@@ -35,7 +35,7 @@ public static class ObservationGeneratorExtensions
             .SetDefault(o => o.Id)
             .Set(o => o.TimeIdentifier, TimeIdentifier.AcademicYear)
             .Set(o => o.Year, f => f.Random.Int(2016, 2022))
-            .Set(o => o.CsvRow, f => f.IndexFaker + 1);
+            .Set(o => o.CsvRow, f => f.IndexFaker + 2);
 
     public static InstanceSetters<Observation> SetSubject(
         this InstanceSetters<Observation> setters,

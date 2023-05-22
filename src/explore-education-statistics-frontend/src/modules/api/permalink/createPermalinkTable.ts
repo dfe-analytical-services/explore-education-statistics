@@ -11,8 +11,8 @@ import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataResponse } from '@common/services/tableBuilderService';
 
 interface SuccessBody {
-  table: TableJson;
-  title: string;
+  json: TableJson;
+  caption: string;
 }
 
 /**
@@ -55,10 +55,10 @@ export default async function createPermalinkTable(
       results: fullTable.results,
     });
 
-    const title = generateTableTitle(fullTable.subjectMeta);
+    const caption = generateTableTitle(fullTable.subjectMeta);
 
-    if (tableJson && title) {
-      return res.status(200).send({ table: tableJson, title });
+    if (tableJson && caption) {
+      return res.status(200).send({ json: tableJson, caption });
     }
     return res.status(500).send({ message: 'Cannot build table', status: 500 });
   } catch (error) {

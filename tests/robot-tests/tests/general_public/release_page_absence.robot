@@ -26,7 +26,7 @@ Navigate to Absence publication
 
 Validate title
     user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
-    user waits until page contains title caption    Academic Year 2016/17
+    user waits until page contains title caption    Academic year 2016/17
 
 Validate URL
     user checks url contains    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
@@ -46,7 +46,6 @@ Validate Email alerts link
 Validate "About these statistics" -- Number of other releases
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
-
     user checks number of other releases is correct    6
     user opens details dropdown    View releases (6)
     user checks other release is shown in position    Academic year 2014/15    1
@@ -107,10 +106,7 @@ Validate absence_in_prus.csv file can be downloaded
 Validate headlines -- Summary tab key stats
     [Documentation]    DFE-915    EES-806    EES-1508    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
-
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
-
-    user clicks element    id:releaseHeadlines-charts-tab
 
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    %{WAIT_MEDIUM}
     user checks key stat guidance    1    What is overall absence?
@@ -127,7 +123,6 @@ Validate headlines -- Summary tab key stats
 Validate headlines -- Summary tab content
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    NotAgainstPreProd    Failing
-
     user checks headline summary contains    pupils missed on average 8.2 school days
     user checks headline summary contains    overall and unauthorised absence rates up on 2015/16
     user checks headline summary contains    unauthorised absence rise due to higher rates of unauthorised holidays
@@ -308,7 +303,6 @@ Validate Regional and local authority (LA) breakdown table
 Check Regional and local authority (LA) breakdown table has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
-
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls down    500
     user waits until page does not contain loading spinner
@@ -368,7 +362,6 @@ Validate Regional and local authority (LA) breakdown chart
 Check Regional and local authority (LA) breakdown chart has footnotes
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
-
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     ${data_block_chart}=    user gets data block chart from parent    LAD map    ${accordion}
 

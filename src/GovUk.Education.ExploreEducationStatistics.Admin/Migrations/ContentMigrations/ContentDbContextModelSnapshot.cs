@@ -163,6 +163,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ExpectedImportedRows")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier");
 
@@ -170,17 +173,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ImportedRows")
+                    b.Property<int>("ImportedRows")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LastProcessedRowIndex")
                         .HasColumnType("int");
 
                     b.Property<Guid>("MetaFileId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("NumBatches")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RowsPerBatch")
-                        .HasColumnType("int");
 
                     b.Property<int>("StagePercentageComplete")
                         .HasColumnType("int");

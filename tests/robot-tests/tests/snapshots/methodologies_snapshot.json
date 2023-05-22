@@ -116,6 +116,12 @@
           "Early years foundation stage profile results"
         ],
         "topic_heading": "Early years foundation stage profile"
+      },
+      {
+        "methodologies": [
+          "Childcare and early years provider survey"
+        ],
+        "topic_heading": "Early years surveys"
       }
     ]
   },
@@ -208,6 +214,13 @@
           "Admission appeals in England"
         ],
         "topic_heading": "Admission appeals"
+      },
+      {
+        "methodologies": [
+          "Children missing education",
+          "Elective home education"
+        ],
+        "topic_heading": "Elective home education and children missing education"
       },
       {
         "methodologies": [

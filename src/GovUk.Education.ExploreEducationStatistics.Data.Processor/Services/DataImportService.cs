@@ -17,39 +17,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class DataImportService : IDataImportService
     {
         private readonly IDbContextSupplier _dbContextSupplier;
-        private readonly IDatabaseHelper _databaseHelper;
         private readonly ILogger<DataImportService> _logger;
 
         public DataImportService(
             IDbContextSupplier dbContextSupplier,
-            ILogger<DataImportService> logger, 
-            IDatabaseHelper databaseHelper)
+            ILogger<DataImportService> logger)
         {
             _dbContextSupplier = dbContextSupplier;
             _logger = logger;
-            _databaseHelper = databaseHelper;
         }
 
         public async Task FailImport(Guid id, List<DataImportError> errors)
         {
             await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-            var import = await contentDbContext.DataImports.FindAsync(id);
+            
+            var import = await contentDbContext.DataImports.SingleAsync(d => d.Id == id);
+            
             if (import.Status != COMPLETE && import.Status != FAILED)
             {
                 contentDbContext.Update(import);
                 import.Status = FAILED;
-                if (errors != null)
-                {
-                    import.Errors.AddRange(errors);                    
-                }
+                import.Errors.AddRange(errors);                    
+                
                 await contentDbContext.SaveChangesAsync();
             }
         }
 
         public async Task FailImport(Guid id, params string[] errors)
         {
-            await FailImport(id, errors?
-                .Select(error => new DataImportError(error ?? "An unknown error occurred"))
+            await FailImport(id, errors
+                .Select(error => new DataImportError(error))
                 .ToList());
         }
 
@@ -80,88 +77,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return import.Status;
         }
 
-        public async Task Update(Guid id,
-            int rowsPerBatch,
-            int importedRows,
-            int totalRows,
-            int numBatches,
-            HashSet<GeographicLevel> geographicLevels)
+        public async Task Update(
+            Guid id,
+            int? expectedImportedRows = null,
+            int? totalRows = null,
+            HashSet<GeographicLevel>? geographicLevels = null,
+            int? importedRows = null,
+            int? lastProcessedRowIndex = null)
         {
             await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
             var import = await contentDbContext.DataImports.SingleAsync(import => import.Id == id);
             contentDbContext.Update(import);
 
-            import.RowsPerBatch = rowsPerBatch;
-            import.ImportedRows = importedRows;
-            import.TotalRows = totalRows;
-            import.NumBatches = numBatches;
-            import.GeographicLevels = geographicLevels;
+            import.ExpectedImportedRows = expectedImportedRows ?? import.ExpectedImportedRows;
+            import.TotalRows = totalRows ?? import.TotalRows;
+            import.GeographicLevels = geographicLevels ?? import.GeographicLevels;
+            import.ImportedRows = importedRows ?? import.ImportedRows;
+            import.LastProcessedRowIndex = lastProcessedRowIndex ?? import.LastProcessedRowIndex;
 
             await contentDbContext.SaveChangesAsync();
         }
 
         public async Task UpdateStatus(Guid id, DataImportStatus newStatus, double percentageComplete)
         {
-            await using var contentDbContext = _dbContextSupplier.CreateDbContext<ContentDbContext>();
-            await _databaseHelper.ExecuteWithExclusiveLock(
-                contentDbContext,
-                $"LockForImport-{id}",
-                async context =>
-                {
-                    var import = await context.DataImports
-                        .Include(i => i.File)
-                        .SingleAsync(i => i.Id == id);
+            await using var context = _dbContextSupplier.CreateDbContext<ContentDbContext>();
+            
+            var import = await context.DataImports
+                .Include(i => i.File)
+                .SingleAsync(i => i.Id == id);
 
-                    var filename = import.File.Filename;
+            var filename = import.File.Filename;
 
-                    var percentageCompleteBefore = import.StagePercentageComplete;
-                    var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
+            var percentageCompleteBefore = import.StagePercentageComplete;
+            var percentageCompleteAfter = (int) Math.Clamp(percentageComplete, 0, 100);
 
-                    // Ignore updating if already finished
-                    if (import.Status.IsFinished())
-                    {
-                        _logger.LogWarning(
-                            $"Update: {filename} {import.Status} ({percentageCompleteBefore}%) -> " +
-                            $"{newStatus} ({percentageCompleteAfter}%) ignored as this import is already finished");
-                        return;
-                    }
+            // Ignore updating if already finished, or in the process of aborting and this status update isn't a
+            // finishing status update. 
+            if (import.Status.IsFinished() || (import.Status.IsAborting() && !newStatus.IsFinished()))
+            {
+                _logger.LogWarning(
+                    "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> " +
+                    "{NewStatus} ({PercentageCompleteAfter}%) ignored as this import is already in finished or " +
+                    "completed state state {FinishedImportStatus}",
+                    filename,
+                    import.Status,
+                    percentageCompleteBefore,
+                    newStatus,
+                    percentageCompleteAfter,
+                    import.Status);
+                
+                return;
+            }
 
-                    // Ignore updating if already aborting and the new state is not aborting or finishing
-                    if (import.Status.IsAborting() && !newStatus.IsFinishedOrAborting())
-                    {
-                        _logger.LogWarning(
-                            $"Update: {filename} {import.Status} ({percentageCompleteBefore}%) -> " +
-                            $"{newStatus} ({percentageCompleteAfter}%) ignored as this import is already aborting or is finished");
-                        return;
-                    }
+            // Ignore updating to an equal percentage complete (after rounding) at the same status without logging it
+            if (import.Status == newStatus && percentageCompleteBefore == percentageCompleteAfter)
+            {
+                return;
+            }
 
-                    // Ignore updates if attempting to downgrade from a normal importing state to a lower normal importing state,
-                    // or if the percentage is being set lower or the same as is currently and is the same state
-                    if (!newStatus.IsFinishedOrAborting() &&
-                        (import.Status.CompareTo(newStatus) > 0 ||
-                         import.Status == newStatus && percentageCompleteBefore > percentageCompleteAfter))
-                    {
-                        _logger.LogWarning(
-                            $"Update: {filename} {import.Status} ({percentageCompleteBefore}%) -> " +
-                            $"{newStatus} ({percentageCompleteAfter}%) ignored");
-                        return;
-                    }
+            _logger.LogInformation(
+                "Update: {Filename} {ImportStatus} ({PercentageCompleteBefore}%) -> {NewStatus} ({PercentageCompleteAfter}%)",
+                filename,
+                import.Status,
+                percentageCompleteBefore,
+                newStatus,
+                percentageCompleteAfter);
 
-                    // Ignore updating to an equal percentage complete (after rounding) at the same status without logging it
-                    if (import.Status == newStatus && percentageCompleteBefore == percentageCompleteAfter)
-                    {
-                        return;
-                    }
-
-                    _logger.LogInformation(
-                        $"Update: {filename} {import.Status} ({percentageCompleteBefore}%) -> {newStatus} ({percentageCompleteAfter}%)");
-
-                    import.StagePercentageComplete = percentageCompleteAfter;
-                    import.Status = newStatus;
-                    context.DataImports.Update(import);
-                    await context.SaveChangesAsync();
-                }
-            );
+            import.StagePercentageComplete = percentageCompleteAfter;
+            import.Status = newStatus;
+            context.DataImports.Update(import);
+            await context.SaveChangesAsync();
         }
     }
 }

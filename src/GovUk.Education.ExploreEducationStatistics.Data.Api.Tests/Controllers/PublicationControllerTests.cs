@@ -100,7 +100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var featuredTables = new List<FeaturedTableViewModel>
             {
-                new(Guid.NewGuid(), "name", "description")
+                new
+                (
+                    Id: Guid.NewGuid(),
+                    Name: "name",
+                    Description: "description",
+                    SubjectId: Guid.NewGuid()
+                ),
             };
 
             var (controller, mocks) = BuildControllerAndMocks();
@@ -149,9 +155,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     From = "2020",
                     To = "2022"
                 },
+                new List<string> { "level1" },
+                new List<string> { "filter1", },
+
                 new List<string>
                 {
-                    "level1"
+                    "indicator1", "indicator2", "indicator3", "indicator4",
                 },
                 new FileInfo
                 {

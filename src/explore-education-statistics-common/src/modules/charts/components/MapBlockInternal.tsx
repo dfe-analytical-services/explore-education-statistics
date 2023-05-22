@@ -571,27 +571,29 @@ function generateFeaturesAndDataGroups({
       (acc, { dataSets, filter, geoJson }) => {
         const value = dataSets?.[selectedDataSetKey]?.value;
 
-        if (Number.isFinite(value)) {
-          const matchingDataGroup = dataGroups.find(dataClass => {
-            const roundedValue = Number(value.toFixed(dataClass.decimalPlaces));
-            return (
-              dataClass.minRaw <= roundedValue &&
-              roundedValue <= dataClass.maxRaw
-            );
-          });
+        const matchingDataGroup = Number.isFinite(value)
+          ? dataGroups.find(dataClass => {
+              const roundedValue = Number(
+                value.toFixed(dataClass.decimalPlaces),
+              );
+              return (
+                dataClass.minRaw <= roundedValue &&
+                roundedValue <= dataClass.maxRaw
+              );
+            })
+          : undefined;
 
-          acc.push({
-            ...geoJson,
-            id: filter.id,
-            properties: {
-              ...geoJson.properties,
-              dataSets,
-              // Default to transparent if no match
-              colour: matchingDataGroup?.colour ?? defaultColour,
-              data: value,
-            },
-          });
-        }
+        acc.push({
+          ...geoJson,
+          id: filter.id,
+          properties: {
+            ...geoJson.properties,
+            dataSets,
+            // Default to transparent if no match
+            colour: matchingDataGroup?.colour ?? defaultColour,
+            data: value,
+          },
+        });
 
         return acc;
       },

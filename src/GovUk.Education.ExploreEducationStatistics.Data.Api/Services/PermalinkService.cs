@@ -81,10 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .OnSuccessCombineWith(_ => DownloadPermalink(permalinkId, cancellationToken))
                 .OnSuccess(async tuple =>
                 {
-                    var (permalink, universalTable) = tuple;
-
-                    PermalinkViewModel viewModel = await BuildViewModel(permalink, universalTable);
-                    return viewModel;
+                    var (permalink, table) = tuple;
+                    return await BuildViewModel(permalink, table);
                 });
         }
 
@@ -114,7 +112,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
                 .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                 {
-                    var universalTableTask = _frontendService.CreateUniversalTable(
+                    var subjectMeta = tableResult.SubjectMeta;
+
+                    var frontendTableTask = _frontendService.CreateTable(
                         tableResult,
                         request.Configuration,
                         cancellationToken
@@ -128,14 +128,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         cancellationToken
                     );
 
-                    await Task.WhenAll(universalTableTask, csvMetaTask);
+                    await Task.WhenAll(frontendTableTask, csvMetaTask);
 
-                    var universalTableResult = universalTableTask.Result;
+                    var frontendTableResult = frontendTableTask.Result;
                     var csvMetaResult = csvMetaTask.Result;
 
-                    if (universalTableResult.IsLeft)
+                    if (frontendTableResult.IsLeft)
                     {
-                        return universalTableResult.Left;
+                        return frontendTableResult.Left;
                     }
 
                     if (csvMetaResult.IsLeft)
@@ -143,10 +143,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         return csvMetaResult.Left;
                     }
 
-                    var universalTable = universalTableResult.Right;
+                    var table = frontendTableResult.Right;
                     var csvMeta = csvMetaResult.Right;
 
-                    var subjectMeta = tableResult.SubjectMeta;
+                    // To avoid the frontend processing and returning the footnotes unnecessarily,
+                    // create a new view model with the footnotes added directly
+                    var tableWithFootnotes = table with
+                    {
+                        Footnotes = subjectMeta.Footnotes
+                    };
+
                     var permalink = new Permalink
                     {
                         ReleaseId = releaseId,
@@ -165,13 +171,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     await UploadSnapshot(permalink: permalink,
                         observations: tableResult.Results.ToList(),
                         csvMeta: csvMeta,
-                        universalTable: universalTable,
+                        table: tableWithFootnotes,
                         cancellationToken: cancellationToken);
 
                     await _contentDbContext.SaveChangesAsync(cancellationToken);
-
-                    PermalinkViewModel viewModel = await BuildViewModel(permalink, universalTable);
-                    return viewModel;
+                    return await BuildViewModel(permalink, tableWithFootnotes);
                 });
         }
 
@@ -237,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                     return await DownloadLegacyPermalink(permalinkId, cancellationToken)
                         .OnSuccessCombineWith(legacyPermalink =>
-                            _frontendService.CreateUniversalTable(legacyPermalink, cancellationToken))
+                            _frontendService.CreateTable(legacyPermalink, cancellationToken))
                         .OnSuccessCombineWith(tuple =>
                         {
                             var (legacyPermalink, _) = tuple;
@@ -245,18 +249,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         })
                         .OnSuccessVoid(async tuple =>
                         {
-                            var (legacyPermalink, universalTable, csvMeta) = tuple;
+                            var (legacyPermalink, table, csvMeta) = tuple;
+
+                            // To avoid the frontend processing and returning the footnotes unnecessarily,
+                            // add them to the table view model directly
+                            table = table with
+                            {
+                                Footnotes = legacyPermalink.FullTable.SubjectMeta.Footnotes
+                            };
 
                             await UploadSnapshot(permalink,
-                                legacyPermalink.FullTable.Results,
-                                csvMeta,
-                                universalTable,
-                                cancellationToken);
+                                observations: legacyPermalink.FullTable.Results,
+                                csvMeta: csvMeta,
+                                table: table,
+                                cancellationToken: cancellationToken);
                         });
                 });
         }
 
-        private async Task WriteCsvHeaderRow(CsvWriter csv, PermalinkCsvMetaViewModel meta)
+        private static async Task WriteCsvHeaderRow(CsvWriter csv, PermalinkCsvMetaViewModel meta)
         {
             var headerRow = new ExpandoObject() as IDictionary<string, object>;
 
@@ -465,15 +476,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             };
         }
 
-        private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink, dynamic universalTable)
+        private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink, PermalinkTableViewModel table)
         {
             var status = await GetPermalinkStatus(permalink.SubjectId);
             return new PermalinkViewModel
             {
                 Id = permalink.Id,
                 Created = permalink.Created,
+                DataSetTitle = permalink.DataSetTitle,
+                PublicationTitle = permalink.PublicationTitle,
                 Status = status,
-                Table = universalTable
+                Table = table
             };
         }
 
@@ -551,13 +564,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        private async Task<Either<ActionResult, dynamic>> DownloadPermalink(Guid permalinkId,
+        private async Task<Either<ActionResult, PermalinkTableViewModel>> DownloadPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                // TODO EES-3753 Any settings needed passing into DeserializeObject here?
-                return JsonConvert.DeserializeObject<dynamic>(
+                return JsonConvert.DeserializeObject<PermalinkTableViewModel>(
                     value: await _blobStorageService.DownloadBlobText(
                         containerName: BlobContainers.PermalinkSnapshots,
                         path: $"{permalinkId}.json",
@@ -572,12 +584,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private async Task UploadSnapshot(Permalink permalink,
             List<ObservationViewModel> observations,
             PermalinkCsvMetaViewModel csvMeta,
-            dynamic universalTable,
+            PermalinkTableViewModel table,
             CancellationToken cancellationToken = default)
         {
             await Task.WhenAll(
                 UploadTableCsv(permalink, observations, csvMeta, cancellationToken),
-                UploadTableJson(permalink, universalTable, cancellationToken)
+                UploadTable(permalink, table, cancellationToken)
             );
 
             if (permalink.Legacy)
@@ -610,13 +622,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             );
         }
 
-        private async Task UploadTableJson(Permalink permalink,
-            dynamic universalTable,
+        private async Task UploadTable(Permalink permalink,
+            PermalinkTableViewModel table,
             CancellationToken cancellationToken = default)
         {
             await using var tableStream = new MemoryStream();
             await using var jsonWriter = new JsonTextWriter(new StreamWriter(tableStream, leaveOpen: true));
-            JsonSerializer.CreateDefault().Serialize(jsonWriter, universalTable);
+            JsonSerializer.CreateDefault().Serialize(jsonWriter, table);
             await jsonWriter.FlushAsync(cancellationToken);
 
             await _blobStorageService.UploadStream(

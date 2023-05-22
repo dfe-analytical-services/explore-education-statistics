@@ -12,8 +12,12 @@ public record PermalinkViewModel
 
     public DateTime Created { get; init; }
 
+    public string DataSetTitle { get; init; } = string.Empty;
+
+    public string PublicationTitle { get; init; } = string.Empty;
+
     [JsonConverter(typeof(StringEnumConverter))]
     public PermalinkStatus Status { get; init; }
 
-    public dynamic Table { get; init; }
+    public PermalinkTableViewModel Table { get; init; } = new();
 }

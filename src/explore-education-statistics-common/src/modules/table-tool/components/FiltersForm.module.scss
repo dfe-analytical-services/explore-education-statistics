@@ -1,0 +1,7 @@
+@import '~govuk-frontend/govuk/base';
+
+.hintText {
+  @include govuk-media-query($from: tablet) {
+    max-width: calc(100% - 100px);
+  }
+}

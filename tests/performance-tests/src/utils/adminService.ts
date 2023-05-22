@@ -2,80 +2,19 @@ import { sleep } from 'k6';
 import http, { RefinedResponse } from 'k6/http';
 import HttpClient from './httpClient';
 import TestData from '../tests/testData';
+import {
+  Publication,
+  Release,
+  Topic,
+  ThemeAndTopics,
+  SubjectMeta,
+  TableQuery,
+  OverallStage,
+} from './types';
 
 const applicationJsonHeaders = {
   'Content-Type': 'application/json',
 };
-
-type OverallStage =
-  | 'Validating'
-  | 'Complete'
-  | 'Failed'
-  | 'Invalid'
-  | 'Scheduled'
-  | 'Started'
-  | 'Superseded';
-
-export interface SubjectMeta {
-  filters: {
-    [filter: string]: {
-      options: {
-        [filterGroup: string]: {
-          options: {
-            value: string;
-          }[];
-        };
-      };
-    };
-  };
-  indicators: {
-    [indicatorGroup: string]: {
-      options: {
-        value: string;
-      }[];
-    };
-  };
-  timePeriod: {
-    options: {
-      code: string;
-      year: number;
-    }[];
-  };
-  locations: {
-    [geographicLevel: string]: {
-      options: {
-        id?: string;
-        level?: string;
-        options?: {
-          id: string;
-        }[];
-      }[];
-    };
-  };
-}
-
-interface Topic {
-  id: string;
-  title: string;
-  themeId: string;
-}
-
-interface ThemeAndTopics {
-  id: string;
-  title: string;
-  topics: Topic[];
-}
-
-interface Release {
-  id: string;
-  year: number;
-  approvalStatus: string;
-}
-
-interface Publication {
-  id: string;
-  title: string;
-}
 
 type DataFileImportHandler = (
   adminService: AdminService,
@@ -578,42 +517,10 @@ export class AdminService {
     };
   }
 
-  tableQuery({
-    releaseId,
-    subjectId,
-    filterIds,
-    indicatorIds,
-    locationIds,
-    startYear,
-    startCode,
-    endYear,
-    endCode,
-  }: {
-    releaseId: string;
-    subjectId: string;
-    filterIds: string[];
-    indicatorIds: string[];
-    locationIds: string[];
-    startYear: number;
-    startCode: string;
-    endYear: number;
-    endCode: string;
-  }) {
+  tableQuery({ releaseId, query }: { releaseId: string; query: TableQuery }) {
     const { response, json } = this.client.post<{ results: { id: string }[] }>(
       `/api/data/tablebuilder/release/${releaseId}`,
-      JSON.stringify({
-        filters: filterIds,
-        includeGeoJson: false,
-        indicators: indicatorIds,
-        locationIds,
-        subjectId,
-        timePeriod: {
-          startYear,
-          startCode,
-          endYear,
-          endCode,
-        },
-      }),
+      JSON.stringify(query),
       applicationJsonHeaders,
     );
     return {

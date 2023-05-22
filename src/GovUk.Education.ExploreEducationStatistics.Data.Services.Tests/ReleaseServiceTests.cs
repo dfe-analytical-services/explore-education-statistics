@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -44,10 +45,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 DataGuidance = "Guidance 2"
             };
 
+            var subject1Filter1 = new Filter
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 1",
+            };
+
+            var subject1Filter2 = new Filter
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 2",
+            };
+
+            var subject1IndicatorGroup1 = new IndicatorGroup
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 indicator group 1",
+                Indicators = new List<Indicator>
+                {
+                    new Indicator { Label = "subject 1 indicator group 1 indicator 1" },
+                    new Indicator { Label = "subject 1 indicator group 1 indicator 2" },
+                    new Indicator { Label = "subject 1 indicator group 1 indicator 3" },
+                }
+            };
+
+            var subject1IndicatorGroup2 = new IndicatorGroup
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 indicator group 2",
+                Indicators = new List<Indicator>
+                {
+                    new Indicator { Label = "subject 1 indicator group 2 indicator 1" },
+                    new Indicator { Label = "subject 1 indicator group 2 indicator 2" },
+                }
+            };
+
+            var subject2Filter1 = new Filter
+            {
+                Subject = releaseSubject2.Subject,
+                Label = "subject 2 filter 1",
+            };
+
+            var subject2IndicatorGroup1 = new IndicatorGroup
+            {
+                Subject = releaseSubject2.Subject,
+                Label = "subject 2 indicator group 1",
+                Indicators = new List<Indicator>
+                {
+                    new Indicator { Label = "subject 2 indicator group 1 indicator 1" },
+                }
+            };
+
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.Filter.AddRangeAsync(
+                    subject1Filter1, subject1Filter2, subject2Filter1);
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(
+                    subject1IndicatorGroup1, subject1IndicatorGroup2, subject2IndicatorGroup1);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -155,6 +211,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Local Authority", subjects[0].GeographicLevels[0]);
                 Assert.Equal("Local Authority District", subjects[0].GeographicLevels[1]);
 
+                Assert.Equal(2, subjects[0].Filters.Count);
+                Assert.Equal("subject 1 filter 1", subjects[0].Filters[0]);
+                Assert.Equal("subject 1 filter 2", subjects[0].Filters[1]);
+
+                Assert.Equal(5, subjects[0].Indicators.Count);
+                Assert.Equal("subject 1 indicator group 1 indicator 1", subjects[0].Indicators[0]);
+                Assert.Equal("subject 1 indicator group 1 indicator 2", subjects[0].Indicators[1]);
+                Assert.Equal("subject 1 indicator group 1 indicator 3", subjects[0].Indicators[2]);
+                Assert.Equal("subject 1 indicator group 2 indicator 1", subjects[0].Indicators[3]);
+                Assert.Equal("subject 1 indicator group 2 indicator 2", subjects[0].Indicators[4]);
+
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
                 Assert.Equal(releaseFile2.Name, subjects[1].Name);
                 Assert.Equal(releaseFile2.File.Id, subjects[1].File.Id);
@@ -168,6 +235,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Single(subjects[1].GeographicLevels);
                 Assert.Equal("National", subjects[1].GeographicLevels[0]);
+
+                Assert.Single(subjects[1].Filters);
+                Assert.Equal("subject 2 filter 1", subjects[1].Filters[0]);
+
+                Assert.Single(subjects[1].Indicators);
+                Assert.Equal("subject 2 indicator group 1 indicator 1", subjects[1].Indicators[0]);
             }
         }
 
@@ -493,20 +566,247 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task ListFeaturedTables()
+        public async Task ListSubjects_FilterOrder()
         {
-            var releaseId = Guid.NewGuid();
-            var release = new Release
+            var statisticsRelease = new Data.Model.Release();
+
+            var subject1Filter1Id = Guid.NewGuid();
+            var subject1Filter2Id = Guid.NewGuid();
+            var subject1Filter3Id = Guid.NewGuid();
+
+            var releaseSubject1 = new ReleaseSubject
             {
-                Id = releaseId
+                Release = statisticsRelease,
+                Subject = new Subject(),
+                DataGuidance = "Guidance 1",
+                FilterSequence = new List<FilterSequenceEntry>
+                {
+                    new (subject1Filter2Id, new List<FilterGroupSequenceEntry>()),
+                    new (subject1Filter1Id, new List<FilterGroupSequenceEntry>()),
+                    new (subject1Filter3Id, new List<FilterGroupSequenceEntry>()),
+                },
+            };
+
+            var subject1Filter1 = new Filter
+            {
+                Id = subject1Filter1Id,
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 1",
+            };
+
+            var subject1Filter2 = new Filter
+            {
+                Id = subject1Filter2Id,
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 2",
+            };
+
+            var subject1Filter3 = new Filter
+            {
+                Id = subject1Filter3Id,
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 3",
+            };
+
+            var subject1IndicatorGroup1 = new IndicatorGroup
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 indicator group 1",
+                Indicators = new List<Indicator>
+                {
+                    new() { Label = "subject 1 indicator group 1 indicator 1" },
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1);
+                await statisticsDbContext.Filter.AddRangeAsync(
+                    subject1Filter1, subject1Filter2, subject1Filter3);
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup1);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentRelease = new Release
+            {
+                Id = statisticsRelease.Id,
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = contentRelease,
+                Name = "Subject 1",
+                File = new File
+                {
+                    Filename = "data1.csv",
+                    ContentLength = 10240,
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject1.Subject.Id
+                },
+            };
+
+            var import1 = new DataImport
+            {
+                File = releaseFile1.File,
+                Status = DataImportStatus.COMPLETE
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(releaseFile1);
+                await contentDbContext.AddRangeAsync(import1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext
+                );
+
+                var result = await service.ListSubjects(contentRelease.Id);
+                var subjects = result.AssertRight();
+                var subject = Assert.Single(subjects);
+
+                Assert.Equal(3, subject.Filters.Count);
+                Assert.Equal("subject 1 filter 2", subject.Filters[0]);
+                Assert.Equal("subject 1 filter 1", subject.Filters[1]);
+                Assert.Equal("subject 1 filter 3", subject.Filters[2]);
+            }
+        }
+
+        [Fact]
+        public async Task ListSubjects_IndicatorOrder()
+        {
+            var statisticsRelease = new Data.Model.Release();
+
+            var subject1Indicator1 = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "subject 1 indicator 1",
+            };
+            var subject1Indicator2 = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "subject 1 indicator 2",
+            };
+            var subject1Indicator3 = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "subject 1 indicator 3",
             };
 
             var releaseSubject1 = new ReleaseSubject
             {
-                Release = new Data.Model.Release
+                Release = statisticsRelease,
+                Subject = new Subject(),
+                DataGuidance = "Guidance 1",
+                IndicatorSequence = new List<IndicatorGroupSequenceEntry>
                 {
-                    Id = releaseId
+                    new(Guid.NewGuid(), new List<Guid> { subject1Indicator2.Id, subject1Indicator1.Id, }),
+                    new(Guid.NewGuid(), new List<Guid> { subject1Indicator3.Id, }),
                 },
+            };
+
+            var subject1Filter1 = new Filter
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 filter 1",
+            };
+
+            var subject1IndicatorGroup1 = new IndicatorGroup
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 indicator group 1",
+                Indicators = new List<Indicator>
+                {
+                    subject1Indicator1, subject1Indicator2,
+                },
+            };
+
+            var subject1IndicatorGroup2 = new IndicatorGroup
+            {
+                Subject = releaseSubject1.Subject,
+                Label = "subject 1 indicator group 2",
+                Indicators = new List<Indicator> { subject1Indicator3 },
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1);
+                await statisticsDbContext.Filter.AddRangeAsync(
+                    subject1Filter1);
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(
+                    subject1IndicatorGroup1, subject1IndicatorGroup2);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentRelease = new Release
+            {
+                Id = statisticsRelease.Id,
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = contentRelease,
+                Name = "Subject 1",
+                File = new File
+                {
+                    Filename = "data1.csv",
+                    ContentLength = 10240,
+                    Type = FileType.Data,
+                    SubjectId = releaseSubject1.Subject.Id
+                },
+            };
+
+            var import1 = new DataImport
+            {
+                File = releaseFile1.File,
+                Status = DataImportStatus.COMPLETE
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(releaseFile1);
+                await contentDbContext.AddRangeAsync(import1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext
+                );
+
+                var result = await service.ListSubjects(contentRelease.Id);
+                var subjects = result.AssertRight();
+                var subject = Assert.Single(subjects);
+
+                Assert.Equal(3, subject.Indicators.Count);
+                Assert.Equal("subject 1 indicator 2", subject.Indicators[0]);
+                Assert.Equal("subject 1 indicator 1", subject.Indicators[1]);
+                Assert.Equal("subject 1 indicator 3", subject.Indicators[2]);
+            }
+        }
+
+        [Fact]
+        public async Task ListFeaturedTables()
+        {
+            var releaseId = Guid.NewGuid();
+            var release = new Release { Id = releaseId };
+            var statRelease = new Data.Model.Release { Id = releaseId };
+
+            var releaseSubject1 = new ReleaseSubject
+            {
+                Release = statRelease,
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -514,10 +814,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
             var releaseSubject2 = new ReleaseSubject
             {
-                Release = new Data.Model.Release
-                {
-                    Id = releaseId
-                },
+                Release = statRelease,
                 Subject = new Subject
                 {
                     Id = Guid.NewGuid()
@@ -575,7 +872,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 HighlightDescription = "Test highlight description 2",
                 Query = new ObservationQueryContext
                 {
-                    SubjectId = releaseSubject1.Subject.Id,
+                    SubjectId = releaseSubject2.Subject.Id,
                 }
             };
 
@@ -605,7 +902,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(releaseSubject1);
+                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -626,10 +923,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(dataBlock1.Id, featuredTables[0].Id);
                 Assert.Equal(dataBlock1.HighlightName, featuredTables[0].Name);
                 Assert.Equal(dataBlock1.HighlightDescription, featuredTables[0].Description);
+                Assert.Equal(releaseSubject1.SubjectId, featuredTables[0].SubjectId);
 
                 Assert.Equal(dataBlock2.Id, featuredTables[1].Id);
                 Assert.Equal(dataBlock2.HighlightName, featuredTables[1].Name);
                 Assert.Equal(dataBlock2.HighlightDescription, featuredTables[1].Description);
+                Assert.Equal(releaseSubject2.SubjectId, featuredTables[1].SubjectId);
             }
         }
 

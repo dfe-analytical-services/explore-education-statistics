@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -46,21 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         public static string Path(this File file)
         {
             return $"{FilesPath(file.RootPath, file.Type)}{file.Id}";
-        }
-
-        public static string BatchesPath(this File file)
-        {
-            return $"{file.RootPath}/{Data.GetEnumLabel()}/batches/{file.Id}/";
-        }
-
-        public static string BatchPath(this File file, int batchNumber)
-        {
-            return $"{file.BatchesPath()}{file.Id}_{batchNumber:000000}";
-        }
-
-        public static string PublicPath(this File file, Release release)
-        {
-            return file.PublicPath(release.Id);
         }
 
         public static string PublicPath(this File file, Guid releaseId)

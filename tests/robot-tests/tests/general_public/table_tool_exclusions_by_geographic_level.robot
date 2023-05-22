@@ -24,7 +24,7 @@ Validate "Exclusions by geographic level" subject details
     user opens details dropdown    More details    css:[data-testid="Radio item for Exclusions by geographic level"]
     ${details}=    user gets details content element    More details
     ...    css:[data-testid="Radio item for Exclusions by geographic level"]
-    user checks summary list contains    Geographic levels    Local Authority; National; Regional    ${details}
+    user checks summary list contains    Geographic levels    Local authority; National; Regional    ${details}
     user checks summary list contains    Time period    2006/07 to 2016/17    ${details}
 
 Select subject "Exclusions by geographic level"
@@ -34,16 +34,16 @@ Select subject "Exclusions by geographic level"
     user checks previous table tool step contains    2    Subject    Exclusions by geographic level
 
 Select all LA Locations
-    user opens details dropdown    Local Authority
+    user opens details dropdown    Local authority
     user clicks button    Select all 156 options
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    4    Choose time period
-    user checks previous table tool step contains    3    Local Authority    Barking and Dagenham
-    user checks previous table tool step contains    3    Local Authority    Barnet
-    user checks previous table tool step contains    3    Local Authority    Barnsley
-    user checks previous table tool step contains    3    Local Authority    Bath and North East Somerset
-    user checks previous table tool step contains    3    Local Authority    Bedford
-    user checks previous table tool step contains    3    Local Authority    Show 151 more locations
+    user checks previous table tool step contains    3    Local authority    Barking and Dagenham
+    user checks previous table tool step contains    3    Local authority    Barnet
+    user checks previous table tool step contains    3    Local authority    Barnsley
+    user checks previous table tool step contains    3    Local authority    Bath and North East Somerset
+    user checks previous table tool step contains    3    Local authority    Bedford
+    user checks previous table tool step contains    3    Local authority    Show 151 more locations
 
 Select all available Time periods
     user chooses select option    id:timePeriodForm-start    2006/07
@@ -93,7 +93,7 @@ Go back to Locations step
     user waits until table tool wizard step is available    3    Choose locations
 
 Unselect all LA Locations
-    user opens details dropdown    Local Authority
+    user opens details dropdown    Local authority
     user clicks button    Unselect all 156 options
     user checks page contains element
     ...    xpath://*[@class="govuk-error-message" and text()="Select at least one location"]
@@ -104,9 +104,9 @@ Select Locations LA, Bury, Sheffield, York
     user clicks checkbox    York
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    4    Choose time period
-    user checks previous table tool step contains    3    Local Authority    Bury
-    user checks previous table tool step contains    3    Local Authority    Sheffield
-    user checks previous table tool step contains    3    Local Authority    York
+    user checks previous table tool step contains    3    Local authority    Bury
+    user checks previous table tool step contains    3    Local authority    Sheffield
+    user checks previous table tool step contains    3    Local authority    York
 
 Select new start and end date
     user chooses select option    id:timePeriodForm-start    2006/07

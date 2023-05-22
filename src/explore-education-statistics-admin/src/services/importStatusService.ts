@@ -9,7 +9,6 @@ export interface ImportStatus {
   releaseTitle: string;
   dataFileName: string;
   totalRows?: number;
-  batches: number;
   status: number;
   stagePercentageComplete: number;
   percentageComplete: number;
