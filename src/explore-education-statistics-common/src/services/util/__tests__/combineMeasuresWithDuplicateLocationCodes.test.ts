@@ -22,7 +22,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
       .join(' / ');
   };
 
-  test('does not affect results that do not contain locations with duplicate levels and codes', () => {
+  test('does not affect results that only contain locations without duplicate levels and codes', () => {
     const tableDataResult: TableDataResult[] = [
       {
         filters: ['filter-1', 'filter-2'],
@@ -143,7 +143,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         },
         location: {
           provider: {
-            code: 'duplicate-provider-code',
+            code: 'duplicate-provider-code-1',
             name: 'Provider 1',
           },
         },
@@ -159,7 +159,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         },
         location: {
           provider: {
-            code: 'duplicate-provider-code',
+            code: 'duplicate-provider-code-1',
             name: 'Provider 2',
           },
         },
@@ -180,12 +180,81 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
         },
       },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'provider',
+        timePeriod: '',
+        measures: {
+          'indicator-1': '100',
+          'indicator-2': '110',
+          'indicator-3': '120',
+        },
+        location: {
+          provider: {
+            code: 'duplicate-provider-code-2',
+            name: 'Provider 3',
+          },
+        },
+      },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'provider',
+        timePeriod: '',
+        measures: {
+          'indicator-1': '130',
+          'indicator-2': '140',
+          'indicator-3': '150',
+        },
+        location: {
+          provider: {
+            code: 'duplicate-provider-code-2',
+            name: 'Provider 4',
+          },
+        },
+      },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'provider',
+        timePeriod: '',
+        measures: {
+          'indicator-1': '160',
+          'indicator-2': '170',
+          'indicator-3': '180',
+        },
+        location: {
+          provider: {
+            code: 'provider-5',
+            name: 'Provider 5',
+          },
+        },
+      },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'provider',
+        timePeriod: '',
+        measures: {
+          'indicator-1': '190',
+          'indicator-2': '200',
+          'indicator-3': '210',
+        },
+        location: {
+          provider: {
+            code: 'provider-6',
+            name: 'Provider 6',
+          },
+        },
+      },
     ];
 
     const deduplicatedLocations: LocationFilter[] = [
       new LocationFilter({
-        value: 'duplicate-provider-code',
+        value: 'duplicate-provider-code-1',
         label: 'Provider 1 / Provider 2',
+        level: 'provider',
+      }),
+      new LocationFilter({
+        value: 'duplicate-provider-code-2',
+        label: 'Provider 3 / Provider 4',
         level: 'provider',
       }),
     ];
@@ -212,14 +281,62 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         geographicLevel: 'provider',
         timePeriod: '',
         measures: {
+          'indicator-1': '160',
+          'indicator-2': '170',
+          'indicator-3': '180',
+        },
+        location: {
+          provider: {
+            code: 'provider-5',
+            name: 'Provider 5',
+          },
+        },
+      },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'provider',
+        timePeriod: '',
+        measures: {
+          'indicator-1': '190',
+          'indicator-2': '200',
+          'indicator-3': '210',
+        },
+        location: {
+          provider: {
+            code: 'provider-6',
+            name: 'Provider 6',
+          },
+        },
+      },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'provider',
+        timePeriod: '',
+        measures: {
           'indicator-1': '10 / 40',
           'indicator-2': '20 / 50',
           'indicator-3': '30 / 60',
         },
         location: {
           provider: {
-            code: 'duplicate-provider-code',
+            code: 'duplicate-provider-code-1',
             name: 'Provider 1 / Provider 2',
+          },
+        },
+      },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'provider',
+        timePeriod: '',
+        measures: {
+          'indicator-1': '100 / 130',
+          'indicator-2': '110 / 140',
+          'indicator-3': '120 / 150',
+        },
+        location: {
+          provider: {
+            code: 'duplicate-provider-code-2',
+            name: 'Provider 3 / Provider 4',
           },
         },
       },
@@ -340,7 +457,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
           location: {
             provider: {
-              code: 'duplicate-provider-code',
+              code: 'duplicate-provider-code-1',
               name: 'Provider 1',
             },
           },
@@ -356,8 +473,104 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
           location: {
             provider: {
-              code: 'duplicate-provider-code',
+              code: 'duplicate-provider-code-1',
               name: 'Provider 2',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-1',
+          measures: {
+            'indicator-1': '70',
+            'indicator-2': '80',
+            'indicator-3': '90',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code-2',
+              name: 'Provider 3',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-2',
+          measures: {
+            'indicator-1': '100',
+            'indicator-2': '110',
+            'indicator-3': '120',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code-2',
+              name: 'Provider 4',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-1',
+          measures: {
+            'indicator-1': '130',
+            'indicator-2': '140',
+            'indicator-3': '150',
+          },
+          location: {
+            provider: {
+              code: 'provider-5',
+              name: 'Provider 5',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-2',
+          measures: {
+            'indicator-1': '160',
+            'indicator-2': '170',
+            'indicator-3': '180',
+          },
+          location: {
+            provider: {
+              code: 'provider-5',
+              name: 'Provider 5',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-1',
+          measures: {
+            'indicator-1': '190',
+            'indicator-2': '200',
+            'indicator-3': '210',
+          },
+          location: {
+            provider: {
+              code: 'provider-6',
+              name: 'Provider 6',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-2',
+          measures: {
+            'indicator-1': '220',
+            'indicator-2': '230',
+            'indicator-3': '240',
+          },
+          location: {
+            provider: {
+              code: 'provider-6',
+              name: 'Provider 6',
             },
           },
         },
@@ -365,13 +578,82 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
 
       const deduplicatedLocations: LocationFilter[] = [
         new LocationFilter({
-          value: 'duplicate-provider-code',
+          value: 'duplicate-provider-code-1',
           label: 'Provider 1 / Provider 2',
+          level: 'provider',
+        }),
+        new LocationFilter({
+          value: 'duplicate-provider-code-2',
+          label: 'Provider 3 / Provider 4',
           level: 'provider',
         }),
       ];
 
       const expectedMergedResults = [
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-1',
+          measures: {
+            'indicator-1': '130',
+            'indicator-2': '140',
+            'indicator-3': '150',
+          },
+          location: {
+            provider: {
+              code: 'provider-5',
+              name: 'Provider 5',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-2',
+          measures: {
+            'indicator-1': '160',
+            'indicator-2': '170',
+            'indicator-3': '180',
+          },
+          location: {
+            provider: {
+              code: 'provider-5',
+              name: 'Provider 5',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-1',
+          measures: {
+            'indicator-1': '190',
+            'indicator-2': '200',
+            'indicator-3': '210',
+          },
+          location: {
+            provider: {
+              code: 'provider-6',
+              name: 'Provider 6',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-2',
+          measures: {
+            'indicator-1': '220',
+            'indicator-2': '230',
+            'indicator-3': '240',
+          },
+          location: {
+            provider: {
+              code: 'provider-6',
+              name: 'Provider 6',
+            },
+          },
+        },
         {
           filters: ['filter-1', 'filter-2'],
           geographicLevel: 'provider',
@@ -383,7 +665,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
           location: {
             provider: {
-              code: 'duplicate-provider-code',
+              code: 'duplicate-provider-code-1',
               name: 'Provider 1 / Provider 2',
             },
           },
@@ -399,8 +681,40 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
           location: {
             provider: {
-              code: 'duplicate-provider-code',
+              code: 'duplicate-provider-code-1',
               name: 'Provider 1 / Provider 2',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-1',
+          measures: {
+            'indicator-1': '70 / 0',
+            'indicator-2': '80 / 0',
+            'indicator-3': '90 / 0',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code-2',
+              name: 'Provider 3 / Provider 4',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: 'time-period-2',
+          measures: {
+            'indicator-1': '0 / 100',
+            'indicator-2': '0 / 110',
+            'indicator-3': '0 / 120',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code-2',
+              name: 'Provider 3 / Provider 4',
             },
           },
         },
@@ -423,7 +737,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         {
           filters: ['filter-1', 'filter-2'],
           geographicLevel: 'provider',
-          timePeriod: 'time-period-1',
+          timePeriod: '',
           measures: {
             'indicator-1': '10',
             'indicator-2': '20',
@@ -431,7 +745,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
           location: {
             provider: {
-              code: 'duplicate-provider-code',
+              code: 'duplicate-provider-code-1',
               name: 'Provider 1',
             },
           },
@@ -439,7 +753,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         {
           filters: ['filter-2', 'filter-3'],
           geographicLevel: 'provider',
-          timePeriod: 'time-period-2',
+          timePeriod: '',
           measures: {
             'indicator-1': '40',
             'indicator-2': '50',
@@ -447,8 +761,104 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
           location: {
             provider: {
-              code: 'duplicate-provider-code',
+              code: 'duplicate-provider-code-1',
               name: 'Provider 2',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '70',
+            'indicator-2': '80',
+            'indicator-3': '90',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code-2',
+              name: 'Provider 3',
+            },
+          },
+        },
+        {
+          filters: ['filter-2', 'filter-3'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '100',
+            'indicator-2': '110',
+            'indicator-3': '120',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code-2',
+              name: 'Provider 4',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '130',
+            'indicator-2': '140',
+            'indicator-3': '150',
+          },
+          location: {
+            provider: {
+              code: 'provider-5',
+              name: 'Provider 5',
+            },
+          },
+        },
+        {
+          filters: ['filter-2', 'filter-3'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '160',
+            'indicator-2': '170',
+            'indicator-3': '180',
+          },
+          location: {
+            provider: {
+              code: 'provider-5',
+              name: 'Provider 5',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '190',
+            'indicator-2': '200',
+            'indicator-3': '210',
+          },
+          location: {
+            provider: {
+              code: 'provider-6',
+              name: 'Provider 6',
+            },
+          },
+        },
+        {
+          filters: ['filter-2', 'filter-3'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '220',
+            'indicator-2': '230',
+            'indicator-3': '240',
+          },
+          location: {
+            provider: {
+              code: 'provider-6',
+              name: 'Provider 6',
             },
           },
         },
@@ -456,8 +866,13 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
 
       const deduplicatedLocations: LocationFilter[] = [
         new LocationFilter({
-          value: 'duplicate-provider-code',
+          value: 'duplicate-provider-code-1',
           label: 'Provider 1 / Provider 2',
+          level: 'provider',
+        }),
+        new LocationFilter({
+          value: 'duplicate-provider-code-2',
+          label: 'Provider 3 / Provider 4',
           level: 'provider',
         }),
       ];
@@ -466,7 +881,71 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         {
           filters: ['filter-1', 'filter-2'],
           geographicLevel: 'provider',
-          timePeriod: 'time-period-1',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '130',
+            'indicator-2': '140',
+            'indicator-3': '150',
+          },
+          location: {
+            provider: {
+              code: 'provider-5',
+              name: 'Provider 5',
+            },
+          },
+        },
+        {
+          filters: ['filter-2', 'filter-3'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '160',
+            'indicator-2': '170',
+            'indicator-3': '180',
+          },
+          location: {
+            provider: {
+              code: 'provider-5',
+              name: 'Provider 5',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '190',
+            'indicator-2': '200',
+            'indicator-3': '210',
+          },
+          location: {
+            provider: {
+              code: 'provider-6',
+              name: 'Provider 6',
+            },
+          },
+        },
+        {
+          filters: ['filter-2', 'filter-3'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '220',
+            'indicator-2': '230',
+            'indicator-3': '240',
+          },
+          location: {
+            provider: {
+              code: 'provider-6',
+              name: 'Provider 6',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
           measures: {
             'indicator-1': '10 / 0',
             'indicator-2': '20 / 0',
@@ -474,7 +953,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
           location: {
             provider: {
-              code: 'duplicate-provider-code',
+              code: 'duplicate-provider-code-1',
               name: 'Provider 1 / Provider 2',
             },
           },
@@ -482,7 +961,7 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
         {
           filters: ['filter-2', 'filter-3'],
           geographicLevel: 'provider',
-          timePeriod: 'time-period-2',
+          timePeriod: '',
           measures: {
             'indicator-1': '0 / 40',
             'indicator-2': '0 / 50',
@@ -490,8 +969,40 @@ describe('combineMeasuresWithDuplicateLocationCodes', () => {
           },
           location: {
             provider: {
-              code: 'duplicate-provider-code',
+              code: 'duplicate-provider-code-1',
               name: 'Provider 1 / Provider 2',
+            },
+          },
+        },
+        {
+          filters: ['filter-1', 'filter-2'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '70 / 0',
+            'indicator-2': '80 / 0',
+            'indicator-3': '90 / 0',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code-2',
+              name: 'Provider 3 / Provider 4',
+            },
+          },
+        },
+        {
+          filters: ['filter-2', 'filter-3'],
+          geographicLevel: 'provider',
+          timePeriod: '',
+          measures: {
+            'indicator-1': '0 / 100',
+            'indicator-2': '0 / 110',
+            'indicator-3': '0 / 120',
+          },
+          location: {
+            provider: {
+              code: 'duplicate-provider-code-2',
+              name: 'Provider 3 / Provider 4',
             },
           },
         },
