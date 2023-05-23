@@ -1419,6 +1419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("application/pdf", fileStreamResult.ContentType);
                 Assert.Equal("ancillary.pdf", fileStreamResult.FileDownloadName);
+                Assert.IsType<MemoryStream>(fileStreamResult.FileStream);
                 Assert.Equal("Test file content", fileStreamResult.FileStream.ReadToEnd());
             }
         }
@@ -1467,6 +1468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("application/pdf", fileStreamResult.ContentType);
                 Assert.Equal("Ancillary 1.pdf", fileStreamResult.FileDownloadName);
+                Assert.IsType<MemoryStream>(fileStreamResult.FileStream);
                 Assert.Equal("Test file content", fileStreamResult.FileStream.ReadToEnd());
             }
         }
@@ -2591,10 +2593,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var releaseFile = await contentDbContext.ReleaseFiles
                     .Include(rf => rf.File)
                     .SingleOrDefaultAsync(rf =>
-                    rf.ReleaseId == release.Id
-                    && rf.File.Filename == filename
-                    && rf.File.Type == Ancillary
-                );
+                        rf.ReleaseId == release.Id
+                        && rf.File.Filename == filename
+                        && rf.File.Type == Ancillary
+                    );
 
                 Assert.NotNull(releaseFile);
                 var file = releaseFile.File;
@@ -2603,6 +2605,120 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("application/pdf", file.ContentType);
                 Assert.InRange(DateTime.UtcNow.Subtract(file.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, file.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task ReplaceAncillary()
+        {
+            var release = new Release();
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Filename = "oldAncillary.csv",
+                    Type = Ancillary,
+                    ContentType = "text/csv",
+                    ContentLength = 1024,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                },
+                Name = "Ancillary name",
+                Summary = "Ancillary summary",
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var newFormFile = CreateFormFileMock("newAncillary.pdf", "application/pdf").Object;
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
+
+            blobStorageService.Setup(mock =>
+                mock.UploadFile(PrivateReleaseFiles,
+                    It.Is<string>(path =>
+                        path.Contains(FilesPath(release.Id, Ancillary))),
+                    newFormFile
+                )).Returns(Task.CompletedTask);
+
+            fileUploadsValidatorService.Setup(mock =>
+                    mock.ValidateFileForUpload(newFormFile, Ancillary))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+
+                var result = await service.ReplaceAncillary(
+                    release.Id,
+                    releaseFile.FileId,
+                    newFile: newFormFile
+                );
+
+                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+
+                var fileInfo = result.AssertRight();
+
+                fileUploadsValidatorService.Verify(mock =>
+                    mock.ValidateFileForUpload(newFormFile, Ancillary), Times.Once);
+
+                blobStorageService.Verify(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(release.Id, Ancillary))),
+                        newFormFile
+                    ), Times.Once);
+
+                Assert.True(fileInfo.Id.HasValue);
+                Assert.Equal("pdf", fileInfo.Extension);
+                Assert.Equal("newAncillary.pdf", fileInfo.FileName);
+                Assert.Equal("Ancillary name", fileInfo.Name);
+                Assert.Equal("Ancillary summary", fileInfo.Summary);
+                Assert.Equal("10 Kb", fileInfo.Size);
+                Assert.Equal(Ancillary, fileInfo.Type);
+                Assert.Equal("test@test.com", fileInfo.UserName);
+                Assert.InRange(DateTime.UtcNow.Subtract(fileInfo.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                // Old File shouldn't be removed
+                Assert.Single(await contentDbContext.Files
+                    .Where(f => f.Id == releaseFile.FileId)
+                    .ToListAsync());
+
+                Assert.Empty(await contentDbContext.ReleaseFiles
+                    .Where(rf =>
+                        rf.ReleaseId == release.Id
+                        && rf.FileId == releaseFile.FileId)
+                    .ToListAsync()
+                );
+
+                var dbNewReleaseFile = Assert.Single(await contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf =>
+                        rf.ReleaseId == release.Id
+                        && rf.File.Filename == "newAncillary.pdf"
+                        && rf.File.Type == Ancillary)
+                    .ToListAsync());
+
+                Assert.Equal(releaseFile.Name, dbNewReleaseFile.Name);
+                Assert.Equal(releaseFile.Summary, dbNewReleaseFile.Summary);
+
+                var newFile = dbNewReleaseFile.File;
+
+                Assert.Equal(10240, newFile.ContentLength);
+                Assert.Equal("application/pdf", newFile.ContentType);
+                Assert.InRange(DateTime.UtcNow.Subtract(newFile.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, newFile.CreatedById);
             }
         }
 

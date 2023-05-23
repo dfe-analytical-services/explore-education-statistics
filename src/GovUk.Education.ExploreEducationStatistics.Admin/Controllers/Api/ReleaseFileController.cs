@@ -146,6 +146,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpPost("release/{releaseId}/ancillary/{fileId}/replace")]
+        [RequestSizeLimit(int.MaxValue)]
+        [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
+        public async Task<ActionResult<FileInfo>> ReplaceAncillary(
+            Guid releaseId,
+            Guid fileId,
+            [FromForm] IFormFile newFile)
+        {
+            return await _releaseFileService
+                .ReplaceAncillary(releaseId, fileId, newFile)
+                .HandleFailuresOrOk();
+        }
+
         [HttpPut("release/{releaseId}/chart/{id}")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
