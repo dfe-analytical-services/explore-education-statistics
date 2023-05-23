@@ -10,11 +10,11 @@ import React, { useEffect, useState } from 'react';
 interface Props {
   className?: string;
   hideLabel?: boolean;
-  id?: string;
-  label?: string;
+  id: string;
+  label: string;
   labelSize?: 'xl' | 'l' | 'm' | 's';
   min?: number;
-  name?: string;
+  name: string;
   value?: string;
   onChange?: (value: string) => void;
   onReset?: () => void;
@@ -24,11 +24,11 @@ interface Props {
 const FormSearchBar = ({
   className,
   hideLabel,
-  id = 'searchTerm',
-  label = 'Search',
+  id,
+  label,
   labelSize = 'm',
   min = 3,
-  name = 'search',
+  name,
   value: initialValue = '',
   onChange,
   onReset,

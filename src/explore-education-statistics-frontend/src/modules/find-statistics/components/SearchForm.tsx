@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import FormSearchBar from '@common/components/form/FormSearchBar';
 
 const min = 3;
+const formId = 'searchForm';
 
 interface Props {
   value?: string;
@@ -17,7 +18,7 @@ const SearchForm = ({ value: initialValue = '', onSubmit }: Props) => {
 
   return (
     <form
-      id="searchForm"
+      id={formId}
       className="govuk-!-margin-bottom-2"
       onSubmit={e => {
         e.preventDefault();
@@ -26,7 +27,14 @@ const SearchForm = ({ value: initialValue = '', onSubmit }: Props) => {
         }
       }}
     >
-      <FormSearchBar min={min} value={searchTerm} onChange={setSearchTerm} />
+      <FormSearchBar
+        id={`${formId}-search`}
+        label="Search"
+        min={min}
+        name="search"
+        value={searchTerm}
+        onChange={setSearchTerm}
+      />
     </form>
   );
 };

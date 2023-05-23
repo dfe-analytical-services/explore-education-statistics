@@ -46,8 +46,10 @@ export default function AllFeaturedTables({
 
           <FormSearchBar
             className="govuk-!-margin-bottom-5"
+            id="featuredTables-search"
             label="Search featured tables"
             labelSize="s"
+            name="search"
             onReset={() => setFilteredFeaturedTables(featuredTables)}
             onSubmit={handleSearch}
           />
