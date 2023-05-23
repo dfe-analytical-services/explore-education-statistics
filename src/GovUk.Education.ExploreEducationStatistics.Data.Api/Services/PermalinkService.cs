@@ -74,6 +74,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
+        public static readonly JsonSerializerSettings LegacyPermalinkSerializerSettings = new()
+        {
+            ContractResolver = new PermalinkContractResolver(),
+            NullValueHandling = NullValueHandling.Ignore
+        };
+
         public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
@@ -112,8 +118,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
                 .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
                 {
-                    var subjectMeta = tableResult.SubjectMeta;
-
                     var frontendTableTask = _frontendService.CreateTable(
                         tableResult,
                         request.Configuration,
@@ -145,6 +149,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
                     var table = frontendTableResult.Right;
                     var csvMeta = csvMetaResult.Right;
+
+                    var subjectMeta = tableResult.SubjectMeta;
 
                     // To avoid the frontend processing and returning the footnotes unnecessarily,
                     // create a new view model with the footnotes added directly
@@ -186,8 +192,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return await Find(permalinkId, cancellationToken)
                 .OnSuccessVoid(() => _blobStorageService.DownloadToStream(
                     containerName: BlobContainers.PermalinkSnapshots,
-                    path: $"{permalinkId}.csv",
-                    stream: stream
+                    path: $"{permalinkId}.csv.zst",
+                    stream: stream,
+                    cancellationToken: cancellationToken
                 ));
         }
 
@@ -427,8 +434,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         permalinkTableResult,
                         request.Query);
 
-                    var content = JsonConvert.SerializeObject(legacyPermalink,
-                        BuildJsonSerializerSettings());
+                    var content = JsonConvert.SerializeObject(
+                        value: legacyPermalink,
+                        settings: LegacyPermalinkSerializerSettings);
 
                     await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     permalink.LegacyContentLength = stream.Length;
@@ -465,15 +473,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return locationAttributes.Sum(
                 attribute => attribute.Options is null ? 1 : CountLocations(attribute.Options));
-        }
-
-        private static JsonSerializerSettings BuildJsonSerializerSettings()
-        {
-            return new()
-            {
-                ContractResolver = new PermalinkContractResolver(),
-                NullValueHandling = NullValueHandling.Ignore
-            };
         }
 
         private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink, PermalinkTableViewModel table)
@@ -549,36 +548,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private async Task<Either<ActionResult, LegacyPermalink>> DownloadLegacyPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            try
-            {
-                return JsonConvert.DeserializeObject<LegacyPermalink>(
-                    value: await _blobStorageService.DownloadBlobText(
-                        containerName: BlobContainers.Permalinks,
-                        path: permalinkId.ToString(),
-                        cancellationToken: cancellationToken),
-                    settings: BuildJsonSerializerSettings())!;
-            }
-            catch (FileNotFoundException)
-            {
-                return new NotFoundResult();
-            }
+            return (await _blobStorageService.GetDeserializedJson<LegacyPermalink>(
+                containerName: BlobContainers.Permalinks,
+                path: permalinkId.ToString(),
+                settings: LegacyPermalinkSerializerSettings,
+                cancellationToken: cancellationToken))!;
         }
 
         private async Task<Either<ActionResult, PermalinkTableViewModel>> DownloadPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            try
-            {
-                return JsonConvert.DeserializeObject<PermalinkTableViewModel>(
-                    value: await _blobStorageService.DownloadBlobText(
-                        containerName: BlobContainers.PermalinkSnapshots,
-                        path: $"{permalinkId}.json",
-                        cancellationToken: cancellationToken))!;
-            }
-            catch (FileNotFoundException)
-            {
-                return new NotFoundResult();
-            }
+            return (await _blobStorageService.GetDeserializedJson<PermalinkTableViewModel>(
+                containerName: BlobContainers.PermalinkSnapshots,
+                path: $"{permalinkId}.json.zst",
+                cancellationToken: cancellationToken))!;
         }
 
         private async Task UploadSnapshot(Permalink permalink,
@@ -607,17 +590,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             CancellationToken cancellationToken = default)
         {
             await using var csvStream = new MemoryStream();
-            await using var csvWriter = new CsvWriter(new StreamWriter(csvStream, leaveOpen: true),
-                CultureInfo.InvariantCulture);
+            await using var csvWriter =
+                new CsvWriter(new StreamWriter(csvStream, leaveOpen: true), CultureInfo.InvariantCulture);
             await WriteCsvHeaderRow(csvWriter, csvMeta);
             await WriteCsvRows(csvWriter, observations, csvMeta, cancellationToken);
             await csvWriter.FlushAsync();
 
             await _blobStorageService.UploadStream(
                 containerName: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.csv",
+                path: $"{permalink.Id}.csv.zst",
                 stream: csvStream,
-                contentType: "text/csv",
+                contentType: ContentTypes.Csv,
+                contentEncoding: ContentEncodings.Zstd,
                 cancellationToken: cancellationToken
             );
         }
@@ -626,22 +610,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             PermalinkTableViewModel table,
             CancellationToken cancellationToken = default)
         {
-            await using var tableStream = new MemoryStream();
-            await using var jsonWriter = new JsonTextWriter(new StreamWriter(tableStream, leaveOpen: true));
-            JsonSerializer.CreateDefault().Serialize(jsonWriter, table);
-            await jsonWriter.FlushAsync(cancellationToken);
-
-            await _blobStorageService.UploadStream(
+            await _blobStorageService.UploadAsJson(
                 containerName: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json",
-                stream: tableStream,
-                contentType: MediaTypeNames.Application.Json,
+                path: $"{permalink.Id}.json.zst",
+                content: table,
+                contentEncoding: ContentEncodings.Zstd,
                 cancellationToken: cancellationToken
             );
         }
     }
 
-    internal class PermalinkContractResolver : DefaultContractResolver
+    // TODO EES-3755 Remove after Permalink snapshot work is complete
+    public class PermalinkContractResolver : DefaultContractResolver
     {
         protected override JsonObjectContract CreateObjectContract(Type objectType)
         {

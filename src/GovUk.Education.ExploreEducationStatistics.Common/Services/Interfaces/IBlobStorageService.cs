@@ -48,13 +48,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             string path,
             Stream stream,
             string contentType,
+            string? contentEncoding = null,
             CancellationToken cancellationToken = default);
 
         public Task UploadAsJson<T>(
             IBlobContainer containerName,
             string path,
             T content,
-            JsonSerializerSettings? settings = null);
+            string? contentEncoding = null,
+            JsonSerializerSettings? settings = null,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Download the entirety of a blob to a target stream.
@@ -62,13 +65,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// <param name="containerName">name of the blob container</param>
         /// <param name="path">path to the blob within the container</param>
         /// <param name="stream">stream to output blob to</param>
+        /// <param name="decompress">if true, checks the content encoding and decompresses the blob if necessary</param>
         /// <param name="cancellationToken">used to cancel the download</param>
         /// <returns>the stream that the blob has been output to</returns>
         public Task<Either<ActionResult, Stream>> DownloadToStream(
             IBlobContainer containerName,
             string path,
             Stream stream,
-            CancellationToken? cancellationToken = null);
+            bool decompress = true,
+            CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Stream a blob in chunks.
@@ -91,20 +96,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             int? bufferSize = null,
             CancellationToken cancellationToken = default);
 
-        public Task<string> DownloadBlobText(
+        public Task<Either<ActionResult, string>> DownloadBlobText(
             IBlobContainer containerName,
             string path,
             CancellationToken cancellationToken = default);
 
-        Task<object?> GetDeserializedJson(
+        Task<Either<ActionResult, object?>> GetDeserializedJson(
             IBlobContainer containerName,
             string path,
-            Type target,
+            Type type,
+            JsonSerializerSettings? settings = null,
             CancellationToken cancellationToken = default);
 
-        Task<T?> GetDeserializedJson<T>(
+        Task<Either<ActionResult, T?>> GetDeserializedJson<T>(
             IBlobContainer containerName,
             string path,
+            JsonSerializerSettings? settings = null,
             CancellationToken cancellationToken = default)
             where T : class;
 

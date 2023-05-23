@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
@@ -267,45 +266,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             string? capturedTableCsvBlobPath = null;
             blobStorageService.Setup(s => s.UploadStream(
                     BlobContainers.PermalinkSnapshots,
-                    It.Is<string>(path => path.EndsWith(".csv")),
+                    It.Is<string>(path => path.EndsWith(".csv.zst")),
                     It.IsAny<Stream>(),
-                    "text/csv",
+                    ContentTypes.Csv,
+                    ContentEncodings.Zstd,
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
-                {
-                    // Capture the blob path
-                    capturedTableCsvBlobPath = path;
+                .Callback<IBlobContainer, string, Stream, string, string, CancellationToken>(
+                    (_, path, stream, _, _, _) =>
+                    {
+                        // Capture the blob path
+                        capturedTableCsvBlobPath = path;
 
-                    // Convert captured stream to string
-                    stream.Seek(0L, SeekOrigin.Begin);
-                    var csv = stream.ReadToEnd();
+                        // Capture the csv from the uploaded stream
+                        stream.SeekToBeginning();
+                        var csv = stream.ReadToEnd();
 
-                    // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
-                })
+                        // Compare the captured csv upload with the expected csv
+                        Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
+                    })
                 .Returns(Task.CompletedTask);
 
             string? capturedTableJsonBlobPath = null;
-            blobStorageService.Setup(s => s.UploadStream(
+            blobStorageService.Setup(s => s.UploadAsJson(
                     BlobContainers.PermalinkSnapshots,
-                    It.Is<string>(path => path.EndsWith(".json")),
-                    It.IsAny<Stream>(),
-                    MediaTypeNames.Application.Json,
+                    It.Is<string>(path => path.EndsWith(".json.zst")),
+                    It.IsAny<PermalinkTableViewModel>(),
+                    ContentEncodings.Zstd,
+                    null,
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
-                {
-                    // Capture the blob path
-                    capturedTableJsonBlobPath = path;
+                .Callback<IBlobContainer,
+                    string,
+                    PermalinkTableViewModel,
+                    string,
+                    JsonSerializerSettings?,
+                    CancellationToken>(
+                    (_, path, table, _, _, _) =>
+                    {
+                        // Capture the blob path
+                        capturedTableJsonBlobPath = path;
 
-                    // Convert captured stream to string
-                    stream.Seek(0L, SeekOrigin.Begin);
-                    var tableJson = stream.ReadToEnd();
-
-                    // Compare the captured table json upload with the expected json
-                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
-                })
+                        // Compare the captured table upload with the expected json
+                        Snapshot.Match(table, SnapshotNameExtension.Create("json"));
+                    })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
@@ -378,8 +382,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     tableBuilderService);
 
                 // Expect the uploaded blob paths to be the same apart from the extension
-                var tableCsvBlobPathWithoutExtension = Path.GetFileNameWithoutExtension(capturedTableCsvBlobPath);
-                var tableJsonBlobPathWithoutExtension = Path.GetFileNameWithoutExtension(capturedTableJsonBlobPath);
+                Assert.NotNull(capturedTableCsvBlobPath);
+                Assert.NotNull(capturedTableJsonBlobPath);
+                var tableCsvBlobPathWithoutExtension = capturedTableCsvBlobPath.Replace(".csv.zst", string.Empty);
+                var tableJsonBlobPathWithoutExtension = capturedTableJsonBlobPath.Replace(".json.zst", string.Empty);
                 Assert.Equal(tableJsonBlobPathWithoutExtension, tableCsvBlobPathWithoutExtension);
 
                 // Expect the blob paths to contain a parseable Guid which is the generated permalink Id
@@ -580,45 +586,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             string? capturedTableCsvBlobPath = null;
             blobStorageService.Setup(s => s.UploadStream(
                     BlobContainers.PermalinkSnapshots,
-                    It.Is<string>(path => path.EndsWith(".csv")),
+                    It.Is<string>(path => path.EndsWith(".csv.zst")),
                     It.IsAny<Stream>(),
-                    "text/csv",
+                    ContentTypes.Csv,
+                    ContentEncodings.Zstd,
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
-                {
-                    // Capture the blob path
-                    capturedTableCsvBlobPath = path;
+                .Callback<IBlobContainer, string, Stream, string, string, CancellationToken>(
+                    (_, path, stream, _, _, _) =>
+                    {
+                        // Capture the blob path
+                        capturedTableCsvBlobPath = path;
 
-                    // Convert captured stream to string
-                    stream.Seek(0L, SeekOrigin.Begin);
-                    var csv = stream.ReadToEnd();
+                        // Capture the csv from the uploaded stream
+                        stream.SeekToBeginning();
+                        var csv = stream.ReadToEnd();
 
-                    // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
-                })
+                        // Compare the captured csv upload with the expected csv
+                        Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
+                    })
                 .Returns(Task.CompletedTask);
 
             string? capturedTableJsonBlobPath = null;
-            blobStorageService.Setup(s => s.UploadStream(
+            blobStorageService.Setup(s => s.UploadAsJson(
                     BlobContainers.PermalinkSnapshots,
-                    It.Is<string>(path => path.EndsWith(".json")),
-                    It.IsAny<Stream>(),
-                    MediaTypeNames.Application.Json,
+                    It.Is<string>(path => path.EndsWith(".json.zst")),
+                    It.IsAny<PermalinkTableViewModel>(),
+                    ContentEncodings.Zstd,
+                    null,
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, path, stream, _, _) =>
-                {
-                    // Capture the blob path
-                    capturedTableJsonBlobPath = path;
+                .Callback<IBlobContainer,
+                    string,
+                    PermalinkTableViewModel,
+                    string,
+                    JsonSerializerSettings?,
+                    CancellationToken>(
+                    (_, path, table, _, _, _) =>
+                    {
+                        // Capture the blob path
+                        capturedTableJsonBlobPath = path;
 
-                    // Convert captured stream to string
-                    stream.Seek(0L, SeekOrigin.Begin);
-                    var tableJson = stream.ReadToEnd();
-
-                    // Compare the captured table json upload with the expected json
-                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
-                })
+                        // Compare the captured table upload with the expected json
+                        Snapshot.Match(table, SnapshotNameExtension.Create("json"));
+                    })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
@@ -675,8 +686,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     tableBuilderService);
 
                 // Expect the uploaded blob paths to be the same apart from the extension
-                var tableCsvBlobPathWithoutExtension = Path.GetFileNameWithoutExtension(capturedTableCsvBlobPath);
-                var tableJsonBlobPathWithoutExtension = Path.GetFileNameWithoutExtension(capturedTableJsonBlobPath);
+                Assert.NotNull(capturedTableCsvBlobPath);
+                Assert.NotNull(capturedTableJsonBlobPath);
+                var tableCsvBlobPathWithoutExtension = capturedTableCsvBlobPath.Replace(".csv.zst", string.Empty);
+                var tableJsonBlobPathWithoutExtension = capturedTableJsonBlobPath.Replace(".json.zst", string.Empty);
                 Assert.Equal(tableJsonBlobPathWithoutExtension, tableCsvBlobPathWithoutExtension);
 
                 // Expect the blob paths to contain a parseable Guid which is the generated permalink Id
@@ -766,10 +779,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json",
-                blobText: JsonConvert.SerializeObject(table));
+                path: $"{permalink.Id}.json.zst",
+                value: table);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -815,9 +828,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobTextNotFound(
+            blobStorageService.SetupGetDeserializedJsonNotFound<PermalinkTableViewModel>(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json");
+                path: $"{permalink.Id}.json.zst");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -849,10 +862,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json",
-                blobText: "{}");
+                path: $"{permalink.Id}.json.zst",
+                value: new PermalinkTableViewModel());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -919,10 +932,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json",
-                blobText: "{}");
+                path: $"{permalink.Id}.json.zst",
+                value: new PermalinkTableViewModel());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -984,10 +997,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json",
-                blobText: "{}");
+                path: $"{permalink.Id}.json.zst",
+                value: new PermalinkTableViewModel());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1049,10 +1062,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json",
-                blobText: "{}");
+                path: $"{permalink.Id}.json.zst",
+                value: new PermalinkTableViewModel());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1117,10 +1130,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json",
-                blobText: "{}");
+                path: $"{permalink.Id}.json.zst",
+                value: new PermalinkTableViewModel());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1177,10 +1190,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.json",
-                blobText: "{}");
+                path: $"{permalink.Id}.json.zst",
+                value: new PermalinkTableViewModel());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1213,8 +1226,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             blobStorageService.SetupDownloadToStream(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.csv",
-                blobText: "Test csv");
+                path: $"{permalink.Id}.csv.zst",
+                content: "Test csv");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1231,7 +1244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 result.AssertRight();
 
-                stream.Seek(0L, SeekOrigin.Begin);
+                stream.SeekToBeginning();
                 var csv = stream.ReadToEnd();
 
                 Assert.Equal("Test csv", csv);
@@ -1263,7 +1276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             blobStorageService.SetupDownloadToStreamNotFound(
                 container: BlobContainers.PermalinkSnapshots,
-                path: $"{permalink.Id}.csv");
+                path: $"{permalink.Id}.csv.zst");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1402,45 +1415,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(legacyPermalink));
+                value: legacyPermalink,
+                settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
             blobStorageService.Setup(s => s.UploadStream(
                     BlobContainers.PermalinkSnapshots,
-                    $"{permalink.Id}.csv",
+                    $"{permalink.Id}.csv.zst",
                     It.IsAny<Stream>(),
-                    "text/csv",
+                    ContentTypes.Csv,
+                    ContentEncodings.Zstd,
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
-                {
-                    // Convert captured stream to string
-                    stream.Seek(0L, SeekOrigin.Begin);
-                    var csv = stream.ReadToEnd();
+                .Callback<IBlobContainer, string, Stream, string, string, CancellationToken>(
+                    (_, _, stream, _, _, _) =>
+                    {
+                        // Capture the csv from the uploaded stream
+                        stream.SeekToBeginning();
+                        var csv = stream.ReadToEnd();
 
-                    // Compare the captured csv upload with the expected csv
-                    Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
-                })
+                        // Compare the captured csv upload with the expected csv
+                        Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
+                    })
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(s => s.UploadStream(
+            blobStorageService.Setup(s => s.UploadAsJson(
                     BlobContainers.PermalinkSnapshots,
-                    $"{permalink.Id}.json",
-                    It.IsAny<Stream>(),
-                    MediaTypeNames.Application.Json,
+                    $"{permalink.Id}.json.zst",
+                    It.IsAny<PermalinkTableViewModel>(),
+                    ContentEncodings.Zstd,
+                    null,
                     It.IsAny<CancellationToken>()
                 ))
-                .Callback<IBlobContainer, string, Stream, string, CancellationToken>((_, _, stream, _, _) =>
-                {
-                    // Convert captured stream to string
-                    stream.Seek(0L, SeekOrigin.Begin);
-                    var tableJson = stream.ReadToEnd();
-
-                    // Compare the captured table json upload with the expected json
-                    Snapshot.Match(tableJson, SnapshotNameExtension.Create("json"));
-                })
+                .Callback<IBlobContainer,
+                    string,
+                    PermalinkTableViewModel,
+                    string,
+                    JsonSerializerSettings?,
+                    CancellationToken>(
+                    (_, _, table, _, _, _) =>
+                    {
+                        // Compare the captured table upload with the expected json
+                        Snapshot.Match(table, SnapshotNameExtension.Create("json"));
+                    })
                 .Returns(Task.CompletedTask);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
@@ -1531,9 +1550,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobTextNotFound(
+            blobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
                 container: BlobContainers.Permalinks,
-                path: permalink.Id.ToString());
+                path: permalink.Id.ToString(),
+                settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1628,15 +1648,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(new LegacyPermalink(
+                value: new LegacyPermalink(
                     permalink.Id,
                     DateTime.UtcNow,
                     new TableBuilderConfiguration(),
                     new PermalinkTableBuilderResult(),
-                    new ObservationQueryContext())));
+                    new ObservationQueryContext()),
+                settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 
@@ -1683,15 +1704,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadBlobText(
+            blobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(new LegacyPermalink(
+                value: new LegacyPermalink(
                     permalink.Id,
                     DateTime.UtcNow,
                     new TableBuilderConfiguration(),
                     new PermalinkTableBuilderResult(),
-                    new ObservationQueryContext())));
+                    new ObservationQueryContext()),
+                settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
             var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
 

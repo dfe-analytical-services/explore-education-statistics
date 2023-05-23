@@ -1,11 +1,11 @@
 #nullable enable
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -405,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var result = await service.DeleteAll(methodologyVersion.Id);
 
                 MockUtils.VerifyAllMocks(blobStorageService);
-                
+
                 result.AssertRight();
             }
 
@@ -561,6 +561,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 }
             };
 
+            var fileData = new byte[] { 0 };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -572,10 +574,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.DownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(),
-                        It.IsAny<MemoryStream>(), null))
-                .ReturnsAsync(new MemoryStream());
+            blobStorageService
+                .SetupDownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(), fileData);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -586,17 +586,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
-                var image = result.AssertRight();
+                var fileStreamResult = result.AssertRight();
 
-                blobStorageService.Verify(
-                    mock =>
-                        mock.DownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(),
-                        It.IsAny<MemoryStream>(), null),
-                    Times.Once());
-
-                Assert.Equal("image/png", image.ContentType);
-                Assert.Equal("image.png", image.FileDownloadName);
-                Assert.IsType<MemoryStream>(image.FileStream);
+                Assert.Equal("image/png", fileStreamResult.ContentType);
+                Assert.Equal("image.png", fileStreamResult.FileDownloadName);
+                Assert.Equal(fileData, fileStreamResult.FileStream.ReadFully());
             }
         }
 
@@ -765,7 +759,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     );
 
                 Assert.NotNull(methodologyFile);
-                var file = methodologyFile!.File;
+                var file = methodologyFile.File;
 
                 Assert.Equal(10240, file.ContentLength);
                 Assert.Equal("image/png", file.ContentType);

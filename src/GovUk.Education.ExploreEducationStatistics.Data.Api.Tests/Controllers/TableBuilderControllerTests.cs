@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     content: new JsonNetContent(ObservationQueryContext),
                     headers: new Dictionary<string, string>
                     {
-                        { HeaderNames.Accept, "text/csv" }
+                        { HeaderNames.Accept, ContentTypes.Csv }
                     }
                 );
 
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     content: new JsonNetContent(ObservationQueryContext),
                     headers: new Dictionary<string, string>
                     {
-                        { HeaderNames.Accept, "text/csv" }
+                        { HeaderNames.Accept, ContentTypes.Csv }
                     }
                 );
 

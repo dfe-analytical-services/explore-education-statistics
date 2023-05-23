@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System;
-using System.IO;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -38,6 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 }
             };
 
+            var fileData = new byte[] { 0 };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -49,10 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.DownloadToStream(PublicMethodologyFiles, methodologyFile.Path(),
-                        It.IsAny<MemoryStream>(), null))
-                .ReturnsAsync(new MemoryStream());
+            blobStorageService
+                .SetupDownloadToStream(PublicMethodologyFiles, methodologyFile.Path(), fileData);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -63,18 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
-                Assert.True(result.IsRight);
+                var fileStreamResult = result.AssertRight();
 
-                blobStorageService.Verify(
-                    mock =>
-                        mock.DownloadToStream(
-                            PublicMethodologyFiles, methodologyFile.Path(),
-                            It.IsAny<MemoryStream>(), null),
-                    Times.Once());
-
-                Assert.Equal("image/png", result.Right.ContentType);
-                Assert.Equal("image.png", result.Right.FileDownloadName);
-                Assert.IsType<MemoryStream>(result.Right.FileStream);
+                Assert.Equal("image/png", fileStreamResult.ContentType);
+                Assert.Equal("image.png", fileStreamResult.FileDownloadName);
+                Assert.Equal(fileData, fileStreamResult.FileStream.ReadFully());
             }
         }
 

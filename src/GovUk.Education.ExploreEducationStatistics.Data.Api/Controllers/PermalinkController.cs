@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             if (Request.AcceptsCsv(exact: true))
             {
                 Response.ContentDispositionAttachment(
-                    contentType: "text/csv",
+                    contentType: ContentTypes.Csv,
                     filename: $"permalink-{permalinkId}.csv");
 
                 var csvResult = await _permalinkService.LegacyDownloadCsvToStream(
@@ -84,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             if (Request.AcceptsCsv(exact: true))
             {
                 Response.ContentDispositionAttachment(
-                    contentType: "text/csv",
+                    contentType: ContentTypes.Csv,
                     filename: $"permalink-{permalinkId}.csv");
 
                 var csvResult = await _permalinkService.DownloadCsvToStream(
