@@ -3,7 +3,7 @@ import ChevronGrid from '@common/components/ChevronGrid';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import DataSetDetailsList from '@common/modules/table-tool/components/DataSetDetailsList';
-import { PublicationReleaseSummary } from '@common/services/publicationService';
+import { SelectedRelease } from '@common/modules/table-tool/types/selectedPublication';
 import ButtonText from '@common/components/ButtonText';
 import downloadService from '@common/services/downloadService';
 import { FeaturedTable, Subject } from '@common/services/tableBuilderService';
@@ -13,7 +13,7 @@ interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   isSubmitting: boolean;
   renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
-  release?: Partial<PublicationReleaseSummary>;
+  release?: SelectedRelease;
   subject: Subject;
 }
 
@@ -36,26 +36,21 @@ export default function DataSetDetails({
       <WizardStepFormActions
         {...stepProps}
         additionalButton={
-          <>
-            <span className="govuk-!-margin-left-3">or</span>
-            <ButtonText
-              className="govuk-!-margin-bottom-0 govuk-!-margin-left-2"
-              disabled={!release}
-              onClick={async () => {
-                if (release?.id) {
+          release && (
+            <>
+              <span className="govuk-!-margin-left-3">or</span>
+              <ButtonText
+                className="govuk-!-margin-bottom-0 govuk-!-margin-left-2"
+                onClick={async () => {
                   await downloadService.downloadFiles(release?.id, [
                     subject.file.id,
                   ]);
-                }
-              }}
-            >
-              {`Download full data set ${
-                !release
-                  ? ` (ZIP, available when the release is published)`
-                  : '(ZIP)'
-              }`}
-            </ButtonText>
-          </>
+                }}
+              >
+                Download full data set (ZIP)
+              </ButtonText>
+            </>
+          )
         }
         showPreviousStepButton={false}
         submitText="Create your own table"

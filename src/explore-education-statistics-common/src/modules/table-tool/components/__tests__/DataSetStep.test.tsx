@@ -3,13 +3,13 @@ import DataSetStep, {
   DataSetFormValues,
 } from '@common/modules/table-tool/components/DataSetStep';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import { SelectedRelease } from '@common/modules/table-tool/types/selectedPublication';
 import { Subject, FeaturedTable } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
-import { PublicationReleaseSummary } from '@common/services/publicationService';
 
 describe('DataSetStep', () => {
   const testSubjects: Subject[] = [
@@ -88,8 +88,11 @@ describe('DataSetStep', () => {
     goToPreviousStep: task => task?.(),
   };
 
-  const testRelease: Partial<PublicationReleaseSummary> = {
+  const testRelease: SelectedRelease = {
     id: 'release-1',
+    title: 'Release 1',
+    slug: 'release-1',
+    latestData: true,
   };
 
   test('renders radios with details if no `renderFeaturedTableLink `', () => {
@@ -435,7 +438,7 @@ describe('DataSetStep', () => {
     render(
       <DataSetStep
         {...wizardProps}
-        selectedRelease={testRelease}
+        release={testRelease}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
         subjects={testSubjects}
@@ -519,7 +522,7 @@ describe('DataSetStep', () => {
         {...wizardProps}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
-        selectedRelease={testRelease}
+        release={testRelease}
         subjects={testSubjects}
         onSubmit={noop}
       />,
@@ -547,7 +550,7 @@ describe('DataSetStep', () => {
         isActive={false}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
-        selectedRelease={testRelease}
+        release={testRelease}
         subjectId="subject-1"
         subjects={testSubjects}
         onSubmit={noop}
@@ -565,7 +568,7 @@ describe('DataSetStep', () => {
         isActive={false}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
-        selectedRelease={testRelease}
+        release={testRelease}
         subjectId=""
         subjects={testSubjects}
         onSubmit={noop}
@@ -584,7 +587,7 @@ describe('DataSetStep', () => {
         {...wizardProps}
         featuredTables={testFeaturedTables}
         renderFeaturedTableLink={table => <a href="/">{table.name}</a>}
-        selectedRelease={testRelease}
+        release={testRelease}
         subjects={testSubjects}
         onSubmit={handleSubmit}
       />,

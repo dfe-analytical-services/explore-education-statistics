@@ -3,12 +3,12 @@ import TableToolWizard, {
 } from '@common/modules/table-tool/components/TableToolWizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService, {
   FastTrackTable,
   FeaturedTable,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';

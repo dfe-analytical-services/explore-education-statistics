@@ -190,21 +190,6 @@ export interface TableDataResponse {
   subjectMeta: TableDataSubjectMeta;
 }
 
-export interface SelectedPublication {
-  id: string;
-  title: string;
-  slug: string;
-  selectedRelease: {
-    id: string;
-    slug: string;
-    latestData: boolean;
-    title: string;
-  };
-  latestRelease: {
-    title: string;
-  };
-}
-
 export interface FastTrackTable extends ConfiguredTable {
   query: TableDataQuery & {
     publicationId: string;

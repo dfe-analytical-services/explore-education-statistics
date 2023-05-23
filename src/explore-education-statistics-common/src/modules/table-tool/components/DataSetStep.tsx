@@ -1,4 +1,4 @@
-import { PublicationReleaseSummary } from '@common/services/publicationService';
+import { SelectedRelease } from '@common/modules/table-tool/types/selectedPublication';
 import FormProvider from '@common/components/form/rhf/FormProvider';
 import RHFForm from '@common/components/form/rhf/RHFForm';
 import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
@@ -27,23 +27,23 @@ export interface DataSetFormValues {
 interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   loadingFastTrack?: boolean;
-  selectedRelease?: Partial<PublicationReleaseSummary>;
+  release?: SelectedRelease;
   subjects: Subject[];
   subjectId?: string;
   renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
   onSubmit: DataSetFormSubmitHandler;
 }
 
-const DataSetStep = ({
+export default function DataSetStep({
   featuredTables = [],
   loadingFastTrack = false,
-  selectedRelease,
+  release,
   subjects,
   subjectId = '',
   renderFeaturedTableLink,
   onSubmit,
   ...stepProps
-}: Props) => {
+}: Props) {
   const { goToNextStep, isActive } = stepProps;
 
   const stepHeading = (
@@ -162,7 +162,7 @@ const DataSetStep = ({
                         {...stepProps}
                         featuredTables={featuredTables}
                         isSubmitting={formState.isSubmitting}
-                        release={selectedRelease}
+                        release={release}
                         renderFeaturedTableLink={renderFeaturedTableLink}
                         subjects={subjects}
                       />
@@ -189,6 +189,4 @@ const DataSetStep = ({
       </SummaryList>
     </WizardStepSummary>
   );
-};
-
-export default DataSetStep;
+}

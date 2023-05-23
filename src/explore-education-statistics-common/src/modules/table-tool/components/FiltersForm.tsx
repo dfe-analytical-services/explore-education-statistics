@@ -16,11 +16,8 @@ import WizardStepFormActions from '@common/modules/table-tool/components/WizardS
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import styles from '@common/modules/table-tool/components/FiltersForm.module.scss';
-import {
-  SelectedPublication,
-  Subject,
-  SubjectMeta,
-} from '@common/services/tableBuilderService';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
+import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 import {

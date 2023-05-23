@@ -19,6 +19,7 @@ import TimePeriodForm, {
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -26,7 +27,6 @@ import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTu
 import {
   FeaturedTable,
   ReleaseTableDataQuery,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';

@@ -4,6 +4,7 @@ import useToggle from '@common/hooks/useToggle';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import TableToolShare from '@frontend/modules/table-tool/components/TableToolShare';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -11,7 +12,6 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import publicationService from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
 import tableBuilderService, {
-  SelectedPublication,
   TableDataQuery,
 } from '@common/services/tableBuilderService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';

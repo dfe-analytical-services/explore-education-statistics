@@ -3,7 +3,7 @@ import DataSetDetails from '@common/modules/table-tool/components/DataSetDetails
 import AllFeaturedTables from '@common/modules/table-tool/components/AllFeaturedTables';
 import { DataSetFormValues } from '@common/modules/table-tool/components/DataSetStep';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { PublicationReleaseSummary } from '@common/services/publicationService';
+import { SelectedRelease } from '@common/modules/table-tool/types/selectedPublication';
 import ButtonText from '@common/components/ButtonText';
 import { FeaturedTable, Subject } from '@common/services/tableBuilderService';
 import React, { ReactNode } from 'react';
@@ -13,7 +13,7 @@ interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   isSubmitting: boolean;
   renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
-  release?: Partial<PublicationReleaseSummary>;
+  release?: SelectedRelease;
   subjects: Subject[];
 }
 

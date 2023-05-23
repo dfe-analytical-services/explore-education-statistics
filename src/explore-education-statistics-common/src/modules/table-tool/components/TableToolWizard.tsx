@@ -19,6 +19,7 @@ import TimePeriodForm, {
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import applyTableHeadersOrder from '@common/modules/table-tool/utils/applyTableHeadersOrder';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
@@ -31,7 +32,6 @@ import publicationService, {
 import tableBuilderService, {
   FeaturedTable,
   ReleaseTableDataQuery,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
@@ -448,7 +448,7 @@ const TableToolWizard = ({
                   featuredTables={state.featuredTables}
                   loadingFastTrack={loadingFastTrack}
                   renderFeaturedTableLink={renderFeaturedTableLink}
-                  selectedRelease={state.selectedPublication?.selectedRelease}
+                  release={state.selectedPublication?.selectedRelease}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
                   onSubmit={handleSubjectFormSubmit}

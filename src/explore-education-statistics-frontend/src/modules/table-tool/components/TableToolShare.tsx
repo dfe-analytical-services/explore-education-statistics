@@ -4,14 +4,12 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import UrlContainer from '@common/components/UrlContainer';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import permalinkService from '@common/services/permalinkService';
 import permalinkSnapshotService from '@common/services/permalinkSnapshotService';
-import {
-  SelectedPublication,
-  TableDataQuery,
-} from '@common/services/tableBuilderService';
+import { TableDataQuery } from '@common/services/tableBuilderService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import React, { useEffect, useState } from 'react';
 

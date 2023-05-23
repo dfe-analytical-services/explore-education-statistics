@@ -3,10 +3,10 @@ import PrototypeTableToolFinalStep from '@admin/prototypes/components/PrototypeT
 import PrototypeTableToolWizard from '@admin/prototypes/components/PrototypeTableToolWizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import {
   FastTrackTable,
   FeaturedTable,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
