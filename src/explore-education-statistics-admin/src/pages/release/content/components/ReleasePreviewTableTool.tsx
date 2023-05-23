@@ -20,7 +20,7 @@ interface Props {
   publication: Publication | ContentPublication;
 }
 const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
-  const [featuredTableId, setHighlightId] = useState<string>();
+  const [featuredTableId, setFeaturedTableId] = useState<string>();
 
   const { value: initialState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
@@ -92,14 +92,14 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
             themeMeta={[]}
             hidePublicationStep
             initialState={initialState}
-            onSubjectStepBack={() => setHighlightId(undefined)}
-            renderFeaturedTableLink={highlight => (
+            onSubjectStepBack={() => setFeaturedTableId(undefined)}
+            renderFeaturedTableLink={featuredTable => (
               <ButtonText
                 onClick={() => {
-                  setHighlightId(highlight.id);
+                  setFeaturedTableId(featuredTable.id);
                 }}
               >
-                {highlight.name}
+                {featuredTable.name}
               </ButtonText>
             )}
             finalStep={({ query, table, tableHeaders, onReorder }) => (

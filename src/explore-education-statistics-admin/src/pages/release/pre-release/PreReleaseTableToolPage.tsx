@@ -110,18 +110,18 @@ const PreReleaseTableToolPage = ({
             hidePublicationStep
             scrollOnMount
             initialState={tableToolState}
-            renderFeaturedTableLink={highlight => (
+            renderFeaturedTableLink={featuredTable => (
               <Link
                 to={generatePath<PreReleaseTableToolRouteParams>(
                   preReleaseTableToolRoute.path,
                   {
                     publicationId,
                     releaseId,
-                    dataBlockId: highlight.id,
+                    dataBlockId: featuredTable.id,
                   },
                 )}
               >
-                {highlight.name}
+                {featuredTable.name}
               </Link>
             )}
             finalStep={({ query, table, tableHeaders, onReorder }) => (

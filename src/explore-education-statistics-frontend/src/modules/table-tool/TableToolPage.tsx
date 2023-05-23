@@ -130,20 +130,20 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         themeMeta={themeMeta}
         initialState={initialState}
         loadingFastTrack={loadingFastTrack}
-        renderFeaturedTableLink={highlight => (
+        renderFeaturedTableLink={featuredTable => (
           <Link
-            to={`/data-tables/fast-track/${highlight.id}`}
+            to={`/data-tables/fast-track/${featuredTable.id}`}
             onClick={() => {
               setLoadingFastTrack(true);
               setCurrentStep(undefined);
               logEvent({
                 category: 'Table tool',
                 action: 'Clicked to view featured table',
-                label: `Featured table name: ${highlight.name}`,
+                label: `Featured table name: ${featuredTable.name}`,
               });
             }}
           >
-            {highlight.name}
+            {featuredTable.name}
           </Link>
         )}
         currentStep={currentStep}
