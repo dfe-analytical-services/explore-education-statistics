@@ -105,7 +105,7 @@ describe('DataSetStep', () => {
 
     const radios = within(
       screen.getByRole('group', {
-        name: 'Select a data set',
+        name: 'Step 1 (current) Select a data set',
       }),
     ).getAllByRole('radio');
     expect(radios).toHaveLength(2);

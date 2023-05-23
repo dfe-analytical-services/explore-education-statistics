@@ -47,12 +47,25 @@ const DataSetStep = ({
   const { goToNextStep, isActive } = stepProps;
 
   const stepHeading = (
-    <WizardStepHeading {...stepProps}>
+    <WizardStepHeading
+      {...stepProps}
+      fieldsetHeading={!renderFeaturedTableLink}
+    >
       {featuredTables.length > 0
         ? 'Select a data set or featured table'
         : 'Select a data set'}
     </WizardStepHeading>
   );
+
+  const renderLegend = () => {
+    if (renderFeaturedTableLink) {
+      return featuredTables?.length
+        ? 'View all featured tables or select a data set'
+        : 'Select a data set';
+    }
+
+    return stepHeading;
+  };
 
   const options = subjects.map(subject => ({
     label: subject.name,
@@ -70,6 +83,15 @@ const DataSetStep = ({
       </Details>
     ),
   }));
+
+  if (!subjects.length) {
+    return (
+      <>
+        {stepHeading}
+        <p>No data sets available.</p>
+      </>
+    );
+  }
 
   if (isActive) {
     return (
@@ -92,7 +114,7 @@ const DataSetStep = ({
                 });
               }}
             >
-              {stepHeading}
+              {renderFeaturedTableLink ? stepHeading : undefined}
 
               <LoadingSpinner loading={loadingFastTrack}>
                 <div className="govuk-grid-row">
@@ -103,46 +125,37 @@ const DataSetStep = ({
                         : 'govuk-grid-column-one-third govuk-grid-column-one-quarter-from-desktop'
                     }
                   >
-                    {subjects.length > 0 ? (
-                      <>
-                        <RHFFormFieldRadioGroup
-                          className="govuk-!-margin-bottom-2"
-                          name="subjectId"
-                          order={[]}
-                          legend={
-                            renderFeaturedTableLink && featuredTables.length
-                              ? 'View all featured tables or select a data set'
-                              : 'Select a data set'
-                          }
-                          legendHidden
-                          disabled={formState.isSubmitting}
-                          options={
-                            renderFeaturedTableLink && featuredTables.length
-                              ? [
-                                  {
-                                    divider: 'or select a data set',
-                                    label: 'View all featured tables',
-                                    labelClassName: 'govuk-!-font-weight-bold',
-                                    value: 'all-featured',
-                                  },
-                                  ...options,
-                                ]
-                              : options
-                          }
-                          small={!!renderFeaturedTableLink}
-                          showError={!renderFeaturedTableLink}
-                        />
-                        {!renderFeaturedTableLink && (
-                          <WizardStepFormActions
-                            {...stepProps}
-                            isSubmitting={formState.isSubmitting}
-                          />
-                        )}
-                      </>
-                    ) : (
-                      <p>No data sets available.</p>
+                    <RHFFormFieldRadioGroup
+                      className="govuk-!-margin-bottom-2"
+                      disabled={formState.isSubmitting}
+                      legend={renderLegend()}
+                      legendHidden={!!renderFeaturedTableLink}
+                      name="subjectId"
+                      order={[]}
+                      options={
+                        renderFeaturedTableLink && featuredTables.length
+                          ? [
+                              {
+                                divider: 'or select a data set',
+                                label: 'View all featured tables',
+                                labelClassName: 'govuk-!-font-weight-bold',
+                                value: 'all-featured',
+                              },
+                              ...options,
+                            ]
+                          : options
+                      }
+                      small={!!renderFeaturedTableLink}
+                    />
+
+                    {!renderFeaturedTableLink && (
+                      <WizardStepFormActions
+                        {...stepProps}
+                        isSubmitting={formState.isSubmitting}
+                      />
                     )}
                   </div>
+
                   {renderFeaturedTableLink && (
                     <div className="govuk-grid-column-two-thirds govuk-grid-column-three-quarters-from-desktop">
                       <DataSetStepContent
