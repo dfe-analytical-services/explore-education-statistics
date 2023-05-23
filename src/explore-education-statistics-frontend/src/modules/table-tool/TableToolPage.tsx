@@ -193,9 +193,12 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             },
           );
         }}
+        onPublicationStepBack={async () => {
+          await router.push('/data-tables', undefined, { shallow: true });
+        }}
         onStepChange={() => setCurrentStep(undefined)}
-        onSubjectFormSubmit={({ publication, release, subjectId }) => {
-          router.push(
+        onSubjectFormSubmit={async ({ publication, release, subjectId }) => {
+          await router.push(
             {
               pathname: `/data-tables/${publication.slug}/${release.slug}`,
               query: newPermalinks
@@ -209,8 +212,8 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             },
           );
         }}
-        onSubjectStepBack={publication => {
-          router.push(
+        onSubjectStepBack={async publication => {
+          await router.push(
             {
               pathname: `/data-tables/${publication?.slug}`,
               query: newPermalinks ? { newPermalinks } : undefined,

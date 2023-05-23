@@ -37,7 +37,6 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { useRouter } from 'next/router';
 
 export interface InitialTableToolState {
   initialStep: number;
@@ -78,6 +77,7 @@ export interface TableToolWizardProps {
   themeMeta?: Theme[];
   currentStep?: number;
   onPublicationFormSubmit?: (publication: PublicationTreeSummary) => void;
+  onPublicationStepBack?: () => void;
   onStepChange?: (nextStep: number, previousStep: number) => void;
   onSubjectFormSubmit?(params: {
     publication: SelectedPublication;
@@ -93,7 +93,7 @@ export interface TableToolWizardProps {
   ) => void;
 }
 
-const TableToolWizard = ({
+export default function TableToolWizard({
   finalStep,
   hidePublicationStep,
   initialState = {},
@@ -104,13 +104,13 @@ const TableToolWizard = ({
   themeMeta = [],
   currentStep,
   onPublicationFormSubmit,
+  onPublicationStepBack,
   onStepChange,
   onSubjectFormSubmit,
   onSubjectStepBack,
   onSubmit,
   onTableQueryError,
-}: TableToolWizardProps) => {
-  const router = useRouter();
+}: TableToolWizardProps) {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
     subjects: [],
@@ -136,10 +136,6 @@ const TableToolWizard = ({
   const [reorderedTableHeaders, setReorderedTableHeaders] = useState<
     TableHeadersConfig
   >();
-
-  const handlePublicationStepBack = () => {
-    router.push('/data-tables', undefined, { shallow: true });
-  };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publication,
@@ -181,9 +177,8 @@ const TableToolWizard = ({
     updateState(draft => {
       draft.query.subjectId = '';
     });
-    if (onSubjectStepBack) {
-      onSubjectStepBack(state.selectedPublication);
-    }
+
+    onSubjectStepBack?.(state.selectedPublication);
   };
 
   const handleSubjectFormSubmit: DataSetFormSubmitHandler = async ({
@@ -428,7 +423,7 @@ const TableToolWizard = ({
             }}
           >
             {!hidePublicationStep && (
-              <WizardStep size="l" onBack={handlePublicationStepBack}>
+              <WizardStep size="l" onBack={onPublicationStepBack}>
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
@@ -511,6 +506,4 @@ const TableToolWizard = ({
       )}
     </ConfirmContextProvider>
   );
-};
-
-export default TableToolWizard;
+}
