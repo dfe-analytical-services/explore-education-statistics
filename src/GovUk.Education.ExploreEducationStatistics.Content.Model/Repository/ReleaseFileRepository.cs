@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         public async Task<ReleaseFile?> Find(Guid releaseId, Guid fileId)
         {
             return await _contentDbContext.ReleaseFiles
-                .Include(releaseFile => releaseFile.File)
+                .Include(releaseFile => releaseFile.File.CreatedBy)
                 .SingleOrDefaultAsync(releaseFile =>
                     releaseFile.ReleaseId == releaseId
                     && releaseFile.FileId == fileId);

@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseFileServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
             Id = Guid.NewGuid()
         };
@@ -179,6 +179,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 Title = "Title",
                                 Summary = "Summary",
                             }
+                        );
+                    }
+                );
+        }
+
+        [Fact]
+        public async Task ReplaceAncillary()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseFileService(userService: userService.Object);
+                        return service.ReplaceAncillary(
+                            releaseId: _release.Id,
+                            fileId: Guid.NewGuid(),
+                            newFile: Mock.Of<IFormFile>()
                         );
                     }
                 );

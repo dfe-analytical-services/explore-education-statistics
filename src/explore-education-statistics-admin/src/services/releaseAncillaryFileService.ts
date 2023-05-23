@@ -80,7 +80,7 @@ const releaseAncillaryFileService = {
     newFile: File,
   ): Promise<AncillaryFile> {
     const data = new FormData();
-    data.append('file', newFile);
+    data.append('newFile', newFile);
 
     const file = await client.post<AncillaryFileInfo>(
       `release/${releaseId}/ancillary/${fileId}/replace`,
