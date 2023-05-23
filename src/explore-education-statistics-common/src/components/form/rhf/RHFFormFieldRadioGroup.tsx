@@ -27,7 +27,6 @@ function RHFFormFieldRadioGroup<TFormValues extends FieldValues>({
   const {
     formState: { errors },
     register,
-    trigger,
   } = useFormContext<TFormValues>();
 
   const { ref: inputRef, ...field } = useRegister(name, register);
@@ -61,11 +60,6 @@ function RHFFormFieldRadioGroup<TFormValues extends FieldValues>({
       id={id}
       inputRef={inputRef}
       value={selectedValue}
-      onBlur={() => {
-        if (showError) {
-          trigger(name);
-        }
-      }}
       onChange={handleChange}
     />
   );
