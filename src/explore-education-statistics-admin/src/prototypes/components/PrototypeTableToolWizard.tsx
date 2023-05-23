@@ -10,14 +10,16 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PrototypePublicationForm, {
   PublicationFormSubmitHandler,
 } from '@admin/prototypes/components/PrototypePublicationForm';
-import { SubjectFormSubmitHandler } from '@common/modules/table-tool/components/SubjectForm';
-import SubjectStep from '@common/modules/table-tool/components/SubjectStep';
+import DataSetStep, {
+  DataSetFormSubmitHandler,
+} from '@common/modules/table-tool/components/DataSetStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
@@ -25,7 +27,6 @@ import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTu
 import {
   FeaturedTable,
   ReleaseTableDataQuery,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
@@ -76,7 +77,7 @@ export interface PrototypeTableToolWizardProps {
   hidePublicationStep?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
   loadingFastTrack?: boolean;
-  renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
   onTableQueryError?: (
     errorCode: TableQueryErrorCode,
@@ -93,7 +94,7 @@ const PrototypeTableToolWizard = ({
   initialState = {},
   scrollOnMount,
   hidePublicationStep,
-  renderFeaturedTable,
+  renderFeaturedTableLink,
   finalStep,
   showTableQueryErrorDownload = true,
   onSubmit,
@@ -171,7 +172,7 @@ const PrototypeTableToolWizard = ({
     }
   };
 
-  const handleSubjectFormSubmit: SubjectFormSubmitHandler = async ({
+  const handleSubjectFormSubmit: DataSetFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
     // const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
@@ -393,12 +394,12 @@ const PrototypeTableToolWizard = ({
             )}
             <WizardStep onBack={handleSubjectStepBack}>
               {stepProps => (
-                <SubjectStep
+                <DataSetStep
                   {...stepProps}
                   featuredTables={state.featuredTables}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
-                  renderFeaturedTable={renderFeaturedTable}
+                  renderFeaturedTableLink={renderFeaturedTableLink}
                   onSubmit={handleSubjectFormSubmit}
                   loadingFastTrack={loadingFastTrack}
                 />

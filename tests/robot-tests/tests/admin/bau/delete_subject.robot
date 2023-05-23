@@ -90,14 +90,14 @@ Navigate to 'Data blocks' page
 Create new data block
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until table tool wizard step is available    1    Select a data set
 
 Select subject "UI test subject"
     user waits until page contains    UI test subject
     user clicks radio    UI test subject
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    2    Choose locations
-    user checks previous table tool step contains    1    Subject    UI test subject
+    user checks previous table tool step contains    1    Data set    UI test subject
 
 Select locations
     user opens details dropdown    Opportunity area

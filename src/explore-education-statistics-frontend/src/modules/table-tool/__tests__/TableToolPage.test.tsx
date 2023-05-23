@@ -1,7 +1,7 @@
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { Theme } from '@common/services/publicationService';
 import {
   FastTrackTable,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
@@ -158,6 +158,8 @@ describe('TableToolPage', () => {
         size: '10 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
   ];
 

@@ -75,9 +75,9 @@ Check subject appears in 'Data blocks' page
 
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until page contains    Choose a subject    %{WAIT_LONG}
+    user waits until page contains    Select a data set    %{WAIT_LONG}
 
-    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until table tool wizard step is available    1    Select a data set
 
     user waits until page contains    Updated Absence in PRUs
 

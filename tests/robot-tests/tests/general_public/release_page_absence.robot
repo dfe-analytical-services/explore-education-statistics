@@ -389,5 +389,5 @@ Clicking "Create tables" takes user to Table Tool page with absence publication 
     user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
     user waits for page to finish loading
 
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
