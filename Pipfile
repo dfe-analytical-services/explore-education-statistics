@@ -6,7 +6,7 @@ verify_ssl = true
 [packages]
 robotframework = "~=6.0.2"
 robotframework-seleniumlibrary = "~=6.0.0"
-requests = "~=2.28.2"
+requests = "~=2.31.0"
 python-dotenv = "~=0.21.1"
 robotframework-pabot = "~=2.13.0"
 pyderman = "~=3.2.1"
