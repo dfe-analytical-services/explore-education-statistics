@@ -25,6 +25,7 @@ import React, { useState } from 'react';
 import Link from '@admin/components/Link';
 import { generatePath } from 'react-router';
 import {
+  releaseAncillaryFileReplaceRoute,
   releaseAncillaryFileRoute,
   ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
@@ -291,6 +292,19 @@ const ReleaseFileUploadsSection = ({
                               )}
                             >
                               Edit file
+                            </Link>
+                            <Link
+                              className="govuk-!-margin-right-4"
+                              to={generatePath<ReleaseDataFileRouteParams>(
+                                releaseAncillaryFileReplaceRoute.path,
+                                {
+                                  publicationId,
+                                  releaseId,
+                                  fileId: file.id,
+                                },
+                              )}
+                            >
+                              Replace file
                             </Link>
                             <ButtonText onClick={() => setDeleteFile(file)}>
                               Delete file

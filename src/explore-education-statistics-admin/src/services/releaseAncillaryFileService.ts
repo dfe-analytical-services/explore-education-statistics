@@ -74,6 +74,21 @@ const releaseAncillaryFileService = {
 
     return mapFile(file);
   },
+  async replaceAncillaryFile(
+    releaseId: string,
+    fileId: string,
+    newFile: File,
+  ): Promise<AncillaryFile> {
+    const data = new FormData();
+    data.append('file', newFile);
+
+    const file = await client.post<AncillaryFileInfo>(
+      `release/${releaseId}/ancillary/${fileId}/replace`,
+      data,
+    );
+
+    return mapFile(file);
+  },
   deleteAncillaryFile(releaseId: string, fileId: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/ancillary/${fileId}`);
   },
