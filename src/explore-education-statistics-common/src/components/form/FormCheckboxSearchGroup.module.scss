@@ -4,6 +4,10 @@
   margin: govuk-spacing(4) 0 govuk-spacing(1);
   overflow-y: auto;
   padding: govuk-spacing(2);
+  // Need this to prevent child elements with absolute positioning
+  // (e.g. visually hidden text) from causing the entire browser
+  // window to overflow and have more height than is necessary.
+  position: relative;
 
   @media (max-height: 720px) {
     max-height: 70vh;
