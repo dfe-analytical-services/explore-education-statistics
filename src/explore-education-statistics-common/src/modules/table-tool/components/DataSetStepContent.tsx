@@ -68,7 +68,7 @@ export default function DataSetStepContent({
         </>
       ) : (
         <>
-          <p className="govuk-body-l">
+          <p>
             {`Please select a data set, you will then be able to see a summary of
             the data, create your own tables,${
               featuredTables.length > 0 ? ' view featured tables,' : ''
@@ -77,7 +77,7 @@ export default function DataSetStepContent({
           </p>
           {featuredTables.length > 0 && (
             <>
-              <p className="govuk-body-l">
+              <p>
                 Alternatively you can browse{' '}
                 <ButtonText
                   onClick={() => setValue('subjectId', 'all-featured')}
