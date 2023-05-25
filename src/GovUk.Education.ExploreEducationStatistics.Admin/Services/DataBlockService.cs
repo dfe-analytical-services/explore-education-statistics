@@ -124,6 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(
                         ft => ft.DataBlockId == dataBlock.Id);
+
                     if (featuredTable != null)
                     {
                         viewModel.HighlightName = featuredTable.Name;
@@ -154,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return dataBlocks.Select(block =>
                             {
                                 var featuredTable = featuredTables
-                                        .SingleOrDefault(ft => ft.DataBlockId == block.Id);
+                                    .SingleOrDefault(ft => ft.DataBlockId == block.Id);
 
                                 var inContent = block.ContentSectionId != null
                                                 || dataBlockIdsAttachedToKeyStats.Contains(block.Id);
@@ -264,6 +265,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(f => fileIds.Contains(f.Id))
                 .ToListAsync();
 
+            var featuredTable = await _context.FeaturedTables
+                .SingleOrDefaultAsync(ft => ft.DataBlockId == block.Id);
+
             return new DependentDataBlock
             {
                 Id = block.Id,
@@ -276,8 +280,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }).ToList(),
                 IsKeyStatistic = await _context.KeyStatisticsDataBlock
                     .AnyAsync(ks => ks.DataBlockId == block.Id),
-                IsFeaturedTable = await _context.FeaturedTables
-                    .AnyAsync(ft => ft.DataBlockId == block.Id)
+                FeaturedTable = featuredTable != null
+                    ? new FeaturedTableBasicViewModel
+                    {
+                        Name = featuredTable.Name,
+                        Description = featuredTable.Description,
+                    }
+                    : null,
             };
         }
 
@@ -455,7 +464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public string? ContentSectionHeading { get; set; }
         public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new();
         public bool IsKeyStatistic { get; set; }
-        public bool IsFeaturedTable { get; set; }
+        public FeaturedTableBasicViewModel? FeaturedTable { get; set; }
     }
 
     public class InfographicFileInfo

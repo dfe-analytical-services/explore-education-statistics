@@ -2,23 +2,23 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Requests;
+
+public record FeaturedTableCreateRequest
 {
-    public record FeaturedTableCreateRequest
-    {
-        [Required] public string Name { get; init; } = string.Empty;
+    [Required]
+    public string Name { get; init; } = string.Empty;
 
-        public string? Description { get; set; }
+    public string? Description { get; set; }
 
-        public Guid DataBlockId { get; set; }
+    public Guid DataBlockId { get; set; }
 
-    }
+}
 
-    public record FeaturedTableUpdateRequest
-    {
-        [Required]
-        public string Name { get; init; } = string.Empty;
+public record FeaturedTableUpdateRequest
+{
+    [Required]
+    public string Name { get; init; } = string.Empty;
 
-        public string? Description { get; set; }
-    }
+    public string? Description { get; set; }
 }

@@ -383,10 +383,10 @@ const ReleaseDataUploadsSection = ({
                           be removed.
                         </p>
                       )}
-                      {block.isFeaturedTable && (
+                      {block.featuredTable && (
                         <p>
-                          A featured table associated with this data block will
-                          be removed.
+                          The featured table "{`${block.featuredTable?.name}`}"
+                          using this data block will be removed.
                         </p>
                       )}
                     </li>

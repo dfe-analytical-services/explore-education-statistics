@@ -1,6 +1,10 @@
 import client from '@admin/services/utils/service';
 import { DataBlock } from '@common/services/types/blocks';
 import { OmitStrict } from '@common/types';
+import {
+  FeaturedTableBasic,
+  FeaturedTableCreateRequest,
+} from '@admin/services/featuredTableService';
 
 export type ReleaseDataBlock = OmitStrict<DataBlock, 'order' | 'type'>;
 
@@ -27,7 +31,7 @@ export interface DependentDataBlock {
   contentSectionHeading?: string;
   infographicFilesInfo: InfographicFileInfo[];
   isKeyStatistic: boolean;
-  isFeaturedTable: boolean;
+  featuredTable?: FeaturedTableBasic;
 }
 
 export interface InfographicFileInfo {

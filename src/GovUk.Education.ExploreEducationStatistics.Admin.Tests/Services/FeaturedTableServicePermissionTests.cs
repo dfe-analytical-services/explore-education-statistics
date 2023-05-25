@@ -33,7 +33,7 @@ public class FeaturedTableServicePermissionTests
             .AssertForbidden(
                 userService =>
                 {
-                    var service = SetupFeaturedTableService(userService: userService.Object);
+                    var service = SetupService(userService: userService.Object);
                     return service.Get(
                         _release.Id, Guid.NewGuid()
                     );
@@ -49,7 +49,7 @@ public class FeaturedTableServicePermissionTests
             .AssertForbidden(
                 userService =>
                 {
-                    var service = SetupFeaturedTableService(userService: userService.Object);
+                    var service = SetupService(userService: userService.Object);
                     return service.List(_release.Id);
                 }
             );
@@ -63,7 +63,7 @@ public class FeaturedTableServicePermissionTests
             .AssertForbidden(
                 userService =>
                 {
-                    var service = SetupFeaturedTableService(userService: userService.Object);
+                    var service = SetupService(userService: userService.Object);
                     return service.Create(_release.Id, new FeaturedTableCreateRequest());
                 }
             );
@@ -77,7 +77,7 @@ public class FeaturedTableServicePermissionTests
             .AssertForbidden(
                 userService =>
                 {
-                    var service = SetupFeaturedTableService(userService: userService.Object);
+                    var service = SetupService(userService: userService.Object);
                     return service.Update(_release.Id, Guid.NewGuid(), new FeaturedTableUpdateRequest());
                 }
             );
@@ -91,7 +91,7 @@ public class FeaturedTableServicePermissionTests
             .AssertForbidden(
                 userService =>
                 {
-                    var service = SetupFeaturedTableService(userService: userService.Object);
+                    var service = SetupService(userService: userService.Object);
                     return service.Delete(_release.Id, Guid.NewGuid());
                 }
             );
@@ -105,13 +105,13 @@ public class FeaturedTableServicePermissionTests
             .AssertForbidden(
                 userService =>
                 {
-                    var service = SetupFeaturedTableService(userService: userService.Object);
+                    var service = SetupService(userService: userService.Object);
                     return service.Reorder(_release.Id, new List<Guid>());
                 }
             );
     }
 
-    private FeaturedTableService SetupFeaturedTableService(
+    private FeaturedTableService SetupService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IDataBlockService? dataBlockService = null,

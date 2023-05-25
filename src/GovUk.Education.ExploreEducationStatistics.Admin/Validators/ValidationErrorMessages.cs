@@ -116,7 +116,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Featured tables
         DataBlockAlreadyHasFeaturedTable,
-        FeaturedTableIsNotAssociatedWithRelease,
         ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds,
     }
 }

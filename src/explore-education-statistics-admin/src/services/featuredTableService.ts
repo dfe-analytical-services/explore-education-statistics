@@ -8,6 +8,11 @@ export interface FeaturedTable {
   order: number;
 }
 
+export interface FeaturedTableBasic {
+  name: string;
+  description: string;
+}
+
 export interface FeaturedTableCreateRequest {
   name: string;
   description: string;
@@ -20,22 +25,22 @@ export interface FeaturedTableUpdateRequest {
 }
 
 const featuredTableService = {
-  get(releaseId: string, dataBlockId: string): Promise<FeaturedTable> {
+  getFeaturedTable(
+    releaseId: string,
+    dataBlockId: string,
+  ): Promise<FeaturedTable> {
     return client.get(`/releases/${releaseId}/featured-tables/${dataBlockId}`);
   },
-
-  list(releaseId: string): Promise<FeaturedTable[]> {
+  listFeaturedTables(releaseId: string): Promise<FeaturedTable[]> {
     return client.get(`/releases/${releaseId}/featured-tables`);
   },
-
-  create(
+  createFeaturedTable(
     releaseId: string,
     featuredTable: FeaturedTableCreateRequest,
   ): Promise<FeaturedTable> {
     return client.post(`/releases/${releaseId}/featured-tables`, featuredTable);
   },
-
-  update(
+  updateFeaturedTable(
     releaseId: string,
     dataBlockId: string,
     featuredTable: FeaturedTableUpdateRequest,
@@ -45,14 +50,15 @@ const featuredTableService = {
       featuredTable,
     );
   },
-
-  delete(releaseId: string, dataBlockId: string): Promise<void> {
+  deleteFeaturedTable(releaseId: string, dataBlockId: string): Promise<void> {
     return client.delete(
       `/releases/${releaseId}/featured-tables/${dataBlockId}`,
     );
   },
-
-  reorder(releaseId: string, newOrder: string[]): Promise<FeaturedTable[]> {
+  reorderFeaturedTables(
+    releaseId: string,
+    newOrder: string[],
+  ): Promise<FeaturedTable[]> {
     return client.put(`releases/${releaseId}/featured-tables/order`, newOrder);
   },
 };

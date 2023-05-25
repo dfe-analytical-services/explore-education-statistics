@@ -586,7 +586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
                 Assert.Equal(dataBlock.ContentSection.Heading, dependentBlocks[0].ContentSectionHeading);
                 Assert.False(dependentBlocks[0].IsKeyStatistic);
-                Assert.False(dependentBlocks[0].IsFeaturedTable);
+                Assert.Null(dependentBlocks[0].FeaturedTable);
 
                 Assert.Single(dependentBlocks[0].InfographicFilesInfo);
 
@@ -642,7 +642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetDeletePlan_DependentDataBlockIsFeaturedTable()
+        public async Task GetDeletePlan_DependentDataBlockIncludesFeaturedTableDetails()
         {
             var release = new Release();
 
@@ -650,6 +650,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var featuredTable = new FeaturedTable
             {
+                Name = "Featured table name",
+                Description = "Featured table description",
                 DataBlock = dataBlock,
             };
 
@@ -683,7 +685,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Id, dependentBlocks[0].Id);
                 Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
                 Assert.Null(dataBlock.ContentSection);
-                Assert.True(dependentBlocks[0].IsFeaturedTable);
+                Assert.NotNull(dependentBlocks[0].FeaturedTable);
+                Assert.Equal(featuredTable.Name, dependentBlocks[0].FeaturedTable!.Name);
+                Assert.Equal(featuredTable.Description, dependentBlocks[0].FeaturedTable!.Description);
             }
         }
 

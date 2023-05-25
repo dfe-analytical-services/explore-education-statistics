@@ -61,7 +61,7 @@ public class FeaturedTableServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(context);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Get(
                 release.Id,
@@ -101,7 +101,7 @@ public class FeaturedTableServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(context);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Get(
                 release.Id,
@@ -117,7 +117,7 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(context);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Get(
                 Guid.NewGuid(),
@@ -156,13 +156,13 @@ public class FeaturedTableServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(context);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Get(
                 release.Id,
                 featuredTable.DataBlock.Id);
 
-            result.AssertBadRequest(FeaturedTableIsNotAssociatedWithRelease);
+            result.AssertNotFound();
         }
     }
 
@@ -204,7 +204,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock> { featuredTable1.DataBlock, featuredTable2.DataBlock, });
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -265,7 +265,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock> { featuredTable1.DataBlock, featuredTable2.DataBlock, featuredTable3.DataBlock, });
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -290,7 +290,7 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(context);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.List(Guid.NewGuid());
 
@@ -326,7 +326,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -369,7 +369,7 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context);
 
             var result = await featuredTableService.Create(
@@ -403,7 +403,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -456,7 +456,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -520,7 +520,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -560,7 +560,7 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context);
 
             var result = await featuredTableService.Update(
@@ -594,7 +594,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -648,7 +648,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -661,7 +661,7 @@ public class FeaturedTableServiceTests
                     Description = "Updated featured table description",
                 });
 
-            result.AssertBadRequest(FeaturedTableIsNotAssociatedWithRelease);
+            result.AssertNotFound();
         }
     }
 
@@ -702,7 +702,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -726,7 +726,7 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context);
 
             var result = await featuredTableService.Delete(
@@ -765,7 +765,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -814,7 +814,7 @@ public class FeaturedTableServiceTests
             dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
                 .ReturnsAsync(new List<DataBlock>());
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -822,7 +822,7 @@ public class FeaturedTableServiceTests
                 release.Id,
                 featuredTable.DataBlock.Id);
 
-            result.AssertBadRequest(FeaturedTableIsNotAssociatedWithRelease);
+            result.AssertNotFound();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -890,7 +890,7 @@ public class FeaturedTableServiceTests
                     featuredTable1.DataBlock, featuredTable2.DataBlock, featuredTable3.DataBlock
                 });
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -946,7 +946,7 @@ public class FeaturedTableServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context);
 
             var result = await featuredTableService.Reorder(
@@ -1012,7 +1012,7 @@ public class FeaturedTableServiceTests
                     featuredTable1.DataBlock, featuredTable2.DataBlock, featuredTable3.DataBlock
                 });
 
-            var featuredTableService = SetupFeaturedTableService(
+            var featuredTableService = SetupService(
                 context,
                 dataBlockService: dataBlockService.Object);
 
@@ -1028,7 +1028,7 @@ public class FeaturedTableServiceTests
         }
     }
 
-    private FeaturedTableService SetupFeaturedTableService(
+    private FeaturedTableService SetupService(
         ContentDbContext contentDbContext,
         IDataBlockService? dataBlockService = null,
         IUserService? userService = null)

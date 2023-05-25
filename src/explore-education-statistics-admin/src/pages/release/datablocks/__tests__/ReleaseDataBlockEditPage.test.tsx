@@ -235,7 +235,6 @@ describe('ReleaseDataBlockEditPage', () => {
           contentSectionHeading: 'Test section',
           infographicFilesInfo: [],
           isKeyStatistic: false,
-          isFeaturedTable: false,
         },
       ],
     });
@@ -273,7 +272,6 @@ describe('ReleaseDataBlockEditPage', () => {
           contentSectionHeading: 'Test section',
           infographicFilesInfo: [],
           isKeyStatistic: false,
-          isFeaturedTable: false,
         },
       ],
     });
@@ -315,7 +313,6 @@ describe('ReleaseDataBlockEditPage', () => {
           contentSectionHeading: 'Test section',
           infographicFilesInfo: [],
           isKeyStatistic: false,
-          isFeaturedTable: false,
         },
       ],
     });

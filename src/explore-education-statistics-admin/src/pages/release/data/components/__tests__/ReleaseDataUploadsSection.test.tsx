@@ -309,14 +309,16 @@ describe('ReleaseDataUploadsSection', () => {
               name: 'Test data block 1',
               infographicFilesInfo: [],
               isKeyStatistic: true,
-              isFeaturedTable: false,
             },
             {
               contentSectionHeading: 'Test section 2',
               name: 'Test data block 2',
               infographicFilesInfo: [],
               isKeyStatistic: false,
-              isFeaturedTable: true,
+              featuredTable: {
+                name: 'Test data block 2 featured table',
+                description: 'Test data block 2 featured table description',
+              },
             },
           ],
         },
@@ -376,9 +378,7 @@ describe('ReleaseDataUploadsSection', () => {
       expect(dataBlocks[0]).toHaveTextContent(
         'A key statistic associated with this data block will be removed.',
       );
-      expect(dataBlocks[0]).not.toHaveTextContent(
-        'A featured table associated with this data block will be removed.',
-      );
+      expect(dataBlocks[0]).not.toHaveTextContent('The featured table ');
 
       expect(dataBlocks[1]).toHaveTextContent('Test data block 2');
       expect(dataBlocks[1]).toHaveTextContent(
@@ -388,7 +388,7 @@ describe('ReleaseDataUploadsSection', () => {
         'A key statistic associated with this data block will be removed.',
       );
       expect(dataBlocks[1]).toHaveTextContent(
-        'A featured table associated with this data block will be removed.',
+        'The featured table "Test data block 2 featured table" using this data block will be removed.',
       );
 
       expect(
