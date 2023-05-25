@@ -61,18 +61,21 @@ describe('DataSetStep', () => {
       name: 'Test featured 1',
       description: 'Test featured description 1',
       subjectId: 'subject-1',
+      dataBlockId: 'dataBlock-1',
     },
     {
       id: 'featured-2',
       name: 'Test featured 2',
       description: 'Test featured description 2 find me',
       subjectId: 'subject-1',
+      dataBlockId: 'dataBlock-2',
     },
     {
       id: 'featured-3',
       name: 'Test featured 3',
       description: 'Test featured description 3',
       subjectId: 'subject-3',
+      dataBlockId: 'dataBlock-3',
     },
   ];
 

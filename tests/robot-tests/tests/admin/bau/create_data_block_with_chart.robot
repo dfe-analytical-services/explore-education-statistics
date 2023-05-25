@@ -189,8 +189,8 @@ Save data block
 
     user clicks checkbox    Set as a featured table for this publication
     user waits until page contains element    id:dataBlockDetailsForm-highlightName
-    user enters text into element    id:dataBlockDetailsForm-highlightName    UI test highlight name
-    user enters text into element    id:dataBlockDetailsForm-highlightDescription    UI test highlight description
+    user enters text into element    id:dataBlockDetailsForm-highlightName    UI test featured table name
+    user enters text into element    id:dataBlockDetailsForm-highlightDescription    UI test featured table description
 
     user clicks button    Save data block
     user waits until page contains    Delete this data block
@@ -209,10 +209,8 @@ Validate data block is in list
 
     user checks table body has x rows    1
     user checks table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks table cell contains    1    2    No
     user checks table cell contains    1    3    No
-    # TODO EES-4310 Fails because featured table entity isn't created when data block is created
-    user checks table cell contains    1    4    UI test highlight name
+    user checks table cell contains    1    4    UI test featured table name
 
 Embed data block into release content
     user clicks link    Content

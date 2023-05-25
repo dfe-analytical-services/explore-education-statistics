@@ -29,6 +29,7 @@ import minDelay from '@common/utils/minDelay';
 import produce from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useState } from 'react';
+import featuredTableService from '@admin/services/featuredTableService';
 
 export type SavedDataBlock = CreateReleaseDataBlock & {
   id?: string;
@@ -128,6 +129,41 @@ const DataBlockPageTabs = ({
     }
   }, []);
 
+  const handleFeaturedTableChange = useCallback(
+    async ({
+      originalName,
+      originalDescription,
+      newName,
+      newDescription,
+      dataBlockId,
+    }: {
+      originalName: string | undefined;
+      originalDescription: string | undefined;
+      newName: string | undefined;
+      newDescription: string | undefined;
+      dataBlockId: string;
+    }) => {
+      if (originalName && !newName) {
+        await featuredTableService.deleteFeaturedTable(releaseId, dataBlockId);
+      } else if (!originalName && newName) {
+        await featuredTableService.createFeaturedTable(releaseId, {
+          name: newName,
+          description: newDescription ?? '',
+          dataBlockId,
+        });
+      } else if (
+        (originalName && originalName !== newName) ||
+        (originalName && originalDescription !== newDescription)
+      ) {
+        await featuredTableService.updateFeaturedTable(releaseId, dataBlockId, {
+          name: newName ?? '',
+          description: newDescription ?? '',
+        });
+      }
+    },
+    [releaseId],
+  );
+
   const handleDataBlockSave = useCallback(
     async (nextDataBlock: SavedDataBlock) => {
       setIsSaving(true);
@@ -142,15 +178,35 @@ const DataBlockPageTabs = ({
         },
       };
 
-      const savedDataBlock = await minDelay(() => {
+      const savedDataBlock = await minDelay(async () => {
         if (dataBlockToSave.id) {
+          await handleFeaturedTableChange({
+            originalName: dataBlock?.highlightName,
+            originalDescription: dataBlock?.highlightDescription,
+            newName: dataBlockToSave.highlightName,
+            newDescription: dataBlockToSave.highlightDescription,
+            dataBlockId: dataBlockToSave.id,
+          });
           return dataBlocksService.updateDataBlock(
             dataBlockToSave.id,
             dataBlockToSave as ReleaseDataBlock,
           );
         }
 
-        return dataBlocksService.createDataBlock(releaseId, dataBlockToSave);
+        const newDataBlock = await dataBlocksService.createDataBlock(
+          releaseId,
+          dataBlockToSave,
+        );
+
+        await handleFeaturedTableChange({
+          originalName: dataBlock?.highlightName,
+          originalDescription: dataBlock?.highlightDescription,
+          newName: dataBlockToSave.highlightName,
+          newDescription: dataBlockToSave.highlightDescription,
+          dataBlockId: newDataBlock.id,
+        });
+
+        return newDataBlock;
       }, 500);
 
       if (onDataBlockSave) {
@@ -160,7 +216,7 @@ const DataBlockPageTabs = ({
       setIsSaving(false);
       setSaveNumber(saveNumber + 1);
     },
-    [onDataBlockSave, releaseId, saveNumber],
+    [dataBlock, onDataBlockSave, releaseId, saveNumber],
   );
 
   const handleDataBlockSourceSave: DataBlockSourceWizardSaveHandler = useCallback(
