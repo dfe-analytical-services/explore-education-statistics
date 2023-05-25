@@ -241,7 +241,7 @@ const PrototypeManageUsers = () => {
                   </th>
                 </tr>
                 <tr>
-                  <td>Academic Year 2020/21 (Not live)</td>
+                  <td>Academic year 2020/21 (Not live)</td>
                   <td style={{ width: '12%' }}>
                     <Tag>Draft</Tag>
                   </td>
@@ -267,7 +267,7 @@ const PrototypeManageUsers = () => {
                     <Link to="/prototypes/admin-release-summary">
                       Edit{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20, Pupil absence in schools in
+                        Academic year 2019/20, Pupil absence in schools in
                         England
                       </span>
                     </Link>
@@ -275,7 +275,7 @@ const PrototypeManageUsers = () => {
                   <td />
                 </tr>
                 <tr>
-                  <td>Academic Year 2019/20 (Not live)</td>
+                  <td>Academic year 2019/20 (Not live)</td>
                   <td>
                     <Tag>In review</Tag>
                   </td>
@@ -295,7 +295,7 @@ const PrototypeManageUsers = () => {
                     <Link to="/prototypes/admin-release-summary">
                       Edit{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20, Pupil absence in schools in
+                        Academic year 2019/20, Pupil absence in schools in
                         England
                       </span>
                     </Link>
@@ -308,7 +308,7 @@ const PrototypeManageUsers = () => {
                   </th>
                 </tr>
                 <tr>
-                  <td>Academic Year 2020/21 (Not live)</td>
+                  <td>Academic year 2020/21 (Not live)</td>
                   <td>
                     <Tag>Draft</Tag>
                   </td>
@@ -334,7 +334,7 @@ const PrototypeManageUsers = () => {
                     <Link to="/prototypes/admin-release-summary">
                       Edit{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20, Pupil absence in schools in
+                        Academic year 2019/20, Pupil absence in schools in
                         England
                       </span>
                     </Link>
@@ -347,7 +347,7 @@ const PrototypeManageUsers = () => {
                   </th>
                 </tr>
                 <tr>
-                  <td>Academic Year 2020/21 (Not live)</td>
+                  <td>Academic year 2020/21 (Not live)</td>
                   <td>
                     <Tag>Amendment</Tag>
                   </td>
@@ -367,7 +367,7 @@ const PrototypeManageUsers = () => {
                     <Link to="/prototypes/admin-release-summary">
                       Edit{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20, Pupil absence in schools in
+                        Academic year 2019/20, Pupil absence in schools in
                         England
                       </span>
                     </Link>
@@ -459,7 +459,7 @@ const PrototypeManageUsers = () => {
                 </tr>
                 <tr>
                   <td>
-                    Academic Year 2020/21 (Not live) <Tag>Amendment</Tag>
+                    Academic year 2020/21 (Not live) <Tag>Amendment</Tag>
                   </td>
                   <td>
                     <Tag colour="orange">Validating</Tag>
@@ -470,7 +470,7 @@ const PrototypeManageUsers = () => {
                     <a href="#">
                       View{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20 (Not live)
+                        Academic year 2019/20 (Not live)
                       </span>
                     </a>
                   </td>
@@ -483,7 +483,7 @@ const PrototypeManageUsers = () => {
                   </th>
                 </tr>
                 <tr>
-                  <td>Academic Year 2020/21 (Not live)</td>
+                  <td>Academic year 2020/21 (Not live)</td>
                   <td>
                     <Tag colour="blue">Scheduled</Tag>
                   </td>
@@ -493,7 +493,7 @@ const PrototypeManageUsers = () => {
                     <a href="#">
                       View{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20 (Not live)
+                        Academic year 2019/20 (Not live)
                       </span>
                     </a>
                   </td>
@@ -506,7 +506,7 @@ const PrototypeManageUsers = () => {
                   </th>
                 </tr>
                 <tr>
-                  <td>Academic Year 2018/19 (Not live)</td>
+                  <td>Academic year 2018/19 (Not live)</td>
                   <td>
                     <Tag colour="orange">STARTED</Tag>
                   </td>
@@ -537,14 +537,14 @@ const PrototypeManageUsers = () => {
                     <a href="#">
                       View{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20 (Not live)
+                        Academic year 2019/20 (Not live)
                       </span>
                     </a>
                   </td>
                   <td />
                 </tr>
                 <tr>
-                  <td>Academic Year 2019/20 (Not live)</td>
+                  <td>Academic year 2019/20 (Not live)</td>
                   <td>
                     <Tag colour="green">COMPLETE</Tag>
                   </td>
@@ -575,14 +575,14 @@ const PrototypeManageUsers = () => {
                     <a href="#">
                       View{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20 (Not live)
+                        Academic year 2019/20 (Not live)
                       </span>
                     </a>
                   </td>
                   <td />
                 </tr>
                 <tr>
-                  <td>Academic Year 2021/22 (Not live)</td>
+                  <td>Academic year 2021/22 (Not live)</td>
                   <td>
                     <Tag colour="red">FAILED</Tag>
                   </td>
@@ -620,7 +620,7 @@ const PrototypeManageUsers = () => {
                     <a href="#">
                       View{' '}
                       <span className="govuk-visually-hidden">
-                        Academic Year 2019/20 (Not live)
+                        Academic year 2019/20 (Not live)
                       </span>
                     </a>
                   </td>

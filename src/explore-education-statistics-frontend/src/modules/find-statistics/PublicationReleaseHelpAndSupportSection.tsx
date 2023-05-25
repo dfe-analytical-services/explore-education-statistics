@@ -18,7 +18,6 @@ import ManagementInformationSection from '@common/modules/find-statistics/compon
 
 interface Props {
   includeAnalytics?: boolean;
-  accordionId: string;
   publicationTitle: string;
   methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
@@ -27,7 +26,6 @@ interface Props {
 }
 
 const PublicationReleaseHelpAndSupportSection = ({
-  accordionId,
   includeAnalytics = false,
   publicationTitle,
   methodologies,
@@ -40,11 +38,12 @@ const PublicationReleaseHelpAndSupportSection = ({
       <h2
         className="govuk-heading-m govuk-!-margin-top-9"
         data-testid="extra-information"
+        id="help-and-support"
       >
         Help and support
       </h2>
       <AccordionComponent
-        accordionId={accordionId}
+        accordionId="help-and-support-accordion"
         includeAnalytics={includeAnalytics}
         publicationTitle={publicationTitle}
       >

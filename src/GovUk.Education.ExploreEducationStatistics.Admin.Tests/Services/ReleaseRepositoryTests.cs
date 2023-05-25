@@ -297,9 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ReleaseName = "2000",
                 Published = DateTime.Now,
-                TimePeriodCoverage = TimeIdentifier.April,
                 PreviousVersionId = Guid.NewGuid(),
                 Publication = new Publication
                 {
@@ -335,10 +333,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
-                Assert.Equal(release.Slug, statsRelease!.Slug);
-                Assert.Equal(release.PublicationId, statsRelease.PublicationId);
-                Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);
-                Assert.Equal(release.Year, statsRelease.Year);
+                Assert.Equal(release.Id, statsRelease!.Id);
+                Assert.Equal(release.PublicationId, statsRelease!.PublicationId);
             }
             
         }
@@ -377,8 +373,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddAsync(new Data.Model.Release
                 {
                     Id = release.Id,
-                    Year = 1234,
-                    TimeIdentifier = TimeIdentifier.CalendarYearQ1,
                     PublicationId = release.Publication.Id
                 });
                 await statisticsDbContext.SaveChangesAsync();
@@ -396,9 +390,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
-                Assert.Equal(release.Year, statsRelease!.Year);
-                Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);
-                Assert.Equal(release.PublicationId, statsRelease.PublicationId);
+                Assert.Equal(release.Id, statsRelease!.Id);
+                Assert.Equal(release.PublicationId, statsRelease!.PublicationId);
             }
         }
         

@@ -158,8 +158,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [NotMapped]
         private List<IChart> ChartsInternal { get; set; } = new();
 
-        public DataBlockSummary? Summary { get; set; }
-
         public TableBuilderConfiguration Table { get; set; }
     }
 

@@ -222,7 +222,10 @@ const LocationFiltersForm = ({
                 </div>
               </FormFieldset>
 
-              <WizardStepFormActions {...stepProps} />
+              <WizardStepFormActions
+                {...stepProps}
+                isSubmitting={form.isSubmitting}
+              />
             </Form>
           );
         }
@@ -268,7 +271,7 @@ const LocationFiltersForm = ({
                 ))}
             </SummaryList>
 
-            <ResetFormOnPreviousStep {...stepProps} />
+            <ResetFormOnPreviousStep {...stepProps} onReset={form.resetForm} />
           </WizardStepSummary>
         );
       }}

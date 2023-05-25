@@ -37,6 +37,17 @@ public static class FiltersMetaViewModelBuilder
         );
     }
 
+    public static Dictionary<string, FilterCsvMetaViewModel> BuildCsvFiltersFromFilterItems(
+        IEnumerable<FilterItem> values)
+    {
+        var filters = GroupFilterItemsByFilter(values);
+
+        return filters.ToDictionary(
+            filter => filter.Name,
+            filter => new FilterCsvMetaViewModel(filter)
+        );
+    }
+
     private static Dictionary<string, FilterGroupMetaViewModel> BuildFilterGroups(
         IEnumerable<FilterGroup> values,
         IEnumerable<FilterGroupSequenceEntry>? sequence = null)

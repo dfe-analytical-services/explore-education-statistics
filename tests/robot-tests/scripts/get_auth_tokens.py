@@ -137,11 +137,6 @@ def get_identity_info(
     if not driver:
         get_webdriver("latest")
 
-    # TODO: investigate whether this is necessary for data-guidance assertions
-    # when downloading files, place them by default in ~/tests/robot-tests directory
-    # this is useful when testing data-guidance downloads (without this it
-    # would be placed in your user's download directory)
-
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
     chrome_options.add_argument("--headless")

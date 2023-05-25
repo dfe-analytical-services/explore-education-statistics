@@ -10,7 +10,9 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
-import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
+import tableBuilderService, {
+  ReleaseTableDataQuery,
+} from '@common/services/tableBuilderService';
 import React, { ReactNode, useRef } from 'react';
 import methodologyService, {
   MethodologyVersionSummary,
@@ -99,6 +101,7 @@ const ReleasePreviewTableToolFinalStep = ({
           <DownloadTable
             fullTable={table}
             fileName={`data-${publication.slug}`}
+            onCsvDownload={() => tableBuilderService.getTableCsv(query)}
             tableRef={dataTableRef}
           />
 

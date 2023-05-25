@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Config
 {
     public class SensitiveDataTelemetryProcessorTests
     {
-        private static IEnumerable<object[]> GetSensitiveQueryParamVariations()
+        public static IEnumerable<object[]> GetSensitiveQueryParamVariations()
         {
             return new List<object[]>
             {

@@ -51,12 +51,12 @@ const PrototypeManagePublication = () => {
                 Select release
               </label>
               <select name="topic" id="topic" className="govuk-select">
-                <option value="">Academic Year 2020/21 (Not live)</option>
+                <option value="">Academic year 2020/21 (Not live)</option>
                 <option value="">
-                  Academic Year 2019/20 (Live - Latest release)
+                  Academic year 2019/20 (Live - Latest release)
                 </option>
-                <option value="">Academic Year 2018/19 (Live)</option>
-                <option value="">Academic Year 2017/18 (Live)</option>
+                <option value="">Academic year 2018/19 (Live)</option>
+                <option value="">Academic year 2017/18 (Live)</option>
               </select>
             </form>
           </div>
@@ -72,7 +72,7 @@ const PrototypeManagePublication = () => {
 
         <table className="govuk-table govuk-!-margin-top-9">
           <caption className="govuk-table__caption govuk-table__caption--m">
-            Academic Year 2020/21 (Not live) <Tag>DRAFT</Tag>
+            Academic year 2020/21 (Not live) <Tag>DRAFT</Tag>
           </caption>
           <thead className="govuk-table__head">
             <tr className="govuk-table__row">

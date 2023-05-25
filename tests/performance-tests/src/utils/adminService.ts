@@ -401,7 +401,9 @@ export class AdminService {
         dataFile.file,
         dataFile.filename,
       ),
-      metaFile: !zipUpload ? http.file(metaFile!.file, metaFile!.filename) : '',
+      metaFile: !zipUpload
+        ? http.file(metaFile?.file as ArrayBuffer, metaFile?.filename)
+        : '',
     };
 
     const { response, json } = this.client.post<{ id: string }>(

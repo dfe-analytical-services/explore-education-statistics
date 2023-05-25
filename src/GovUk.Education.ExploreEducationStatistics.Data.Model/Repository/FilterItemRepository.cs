@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return filterItems;
         }
 
-        public IList<FilterItem> GetFilterItemsFromObservationList(IList<Observation> observations)
+        public async Task<IList<FilterItem>> GetFilterItemsFromObservations(IEnumerable<Observation> observations)
         {
             var filterItemIds =
                 observations
@@ -84,13 +84,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                     .Distinct()
                     .ToList();
 
-            return _context
+            return await _context
                 .FilterItem
                 .AsNoTracking()
                 .Include(fi => fi.FilterGroup)
                 .ThenInclude(fg => fg.Filter)
                 .Where(fi => filterItemIds.Contains(fi.Id))
-                .ToList();
+                .ToListAsync();
         }
     }
 }

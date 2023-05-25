@@ -2,6 +2,7 @@ import { dataApi } from '@common/services/api';
 import { FileInfo } from '@common/services/types/file';
 import { ConfiguredTable } from '@common/services/types/table';
 import { Dictionary } from '@common/types';
+import { AxiosRequestConfig } from 'axios';
 import { Feature, Geometry } from 'geojson';
 
 export interface FilterOption {
@@ -252,6 +253,21 @@ const tableBuilderService = {
     return releaseId
       ? dataApi.post(`/tablebuilder/release/${releaseId}`, query)
       : dataApi.post('/tablebuilder', query);
+  },
+  async getTableCsv({
+    releaseId,
+    ...query
+  }: ReleaseTableDataQuery): Promise<Blob> {
+    const config: AxiosRequestConfig = {
+      headers: {
+        Accept: 'text/csv',
+      },
+      responseType: 'blob',
+    };
+
+    return releaseId
+      ? dataApi.post(`/tablebuilder/release/${releaseId}`, query, config)
+      : dataApi.post('/tablebuilder', query, config);
   },
   async getDataBlockTableData(
     releaseId: string,

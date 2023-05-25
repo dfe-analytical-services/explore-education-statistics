@@ -2,8 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+using System.Reflection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -67,6 +66,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 }
 
                 return path;
+            }
+        }
+
+        /// <summary>
+        /// Get the loadable types for an assembly, ignoring types that may
+        /// transitively consume types from an inaccessible assembly.
+        /// </summary>
+        /// <param name="assembly">The assembly to load types from.</param>
+        public static IEnumerable<Type> GetLoadableTypes(this Assembly assembly)
+        {
+            try
+            {
+                return assembly.GetTypes();
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                return e.Types.WhereNotNull();
             }
         }
     }

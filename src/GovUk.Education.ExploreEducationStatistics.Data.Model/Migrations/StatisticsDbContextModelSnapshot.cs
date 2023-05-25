@@ -492,29 +492,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("PreviousVersionId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<Guid>("PublicationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime?>("Published")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TimeIdentifier")
-                        .IsRequired()
-                        .HasMaxLength(6)
-                        .HasColumnType("nvarchar(6)");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("PreviousVersionId");
 
                     b.HasIndex("PublicationId");
 
@@ -1003,7 +984,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", "Release")
-                        .WithMany("Footnotes")
+                        .WithMany()
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1098,11 +1079,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
                 {
                     b.Navigation("FilterItems");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
-                {
-                    b.Navigation("Footnotes");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>

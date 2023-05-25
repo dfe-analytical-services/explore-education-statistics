@@ -21,7 +21,7 @@ Create new publication and release via API
 
 Go to release sign off page and verify initial release checklist
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial Year 3000-01
+    ...    Financial year 3000-01
 
     user edits release status
 
@@ -106,7 +106,7 @@ Move release status back to Draft
 Check that having a Draft owned Methodology attached to this Release's Publication will show a checklist warning
     user creates methodology for publication    ${PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial Year 3000-01
+    ...    Financial year 3000-01
     user edits release status
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
@@ -116,7 +116,7 @@ Check that having a Draft owned Methodology attached to this Release's Publicati
 Approve the owned methodology and verify the warning disappears
     user approves methodology for publication    ${PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial Year 3000-01
+    ...    Financial year 3000-01
     user edits release status
     user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
@@ -138,7 +138,7 @@ Adopt a Draft methodology
 
 Check that having a Draft methodology adopted by this Release's Publication will show a checklist warning
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial Year 3000-01
+    ...    Financial year 3000-01
     user edits release status
     user checks checklist warnings contains
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
@@ -147,7 +147,7 @@ Check that having a Draft methodology adopted by this Release's Publication will
 Approve the adopted methodology and verify the warning disappears
     user approves methodology for publication    ${ADOPTED_PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Financial Year 3000-01
+    ...    Financial year 3000-01
     user edits release status
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.

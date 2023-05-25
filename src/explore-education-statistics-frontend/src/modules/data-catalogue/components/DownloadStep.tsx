@@ -164,6 +164,7 @@ const DownloadStep = ({
             {checkboxOptions.length > 0 ? (
               <WizardStepFormActions
                 {...stepProps}
+                isSubmitting={form.isSubmitting}
                 submitText="Download selected files"
                 submittingText="Downloading"
               />
@@ -175,6 +176,7 @@ const DownloadStep = ({
           <ResetFormOnPreviousStep
             currentStep={currentStep}
             stepNumber={stepNumber}
+            onReset={form.resetForm}
           />
         );
       }}

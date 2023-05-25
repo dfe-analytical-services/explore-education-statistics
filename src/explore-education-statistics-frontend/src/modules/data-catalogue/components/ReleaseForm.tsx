@@ -101,7 +101,10 @@ const ReleaseForm = ({
             />
 
             {options.length > 0 ? (
-              <WizardStepFormActions {...stepProps} />
+              <WizardStepFormActions
+                {...stepProps}
+                isSubmitting={form.isSubmitting}
+              />
             ) : (
               <p>No releases available.</p>
             )}
@@ -110,6 +113,7 @@ const ReleaseForm = ({
           <ResetFormOnPreviousStep
             currentStep={currentStep}
             stepNumber={stepNumber}
+            onReset={form.resetForm}
           />
         );
       }}

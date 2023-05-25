@@ -22,7 +22,7 @@ Create test publication and release via api
 
 Navigate to 'Data and files' page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26
+    ...    Academic year 2025/26
 
     user clicks link    Data and files
     user waits until h1 is visible    ${PUBLICATION_NAME}

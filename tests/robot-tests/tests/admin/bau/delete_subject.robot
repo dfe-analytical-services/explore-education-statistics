@@ -21,8 +21,8 @@ Create test publication and release via API
 
 Verify Release summary
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Tax Year 2020-21
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Tax Year    2020-21
+    ...    Tax year 2020-21
+    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Tax year    2020-21
     ...    UI test contact name    National statistics
 
 Upload subject

@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
 {
@@ -15,6 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
         protected override IHostBuilder CreateHostBuilder()
         {
             return Host.CreateDefaultBuilder()
+            .ConfigureLogging(
+                builder =>
+                {
+                    builder
+                        .AddFilter<ConsoleLoggerProvider>("Default", LogLevel.Warning)
+                        .AddFilter<ConsoleLoggerProvider>("Microsoft", LogLevel.Warning);
+                }
+            )
             .ConfigureWebHostDefaults(builder =>
             {
                 builder.UseStartup<TStartup>().UseTestServer();

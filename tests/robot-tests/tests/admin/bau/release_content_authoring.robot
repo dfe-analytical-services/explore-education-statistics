@@ -9,7 +9,7 @@ Test Setup          fail test fast if required
 
 
 *** Variables ***
-${RELEASE_NAME}=        Academic Year Q1 2020/21
+${RELEASE_NAME}=        Academic year Q1 2020/21
 ${PUBLICATION_NAME}=    UI tests - comments %{RUN_IDENTIFIER}
 ${SECTION_1_TITLE}=     First content section
 ${BLOCK_1_CONTENT}=     Block 1 content
@@ -25,7 +25,7 @@ Create publication
 
 Create new release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user creates release from publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic year Q1    2020
 
 Give analyst1 publication owner permissions to work on release
     user gives analyst publication owner access    ${PUBLICATION_NAME}

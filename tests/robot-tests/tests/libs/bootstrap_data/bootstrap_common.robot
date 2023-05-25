@@ -17,7 +17,7 @@ user creates a fully populated higher review release
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2023
-    ...    ${RELEASE_TYPE}=Academic Year 2023/24
+    ...    ${RELEASE_TYPE}=Academic year 2023/24
     user creates a fully populated draft release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
@@ -36,7 +36,7 @@ user creates a fully populated approved release
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2024
-    ...    ${RELEASE_TYPE}=Academic Year 2024/25
+    ...    ${RELEASE_TYPE}=Academic year 2024/25
     user creates a fully populated draft release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
@@ -62,7 +62,7 @@ user creates a fully populated published release
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2025
-    ...    ${RELEASE_TYPE}=Academic Year 2025/26
+    ...    ${RELEASE_TYPE}=Academic year 2025/26
     user creates a fully populated draft release
     ...    ${PUBLICATION_ID}
     ...    ${PUBLICATION_NAME}
@@ -81,7 +81,7 @@ user creates a fully populated draft release
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     ...    ${RELEASE_TIME_PERIOD}=AY
     ...    ${RELEASE_YEAR}=2022
-    ...    ${RELEASE_TYPE}=Academic Year 2022/23
+    ...    ${RELEASE_TYPE}=Academic year 2022/23
     user creates test release via api    ${PUBLICATION_ID}    ${RELEASE_TIME_PERIOD}    ${RELEASE_YEAR}
     user navigates to draft release page from dashboard
     ...    ${PUBLICATION_NAME}

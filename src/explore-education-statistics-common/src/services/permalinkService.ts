@@ -51,4 +51,12 @@ export default {
   async getPermalink(id: string): Promise<Permalink> {
     return deduplicatePermalinkLocations(await dataApi.get(`/permalink/${id}`));
   },
+  async getPermalinkCsv(id: string): Promise<Blob> {
+    return dataApi.get(`/permalink/${id}`, {
+      headers: {
+        Accept: 'text/csv',
+      },
+      responseType: 'blob',
+    });
+  },
 };

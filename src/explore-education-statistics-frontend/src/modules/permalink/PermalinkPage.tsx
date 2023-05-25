@@ -1,9 +1,7 @@
 import FormattedDate from '@common/components/FormattedDate';
 import WarningMessage from '@common/components/WarningMessage';
 import useToggle from '@common/hooks/useToggle';
-import DownloadTable, {
-  FileFormat,
-} from '@common/modules/table-tool/components/DownloadTable';
+import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
@@ -104,10 +102,11 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           <DownloadTable
             fullTable={fullTable}
             fileName={`permalink-${data.id}`}
+            onCsvDownload={() => permalinkService.getPermalinkCsv(data.id)}
             headingSize="m"
             headingTag="h2"
             tableRef={tableRef}
-            onSubmit={(fileFormat: FileFormat) =>
+            onSubmit={fileFormat =>
               logEvent({
                 category: 'Permalink page',
                 action:

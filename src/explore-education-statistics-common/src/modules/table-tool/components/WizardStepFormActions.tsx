@@ -1,13 +1,13 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FormGroup } from '@common/components/form';
-import { useFormContext } from '@common/components/form/contexts/FormContext';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { useFormikContext } from 'formik';
 import React, { MouseEventHandler } from 'react';
 import { InjectedWizardProps } from './Wizard';
 
 interface Props extends InjectedWizardProps {
+  isSubmitting?: boolean;
   submitText?: string;
   submittingText?: string;
   onPreviousStep?: MouseEventHandler<HTMLButtonElement>;
@@ -16,6 +16,7 @@ interface Props extends InjectedWizardProps {
 
 const WizardStepFormActions = ({
   goToPreviousStep,
+  isSubmitting = false,
   loadingStep,
   stepNumber,
   submitText = 'Next step',
@@ -23,10 +24,8 @@ const WizardStepFormActions = ({
   onPreviousStep,
   onSubmit,
 }: Props) => {
-  const { formId } = useFormContext();
-  const form = useFormikContext();
-
-  const loading = typeof loadingStep !== 'undefined' || form.isSubmitting;
+  const { formId } = useFormIdContext();
+  const loading = typeof loadingStep !== 'undefined' || isSubmitting;
   const isLoadingNextStep = (loadingStep ?? stepNumber) > stepNumber;
 
   return (
@@ -57,7 +56,7 @@ const WizardStepFormActions = ({
           type="submit"
           onClick={onSubmit}
         >
-          {form.isSubmitting ? submittingText : submitText}
+          {isSubmitting ? submittingText : submitText}
         </Button>
 
         <LoadingSpinner

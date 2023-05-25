@@ -42,7 +42,7 @@ describe('PublicationReleasePage', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'View latest data: Academic Year 2018/19',
+        name: 'View latest data: Academic year 2018/19',
       }),
     ).toBeInTheDocument();
   });
@@ -155,14 +155,14 @@ describe('PublicationReleasePage', () => {
 
     expect(quickLinks).toHaveLength(4);
 
-    expect(quickLinks[0]).toHaveTextContent('Release contents');
-    expect(quickLinks[0]).toHaveAttribute('href', '#content');
+    expect(quickLinks[0]).toHaveTextContent('View related dashboard(s)');
+    expect(quickLinks[0]).toHaveAttribute('href', '#related-dashboards');
 
-    expect(quickLinks[1]).toHaveTextContent('Explore data');
-    expect(quickLinks[1]).toHaveAttribute('href', '#explore-data-and-files');
+    expect(quickLinks[1]).toHaveTextContent('Release contents');
+    expect(quickLinks[1]).toHaveAttribute('href', '#content');
 
-    expect(quickLinks[2]).toHaveTextContent('View related dashboard(s)');
-    expect(quickLinks[2]).toHaveAttribute('href', '#related-dashboards');
+    expect(quickLinks[2]).toHaveTextContent('Explore data');
+    expect(quickLinks[2]).toHaveAttribute('href', '#explore-data-and-files');
 
     expect(quickLinks[3]).toHaveTextContent('Help and support');
     expect(quickLinks[3]).toHaveAttribute('href', '#help-and-support');
@@ -190,31 +190,31 @@ describe('PublicationReleasePage', () => {
 
     expect(otherReleaseLinks).toHaveLength(5);
 
-    expect(otherReleaseLinks[0]).toHaveTextContent('Academic Year 2018/19');
+    expect(otherReleaseLinks[0]).toHaveTextContent('Academic year 2018/19');
     expect(otherReleaseLinks[0]).toHaveAttribute(
       'href',
       '/find-statistics/pupil-absence-in-schools-in-england/2018-19',
     );
 
-    expect(otherReleaseLinks[1]).toHaveTextContent('Academic Year 2017/18');
+    expect(otherReleaseLinks[1]).toHaveTextContent('Academic year 2017/18');
     expect(otherReleaseLinks[1]).toHaveAttribute(
       'href',
       '/find-statistics/pupil-absence-in-schools-in-england/2017-18',
     );
 
-    expect(otherReleaseLinks[2]).toHaveTextContent('Academic Year 2014/15');
+    expect(otherReleaseLinks[2]).toHaveTextContent('Academic year 2014/15');
     expect(otherReleaseLinks[2]).toHaveAttribute(
       'href',
       'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015',
     );
 
-    expect(otherReleaseLinks[3]).toHaveTextContent('Academic Year 2013/14');
+    expect(otherReleaseLinks[3]).toHaveTextContent('Academic year 2013/14');
     expect(otherReleaseLinks[3]).toHaveAttribute(
       'href',
       'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014',
     );
 
-    expect(otherReleaseLinks[4]).toHaveTextContent('Academic Year 2012/13');
+    expect(otherReleaseLinks[4]).toHaveTextContent('Academic year 2012/13');
     expect(otherReleaseLinks[4]).toHaveAttribute(
       'href',
       'https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013',
@@ -352,7 +352,7 @@ describe('PublicationReleasePage', () => {
 
     userEvent.click(
       screen.getByRole('button', {
-        name: `See all updates (2) for Academic Year 2016/17`,
+        name: `See all updates (2) for Academic year 2016/17`,
       }),
     );
 

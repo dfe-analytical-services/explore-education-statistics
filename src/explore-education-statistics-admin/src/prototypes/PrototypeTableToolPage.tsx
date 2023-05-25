@@ -75,6 +75,7 @@ const PrototypeTableTool = ({ fastTrack, themeMeta = themes }: Props) => {
 
                   {response && query && selectedPublicationDetails && (
                     <PrototypeTableToolFinalStep
+                      query={query}
                       table={response.table}
                       tableHeaders={response.tableHeaders}
                       selectedPublication={selectedPublicationDetails}

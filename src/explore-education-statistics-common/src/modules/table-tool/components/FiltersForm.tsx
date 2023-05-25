@@ -1,14 +1,12 @@
 import CollapsibleList from '@common/components/CollapsibleList';
-import {
-  Form,
-  FormFieldCheckboxSearchSubGroups,
-  FormFieldset,
-  FormGroup,
-} from '@common/components/form';
+import { FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormCheckboxSelectedCount from '@common/components/form/rhf/RHFFormCheckboxSelectedCount';
+import RHFFormFieldCheckboxSearchSubGroups from '@common/components/form/rhf/RHFFormFieldCheckboxSearchSubGroups';
+import RHFFormFieldCheckboxGroupsMenu from '@common/components/form/rhf/RHFFormFieldCheckboxGroupsMenu';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
-import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import TableQueryError from '@common/modules/table-tool/components/TableQueryError';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
@@ -21,15 +19,13 @@ import {
   SubjectMeta,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import createErrorHelper from '@common/validation/createErrorHelper';
+import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 import {
   getErrorMessage,
   hasErrorMessage,
   isServerValidationError,
 } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
@@ -121,8 +117,8 @@ const FiltersForm = ({
     <WizardStepHeading {...stepProps}>Choose your filters</WizardStepHeading>
   );
 
-  const handleSubmit = async (values: FormValues) => {
-    setPreviousValues(values);
+  const handleSubmitForm = async (values: FormValues) => {
+    setPreviousValues({ ...values });
 
     try {
       setTableQueryError(undefined);
@@ -164,18 +160,18 @@ const FiltersForm = ({
     'order',
   );
 
-  return (
-    <Formik<FormValues>
-      enableReinitialize
-      initialValues={initialFormValues}
-      validateOnBlur={false}
-      validationSchema={Yup.object<FormValues>({
+  const validationSchema = useMemo(
+    () =>
+      Yup.object<FormValues>({
         indicators: Yup.array()
           .of(Yup.string())
           .required('Select at least one option from indicators'),
         filters: Yup.object(
           mapValues(subjectMeta.filters, filter =>
             Yup.array()
+              .typeError(
+                `Select at least one option from ${filter.legend.toLowerCase()}`,
+              )
               .of(Yup.string())
               .min(
                 1,
@@ -183,108 +179,118 @@ const FiltersForm = ({
               ),
           ),
         ),
-      })}
-      onSubmit={handleSubmit}
-    >
-      {form => {
-        const { getError } = createErrorHelper(form);
+      }),
+    [subjectMeta.filters],
+  );
 
+  return (
+    <FormProvider
+      enableReinitialize
+      initialValues={initialFormValues}
+      validationSchema={validationSchema}
+    >
+      {({ formState, getValues, reset, setValue }) => {
+        const { getError } = createRHFErrorHelper({
+          errors: formState.errors,
+          touchedFields: formState.touchedFields,
+        });
         if (isActive) {
           return (
-            <Form {...form} id={formId} showSubmitError>
-              {tableQueryError &&
-                form.submitCount > 0 &&
-                isEqual(form.values, previousValues) && (
-                  <TableQueryError
-                    id={`${formId}-tableQueryError`}
-                    errorCode={tableQueryError}
-                    releaseId={selectedPublication?.selectedRelease.id}
-                    showDownloadOption={showTableQueryErrorDownload}
-                    subject={subject}
-                  />
-                )}
+            <RHFForm id={formId} showSubmitError onSubmit={handleSubmitForm}>
+              {tableQueryError && formState.submitCount > 0 && (
+                <TableQueryError
+                  id={`${formId}-tableQueryError`}
+                  errorCode={tableQueryError}
+                  releaseId={selectedPublication?.selectedRelease.id}
+                  showDownloadOption={showTableQueryErrorDownload}
+                  subject={subject}
+                  previousValues={previousValues}
+                />
+              )}
 
               {stepHeading}
 
-              <FormGroup>
-                <div className="govuk-grid-row">
-                  <div className="govuk-grid-column-one-half-from-desktop">
-                    <FormFieldCheckboxSearchSubGroups
-                      name="indicators"
-                      legend={
-                        <>
-                          Indicators
-                          <FormCheckboxSelectedCount name="indicators" />
-                        </>
-                      }
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-one-half-from-desktop">
+                  <RHFFormFieldCheckboxSearchSubGroups
+                    disabled={formState.isSubmitting}
+                    hint="Select at least one indicator below"
+                    legend={
+                      <>
+                        Indicators
+                        <RHFFormCheckboxSelectedCount name="indicators" />
+                      </>
+                    }
+                    legendSize="m"
+                    name="indicators"
+                    options={orderedIndicators.map(group => ({
+                      legend: group.label,
+                      options: group.options,
+                    }))}
+                    order={[]}
+                  />
+                  {orderedFilters.length > 0 && (
+                    <FormFieldset
+                      error={getError('filters')}
+                      hint="Select at least one option from all categories"
+                      id="filters"
+                      legend="Categories"
                       legendSize="m"
-                      hint="Select at least one indicator below"
-                      disabled={form.isSubmitting}
-                      order={[]}
-                      options={orderedIndicators.map(group => ({
-                        legend: group.label,
-                        options: group.options,
-                      }))}
-                    />
-
-                    {orderedFilters.length > 0 && (
-                      <FormFieldset
-                        id="filters"
-                        legend="Categories"
-                        legendSize="m"
-                        hint="Select at least one option from all categories"
-                        error={getError('filters')}
-                      >
-                        {orderedFilters.map(([filterKey, filterGroup]) => {
-                          const filterName = `filters.${filterKey}`;
-                          const orderedFilterGroupOptions = orderBy(
-                            Object.values(filterGroup.options),
-                            'order',
-                          );
-
-                          return (
-                            <FormFieldCheckboxGroupsMenu
-                              key={filterKey}
-                              name={filterName}
-                              legend={filterGroup.legend}
-                              hint={filterGroup.hint}
-                              disabled={form.isSubmitting}
-                              order={[]}
-                              options={orderedFilterGroupOptions.map(group => ({
-                                legend: group.label,
-                                options: group.options,
-                              }))}
-                              open={orderedFilterGroupOptions.length === 1}
-                            />
-                          );
-                        })}
-                      </FormFieldset>
-                    )}
-                  </div>
+                    >
+                      {orderedFilters.map(([filterKey, filterGroup]) => {
+                        const filterName = `filters.${filterKey}`;
+                        const orderedFilterGroupOptions = orderBy(
+                          Object.values(filterGroup.options),
+                          'order',
+                        );
+                        return (
+                          <RHFFormFieldCheckboxGroupsMenu
+                            disabled={formState.isSubmitting}
+                            hint={filterGroup.hint}
+                            id={`${formId}-${filterName}`}
+                            key={filterKey}
+                            legend={filterGroup.legend}
+                            name={filterName}
+                            open={orderedFilterGroupOptions.length === 1}
+                            options={orderedFilterGroupOptions.map(group => ({
+                              legend: group.label,
+                              options: group.options,
+                            }))}
+                            order={[]}
+                          />
+                        );
+                      })}
+                    </FormFieldset>
+                  )}
                 </div>
-              </FormGroup>
+              </div>
 
               <WizardStepFormActions
                 {...stepProps}
+                isSubmitting={formState.isSubmitting}
                 submitText="Create table"
                 submittingText="Creating table"
                 onSubmit={() => {
+                  const filterValues = getValues('filters');
                   // Automatically select totalValue for filters that haven't had a selection made
-                  Object.keys(form.values.filters).forEach(filterName => {
+                  Object.keys(filterValues).forEach(filterName => {
                     if (
-                      form.values.filters[filterName].length === 0 &&
+                      (!filterValues[filterName] ||
+                        filterValues[filterName].length === 0) &&
                       subjectMeta.filters[filterName].totalValue
                     ) {
-                      form.setFieldValue(`filters.${filterName}`, [
-                        subjectMeta.filters[filterName].totalValue,
+                      setValue(`filters.${filterName}`, [
+                        subjectMeta.filters[filterName].totalValue as string,
                       ]);
                     }
                   });
                 }}
               />
-            </Form>
+            </RHFForm>
           );
         }
+
+        const values = getValues();
 
         return (
           <WizardStepSummary {...stepProps} goToButtonText="Edit filters">
@@ -300,7 +306,7 @@ const FiltersForm = ({
                   {orderedIndicators
                     .flatMap(group => group.options)
                     .filter(indicator =>
-                      form.values.indicators.includes(indicator.value),
+                      values.indicators.includes(indicator.value),
                     )
                     .map(indicator => (
                       <li key={indicator.value}>{indicator.label}</li>
@@ -309,7 +315,7 @@ const FiltersForm = ({
               </SummaryListItem>
 
               {orderedFilters
-                .filter(([groupKey]) => !!form.values.filters[groupKey])
+                .filter(([groupKey]) => !!values.filters[groupKey])
                 .map(([filterGroupKey, filterGroup]) => (
                   <SummaryListItem
                     key={filterGroupKey}
@@ -323,9 +329,7 @@ const FiltersForm = ({
                       {orderBy(Object.values(filterGroup.options), 'order')
                         .flatMap(group => group.options)
                         .filter(option =>
-                          form.values.filters[filterGroupKey].includes(
-                            option.value,
-                          ),
+                          values.filters[filterGroupKey].includes(option.value),
                         )
                         .map(option => (
                           <li key={option.value}>{option.label}</li>
@@ -335,11 +339,11 @@ const FiltersForm = ({
                 ))}
             </SummaryList>
 
-            <ResetFormOnPreviousStep {...stepProps} />
+            <ResetFormOnPreviousStep {...stepProps} onReset={reset} />
           </WizardStepSummary>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
-public class LocationViewModelBuilder
+public static class LocationViewModelBuilder
 {
     public static Dictionary<GeographicLevel, List<LocationAttributeViewModel>> BuildLocationAttributeViewModels(
         IList<Location> locations,

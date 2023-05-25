@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -18,6 +19,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Guid releaseId,
             ObservationQueryContext queryContext,
+            CancellationToken cancellationToken = default);
+
+        Task<Either<ActionResult, Unit>> QueryToCsvStream(
+            ObservationQueryContext queryContext,
+            Stream stream,
+            CancellationToken cancellationToken = default);
+
+        Task<Either<ActionResult, Unit>> QueryToCsvStream(
+            Guid releaseId,
+            ObservationQueryContext queryContext,
+            Stream stream,
             CancellationToken cancellationToken = default);
     }
 }

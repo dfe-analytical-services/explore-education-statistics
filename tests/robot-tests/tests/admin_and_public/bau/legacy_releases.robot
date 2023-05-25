@@ -46,7 +46,7 @@ Navigate to admin dashboard to create new release
 
 Navigate to release in admin
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2020/21
+    ...    Academic year 2020/21
 
 Approve release
     user clicks link    Sign off

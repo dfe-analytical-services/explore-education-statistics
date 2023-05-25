@@ -16,11 +16,12 @@ import React, {
   useCallback,
   useMemo,
   useState,
+  memo,
 } from 'react';
 import styles from './FormCheckboxSearchSubGroups.module.scss';
 import FormTextSearchInput from './FormTextSearchInput';
 
-interface OptionGroup {
+export interface OptionGroup {
   id?: string;
   legend: string;
   options: CheckboxOption[];
@@ -224,4 +225,4 @@ const FormCheckboxSearchSubGroups = ({
   );
 };
 
-export default FormCheckboxSearchSubGroups;
+export default memo(FormCheckboxSearchSubGroups);

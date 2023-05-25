@@ -11,7 +11,7 @@ export const options: Options = {
 };
 
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
-  __ENV.TEST_ENVIRONMENT as string,
+  __ENV.TEST_ENVIRONMENT,
 );
 
 const performTest = () => {};

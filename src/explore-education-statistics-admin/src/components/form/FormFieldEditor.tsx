@@ -3,7 +3,7 @@ import FormEditor, {
   EditorElementsHandler,
   FormEditorProps,
 } from '@admin/components/form/FormEditor';
-import { useFormContext } from '@common/components/form/contexts/FormContext';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import FormGroup from '@common/components/form/FormGroup';
 import { OmitStrict } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
@@ -35,7 +35,7 @@ function FormFieldEditor<T>({
   onBlur,
   ...props
 }: Props<T>) {
-  const { prefixFormId, fieldId } = useFormContext();
+  const { fieldId } = useFormIdContext();
   const elements = useRef<Element[]>([]);
 
   return (
@@ -64,7 +64,7 @@ function FormFieldEditor<T>({
               testId={testId}
               {...props}
               {...field}
-              id={id ? prefixFormId(id) : fieldId(name as string)}
+              id={fieldId(name as string, id)}
               onBlur={() => {
                 form.setFieldTouched(name as string, true);
                 if (onBlur) {

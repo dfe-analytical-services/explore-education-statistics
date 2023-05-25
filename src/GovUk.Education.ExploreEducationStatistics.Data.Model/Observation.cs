@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public Dictionary<Guid, string> Measures { get; set; }
 
-        public ICollection<ObservationFilterItem> FilterItems { get; set; }
+        public List<ObservationFilterItem> FilterItems { get; set; } = new();
 
         public long CsvRow { get; set; }
     }

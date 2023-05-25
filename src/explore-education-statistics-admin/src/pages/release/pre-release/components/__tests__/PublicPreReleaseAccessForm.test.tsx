@@ -64,7 +64,7 @@ describe('PublicPreReleaseAccessForm', () => {
     render(
       <TestConfigContextProvider>
         <PublicPreReleaseAccessForm
-          canUpdateRelease
+          canUpdateRelease={false}
           isReleaseLive
           preReleaseAccessList={testAccessList}
           onSubmit={noop}
@@ -74,7 +74,7 @@ describe('PublicPreReleaseAccessForm', () => {
 
     expect(
       screen.getByText(
-        'This release has been published and can no longer be updated.',
+        'This release has been approved, and can no longer be updated.',
       ),
     ).toBeInTheDocument();
 
@@ -170,11 +170,6 @@ describe('PublicPreReleaseAccessForm', () => {
         />
       </TestConfigContextProvider>,
     );
-    expect(
-      screen.getByText(
-        'This release has been approved, and can no longer be updated',
-      ),
-    ).toBeInTheDocument();
     expect(screen.queryByTestId('access-list-btn')).not.toBeInTheDocument();
   });
 });

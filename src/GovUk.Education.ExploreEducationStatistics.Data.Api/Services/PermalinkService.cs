@@ -1,11 +1,17 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Dynamic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -14,14 +20,18 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
@@ -29,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly ITableBuilderService _tableBuilderService;
+        private readonly IPermalinkCsvMetaService _permalinkCsvMetaService;
         private readonly IBlobStorageService _blobStorageService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IPublicationRepository _publicationRepository;
@@ -38,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public PermalinkService(
             ContentDbContext contentDbContext,
             ITableBuilderService tableBuilderService,
+            IPermalinkCsvMetaService permalinkCsvMetaService,
             IBlobStorageService blobStorageService,
             ISubjectRepository subjectRepository,
             IPublicationRepository publicationRepository,
@@ -46,6 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             _contentDbContext = contentDbContext;
             _tableBuilderService = tableBuilderService;
+            _permalinkCsvMetaService = permalinkCsvMetaService;
             _blobStorageService = blobStorageService;
             _subjectRepository = subjectRepository;
             _publicationRepository = publicationRepository;
@@ -53,18 +66,159 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Get(Guid id)
+        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> Get(
+            Guid id,
+            CancellationToken cancellationToken = default)
+        {
+            return await Find(id, cancellationToken).OnSuccess(BuildViewModel);
+        }
+
+        public async Task<Either<ActionResult, Unit>> DownloadCsvToStream(
+            Guid id,
+            Stream stream,
+            CancellationToken cancellationToken = default)
+        {
+            return await Find(id, cancellationToken)
+                .OnSuccessCombineWith(permalink => _permalinkCsvMetaService.GetCsvMeta(permalink, cancellationToken))
+                .OnSuccessVoid(
+                    async tuple =>
+                    {
+                        var (permalink, meta) = tuple;
+
+                        await using var writer = new StreamWriter(stream, leaveOpen: true);
+                        await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
+
+                        await WriteCsvHeaderRow(csv, meta);
+                        await WriteCsvRows(csv, permalink.FullTable.Results, meta, cancellationToken);
+                    }
+                );
+        }
+
+        private async Task WriteCsvHeaderRow(CsvWriter csv, PermalinkCsvMetaViewModel meta)
+        {
+            var headerRow = new ExpandoObject() as IDictionary<string, object>;
+
+            foreach (var header in meta.Headers)
+            {
+                headerRow[header] = string.Empty;
+            }
+
+            csv.WriteDynamicHeader(headerRow as dynamic);
+
+            await csv.NextRecordAsync();
+        }
+
+        private async Task WriteCsvRows(
+            IWriter csv,
+            List<ObservationViewModel> observations,
+            PermalinkCsvMetaViewModel meta,
+            CancellationToken cancellationToken)
+        {
+            var locationHeaders = meta.Headers
+                .Where(header => LocationCsvUtils.AllCsvColumns().Contains(header))
+                .ToHashSet();
+
+            var rows = observations
+                .Select(
+                    observation => MapCsvRow(
+                        observation: observation,
+                        meta: meta,
+                        locationHeaders: locationHeaders
+                    )
+                );
+
+            await csv.WriteRecordsAsync(rows, cancellationToken);
+        }
+
+        private object MapCsvRow(
+            ObservationViewModel observation,
+            PermalinkCsvMetaViewModel meta,
+            HashSet<string> locationHeaders)
+        {
+            var timePeriod = observation.GetTimePeriodTuple();
+
+            var row = new ExpandoObject() as IDictionary<string, object>;
+
+            foreach (var header in meta.Headers)
+            {
+                row[header] = GetCsvRowValue(header, observation, timePeriod, meta, locationHeaders);
+            }
+
+            return row;
+        }
+
+        private string GetCsvRowValue(
+            string header,
+            ObservationViewModel observation,
+            (int Year, TimeIdentifier TimeIdentifier) timePeriod,
+            PermalinkCsvMetaViewModel meta,
+            IReadOnlySet<string> locationHeaders)
+        {
+            if (header == "time_period")
+            {
+                return TimePeriodLabelFormatter.FormatCsvYear(timePeriod.Year, timePeriod.TimeIdentifier);
+            }
+
+            if (header == "time_identifier")
+            {
+                return timePeriod.TimeIdentifier.GetEnumLabel();
+            }
+
+            if (header == "geographic_level")
+            {
+                return observation.GeographicLevel.GetEnumLabel();
+            }
+
+            if (locationHeaders.Contains(header))
+            {
+                var location = meta.Locations[observation.LocationId];
+
+                if (location.ContainsKey(header))
+                {
+                    return location[header];
+                }
+            }
+
+            if (meta.Filters.TryGetValue(header, out var filter))
+            {
+                var match = observation.Filters
+                    .Where(filterItemId => filter.Items.ContainsKey(filterItemId))
+                    .OfType<Guid?>()
+                    .FirstOrDefault(null as Guid?);
+
+                if (match.HasValue)
+                {
+                    return filter.Items[match.Value].Label;
+                }
+            }
+
+            if (meta.Indicators.TryGetValue(header, out var indicator))
+            {
+                var match = observation.Measures
+                    .First(measure => measure.Key == indicator.Id);
+
+                return match.Value;
+            }
+
+            return string.Empty;
+        }
+
+        private async Task<Either<ActionResult, LegacyPermalink>> Find(
+            Guid id,
+            CancellationToken cancellationToken)
         {
             try
             {
-                var text = await _blobStorageService.DownloadBlobText(Permalinks, id.ToString());
-                var permalink = JsonConvert.DeserializeObject<LegacyPermalink>(
+                var text = await _blobStorageService.DownloadBlobText(
+                    containerName: Permalinks,
+                    path: id.ToString(),
+                    cancellationToken: cancellationToken);
+
+                return JsonConvert.DeserializeObject<LegacyPermalink>(
                     value: text,
-                    settings: BuildJsonSerializerSettings());
-                return await BuildViewModel(permalink!);
+                    settings: BuildJsonSerializerSettings())!;
             }
-            catch (StorageException e)
-                when ((HttpStatusCode)e.RequestInformation.HttpStatusCode == HttpStatusCode.NotFound)
+            catch (FileNotFoundException)
             {
                 return new NotFoundResult();
             }

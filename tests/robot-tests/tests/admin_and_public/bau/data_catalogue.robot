@@ -13,7 +13,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - data catalogue %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Academic Year Q1
+${RELEASE_NAME}=        Academic year Q1
 ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
 ${SUBJECT_NAME_3}=      UI test subject 3
@@ -122,6 +122,8 @@ Check checkbox and download file
 # Check zip file for 2021 here
 
 Validate zip contains correct files
+    [Documentation]    EES-4147
+    [Tags]    Failing
     sleep    8    # wait for file to download
     ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
@@ -142,6 +144,8 @@ Select new subject and download new subject file
     user clicks button    Download selected files
 
 Validate new zip contains correct files
+    [Documentation]    EES-4147
+    [Tags]    Failing
     sleep    8    # wait for file to download
     ${list}=    create list    data/seven_filters.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2020-21-q1.zip    ${list}

@@ -12,7 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private readonly ITestOutputHelper _testOutputHelper;
         private const int Year = 2018;
         private static readonly string FormattedAcademicYear = $"{Year}/{(Year + 1).ToString().Substring(2)}";
+        private static readonly string FormattedAcademicCsvYear = $"{Year}{(Year + 1).ToString().Substring(2)}";
         private static readonly string FormattedFiscalYear = $"{Year}-{(Year + 1).ToString().Substring(2)}";
+        private static readonly string FormattedFiscalCsvYear = $"{Year}{(Year + 1).ToString().Substring(2)}";
 
         public TimePeriodLabelFormatterTests(ITestOutputHelper testOutputHelper)
         {
@@ -85,10 +87,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         [Fact]
         public void FormatTimePeriodUsingTermIdentifiers()
         {
-            Assert.Equal($"{FormattedAcademicYear} Autumn Term", Format(Year, AutumnTerm));
-            Assert.Equal($"{FormattedAcademicYear} Spring Term", Format(Year, SpringTerm));
-            Assert.Equal($"{FormattedAcademicYear} Summer Term", Format(Year, SummerTerm));
-            Assert.Equal($"{FormattedAcademicYear} Autumn and Spring Term", Format(Year, AutumnSpringTerm));
+            Assert.Equal($"{FormattedAcademicYear} Autumn term", Format(Year, AutumnTerm));
+            Assert.Equal($"{FormattedAcademicYear} Spring term", Format(Year, SpringTerm));
+            Assert.Equal($"{FormattedAcademicYear} Summer term", Format(Year, SummerTerm));
+            Assert.Equal($"{FormattedAcademicYear} Autumn and spring term", Format(Year, AutumnSpringTerm));
         }
 
         [Fact]
@@ -158,14 +160,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         [Fact]
         public void FormatTimePeriodWithFullLabelFormat()
         {
-            Assert.Equal($"{Year} Calendar Year", Format(Year, CalendarYear, FullLabel));
-            Assert.Equal($"{FormattedAcademicYear} Academic Year", Format(Year, AcademicYear, FullLabel));
-            Assert.Equal($"{FormattedAcademicYear} Academic Year Q1", Format(Year, AcademicYearQ1, FullLabel));
-            Assert.Equal($"{FormattedFiscalYear} Financial Year", Format(Year, FinancialYear, FullLabel));
-            Assert.Equal($"{FormattedFiscalYear} Tax Year", Format(Year, TaxYear, FullLabel));
-            Assert.Equal($"{Year} Reporting Year", Format(Year, ReportingYear, FullLabel));
+            Assert.Equal($"{Year} Calendar year", Format(Year, CalendarYear, FullLabel));
+            Assert.Equal($"{FormattedAcademicYear} Academic year", Format(Year, AcademicYear, FullLabel));
+            Assert.Equal($"{FormattedAcademicYear} Academic year Q1", Format(Year, AcademicYearQ1, FullLabel));
+            Assert.Equal($"{FormattedFiscalYear} Financial year", Format(Year, FinancialYear, FullLabel));
+            Assert.Equal($"{FormattedFiscalYear} Tax year", Format(Year, TaxYear, FullLabel));
+            Assert.Equal($"{Year} Reporting year", Format(Year, ReportingYear, FullLabel));
             Assert.Equal($"{Year} January", Format(Year, January, FullLabel));
-            Assert.Equal($"{FormattedAcademicYear} Autumn Term", Format(Year, AutumnTerm, FullLabel));
+            Assert.Equal($"{FormattedAcademicYear} Autumn term", Format(Year, AutumnTerm, FullLabel));
             Assert.Equal($"{FormattedFiscalYear} Part 1 (April to September)", Format(Year, FinancialYearPart1, FullLabel));
             Assert.Equal($"{FormattedFiscalYear} Part 2 (October to March)", Format(Year, FinancialYearPart2, FullLabel));
         }
@@ -173,14 +175,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         [Fact]
         public void FormatTimePeriodWithFullLabelBeforeYearFormat()
         {
-            Assert.Equal($"Calendar Year {Year}", Format(Year, CalendarYear, FullLabelBeforeYear));
-            Assert.Equal($"Academic Year {FormattedAcademicYear}", Format(Year, AcademicYear, FullLabelBeforeYear));
-            Assert.Equal($"Academic Year Q1 {FormattedAcademicYear}", Format(Year, AcademicYearQ1, FullLabelBeforeYear));
-            Assert.Equal($"Financial Year {FormattedFiscalYear}", Format(Year, FinancialYear, FullLabelBeforeYear));
-            Assert.Equal($"Tax Year {FormattedFiscalYear}", Format(Year, TaxYear, FullLabelBeforeYear));
-            Assert.Equal($"Reporting Year {Year}", Format(Year, ReportingYear, FullLabelBeforeYear));
+            Assert.Equal($"Calendar year {Year}", Format(Year, CalendarYear, FullLabelBeforeYear));
+            Assert.Equal($"Academic year {FormattedAcademicYear}", Format(Year, AcademicYear, FullLabelBeforeYear));
+            Assert.Equal($"Academic year Q1 {FormattedAcademicYear}", Format(Year, AcademicYearQ1, FullLabelBeforeYear));
+            Assert.Equal($"Financial year {FormattedFiscalYear}", Format(Year, FinancialYear, FullLabelBeforeYear));
+            Assert.Equal($"Tax year {FormattedFiscalYear}", Format(Year, TaxYear, FullLabelBeforeYear));
+            Assert.Equal($"Reporting year {Year}", Format(Year, ReportingYear, FullLabelBeforeYear));
             Assert.Equal($"January {Year}", Format(Year, January, FullLabelBeforeYear));
-            Assert.Equal($"Autumn Term {FormattedAcademicYear}", Format(Year, AutumnTerm, FullLabelBeforeYear));
+            Assert.Equal($"Autumn term {FormattedAcademicYear}", Format(Year, AutumnTerm, FullLabelBeforeYear));
             Assert.Equal($"Part 1 (April to September) {FormattedFiscalYear}", Format(Year, FinancialYearPart1, FullLabelBeforeYear));
             Assert.Equal($"Part 2 (October to March) {FormattedFiscalYear}", Format(Year, FinancialYearPart2, FullLabelBeforeYear));
         }
@@ -212,6 +214,118 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"{FormattedAcademicYear}", Format(Year, AutumnTerm, ShortLabel));
             Assert.Equal($"{FormattedFiscalYear} Part 1 (Apr to Sep)", Format(Year, FinancialYearPart1, ShortLabel));
             Assert.Equal($"{FormattedFiscalYear} Part 2 (Oct to Mar)", Format(Year, FinancialYearPart2, ShortLabel));
+        }
+
+        [Fact]
+        public void FormatCsvYear_AcademicYearFormat()
+        {
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, AcademicYear));
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, AcademicYearQ1));
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, AcademicYearQ2));
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, AcademicYearQ3));
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, AcademicYearQ4));
+
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, AutumnTerm));
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, SpringTerm));
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, SummerTerm));
+            Assert.Equal(FormattedAcademicCsvYear, FormatCsvYear(Year, AutumnSpringTerm));
+        }
+
+        [Fact]
+        public void FormatCsvYear_FiscalYearFormat()
+        {
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, FinancialYear));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, FinancialYearQ1));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, FinancialYearQ2));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, FinancialYearQ3));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, FinancialYearQ4));
+
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, TaxYear));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, TaxYearQ1));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, TaxYearQ2));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, TaxYearQ3));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, TaxYearQ4));
+
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, FinancialYearPart1));
+            Assert.Equal(FormattedFiscalCsvYear, FormatCsvYear(Year, FinancialYearPart2));
+        }
+
+        [Fact]
+        public void FormatCsvYear_DefaultFormat()
+        {
+            Assert.Equal($"{Year}", FormatCsvYear(Year, CalendarYear));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, CalendarYearQ1));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, CalendarYearQ2));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, CalendarYearQ3));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, CalendarYearQ4));
+
+            Assert.Equal($"{Year}", FormatCsvYear(Year, ReportingYear));
+
+            Assert.Equal($"{Year}", FormatCsvYear(Year, January));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, February));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, March));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, April));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, May));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, June));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, July));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, August));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, September));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, October));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, November));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, December));
+
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week1));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week2));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week3));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week4));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week5));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week6));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week7));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week8));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week9));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week10));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week11));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week12));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week13));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week14));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week15));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week16));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week17));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week18));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week19));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week20));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week21));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week22));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week23));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week24));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week25));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week26));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week27));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week28));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week29));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week30));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week31));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week32));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week33));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week34));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week35));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week36));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week37));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week38));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week39));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week40));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week41));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week42));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week43));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week44));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week45));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week46));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week47));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week48));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week49));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week50));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week51));
+            Assert.Equal($"{Year}", FormatCsvYear(Year, Week52));
         }
 
         [Fact(Skip = "Use this to debug")]

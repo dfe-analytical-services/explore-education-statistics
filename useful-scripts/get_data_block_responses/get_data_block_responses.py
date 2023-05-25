@@ -17,12 +17,15 @@ SELECT ContentBlock.Id                              AS ContentBlockId,
 FROM ContentBlock
 JOIN ReleaseContentBlocks ON ContentBlock.Id = ReleaseContentBlocks.ContentBlockId
 JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
+LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockId
 WHERE ContentBlock.Type = 'DataBlock'
   AND Releases.Published IS NOT NULL
   AND Releases.SoftDeleted = 0
   AND (
     -- Include DataBlocks that are linked to Content Sections
     ContentSectionId IS NOT NULL
+    -- Include DataBlocks that are Key Statistics
+    OR KeyStatisticsDataBlock.DataBlockId IS NOT NULL
     -- Include DataBlocks that are Featured Tables
     OR (DataBlock_HighlightName IS NOT NULL
         AND DataBlock_HighlightName <> ''))

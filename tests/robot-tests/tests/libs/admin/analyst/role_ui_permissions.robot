@@ -29,7 +29,8 @@ user cannot see edit controls for release content
     user waits until page does not contain button    Add note
     user waits until page does not contain button    Add related page link
     user waits until page does not contain button    Add secondary stats
-    user waits until page does not contain button    Add key statistic
+    user waits until page does not contain button    Add key statistic from data block
+    user waits until page does not contain button    Add free text key statistic
     user waits until page does not contain button    Add a headlines text block
     user waits until page does not contain button    Add new section
 

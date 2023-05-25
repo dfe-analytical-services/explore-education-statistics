@@ -27,9 +27,9 @@ describe('PublicationReleaseAccess', () => {
     slug: 'release-1-slug',
     timePeriodCoverage: {
       value: 'AY',
-      label: 'Academic Year',
+      label: 'Academic year',
     },
-    title: 'Academic Year 2000/01',
+    title: 'Academic year 2000/01',
     type: 'AdHocStatistics',
     publishScheduled: '2001-01-01',
     approvalStatus: 'Draft',
@@ -68,7 +68,7 @@ describe('PublicationReleaseAccess', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('Release')).toHaveTextContent(
-        'Academic Year 2000/01 (Not live)',
+        'Academic year 2000/01 (Not live)',
       );
     });
 
@@ -148,7 +148,7 @@ describe('PublicationReleaseAccess', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('Release')).toHaveTextContent(
-        'Academic Year 2000/01 (Not live)',
+        'Academic year 2000/01 (Not live)',
       );
     });
 
@@ -184,7 +184,7 @@ describe('PublicationReleaseAccess', () => {
 
     await waitFor(() => {
       expect(screen.getByTestId('Release')).toHaveTextContent(
-        'Academic Year 2000/01 (Not live)',
+        'Academic year 2000/01 (Not live)',
       );
     });
 

@@ -37,17 +37,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         {
         }
 
-        public PermalinkResultSubjectMeta(ResultSubjectMetaViewModel resultSubjectMeta)
+        public PermalinkResultSubjectMeta(SubjectResultMetaViewModel subjectResultMeta)
         {
-            Filters = resultSubjectMeta.Filters;
-            Footnotes = resultSubjectMeta.Footnotes;
-            Indicators = resultSubjectMeta.Indicators;
-            LocationsHierarchical = resultSubjectMeta.Locations;
-            BoundaryLevels = resultSubjectMeta.BoundaryLevels;
-            PublicationName = resultSubjectMeta.PublicationName;
-            SubjectName = resultSubjectMeta.SubjectName;
-            TimePeriodRange = resultSubjectMeta.TimePeriodRange;
-            GeoJsonAvailable = resultSubjectMeta.GeoJsonAvailable;
+            Filters = subjectResultMeta.Filters;
+            Footnotes = subjectResultMeta.Footnotes;
+            Indicators = subjectResultMeta.Indicators;
+            LocationsHierarchical = subjectResultMeta.Locations;
+            BoundaryLevels = subjectResultMeta.BoundaryLevels;
+            PublicationName = subjectResultMeta.PublicationName;
+            SubjectName = subjectResultMeta.SubjectName;
+            TimePeriodRange = subjectResultMeta.TimePeriodRange;
+            GeoJsonAvailable = subjectResultMeta.GeoJsonAvailable;
         }
     }
 }

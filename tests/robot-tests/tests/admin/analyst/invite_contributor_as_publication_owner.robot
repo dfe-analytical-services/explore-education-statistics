@@ -30,7 +30,7 @@ Create Publication as bau1
 
 Validate "Manage release contributors" page
     user clicks link    Manage release contributors
-    user waits until h2 is visible    Manage release contributors (Academic Year 2002/03)
+    user waits until h2 is visible    Manage release contributors (Academic year 2002/03)
     user waits until page contains    There are no contributors for this release's publication.
 
 Validate Invite new users page
@@ -39,9 +39,9 @@ Validate Invite new users page
     user clicks link    Invite new contributors
 
     user waits until page contains element    id:email
-    user checks checkbox is checked    Academic Year 2002/03
-    user checks checkbox is checked    Academic Year 2001/02
-    user checks checkbox is checked    Academic Year 2000/01
+    user checks checkbox is checked    Academic year 2002/03
+    user checks checkbox is checked    Academic year 2001/02
+    user checks checkbox is checked    Academic year 2000/01
 
 Assign various release access permissions to analysts
     user changes to bau1
@@ -51,13 +51,13 @@ Assign various release access permissions to analysts
 
     user gives release access to analyst
     ...    ${PUBLICATION_NAME}
-    ...    Academic Year 2000/01
+    ...    Academic year 2000/01
     ...    Contributor
     ...    EES-test.ANALYST3@education.gov.uk
 
     user gives release access to analyst
     ...    ${PUBLICATION_NAME}
-    ...    Academic Year 2001/02
+    ...    Academic year 2001/02
     ...    Contributor
     ...    EES-test.ANALYST2@education.gov.uk
 
@@ -67,7 +67,7 @@ Sign in as analyst1 and go to Manage team access page
     user clicks link    Team access
 
     user waits until page contains    Update release access
-    user checks summary list contains    Release    Academic Year 2002/03 (Not live)
+    user checks summary list contains    Release    Academic year 2002/03 (Not live)
     user checks summary list contains    Status    Draft
     user checks page contains    There are no approvers or pending approver invites for this release.
     user checks page contains    There are no contributors or pending contributor invites for this release.
@@ -75,29 +75,29 @@ Sign in as analyst1 and go to Manage team access page
 
 Validate Select release dropdown
     user checks select contains x options    id:currentRelease    3
-    user checks select contains option    id:currentRelease    Academic Year 2002/03
-    user checks select contains option    id:currentRelease    Academic Year 2001/02
-    user checks select contains option    id:currentRelease    Academic Year 2000/01
+    user checks select contains option    id:currentRelease    Academic year 2002/03
+    user checks select contains option    id:currentRelease    Academic year 2001/02
+    user checks select contains option    id:currentRelease    Academic year 2000/01
 
 Invite existing user analyst2 to be a contributor for 2002/03 release
     user clicks link    Invite new contributors
     user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    EES-test.ANALYST2@education.gov.uk
 
-    user checks checkbox is checked    Academic Year 2002/03
-    user checks checkbox is checked    Academic Year 2001/02
-    user checks checkbox is checked    Academic Year 2000/01
+    user checks checkbox is checked    Academic year 2002/03
+    user checks checkbox is checked    Academic year 2001/02
+    user checks checkbox is checked    Academic year 2000/01
 
-    user clicks checkbox    Academic Year 2001/02
-    user clicks checkbox    Academic Year 2000/01
+    user clicks checkbox    Academic year 2001/02
+    user clicks checkbox    Academic year 2000/01
 
-    user checks checkbox is checked    Academic Year 2002/03
-    user checks checkbox is not checked    Academic Year 2001/02
-    user checks checkbox is not checked    Academic Year 2000/01
+    user checks checkbox is checked    Academic year 2002/03
+    user checks checkbox is not checked    Academic year 2001/02
+    user checks checkbox is not checked    Academic year 2000/01
 
     user clicks button    Invite user
     user waits until page contains    Update release access
-    user checks summary list contains    Release    Academic Year 2002/03 (Not live)
+    user checks summary list contains    Release    Academic year 2002/03 (Not live)
 
 Validate contributors for 2002/03 release
     user checks table body has x rows    1    testid:releaseContributors
@@ -106,7 +106,7 @@ Validate contributors for 2002/03 release
 
 Add new contributors to release
     user clicks link    Manage release contributors
-    user waits until page contains    Manage release contributors (Academic Year 2002/03)
+    user waits until page contains    Manage release contributors (Academic year 2002/03)
 
     user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
     user checks checkbox is checked    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
@@ -137,16 +137,16 @@ Validate contributors for 2002/03 release for the third time
     user checks page contains    There are no contributors or pending contributor invites for this release.
 
 Validate contributors for 2001/02 release
-    user chooses select option    id:currentRelease    Academic Year 2001/02
-    user checks summary list contains    Release    Academic Year 2001/02 (Not live)
+    user chooses select option    id:currentRelease    Academic year 2001/02
+    user checks summary list contains    Release    Academic year 2001/02 (Not live)
 
     user checks table body has x rows    1    testid:releaseContributors
     user checks table cell contains    1    1    Analyst2 User2    testid:releaseContributors
     user checks table cell contains    1    2    ees-test.analyst2@education.gov.uk    testid:releaseContributors
 
 Validate contributors for 2000/01 release
-    user chooses select option    id:currentRelease    Academic Year 2000/01
-    user checks summary list contains    Release    Academic Year 2000/01 (Not live)
+    user chooses select option    id:currentRelease    Academic year 2000/01
+    user checks summary list contains    Release    Academic year 2000/01 (Not live)
 
     user waits until page does not contain element    testid:releaseContributors
     user checks page contains    There are no contributors or pending contributor invites for this release.
@@ -158,7 +158,7 @@ Invite brand new user
 
     user clicks button    Invite user
     user waits until page contains    Update release access
-    user checks summary list contains    Release    Academic Year 2000/01 (Not live)
+    user checks summary list contains    Release    Academic year 2000/01 (Not live)
 
 Validate contributors for 2000/01 release again
     user checks page contains element    testid:releaseContributors

@@ -19,11 +19,11 @@ describe('ReleaseSummaryForm', () => {
     {
       category: { label: 'Academic year' },
       timeIdentifiers: [
-        { identifier: { value: 'AY', label: 'Academic Year' } },
-        { identifier: { value: 'AYQ1', label: 'Academic Year Q1' } },
-        { identifier: { value: 'AYQ2', label: 'Academic Year Q2' } },
-        { identifier: { value: 'AYQ3', label: 'Academic Year Q3' } },
-        { identifier: { value: 'AYQ4', label: 'Academic Year Q4' } },
+        { identifier: { value: 'AY', label: 'Academic year' } },
+        { identifier: { value: 'AYQ1', label: 'Academic year Q1' } },
+        { identifier: { value: 'AYQ2', label: 'Academic year Q2' } },
+        { identifier: { value: 'AYQ3', label: 'Academic year Q3' } },
+        { identifier: { value: 'AYQ4', label: 'Academic year Q4' } },
       ],
     },
   ];

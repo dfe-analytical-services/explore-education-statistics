@@ -94,7 +94,7 @@ public class ImporterLocationCache : IImporterLocationCache
         LocalAuthorityDistrict? localAuthorityDistrict,
         LocalEnterprisePartnership? localEnterprisePartnership,
         MayoralCombinedAuthority? mayoralCombinedAuthority,
-        Mat? multiAcademyTrust,
+        MultiAcademyTrust? multiAcademyTrust,
         OpportunityArea? opportunityArea,
         ParliamentaryConstituency? parliamentaryConstituency,
         PlanningArea? planningArea,

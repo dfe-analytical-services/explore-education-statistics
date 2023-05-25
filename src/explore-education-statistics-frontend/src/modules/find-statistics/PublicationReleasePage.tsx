@@ -254,6 +254,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     </ButtonLink>
                   </li>
                 )}
+                {!!release.relatedDashboardsSection?.content.length && (
+                  <li>
+                    <a href="#related-dashboards">View related dashboard(s)</a>
+                  </li>
+                )}
                 <li>
                   <a
                     href="#content"
@@ -282,11 +287,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     Explore data
                   </a>
                 </li>
-                {!!release.relatedDashboardsSection?.content.length && (
-                  <li>
-                    <a href="#related-dashboards">View related dashboard(s)</a>
-                  </li>
-                )}
+
                 <li>
                   <a
                     href="#help-and-support"
@@ -570,7 +571,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       )}
 
       <PublicationReleaseHelpAndSupportSection
-        accordionId="help-and-support"
         publicationTitle={release.publication.title}
         methodologies={release.publication.methodologies}
         externalMethodology={release.publication.externalMethodology}

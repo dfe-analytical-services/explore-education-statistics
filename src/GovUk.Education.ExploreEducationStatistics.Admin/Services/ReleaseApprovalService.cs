@@ -165,7 +165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             switch (request.ApprovalStatus)
                             {
                                 case ReleaseApprovalStatus.Approved:
-                                    await _preReleaseUserService.SendPreReleaseUserInviteEmails(release.Id);
+                                    if (request.PublishMethod == PublishMethod.Scheduled)
+                                    {
+                                        await _preReleaseUserService.SendPreReleaseUserInviteEmails(release.Id);
+                                    }
                                     break;
 
                                 case ReleaseApprovalStatus.HigherLevelReview:

@@ -462,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Publication", resultPublication.Title);
 
                 var resultRelease = Assert.Single(resultPublication.Releases);
-                Assert.Equal("Academic Year 2011/12", resultRelease.Title);
+                Assert.Equal("Academic year 2011/12", resultRelease.Title);
             }
         }
 

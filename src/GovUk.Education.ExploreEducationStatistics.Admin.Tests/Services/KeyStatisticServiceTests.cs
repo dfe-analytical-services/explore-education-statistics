@@ -1067,75 +1067,6 @@ public class KeyStatisticServiceTests
     }
 
     [Fact]
-    public async Task Delete_KeyStatisticDataBlock_DataBlockHasContentSectionSet() // See EES-3988
-    {
-        var releaseId = Guid.NewGuid();
-        var dataBlockId = Guid.NewGuid();
-
-        var keyStatisticDataBlock = new KeyStatisticDataBlock
-        {
-            ReleaseId = releaseId,
-            DataBlockId = dataBlockId,
-            Trend = "trend",
-            GuidanceTitle = "guidanceTitle",
-            GuidanceText = "guidanceText",
-            Created = new DateTime(2000, 1, 1),
-            Updated = null,
-        };
-
-        var release = new Release
-        {
-            Id = releaseId,
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                        ContentSectionId = Guid.NewGuid(),
-                    },
-                },
-            },
-            KeyStatistics = new List<KeyStatistic>
-            {
-                new KeyStatisticText(),
-                keyStatisticDataBlock,
-                new KeyStatisticText(),
-            }
-        };
-
-        var contextId = Guid.NewGuid().ToString();
-        await using (var context = InMemoryContentDbContext(contextId))
-        {
-            await context.Releases.AddRangeAsync(release);
-            await context.SaveChangesAsync();
-        }
-
-        await using (var context = InMemoryContentDbContext(contextId))
-        {
-            var keyStatisticService = SetupKeyStatisticService(context);
-            var result = await keyStatisticService.Delete(
-                release.Id,
-                keyStatisticDataBlock.Id);
-
-            result.AssertRight();
-        }
-
-        await using (var context = InMemoryContentDbContext(contextId))
-        {
-            var keyStatistics = context.KeyStatistics.ToList();
-            Assert.Equal(2, keyStatistics.Count);
-            Assert.Null(keyStatistics.Find(ks => ks.Id == keyStatisticDataBlock.Id));
-
-            var dataBlockList = context.DataBlocks.ToList();
-            var dataBlock = Assert.Single(dataBlockList);
-            Assert.Equal(dataBlockId, dataBlock.Id);
-            Assert.Null(dataBlock.ContentSectionId); // if it isn't null, data block won't become available for selection again
-        }
-    }
-
-    [Fact]
     public async Task Delete_KeyStatisticText()
     {
         var releaseId = Guid.NewGuid();
@@ -1292,6 +1223,42 @@ public class KeyStatisticServiceTests
                 Guid.NewGuid());
 
             result.AssertNotFound();
+        }
+    }
+
+    [Fact]
+    public async Task Delete_KeyStatAttachedToDifferentRelease()
+    {
+        var release = new Release();
+        var incorrectRelease = new Release();
+
+        var keyStatisticText = new KeyStatisticText
+        {
+            Release = release,
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            await context.Releases.AddRangeAsync(incorrectRelease, release);
+            await context.KeyStatistics.AddRangeAsync(keyStatisticText);
+            await context.SaveChangesAsync();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatisticService = SetupKeyStatisticService(context);
+            var result = await keyStatisticService.Delete(
+                incorrectRelease.Id,
+                keyStatisticText.Id);
+
+            result.AssertNotFound();
+        }
+
+        await using (var context = InMemoryContentDbContext(contextId))
+        {
+            var keyStatistics = context.KeyStatistics.ToList();
+            Assert.Single(keyStatistics);
         }
     }
 

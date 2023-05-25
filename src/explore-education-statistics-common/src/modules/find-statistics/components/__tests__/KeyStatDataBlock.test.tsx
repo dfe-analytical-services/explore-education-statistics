@@ -95,7 +95,9 @@ describe('KeyStatDataBlock', () => {
         'Number of applications received',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
 
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'Down from 620,330 in 2017',
@@ -137,7 +139,9 @@ describe('KeyStatDataBlock', () => {
         'Number of applications received',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
 
       expect(screen.getByTestId('keyStat-trend')).toHaveTextContent(
         'Down from 620,330 in 2017',
@@ -177,7 +181,9 @@ describe('KeyStatDataBlock', () => {
         'Number of applications received',
       );
 
-      expect(screen.getByTestId('keyStat-value')).toHaveTextContent('608,180');
+      expect(screen.getByTestId('keyStat-statistic')).toHaveTextContent(
+        '608,180',
+      );
 
       expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
     });
@@ -209,7 +215,7 @@ describe('KeyStatDataBlock', () => {
         1,
       );
       expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('keyStat-statistic')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
     });
 
@@ -251,7 +257,7 @@ describe('KeyStatDataBlock', () => {
         1,
       );
       expect(screen.queryByTestId('keyStat-title')).not.toBeInTheDocument();
-      expect(screen.queryByTestId('keyStat-value')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('keyStat-statistic')).not.toBeInTheDocument();
       expect(screen.queryByTestId('keyStat-trend')).not.toBeInTheDocument();
     });
 

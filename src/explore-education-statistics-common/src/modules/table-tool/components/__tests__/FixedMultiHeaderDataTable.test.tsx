@@ -1,4 +1,3 @@
-import Header from '@common/modules/table-tool/components/utils/Header';
 import { render } from '@testing-library/react';
 import React from 'react';
 import FixedMultiHeaderDataTable from '../FixedMultiHeaderDataTable';
@@ -9,38 +8,88 @@ describe('FixedMultiHeaderDataTable', () => {
       <FixedMultiHeaderDataTable
         caption="Test table"
         captionId="test-caption-id"
-        columnHeaders={[
-          new Header('A', 'Col group A')
-            .addChild(new Header('C', 'Col C'))
-            .addChild(new Header('D', 'Col D')),
-          new Header('B', 'Col group B')
-            .addChild(new Header('C', 'Col C'))
-            .addChild(new Header('D', 'Col D')),
-        ]}
         footnotesId="test-footnotes-id"
-        rowHeaders={[new Header('A', 'Row A'), new Header('B', 'Row B')]}
-        rows={[
-          ['1', '2', '3', '4'],
-          ['5', '6', '7', '8'],
-        ]}
+        tableJson={{
+          tbody: [
+            [
+              {
+                colSpan: 1,
+                rowSpan: 1,
+                scope: 'row',
+                tag: 'th',
+                text: 'Row header',
+              },
+              {
+                tag: 'td',
+                text: '425,590',
+              },
+              {
+                tag: 'td',
+                text: '425,591',
+              },
+            ],
+          ],
+          thead: [
+            [
+              {
+                colSpan: 1,
+                rowSpan: 1,
+                tag: 'td',
+              },
+              {
+                colSpan: 1,
+                rowSpan: 1,
+                scope: 'col',
+                tag: 'th',
+                text: 'Column heading',
+              },
+              {
+                colSpan: 1,
+                rowSpan: 1,
+                scope: 'col',
+                tag: 'th',
+                text: 'Column heading 2',
+              },
+            ],
+          ],
+        }}
       />,
     );
 
-    const table = container.querySelector('table') as HTMLElement;
+    // 3x2 table
+    expect(container.querySelectorAll('tbody tr')).toHaveLength(1);
+    expect(container.querySelectorAll('tbody td')).toHaveLength(2);
+    expect(container.innerHTML).toMatchSnapshot();
 
-    expect(table).toHaveAttribute('aria-labelledby', 'test-caption-id');
+    expect(container.querySelectorAll('tbody tr th')).toHaveLength(1);
 
-    expect(table.querySelectorAll('thead tr')).toHaveLength(2);
-    expect(table.querySelectorAll('thead tr:nth-child(1) th')).toHaveLength(2);
-    expect(table.querySelectorAll('thead tr:nth-child(2) th')).toHaveLength(4);
+    // header
+    expect(container.querySelectorAll('thead tr td')).toHaveLength(1);
 
-    expect(table.querySelectorAll('tbody tr')).toHaveLength(2);
-    expect(table.querySelectorAll('tbody tr:nth-child(1) th')).toHaveLength(1);
-    expect(table.querySelectorAll('tbody tr:nth-child(2) th')).toHaveLength(1);
+    expect(container.querySelectorAll('thead tr th')).toHaveLength(2);
 
-    expect(table.querySelectorAll('tbody tr:nth-child(1) td')).toHaveLength(4);
-    expect(table.querySelectorAll('tbody tr:nth-child(2) td')).toHaveLength(4);
+    expect(container.querySelectorAll('thead tr th')[0]).toHaveTextContent(
+      'Column heading',
+    );
+    expect(container.querySelectorAll('thead tr th')[1]).toHaveTextContent(
+      'Column heading 2',
+    );
 
-    expect(table).toMatchSnapshot();
+    // rows
+    expect(container.querySelectorAll('tbody tr td')).toHaveLength(2);
+
+    expect(container.querySelectorAll('tbody tr th')).toHaveLength(1);
+
+    // row header
+    expect(container.querySelectorAll('tbody tr th')[0]).toHaveTextContent(
+      'Row header',
+    );
+
+    expect(container.querySelectorAll('tbody tr td')[0]).toHaveTextContent(
+      '425,590',
+    );
+    expect(container.querySelectorAll('tbody tr td')[1]).toHaveTextContent(
+      '425,591',
+    );
   });
 });

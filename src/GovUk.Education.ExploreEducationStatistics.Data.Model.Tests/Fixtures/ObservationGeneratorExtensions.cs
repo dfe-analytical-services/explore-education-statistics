@@ -60,6 +60,11 @@ public static class ObservationGeneratorExtensions
 
     public static InstanceSetters<Observation> SetFilterItems(
         this InstanceSetters<Observation> setters,
+        params FilterItem[] filterItems)
+        => setters.SetFilterItems(filterItems.ToList());
+
+    public static InstanceSetters<Observation> SetFilterItems(
+        this InstanceSetters<Observation> setters,
         IEnumerable<FilterItem> filterItems)
         => setters.Set(
             o => o.FilterItems,
@@ -85,4 +90,12 @@ public static class ObservationGeneratorExtensions
             o => o.Measures,
             f => indicators.ToDictionary(i => i.Id, _ => f.Random.Short().ToString())
         );
+
+    public static InstanceSetters<Observation> SetTimePeriod(
+        this InstanceSetters<Observation> setters,
+        int year,
+        TimeIdentifier identifier)
+        => setters
+            .Set(o => o.Year, year)
+            .Set(o => o.TimeIdentifier, identifier);
 }

@@ -13,7 +13,7 @@ Force Tags          Admin    Local    Dev    AltersData    Footnotes
 
 *** Variables ***
 ${PUBLICATION_NAME}     UI tests - publication_owner %{RUN_IDENTIFIER}
-${RELEASE_TYPE}         Academic Year 2025/26
+${RELEASE_TYPE}         Academic year 2025/26
 ${RELEASE_NAME}         ${PUBLICATION_NAME} - ${RELEASE_TYPE}
 ${SUBJECT_NAME}         UI test subject
 
@@ -122,7 +122,7 @@ Validates Release status table is correct again
 
 Check that a publication owner can make a new release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
-    user creates release from publication page    ${PUBLICATION_NAME}    Academic Year Q1    2020
+    user creates release from publication page    ${PUBLICATION_NAME}    Academic year Q1    2020
 
 Check publication owner can upload subject file on new release
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv

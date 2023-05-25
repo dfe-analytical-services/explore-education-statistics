@@ -9,7 +9,7 @@ import { MethodologyDispatchAction } from '@admin/pages/methodology/edit-methodo
 
 const basicMethodology: MethodologyContent = {
   id: 'methodology-0',
-  title: 'Academic Year 2020/21',
+  title: 'Academic year 2020/21',
   status: 'Draft',
   slug: '2020-21',
   content: [

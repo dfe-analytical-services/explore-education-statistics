@@ -158,7 +158,7 @@ user checks map tooltip item contains
     user waits until element contains    ${element}    ${text}
 
 user checks map chart indicator tile contains
-    [Arguments]    ${locator}    ${title}    ${value}
+    [Arguments]    ${locator}    ${title}    ${statistic}
     user waits until parent contains element    ${locator}
     ...    testid:mapBlock-indicator
     ${indicator}=    get child element    ${locator}    testid:mapBlock-indicator
@@ -167,9 +167,9 @@ user checks map chart indicator tile contains
     user waits until element is visible    ${indicator_title}
     user waits until element contains    ${indicator_title}    ${title}
 
-    ${indicator_value}=    get child element    ${indicator}    testid:mapBlock-indicatorTile-value
-    user waits until element is visible    ${indicator_value}
-    user waits until element contains    ${indicator_value}    ${value}
+    ${indicator_stat}=    get child element    ${indicator}    testid:mapBlock-indicatorTile-statistic
+    user waits until element is visible    ${indicator_stat}
+    user waits until element contains    ${indicator_stat}    ${statistic}
 
 user checks infographic chart contains alt
     [Arguments]    ${locator}    ${text}

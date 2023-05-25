@@ -137,7 +137,10 @@ const SubjectForm = ({
             />
 
             {radioOptions.length > 0 ? (
-              <WizardStepFormActions {...stepProps} />
+              <WizardStepFormActions
+                {...stepProps}
+                isSubmitting={form.isSubmitting}
+              />
             ) : (
               <p>No subjects available.</p>
             )}
@@ -146,6 +149,7 @@ const SubjectForm = ({
           <ResetFormOnPreviousStep
             currentStep={currentStep}
             stepNumber={stepNumber}
+            onReset={form.resetForm}
           />
         );
       }}

@@ -258,9 +258,9 @@ describe('MapBlockInternal', () => {
     expect(tile.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
-    expect(tile.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '3.5%',
-    );
+    expect(
+      tile.getByTestId('mapBlock-indicatorTile-statistic'),
+    ).toHaveTextContent('3.5%');
   });
 
   test('renders location indicator tiles correctly with custom decimal places', async () => {
@@ -299,9 +299,9 @@ describe('MapBlockInternal', () => {
     expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
-    expect(tile1.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '3.51%',
-    );
+    expect(
+      tile1.getByTestId('mapBlock-indicatorTile-statistic'),
+    ).toHaveTextContent('3.51%');
 
     userEvent.selectOptions(select, group1Options[1]);
 
@@ -309,9 +309,9 @@ describe('MapBlockInternal', () => {
     expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
-    expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '3.01%',
-    );
+    expect(
+      tile2.getByTestId('mapBlock-indicatorTile-statistic'),
+    ).toHaveTextContent('3.01%');
 
     userEvent.selectOptions(select, group1Options[2]);
 
@@ -319,9 +319,9 @@ describe('MapBlockInternal', () => {
     expect(tile3.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
-    expect(tile3.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '4.01%',
-    );
+    expect(
+      tile3.getByTestId('mapBlock-indicatorTile-statistic'),
+    ).toHaveTextContent('4.01%');
   });
 
   test('resetting the map when select None Selected', async () => {

@@ -12,9 +12,9 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - invite new users %{RUN_IDENTIFIER}
-${RELEASE1_NAME}=       ${PUBLICATION_NAME} - Academic Year 2000/01
-${RELEASE2_NAME}=       ${PUBLICATION_NAME} - Academic Year 2001/02
-${RELEASE3_NAME}=       ${PUBLICATION_NAME} - Academic Year 2002/03
+${RELEASE1_NAME}=       ${PUBLICATION_NAME} - Academic year 2000/01
+${RELEASE2_NAME}=       ${PUBLICATION_NAME} - Academic year 2001/02
+${RELEASE3_NAME}=       ${PUBLICATION_NAME} - Academic year 2002/03
 ${EMAIL}=               ees-ui-test-%{RUN_IDENTIFIER}@education.gov.uk
 
 
@@ -105,11 +105,11 @@ Validate newly invited user with roles appears on Pending invites page
     user checks element contains    ${ROW}    Analyst
     user checks element contains    ${ROW}    ${PUBLICATION_NAME}
 
-    user checks element contains    ${ROW}    Academic Year 2000/01
+    user checks element contains    ${ROW}    Academic year 2000/01
     user checks element contains    ${ROW}    Approver
-    user checks element contains    ${ROW}    Academic Year 2001/02
+    user checks element contains    ${ROW}    Academic year 2001/02
     user checks element contains    ${ROW}    Contributor
-    user checks element does not contain    ${ROW}    Academic Year 2002/03
+    user checks element does not contain    ${ROW}    Academic year 2002/03
     user checks element does not contain    ${ROW}    PrereleaseViewer
 
     user checks element contains    ${ROW}    ${PUBLICATION_NAME} - Approver

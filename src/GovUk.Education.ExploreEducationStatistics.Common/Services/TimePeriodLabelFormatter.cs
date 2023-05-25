@@ -21,7 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             YearFormat = yearFormat;
         }
 
-        public static string Format(int year, TimeIdentifier timeIdentifier,
+        public static string Format(
+            int year,
+            TimeIdentifier timeIdentifier,
             TimePeriodLabelFormat? overridingLabelFormat = null)
         {
             return FormatterFor(timeIdentifier, overridingLabelFormat).FormatInternal(year, timeIdentifier);
@@ -30,6 +32,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string FormatYear(int year, TimeIdentifier timeIdentifier)
         {
             return FormatterFor(timeIdentifier).FormatYearInternal(year);
+        }
+
+        public static string FormatCsvYear(int year, TimeIdentifier timeIdentifier)
+        {
+            return FormatterFor(timeIdentifier).FormatCsvYearInternal(year);
         }
 
         private string FormatInternal(int year, TimeIdentifier timeIdentifier)
@@ -64,7 +71,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             throw new ArgumentOutOfRangeException();
         }
 
-        private static TimePeriodLabelFormatter FormatterFor(TimeIdentifier timeIdentifier,
+        private string FormatCsvYearInternal(int year)
+        {
+            if (YearRegex.Match(year.ToString()).Success)
+            {
+                return YearFormat switch
+                {
+                    Academic or Fiscal => $"{year}{(year + 1) % 100:D2}",
+                    _ => year.ToString()
+                };
+            }
+
+            throw new ArgumentOutOfRangeException();
+        }
+
+        private static TimePeriodLabelFormatter FormatterFor(
+            TimeIdentifier timeIdentifier,
             TimePeriodLabelFormat? overridingLabelFormat = null)
         {
             var labelValueAttribute = timeIdentifier.GetEnumAttribute<TimeIdentifierMetaAttribute>();

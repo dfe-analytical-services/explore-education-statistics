@@ -12,16 +12,17 @@ public static class EitherTaskExtensionsTests
         [Fact]
         public async Task ValueType_NotNull()
         {
-            var result = await Task.FromResult<int?>(123).OrNotFound();
+            int? value = 123;
+            var result = await value.OrNotFound();
 
-            var value = result.AssertRight();
-            Assert.Equal(123, value);
+            result.AssertRight(123);
         }
 
         [Fact]
         public async Task ValueType_Null()
         {
-            var result = await Task.FromResult<int?>(null).OrNotFound();
+            int? value = null;
+            var result = await value.OrNotFound();
 
             result.AssertNotFound();
         }
@@ -29,14 +30,46 @@ public static class EitherTaskExtensionsTests
         [Fact]
         public async Task ReferenceType_NotNull()
         {
-            var result = await Task.FromResult<Test?>(new Test()).OrNotFound();
+            var result = await new Test().OrNotFound();
 
-            var value = result.AssertRight();
-            Assert.Equal(new Test(), value);
+            result.AssertRight(new Test());
         }
 
         [Fact]
         public async Task ReferenceTypeType_Null()
+        {
+            Test? value = null;
+            var result = await value.OrNotFound();
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task Task_ValueType_NotNull()
+        {
+            var result = await Task.FromResult<int?>(123).OrNotFound();
+
+            result.AssertRight(123);
+        }
+
+        [Fact]
+        public async Task Task_ValueType_Null()
+        {
+            var result = await Task.FromResult<int?>(null).OrNotFound();
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task Task_ReferenceType_NotNull()
+        {
+            var result = await Task.FromResult<Test?>(new Test()).OrNotFound();
+
+            result.AssertRight(new Test());
+        }
+
+        [Fact]
+        public async Task Task_ReferenceTypeType_Null()
         {
             var result = await Task.FromResult<Test?>(null).OrNotFound();
 

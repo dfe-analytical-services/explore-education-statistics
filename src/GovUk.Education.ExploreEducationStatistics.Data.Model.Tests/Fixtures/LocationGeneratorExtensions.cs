@@ -1,5 +1,6 @@
 #nullable enable
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures.LocationHierarchyPresets;
 
@@ -12,6 +13,9 @@ public static class LocationGeneratorExtensions
 
     public static Generator<Location> WithDefaults(this Generator<Location> generator)
         => generator.ForInstance(s => s.SetDefaults());
+
+    public static Generator<Location> WithGeographicLevel(this Generator<Location> generator, GeographicLevel level)
+        => generator.ForInstance(s => s.SetGeographicLevel(level));
 
     public static Generator<Location> WithPresetRegion(this Generator<Location> generator)
         => generator.ForInstance(s => s.SetPresetRegion());
@@ -26,6 +30,11 @@ public static class LocationGeneratorExtensions
         => setters
             .SetDefault(l => l.Id)
             .Set(l => l.Country, CountryPresets.England);
+
+    public static InstanceSetters<Location> SetGeographicLevel(
+        this InstanceSetters<Location> setters,
+        GeographicLevel level)
+        => setters.Set(l => l.GeographicLevel, level);
 
     public static InstanceSetters<Location> SetPresetRegion(
         this InstanceSetters<Location> setters)

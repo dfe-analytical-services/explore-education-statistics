@@ -40,12 +40,12 @@ describe('PublicationInviteUsersPage', () => {
       }),
     ).toBeInTheDocument();
 
-    const checkboxes = screen.getAllByLabelText(/Academic Year/);
+    const checkboxes = screen.getAllByLabelText(/Academic year/);
     expect(checkboxes).toHaveLength(3);
 
-    expect(screen.getByLabelText('Academic Year 2023/24')).toBeInTheDocument();
-    expect(screen.getByLabelText('Academic Year 2022/23')).toBeInTheDocument();
-    expect(screen.getByLabelText('Academic Year 2021/22')).toBeInTheDocument();
+    expect(screen.getByLabelText('Academic year 2023/24')).toBeInTheDocument();
+    expect(screen.getByLabelText('Academic year 2022/23')).toBeInTheDocument();
+    expect(screen.getByLabelText('Academic year 2021/22')).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {

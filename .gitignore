@@ -54,6 +54,12 @@ src/explore-education-statistics-frontend/*.xml
 /tests/robot-tests/tests/visual_testing/visually_check_tables_and_charts.dev.robot
 /tests/robot-tests/tests/visual_testing/visually_check_tables_and_charts.dev.robot.csv
 
+/tests/performance-tests/.env.*
+!/tests/performance-tests/.env.example.json
+/tests/performance-tests/dist
+/tests/performance-tests/big-files
+/tests/performance-tests/*.html
+
 ## Data API Seed CSV data
 
 src/GovUk.Education.ExploreEducationStatistics.Data.Seed/Files/

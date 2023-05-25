@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 
@@ -6,10 +7,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     public class Subject
     {
         public Guid Id { get; set; }
-        public ICollection<Observation> Observations { get; set; }
-        public ICollection<Filter> Filters { get; set; }
-        public ICollection<IndicatorGroup> IndicatorGroups { get; set; }
-        public ICollection<SubjectFootnote> Footnotes { get; set; }
+        public List<Observation> Observations { get; set; } = new();
+        public List<Filter> Filters { get; set; } = new();
+        public List<IndicatorGroup> IndicatorGroups { get; set; } = new();
+        public List<SubjectFootnote> Footnotes { get; set; } = new();
         public bool SoftDeleted { get; set; }
     }
 }

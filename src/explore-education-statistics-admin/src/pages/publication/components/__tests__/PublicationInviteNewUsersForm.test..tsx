@@ -34,13 +34,13 @@ describe('PublicationInviteNewUsersForm', () => {
         screen.getByText('Invite a user to edit Publication title'),
       ).toBeInTheDocument();
       expect(
-        screen.getByLabelText('Academic Year 2000/01'),
+        screen.getByLabelText('Academic year 2000/01'),
       ).toBeInTheDocument();
       expect(
-        screen.getByLabelText('Academic Year 2001/02'),
+        screen.getByLabelText('Academic year 2001/02'),
       ).toBeInTheDocument();
       expect(
-        screen.getByLabelText('Academic Year 2002/03'),
+        screen.getByLabelText('Academic year 2002/03'),
       ).toBeInTheDocument();
     });
 
@@ -48,7 +48,7 @@ describe('PublicationInviteNewUsersForm', () => {
     await userEvent.type(emailInput, 'test@test.com');
 
     const checkboxes = screen.getAllByLabelText(
-      /Academic Year /,
+      /Academic year /,
     ) as HTMLInputElement[];
     expect(checkboxes).toHaveLength(3);
 
@@ -130,7 +130,7 @@ describe('PublicationInviteNewUsersForm', () => {
     await userEvent.type(emailInput, 'test@test.com');
 
     const checkboxes = screen.getAllByLabelText(
-      /Academic Year /,
+      /Academic year /,
     ) as HTMLInputElement[];
     expect(checkboxes).toHaveLength(3);
 

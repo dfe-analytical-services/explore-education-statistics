@@ -1,5 +1,11 @@
 import classNames from 'classnames';
-import React, { ChangeEvent, FocusEventHandler, memo, ReactNode } from 'react';
+import React, {
+  ChangeEvent,
+  FocusEventHandler,
+  memo,
+  ReactNode,
+  Ref,
+} from 'react';
 
 export type OtherCheckboxChangeProps = Pick<FormCheckboxProps, 'label'>;
 
@@ -23,6 +29,7 @@ export interface FormCheckboxProps {
   onChange?: CheckboxChangeEventHandler;
   value: string;
   disabled?: boolean;
+  inputRef?: Ref<HTMLInputElement>;
 }
 
 const FormCheckbox = ({
@@ -40,6 +47,7 @@ const FormCheckbox = ({
   onChange,
   value,
   disabled = false,
+  inputRef,
 }: FormCheckboxProps) => {
   return (
     <>
@@ -63,6 +71,7 @@ const FormCheckbox = ({
           type="checkbox"
           value={value}
           disabled={disabled}
+          ref={inputRef}
         />
         <label
           className={classNames('govuk-label govuk-checkboxes__label', {

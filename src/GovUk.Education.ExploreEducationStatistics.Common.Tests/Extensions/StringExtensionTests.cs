@@ -364,6 +364,65 @@ Test
             }
         }
 
+        public class SnakeCaseTests
+        {
+            [Fact]
+            public void Null()
+            {
+                string? input = null;
+                Assert.Null(input!.SnakeCase());
+            }
+
+            [Fact]
+            public void Empty()
+            {
+                Assert.Equal(string.Empty, string.Empty.SnakeCase());
+            }
+
+            [Theory]
+            [InlineData("foo bar  baz")]
+            [InlineData("foo-bar--baz")]
+            [InlineData("foo_bar__baz")]
+            [InlineData("foo,bar,,baz")]
+            [InlineData("foo.bar..baz")]
+            public void NonAlphaNumeric(string input)
+            {
+                Assert.Equal("foo_bar_baz", input.SnakeCase());
+            }
+
+            [Theory]
+            [InlineData("foo 2 bar1  baz 3")]
+            [InlineData("foo-2-bar1--baz-3")]
+            [InlineData("foo_2_bar1__baz_3")]
+            [InlineData("foo,2,bar1,,baz,3")]
+            [InlineData("foo.2.bar1..baz.3")]
+            public void WithNumbers(string input)
+            {
+                Assert.Equal("foo_2_bar1_baz_3", input.SnakeCase());
+            }
+
+            [Theory]
+            [InlineData("foo")]
+            [InlineData("Foo")]
+            [InlineData("FOO")]
+            public void SingleWord(string input)
+            {
+                Assert.Equal("foo", input.SnakeCase());
+            }
+
+            [Theory]
+            [InlineData("foo_bar")]
+            [InlineData("foo-bar")]
+            [InlineData("FOO_BAR")]
+            [InlineData("fooBar")]
+            [InlineData("fooBAR")]
+            [InlineData("FooBar")]
+            public void ExistingCasings(string input)
+            {
+                Assert.Equal("foo_bar", input.SnakeCase());
+            }
+        }
+
         public class ToMd5HashTests
         {
             [Fact]

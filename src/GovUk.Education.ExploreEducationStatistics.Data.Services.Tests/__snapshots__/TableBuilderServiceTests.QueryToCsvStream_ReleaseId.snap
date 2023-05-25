@@ -1,0 +1,5 @@
+time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,name_of_filter_0,name_of_filter_1,name_of_indicator_0,name_of_indicator_1,name_of_indicator_2
+202223,Academic year,Regional,E92000001,England,E12000005,West Midlands,Label of FilterItem 0,Label of FilterItem 2,32462,11611,-12151
+202223,Academic year,Regional,E92000001,England,E12000005,West Midlands,Label of FilterItem 0,Label of FilterItem 2,7559,13385,13224
+202324,Academic year,Regional,E92000001,England,E13000001,Inner London,Label of FilterItem 1,Label of FilterItem 3,-17345,15159,-26935
+202324,Academic year,Regional,E92000001,England,E13000001,Inner London,Label of FilterItem 1,Label of FilterItem 3,23287,16933,-1560

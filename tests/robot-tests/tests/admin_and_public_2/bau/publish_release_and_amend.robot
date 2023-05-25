@@ -15,7 +15,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish release and amend %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Financial Year 3000-01
+${RELEASE_NAME}=        Financial year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
 
@@ -123,6 +123,13 @@ Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+
+Add free text key stat
+    user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
+
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Free text key stat title    9001%    Trend
+    user checks key stat guidance    1    Guidance title    Guidance text
 
 Add three accordion sections to release
     user waits for page to finish loading
@@ -366,8 +373,14 @@ Verify public pre-release access list
     user waits until page contains    Published ${EXPECTED_PUBLISHED_DATE}
     user waits until page contains    Test public access list
 
-Verify accordions are correct
+Verify free text key stat is correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Free text key stat title    9001%    Trend
+    user checks key stat guidance    1    Guidance title    Guidance text
+
+Verify accordions are correct
     user checks there are x accordion sections    1    id:data-accordion
     user checks accordion is in position    Explore data and files    1    id:data-accordion
 
@@ -376,9 +389,9 @@ Verify accordions are correct
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content
 
-    user checks there are x accordion sections    2    id:help-and-support
-    user checks accordion is in position    National statistics    1    id:help-and-support
-    user checks accordion is in position    Contact us    2    id:help-and-support
+    user checks there are x accordion sections    2    id:help-and-support-accordion
+    user checks accordion is in position    National statistics    1    id:help-and-support-accordion
+    user checks accordion is in position    Contact us    2    id:help-and-support-accordion
 
 Verify Dates data block accordion section
     user opens accordion section    Dates data block    id:content
@@ -441,7 +454,7 @@ Change the Release type
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} summary
-    ...    Financial Year
+    ...    Financial year
     ...    3000-01
     ...    UI test contact name
     ...    Experimental statistics
@@ -624,6 +637,14 @@ Navigate to 'Content' page for amendment
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block
 
+Update free text key stat
+    user updates free text key stat    1    Updated title    New stat    Updated trend
+    ...    Updated guidance title    Updated guidance text
+
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Updated title    New stat    Updated trend
+    user checks key stat guidance    1    Updated guidance title    Updated guidance text
+
 Verify amended Dates data block table has footnotes
     ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
@@ -684,9 +705,11 @@ Add release note to first amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Update public prerelease access list for amendment
+Create public prerelease access list for amendment
     user clicks link    Pre-release access
-    user updates public prerelease access list    Amended public access list
+    user clicks link    Public access list
+    user waits until h2 is visible    Public pre-release access list
+    user creates public prerelease access list    Amended public access list
 
 Approve amendment for scheduled release
     ${days_until_release}=    set variable    1
@@ -729,6 +752,11 @@ Verify amendment is displayed as the latest release
 Verify amendment is published
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
     user checks summary list contains    Next update    December 3001
+
+Verify amendment free text key stat is updated
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Updated title    New stat    Updated trend
+    user checks key stat guidance    1    Updated guidance title    Updated guidance text
 
 Verify amendment files
     user opens accordion section    Explore data and files
@@ -820,8 +848,8 @@ Verify amendment accordions are correct
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content
-    user checks accordion is in position    Experimental statistics    1    id:help-and-support
-    user checks accordion is in position    Contact us    2    id:help-and-support
+    user checks accordion is in position    Experimental statistics    1    id:help-and-support-accordion
+    user checks accordion is in position    Contact us    2    id:help-and-support-accordion
 
 Verify amendment Dates data block accordion section
     user opens accordion section    Dates data block    id:content

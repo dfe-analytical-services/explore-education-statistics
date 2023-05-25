@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var result = await service.GetLatestRelease(publication.Id, Enumerable.Empty<Guid>());
 
                 Assert.Equal(release3V1.Id, result.Id);
-                Assert.Equal("Academic Year Q2 2018/19", result.Title);
+                Assert.Equal("Academic year Q2 2018/19", result.Title);
             }
         }
 

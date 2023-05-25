@@ -750,23 +750,26 @@ user checks publication bullet does not contain link
     ...    xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
 
 user checks key stat contents
-    [Arguments]    ${tile}    ${title}    ${value}    ${trend}    ${wait}=${timeout}
+    [Arguments]    ${tile}    ${title}    ${statistic}    ${trend}    ${wait}=${timeout}
     user waits until element is visible
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]    ${wait}
     user waits until element contains    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-title"]
     ...    ${title}
-    user waits until element contains    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-value"]
-    ...    ${value}
+    user waits until element contains
+    ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-statistic"]    ${statistic}
     user waits until element contains
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-trend"]    ${trend}
 
-user checks key stat definition
+user checks key stat guidance
     [Arguments]    ${tile}    ${guidance_title}    ${guidance_text}
     user opens details dropdown    ${guidance_title}    css:[data-testid="keyStat"]:nth-of-type(${tile})
     user waits until element is visible
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-guidanceText"]
     user checks element should contain
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-guidanceText"]    ${guidance_text}
+
+    # The guidance text dropdown can hide the key stat Edit and Remove buttons
+    user closes details dropdown    ${guidance_title}    css:[data-testid="keyStat"]:nth-of-type(${tile})
 
 user checks page contains radio
     [Arguments]    ${label}

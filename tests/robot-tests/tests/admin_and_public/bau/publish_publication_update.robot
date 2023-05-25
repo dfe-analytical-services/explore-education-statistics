@@ -22,7 +22,7 @@ Create Publication as bau1
 
 Publish release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2046/47
+    ...    Academic year 2046/47
     user approves release for immediate publication
 
 Update publication details
@@ -78,7 +78,7 @@ Go to public release page
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    %{WAIT_MEDIUM}
 
 Validate publication details are updated on public page
-    ${section}=    user opens accordion section    Contact us    css:#help-and-support
+    ${section}=    user opens accordion section    Contact us    css:#help-and-support-accordion
     user checks element contains    ${section}    Team name updated
     user checks element contains    ${section}    email_updated@test.com
     user checks element contains    ${section}    Contact name updated

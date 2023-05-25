@@ -225,7 +225,10 @@ const PublicationForm = ({
                     )}
 
                     <div className="govuk-!-margin-top-6">
-                      <WizardStepFormActions {...stepProps} />
+                      <WizardStepFormActions
+                        {...stepProps}
+                        isSubmitting={form.isSubmitting}
+                      />
                     </div>
                   </div>
                 </div>

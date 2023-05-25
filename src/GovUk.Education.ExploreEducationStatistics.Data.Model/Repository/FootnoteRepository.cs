@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         {
             // Query the id's of the filter groups and filters corresponding with the filter item id's
             // Sanitise all id's to make sure they belong to the subject
-            var filterIdsResult = await _context.FilterItem
+            var filterItemIdsResult = await _context.FilterItem
                 .Where(filterItem => filterItemIds.Contains(filterItem.Id)
                                      && filterItem.FilterGroup.Filter.SubjectId == subjectId)
                 .Select(filterItem => new
@@ -91,16 +91,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 })
                 .ToListAsync();
 
-            var filterItemIdsSanitised = filterIdsResult
+            var filterItemIdsSanitised = filterItemIdsResult
                 .Select(filter => filter.FilterItemId)
                 .ToList();
 
-            var filterGroupsIdsSanitised = filterIdsResult
+            var filterGroupsIdsSanitised = filterItemIdsResult
                 .Select(filter => filter.FilterGroupId)
                 .Distinct()
                 .ToList();
 
-            var filterIdsSanitised = filterIdsResult
+            var filterIdsSanitised = filterItemIdsResult
                 .Select(filter => filter.FilterId)
                 .Distinct()
                 .ToList();
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
             // If the list of filter and indicator id's are empty,
             // return early with only footnotes that apply directly to this subject
-            if (!filterIdsResult.Any() && !indicatorIdsSanitised.Any())
+            if (!filterItemIdsResult.Any() && !indicatorIdsSanitised.Any())
             {
                 return await footnotesQueryable.Where(footnote =>
                         footnote.Subjects.Any(subjectFootnote => subjectFootnote.SubjectId == subjectId)

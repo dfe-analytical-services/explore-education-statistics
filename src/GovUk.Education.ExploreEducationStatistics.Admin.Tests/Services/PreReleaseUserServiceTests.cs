@@ -1837,7 +1837,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new()
             {
                 {"newUser", newUser ? "yes" : "no"},
-                {"release name", "Calendar Year 2020"},
+                {"release name", "Calendar year 2020"},
                 {"publication name", "Test publication"},
                 {
                     "prerelease link",

@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var emailService = new Mock<IEmailService>(Strict);
             var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
-                publication.Title, "* Academic Year 2000/01\n* Academic Year 2001/02");
+                publication.Title, "* Academic year 2000/01\n* Academic year 2001/02");
             emailService.Setup(mock => mock.SendEmail(
                     "test@test.com",
                     NotifyContributorTemplateId,
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var emailService = new Mock<IEmailService>(Strict);
             var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
-                publication.Title, "* Academic Year 2001/02");
+                publication.Title, "* Academic year 2001/02");
             emailService.Setup(mock => mock.SendEmail(
                     "test@test.com",
                     NotifyContributorTemplateId,
@@ -461,7 +461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var emailService = new Mock<IEmailService>(Strict);
             var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
-                publication.Title, "* Academic Year 2000/01");
+                publication.Title, "* Academic year 2000/01");
             emailService.Setup(mock => mock.SendEmail(
                     "test@test.com",
                     NotifyContributorTemplateId,
@@ -547,7 +547,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var emailService = new Mock<IEmailService>(Strict);
             var expectedTemplateValues = GetExpectedContributorInviteTemplateValues(
-                publication.Title, "* Academic Year 2000/01");
+                publication.Title, "* Academic year 2000/01");
             emailService.Setup(mock => mock.SendEmail(
                     "test@test.com",
                     NotifyContributorTemplateId,

@@ -90,7 +90,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan)
         {
             return InvalidateDataBlockCaches(deletePlan)
-                .OnSuccess(() => DeleteDependentDataBlocks(deletePlan))
                 .OnSuccessVoid(async () =>
                 {
                     var dataBlockIds = deletePlan.DependentDataBlocks
@@ -102,7 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.SaveChangesAsync();
 
                     await RemoveChartFileReleaseLinks(deletePlan);
-                });
+                })
+                .OnSuccess(() => DeleteDependentDataBlocks(deletePlan));
         }
 
         public async Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id)
@@ -403,11 +403,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlock dataBlock)
         {
-                return dataBlock.ContentSectionId == null
-                       && await _context.KeyStatisticsDataBlock
-                           .Where(ks =>ks.ReleaseId == releaseId)
-                           .AllAsync(ks =>
-                               ks.DataBlockId != dataBlock.Id);
+            return dataBlock.ContentSectionId == null
+                   && await _context.KeyStatisticsDataBlock
+                       .Where(ks =>ks.ReleaseId == releaseId)
+                       .AllAsync(ks =>
+                           ks.DataBlockId != dataBlock.Id);
         }
     }
 

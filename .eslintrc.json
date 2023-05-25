@@ -29,6 +29,7 @@
     "@typescript-eslint/ban-ts-ignore": "off",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-shadow": "error",
     "@typescript-eslint/no-unused-vars": [
       "warn",
       { "argsIgnorePattern": "^_$" }
@@ -129,6 +130,7 @@
       "props": true,
       "ignorePropertyModificationsFor": ["draft", "acc"]
     }],
+    "no-shadow": "off",
     "no-use-before-define": "off",
     "no-useless-constructor": "off",
     "spaced-comment": ["warn", "always", { "markers": ["/"] }]

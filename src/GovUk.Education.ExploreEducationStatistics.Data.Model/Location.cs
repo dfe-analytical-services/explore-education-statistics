@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
@@ -12,6 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     [SuppressMessage("ReSharper", "InconsistentNaming")]
     public class Location
     {
+        private static readonly Lazy<List<PropertyInfo>> _locationAttributeProperties = new(
+            () => typeof(Location).GetProperties()
+                .Where(member => member.PropertyType.IsAssignableTo(typeof(LocationAttribute)))
+                .ToList()
+        );
+
         public Guid Id { get; set; }
 
         public GeographicLevel GeographicLevel { get; set; }
@@ -134,11 +141,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? MultiAcademyTrust_Name { get; set; }
 
         [NotMapped]
-        public Mat? MultiAcademyTrust
+        public MultiAcademyTrust? MultiAcademyTrust
         {
             get => MultiAcademyTrust_Code == null && MultiAcademyTrust_Name == null
                 ? null
-                : new Mat(MultiAcademyTrust_Code, MultiAcademyTrust_Name);
+                : new MultiAcademyTrust(MultiAcademyTrust_Code, MultiAcademyTrust_Name);
             init
             {
                 MultiAcademyTrust_Code = value?.Code;
@@ -373,6 +380,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             hashCode.Add(Ward_Code);
             hashCode.Add(Ward_Name);
             return hashCode.ToHashCode();
+        }
+
+        public IEnumerable<LocationAttribute> GetAttributes()
+        {
+            return _locationAttributeProperties.Value
+                .Select(property => property.GetValue(this))
+                .OfType<LocationAttribute?>()
+                .WhereNotNull();
         }
 
         public LocationAttribute ToLocationAttribute()

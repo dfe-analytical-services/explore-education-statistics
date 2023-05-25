@@ -147,6 +147,13 @@
     "theme": "Early years"
   },
   {
+    "publication_summary": "Early career teachers and mentors starting the provider-led ECF-based induction programme and teachers and leaders starting a DfE-funded NPQ in England.",
+    "publication_title": "ECF and NPQ starts",
+    "published": "2 Mar 2023",
+    "release_type": "Management information",
+    "theme": "Teachers and school workforce"
+  },
+  {
     "publication_summary": "Annual data release on schools, pupils, teachers, qualifications gained, education expenditure, further education and higher education in the UK.",
     "publication_title": "Education and training statistics for the UK",
     "published": "17 Nov 2022",
@@ -322,6 +329,13 @@
     "theme": "Children's social care"
   },
   {
+    "publication_summary": "Attainment statistics for students across KS2, KS4, 16 to 18 who attended multi-academy trusts (MATs) in England in academic year 2021 to 2022.",
+    "publication_title": "Multi-academy trust performance measures (Key stages 2, 4 and 5)",
+    "published": "16 Mar 2023",
+    "release_type": "Official statistics",
+    "theme": "School and college outcomes and performance"
+  },
+  {
     "publication_summary": "",
     "publication_title": "Multi-academy trust performance measures at key stage 2",
     "published": "8 Oct 2020",
@@ -352,7 +366,7 @@
   {
     "publication_summary": "Annual estimates from the Labour Force Survey of young people aged 16 to 24 not in education, employment or training (NEET) in England.",
     "publication_title": "NEET age 16 to 24",
-    "published": "3 Mar 2022",
+    "published": "2 Mar 2023",
     "release_type": "National statistics",
     "theme": "Destination of pupils and students"
   },
@@ -436,7 +450,7 @@
   {
     "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the full academic year.",
     "publication_title": "Pupil absence in schools in England",
-    "published": "24 Mar 2022",
+    "published": "16 Mar 2023",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
   },
@@ -457,7 +471,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "23 Feb 2023",
+    "published": "9 Mar 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },

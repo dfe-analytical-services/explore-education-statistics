@@ -28,7 +28,7 @@ Create test publication and release via API
 
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26
+    ...    Academic year 2025/26
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Navigate to 'Footnotes' page

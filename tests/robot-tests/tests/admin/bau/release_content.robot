@@ -23,7 +23,7 @@ Create test publication and release via API
 
 Upload a subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26
+    ...    Academic year 2025/26
 
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
@@ -51,7 +51,7 @@ Create 4 data blocks
 
 Navigate to 'Content' page
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Academic Year 2025/26
+    ...    Academic year 2025/26
     user clicks link    Content
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until h2 is visible    ${PUBLICATION_NAME}
@@ -105,6 +105,7 @@ Change secondary statistics
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 1
     user checks select contains option    name:selectedDataBlock    Key Stats Data Block 2
     user chooses and embeds data block    Data Block 2
+    user waits until page does not contain loading spinner
     user waits until element is visible    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]    %{WAIT_MEDIUM}
     user checks page contains    Data Block 2 title
     user checks page contains button    Change secondary stats
@@ -121,8 +122,8 @@ Remove secondary statistics
     user checks page does not contain button    Remove secondary stats
     user checks page contains button    Add secondary stats
 
-Add a key statistics tile
-    user clicks button    Add key statistic
+Add a key statistics data block tile
+    user clicks button    Add key statistic from data block
     user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
     user checks select contains x options    name:selectedDataBlock    3
     user checks select contains option    name:selectedDataBlock    Select a data block
@@ -149,8 +150,8 @@ Check the guidance information for the key statistics tile
     user opens details dropdown    Learn more about open settings
     user checks page contains    Some information about about open settings
 
-Add another key statistics tile
-    user clicks button    Add another key statistic
+Add another key statistics data block tile
+    user clicks button    Add key statistic from data block
     user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
     user checks select contains x options    name:selectedDataBlock    2
     user checks select contains option    name:selectedDataBlock    Select a data block
@@ -159,13 +160,40 @@ Add another key statistics tile
     user checks page contains    Number of open settings
     user checks page contains    22,900
 
-Remove a key statistics tile
-    # Remove the second tile
+Remove newly added key statistics data block tile
     user clicks the nth key stats tile button    2    Remove
     user waits until page does not contain    Number of open settings    %{WAIT_MEDIUM}
     user checks page does not contain    22,900
+
     # Make sure the first key stat tile is still there
     user checks page contains    Proportion of settings open
+
+Add free text key stat
+    user adds free text key stat    Free text key stat title    9001%    Trend    Guidance title    Guidance text
+
+    user checks element count is x    testid:keyStat    2
+    user checks key stat contents    1    Proportion of settings open    1%    Down from last year
+    user checks key stat guidance    1    Learn more about open settings    Some information about about open settings
+    user checks key stat contents    2    Free text key stat title    9001%    Trend
+    user checks key stat guidance    2    Guidance title    Guidance text
+
+Update free text key stat
+    user updates free text key stat    2    Updated title    9002%    Updated trend    Updated guidance title
+    ...    Updated guidance text
+
+    user checks element count is x    testid:keyStat    2
+    user checks key stat contents    1    Proportion of settings open    1%    Down from last year
+    user checks key stat guidance    1    Learn more about open settings    Some information about about open settings
+    user checks key stat contents    2    Updated title    9002%    Updated trend
+    user checks key stat guidance    2    Updated guidance title    Updated guidance text
+
+Remove free text key stat
+    user removes key stat    2
+    user waits until page does not contain    Updated title
+
+    user checks element count is x    testid:keyStat    1
+    user checks key stat contents    1    Proportion of settings open    1%    Down from last year
+    user checks key stat guidance    1    Learn more about open settings    Some information about about open settings
 
 Add key statistics summary content to release
     user adds headlines text block

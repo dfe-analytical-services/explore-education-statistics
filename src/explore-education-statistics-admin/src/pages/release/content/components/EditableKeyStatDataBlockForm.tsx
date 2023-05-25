@@ -11,6 +11,8 @@ import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile'
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import { Formik } from 'formik';
 import React from 'react';
+import Yup from '@common/validation/yup';
+import { KeyStatTextFormValues } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 
 export interface KeyStatDataBlockFormValues {
   trend: string;
@@ -23,7 +25,7 @@ export interface EditableKeyStatDataBlockFormProps {
   title: string;
   statistic: string;
   isReordering?: boolean;
-  testId?: string;
+  testId: string;
   onSubmit: (values: KeyStatDataBlockFormValues) => void;
   onCancel: () => void;
 }
@@ -33,7 +35,7 @@ const EditableKeyStatDataBlockForm = ({
   title,
   statistic,
   isReordering,
-  testId = 'keyStat',
+  testId,
   onSubmit,
   onCancel,
 }: EditableKeyStatDataBlockFormProps) => {
@@ -54,10 +56,15 @@ const EditableKeyStatDataBlockForm = ({
         guidanceTitle: keyStat.guidanceTitle ?? 'Help',
         guidanceText: keyStat.guidanceText ? toHtml(keyStat.guidanceText) : '',
       }}
+      validationSchema={Yup.object<KeyStatDataBlockFormValues>({
+        trend: Yup.string().max(230),
+        guidanceTitle: Yup.string().max(65),
+        guidanceText: Yup.string(),
+      })}
       onSubmit={handleSubmit}
     >
       {form => (
-        <Form id={`editableKeyStatForm-${keyStat.id}`}>
+        <Form id={`editableKeyStatDataBlockForm-${keyStat.id}`}>
           <KeyStatTile
             title={title}
             titleTag="h4"

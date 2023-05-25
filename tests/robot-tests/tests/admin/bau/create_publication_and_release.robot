@@ -160,17 +160,17 @@ Verify Release type options
     user checks page contains radio    Management information
 
 Create new release
-    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring Term
+    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2025
     user clicks radio    National statistics
     user clicks button    Create new release
-    user waits until page contains title caption    Edit release for Spring Term 2025/26
+    user waits until page contains title caption    Edit release for Spring term 2025/26
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Verify created release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary updated    Spring Term
+    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary updated    Spring term
     ...    2025/26    UI Tests Contact Name    National statistics
 
 Edit release summary
@@ -178,14 +178,14 @@ Edit release summary
     user clicks link    Edit release summary
     user waits until h2 is visible    Edit release summary
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
-    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Summer Term
+    user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Summer term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2026
     user clicks radio    Official statistics
     user clicks button    Update release summary
 
 Verify updated release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary updated    Summer Term
+    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary updated    Summer term
     ...    2026/27    UI Tests Contact Name    Official statistics
 
 

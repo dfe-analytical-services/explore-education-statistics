@@ -10,16 +10,21 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import publicationService from '@common/services/publicationService';
 import Link from '@admin/components/Link';
-import { SelectedPublication } from '@common/services/tableBuilderService';
+import tableBuilderService, {
+  ReleaseTableDataQuery,
+  SelectedPublication,
+} from '@common/services/tableBuilderService';
 import React, { memo, ReactNode, useEffect, useRef, useState } from 'react';
 
 interface TableToolFinalStepProps {
+  query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   selectedPublication: SelectedPublication;
 }
 
 const TableToolFinalStep = ({
+  query,
   table,
   tableHeaders,
   selectedPublication,
@@ -148,6 +153,7 @@ const TableToolFinalStep = ({
           <DownloadTable
             fullTable={table}
             fileName={`data-${selectedPublication.slug}`}
+            onCsvDownload={() => tableBuilderService.getTableCsv(query)}
             tableRef={dataTableRef}
           />
         </>

@@ -14,7 +14,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish amend and cancel %{RUN_IDENTIFIER}
-${RELEASE_NAME}=        Financial Year 3000-01
+${RELEASE_NAME}=        Financial year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
 
 
@@ -200,7 +200,7 @@ Change the Release type
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} summary
-    ...    Financial Year
+    ...    Financial year
     ...    3000-01
     ...    UI test contact name
     ...    Experimental statistics
@@ -354,7 +354,7 @@ Revisit the Release after the cancellation to double check it remains unaffected
     user waits until h2 is visible    Release summary
     user verifies release summary    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} summary
-    ...    Financial Year
+    ...    Financial year
     ...    3000-01
     ...    UI test contact name
     ...    National statistics

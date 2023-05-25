@@ -381,12 +381,16 @@ describe('Form', () => {
 
     const input = screen.getByLabelText('First name');
 
-    input.focus();
+    userEvent.type(input, 'a first name');
 
-    fireEvent.change(input, {
-      target: {
-        value: 'a first name',
-      },
+    await waitFor(() => {
+      expect(screen.queryByText('There is a problem')).not.toBeInTheDocument();
+    });
+
+    userEvent.clear(input);
+
+    await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
     expect(screen.getByRole('alert')).not.toHaveFocus();

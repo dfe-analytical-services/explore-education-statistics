@@ -27,7 +27,7 @@ Create test publication and release via API
 
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
-    ...    Calendar Year 2000
+    ...    Calendar year 2000
 
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
@@ -283,7 +283,7 @@ Validate prerelease has started
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
@@ -300,7 +300,7 @@ Validate metadata guidance page
     user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
@@ -330,12 +330,12 @@ Go back to prerelease content page
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list
     user clicks link    Pre-release access list
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
     user waits until page contains    Updated test public access list    %{WAIT_SMALL}
@@ -402,7 +402,7 @@ Validate prerelease has started for Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
@@ -413,7 +413,7 @@ Validate public metdata guidance for Analyst user
     user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
@@ -443,13 +443,13 @@ Go back to prerelease content page as Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list as Analyst user
     user clicks link    Pre-release access list
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
@@ -462,7 +462,7 @@ Go back to prerelease content page again as Analyst user
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
-    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
+    user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Go to prerelease table tool page as Analyst user

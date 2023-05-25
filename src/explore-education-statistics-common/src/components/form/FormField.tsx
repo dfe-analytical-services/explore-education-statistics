@@ -1,4 +1,4 @@
-import { useFormContext } from '@common/components/form/contexts/FormContext';
+import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import { FormGroup } from '@common/components/form/index';
 import {
   FieldHelperProps,
@@ -61,8 +61,8 @@ function FormField<Value, Props = Record<string, unknown>>({
   type,
   ...props
 }: FormFieldProps & InternalFormFieldProps<Props, Value>) {
-  const { prefixFormId, fieldId } = useFormContext();
-  const id = customId ? prefixFormId(customId) : fieldId(name);
+  const { fieldId } = useFormIdContext();
+  const id = fieldId(name, customId);
 
   const [field, meta, helpers] = useField({
     name,
@@ -83,7 +83,7 @@ function FormField<Value, Props = Record<string, unknown>>({
         <Component
           {...props}
           {...field}
-          id={customId ? prefixFormId(customId) : fieldId(name)}
+          id={fieldId(name, customId)}
           name={name}
           error={error}
           onChange={(event: ChangeEvent) => {
@@ -122,7 +122,6 @@ function FormField<Value, Props = Record<string, unknown>>({
   }, [
     as,
     children,
-    prefixFormId,
     customId,
     error,
     field,

@@ -1,5 +1,5 @@
 import { getAllDescribedBy } from '@common-test/queries';
-import { FormContextProvider } from '@common/components/form/contexts/FormContext';
+import { FormIdContextProvider } from '@common/components/form/contexts/FormIdContext';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import FormFieldset from '../FormFieldset';
@@ -141,7 +141,7 @@ describe('FormFieldset', () => {
 
   test('renders with correct ids with form context', () => {
     render(
-      <FormContextProvider id="testForm">
+      <FormIdContextProvider id="testForm">
         <FormFieldset
           id="test-fieldset"
           legend="Fill the form"
@@ -149,7 +149,7 @@ describe('FormFieldset', () => {
           error="There was an error"
           legendHidden
         />
-      </FormContextProvider>,
+      </FormIdContextProvider>,
     );
 
     const group = screen.getByRole('group');

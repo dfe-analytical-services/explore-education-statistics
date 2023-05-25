@@ -638,29 +638,60 @@
         "dev"
       ]
     },
-    "minCapacityStatisticsDb": {
+    "skuContentDb": {
       "type": "string",
-      "defaultValue": "0.75"
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GP_S_Gen5"
+      ]
     },
-    "maxCapacityStatisticsDb": {
-      "type": "int",
-      "defaultValue": 1
+    "skuStatisticsDb": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GP_Gen5",
+        "GP_S_Gen5"
+      ]
     },
-    "autoPauseDelayStatisticsDb": {
-      "type": "int",
-      "defaultValue": -1
+    "tierContentDb": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GeneralPurpose"
+      ]
+    },
+    "tierStatisticsDb": {
+      "type": "string",
+      "allowedValues": [
+        "Free",
+        "Basic",
+        "Standard",
+        "Premium",
+        "GeneralPurpose"
+      ]
     },
     "minCapacityContentDb": {
       "type": "string",
-      "defaultValue": "0.75"
+      "defaultValue": ""
     },
-    "maxCapacityContentDb": {
-      "type": "int",
-      "defaultValue": 1
+    "capacityContentDb": {
+      "type": "int"
     },
-    "autoPauseDelayContentDb": {
-      "type": "int",
-      "defaultValue": -1
+    "minCapacityStatisticsDb": {
+      "type": "string",
+      "defaultValue": ""
+    },
+    "capacityStatisticsDb": {
+      "type": "int"
     },
     "deploySlotName": {
       "type": "string",
@@ -825,7 +856,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), variables('statisticsReplicaDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
-        "threshold": 50,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -902,7 +933,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
-        "threshold": 50,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -979,7 +1010,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('contentDbName'))]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "physical_data_read_percent",
-        "threshold": 50,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -2108,7 +2139,7 @@
     {
       "name": "[variables('coreSqlServerName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2019-06-01-preview",
+      "apiVersion": "2022-05-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -2118,6 +2149,7 @@
       "resources": [
         {
           "type": "databases",
+          "apiVersion": "2022-05-01-preview",
           "name": "[variables('statisticsDbName')]",
           "location": "[resourceGroup().location]",
           "tags": {
@@ -2133,31 +2165,29 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('coreSqlServerName')]"
           ],
           "sku": {
-            "name": "GP_S_Gen5",
-            "tier": "GeneralPurpose",
-            "family": "Gen5",
-            "capacity": "[parameters('maxCapacityStatisticsDb')]"
+            "name": "[parameters('skuStatisticsDb')]",
+            "tier": "[parameters('tierStatisticsDb')]",
+            "capacity": "[parameters('capacityStatisticsDb')]"
           },
-          "kind": "v12.0,user,vcore,serverless",
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
-            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "autoPauseDelay": -1,
             "storageAccountType": "GRS",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]"
+            "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]"
           }
         },
         {
-          "name": "[variables('contentDbName')]",
           "type": "databases",
+          "apiVersion": "2022-05-01-preview",
+          "name": "[variables('contentDbName')]",
           "location": "[resourceGroup().location]",
           "tags": {
             "Department": "[parameters('departmentName')]",
@@ -2172,26 +2202,23 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('coreSqlServerName')]"
           ],
           "sku": {
-            "name": "GP_S_Gen5",
-            "tier": "GeneralPurpose",
-            "family": "Gen5",
-            "capacity": "[parameters('maxCapacityContentDb')]"
+            "name": "[parameters('skuContentDb')]",
+            "tier": "[parameters('tierContentDb')]",
+            "capacity": "[parameters('capacityContentDb')]"
           },
-          "kind": "v12.0,user,vcore,serverless",
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "[parameters('maxContentDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
-            "autoPauseDelay": "[parameters('autoPauseDelayContentDb')]",
+            "autoPauseDelay": -1,
             "storageAccountType": "GRS",
-            "minCapacity": "[parameters('minCapacityContentDb')]"
+            "minCapacity": "[if(not(empty(parameters('minCapacityContentDb'))), parameters('minCapacityContentDb'), json('null'))]"
           }
         },
         {
@@ -2357,7 +2384,7 @@
     {
       "name": "[variables('publicSqlServerName')]",
       "type": "Microsoft.Sql/servers",
-      "apiVersion": "2019-06-01-preview",
+      "apiVersion": "2022-05-01-preview",
       "location": "[resourceGroup().location]",
       "properties": {
         "administratorLogin": "[parameters('sqlAdministratorLogin')]",
@@ -2367,6 +2394,7 @@
       "resources": [
         {
           "type": "databases",
+          "apiVersion": "2022-05-01-preview",
           "name": "[variables('statisticsReplicaDbName')]",
           "location": "[resourceGroup().location]",
           "tags": {
@@ -2382,27 +2410,24 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "apiVersion": "2020-08-01-preview",
           "dependsOn": [
             "[variables('publicSqlServerName')]",
             "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]"
           ],
           "sku": {
-            "name": "GP_S_Gen5",
-            "tier": "GeneralPurpose",
-            "family": "Gen5",
-            "capacity": "[parameters('maxCapacityStatisticsDb')]"
+            "name": "[parameters('skuStatisticsDb')]",
+            "tier": "[parameters('tierStatisticsDb')]",
+            "capacity": "[parameters('capacityStatisticsDb')]"
           },
-          "kind": "v12.0,user,vcore,serverless",
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
             "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
-            "autoPauseDelay": "[parameters('autoPauseDelayStatisticsDb')]",
+            "autoPauseDelay": -1,
             "storageAccountType": "GRS",
-            "minCapacity": "[parameters('minCapacityStatisticsDb')]",
+            "minCapacity": "[if(not(empty(parameters('minCapacityStatisticsDb'))), parameters('minCapacityStatisticsDb'), json('null'))]",
             "createMode": "OnlineSecondary",
             "sourceDatabaseId": "[resourceId('Microsoft.Sql/servers/databases', variables('coreSqlServerName'), variables('statisticsDbName'))]",
             "secondaryType": "Geo"

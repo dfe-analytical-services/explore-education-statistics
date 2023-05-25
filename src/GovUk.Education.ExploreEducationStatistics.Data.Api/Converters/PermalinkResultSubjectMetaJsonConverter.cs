@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Converters
     /// flat 'Locations' field in their JSON serialization of type <see cref="List{T}"/>.
     ///
     /// Permalinks created afterwards, plus any created while the dedicated release toggle for that feature was turned on,
-    /// have locations in field <see cref="ResultSubjectMetaViewModel.Locations">PermalinkResultSubjectMeta.LocationsHierarchical</see>.
+    /// have locations in field <see cref="SubjectResultMetaViewModel.Locations">PermalinkResultSubjectMeta.LocationsHierarchical</see>.
     ///
     /// Until old Permalinks are migrated, the translation provided by this converter ensures that consumers
     /// are aware of legacy locations when accessing <see cref="PermalinkResultSubjectMeta.LocationsHierarchical" />.

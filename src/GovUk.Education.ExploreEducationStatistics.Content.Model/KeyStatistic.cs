@@ -6,6 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
+    public const int TitleMaxLength = 25;
+    public const int StatisticMaxLength = 12;
+    public const int TrendMaxLength = 230;
+    public const int GuidanceTitleMaxLength = 65;
+
     public Guid Id { get; set; }
 
     public Guid ReleaseId { get; set; }
@@ -31,8 +36,6 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
     public Guid? UpdatedById { get; set; }
 
     public User? UpdatedBy { get; set; }
-
-    public Guid ContentBlockIdTemp { get; set; } // TODO: Remove in EES-3988
 
     public KeyStatistic Clone(Release newRelease)
     {

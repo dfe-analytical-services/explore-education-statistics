@@ -164,45 +164,14 @@ public class KeyStatisticService : IKeyStatisticService
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanUpdateRelease)
             .OnSuccess(async release =>
-                await _persistenceHelper.CheckEntityExists<KeyStatistic>(keyStatisticId, query =>
-                    query
-                        .Include(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock) // TODO Include can be removed in EES-3988
-                        .Where(keyStat => keyStat.ReleaseId == release.Id)))
-            // TODO: Can remove the below OnSuccess in EES-3988
-            // Key stats were previously associated with a KeyStatistic content section,
-            // which meant their data blocks had a ContentSectionId set. The below code
-            // ensures ContentSectionId is unset when a key stat is removed. If it isn't
-            // unset, that data block won't become available for selection for content again.
-            .OnSuccess(async keyStat =>
-            {
-                if (keyStat is KeyStatisticDataBlock keyStatDataBlock)
-                {
-                    var dataBlock = keyStatDataBlock.DataBlock;
-                    dataBlock.ContentSection = null;
-                    dataBlock.ContentSectionId = null;
-                    _context.ContentBlocks.Update(dataBlock);
-                    await _context.SaveChangesAsync();
-                }
-                return keyStat;
-            })
+                await _persistenceHelper.CheckEntityExists<KeyStatistic>(query =>
+                    query.Where(keyStat => keyStat.Id == keyStatisticId
+                                                     && keyStat.ReleaseId == release.Id)))
             .OnSuccessVoid(async keyStat =>
             {
                 _context.KeyStatistics.Remove(keyStat);
                 await _context.SaveChangesAsync();
             });
-    }
-
-    public async Task DeleteAssociatedKeyStatisticDataBlock(Guid dataBlockId)
-    {
-        var keyStat = await _context
-            .KeyStatisticsDataBlock
-            .SingleOrDefaultAsync(ks => ks.DataBlockId == dataBlockId);
-
-        if (keyStat != null)
-        {
-            _context.KeyStatisticsDataBlock.RemoveRange(keyStat);
-            await _context.SaveChangesAsync();
-        }
     }
 
     public async Task<Either<ActionResult, List<KeyStatisticViewModel>>> Reorder(

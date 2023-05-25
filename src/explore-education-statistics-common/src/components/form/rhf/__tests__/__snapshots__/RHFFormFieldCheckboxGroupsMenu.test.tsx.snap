@@ -1,0 +1,303 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct order with search input 1`] = `
+<fieldset
+  class="govuk-fieldset"
+  id="test"
+>
+  <legend
+    class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
+  >
+    Choose options
+  </legend>
+  <button
+    aria-disabled="false"
+    class="button noUnderline govuk-!-margin-bottom-4"
+    id="test-all"
+    type="button"
+  >
+    Select all 4 options
+  </button>
+  <label
+    class="govuk-label"
+    for="test-search"
+  >
+    Search options
+  </label>
+  <div
+    class=""
+  >
+    <input
+      class="govuk-input searchInput govuk-input--width-20"
+      id="test-search"
+      name="test-search"
+      type="text"
+      value=""
+    />
+  </div>
+  <div
+    aria-live="assertive"
+    class="optionsContainer"
+  >
+    <div
+      class="govuk-form-group"
+    >
+      <fieldset
+        class="govuk-fieldset"
+        id="test-options-1"
+      >
+        <legend
+          class="govuk-fieldset__legend govuk-fieldset__legend--s"
+        >
+          Group A
+        </legend>
+        <div
+          class="govuk-checkboxes govuk-checkboxes--small"
+        >
+          <button
+            aria-disabled="false"
+            class="button noUnderline selectAll"
+            id="test-options-1-all"
+            type="button"
+          >
+            Select all 2 subgroup options
+            <span
+              class="govuk-visually-hidden"
+            >
+               
+              for Group A
+            </span>
+          </button>
+          <div
+            class="govuk-checkboxes__item"
+            data-testid="Checkbox item for Option 1"
+          >
+            <input
+              class="govuk-checkboxes__input"
+              id="test-options-1-1"
+              name="test"
+              type="checkbox"
+              value="1"
+            />
+            <label
+              class="govuk-label govuk-checkboxes__label"
+              for="test-options-1-1"
+            >
+              Option 1
+            </label>
+          </div>
+          <div
+            class="govuk-checkboxes__item"
+            data-testid="Checkbox item for Option 2"
+          >
+            <input
+              class="govuk-checkboxes__input"
+              id="test-options-1-2"
+              name="test"
+              type="checkbox"
+              value="2"
+            />
+            <label
+              class="govuk-label govuk-checkboxes__label"
+              for="test-options-1-2"
+            >
+              Option 2
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+    <div
+      class="govuk-form-group"
+    >
+      <fieldset
+        class="govuk-fieldset"
+        id="test-options-2"
+      >
+        <legend
+          class="govuk-fieldset__legend govuk-fieldset__legend--s"
+        >
+          Group B
+        </legend>
+        <div
+          class="govuk-checkboxes govuk-checkboxes--small"
+        >
+          <button
+            aria-disabled="false"
+            class="button noUnderline selectAll"
+            id="test-options-2-all"
+            type="button"
+          >
+            Select all 2 subgroup options
+            <span
+              class="govuk-visually-hidden"
+            >
+               
+              for Group B
+            </span>
+          </button>
+          <div
+            class="govuk-checkboxes__item"
+            data-testid="Checkbox item for Option 3"
+          >
+            <input
+              class="govuk-checkboxes__input"
+              id="test-options-2-3"
+              name="test"
+              type="checkbox"
+              value="3"
+            />
+            <label
+              class="govuk-label govuk-checkboxes__label"
+              for="test-options-2-3"
+            >
+              Option 3
+            </label>
+          </div>
+          <div
+            class="govuk-checkboxes__item"
+            data-testid="Checkbox item for Option 4"
+          >
+            <input
+              class="govuk-checkboxes__input"
+              id="test-options-2-4"
+              name="test"
+              type="checkbox"
+              value="4"
+            />
+            <label
+              class="govuk-label govuk-checkboxes__label"
+              for="test-options-2-4"
+            >
+              Option 4
+            </label>
+          </div>
+        </div>
+      </fieldset>
+    </div>
+  </div>
+</fieldset>
+`;
+
+exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search input 1`] = `
+<fieldset
+  class="govuk-fieldset"
+  id="test"
+>
+  <legend
+    class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
+  >
+    Choose options
+  </legend>
+  <label
+    class="govuk-label"
+    for="test-search"
+  >
+    Search options
+  </label>
+  <div
+    class=""
+  >
+    <input
+      class="govuk-input searchInput govuk-input--width-20"
+      id="test-search"
+      name="test-search"
+      type="text"
+      value=""
+    />
+  </div>
+  <div
+    aria-live="assertive"
+    class="optionsContainer"
+  >
+    <div
+      class="govuk-checkboxes govuk-checkboxes--small"
+    >
+      <button
+        aria-disabled="false"
+        class="button noUnderline selectAll"
+        id="test-1-all"
+        type="button"
+      >
+        Select all 2 options
+      </button>
+      <div
+        class="govuk-checkboxes__item"
+        data-testid="Checkbox item for Option 1"
+      >
+        <input
+          class="govuk-checkboxes__input"
+          id="test-1-1"
+          name="test"
+          type="checkbox"
+          value="1"
+        />
+        <label
+          class="govuk-label govuk-checkboxes__label"
+          for="test-1-1"
+        >
+          Option 1
+        </label>
+      </div>
+      <div
+        class="govuk-checkboxes__item"
+        data-testid="Checkbox item for Option 2"
+      >
+        <input
+          class="govuk-checkboxes__input"
+          id="test-1-2"
+          name="test"
+          type="checkbox"
+          value="2"
+        />
+        <label
+          class="govuk-label govuk-checkboxes__label"
+          for="test-1-2"
+        >
+          Option 2
+        </label>
+      </div>
+    </div>
+  </div>
+</fieldset>
+`;
+
+exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with single checkbox option and no search input 1`] = `
+<fieldset
+  class="govuk-fieldset"
+  id="test"
+>
+  <legend
+    class="govuk-fieldset__legend govuk-fieldset__legend--l govuk-visually-hidden"
+  >
+    Choose options
+  </legend>
+  <div
+    aria-live="assertive"
+    class="optionsContainer"
+  >
+    <div
+      class="govuk-checkboxes govuk-checkboxes--small"
+    >
+      <div
+        class="govuk-checkboxes__item"
+        data-testid="Checkbox item for Option 1"
+      >
+        <input
+          class="govuk-checkboxes__input"
+          id="test-1-1"
+          name="test"
+          type="checkbox"
+          value="1"
+        />
+        <label
+          class="govuk-label govuk-checkboxes__label"
+          for="test-1-1"
+        >
+          Option 1
+        </label>
+      </div>
+    </div>
+  </div>
+</fieldset>
+`;

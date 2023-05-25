@@ -8,12 +8,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
     public static class EitherTaskExtensions
     {
+        public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(this TRight? result)
+            where TRight : struct
+        {
+            return await OrNotFound(Task.FromResult(result));
+        }
+
         public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(this Task<TRight?> task)
             where TRight : struct
         {
             var result = await task;
 
             return result is not null ? result : new NotFoundResult();
+        }
+
+        public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(this TRight? result)
+            where TRight : class?
+        {
+            return await OrNotFound(Task.FromResult(result));
         }
 
         public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(this Task<TRight?> task)
