@@ -364,8 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         contentLength: newFile.Length,
                         contentType: newFile.ContentType,
                         type: Ancillary,
-                        // @MarkFix need the order preserving from oldReleaseFile
-                        createdById: _userService.GetUserId(), // @MarkFix should remain the same and add UpdatedById to File?
+                        createdById: _userService.GetUserId(),
                         name: oldReleaseFile.Name,
                         summary: oldReleaseFile.Summary);
 

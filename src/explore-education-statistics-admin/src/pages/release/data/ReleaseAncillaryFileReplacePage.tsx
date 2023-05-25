@@ -18,6 +18,7 @@ import releaseAncillaryFileService from '@admin/services/releaseAncillaryFileSer
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
+import AncillaryFileDetailsTable from '@admin/pages/release/data/components/AncillaryFileDetailsTable';
 
 interface FormValues {
   file: File | null;
@@ -73,72 +74,10 @@ const ReleaseAncillaryFileReplacePage = ({
             <>
               <h3>Ancillary file details</h3>
 
-              <table>
-                <tbody>
-                  <tr>
-                    <th scope="row" className="gov-!-width-one-third">
-                      Title
-                    </th>
-                    <td>{ancillaryFile.title}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" className="gov-!-width-one-third">
-                      File
-                    </th>
-                    <td>
-                      <ButtonText
-                        onClick={() =>
-                          releaseAncillaryFileService.downloadFile(
-                            releaseId,
-                            ancillaryFile.id,
-                            ancillaryFile.filename,
-                          )
-                        }
-                      >
-                        {ancillaryFile.filename}
-                      </ButtonText>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row" className="gov-!-width-one-third">
-                      File size
-                    </th>
-                    <td>{`${ancillaryFile.fileSize.size.toLocaleString()} ${
-                      ancillaryFile.fileSize.unit
-                    }`}</td>
-                  </tr>
-                  <tr>
-                    <th scope="row" className="gov-!-width-one-third">
-                      Uploaded by
-                    </th>
-                    <td>
-                      <a href={`mailto:${ancillaryFile.userName}`}>
-                        {ancillaryFile.userName}
-                      </a>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row" className="gov-!-width-one-third">
-                      Date uploaded
-                    </th>
-                    <td>
-                      <FormattedDate format="d MMMM yyyy HH:mm">
-                        {ancillaryFile.created}
-                      </FormattedDate>
-                    </td>
-                  </tr>
-                  <tr>
-                    <th scope="row" className="gov-!-width-one-third">
-                      Summary
-                    </th>
-                    <td>
-                      <div className="dfe-white-space--pre-wrap">
-                        {ancillaryFile.summary}
-                      </div>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+              <AncillaryFileDetailsTable
+                ancillaryFile={ancillaryFile}
+                releaseId={releaseId}
+              />
 
               <h3>Upload replacement file</h3>
 
