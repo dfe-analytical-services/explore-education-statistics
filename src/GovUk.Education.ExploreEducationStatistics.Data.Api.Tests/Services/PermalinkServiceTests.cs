@@ -326,9 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s
                     .GetCsvMeta(
                         subject.Id,
-                        tableResult.SubjectMeta.Locations,
-                        tableResult.SubjectMeta.Filters,
-                        tableResult.SubjectMeta.Indicators,
+                        tableResult.SubjectMeta,
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(csvMeta);
 
@@ -646,9 +644,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s
                     .GetCsvMeta(
                         subject.Id,
-                        tableResult.SubjectMeta.Locations,
-                        tableResult.SubjectMeta.Filters,
-                        tableResult.SubjectMeta.Indicators,
+                        tableResult.SubjectMeta,
                         It.IsAny<CancellationToken>()))
                 .ReturnsAsync(csvMeta);
 

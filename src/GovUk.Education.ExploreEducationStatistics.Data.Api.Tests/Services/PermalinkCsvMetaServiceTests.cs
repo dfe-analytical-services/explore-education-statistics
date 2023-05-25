@@ -7,13 +7,11 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -92,7 +90,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?)null);
+                .ReturnsAsync((ReleaseSubject?) null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
@@ -100,30 +98,18 @@ public class PermalinkCsvMetaServiceTests
                 releaseSubjectService: releaseSubjectService.Object
             );
 
-            var query = new ObservationQueryContext
+            var tableResultMeta = new SubjectResultMetaViewModel
             {
-                SubjectId = subjectId
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(
+                        level => level.Key.ToString().CamelCase(),
+                        level => level.Value)
             };
 
-            var permalink = new LegacyPermalink
-            {
-                Query = query,
-                FullTable = new PermalinkTableBuilderResult
-                {
-                    SubjectMeta = new PermalinkResultSubjectMeta
-                    {
-                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                        LocationsHierarchical = LocationViewModelBuilder
-                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                            .ToDictionary(
-                                level => level.Key.ToString().CamelCase(),
-                                level => level.Value)
-                    }
-                }
-            };
-
-            var result = await service.GetCsvMeta(permalink);
+            var result = await service.GetCsvMeta(subjectId, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService);
 
@@ -229,7 +215,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?)null);
+                .ReturnsAsync((ReleaseSubject?) null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
@@ -237,40 +223,28 @@ public class PermalinkCsvMetaServiceTests
                 releaseSubjectService: releaseSubjectService.Object
             );
 
-            var query = new ObservationQueryContext
+            var tableResultMeta = new SubjectResultMetaViewModel
             {
-                SubjectId = subjectId
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(
+                        level => level.Key.ToString().CamelCase(),
+                        level => level.Value)
             };
 
-            var permalink = new LegacyPermalink
-            {
-                Query = query,
-                FullTable = new PermalinkTableBuilderResult
-                {
-                    SubjectMeta = new PermalinkResultSubjectMeta
-                    {
-                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                        LocationsHierarchical = LocationViewModelBuilder
-                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                            .ToDictionary(
-                                level => level.Key.ToString().CamelCase(),
-                                level => level.Value)
-                    }
-                }
-            };
-
-            var result = await service.GetCsvMeta(permalink);
+            var result = await service.GetCsvMeta(subjectId, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService);
 
             var viewModel = result.AssertRight();
 
             Assert.Equal(4, viewModel.Locations.Count);
-            Assert.Equal(locations[0].GetCsvValues(),viewModel.Locations[locations[0].Id]);
-            Assert.Equal(locations[1].GetCsvValues(),viewModel.Locations[locations[1].Id]);
-            Assert.Equal(locations[2].GetCsvValues(),viewModel.Locations[locations[2].Id]);
-            Assert.Equal(locations[3].GetCsvValues(),viewModel.Locations[locations[3].Id]);
+            Assert.Equal(locations[0].GetCsvValues(), viewModel.Locations[locations[0].Id]);
+            Assert.Equal(locations[1].GetCsvValues(), viewModel.Locations[locations[1].Id]);
+            Assert.Equal(locations[2].GetCsvValues(), viewModel.Locations[locations[2].Id]);
+            Assert.Equal(locations[3].GetCsvValues(), viewModel.Locations[locations[3].Id]);
 
             var expectedHeaders = new List<string>
             {
@@ -335,7 +309,7 @@ public class PermalinkCsvMetaServiceTests
 
             releaseSubjectService
                 .Setup(s => s.FindForLatestPublishedVersion(subjectId))
-                .ReturnsAsync((ReleaseSubject?)null);
+                .ReturnsAsync((ReleaseSubject?) null);
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
@@ -343,30 +317,18 @@ public class PermalinkCsvMetaServiceTests
                 releaseSubjectService: releaseSubjectService.Object
             );
 
-            var query = new ObservationQueryContext
+            var tableResultMeta = new SubjectResultMetaViewModel
             {
-                SubjectId = subjectId
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(
+                        level => level.Key.ToString().CamelCase(),
+                        level => level.Value)
             };
 
-            var permalink = new LegacyPermalink
-            {
-                Query = query,
-                FullTable = new PermalinkTableBuilderResult
-                {
-                    SubjectMeta = new PermalinkResultSubjectMeta
-                    {
-                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                        LocationsHierarchical = LocationViewModelBuilder
-                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                            .ToDictionary(
-                                level => level.Key.ToString().CamelCase(),
-                                level => level.Value)
-                    }
-                }
-            };
-
-            var result = await service.GetCsvMeta(permalink);
+            var result = await service.GetCsvMeta(subjectId, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService);
 
@@ -375,7 +337,7 @@ public class PermalinkCsvMetaServiceTests
             Assert.Equal(3, viewModel.Locations.Count);
 
             // This locations exists in the database - can get all attribute columns.
-            Assert.Equal(locations[0].GetCsvValues(),viewModel.Locations[locations[0].Id]);
+            Assert.Equal(locations[0].GetCsvValues(), viewModel.Locations[locations[0].Id]);
 
             // These locations do not exist in the database anymore. We have to infer location
             // columns from permalink meta meaning that we are missing various columns.
@@ -388,7 +350,7 @@ public class PermalinkCsvMetaServiceTests
             Assert.Equal(locations[1].Region!.Name, viewModelLocation1["region_name"]);
 
             // Is missing country columns and old_la_code
-            Assert.Equal(5,viewModelLocation2.Count);
+            Assert.Equal(5, viewModelLocation2.Count);
             Assert.Equal(locations[2].Region!.Code, viewModelLocation2["region_code"]);
             Assert.Equal(locations[2].Region!.Name, viewModelLocation2["region_name"]);
             Assert.Equal(locations[2].LocalAuthority!.Code, viewModelLocation2["new_la_code"]);
@@ -530,30 +492,18 @@ public class PermalinkCsvMetaServiceTests
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
-            var query = new ObservationQueryContext
+            var tableResultMeta = new SubjectResultMetaViewModel
             {
-                SubjectId = releaseSubject.SubjectId
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(
+                        level => level.Key.ToString().CamelCase(),
+                        level => level.Value)
             };
 
-            var permalink = new LegacyPermalink
-            {
-                Query = query,
-                FullTable = new PermalinkTableBuilderResult
-                {
-                    SubjectMeta = new PermalinkResultSubjectMeta
-                    {
-                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                        LocationsHierarchical = LocationViewModelBuilder
-                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                            .ToDictionary(
-                                level => level.Key.ToString().CamelCase(),
-                                level => level.Value)
-                    }
-                }
-            };
-
-            var result = await service.GetCsvMeta(permalink);
+            var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
 
@@ -757,30 +707,18 @@ public class PermalinkCsvMetaServiceTests
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
-            var query = new ObservationQueryContext
+            var tableResultMeta = new SubjectResultMetaViewModel
             {
-                SubjectId = releaseSubject.SubjectId
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(
+                        level => level.Key.ToString().CamelCase(),
+                        level => level.Value)
             };
 
-            var permalink = new LegacyPermalink
-            {
-                Query = query,
-                FullTable = new PermalinkTableBuilderResult
-                {
-                    SubjectMeta = new PermalinkResultSubjectMeta
-                    {
-                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                        LocationsHierarchical = LocationViewModelBuilder
-                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                            .ToDictionary(
-                                level => level.Key.ToString().CamelCase(),
-                                level => level.Value)
-                    }
-                }
-            };
-
-            var result = await service.GetCsvMeta(permalink);
+            var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
 
@@ -870,30 +808,18 @@ public class PermalinkCsvMetaServiceTests
                 releaseSubjectService: releaseSubjectService.Object
             );
 
-            var query = new ObservationQueryContext
+            var tableResultMeta = new SubjectResultMetaViewModel
             {
-                SubjectId = releaseSubject.SubjectId
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(
+                        level => level.Key.ToString().CamelCase(),
+                        level => level.Value)
             };
 
-            var permalink = new LegacyPermalink
-            {
-                Query = query,
-                FullTable = new PermalinkTableBuilderResult
-                {
-                    SubjectMeta = new PermalinkResultSubjectMeta
-                    {
-                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                        LocationsHierarchical = LocationViewModelBuilder
-                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                            .ToDictionary(
-                                level => level.Key.ToString().CamelCase(),
-                                level => level.Value)
-                    }
-                }
-            };
-
-            var result = await service.GetCsvMeta(permalink);
+            var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService);
 
@@ -1012,30 +938,18 @@ public class PermalinkCsvMetaServiceTests
                 releaseFileBlobService: releaseFileBlobService.Object
             );
 
-            var query = new ObservationQueryContext
+            var tableResultMeta = new SubjectResultMetaViewModel
             {
-                SubjectId = releaseSubject.SubjectId
+                Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                Locations = LocationViewModelBuilder
+                    .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                    .ToDictionary(
+                        level => level.Key.ToString().CamelCase(),
+                        level => level.Value)
             };
 
-            var permalink = new LegacyPermalink
-            {
-                Query = query,
-                FullTable = new PermalinkTableBuilderResult
-                {
-                    SubjectMeta = new PermalinkResultSubjectMeta
-                    {
-                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
-                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
-                        LocationsHierarchical = LocationViewModelBuilder
-                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
-                            .ToDictionary(
-                                level => level.Key.ToString().CamelCase(),
-                                level => level.Value)
-                    }
-                }
-            };
-
-            var result = await service.GetCsvMeta(permalink);
+            var result = await service.GetCsvMeta(releaseSubject.SubjectId, tableResultMeta);
 
             VerifyAllMocks(releaseSubjectService);
 

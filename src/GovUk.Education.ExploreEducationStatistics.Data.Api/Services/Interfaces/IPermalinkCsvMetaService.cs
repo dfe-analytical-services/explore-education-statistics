@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -19,9 +18,7 @@ public interface IPermalinkCsvMetaService
 
     Task<Either<ActionResult, PermalinkCsvMetaViewModel>> GetCsvMeta(
         Guid subjectId,
-        Dictionary<string, List<LocationAttributeViewModel>> locationsHierarchical,
-        Dictionary<string, FilterMetaViewModel> filters,
-        List<IndicatorMetaViewModel> indicators,
+        SubjectResultMetaViewModel tableResultMeta,
         CancellationToken cancellationToken = default
     );
 }
