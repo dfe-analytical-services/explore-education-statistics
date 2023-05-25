@@ -30,6 +30,7 @@ import {
   ReleaseDataFileRouteParams,
 } from '@admin/routes/releaseRoutes';
 import FormattedDate from '@common/components/FormattedDate';
+import AncillaryFileDetailsTable from '@admin/pages/release/data/components/AncillaryFileDetailsTable';
 
 interface FormValues {
   title: string;
@@ -238,82 +239,44 @@ const ReleaseFileUploadsSection = ({
                     <LoadingSpinner text="Deleting file" overlay />
                   )}
 
-                  <SummaryList>
-                    <SummaryListItem term="Title">{file.title}</SummaryListItem>
-
-                    <SummaryListItem term="File">
-                      <ButtonText
-                        onClick={() =>
-                          releaseAncillaryFileService.downloadFile(
-                            releaseId,
-                            file.id,
-                            file.filename,
-                          )
-                        }
-                      >
-                        {file.filename}
-                      </ButtonText>
-                    </SummaryListItem>
-
-                    <SummaryListItem term="File size">
-                      {file.fileSize.size.toLocaleString()} {file.fileSize.unit}
-                    </SummaryListItem>
-
-                    <SummaryListItem term="Uploaded by">
-                      <a href={`mailto:${file.userName}`}>{file.userName}</a>
-                    </SummaryListItem>
-
-                    <SummaryListItem term="Date uploaded">
-                      <FormattedDate format="d MMMM yyyy HH:mm">
-                        {file.created}
-                      </FormattedDate>
-                    </SummaryListItem>
-
-                    <SummaryListItem term="Summary">
-                      <div className="dfe-white-space--pre-wrap">
-                        {file.summary}
-                      </div>
-                    </SummaryListItem>
-
+                  <AncillaryFileDetailsTable
+                    ancillaryFile={file}
+                    releaseId={releaseId}
+                  >
                     {canUpdateRelease && (
-                      <SummaryListItem
-                        term="Actions"
-                        actions={
-                          <>
-                            <Link
-                              className="govuk-!-margin-right-4"
-                              to={generatePath<ReleaseDataFileRouteParams>(
-                                releaseAncillaryFileRoute.path,
-                                {
-                                  publicationId,
-                                  releaseId,
-                                  fileId: file.id,
-                                },
-                              )}
-                            >
-                              Edit file
-                            </Link>
-                            <Link
-                              className="govuk-!-margin-right-4"
-                              to={generatePath<ReleaseDataFileRouteParams>(
-                                releaseAncillaryFileReplaceRoute.path,
-                                {
-                                  publicationId,
-                                  releaseId,
-                                  fileId: file.id,
-                                },
-                              )}
-                            >
-                              Replace file
-                            </Link>
-                            <ButtonText onClick={() => setDeleteFile(file)}>
-                              Delete file
-                            </ButtonText>
-                          </>
-                        }
-                      />
+                      <>
+                        <Link
+                          className="govuk-!-margin-right-4"
+                          to={generatePath<ReleaseDataFileRouteParams>(
+                            releaseAncillaryFileRoute.path,
+                            {
+                              publicationId,
+                              releaseId,
+                              fileId: file.id,
+                            },
+                          )}
+                        >
+                          Edit file
+                        </Link>
+                        <Link
+                          className="govuk-!-margin-right-4"
+                          to={generatePath<ReleaseDataFileRouteParams>(
+                            releaseAncillaryFileReplaceRoute.path,
+                            {
+                              publicationId,
+                              releaseId,
+                              fileId: file.id,
+                            },
+                          )}
+                        >
+                          Replace file
+                        </Link>
+                        <ButtonText onClick={() => setDeleteFile(file)}>
+                          Delete file
+                        </ButtonText>
+                      </>
                     )}
-                  </SummaryList>
+                  </AncillaryFileDetailsTable>
                 </div>
               </AccordionSection>
             ))}
