@@ -28,7 +28,7 @@ const PrototypePrepareNextSubjectStep1 = ({
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
-      Select new API dataset
+      Select new API data set
     </WizardStepHeading>
   );
 
@@ -45,7 +45,7 @@ const PrototypePrepareNextSubjectStep1 = ({
                 .required('Choose a subject')
                 .test({
                   name: 'whatevs',
-                  message: `Time periods in the next dataset should be compatible with the current dataset.`,
+                  message: `Time periods in the next data set should be compatible with the current data set.`,
                   test(values) {
                     if (values !== 'id4') {
                       return true;
@@ -64,31 +64,31 @@ const PrototypePrepareNextSubjectStep1 = ({
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
                     <p>
-                      To make updates to this API dataset, a new dataset needs
+                      To make updates to this API data set, a new data set needs
                       to be selected to provide the underlying data. The chosen
-                      dataset should be a continuation of the current dataset
+                      data set should be a continuation of the current data set
                       and not have a drastically differing data structure.
                     </p>
                     <p>The following rules apply:</p>
                     <ul className="govuk-!-margin-bottom-8">
                       <li>
                         existing facets (column variables) should map to
-                        equivalent facets in the new dataset
+                        equivalent facets in the new data set
                       </li>
                       <li>
                         existing facets (column variables) should not have been
-                        removed in the new dataset
+                        removed in the new data set
                       </li>
                     </ul>
                     <FormFieldSelect<FormValues>
                       id="subjectId"
                       name="subjectId"
-                      label="Available datasets"
+                      label="Available data sets"
                       options={subjectsForRelease2.map(s => ({
                         label: s.title,
                         value: s.id,
                       }))}
-                      placeholder="Select a new dataset"
+                      placeholder="Select a new data set"
                     />
                   </>
                 </FormFieldset>
@@ -107,12 +107,12 @@ const PrototypePrepareNextSubjectStep1 = ({
   return (
     <WizardStepSummary
       {...stepProps}
-      goToButtonText="Change dataset for next release"
+      goToButtonText="Change data set for next release"
     >
       {stepHeading}
 
       <SummaryList noBorder>
-        <SummaryListItem term="Dataset for next release">
+        <SummaryListItem term="Data set for next release">
           {subjectsForRelease2[0].title}
         </SummaryListItem>
         <SummaryListItem term="Next release">

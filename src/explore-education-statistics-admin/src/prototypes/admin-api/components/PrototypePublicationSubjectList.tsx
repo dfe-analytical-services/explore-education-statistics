@@ -38,7 +38,7 @@ const PrototypePublicationSubjectList = ({
     <>
       {publicationSubjects.length > 0 && (
         <>
-          <h3 className="govuk-!-margin-top-9">Selected API Datasets</h3>
+          <h3 className="govuk-!-margin-top-9">Selected API data sets</h3>
           <Accordion id="ps">
             {publicationSubjects.map(publicationSubject => {
               const subject = subjectsForRelease1.find(
@@ -65,8 +65,8 @@ const PrototypePublicationSubjectList = ({
                       <SummaryListItem
                         term={
                           subject.release === currentRelease
-                            ? 'Next dataset to publish'
-                            : 'Current dataset'
+                            ? 'Next data set to publish'
+                            : 'Current data set'
                         }
                       >
                         {isCurrentReleasePublished && nextSubject
@@ -84,17 +84,33 @@ const PrototypePublicationSubjectList = ({
                           ? nextSubject.release
                           : subject.release}
                       </SummaryListItem>
-                      {nextSubject && !isCurrentReleasePublished && (
-                        <>
-                          <SummaryListItem term="Next dataset to publish">
-                            {nextSubject.title}
-                          </SummaryListItem>
-                          <SummaryListItem term="Next release to publish">
-                            {nextSubject.release}
-                          </SummaryListItem>
-                        </>
-                      )}
-                      {!isCurrentReleasePublished && (
+                      <SummaryListItem
+                        term={
+                          subject.release === currentRelease
+                            ? 'Next API data set version'
+                            : 'Current API data set version'
+                        }
+                      >
+                        {isCurrentReleasePublished && nextSubject
+                          ? nextSubject.version
+                          : subject.version}
+                      </SummaryListItem>
+                    </SummaryList>
+                    {nextSubject && !isCurrentReleasePublished && (
+                      <SummaryList>
+                        <SummaryListItem term="Next API data set to publish">
+                          {nextSubject.title}
+                        </SummaryListItem>
+                        <SummaryListItem term="Next release to publish">
+                          {nextSubject.release}
+                        </SummaryListItem>
+                        <SummaryListItem term="Next API data set version">
+                          {nextSubject.version}
+                        </SummaryListItem>
+                      </SummaryList>
+                    )}
+                    {!isCurrentReleasePublished && (
+                      <SummaryList>
                         <SummaryListItem term="Actions">
                           <ButtonGroup className="dfe-justify-content--flex-end">
                             {subject.release === currentRelease && (
@@ -103,7 +119,7 @@ const PrototypePublicationSubjectList = ({
                                   onEditSubject(publicationSubject)
                                 }
                               >
-                                Change dataset to publish
+                                Change data set to publish
                               </ButtonText>
                             )}
                             {nextSubject && (
@@ -125,7 +141,7 @@ const PrototypePublicationSubjectList = ({
                                   className="govuk-button"
                                   to={`./2022-23/prepare-subject/${publicationSubject.subjectId}`}
                                 >
-                                  Link a dataset for next release
+                                  Create new API data set version
                                 </Link>
                               )}
 
@@ -134,8 +150,8 @@ const PrototypePublicationSubjectList = ({
                             )}
                           </ButtonGroup>
                         </SummaryListItem>
-                      )}
-                    </SummaryList>
+                      </SummaryList>
+                    )}
                   </AccordionSection>
                 );
               }

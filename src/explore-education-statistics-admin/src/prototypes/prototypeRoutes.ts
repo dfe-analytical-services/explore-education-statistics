@@ -18,6 +18,7 @@ import PrototypeReleaseData from './PrototypeReleaseData';
 import PrototypeReleaseData2 from './PrototypeReleaseData2';
 import PrototypeManageUsers from './PrototypeManageUsers';
 import PrototypeAdminDashboard from './PrototypeAdminDashboard';
+import PrototypeAdminDashboard2 from './PrototypeAdminDashboard2';
 import PrototypeAdminPublication from './PrototypeAdminPublication';
 import PrototypeAdminMethodology from './PrototypeAdminMethodology';
 import PrototypeAdminContact from './PrototypeAdminContact';
@@ -310,6 +311,12 @@ const prototypeRoutes: PrototypeRoute[] = [
     path: '/prototypes/admin-api/pre-release/:id',
     component: PrototypeReleasePage,
   },
+  {
+    name: 'Admin dashboard',
+    path: '/prototypes/admin-dashboard2',
+    component: PrototypeAdminDashboard2,
+  },
+
 ];
 
 export default prototypeRoutes;

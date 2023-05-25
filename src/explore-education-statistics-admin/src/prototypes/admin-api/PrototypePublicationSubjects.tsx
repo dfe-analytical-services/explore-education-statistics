@@ -16,6 +16,7 @@ export interface PrototypeSubject {
   id: string;
   title: string;
   release: string;
+  version: string;
 }
 
 export const subjectsForRelease1: PrototypeSubject[] = [
@@ -23,12 +24,14 @@ export const subjectsForRelease1: PrototypeSubject[] = [
     id: 'id1',
     title: 'Children in need and episodes of need by local authority',
     release: 'Academic Year 2021/22',
+    version: '1.0',
   },
   {
     id: 'id2',
     title:
       "Referrals and re-referrals to children's social care services by local authority",
     release: 'Academic Year 2021/22',
+    version: '1.0',
   },
 ];
 export const subjectsForRelease2: PrototypeSubject[] = [
@@ -36,17 +39,20 @@ export const subjectsForRelease2: PrototypeSubject[] = [
     id: 'id3',
     title: 'Children in need and episodes of need by local authority',
     release: 'Academic Year 2022/23',
+    version: '2.5',
   },
   {
     id: 'id4',
     title: 'A different subject',
     release: 'Academic Year 2022/23',
+    version: '2.5',
   },
   {
     id: 'id5',
     title:
       "Referrals and re-referrals to children's social care services by local authority",
     release: 'Academic Year 2022/23',
+    version: '2.5',
   },
 ];
 

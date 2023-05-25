@@ -39,7 +39,7 @@ const ReleaseDataPage = () => {
       </TabsSection>
       <TabsSection
         id={releaseDataPageTabIds.subjects}
-        title="API datasets"
+        title="API data sets"
         lazy
       >
         <PrototypePublicationSubjects />

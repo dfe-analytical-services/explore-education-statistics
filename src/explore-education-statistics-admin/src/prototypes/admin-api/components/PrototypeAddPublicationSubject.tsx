@@ -32,16 +32,16 @@ const PrototypeAddPublicationSubject = ({
 }: Props) => {
   return (
     <>
-      <h2>API datasets</h2>
+      <h2>API data sets</h2>
       <InsetText>
         <h3>Before you start</h3>
         <p>
-          API datasets are available for use in the EES public API for
+          API data sets are available for use in the EES public API for
           third-party applications to consume. They represent a long-lived data
           series where the data structure cannot change in a drastic way between
           each release.
         </p>
-        <p>Please note the following constraints to using API datasets:</p>
+        <p>Please note the following constraints to using API data sets:</p>
         <ul>
           <li>
             they <strong>cannot</strong> be deleted once published, however they
@@ -58,11 +58,11 @@ const PrototypeAddPublicationSubject = ({
         </ul>
         <p>
           If your dataset cannot meet these criteria, we advise you to continue
-          using standard datasets, but note these will not be available in the
+          using standard data sets, but note these will not be available in the
           public api.
         </p>
         <WarningMessage>
-          Changes will not be made in the public API until the next dataset's
+          Changes will not be made in the public API until the next data set's
           release has been published.
         </WarningMessage>
       </InsetText>
@@ -74,7 +74,7 @@ const PrototypeAddPublicationSubject = ({
             subjectId: '',
           }}
           validationSchema={Yup.object({
-            subjectId: Yup.string().required('Select a dataset'),
+            subjectId: Yup.string().required('Select a data set'),
             // title: Yup.string().required('Enter a title'),
           })}
           onSubmit={(values, { resetForm }) => {
@@ -95,14 +95,14 @@ const PrototypeAddPublicationSubject = ({
               <FormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"
-                label="Available datasets"
+                label="Available data sets"
                 options={subjects.map(s => ({
                   label: s.title,
                   value: s.id,
                 }))}
-                placeholder="Select a dataset"
+                placeholder="Select a data set"
               />
-              <Button type="submit">Create API dataset</Button>
+              <Button type="submit">Create API data set</Button>
             </Form>
           )}
         </Formik>

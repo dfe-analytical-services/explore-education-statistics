@@ -52,7 +52,7 @@ const PrototypePrepareNextSubjectStep2 = ({
     }),
   );
 
-  let nextStep = 'complete linking';
+  let nextStep = 'view changelog';
 
   if (name === 'location') {
     nextStep = 'filters';

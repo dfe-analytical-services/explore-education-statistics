@@ -24,6 +24,7 @@ import {
   mappedIndicators,
 } from './data/indicators';
 import PrototypePrepareNextSubjectStep5 from './components/PrototypePrepareNextSubjectStep5';
+import PrototypePrepareNextSubjectStep6 from './components/PrototypePrepareNextSubjectStep6';
 
 export interface MapItem {
   id: string;
@@ -70,16 +71,19 @@ const PrototypePrepareNextSubjectPage = ({
         className="govuk-!-margin-bottom-6 govuk-!-padding-left-3 govuk-link govuk-back-link"
         to="/prototypes/admin-api/data/2022-23#subjects"
       >
-        Back to API Datasets
+        Back to API data sets
       </Link>
       {publicationSubject && release ? (
         <section>
           <span className="govuk-caption-l">{publicationSubject.title}</span>
-          <h2>Link a dataset for next release</h2>
+          <h2>Create new API data set version</h2>
 
           <SummaryList className="govuk-!-margin-bottom-8">
-            <SummaryListItem term="Current dataset">
+            <SummaryListItem term="Current data set">
               {release.title}
+            </SummaryListItem>
+            <SummaryListItem term="Current data set version">
+              {release.version}
             </SummaryListItem>
             <SummaryListItem term="Current release">
               {release.release}
@@ -142,6 +146,10 @@ const PrototypePrepareNextSubjectPage = ({
             </WizardStep>
             <WizardStep size="l">
               {stepProps => <PrototypePrepareNextSubjectStep5 {...stepProps} />}
+            </WizardStep>
+
+            <WizardStep size="l">
+              {stepProps => <PrototypePrepareNextSubjectStep6 {...stepProps} />}
             </WizardStep>
           </Wizard>
         </section>

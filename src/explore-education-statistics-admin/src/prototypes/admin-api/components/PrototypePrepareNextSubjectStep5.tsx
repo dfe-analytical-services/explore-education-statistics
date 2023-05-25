@@ -1,51 +1,128 @@
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import useMounted from '@common/hooks/useMounted';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import Button from '@common/components/Button';
-import WarningMessage from '@common/components/WarningMessage';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
+import {
+  Form,
+  FormRadio,
+  FormRadioGroup,
+  FormFieldset,
+} from '@common/components/form';
+import Yup from '@common/validation/yup';
+import { Formik } from 'formik';
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { subjectsForRelease2 } from '../PrototypePublicationSubjects';
 
-const PrototypePrepareNextSubjectStep5 = ({
+interface FormValues {
+  subjectId: string;
+}
+
+interface Props extends InjectedWizardProps {
+  onSubmit: (subjectId: string) => void;
+}
+
+const PrototypePrepareNextSubjectStep1 = ({
+  onSubmit,
   ...stepProps
-}: InjectedWizardProps) => {
-  const history = useHistory();
+}: Props) => {
+  const { isMounted } = useMounted();
+  const { isActive, goToNextStep } = stepProps;
 
   const stepHeading = (
-    <WizardStepHeading {...stepProps}>Complete linking</WizardStepHeading>
+    <WizardStepHeading {...stepProps} fieldsetHeading>
+      Changelog
+    </WizardStepHeading>
   );
 
-  return (
-    <>
-      {stepHeading}
+  if (isActive && isMounted) {
+    return (
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <p>
-            By completing this step, this publication subject will be updated to
-            use data from the next dataset chosen above.
-          </p>
-
-          <p>
-            All of the above mapping will be applied so that existing facets
-            match to facets on the next dataset. Any new facets introduced by
-            the next dataset will also be created.
-          </p>
-
-          <WarningMessage>
-            Changes will not be made in the public API until the next dataset's
-            release has been published.
-          </WarningMessage>
-
-          <Button
-            onClick={() => {
-              history.push('/prototypes/admin-api/data/2022-23#subjects');
+          <Formik<FormValues>
+            initialValues={{
+              subjectId: '',
+            }}
+            validationSchema={Yup.object({
+              subjectId: Yup.string().test({
+                name: 'whatevs',
+                message: `Time periods in the next dataset should be compatible with the current dataset.`,
+                test(values) {
+                  if (values !== 'id4') {
+                    return true;
+                  }
+                  return false;
+                },
+              }),
+            })}
+            onSubmit={() => {
+              goToNextStep();
             }}
           >
-            Complete dataset linking
-          </Button>
+            {() => (
+              <Form id="form">
+                <FormFieldset id="downloadFiles" legend={stepHeading}>
+                  <>
+                    <div>
+                      <FormRadio
+                        name="test"
+                        id="test-radio-1"
+                        label="Minor version update"
+                        value="true"
+                      />
+                      <FormRadio
+                        name="test"
+                        id="test-radio-2"
+                        label="Major version update"
+                        value="false"
+                      />
+                    </div>
+                    <p>
+                      THIS IS A TEST2 To make updates to this API dataset, a new
+                      dataset needs to be selected to provide the underlying
+                      data. The chosen dataset should be a continuation of the
+                      current dataset and not have a drastically differing data
+                      structure.
+                    </p>
+                    <p>The following rules apply:</p>
+                    <ul className="govuk-!-margin-bottom-8">
+                      <li>
+                        existing facets (column variables) should map to
+                        equivalent facets in the new dataset
+                      </li>
+                      <li>
+                        existing facets (column variables) should not have been
+                        removed in the new dataset
+                      </li>
+                    </ul>
+                  </>
+                </FormFieldset>
+                <WizardStepFormActions
+                  submitText="Next step - complete this API dataset version"
+                  {...stepProps}
+                />
+              </Form>
+            )}
+          </Formik>
         </div>
       </div>
-    </>
+    );
+  }
+
+  return (
+    <WizardStepSummary {...stepProps} goToButtonText="Update version changelog">
+      {stepHeading}
+
+      <SummaryList noBorder>
+        <SummaryListItem term="Dataset for next release">
+          THIS IS TEST 1
+        </SummaryListItem>
+        <SummaryListItem term="Next release">THIS IS TEST 2s</SummaryListItem>
+      </SummaryList>
+    </WizardStepSummary>
   );
 };
 
-export default PrototypePrepareNextSubjectStep5;
+export default PrototypePrepareNextSubjectStep1;
