@@ -137,28 +137,44 @@ const DataBlockPageTabs = ({
       newDescription,
       dataBlockId,
     }: {
-      originalName: string | undefined;
-      originalDescription: string | undefined;
-      newName: string | undefined;
-      newDescription: string | undefined;
+      originalName?: string;
+      originalDescription?: string;
+      newName?: string;
+      newDescription?: string;
       dataBlockId: string;
     }) => {
-      if (originalName && !newName) {
-        await featuredTableService.deleteFeaturedTable(releaseId, dataBlockId);
-      } else if (!originalName && newName) {
-        await featuredTableService.createFeaturedTable(releaseId, {
-          name: newName,
-          description: newDescription ?? '',
-          dataBlockId,
-        });
-      } else if (
-        (originalName && originalName !== newName) ||
-        (originalName && originalDescription !== newDescription)
-      ) {
-        await featuredTableService.updateFeaturedTable(releaseId, dataBlockId, {
-          name: newName ?? '',
-          description: newDescription ?? '',
-        });
+      switch (true) {
+        case !!(originalName && !newName):
+          await featuredTableService.deleteFeaturedTable(
+            releaseId,
+            dataBlockId,
+          );
+          break;
+
+        case !!(!originalName && newName):
+          await featuredTableService.createFeaturedTable(releaseId, {
+            name: newName ?? '',
+            description: newDescription ?? '',
+            dataBlockId,
+          });
+          break;
+
+        case !!(
+          (originalName && originalName !== newName) ||
+          (originalName && originalDescription !== newDescription)
+        ):
+          await featuredTableService.updateFeaturedTable(
+            releaseId,
+            dataBlockId,
+            {
+              name: newName ?? '',
+              description: newDescription ?? '',
+            },
+          );
+          break;
+
+        default:
+          break;
       }
     },
     [releaseId],
@@ -216,7 +232,13 @@ const DataBlockPageTabs = ({
       setIsSaving(false);
       setSaveNumber(saveNumber + 1);
     },
-    [dataBlock, onDataBlockSave, releaseId, saveNumber],
+    [
+      dataBlock,
+      onDataBlockSave,
+      releaseId,
+      saveNumber,
+      handleFeaturedTableChange,
+    ],
   );
 
   const handleDataBlockSourceSave: DataBlockSourceWizardSaveHandler = useCallback(

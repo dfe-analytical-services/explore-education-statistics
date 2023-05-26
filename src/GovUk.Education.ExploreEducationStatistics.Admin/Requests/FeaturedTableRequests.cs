@@ -9,7 +9,8 @@ public record FeaturedTableCreateRequest
     [Required]
     public string Name { get; init; } = string.Empty;
 
-    public string? Description { get; set; }
+    [Required]
+    public string Description { get; set; } = string.Empty;
 
     public Guid DataBlockId { get; set; }
 
@@ -20,5 +21,6 @@ public record FeaturedTableUpdateRequest
     [Required]
     public string Name { get; init; } = string.Empty;
 
-    public string? Description { get; set; }
+    [Required]
+    public string Description { get; set; } = string.Empty;
 }

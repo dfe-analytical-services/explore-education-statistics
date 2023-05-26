@@ -7,7 +7,7 @@ SELECT NEWID() AS Id,
        0 AS [Order],
        CB.Id AS DataBlockId,
        RCB.ReleaseId AS ReleaseId,
-       GETDATE() AS Created,
+       GETUTCDATE() AS Created,
        NULL AS Updated,
        NULL AS CreatedById,
        NULL AS UpdatedById

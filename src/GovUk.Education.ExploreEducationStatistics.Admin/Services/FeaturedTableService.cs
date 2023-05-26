@@ -91,11 +91,11 @@ public class FeaturedTableService : IFeaturedTableService
 
                 var featuredTableList = await ListFeaturedTables(releaseId);
 
-                var order = featuredTableList
+                var currentMaxOrder = featuredTableList
                     .Select(ft => ft.Order)
                     .Max(order => (int?)order);
 
-                featuredTable.Order = order.HasValue ? order.Value + 1 : 0;
+                featuredTable.Order = currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
 
                 await _contentDbContext.FeaturedTables.AddAsync(featuredTable);
                 await _contentDbContext.SaveChangesAsync();
@@ -179,11 +179,13 @@ public class FeaturedTableService : IFeaturedTableService
 
     private async Task<List<FeaturedTable>> ListFeaturedTables(Guid releaseId)
     {
-        var releaseDataBlocks = await _dataBlockService.ListDataBlocks(releaseId);
-
-        var releaseDataBlockIds = releaseDataBlocks
+        var releaseDataBlockIds = await _contentDbContext
+            .ReleaseContentBlocks
+            .Where(releaseContentBlock => releaseContentBlock.ReleaseId == releaseId)
+            .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
+            .OfType<DataBlock>()
             .Select(dataBlock => dataBlock.Id)
-            .ToList();
+            .ToListAsync();
 
         return await _contentDbContext.FeaturedTables
             .Where(ft => releaseDataBlockIds.Contains(ft.DataBlockId))

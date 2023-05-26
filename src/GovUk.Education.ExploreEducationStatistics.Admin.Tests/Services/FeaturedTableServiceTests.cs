@@ -176,17 +176,32 @@ public class FeaturedTableServiceTests
             DataBlock = new DataBlock(),
             Release = release,
         };
+        var releaseContentBlock1 = new ReleaseContentBlock
+        {
+            Release = release,
+            ContentBlock = featuredTable1.DataBlock,
+        };
         var featuredTable2 = new FeaturedTable
         {
             Name = "Featured table name 2",
             DataBlock = new DataBlock(),
             Release = release,
         };
+        var releaseContentBlock2 = new ReleaseContentBlock
+        {
+            Release = release,
+            ContentBlock = featuredTable2.DataBlock,
+        };
         var unassociatedFeaturedTable = new FeaturedTable
         {
             Name = "Unassociated featured table",
             DataBlock = new DataBlock(),
             Release = new Release(),
+        };
+        var unassociatedReleaseContentBlock = new ReleaseContentBlock
+        {
+            Release = unassociatedFeaturedTable.Release,
+            ContentBlock = unassociatedFeaturedTable.DataBlock,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -195,18 +210,14 @@ public class FeaturedTableServiceTests
             await context.Releases.AddRangeAsync(release);
             await context.FeaturedTables.AddRangeAsync(
                 featuredTable1, featuredTable2, unassociatedFeaturedTable);
+            await context.ReleaseContentBlocks.AddRangeAsync(
+                releaseContentBlock1, releaseContentBlock2, unassociatedReleaseContentBlock);
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
-                .ReturnsAsync(new List<DataBlock> { featuredTable1.DataBlock, featuredTable2.DataBlock, });
-
-            var featuredTableService = SetupService(
-                context,
-                dataBlockService: dataBlockService.Object);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.List(release.Id);
 
@@ -235,12 +246,22 @@ public class FeaturedTableServiceTests
             Release = release,
             Order = 1,
         };
+        var releaseContentBlock1 = new ReleaseContentBlock
+        {
+            Release = release,
+            ContentBlock = featuredTable1.DataBlock,
+        };
         var featuredTable2 = new FeaturedTable
         {
             Name = "Featured table name 2",
             DataBlock = new DataBlock(),
             Release = release,
             Order = 2,
+        };
+        var releaseContentBlock2 = new ReleaseContentBlock
+        {
+            Release = release,
+            ContentBlock = featuredTable2.DataBlock,
         };
         var featuredTable3 = new FeaturedTable
         {
@@ -249,6 +270,11 @@ public class FeaturedTableServiceTests
             Release = release,
             Order = 0,
         };
+        var releaseContentBlock3 = new ReleaseContentBlock
+        {
+            Release = release,
+            ContentBlock = featuredTable3.DataBlock,
+        };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
@@ -256,6 +282,8 @@ public class FeaturedTableServiceTests
             await context.Releases.AddRangeAsync(release);
             await context.FeaturedTables.AddRangeAsync(
                 featuredTable1, featuredTable2, featuredTable3);
+            await context.ReleaseContentBlocks.AddRangeAsync(
+                releaseContentBlock1, releaseContentBlock2, releaseContentBlock3);
             await context.SaveChangesAsync();
         }
 
@@ -322,13 +350,7 @@ public class FeaturedTableServiceTests
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
-                .ReturnsAsync(new List<DataBlock>());
-
-            var featuredTableService = SetupService(
-                context,
-                dataBlockService: dataBlockService.Object);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Create(
                 release.Id,
@@ -842,20 +864,29 @@ public class FeaturedTableServiceTests
     public async Task Reorder()
     {
         var release = new Release();
-        var dataBlock = new DataBlock();
         var featuredTable1 = new FeaturedTable
         {
             Name = "Featured table name 1",
             Order = 3,
-            DataBlock = dataBlock,
+            DataBlock = new DataBlock(),
             Release = release,
+        };
+        var releaseContentBlock1 = new ReleaseContentBlock
+        {
+            Release = release,
+            ContentBlock = featuredTable1.DataBlock,
         };
         var featuredTable2 = new FeaturedTable
         {
             Name = "Featured table name 2",
             Order = 1,
-            DataBlock = dataBlock,
+            DataBlock = new DataBlock(),
             Release = release,
+        };
+        var releaseContentBlock2 = new ReleaseContentBlock
+        {
+            Release = release,
+            ContentBlock = featuredTable2.DataBlock,
         };
         var featuredTable3 = new FeaturedTable
         {
@@ -864,12 +895,22 @@ public class FeaturedTableServiceTests
             DataBlock = new DataBlock(),
             Release = release,
         };
+        var releaseContentBlock3 = new ReleaseContentBlock
+        {
+            Release = release,
+            ContentBlock = featuredTable3.DataBlock,
+        };
         var unassociatedFeaturedTable = new FeaturedTable
         {
             Name = "Unassociated featured table",
             Order = 4,
             DataBlock = new DataBlock(),
             Release = new Release(),
+        };
+        var unassociatedReleaseContentBlock = new ReleaseContentBlock
+        {
+            Release = unassociatedFeaturedTable.Release,
+            ContentBlock = unassociatedFeaturedTable.DataBlock,
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -878,21 +919,15 @@ public class FeaturedTableServiceTests
             await context.Releases.AddRangeAsync(release);
             await context.FeaturedTables.AddRangeAsync(
                 featuredTable1, featuredTable2, featuredTable3, unassociatedFeaturedTable);
+            await context.ReleaseContentBlocks.AddRangeAsync(
+                releaseContentBlock1, releaseContentBlock2,
+                releaseContentBlock3, unassociatedReleaseContentBlock);
             await context.SaveChangesAsync();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            dataBlockService.Setup(s => s.ListDataBlocks(release.Id))
-                .ReturnsAsync(new List<DataBlock>
-                {
-                    featuredTable1.DataBlock, featuredTable2.DataBlock, featuredTable3.DataBlock
-                });
-
-            var featuredTableService = SetupService(
-                context,
-                dataBlockService: dataBlockService.Object);
+            var featuredTableService = SetupService(context);
 
             var result = await featuredTableService.Reorder(
                 release.Id,

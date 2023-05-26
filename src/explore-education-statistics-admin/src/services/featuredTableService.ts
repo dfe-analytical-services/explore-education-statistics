@@ -13,16 +13,11 @@ export interface FeaturedTableBasic {
   description: string;
 }
 
-export interface FeaturedTableCreateRequest {
-  name: string;
-  description: string;
+export type FeaturedTableCreateRequest = FeaturedTableBasic & {
   dataBlockId: string;
-}
+};
 
-export interface FeaturedTableUpdateRequest {
-  name: string;
-  description: string;
-}
+type FeaturedTableUpdateRequest = FeaturedTableBasic;
 
 const featuredTableService = {
   getFeaturedTable(

@@ -120,6 +120,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(CheckIsDataBlock)
                 .OnSuccess(async dataBlock =>
                 {
+                    // Remove as part of EES-4273 - we fetch these from the FeaturedTables table now
+                    dataBlock.HighlightName = null;
+                    dataBlock.HighlightDescription = null;
+
                     var viewModel = _mapper.Map<DataBlockViewModel>(dataBlock);
 
                     var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(
@@ -448,12 +452,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<DataBlock>> ListDataBlocks(Guid releaseId)
         {
             return await _context
-                .ReleaseContentBlocks
-                .AsQueryable()
-                .Where(releaseContentBlock => releaseContentBlock.ReleaseId == releaseId)
-                .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
-                .OfType<DataBlock>()
-                .ToListAsync();
+                    .ReleaseContentBlocks
+                    .Where(releaseContentBlock => releaseContentBlock.ReleaseId == releaseId)
+                    .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
+                    .OfType<DataBlock>()
+                    .ToListAsync();
         }
     }
 

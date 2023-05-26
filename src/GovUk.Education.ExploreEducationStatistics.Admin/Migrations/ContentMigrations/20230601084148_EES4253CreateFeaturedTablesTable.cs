@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
+
     public partial class EES4253CreateFeaturedTablesTable : Migration
     {
         private const string MigrationId = "20230601084148";
