@@ -34,6 +34,15 @@ export interface AutoSavePluginConfig {
   waitingTime: number;
 }
 
+export interface AlignmentFormat {
+  className?: string;
+  name: 'left' | 'right' | 'center' | 'justify';
+}
+
+export interface AlignmentConfig {
+  options: AlignmentFormat['name'][];
+}
+
 export interface EditorConfig {
   toolbar: string[];
   extraPlugins?: Plugin[];
@@ -52,6 +61,7 @@ export interface EditorConfig {
   };
   comments?: CommentsPluginConfig;
   autosave?: AutoSavePluginConfig;
+  alignment?: AlignmentConfig;
 }
 
 export interface PluginCollection {

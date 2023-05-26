@@ -257,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private Task DeleteCachedReleaseContent(Guid releaseId)
         {
-            return _cacheService.DeleteCacheFolder(new PrivateReleaseContentFolderCacheKey(releaseId));
+            return _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseId));
         }
 
         private async Task DeleteSoftDeletedContentDbRelease(Guid releaseId)

@@ -40,6 +40,7 @@ export interface InjectedWizardProps {
 
 interface Props {
   children: ReactElement | (ReactElement | undefined | boolean)[];
+  currentStep?: number;
   initialStep?: number;
   id: string;
   scrollOnMount?: boolean;
@@ -51,6 +52,7 @@ interface Props {
 
 const Wizard = ({
   children,
+  currentStep,
   initialStep = 1,
   id,
   scrollOnMount = false,
@@ -59,7 +61,7 @@ const Wizard = ({
   const mountedRef = useMountedRef();
 
   const [shouldScroll, setShouldScroll] = useState(scrollOnMount);
-  const [currentStep, setCurrentStepState] = useState(initialStep);
+  const [activeStep, setActiveStepState] = useState(initialStep);
 
   const [loadingStep, setLoadingStep] = useState<number>();
 
@@ -69,7 +71,7 @@ const Wizard = ({
 
   const lastStep = filteredChildren.length;
 
-  const setCurrentStep = async (
+  const setActiveStep = async (
     nextStep: number,
     task?: () => Promise<void>,
   ) => {
@@ -79,11 +81,11 @@ const Wizard = ({
 
     setShouldScroll(true);
 
-    const current = currentStep;
+    const current = activeStep;
     let next = nextStep;
 
     if (onStepChange) {
-      next = await onStepChange(nextStep, currentStep);
+      next = await onStepChange(nextStep, activeStep);
     }
 
     setLoadingStep(next);
@@ -99,7 +101,7 @@ const Wizard = ({
         await task();
       }
 
-      setCurrentStepState(next);
+      setActiveStepState(next);
     } finally {
       if (mountedRef.current) {
         setLoadingStep(undefined);
@@ -108,8 +110,10 @@ const Wizard = ({
   };
 
   useEffect(() => {
-    setCurrentStepState(initialStep);
-  }, [initialStep]);
+    if (currentStep) {
+      setActiveStepState(currentStep);
+    }
+  }, [currentStep]);
 
   return (
     <ol className={styles.stepNav} id={id}>
@@ -118,19 +122,19 @@ const Wizard = ({
 
         return cloneElement<WizardStepProps & InjectedWizardProps>(child, {
           stepNumber,
-          currentStep,
+          currentStep: activeStep,
           loadingStep,
           shouldScroll,
-          setCurrentStep,
+          setCurrentStep: setActiveStep,
           id: child.props.id || `${id}-step-${stepNumber}`,
-          isActive: stepNumber === currentStep,
-          isEnabled: currentStep >= stepNumber,
+          isActive: stepNumber === activeStep,
+          isEnabled: activeStep >= stepNumber,
           isLoading: loadingStep === stepNumber,
           async goToPreviousStep(task) {
-            await setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1, task);
+            await setActiveStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1, task);
           },
           async goToNextStep(task) {
-            await setCurrentStep(
+            await setActiveStep(
               stepNumber + 1 > lastStep ? lastStep : stepNumber + 1,
               task,
             );

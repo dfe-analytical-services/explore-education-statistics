@@ -3,287 +3,453 @@ import {
   testPermalinkWithHierarchicalLocations,
   testPermalinkWithLocationCodes,
   testPermalinkWithResultLocationIds,
+  testPermalinkSnapshot,
 } from '@frontend/modules/permalink/__data__/testPermalinkData';
 import PermalinkPage from '@frontend/modules/permalink/PermalinkPage';
 import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 
 describe('PermalinkPage', () => {
-  test('renders correctly with permalink', () => {
-    render(<PermalinkPage data={testPermalink} />);
+  // TO DO - EES-4259 remove without newPermalinks version tests and test data
+  describe('with newPermalinks', () => {
+    test('renders correctly with permalink', () => {
+      render(<PermalinkPage newPermalinks data={testPermalinkSnapshot} />);
 
-    expect(
-      screen.getByText("'Subject 1' from 'Test publication'", {
-        selector: 'h1',
-      }),
-    ).toBeInTheDocument();
+      expect(
+        screen.getByText("'Data Set 1' from 'Publication 1'", {
+          selector: 'h1',
+        }),
+      ).toBeInTheDocument();
 
-    expect(screen.getByTestId('created-date')).toHaveTextContent(
-      '7 October 2020',
-    );
+      expect(screen.getByTestId('created-date')).toHaveTextContent(
+        '7 October 2020',
+      );
 
-    expect(screen.getByRole('figure')).toHaveTextContent(
-      "Number of authorised absence sessions for 'Subject 1' for Gender female in Barnet for 2020/21",
-    );
+      expect(screen.getByRole('figure')).toHaveTextContent(
+        'Test table caption 1',
+      );
 
-    expect(screen.getByRole('table')).toBeInTheDocument();
+      const table = screen.getByRole('table');
 
-    const rows = screen.getAllByRole('row');
+      expect(table.querySelectorAll('thead tr')).toHaveLength(1);
+      expect(table.querySelectorAll('thead th')).toHaveLength(4);
 
-    expect(rows).toHaveLength(2);
-    expect(within(rows[0]).getByRole('columnheader')).toHaveTextContent(
-      '2020/21',
-    );
-    expect(within(rows[1]).getByRole('rowheader')).toHaveTextContent('Barnet');
-    expect(within(rows[1]).getByRole('cell')).toHaveTextContent('123');
+      expect(table.querySelectorAll('tbody tr')).toHaveLength(3);
+      expect(table.querySelectorAll('tbody th')).toHaveLength(3);
+      expect(table.querySelectorAll('tbody td')).toHaveLength(12);
 
-    expect(
-      screen.getByText('Source: Test publication, Subject 1'),
-    ).toBeInTheDocument();
+      expect(table).toMatchSnapshot();
+
+      const footnotes = within(screen.getByTestId('footnotes')).getAllByRole(
+        'listitem',
+      );
+      expect(footnotes).toHaveLength(2);
+      expect(footnotes[0]).toHaveTextContent('Footnote 1');
+      expect(footnotes[1]).toHaveTextContent('Footnote 2');
+    });
+
+    test('renders no warning message with permalink status Current', () => {
+      render(<PermalinkPage newPermalinks data={testPermalinkSnapshot} />);
+
+      expect(screen.queryByText(/WARNING/)).not.toBeInTheDocument();
+
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(4);
+    });
+
+    test('renders warning message with permalink status SubjectRemoved', () => {
+      render(
+        <PermalinkPage
+          newPermalinks
+          data={{
+            ...testPermalinkSnapshot,
+            status: 'SubjectRemoved',
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'WARNING - The data used in this table is no longer valid.',
+        ),
+      ).toBeInTheDocument();
+
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(4);
+    });
+
+    test('renders warning message with permalink status SubjectReplacedOrRemoved', () => {
+      render(
+        <PermalinkPage
+          newPermalinks
+          data={{
+            ...testPermalinkSnapshot,
+            status: 'SubjectReplacedOrRemoved',
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'WARNING - The data used in this table may be invalid as the subject file has been amended or removed since its creation.',
+        ),
+      ).toBeInTheDocument();
+
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(4);
+    });
+
+    test('renders warning message with permalink status NotForLatestRelease', () => {
+      render(
+        <PermalinkPage
+          newPermalinks
+          data={{
+            ...testPermalinkSnapshot,
+            status: 'NotForLatestRelease',
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
+        ),
+      ).toBeInTheDocument();
+
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(4);
+    });
+
+    test('renders warning message with permalink status PublicationSuperseded', () => {
+      render(
+        <PermalinkPage
+          newPermalinks
+          data={{
+            ...testPermalinkSnapshot,
+            status: 'PublicationSuperseded',
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
+        ),
+      ).toBeInTheDocument();
+
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(4);
+    });
   });
 
-  test('renders correctly with hierarchical locations', () => {
-    render(<PermalinkPage data={testPermalinkWithHierarchicalLocations} />);
+  describe('without newPermalinks', () => {
+    test('renders correctly with permalink', () => {
+      render(<PermalinkPage newPermalinks={false} data={testPermalink} />);
 
-    expect(
-      screen.getByText("'Subject 1' from 'Test publication'", {
-        selector: 'h1',
-      }),
-    ).toBeInTheDocument();
+      expect(
+        screen.getByText("'Subject 1' from 'Test publication'", {
+          selector: 'h1',
+        }),
+      ).toBeInTheDocument();
 
-    expect(screen.getByTestId('created-date')).toHaveTextContent(
-      '7 October 2020',
-    );
+      expect(screen.getByTestId('created-date')).toHaveTextContent(
+        '7 October 2020',
+      );
 
-    expect(screen.getByRole('figure')).toHaveTextContent(
-      "Number of authorised absence sessions for 'Subject 1' for Gender female in Barnet and Bolton for 2020/21",
-    );
+      expect(screen.getByRole('figure')).toHaveTextContent(
+        "Number of authorised absence sessions for 'Subject 1' for Gender female in Barnet for 2020/21",
+      );
 
-    expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const table = screen.getByRole('table');
+      const rows = screen.getAllByRole('row');
 
-    expect(table.querySelectorAll('thead tr')).toHaveLength(1);
-    expect(table.querySelectorAll('thead th')).toHaveLength(1);
-    expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
-      0,
-    );
-    expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(1);
-    expect(table.querySelector('thead th[scope="col"]')).toHaveTextContent(
-      '2020/21',
-    );
+      expect(rows).toHaveLength(2);
+      expect(within(rows[0]).getByRole('columnheader')).toHaveTextContent(
+        '2020/21',
+      );
+      expect(within(rows[1]).getByRole('rowheader')).toHaveTextContent(
+        'Barnet',
+      );
+      expect(within(rows[1]).getByRole('cell')).toHaveTextContent('123');
 
-    const rows = table.querySelectorAll('tbody tr');
+      expect(
+        screen.getByText('Source: Test publication, Subject 1'),
+      ).toBeInTheDocument();
+    });
 
-    expect(rows).toHaveLength(2);
+    test('renders correctly with hierarchical locations', () => {
+      render(
+        <PermalinkPage
+          newPermalinks={false}
+          data={testPermalinkWithHierarchicalLocations}
+        />,
+      );
 
-    // Row 1
+      expect(
+        screen.getByText("'Subject 1' from 'Test publication'", {
+          selector: 'h1',
+        }),
+      ).toBeInTheDocument();
 
-    const row1Headers = rows[0].querySelectorAll('th');
-    const row1Cells = rows[0].querySelectorAll('td');
+      expect(screen.getByTestId('created-date')).toHaveTextContent(
+        '7 October 2020',
+      );
 
-    expect(row1Headers).toHaveLength(2);
+      expect(screen.getByRole('figure')).toHaveTextContent(
+        "Number of authorised absence sessions for 'Subject 1' for Gender female in Barnet and Bolton for 2020/21",
+      );
 
-    expect(row1Headers[0]).toHaveAttribute('scope', 'rowgroup');
-    expect(row1Headers[0]).toHaveAttribute('colspan', '1');
-    expect(row1Headers[0]).toHaveTextContent('Outer London');
+      expect(screen.getByRole('table')).toBeInTheDocument();
 
-    expect(row1Headers[1]).toHaveAttribute('scope', 'row');
-    expect(row1Headers[1]).toHaveAttribute('colspan', '1');
-    expect(row1Headers[1]).toHaveTextContent('Barnet');
+      const table = screen.getByRole('table');
 
-    expect(row1Cells).toHaveLength(1);
-    expect(row1Cells[0]).toHaveTextContent('123');
+      expect(table.querySelectorAll('thead tr')).toHaveLength(1);
+      expect(table.querySelectorAll('thead th')).toHaveLength(1);
+      expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
+        0,
+      );
+      expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(1);
+      expect(table.querySelector('thead th[scope="col"]')).toHaveTextContent(
+        '2020/21',
+      );
 
-    // Row 2
+      const rows = table.querySelectorAll('tbody tr');
 
-    const row2Headers = rows[1].querySelectorAll('th');
-    const row2Cells = rows[1].querySelectorAll('td');
+      expect(rows).toHaveLength(2);
 
-    expect(row2Headers).toHaveLength(2);
+      // Row 1
 
-    expect(row2Headers[0]).toHaveAttribute('scope', 'rowgroup');
-    expect(row2Headers[0]).toHaveAttribute('colspan', '1');
-    expect(row2Headers[0]).toHaveTextContent('North West');
+      const row1Headers = rows[0].querySelectorAll('th');
+      const row1Cells = rows[0].querySelectorAll('td');
 
-    expect(row2Headers[1]).toHaveAttribute('scope', 'row');
-    expect(row2Headers[1]).toHaveAttribute('colspan', '1');
-    expect(row2Headers[1]).toHaveTextContent('Bolton');
+      expect(row1Headers).toHaveLength(2);
 
-    expect(row2Cells).toHaveLength(1);
-    expect(row2Cells[0]).toHaveTextContent('456');
+      expect(row1Headers[0]).toHaveAttribute('scope', 'rowgroup');
+      expect(row1Headers[0]).toHaveAttribute('colspan', '1');
+      expect(row1Headers[0]).toHaveTextContent('Outer London');
 
-    expect(
-      screen.getByText('Source: Test publication, Subject 1'),
-    ).toBeInTheDocument();
-  });
+      expect(row1Headers[1]).toHaveAttribute('scope', 'row');
+      expect(row1Headers[1]).toHaveAttribute('colspan', '1');
+      expect(row1Headers[1]).toHaveTextContent('Barnet');
 
-  test("renders correctly with a permalink created prior to the switchover from Location codes to id's", () => {
-    render(<PermalinkPage data={testPermalinkWithLocationCodes} />);
+      expect(row1Cells).toHaveLength(1);
+      expect(row1Cells[0]).toHaveTextContent('123');
 
-    expect(
-      screen.getByText("'Subject 1' from 'Test publication'", {
-        selector: 'h1',
-      }),
-    ).toBeInTheDocument();
+      // Row 2
 
-    expect(screen.getByTestId('created-date')).toHaveTextContent(
-      '7 October 2020',
-    );
+      const row2Headers = rows[1].querySelectorAll('th');
+      const row2Cells = rows[1].querySelectorAll('td');
 
-    expect(screen.getByRole('figure')).toHaveTextContent(
-      "Number of authorised absence sessions for 'Subject 1' for Gender female in Barnet for 2020/21",
-    );
+      expect(row2Headers).toHaveLength(2);
 
-    expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(row2Headers[0]).toHaveAttribute('scope', 'rowgroup');
+      expect(row2Headers[0]).toHaveAttribute('colspan', '1');
+      expect(row2Headers[0]).toHaveTextContent('North West');
 
-    const rows = screen.getAllByRole('row');
+      expect(row2Headers[1]).toHaveAttribute('scope', 'row');
+      expect(row2Headers[1]).toHaveAttribute('colspan', '1');
+      expect(row2Headers[1]).toHaveTextContent('Bolton');
 
-    expect(rows).toHaveLength(2);
-    expect(within(rows[0]).getByRole('columnheader')).toHaveTextContent(
-      '2020/21',
-    );
-    expect(within(rows[1]).getByRole('rowheader')).toHaveTextContent('Barnet');
-    expect(within(rows[1]).getByRole('cell')).toHaveTextContent('123');
+      expect(row2Cells).toHaveLength(1);
+      expect(row2Cells[0]).toHaveTextContent('456');
 
-    expect(
-      screen.getByText('Source: Test publication, Subject 1'),
-    ).toBeInTheDocument();
-  });
+      expect(
+        screen.getByText('Source: Test publication, Subject 1'),
+      ).toBeInTheDocument();
+    });
 
-  // Test a special case where a Permalink has 'locationId' in each result but still uses location codes.
-  // This was a possible state after EES-3203.
-  test("renders correctly with a permalink that has location id's in results", () => {
-    render(<PermalinkPage data={testPermalinkWithResultLocationIds} />);
+    test("renders correctly with a permalink created prior to the switchover from Location codes to id's", () => {
+      render(
+        <PermalinkPage
+          newPermalinks={false}
+          data={testPermalinkWithLocationCodes}
+        />,
+      );
 
-    expect(
-      screen.getByText("'Subject 1' from 'Test publication'", {
-        selector: 'h1',
-      }),
-    ).toBeInTheDocument();
+      expect(
+        screen.getByText("'Subject 1' from 'Test publication'", {
+          selector: 'h1',
+        }),
+      ).toBeInTheDocument();
 
-    expect(screen.getByTestId('created-date')).toHaveTextContent(
-      '7 October 2020',
-    );
+      expect(screen.getByTestId('created-date')).toHaveTextContent(
+        '7 October 2020',
+      );
 
-    expect(screen.getByRole('figure')).toHaveTextContent(
-      "Number of authorised absence sessions for 'Subject 1' for Gender female in Barnet for 2020/21",
-    );
+      expect(screen.getByRole('figure')).toHaveTextContent(
+        "Number of authorised absence sessions for 'Subject 1' for Gender female in Barnet for 2020/21",
+      );
 
-    expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByRole('table')).toBeInTheDocument();
 
-    const rows = screen.getAllByRole('row');
+      const rows = screen.getAllByRole('row');
 
-    expect(rows).toHaveLength(2);
-    expect(within(rows[0]).getByRole('columnheader')).toHaveTextContent(
-      '2020/21',
-    );
-    expect(within(rows[1]).getByRole('rowheader')).toHaveTextContent('Barnet');
-    expect(within(rows[1]).getByRole('cell')).toHaveTextContent('123');
+      expect(rows).toHaveLength(2);
+      expect(within(rows[0]).getByRole('columnheader')).toHaveTextContent(
+        '2020/21',
+      );
+      expect(within(rows[1]).getByRole('rowheader')).toHaveTextContent(
+        'Barnet',
+      );
+      expect(within(rows[1]).getByRole('cell')).toHaveTextContent('123');
 
-    expect(
-      screen.getByText('Source: Test publication, Subject 1'),
-    ).toBeInTheDocument();
-  });
+      expect(
+        screen.getByText('Source: Test publication, Subject 1'),
+      ).toBeInTheDocument();
+    });
 
-  test('renders no warning message with permalink status Current', () => {
-    render(
-      <PermalinkPage
-        data={{
-          ...testPermalink,
-          status: 'Current',
-        }}
-      />,
-    );
+    // Test a special case where a Permalink has 'locationId' in each result but still uses location codes.
+    // This was a possible state after EES-3203.
+    test("renders correctly with a permalink that has location id's in results", () => {
+      render(
+        <PermalinkPage
+          newPermalinks={false}
+          data={testPermalinkWithResultLocationIds}
+        />,
+      );
 
-    expect(screen.queryByText(/WARNING/)).not.toBeInTheDocument();
+      expect(
+        screen.getByText("'Subject 1' from 'Test publication'", {
+          selector: 'h1',
+        }),
+      ).toBeInTheDocument();
 
-    // Table still renders
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getAllByRole('row')).toHaveLength(2);
-  });
+      expect(screen.getByTestId('created-date')).toHaveTextContent(
+        '7 October 2020',
+      );
 
-  test('renders warning message with permalink status SubjectRemoved', () => {
-    render(
-      <PermalinkPage
-        data={{
-          ...testPermalink,
-          status: 'SubjectRemoved',
-        }}
-      />,
-    );
+      expect(screen.getByRole('figure')).toHaveTextContent(
+        "Number of authorised absence sessions for 'Subject 1' for Gender female in Barnet for 2020/21",
+      );
 
-    expect(
-      screen.getByText(
-        'WARNING - The data used in this table is no longer valid.',
-      ),
-    ).toBeInTheDocument();
+      expect(screen.getByRole('table')).toBeInTheDocument();
 
-    // Table still renders
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getAllByRole('row')).toHaveLength(2);
-  });
+      const rows = screen.getAllByRole('row');
 
-  test('renders warning message with permalink status SubjectReplacedOrRemoved', () => {
-    render(
-      <PermalinkPage
-        data={{
-          ...testPermalink,
-          status: 'SubjectReplacedOrRemoved',
-        }}
-      />,
-    );
+      expect(rows).toHaveLength(2);
+      expect(within(rows[0]).getByRole('columnheader')).toHaveTextContent(
+        '2020/21',
+      );
+      expect(within(rows[1]).getByRole('rowheader')).toHaveTextContent(
+        'Barnet',
+      );
+      expect(within(rows[1]).getByRole('cell')).toHaveTextContent('123');
 
-    expect(
-      screen.getByText(
-        'WARNING - The data used in this table may be invalid as the subject file has been amended or removed since its creation.',
-      ),
-    ).toBeInTheDocument();
+      expect(
+        screen.getByText('Source: Test publication, Subject 1'),
+      ).toBeInTheDocument();
+    });
 
-    // Table still renders
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getAllByRole('row')).toHaveLength(2);
-  });
+    test('renders no warning message with permalink status Current', () => {
+      render(
+        <PermalinkPage
+          newPermalinks={false}
+          data={{
+            ...testPermalink,
+            status: 'Current',
+          }}
+        />,
+      );
 
-  test('renders warning message with permalink status NotForLatestRelease', () => {
-    render(
-      <PermalinkPage
-        data={{
-          ...testPermalink,
-          status: 'NotForLatestRelease',
-        }}
-      />,
-    );
+      expect(screen.queryByText(/WARNING/)).not.toBeInTheDocument();
 
-    expect(
-      screen.getByText(
-        'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
-      ),
-    ).toBeInTheDocument();
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(2);
+    });
 
-    // Table still renders
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getAllByRole('row')).toHaveLength(2);
-  });
+    test('renders warning message with permalink status SubjectRemoved', () => {
+      render(
+        <PermalinkPage
+          newPermalinks={false}
+          data={{
+            ...testPermalink,
+            status: 'SubjectRemoved',
+          }}
+        />,
+      );
 
-  test('renders warning message with permalink status PublicationSuperseded', () => {
-    render(
-      <PermalinkPage
-        data={{
-          ...testPermalink,
-          status: 'PublicationSuperseded',
-        }}
-      />,
-    );
+      expect(
+        screen.getByText(
+          'WARNING - The data used in this table is no longer valid.',
+        ),
+      ).toBeInTheDocument();
 
-    expect(
-      screen.getByText(
-        'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
-      ),
-    ).toBeInTheDocument();
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(2);
+    });
 
-    // Table still renders
-    expect(screen.getByRole('table')).toBeInTheDocument();
-    expect(screen.getAllByRole('row')).toHaveLength(2);
+    test('renders warning message with permalink status SubjectReplacedOrRemoved', () => {
+      render(
+        <PermalinkPage
+          newPermalinks={false}
+          data={{
+            ...testPermalink,
+            status: 'SubjectReplacedOrRemoved',
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'WARNING - The data used in this table may be invalid as the subject file has been amended or removed since its creation.',
+        ),
+      ).toBeInTheDocument();
+
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(2);
+    });
+
+    test('renders warning message with permalink status NotForLatestRelease', () => {
+      render(
+        <PermalinkPage
+          newPermalinks={false}
+          data={{
+            ...testPermalink,
+            status: 'NotForLatestRelease',
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
+        ),
+      ).toBeInTheDocument();
+
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(2);
+    });
+
+    test('renders warning message with permalink status PublicationSuperseded', () => {
+      render(
+        <PermalinkPage
+          newPermalinks={false}
+          data={{
+            ...testPermalink,
+            status: 'PublicationSuperseded',
+          }}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
+        ),
+      ).toBeInTheDocument();
+
+      // Table still renders
+      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getAllByRole('row')).toHaveLength(2);
+    });
   });
 });

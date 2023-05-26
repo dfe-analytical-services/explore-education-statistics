@@ -10,30 +10,33 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import { SubjectFormSubmitHandler } from '@common/modules/table-tool/components/SubjectForm';
-import SubjectStep from '@common/modules/table-tool/components/SubjectStep';
+import DataSetStep, {
+  DataSetFormSubmitHandler,
+} from '@common/modules/table-tool/components/DataSetStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import applyTableHeadersOrder from '@common/modules/table-tool/utils/applyTableHeadersOrder';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
-import publicationService, { Theme } from '@common/services/publicationService';
+import publicationService, {
+  PublicationTreeSummary,
+  Theme,
+} from '@common/services/publicationService';
 import tableBuilderService, {
   FeaturedTable,
   ReleaseTableDataQuery,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { useRouter } from 'next/router';
 
 export interface InitialTableToolState {
   initialStep: number;
@@ -64,37 +67,50 @@ export interface FinalStepRenderProps {
 }
 
 export interface TableToolWizardProps {
-  themeMeta?: Theme[];
-  initialState?: Partial<InitialTableToolState>;
-  hidePublicationSelectionStage?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
+  hidePublicationStep?: boolean;
+  initialState?: Partial<InitialTableToolState>;
   loadingFastTrack?: boolean;
-  renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
+  showTableQueryErrorDownload?: boolean;
+  themeMeta?: Theme[];
+  currentStep?: number;
+  onPublicationFormSubmit?: (publication: PublicationTreeSummary) => void;
+  onPublicationStepBack?: () => void;
+  onStepChange?: (nextStep: number, previousStep: number) => void;
+  onSubjectFormSubmit?(params: {
+    publication: SelectedPublication;
+    release: SelectedPublication['selectedRelease'];
+    subjectId: string;
+  }): void;
+  onSubjectStepBack?: (publication?: SelectedPublication) => void;
+  onSubmit?: (table: FullTable) => void;
   onTableQueryError?: (
     errorCode: TableQueryErrorCode,
     publicationTitle: string,
     subjectName: string,
   ) => void;
-  showTableQueryErrorDownload?: boolean;
-  onSubmit?: (table: FullTable) => void;
-  onSubjectStepBack?: () => void;
 }
 
-const TableToolWizard = ({
-  themeMeta = [],
-  initialState = {},
-  scrollOnMount,
-  hidePublicationSelectionStage,
-  renderFeaturedTable,
+export default function TableToolWizard({
   finalStep,
-  showTableQueryErrorDownload = true,
-  onSubmit,
-  onSubjectStepBack,
-  onTableQueryError,
+  hidePublicationStep,
+  initialState = {},
   loadingFastTrack = false,
-}: TableToolWizardProps) => {
-  const router = useRouter();
+  renderFeaturedTableLink,
+  scrollOnMount,
+  showTableQueryErrorDownload = true,
+  themeMeta = [],
+  currentStep,
+  onPublicationFormSubmit,
+  onPublicationStepBack,
+  onStepChange,
+  onSubjectFormSubmit,
+  onSubjectStepBack,
+  onSubmit,
+  onTableQueryError,
+}: TableToolWizardProps) {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
     subjects: [],
@@ -121,13 +137,11 @@ const TableToolWizard = ({
     TableHeadersConfig
   >();
 
-  const handlePublicationStepBack = () => {
-    router.push('/data-tables', undefined, { shallow: true });
-  };
-
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publication,
   }) => {
+    onPublicationFormSubmit?.(publication);
+
     const [subjects, featuredTables] = await Promise.all([
       tableBuilderService.listLatestReleaseSubjects(publication.id),
       tableBuilderService.listLatestReleaseFeaturedTables(publication.id),
@@ -140,7 +154,7 @@ const TableToolWizard = ({
     updateState(draft => {
       draft.subjects = subjects;
       draft.featuredTables = featuredTables;
-
+      draft.query.releaseId = undefined;
       draft.query.publicationId = publication.id;
       draft.selectedPublication = {
         id: publication.id,
@@ -160,14 +174,24 @@ const TableToolWizard = ({
   };
 
   const handleSubjectStepBack = () => {
-    if (onSubjectStepBack) {
-      onSubjectStepBack();
-    }
+    updateState(draft => {
+      draft.query.subjectId = '';
+    });
+
+    onSubjectStepBack?.(state.selectedPublication);
   };
 
-  const handleSubjectFormSubmit: SubjectFormSubmitHandler = async ({
+  const handleSubjectFormSubmit: DataSetFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
+    if (state.selectedPublication) {
+      onSubjectFormSubmit?.({
+        publication: state.selectedPublication,
+        release: state.selectedPublication.selectedRelease,
+        subjectId: selectedSubjectId,
+      });
+    }
+
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       selectedSubjectId,
       state.query.releaseId,
@@ -374,6 +398,8 @@ const TableToolWizard = ({
     state.response?.tableHeaders,
   ]);
 
+  const showChangeWarningForSteps = hidePublicationStep ? [1] : [1, 2];
+
   return (
     <ConfirmContextProvider>
       {({ askConfirm }) => (
@@ -382,8 +408,13 @@ const TableToolWizard = ({
             scrollOnMount={scrollOnMount}
             initialStep={state.initialStep}
             id="tableToolWizard"
+            currentStep={currentStep}
             onStepChange={async (nextStep, previousStep) => {
-              if (nextStep < previousStep) {
+              onStepChange?.(nextStep, previousStep);
+              if (
+                nextStep < previousStep &&
+                showChangeWarningForSteps.includes(nextStep)
+              ) {
                 const confirmed = await askConfirm();
                 return confirmed ? nextStep : previousStep;
               }
@@ -391,8 +422,8 @@ const TableToolWizard = ({
               return nextStep;
             }}
           >
-            {!hidePublicationSelectionStage && (
-              <WizardStep onBack={handlePublicationStepBack}>
+            {!hidePublicationStep && (
+              <WizardStep size="l" onBack={onPublicationStepBack}>
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
@@ -405,20 +436,21 @@ const TableToolWizard = ({
                 )}
               </WizardStep>
             )}
-            <WizardStep onBack={handleSubjectStepBack}>
+            <WizardStep size="l" onBack={handleSubjectStepBack}>
               {stepProps => (
-                <SubjectStep
+                <DataSetStep
                   {...stepProps}
                   featuredTables={state.featuredTables}
+                  loadingFastTrack={loadingFastTrack}
+                  renderFeaturedTableLink={renderFeaturedTableLink}
+                  release={state.selectedPublication?.selectedRelease}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
-                  renderFeaturedTable={renderFeaturedTable}
                   onSubmit={handleSubjectFormSubmit}
-                  loadingFastTrack={loadingFastTrack}
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleLocationStepBack}>
+            <WizardStep size="l" onBack={handleLocationStepBack}>
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
@@ -428,7 +460,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleTimePeriodStepBack}>
+            <WizardStep size="l" onBack={handleTimePeriodStepBack}>
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
@@ -438,7 +470,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleFiltersStepBack}>
+            <WizardStep size="l" onBack={handleFiltersStepBack}>
               {stepProps => (
                 <FiltersForm
                   {...stepProps}
@@ -474,6 +506,4 @@ const TableToolWizard = ({
       )}
     </ConfirmContextProvider>
   );
-};
-
-export default TableToolWizard;
+}

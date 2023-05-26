@@ -21,10 +21,20 @@ public static class FilterItemGeneratorExtensions
         IEnumerable<Footnote> footnotes)
         => generator.ForInstance(s => s.SetFootnotes(footnotes));
 
+    public static Generator<FilterItem> WithLabel(
+        this Generator<FilterItem> generator,
+        string label)
+        => generator.ForInstance(s => s.SetLabel(label));
+
     public static InstanceSetters<FilterItem> SetDefaults(this InstanceSetters<FilterItem> setters)
         => setters
             .SetDefault(fi => fi.Id)
             .SetDefault(fi => fi.Label);
+
+    public static InstanceSetters<FilterItem> SetLabel(
+        this InstanceSetters<FilterItem> setters,
+        string label)
+        => setters.Set(fi => fi.Label, label);
 
     public static InstanceSetters<FilterItem> SetFilterGroup(
         this InstanceSetters<FilterItem> setters,

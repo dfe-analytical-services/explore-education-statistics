@@ -117,6 +117,7 @@ Add data block to first accordion section
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
     ...    id:releaseMainContent
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
+    user scrolls to element    ${datablock}
     user waits until page contains element    ${datablock}    %{WAIT_SMALL}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
@@ -226,6 +227,7 @@ Upload replacement data
     user waits until page contains element    testid:Replacement Subject title
     user checks table column heading contains    1    1    Original file
     user checks table column heading contains    1    2    Replacement file
+    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK
@@ -273,7 +275,6 @@ Edit data block for amendment
     user waits until h2 is visible    Data block details
 
     user clicks element    testid:wizardStep-4-goToButton
-    user clicks button    Confirm
 
     user opens details dropdown    Date
     user clicks category checkbox    Date    24/03/2020

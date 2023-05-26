@@ -7,6 +7,8 @@ import {
   ChartDefinitionAxis,
   ChartDefinitionOptions,
   chartDefinitions,
+  MapConfig,
+  MapDataSetConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -26,6 +28,7 @@ export interface ChartBuilderState {
   options?: ChartOptions;
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
+  map?: MapConfig;
   titleType?: 'default' | 'alternative';
 }
 
@@ -45,6 +48,10 @@ export type ChartBuilderActions =
   | {
       type: 'UPDATE_CHART_LEGEND';
       payload: LegendConfiguration;
+    }
+  | {
+      type: 'UPDATE_CHART_MAP_CONFIGURATION';
+      payload: MapDataSetConfig[];
     }
   | {
       type: 'UPDATE_CHART_AXIS';
@@ -109,7 +116,7 @@ const getInitialState = (
     };
   }
 
-  const { type, axes, legend, ...options } = initialChart;
+  const { type, axes, legend, map, ...options } = initialChart;
 
   const definition = chartDefinitions.find(
     chartDefinition => chartDefinition.type === type,
@@ -133,6 +140,7 @@ const getInitialState = (
           (axes?.[axisType] ?? {}) as AxisConfiguration,
         ),
     ),
+    map,
   };
 };
 
@@ -205,6 +213,14 @@ export const chartBuilderReducer: Reducer<
         ...(draft?.definition?.legend.defaults ?? {}),
         ...draft.legend,
         ...action.payload,
+      };
+
+      break;
+    }
+    case 'UPDATE_CHART_MAP_CONFIGURATION': {
+      draft.map = {
+        ...draft.map,
+        dataSetConfigs: action.payload,
       };
 
       break;
@@ -288,6 +304,16 @@ export function useChartBuilderReducer(
     [dispatch],
   );
 
+  const updateChartMapConfiguration = useCallback(
+    (dataSetConfigs: MapDataSetConfig[]) => {
+      dispatch({
+        type: 'UPDATE_CHART_MAP_CONFIGURATION',
+        payload: dataSetConfigs,
+      });
+    },
+    [dispatch],
+  );
+
   const updateChartAxis = useCallback(
     (axisConfiguration: AxisConfiguration) => {
       dispatch({
@@ -309,6 +335,7 @@ export function useChartBuilderReducer(
       updateDataSets,
       updateChartDefinition,
       updateChartLegend,
+      updateChartMapConfiguration,
       updateChartOptions,
       updateChartAxis,
       resetState,
@@ -318,6 +345,7 @@ export function useChartBuilderReducer(
       updateChartAxis,
       updateChartDefinition,
       updateChartLegend,
+      updateChartMapConfiguration,
       updateChartOptions,
       resetState,
     ],

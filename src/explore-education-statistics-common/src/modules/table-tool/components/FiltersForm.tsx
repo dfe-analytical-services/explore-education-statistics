@@ -1,3 +1,5 @@
+import ButtonText from '@common/components/ButtonText';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import CollapsibleList from '@common/components/CollapsibleList';
 import { FormFieldset } from '@common/components/form';
 import FormProvider from '@common/components/form/rhf/FormProvider';
@@ -13,11 +15,9 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import {
-  SelectedPublication,
-  Subject,
-  SubjectMeta,
-} from '@common/services/tableBuilderService';
+import styles from '@common/modules/table-tool/components/FiltersForm.module.scss';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
+import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 import {
@@ -77,6 +77,7 @@ const FiltersForm = ({
 
   const [tableQueryError, setTableQueryError] = useState<TableQueryErrorCode>();
   const [previousValues, setPreviousValues] = useState<FormValues>();
+  const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
   const initialFormValues = useMemo(() => {
     // Automatically select indicator when one indicator group with one option
@@ -155,6 +156,10 @@ const FiltersForm = ({
     ([_, value]) => value.order,
   );
 
+  const allFilterKeys = orderedFilters.map(([filterKey]) => filterKey);
+
+  const allFiltersOpen = openFilterGroups.length === allFilterKeys.length;
+
   const orderedIndicators = orderBy(
     Object.values(subjectMeta.indicators),
     'order',
@@ -181,6 +186,10 @@ const FiltersForm = ({
         ),
       }),
     [subjectMeta.filters],
+  );
+
+  const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
+    filter => filter.totalValue,
   );
 
   return (
@@ -211,7 +220,7 @@ const FiltersForm = ({
               {stepHeading}
 
               <div className="govuk-grid-row">
-                <div className="govuk-grid-column-one-half-from-desktop">
+                <div className="govuk-grid-column-one-half-from-desktop govuk-!-margin-bottom-6">
                   <RHFFormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
                     hint="Select at least one indicator below"
@@ -232,34 +241,77 @@ const FiltersForm = ({
                   {orderedFilters.length > 0 && (
                     <FormFieldset
                       error={getError('filters')}
-                      hint="Select at least one option from all categories"
+                      hint={
+                        <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap dfe-align-items-start">
+                          <span
+                            className={`govuk-!-margin-bottom-2 ${styles.hintText}`}
+                          >
+                            {`Select at least one option from all categories.
+                            ${
+                              filtersIncludeTotal
+                                ? ` If no options are selected from a category then
+                                a 'Total' option may be selected automatically
+                                when creating a table. Where present, the
+                                'Total' option is usually an aggregate of all
+                                other options within a category.`
+                                : ''
+                            }`}
+                          </span>
+                          {orderedFilters.length > 1 && (
+                            <ButtonText
+                              ariaExpanded={allFiltersOpen}
+                              ariaControls="filterGroups"
+                              className="govuk-!-margin-bottom-2"
+                              onClick={() => {
+                                setOpenFilterGroups(
+                                  allFiltersOpen ? [] : allFilterKeys,
+                                );
+                              }}
+                            >
+                              {allFiltersOpen ? 'Collapse all' : 'Expand all'}
+                              <VisuallyHidden> categories</VisuallyHidden>
+                            </ButtonText>
+                          )}
+                        </div>
+                      }
                       id="filters"
                       legend="Categories"
                       legendSize="m"
                     >
-                      {orderedFilters.map(([filterKey, filterGroup]) => {
-                        const filterName = `filters.${filterKey}`;
-                        const orderedFilterGroupOptions = orderBy(
-                          Object.values(filterGroup.options),
-                          'order',
-                        );
-                        return (
-                          <RHFFormFieldCheckboxGroupsMenu
-                            disabled={formState.isSubmitting}
-                            hint={filterGroup.hint}
-                            id={`${formId}-${filterName}`}
-                            key={filterKey}
-                            legend={filterGroup.legend}
-                            name={filterName}
-                            open={orderedFilterGroupOptions.length === 1}
-                            options={orderedFilterGroupOptions.map(group => ({
-                              legend: group.label,
-                              options: group.options,
-                            }))}
-                            order={[]}
-                          />
-                        );
-                      })}
+                      <div id="filterGroups">
+                        {orderedFilters.map(([filterKey, filterGroup]) => {
+                          const filterName = `filters.${filterKey}`;
+                          const orderedFilterGroupOptions = orderBy(
+                            Object.values(filterGroup.options),
+                            'order',
+                          );
+                          return (
+                            <RHFFormFieldCheckboxGroupsMenu
+                              disabled={formState.isSubmitting}
+                              hint={filterGroup.hint}
+                              id={`${formId}-${filterName}`}
+                              key={filterKey}
+                              legend={filterGroup.legend}
+                              name={filterName}
+                              open={openFilterGroups.includes(filterKey)}
+                              options={orderedFilterGroupOptions.map(group => ({
+                                legend: group.label,
+                                options: group.options,
+                              }))}
+                              order={[]}
+                              onToggle={isOpen => {
+                                setOpenFilterGroups(groups =>
+                                  isOpen
+                                    ? [...groups, filterKey]
+                                    : groups.filter(
+                                        group => group !== filterKey,
+                                      ),
+                                );
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
                     </FormFieldset>
                   )}
                 </div>

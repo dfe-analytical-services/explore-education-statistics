@@ -98,6 +98,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                     return true;
                 }
 
+                if (result is Task)
+                {
+                    // TODO: EES-4268 Create async variant of this method
+                    throw new ArgumentException("Cannot unbox Tasks as this may cause thread exhaustion. Consider awaiting the result first.");
+                }
+
                 var resultType = result.GetType();
 
                 // Stop at the first non-generic result type type.
@@ -111,23 +117,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                 {
                     result = null;
                     return false;
-                }
-
-                if (result is Task task)
-                {
-                    try
-                    {
-                        task.Wait();
-
-                    }
-                    catch (AggregateException)
-                    {
-                        result = null;
-                        return false;
-                    }
-
-                    result = result.GetType().GetProperty("Result")?.GetValue(task);
-                    continue;
                 }
 
                 // Potentially unsafe to use just the name for this,

@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
-                .OnSuccessDo(async release => await _cacheService.DeleteCacheFolder(
+                .OnSuccessDo(async release => await _cacheService.DeleteCacheFolderAsync(
                     new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseId))
@@ -560,7 +560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid(async deletePlan =>
                 {
                     await _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId, deletePlan.SubjectId);
-                    await _cacheService.DeleteItem(new PrivateSubjectMetaCacheKey(releaseId, deletePlan.SubjectId));
+                    await _cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseId, deletePlan.SubjectId));
                 })
                 .OnSuccess(() => _releaseDataFileService.Delete(releaseId, fileId));
         }

@@ -2,7 +2,6 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functions
 {
@@ -22,9 +20,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsUnpackArchive()
         {
             var mocks = Mocks();
-            var (processorService, importService, fileImportService) = mocks;
+            var (processorService, dataImportService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
-            var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
             var import = new DataImport
             {
@@ -41,21 +38,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             };
 
             var processor = new Processor.Functions.Processor(
-                fileImportService.Object,
-                importService.Object,
+                dataImportService.Object,
                 processorService.Object,
-                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
             processorService
                 .Setup(s => s.ProcessUnpackingArchive(import.Id))
                 .Returns(Task.CompletedTask);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(import.Id, STAGE_1, 0))
                 .Returns(Task.CompletedTask);
 
@@ -67,21 +62,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             processor.ProcessUploads(
                 message,
                 new ExecutionContext(),
-                importStagesMessageQueue.Object,
-                datafileProcessingMessageQueue.Object
-            );
+                importStagesMessageQueue.Object);
 
-            MockUtils.VerifyAllMocks(processorService, importService,
-                fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
+            MockUtils.VerifyAllMocks(processorService, dataImportService,
+                fileImportService, importStagesMessageQueue);
         }
 
         [Fact]
         public void ProcessUploadsUnpackArchiveWithNoArchive()
         {
             var mocks = Mocks();
-            var (processorService, importService, fileImportService) = mocks;
+            var (processorService, dataImportService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
-            var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
             var import = new DataImport
             {
@@ -94,17 +86,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             };
 
             var processor = new Processor.Functions.Processor(
-                fileImportService.Object,
-                importService.Object,
+                dataImportService.Object,
                 processorService.Object,
-                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(import.Id, STAGE_1, 0))
                 .Returns(Task.CompletedTask);
 
@@ -116,12 +106,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             processor.ProcessUploads(
                 message,
                 new ExecutionContext(),
-                importStagesMessageQueue.Object,
-                datafileProcessingMessageQueue.Object
-            );
+                importStagesMessageQueue.Object);
 
-            MockUtils.VerifyAllMocks(processorService, importService,
-                fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
+            MockUtils.VerifyAllMocks(processorService, dataImportService,
+                fileImportService, importStagesMessageQueue);
         }
 
         [Fact]
@@ -135,9 +123,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             finishedStates.ForEach(currentState =>
             {
                 var mocks = Mocks();
-                var (processorService, importService, fileImportService) = mocks;
+                var (processorService, dataImportService, fileImportService) = mocks;
                 var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
-                var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
                 var import = new DataImport
                 {
@@ -150,13 +137,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 };
 
                 var processor = new Processor.Functions.Processor(
-                    fileImportService.Object,
-                    importService.Object,
+                    dataImportService.Object,
                     processorService.Object,
-                    Mock.Of<IDbContextSupplier>(Strict),
                     new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
-                importService
+                dataImportService
                     .Setup(s => s.GetImport(import.Id))
                     .ReturnsAsync(import);
 
@@ -165,14 +150,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
                 processor.ProcessUploads(
                     message,
                     new ExecutionContext(),
-                    importStagesMessageQueue.Object,
-                    datafileProcessingMessageQueue.Object
-                );
+                    importStagesMessageQueue.Object);
 
                 // Verify that no Status updates occurred and that no further attempt to add further processing
                 // messages to queues occurred.
-                MockUtils.VerifyAllMocks(processorService, importService,
-                    fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
+                MockUtils.VerifyAllMocks(processorService, dataImportService,
+                    fileImportService, importStagesMessageQueue);
             });
         }
 
@@ -180,9 +163,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
         public void ProcessUploadsButImportIsBeingCancelled()
         {
             var mocks = Mocks();
-            var (processorService, importService, fileImportService) = mocks;
+            var (processorService, dataImportService, fileImportService) = mocks;
             var importStagesMessageQueue = new Mock<ICollector<ImportMessage>>();
-            var datafileProcessingMessageQueue = new Mock<ICollector<ImportObservationsMessage>>();
 
             var import = new DataImport
             {
@@ -195,17 +177,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             };
 
             var processor = new Processor.Functions.Processor(
-                fileImportService.Object,
-                importService.Object,
+                dataImportService.Object,
                 processorService.Object,
-                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
 
-            importService
+            dataImportService
                 .Setup(s => s.GetImport(import.Id))
                 .ReturnsAsync(import);
 
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(import.Id, CANCELLED, 100))
                 .Returns(Task.CompletedTask);
 
@@ -214,39 +194,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Functi
             processor.ProcessUploads(
                 message,
                 new ExecutionContext(),
-                importStagesMessageQueue.Object,
-                datafileProcessingMessageQueue.Object
-            );
+                importStagesMessageQueue.Object);
 
             // Verify that an import with the current Status of CANCELLING will be updated to be CANCELLED, and that
             // no further processing messages are added to any queues.
-            MockUtils.VerifyAllMocks(processorService, importService,
-                fileImportService, importStagesMessageQueue, datafileProcessingMessageQueue);
+            MockUtils.VerifyAllMocks(processorService, dataImportService,
+                fileImportService, importStagesMessageQueue);
         }
 
         [Fact]
         public void CancelImport()
         {
             var mocks = Mocks();
-            var (processorService, importService, fileImportService) = mocks;
+            var (processorService, dataImportService, fileImportService) = mocks;
 
             var processor = new Processor.Functions.Processor(
-                fileImportService.Object,
-                importService.Object,
+                dataImportService.Object,
                 processorService.Object,
-                Mock.Of<IDbContextSupplier>(Strict),
                 new Mock<ILogger<Processor.Functions.Processor>>().Object);
             
             var message = new CancelImportMessage(Guid.NewGuid());
             
-            importService
+            dataImportService
                 .Setup(s => s.UpdateStatus(message.Id, CANCELLING, 0))
                 .Returns(Task.CompletedTask);
 
             processor.CancelImports(message);
 
             // Verify that the status has been updated to CANCELLING.
-            MockUtils.VerifyAllMocks(processorService, importService, fileImportService);
+            MockUtils.VerifyAllMocks(processorService, dataImportService, fileImportService);
         }
 
         private static (

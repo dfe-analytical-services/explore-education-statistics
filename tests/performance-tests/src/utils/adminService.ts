@@ -2,91 +2,38 @@ import { sleep } from 'k6';
 import http, { RefinedResponse } from 'k6/http';
 import HttpClient from './httpClient';
 import TestData from '../tests/testData';
+import {
+  Publication,
+  Release,
+  Topic,
+  ThemeAndTopics,
+  SubjectMeta,
+  TableQuery,
+  OverallStage,
+} from './types';
 
 const applicationJsonHeaders = {
   'Content-Type': 'application/json',
 };
 
-type OverallStage =
-  | 'Validating'
-  | 'Complete'
-  | 'Failed'
-  | 'Invalid'
-  | 'Scheduled'
-  | 'Started'
-  | 'Superseded';
-
-export interface SubjectMeta {
-  filters: {
-    [filter: string]: {
-      options: {
-        [filterGroup: string]: {
-          options: {
-            value: string;
-          }[];
-        };
-      };
-    };
-  };
-  indicators: {
-    [indicatorGroup: string]: {
-      options: {
-        value: string;
-      }[];
-    };
-  };
-  timePeriod: {
-    options: {
-      code: string;
-      year: number;
-    }[];
-  };
-  locations: {
-    [geographicLevel: string]: {
-      options: {
-        id?: string;
-        level?: string;
-        options?: {
-          id: string;
-        }[];
-      }[];
-    };
-  };
-}
-
-interface Topic {
+type DataFileImportHandler = (
+  adminService: AdminService,
+  releaseId: string,
+) => {
+  response: RefinedResponse<'text'>;
   id: string;
-  title: string;
-  themeId: string;
-}
-
-interface ThemeAndTopics {
-  id: string;
-  title: string;
-  topics: Topic[];
-}
-
-interface Release {
-  id: string;
-  year: number;
-  approvalStatus: string;
-}
-
-interface Publication {
-  id: string;
-  title: string;
-}
+};
 
 export class AdminService {
   private readonly client: HttpClient;
 
   constructor(
-    adminUrl: string,
+    baseUrl: string,
     accessToken: string,
     checkResponseStatus = true,
   ) {
     this.client = new HttpClient({
-      baseUrl: adminUrl,
+      baseUrl,
       accessToken,
       checkResponseStatus,
     });
@@ -570,42 +517,10 @@ export class AdminService {
     };
   }
 
-  tableQuery({
-    releaseId,
-    subjectId,
-    filterIds,
-    indicatorIds,
-    locationIds,
-    startYear,
-    startCode,
-    endYear,
-    endCode,
-  }: {
-    releaseId: string;
-    subjectId: string;
-    filterIds: string[];
-    indicatorIds: string[];
-    locationIds: string[];
-    startYear: number;
-    startCode: string;
-    endYear: number;
-    endCode: string;
-  }) {
+  tableQuery({ releaseId, query }: { releaseId: string; query: TableQuery }) {
     const { response, json } = this.client.post<{ results: { id: string }[] }>(
       `/api/data/tablebuilder/release/${releaseId}`,
-      JSON.stringify({
-        filters: filterIds,
-        includeGeoJson: false,
-        indicators: indicatorIds,
-        locationIds,
-        subjectId,
-        timePeriod: {
-          startYear,
-          startCode,
-          endYear,
-          endCode,
-        },
-      }),
+      JSON.stringify(query),
       applicationJsonHeaders,
     );
     return {
@@ -667,7 +582,6 @@ export class AdminService {
     const { response, json } = this.client.get<{ overallStage: OverallStage }>(
       `/api/releases/${releaseId}/stage-status`,
       applicationJsonHeaders,
-      [204],
     );
     return {
       status: json.overallStage,
@@ -745,10 +659,62 @@ export class AdminService {
   }
 }
 
+export function getDataFileUploadStrategy({
+  filename,
+}: {
+  filename: string;
+}): {
+  filename: string;
+  isZip: boolean;
+  subjectName: string;
+  getOrImportSubject: DataFileImportHandler;
+} {
+  const isZip = filename.endsWith('.zip');
+  const subjectName = filename;
+
+  /* eslint-disable no-restricted-globals */
+  const zipFile = isZip ? open(`admin/import/assets/${filename}`, 'b') : null;
+  const subjectFile = !isZip
+    ? open(`admin/import/assets/${filename}`, 'b')
+    : null;
+  const subjectMetaFile = !isZip
+    ? open(`admin/import/assets/${filename.replace('.csv', '.meta.csv')}`, 'b')
+    : null;
+  /* eslint-enable no-restricted-globals */
+
+  return {
+    isZip,
+    filename,
+    subjectName: filename,
+    getOrImportSubject: (adminService, releaseId) =>
+      isZip
+        ? adminService.uploadDataZipFile({
+            title: subjectName,
+            releaseId,
+            zipFile: {
+              file: zipFile as ArrayBuffer,
+              filename: `${subjectName}.zip`,
+            },
+          })
+        : adminService.uploadDataFile({
+            title: subjectName,
+            releaseId,
+            dataFile: {
+              file: subjectFile as ArrayBuffer,
+              filename: `${subjectName}.csv`,
+            },
+            metaFile: {
+              file: subjectMetaFile as ArrayBuffer,
+              filename: `${subjectName}.meta.csv`,
+            },
+          }),
+  };
+}
+
 export default function createAdminService(
-  adminUrl: string,
+  baseUrl: string,
   accessToken: string,
   checkResponseStatus = true,
 ) {
-  return new AdminService(adminUrl, accessToken, checkResponseStatus);
+  return new AdminService(baseUrl, accessToken, checkResponseStatus);
 }

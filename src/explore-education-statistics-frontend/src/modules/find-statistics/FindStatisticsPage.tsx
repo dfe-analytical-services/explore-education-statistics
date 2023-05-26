@@ -32,7 +32,6 @@ import compact from 'lodash/compact';
 import omit from 'lodash/omit';
 import { useRouter } from 'next/router';
 import { ParsedUrlQuery } from 'querystring';
-import InsetText from '@common/components/InsetText';
 
 export interface FindStatisticsPageQuery {
   page?: number;
@@ -191,7 +190,7 @@ const FindStatisticsPage: NextPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third">
           <SearchForm
-            searchTerm={search}
+            value={search}
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
             }

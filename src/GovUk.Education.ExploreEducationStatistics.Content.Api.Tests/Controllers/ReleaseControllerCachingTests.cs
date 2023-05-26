@@ -37,7 +37,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new GetLatestReleaseCacheKey(PublicationSlug),
                 typeof(ReleaseViewModel)))
-            .ReturnsAsync(null);
+            .Returns(null);
 
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
         var publicationCacheViewModel = new PublicationCacheViewModel
@@ -63,8 +63,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
                 new GetLatestReleaseCacheKey(PublicationSlug),
                 It.IsAny<ReleaseViewModel>(),
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
-                null))
-            .Returns(Task.CompletedTask);
+                null));
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
@@ -91,7 +90,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new GetLatestReleaseCacheKey(PublicationSlug),
                 typeof(ReleaseViewModel)))
-            .ReturnsAsync(releaseViewModel);
+            .Returns(releaseViewModel);
 
         var controller = BuildReleaseController();
 
@@ -112,7 +111,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
                 typeof(ReleaseViewModel)))
-            .ReturnsAsync(null);
+            .Returns(null);
 
         var methodologySummaries = new List<MethodologyVersionSummaryViewModel>();
         var publicationCacheViewModel = new PublicationCacheViewModel
@@ -138,8 +137,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
                 new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
                 It.IsAny<ReleaseViewModel>(),
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
-                null))
-            .Returns(Task.CompletedTask);
+                null));
 
         var controller = BuildReleaseController(
             methodologyCacheService: methodologyCacheService.Object,
@@ -166,7 +164,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(s => s.GetItem(
                 new GetReleaseCacheKey(PublicationSlug, ReleaseSlug),
                 typeof(ReleaseViewModel)))
-            .ReturnsAsync(releaseViewModel);
+            .Returns(releaseViewModel);
 
         var controller = BuildReleaseController();
 

@@ -5,6 +5,7 @@ import { FormIdContextProvider } from '@common/components/form/contexts/FormIdCo
 import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
+import logger from '@common/services/logger';
 import isErrorLike from '@common/utils/error/isErrorLike';
 import camelCase from 'lodash/camelCase';
 import isEqual from 'lodash/isEqual';
@@ -118,12 +119,10 @@ export default function RHFForm<TFormValues extends FieldValues>({
         try {
           await onSubmit(values as TFormValues);
         } catch (error) {
-          if (!error) {
-            return;
-          }
+          if (showSubmitError && isErrorLike(error)) {
+            logger.error(error);
 
-          if (showSubmitError) {
-            if (isMounted.current && isErrorLike(error)) {
+            if (isMounted.current) {
               setSubmitError({
                 id: submitId,
                 message: error.message ?? error,

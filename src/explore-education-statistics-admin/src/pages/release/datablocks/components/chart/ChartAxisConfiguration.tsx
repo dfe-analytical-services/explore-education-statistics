@@ -90,7 +90,12 @@ const ChartAxisConfiguration = ({
       max: undefined,
     };
 
-    return createDataSetCategories(config, data, meta, includeNonNumericData);
+    return createDataSetCategories({
+      axisConfiguration: config,
+      data,
+      meta,
+      includeNonNumericData,
+    });
   }, [axesConfiguration.major, data, meta, includeNonNumericData]);
 
   const chartData = dataSetCategories.map(toChartData);

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
+    // TODO EES-3755 Remove after Permalink snapshot work is complete
     public class PermalinkTableBuilderResult
     {
         public PermalinkResultSubjectMeta SubjectMeta { get; init; }
@@ -19,6 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         {
             SubjectMeta = new PermalinkResultSubjectMeta(tableBuilderResult.SubjectMeta);
             Results = tableBuilderResult.Results.ToList();
+        }
+
+        public TableBuilderResultViewModel AsTableBuilderResultViewModel()
+        {
+            return new TableBuilderResultViewModel
+            {
+                SubjectMeta = SubjectMeta.AsSubjectResultMetaViewModel(),
+                Results = Results
+            };
         }
     }
 }

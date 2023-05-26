@@ -163,6 +163,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ExpectedImportedRows")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("FileId")
                         .HasColumnType("uniqueidentifier");
 
@@ -170,17 +173,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("ImportedRows")
+                    b.Property<int>("ImportedRows")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LastProcessedRowIndex")
                         .HasColumnType("int");
 
                     b.Property<Guid>("MetaFileId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("NumBatches")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RowsPerBatch")
-                        .HasColumnType("int");
 
                     b.Property<int>("StagePercentageComplete")
                         .HasColumnType("int");
@@ -593,12 +593,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("CountFilterItems")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountFootnotes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountIndicators")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountLocations")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountObservations")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountTimePeriods")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DataSetTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Legacy")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("LegacyContentLength")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool?>("LegacyHasConfigurationHeaders")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("LegacyHasSnapshot")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PublicationTitle")
                         .IsRequired()

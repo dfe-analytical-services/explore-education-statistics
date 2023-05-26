@@ -1,0 +1,50 @@
+@import '~govuk-frontend/govuk/base';
+
+.card {
+  border-top: 1px solid $govuk-border-colour;
+  padding: govuk-spacing(3) govuk-spacing(6) govuk-spacing(6) 0;
+  position: relative;
+
+  &.noBorder {
+    border-top: 0;
+  }
+}
+
+.link {
+  font-weight: bold;
+
+  &::after {
+    bottom: 0;
+    content: '';
+    display: block;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
+
+.linkWithChevron {
+  &::before {
+    border-right: 3px solid $govuk-link-colour;
+    border-top: 3px solid $govuk-link-colour;
+    content: '';
+    display: block;
+    height: 7px;
+    position: absolute;
+    right: govuk-spacing(1);
+    top: govuk-spacing(5);
+    transform: translateY(0) rotate(45deg) scale(1);
+    width: 7px;
+  }
+  &:focus::before {
+    border-color: $govuk-focus-text-colour;
+  }
+  &:hover::before {
+    border-color: $govuk-link-hover-colour;
+  }
+}
+
+.description {
+  margin: 0 -#{govuk-spacing(6)} 0 0;
+}

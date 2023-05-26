@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 
@@ -22,11 +21,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 /// </summary>
 public interface IMemoryCacheService
 {
-    Task<object?> GetItem(IMemoryCacheKey cacheKey, Type targetType);
+    object? GetItem(IMemoryCacheKey cacheKey, Type targetType);
 
-    Task SetItem<TItem>(
-        IMemoryCacheKey cacheKey, 
-        TItem item, 
+    void SetItem<TItem>(
+        IMemoryCacheKey cacheKey,
+        TItem item,
         MemoryCacheConfiguration configuration,
         DateTime? nowUtc = null);
 }

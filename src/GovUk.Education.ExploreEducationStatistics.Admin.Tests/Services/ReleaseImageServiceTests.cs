@@ -1,9 +1,9 @@
 ﻿#nullable enable
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -53,6 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var fileData = new byte[] { 0 };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -64,10 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>(), null))
-                .ReturnsAsync(new MemoryStream());
+            blobStorageService
+                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), fileData);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -78,17 +78,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 MockUtils.VerifyAllMocks(blobStorageService);
 
-                Assert.True(result.IsRight);
+                var fileStreamResult = result.AssertRight();
 
-                blobStorageService.Verify(
-                    mock =>
-                        mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
-                        It.IsAny<MemoryStream>(), null),
-                    Times.Once());
-
-                Assert.Equal("image/png", result.Right.ContentType);
-                Assert.Equal("image.png", result.Right.FileDownloadName);
-                Assert.IsType<MemoryStream>(result.Right.FileStream);
+                Assert.Equal("image/png", fileStreamResult.ContentType);
+                Assert.Equal("image.png", fileStreamResult.FileDownloadName);
+                Assert.Equal(fileData, fileStreamResult.FileStream.ReadFully());
             }
         }
 
@@ -257,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.NotNull(releaseFile);
-                var file = releaseFile!.File;
+                var file = releaseFile.File;
 
                 Assert.Equal(10240, file.ContentLength);
                 Assert.Equal("image/png", file.ContentType);

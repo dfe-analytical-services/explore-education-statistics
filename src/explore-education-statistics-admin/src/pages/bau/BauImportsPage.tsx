@@ -24,15 +24,10 @@ const BauImportsPage = () => {
         <table>
           <thead>
             <tr>
-              {/* EES-1655 */}
-              {/* <th scope="col" className="govuk-table__header">
-              Subject title
-            </th> */}
               <th scope="col">Status</th>
               <th scope="col">Subject Id</th>
               <th scope="col">Data filename</th>
               <th scope="col">Rows</th>
-              <th scope="col">Batches</th>
               <th scope="col">Stage complete</th>
               <th scope="col">Overall complete</th>
               <th scope="col">Go to release data files</th>
@@ -42,15 +37,10 @@ const BauImportsPage = () => {
             <tbody>
               {value.map(subject => (
                 <tr key={subject.subjectId}>
-                  {/* EES-1655 */}
-                  {/* <th scope="row" className="govuk-table__header">
-                    {subject.subjectTitle}
-                  </th> */}
                   <td>{subject.status}</td>
                   <td>{subject.subjectId}</td>
                   <td>{subject.dataFileName}</td>
                   <td>{subject.totalRows ?? 'Unknown'}</td>
-                  <td>{subject.batches}</td>
                   <td>{subject.stagePercentageComplete}%</td>
                   <td>{subject.percentageComplete}%</td>
                   <td>

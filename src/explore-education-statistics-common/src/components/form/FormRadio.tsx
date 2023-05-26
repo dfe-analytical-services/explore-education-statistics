@@ -1,7 +1,13 @@
 import useMounted from '@common/hooks/useMounted';
 import styles from '@common/components/form/FormRadio.module.scss';
 import classNames from 'classnames';
-import React, { ChangeEvent, FocusEventHandler, memo, ReactNode } from 'react';
+import React, {
+  ChangeEvent,
+  FocusEventHandler,
+  memo,
+  ReactNode,
+  Ref,
+} from 'react';
 
 export type OtherRadioChangeProps = Pick<FormRadioProps, 'label'>;
 
@@ -12,36 +18,44 @@ export type RadioChangeEventHandler = (
 
 export interface FormRadioProps {
   checked?: boolean;
+  className?: string;
   conditional?: ReactNode;
   defaultChecked?: boolean;
+  disabled?: boolean;
+  divider?: string;
   hiddenConditional?: boolean;
   hint?: string | ReactNode;
   hintSmall?: boolean;
   inlineHint?: boolean;
   id: string;
+  inputRef?: Ref<HTMLInputElement>;
   label: string;
+  labelClassName?: string;
   name: string;
+  value: string;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: RadioChangeEventHandler;
-  value: string;
-  disabled?: boolean;
 }
 
 const FormRadio = ({
   checked,
+  className,
   conditional,
   defaultChecked,
+  disabled = false,
+  divider,
   hiddenConditional,
   hint,
   hintSmall = false,
   id,
   inlineHint,
+  inputRef,
   label,
+  labelClassName,
   name,
+  value,
   onBlur,
   onChange,
-  value,
-  disabled = false,
 }: FormRadioProps) => {
   const { onMounted } = useMounted(undefined, false);
 
@@ -49,7 +63,7 @@ const FormRadio = ({
   return (
     <>
       <div
-        className={classNames('govuk-radios__item', {
+        className={classNames('govuk-radios__item', className, {
           [styles.inlineHint]: inlineHint,
         })}
         data-testid={`Radio item for ${label}`}
@@ -72,10 +86,17 @@ const FormRadio = ({
               onChange(event, { label });
             }
           }}
+          ref={inputRef}
           type="radio"
           value={value}
         />
-        <label className="govuk-label govuk-radios__label" htmlFor={id}>
+        <label
+          className={classNames(
+            'govuk-label govuk-radios__label',
+            labelClassName,
+          )}
+          htmlFor={id}
+        >
           {label}
         </label>
         {hint && (
@@ -100,6 +121,8 @@ const FormRadio = ({
           {conditional}
         </div>
       )}
+
+      {divider && <div className={styles.divider}>{divider}</div>}
     </>
   );
 };

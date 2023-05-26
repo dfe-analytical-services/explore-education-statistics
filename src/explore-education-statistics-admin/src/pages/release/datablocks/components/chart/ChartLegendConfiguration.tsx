@@ -115,20 +115,20 @@ const ChartLegendConfiguration = ({
   legendItems.current = legend.items;
 
   const initialValues = useMemo<FormValues>(() => {
-    const dataSetCategories: DataSetCategory[] = createDataSetCategories(
-      {
+    const dataSetCategories: DataSetCategory[] = createDataSetCategories({
+      axisConfiguration: {
         ...axisMajor,
         groupBy: definition.axes.major?.constants?.groupBy ?? axisMajor.groupBy,
       },
       data,
       meta,
-    );
+    });
 
-    const dataSetCategoryConfigs = getDataSetCategoryConfigs(
+    const dataSetCategoryConfigs = getDataSetCategoryConfigs({
       dataSetCategories,
-      legendItems.current,
+      legendItems: legendItems.current,
       meta,
-    );
+    });
 
     const defaultConfig: Partial<LegendItemConfiguration> = {
       symbol: capabilities.hasSymbols ? 'none' : undefined,

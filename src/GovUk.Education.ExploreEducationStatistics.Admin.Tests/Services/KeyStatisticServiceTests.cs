@@ -56,7 +56,7 @@ public class KeyStatisticServiceTests
                 .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
                     new List<DataBlockViewModel>
                     {
-                        new ()
+                        new()
                         {
                             Id = dataBlock.Id
                         },
@@ -323,8 +323,8 @@ public class KeyStatisticServiceTests
                 .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
                     new List<DataBlockViewModel>
                     {
-                        new (),
-                        new (),
+                        new(),
+                        new(),
                     }));
 
             dataBlockService.Setup(s =>

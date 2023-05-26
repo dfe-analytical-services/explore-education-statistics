@@ -1,7 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using Microsoft.Azure.WebJobs;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces
 {
@@ -14,7 +12,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Int
         Task ProcessStage2(Guid importId);
 
         Task ProcessStage3(Guid importId);
-
-        Task ProcessStage4Messages(Guid importId, ICollector<ImportObservationsMessage> collector);
     }
 }

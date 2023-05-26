@@ -4,12 +4,10 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import {
-  TableDataQuery,
-  SelectedPublication,
-} from '@common/services/tableBuilderService';
+import { TableDataQuery } from '@common/services/tableBuilderService';
 import { Release } from '@common/services/publicationService';
 
 export const testQuery: TableDataQuery = {

@@ -27,6 +27,9 @@ public static class FilterGeneratorExtensions
     public static Generator<Filter> WithSubject(this Generator<Filter> generator, Subject subject)
         => generator.ForInstance(s => s.SetSubject(subject));
 
+    public static Generator<Filter> WithLabel(this Generator<Filter> generator, string label)
+        => generator.ForInstance(s => s.SetLabel(label));
+
     public static Generator<Filter> WithFilterGroups(
         this Generator<Filter> generator,
         IEnumerable<FilterGroup> filterGroups)
@@ -49,6 +52,13 @@ public static class FilterGeneratorExtensions
             .SetDefault(f => f.Hint)
             .SetDefault(f => f.Name)
             .Set(f => f.Name, (_, f) => f.Name.SnakeCase());
+
+    public static InstanceSetters<Filter> SetLabel(
+        this InstanceSetters<Filter> setters,
+        string label)
+        => setters
+            .Set(f => f.Label, label)
+            .Set(f => f.Name, label.SnakeCase());
 
     public static InstanceSetters<Filter> SetSubject(
         this InstanceSetters<Filter> setters,

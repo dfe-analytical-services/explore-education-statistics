@@ -105,46 +105,37 @@ public class ProcessorStage1Tests
         
         var dataImportService = new DataImportService(
             dbContextSupplier,
-            Mock.Of<ILogger<DataImportService>>(),
-            transactionHelper);
-
-        var importerFilterCache = new ImporterFilterCache();
+            Mock.Of<ILogger<DataImportService>>());
 
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
         
         var guidGenerator = new SequentialGuidGenerator();
+
+        var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
         
         var importerService = new ImporterService(
             guidGenerator,
-            new ImporterFilterService(importerFilterCache),
             new ImporterLocationService(
                 guidGenerator, 
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
-            new ImporterMetaService(guidGenerator, transactionHelper),
+            importerMetaService,
             dataImportService,
             Mock.Of<ILogger<ImporterService>>(),
-            transactionHelper,
-            importerFilterCache);
+            transactionHelper);
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            Mock.Of<IBatchService>(Strict),
             blobStorageService.Object,
             dataImportService,
             importerService,
-            transactionHelper);
+            importerMetaService);
 
-        var rowsPerBatch = 5;
-        
-        Environment.SetEnvironmentVariable("RowsPerBatch", rowsPerBatch.ToString());
-        
         var validatorService = new ValidatorService(
             Mock.Of<ILogger<ValidatorService>>(),
             blobStorageService.Object,
             new FileTypeService(Mock.Of<ILogger<FileTypeService>>()),
-            dataImportService,
-            importerService);
+            dataImportService);
 
         var processorService = BuildProcessorService(
             dbContextSupplier,
@@ -166,8 +157,7 @@ public class ProcessorStage1Tests
         await function.ProcessUploads(
             importMessage, 
             new ExecutionContext(),
-            importStagesMessageQueue.Object,
-            Mock.Of<ICollector<ImportObservationsMessage>>(Strict));
+            importStagesMessageQueue.Object);
         
         VerifyAllMocks(blobStorageService, importStagesMessageQueue);
 
@@ -182,9 +172,7 @@ public class ProcessorStage1Tests
             {
                 Assert.Equal(DataImportStatus.STAGE_2, dataImport.Status);
                 Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.TotalRows);
-                Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.ImportedRows);
-                Assert.Equal(rowsPerBatch, dataImport.RowsPerBatch);
-                Assert.Equal(4, dataImport.NumBatches);
+                Assert.Equal(scenario.GetExpectedTotalRows(), dataImport.ExpectedImportedRows);
             });
         }
     }
@@ -201,25 +189,21 @@ public class ProcessorStage1Tests
             Mock.Of<ILogger<ProcessorService>>(),
             blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
-            Mock.Of<ISplitFileService>(Strict),
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             validatorService ?? Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
     }
-    
-    
 
     private static Processor.Functions.Processor BuildFunction(
         IProcessorService? processorService = null,
         IDataImportService? dataImportService = null)
     {
         return new Processor.Functions.Processor(
-            Mock.Of<IFileImportService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
             processorService ?? Mock.Of<IProcessorService>(Strict),
-            Mock.Of<IDbContextSupplier>(),
-            Mock.Of<ILogger<Processor.Functions.Processor>>());
+            Mock.Of<ILogger<Processor.Functions.Processor>>(),
+            rethrowExceptions: true);
     }
 }

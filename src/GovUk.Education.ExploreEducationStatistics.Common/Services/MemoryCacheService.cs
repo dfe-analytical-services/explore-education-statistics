@@ -32,7 +32,7 @@ public class MemoryCacheService : IMemoryCacheService
         _logger = logger;
     }
 
-    public Task<object?> GetItem(IMemoryCacheKey cacheKey, Type targetType)
+    public object? GetItem(IMemoryCacheKey cacheKey, Type targetType)
     {
         object? cachedItem;
 
@@ -43,40 +43,40 @@ public class MemoryCacheService : IMemoryCacheService
         catch (Exception e)
         {
             _logger.LogError(
-                e, 
-                "Error whilst retrieving cached item for key {CacheKey} - returning null", 
+                e,
+                "Error whilst retrieving cached item for key {CacheKey} - returning null",
                 GetCacheKeyDescription(cacheKey));
-            return Task.FromResult((object?) null);
+            return null;
         }
 
         if (cachedItem == null)
         {
             _logger.LogInformation(
-                "Cache miss for cache key {CacheKeyDescription}", 
+                "Cache miss for cache key {CacheKeyDescription}",
                 GetCacheKeyDescription(cacheKey));
-            return Task.FromResult((object?) null);
+            return null;
         }
-        
+
         if (!targetType.IsInstanceOfType(cachedItem))
         {
             _logger.LogError(
                 "Cached type {CachedItemType} is not an instance of " +
                 "{TargetType} for cache key {CacheKey} - returning null",
-                cachedItem.GetType(), 
-                nameof(targetType), 
+                cachedItem.GetType(),
+                nameof(targetType),
                 GetCacheKeyDescription(cacheKey));
 
-            return Task.FromResult((object?) null);
+            return null;
         }
 
         _logger.LogInformation(
             "Returning cached result for cache key {CacheKeyDescription}",
             GetCacheKeyDescription(cacheKey));
 
-        return Task.FromResult(cachedItem)!;
+        return cachedItem;
     }
 
-    public Task SetItem<TItem>(
+    public void SetItem<TItem>(
         IMemoryCacheKey cacheKey,
         TItem item,
         MemoryCacheConfiguration configuration,
@@ -96,7 +96,7 @@ public class MemoryCacheService : IMemoryCacheService
             else
             {
                 var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(now);
-                
+
                 absoluteExpiryTime = targetAbsoluteExpiryDateTime < nextExpiryTime
                     ? targetAbsoluteExpiryDateTime
                     : nextExpiryTime;
@@ -118,14 +118,12 @@ public class MemoryCacheService : IMemoryCacheService
             _logger.LogInformation("Setting cached item with cache key {CacheKeyDescription}, " +
                                    "approx size {Size} bytes, expiry time {ExpiryTime}",
                 GetCacheKeyDescription(cacheKey), approximateSizeInBytes, expiryTime);
-            return Task.CompletedTask;
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Exception thrown when caching item with cache key {CacheKeyDescription}.  " +
-                                "Returning gracefully.", 
+                                "Returning gracefully.",
                 GetCacheKeyDescription(cacheKey));
-            return Task.CompletedTask;
         }
     }
 

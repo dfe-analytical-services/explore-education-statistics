@@ -3,10 +3,10 @@ import PrototypeTableToolFinalStep from '@admin/prototypes/components/PrototypeT
 import PrototypeTableToolWizard from '@admin/prototypes/components/PrototypeTableToolWizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import {
   FastTrackTable,
   FeaturedTable,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
@@ -51,7 +51,7 @@ const PrototypeTableTool = ({ fastTrack, themeMeta = themes }: Props) => {
           themeMeta={themeMeta}
           initialState={initialState}
           loadingFastTrack={loadingFastTrack}
-          renderFeaturedTable={highlight => (
+          renderFeaturedTableLink={highlight => (
             <Link
               to={`/data-tables/fast-track/${highlight.id}`}
               onClick={() => {

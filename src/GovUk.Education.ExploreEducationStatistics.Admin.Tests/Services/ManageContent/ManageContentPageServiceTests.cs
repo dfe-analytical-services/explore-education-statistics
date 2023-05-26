@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     new ReleaseContentSection
                     {
                         Release = release,
-                        ContentSection = new ()
+                        ContentSection = new()
                         {
                             Type = ContentSectionType.Headlines
                         }
@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     new ReleaseContentSection
                     {
                         Release = release,
-                        ContentSection = new ()
+                        ContentSection = new()
                         {
                             Type = ContentSectionType.KeyStatisticsSecondary
                         }
@@ -189,15 +189,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     new ReleaseContentSection
                     {
                         Release = release,
-                        ContentSection = new ()
+                        ContentSection = new()
                         {
                             Type = ContentSectionType.ReleaseSummary
                         }
                     },
-                    new ()
+                    new()
                     {
                         Release = release,
-                        ContentSection = new ()
+                        ContentSection = new()
                         {
                             Type = ContentSectionType.RelatedDashboards
                         }

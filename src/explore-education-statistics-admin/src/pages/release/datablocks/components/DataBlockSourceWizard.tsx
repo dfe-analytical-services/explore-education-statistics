@@ -129,7 +129,7 @@ const DataBlockSourceWizard = ({
 
       <TableToolWizard
         themeMeta={[]}
-        hidePublicationSelectionStage
+        hidePublicationStep
         initialState={tableToolState}
         showTableQueryErrorDownload={false}
         finalStep={({ query, table, tableHeaders, onReorder }) => (

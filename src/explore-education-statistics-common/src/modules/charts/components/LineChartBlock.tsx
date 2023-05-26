@@ -82,22 +82,22 @@ const LineChartBlock = ({
     return <div>Unable to render chart, chart incorrectly configured</div>;
   }
 
-  const dataSetCategories: DataSetCategory[] = createDataSetCategories(
-    axes.major,
+  const dataSetCategories: DataSetCategory[] = createDataSetCategories({
+    axisConfiguration: axes.major,
     data,
     meta,
     includeNonNumericData,
-  );
+  });
 
   const chartData = dataSetCategories.map(toChartData);
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
-  const dataSetCategoryConfigs = getDataSetCategoryConfigs(
+  const dataSetCategoryConfigs = getDataSetCategoryConfigs({
     dataSetCategories,
-    legend.items,
+    legendItems: legend.items,
     meta,
-  );
+  });
   const minorAxisDecimals = getMinorAxisDecimalPlaces(dataSetCategoryConfigs);
   const minorAxisUnit = axes.minor.unit || getUnit(dataSetCategoryConfigs);
   const yAxisWidth = getMinorAxisSize({

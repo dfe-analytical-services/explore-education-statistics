@@ -53,10 +53,10 @@ user creates data block for dates csv
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
 
-    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until table tool wizard step is available    1    Select a data set
     user waits until page contains    ${subject_name}
     user clicks radio    ${subject_name}
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
 
     user waits until table tool wizard step is available    2    Choose locations
     user opens details dropdown    National
@@ -109,10 +109,10 @@ user creates key stats data block for dates csv
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
 
-    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until table tool wizard step is available    1    Select a data set
     user waits until page contains    ${subject_name}
     user clicks radio    ${subject_name}
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
 
     user waits until table tool wizard step is available    2    Choose locations
     user opens details dropdown    National

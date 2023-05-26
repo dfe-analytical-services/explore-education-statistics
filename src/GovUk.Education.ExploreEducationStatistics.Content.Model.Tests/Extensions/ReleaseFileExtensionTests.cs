@@ -9,23 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
     public class ReleaseFileExtensionTests
     {
         [Fact]
-        public void BatchesPath()
-        {
-            var releaseFile = new ReleaseFile
-            {
-                File = new File
-                {
-                    Id = Guid.NewGuid(),
-                    RootPath = Guid.NewGuid(),
-                    Filename = "data.csv",
-                    Type = Data
-                }
-            };
-
-            Assert.Equal(releaseFile.File.BatchesPath(), releaseFile.BatchesPath());
-        }
-
-        [Fact]
         public void Path()
         {
             var releaseFile = new ReleaseFile
@@ -45,14 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void PublicPath()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
             var releaseFile = new ReleaseFile
             {
-                Release = release,
+                ReleaseId = Guid.NewGuid(),
                 File = new File
                 {
                     Id = Guid.NewGuid(),
@@ -62,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 }
             };
 
-            Assert.Equal(releaseFile.File.PublicPath(release), releaseFile.PublicPath());
+            Assert.Equal($"{releaseFile.ReleaseId}/ancillary/{releaseFile.File.Id}", releaseFile.PublicPath());
         }
 
         [Fact]

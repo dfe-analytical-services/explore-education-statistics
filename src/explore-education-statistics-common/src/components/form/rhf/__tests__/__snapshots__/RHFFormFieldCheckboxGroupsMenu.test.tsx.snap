@@ -24,17 +24,13 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
   >
     Search options
   </label>
-  <div
-    class=""
-  >
-    <input
-      class="govuk-input searchInput govuk-input--width-20"
-      id="test-search"
-      name="test-search"
-      type="text"
-      value=""
-    />
-  </div>
+  <input
+    class="govuk-input searchInput govuk-input--width-20"
+    id="test-search"
+    name="test-search"
+    type="text"
+    value=""
+  />
   <div
     aria-live="assertive"
     class="optionsContainer"
@@ -195,17 +191,13 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
   >
     Search options
   </label>
-  <div
-    class=""
-  >
-    <input
-      class="govuk-input searchInput govuk-input--width-20"
-      id="test-search"
-      name="test-search"
-      type="text"
-      value=""
-    />
-  </div>
+  <input
+    class="govuk-input searchInput govuk-input--width-20"
+    id="test-search"
+    name="test-search"
+    type="text"
+    value=""
+  />
   <div
     aria-live="assertive"
     class="optionsContainer"

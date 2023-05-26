@@ -86,126 +86,122 @@ export default function combineMeasuresWithDuplicateLocationCodes(
       }),
   );
 
-  return Object.entries(resultsGroupedByLocationCodeAndLevel).flatMap(
-    ([key, resultsForLocation]) => {
-      const { level, code }: LocationGroupingKey = JSON.parse(key);
-      const resultsGroupedByLocationName = groupBy(
-        resultsForLocation,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        r => r.location![level].name,
-      );
+  const deduplicatedResults = Object.entries(
+    resultsGroupedByLocationCodeAndLevel,
+  ).flatMap(([key, resultsForLocation]) => {
+    const { level, code }: LocationGroupingKey = JSON.parse(key);
+    const resultsGroupedByLocationName = groupBy(
+      resultsForLocation,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      r => r.location![level].name,
+    );
 
-      // If there is only a single unique Location name for this combination of Level and Code, no combining of result
-      // sets needs to be done.
-      if (Object.keys(resultsGroupedByLocationName).length === 1) {
-        return resultsForLocation;
-      }
+    // If there is only a single unique Location name for this combination of Level and Code, no combining of result
+    // sets needs to be done.
+    if (Object.keys(resultsGroupedByLocationName).length === 1) {
+      return resultsForLocation;
+    }
 
-      // Get the label for the combined Location row.
-      const combinedLocation = deduplicatedLocations.find(
-        l => l.level === level && l.value === code,
+    // Get the label for the combined Location row.
+    const combinedLocation = deduplicatedLocations.find(
+      l => l.level === level && l.value === code,
+    );
+    if (!combinedLocation) {
+      throw new Error(
+        `No available Location exists with level ${level} and code ${code}`,
       );
-      if (!combinedLocation) {
-        throw new Error(
-          `No available Location exists with level ${level} and code ${code}`,
+    }
+
+    const allAvailableTimePeriods = uniq(
+      resultsForLocation.flatMap(result => result.timePeriod),
+    );
+
+    // Generate a set of result rows that will cover every Time Period / Filter combination that is present in
+    // this set of data.  These combinations will be used to gather values from each Location name's data sets
+    // against every measurement that is captured in this data.  The values will be kept in order of their Location
+    // name so that the order of combined measurement values will match the order of the combined Location names in the
+    // table row label e.g. ("Provider 1 / Provider 2" - Achievements: "20 / 35"), where "20" is the "Achievements" value
+    // for Provider 1, and "35" is the "Achievements" value for Provider 2.
+    const timePeriodFilterCombinations: TableDataResult[] = allAvailableTimePeriods.flatMap(
+      timePeriod => {
+        const rowsForTimePeriod = resultsForLocation.filter(
+          r => r.timePeriod === timePeriod,
         );
-      }
-
-      const allAvailableTimePeriods = uniq(
-        resultsForLocation.flatMap(result => result.timePeriod),
-      );
-
-      // Generate a set of result rows that will cover every Time Period / Filter combination that is present in
-      // this set of data.  These combinations will be used to gather values from each Location name's data sets
-      // against every measurement that is captured in this data.  The values will be kept in order of their Location
-      // name so that the order of combined measurement values will match the order of the combined Location names in the
-      // table row label e.g. ("Provider 1 / Provider 2" - Achievements: "20 / 35"), where "20" is the "Achievements" value
-      // for Provider 1, and "35" is the "Achievements" value for Provider 2.
-      const timePeriodFilterCombinations: TableDataResult[] = allAvailableTimePeriods.flatMap(
-        timePeriod => {
-          const rowsForTimePeriod = resultsForLocation.filter(
-            r => r.timePeriod === timePeriod,
-          );
-          const allAvailableFilterCombinations = uniqWith(
-            rowsForTimePeriod.map(result => result.filters.sort()),
-            (a1, a2) => isEqual(a1, a2),
-          );
-          const allAvailableMeasures = uniq(
-            rowsForTimePeriod.flatMap(result => Object.keys(result.measures)),
-          );
-          return allAvailableFilterCombinations.flatMap(filters => {
-            return {
-              timePeriod,
-              filters,
-              geographicLevel: level,
-              location: {
-                [level]: {
-                  name: combinedLocation.label,
-                  code,
-                },
-              },
-              measures: allAvailableMeasures.reduce(
-                (acc, measure) => ({
-                  ...acc,
-                  [measure]: '',
-                }),
-                {},
-              ),
-            } as TableDataResult;
-          });
-        },
-      );
-
-      const allAvailableLocationNames = Object.keys(
-        resultsGroupedByLocationName,
-      ).sort();
-
-      // Now for each combination of Time Period and Filters, produce a single combined row of data that merges
-      // the duplicate rows from each Location into one, using a strategy to merge a set of data for each measurement
-      // into a single value.
-      const deduplicatedResults = timePeriodFilterCombinations.flatMap(
-        combination => {
-          // For each measure, collect the value for that measure from each Location's results for this Time Period and
-          // Filter combination, or undefined if a Location does not have a value that matches this criteria.
-          const measureValuesForEachLocation = Object.keys(
-            combination.measures,
-          ).reduce((acc, measure) => {
-            const measureValues = allAvailableLocationNames.map(
-              locationName => {
-                const resultForLocationName = resultsGroupedByLocationName[
-                  locationName
-                ].find(
-                  result =>
-                    result.timePeriod === combination.timePeriod &&
-                    isEqual(combination.filters, result.filters),
-                );
-                return resultForLocationName?.measures[measure];
-              },
-            );
-            return {
-              ...acc,
-              [measure]: measureValues,
-            };
-          }, {});
-
-          // Now for each measure, combine the values gathered from all of the Locations into a single value per measure.
-          const mergedMeasurements = mapValues(
-            measureValuesForEachLocation,
-            measurementsMergeStrategy,
-          );
-
-          // Return the Time Period / Filter combination, now with the merged measurement values from all of the
-          // Locations
+        const allAvailableFilterCombinations = uniqWith(
+          rowsForTimePeriod.map(result => result.filters.sort()),
+          (filters, filtersOther) => isEqual(filters, filtersOther),
+        );
+        const allAvailableMeasures = uniq(
+          rowsForTimePeriod.flatMap(result => Object.keys(result.measures)),
+        );
+        return allAvailableFilterCombinations.flatMap(filters => {
           return {
-            ...combination,
-            measures: mergedMeasurements,
+            timePeriod,
+            filters,
+            geographicLevel: level,
+            location: {
+              [level]: {
+                name: combinedLocation.label,
+                code,
+              },
+            },
+            measures: allAvailableMeasures.reduce(
+              (acc, measure) => ({
+                ...acc,
+                [measure]: '',
+              }),
+              {},
+            ),
           };
-        },
+        });
+      },
+    );
+
+    const allAvailableLocationNames = Object.keys(
+      resultsGroupedByLocationName,
+    ).sort();
+
+    // Now for each combination of Time Period and Filters, produce a single combined row of data that merges
+    // the duplicate rows from each Location into one, using a strategy to merge a set of data for each measurement
+    // into a single value.
+    return timePeriodFilterCombinations.flatMap(combination => {
+      // For each measure, collect the value for that measure from each Location's results for this Time Period and
+      // Filter combination, or undefined if a Location does not have a value that matches this criteria.
+      const measureValuesForEachLocation = Object.keys(
+        combination.measures,
+      ).reduce((acc, measure) => {
+        const measureValues = allAvailableLocationNames.map(locationName => {
+          const resultForLocationName = resultsGroupedByLocationName[
+            locationName
+          ].find(
+            result =>
+              result.timePeriod === combination.timePeriod &&
+              isEqual(combination.filters, result.filters),
+          );
+          return resultForLocationName?.measures[measure];
+        });
+        return {
+          ...acc,
+          [measure]: measureValues,
+        };
+      }, {});
+
+      // Now for each measure, combine the values gathered from all of the Locations into a single value per measure.
+      const mergedMeasurements = mapValues(
+        measureValuesForEachLocation,
+        measurementsMergeStrategy,
       );
 
-      return [...unaffectedResults, ...deduplicatedResults];
-    },
-  );
+      // Return the Time Period / Filter combination, now with the merged measurement values from all of the
+      // Locations
+      return {
+        ...combination,
+        measures: mergedMeasurements,
+      };
+    });
+  });
+
+  return [...unaffectedResults, ...deduplicatedResults];
 }
 
 /**

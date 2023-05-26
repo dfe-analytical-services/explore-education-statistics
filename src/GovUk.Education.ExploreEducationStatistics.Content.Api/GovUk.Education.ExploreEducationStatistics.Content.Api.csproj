@@ -14,7 +14,6 @@
         <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
-        <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.2.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
         <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="6.0.2" />
@@ -29,6 +28,5 @@
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Services\GovUk.Education.ExploreEducationStatistics.Data.Services.csproj" />
-        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Publisher.Model\GovUk.Education.ExploreEducationStatistics.Publisher.Model.csproj" />
     </ItemGroup>
 </Project>

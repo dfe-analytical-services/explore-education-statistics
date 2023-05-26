@@ -1,0 +1,73 @@
+name: Validate snapshots
+on:
+  workflow_dispatch:
+  schedule:
+    # Actions are scheduled in UTC
+    # Until Actions supports timezones, we need to update this cron
+    # twice a year (at the start and end of daylight saving time) 
+    # to account for daylight saving time in the UK
+    # This action is intended to run at 9:35AM, 12:35PM & 4:35PM
+    - cron: '35 8,11,15 * * 1-5'
+env:
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  PYTHON_VERSION: 3.10.10
+
+jobs:
+  test:
+    name: Validate snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Install moreutils
+        run: sudo apt install moreutils
+
+      # https://github.com/actions/virtual-environments/issues/1187
+      - name: tune linux network
+        run: sudo ethtool -K eth0 tx off rx off
+
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Setup python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pipenv'
+
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+
+      - name: pipenv install
+        run: pipenv install
+
+      - name: Validate snapshots
+        working-directory: tests/robot-tests
+        run: pipenv run python scripts/create_snapshots.py --ci --slack-webhook-url ${{ env.SLACK_WEBHOOK_URL }}
+
+      - name: Set output variables
+        id: vars
+        run: |
+          pr_title="chore(tests): Update test snapshots $(date +%d-%m-%Y)"
+          pr_body="This PR was auto-generated on $(date +%d-%m-%Y) \
+            by [create-pull-request](https://github.com/peter-evans/create-pull-request) \
+            due to visual differences identified"
+          echo "pr_title=$pr_title" >> $GITHUB_OUTPUT
+          echo "pr_body=$pr_body" >> $GITHUB_OUTPUT
+
+      - name: Create pull request
+        id: cpr
+        uses: peter-evans/create-pull-request@v4
+        with:
+          token: ${{ env.GH_TOKEN }}
+          commit-message: 'chore(tests): update test snapshots'
+          committer: dfe-sdt <dfe-sdt@users.noreply.github.com>
+          author: dfe-sdt <dfe-sdt@users.noreply.github.com>
+          labels: snapshots, automated
+          branch: chore/update-test-snapshots
+          add-paths: |
+            tests/robot-tests/tests/snapshots
+          reviewers: rmbielby, lauraselby, cjrace, chfoster, twilliams24
+          title: ${{ steps.vars.outputs.pr_title }}
+          body: ${{ steps.vars.outputs.pr_body }}
+          draft: false

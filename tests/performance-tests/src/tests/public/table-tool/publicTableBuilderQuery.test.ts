@@ -4,19 +4,22 @@ import exec from 'k6/execution';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
-import createAdminService, { SubjectMeta } from '../../../utils/adminService';
+import createAdminService, {
+  getDataFileUploadStrategy,
+} from '../../../utils/adminService';
 import testData from '../../testData';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 import createDataService from '../../../utils/dataService';
-import utils from '../../../utils/utils';
 import loggingUtils from '../../../utils/loggingUtils';
+import { createTableBuilderQuery } from '../../../utils/tableQueries';
+import { SubjectMeta } from '../../../utils/types';
 
 const tearDownData = false;
 const publicationTitle =
   __ENV.PUBLICATION_TITLE ?? 'publicTableBuilderQuery.test.ts';
 const dataFile = __ENV.DATA_FILE ?? 'small-file.csv';
-const uploadFileStrategy = utils.getDataFileUploadStrategy({
+const uploadFileStrategy = getDataFileUploadStrategy({
   filename: dataFile,
 });
 
@@ -39,7 +42,6 @@ export const options: Options = {
 interface SetupData {
   themeId: string;
   topicId: string;
-  publicationId: string;
   subjectId: string;
   subjectMeta: SubjectMeta;
 }
@@ -148,7 +150,6 @@ function getOrCreateReleaseWithSubject() {
   return {
     themeId,
     topicId,
-    publicationId,
     releaseId,
     subjectId,
   };
@@ -161,7 +162,6 @@ export function setup(): SetupData {
     themeId,
     topicId,
     releaseId,
-    publicationId,
     subjectId,
   } = getOrCreateReleaseWithSubject();
 
@@ -172,87 +172,22 @@ export function setup(): SetupData {
   return {
     themeId,
     topicId,
-    publicationId,
     subjectId,
     subjectMeta,
   };
 }
 
-const performTest = ({ publicationId, subjectId, subjectMeta }: SetupData) => {
+const performTest = ({ subjectId, subjectMeta }: SetupData) => {
   const dataService = createDataService(dataApiUrl);
 
-  const oneFilterItemIdFromEachFilter = Object.values(
-    subjectMeta.filters,
-  ).flatMap(filter =>
-    Object.values(filter.options)
-      .flatMap(filterGroup =>
-        filterGroup.options.flatMap(filterItem => filterItem.value),
-      )
-      .slice(0, 1),
-  );
-
-  const allOtherFilterItemIds = Object.values(subjectMeta.filters).flatMap(
-    filter =>
-      Object.values(filter.options)
-        .flatMap(filterGroup =>
-          filterGroup.options.flatMap(filterItem => filterItem.value),
-        )
-        .slice(1),
-  );
-
-  const maxSelectedFilterItemIds = 10;
-
-  const someFilterItemIds = [
-    ...oneFilterItemIdFromEachFilter,
-    ...allOtherFilterItemIds.slice(
-      0,
-      Math.min(
-        allOtherFilterItemIds.length,
-        maxSelectedFilterItemIds - oneFilterItemIdFromEachFilter.length,
-      ),
-    ),
-  ];
-
-  const allIndicationIds = Object.values(
-    subjectMeta.indicators,
-  ).flatMap(indicatorGroup =>
-    indicatorGroup.options.map(indicator => indicator.value),
-  );
-
-  const allLocationIds = Object.values(subjectMeta.locations).flatMap(
-    geographicLevel =>
-      geographicLevel.options.flatMap(location => {
-        if (location.options) {
-          return location.options.flatMap(o => o.id);
-        }
-        return [location.id];
-      }),
-  );
-
-  const someLocationIds = allLocationIds.slice(
-    0,
-    Math.min(allLocationIds.length, 20),
-  );
-
-  const someTimePeriods = {
-    startYear: subjectMeta.timePeriod.options[0].year,
-    startCode: subjectMeta.timePeriod.options[0].code,
-    endYear: subjectMeta.timePeriod.options[1].year,
-    endCode: subjectMeta.timePeriod.options[1].code,
-  };
+  const query = createTableBuilderQuery({
+    subjectId,
+    subjectMeta,
+  });
 
   const startTimeMillis = Date.now();
 
-  console.log(`Starting table query ${exec.scenario.iterationInTest}`);
-
-  const { response, results } = dataService.tableQuery({
-    publicationId,
-    subjectId,
-    filterIds: someFilterItemIds,
-    indicatorIds: allIndicationIds,
-    locationIds: someLocationIds as string[],
-    ...someTimePeriods,
-  });
+  const { response, results } = dataService.tableQuery(query);
 
   if (
     check(response, {

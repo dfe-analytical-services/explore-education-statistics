@@ -28,6 +28,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-07T16:05:44.1213125Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '8bfceddc-e6da-4b26-998e-08d987eb588f',
@@ -50,6 +52,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T08:02:58.3152676Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '7e47015e-bf0e-4b42-9990-08d987eb588f',
@@ -71,6 +75,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T08:17:41.217646Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: 'f92c494b-571f-4dda-99a0-08d987eb588f',
@@ -92,6 +98,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T10:45:35.58381Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '2c9b1ba9-b79a-4cba-99a4-08d987eb588f',
@@ -115,6 +123,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T11:04:14.9637298Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: 'c8bd097a-c011-4693-999e-08d987eb588f',
@@ -132,11 +142,13 @@ export const subjects: Subject[] = [
       extension: 'csv',
       fileName: 'a6_cpp_initial_category_of_abuse_2013_to_2021.csv',
       name:
-        'A6 National time series of child protection plans by initial category of abuse, England 2013 to 2021',
+        ',A6 National time series of child protection plans by initial category of abuse, England 2013 to 2021',
       size: '1 Kb',
       type: 'Data',
       created: '2021-10-08T10:10:01.499493Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: 'c28569ca-4a59-44cd-9996-08d987eb588f',
@@ -158,6 +170,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T09:58:15.6856206Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '0f2f9b9b-85c8-4441-998c-08d987eb588f',
@@ -180,6 +194,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T07:49:49.8933633Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '949f4689-729f-425d-99ac-08d987eb588f',
@@ -201,6 +217,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T13:15:55.3925348Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '03027d63-f185-49c8-bccc-08d98e1873d8',
@@ -222,6 +240,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-14T13:10:24.7844085Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: 'ef301961-dbfc-44a8-99b0-08d987eb588f',
@@ -243,6 +263,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T13:44:02.0031304Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '2ed75fdd-c6b2-433a-99b4-08d987eb588f',
@@ -266,6 +288,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-08T14:28:33.4840179Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: 'ecd8b9bb-822d-4840-20d1-08d98d84ca80',
@@ -288,6 +312,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-12T15:25:03.2491626Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '655d0d18-d3e4-4c1d-99be-08d987eb588f',
@@ -311,6 +337,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-11T07:54:02.0817658Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '84609c65-55d8-49d7-bc5a-08d98e1873d8',
@@ -333,6 +361,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-13T09:08:47.3790075Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '74eb4c5b-b276-4d28-f2c7-08d99857c8b0',
@@ -355,6 +385,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-26T12:07:38.797588Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '432a7ff4-e7ef-46a3-bc5c-08d98e1873d8',
@@ -377,6 +409,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-13T09:28:55.3417685Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '7f16dcfc-6491-40ae-bc58-08d98e1873d8',
@@ -399,6 +433,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-13T08:35:21.2321858Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: 'd843a8fc-0fc3-4e10-bcec-08d98e1873d8',
@@ -421,6 +457,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-14T15:55:47.6658869Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '28f10859-b469-494a-99c0-08d987eb588f',
@@ -442,6 +480,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-11T08:01:00.6976498Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: 'b6af0e66-78fc-4a12-bcf2-08d98e1873d8',
@@ -464,6 +504,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-14T16:39:44.5001306Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '34c61111-6958-4b47-99c2-08d987eb588f',
@@ -486,6 +528,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-11T08:17:02.0521492Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '4ab9b578-8326-4c0e-bcf4-08d98e1873d8',
@@ -508,6 +552,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-14T16:46:37.3843777Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '71a006ac-9c4e-421d-bc8c-08d98e1873d8',
@@ -530,6 +576,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-13T15:39:18.0125196Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '82c7e75b-1317-41a1-bcf6-08d98e1873d8',
@@ -552,6 +600,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-14T16:51:46.5977166Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: 'cf86bc9a-9d5c-4fd8-bcf0-08d98e1873d8',
@@ -574,6 +624,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-14T16:08:31.3655299Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '103bab64-2d9f-44b7-bcf8-08d98e1873d8',
@@ -596,6 +648,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-14T16:58:02.1950332Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '9b1e3140-5171-4edd-f2dd-08d99857c8b0',
@@ -616,6 +670,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-26T14:12:58.7481556Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
   {
     id: '1e916eb9-6206-46ee-9df5-08d9924737d1',
@@ -636,6 +692,8 @@ export const subjects: Subject[] = [
       type: 'Data',
       created: '2021-10-20T13:35:00.1303415Z',
     },
+    filters: ['Filter 1'],
+    indicators: ['Indicator 1'],
   },
 ];
 

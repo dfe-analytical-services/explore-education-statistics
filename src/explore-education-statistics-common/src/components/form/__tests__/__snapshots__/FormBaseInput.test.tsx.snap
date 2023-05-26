@@ -14,14 +14,12 @@ exports[`FormTextInput renders correctly with error 1`] = `
   </span>
   Field is required
 </span>
-<div class>
-  <input name="testInput"
-         aria-describedby="test-input-error"
-         class="govuk-input govuk-input--error"
-         id="test-input"
-         type="text"
-  >
-</div>
+<input name="testInput"
+       aria-describedby="test-input-error"
+       class="govuk-input govuk-input--error"
+       id="test-input"
+       type="text"
+>
 `;
 
 exports[`FormTextInput renders correctly with hint 1`] = `
@@ -35,14 +33,12 @@ exports[`FormTextInput renders correctly with hint 1`] = `
 >
   Fill me in
 </span>
-<div class>
-  <input name="testInput"
-         aria-describedby="test-input-hint"
-         class="govuk-input"
-         id="test-input"
-         type="text"
-  >
-</div>
+<input name="testInput"
+       aria-describedby="test-input-hint"
+       class="govuk-input"
+       id="test-input"
+       type="text"
+>
 `;
 
 exports[`FormTextInput renders correctly with required props 1`] = `
@@ -51,13 +47,11 @@ exports[`FormTextInput renders correctly with required props 1`] = `
 >
   Test input
 </label>
-<div class>
-  <input name="testInput"
-         class="govuk-input"
-         id="test-input"
-         type="text"
-  >
-</div>
+<input name="testInput"
+       class="govuk-input"
+       id="test-input"
+       type="text"
+>
 `;
 
 exports[`FormTextInput renders with a specific width class 1`] = `
@@ -71,14 +65,12 @@ exports[`FormTextInput renders with a specific width class 1`] = `
 >
   Fill me in
 </span>
-<div class>
-  <input name="testInput"
-         aria-describedby="test-input-hint"
-         class="govuk-input govuk-input--width-20"
-         id="test-input"
-         type="text"
-  >
-</div>
+<input name="testInput"
+       aria-describedby="test-input-hint"
+       class="govuk-input govuk-input--width-20"
+       id="test-input"
+       type="text"
+>
 `;
 
 exports[`FormTextInput renders with an add on 1`] = `

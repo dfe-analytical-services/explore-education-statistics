@@ -192,9 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     filterItemIds: filterItemIds,
                     indicatorIds: indicatorIds);
 
-            return footnotes
-                .Select(footnote => new FootnoteViewModel(footnote.Id, footnote.Content))
-                .ToList();
+            return FootnotesViewModelBuilder.BuildFootnotes(footnotes);
         }
 
         private List<TimePeriodMetaViewModel> GetTimePeriodViewModels(IList<Observation> observations)

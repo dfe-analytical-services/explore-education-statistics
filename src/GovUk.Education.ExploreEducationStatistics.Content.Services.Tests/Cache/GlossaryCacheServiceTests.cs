@@ -28,11 +28,11 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
         var cacheKey = new GlossaryCacheKey();
 
         PublicBlobCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(List<GlossaryCategoryViewModel>)))
+            .Setup(s => s.GetItemAsync(cacheKey, typeof(List<GlossaryCategoryViewModel>)))
             .ReturnsAsync(null);
 
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(cacheKey, _glossary))
+            .Setup(s => s.SetItemAsync<object>(cacheKey, _glossary))
             .Returns(Task.CompletedTask);
 
         var glossaryService = new Mock<IGlossaryService>(Strict);
@@ -54,7 +54,7 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
     public async Task GetGlossary_CachedGlossary()
     {
         PublicBlobCacheService
-            .Setup(s => s.GetItem(new GlossaryCacheKey(), typeof(List<GlossaryCategoryViewModel>)))
+            .Setup(s => s.GetItemAsync(new GlossaryCacheKey(), typeof(List<GlossaryCategoryViewModel>)))
             .ReturnsAsync(_glossary);
 
         var service = BuildService();
@@ -76,7 +76,7 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
             .ReturnsAsync(_glossary);
 
         PublicBlobCacheService
-            .Setup(s => s.SetItem<object>(new GlossaryCacheKey(), _glossary))
+            .Setup(s => s.SetItemAsync<object>(new GlossaryCacheKey(), _glossary))
             .Returns(Task.CompletedTask);
 
         var service = BuildService(glossaryService: glossaryService.Object);

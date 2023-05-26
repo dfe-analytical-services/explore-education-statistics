@@ -89,6 +89,7 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
                 .SingleAsync(
                     predicate: rf =>
                         rf.File.SubjectId == releaseSubject.SubjectId
+                        && rf.File.Type == FileType.Data
                         && rf.ReleaseId == releaseSubject.ReleaseId,
                     cancellationToken: cancellationToken
                 );
@@ -100,7 +101,7 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             _logger.LogError(
                 exception,
                 message: "Could not get file for release subject (ReleaseId = {ReleaseId}, SubjectId = {SubjectId})",
-                releaseSubject.ReleaseId, releaseSubject.Subject);
+                releaseSubject.ReleaseId, releaseSubject.SubjectId);
 
             return null;
         }

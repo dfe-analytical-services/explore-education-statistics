@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net.Mime;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -18,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -878,11 +877,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             // to prevent the next file from being fetched.
             blobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
+
             blobStorageService
                 .SetupDownloadToStream(
                     container: PublicReleaseFiles,
                     path: releaseFile1.PublicPath(),
-                    blobText: "Test ancillary blob",
+                    content: "Test ancillary blob",
                     cancellationToken: tokenSource.Token)
                 .Callback(() => tokenSource.Cancel());
 
@@ -983,7 +983,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             PublicReleaseFiles,
                             allFilesZipPath,
                             It.IsAny<Stream>(),
-                            "application/zip"
+                            MediaTypeNames.Application.Zip,
+                            null,
+                            It.IsAny<CancellationToken>()
                         )
                 )
                 .Returns(Task.CompletedTask);
@@ -1042,7 +1044,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // Data guidance is generated if there is at least one data file
                 Assert.Equal("data-guidance/data-guidance.txt", zip.Entries[2].FullName);
                 Assert.Equal("Test data guidance blob", zip.Entries[2].Open().ReadToEnd());
-
             }
         }
 
@@ -1084,21 +1085,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 );
 
             blobStorageService
-                .Setup(
-                    s =>
-                        s.DownloadToStream(
-                            PublicReleaseFiles,
-                            allFilesZipPath,
-                            It.IsAny<FileStream>(),
-                            null
-                        )
-                )
-                .Returns<IBlobContainer, string, Stream, CancellationToken?>(
-                    (_, _, stream, _) => Task.FromResult(new Either<ActionResult, Stream>(stream))
-                )
-                .Callback<IBlobContainer, string, Stream, CancellationToken?>(
-                    (_, _, stream, _) => { stream.WriteText("Test cached all files zip"); }
-                );
+                .SetupDownloadToStream(PublicReleaseFiles, allFilesZipPath, "Test cached all files zip");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -1187,7 +1174,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             PublicReleaseFiles,
                             allFilesZipPath,
                             It.IsAny<Stream>(),
-                            "application/zip"
+                            MediaTypeNames.Application.Zip,
+                            null,
+                            It.IsAny<CancellationToken>()
                         )
                 )
                 .Returns(Task.CompletedTask);

@@ -6,6 +6,7 @@
   flex-direction: column;
   flex-grow: 1;
   justify-content: space-evenly;
+  overflow-wrap: break-word;
   padding: 0.7rem 1rem;
 
   @include govuk-media-query($until: tablet) {

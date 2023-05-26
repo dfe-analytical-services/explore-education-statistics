@@ -1,4 +1,5 @@
 import {
+  alignmentOptions,
   headingOptions,
   imageToolbar,
   resizeOptions,
@@ -176,6 +177,7 @@ const useCKEditorConfig = ({
             waitingTime: 5000,
           }
         : undefined,
+      alignment: alignmentOptions,
     };
   }, [
     allowComments,

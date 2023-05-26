@@ -277,11 +277,11 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(1);
 
@@ -338,11 +338,11 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(2);
 
@@ -423,11 +423,11 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(2);
 
@@ -550,11 +550,11 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(2);
 
@@ -665,11 +665,11 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(1);
 
@@ -785,11 +785,11 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(2);
 
@@ -916,11 +916,11 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(2);
 
@@ -1051,11 +1051,11 @@ describe('createDataSetCategories', () => {
     });
     const fullTable = mapFullTable(updatedTestTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(1);
 
@@ -1096,11 +1096,11 @@ describe('createDataSetCategories', () => {
     });
     const fullTable = mapFullTable(updatedTestTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(2);
 
@@ -1219,11 +1219,11 @@ describe('createDataSetCategories', () => {
       ],
     });
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(1);
 
@@ -1303,11 +1303,11 @@ describe('createDataSetCategories', () => {
     });
     const fullTable = mapFullTable(updatedTestTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(2);
     expect(dataSetCategories[0].filter.label).toBe('State-funded primary');
@@ -1348,12 +1348,12 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-      true,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+      includeNonNumericData: true,
+    });
 
     expect(dataSetCategories).toHaveLength(2);
 
@@ -1371,7 +1371,7 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
     });
-    expect(dataSet1.value).toBe(null);
+    expect(dataSet1.value).toBe('x');
     expect(dataSet1.dataSet).toEqual<DataSet>({
       indicator: 'authorised-absence-sessions',
       filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
@@ -1442,11 +1442,11 @@ describe('createDataSetCategories', () => {
 
     const fullTable = mapFullTable(testTable);
 
-    const dataSetCategories = createDataSetCategories(
+    const dataSetCategories = createDataSetCategories({
       axisConfiguration,
-      fullTable.results,
-      fullTable.subjectMeta,
-    );
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
 
     expect(dataSetCategories).toHaveLength(1);
 
@@ -1531,11 +1531,11 @@ describe('createDataSetCategories', () => {
 
     test('grouped by time period', () => {
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
-        testOrderedAxisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+      const dataSetCategories = createDataSetCategories({
+        axisConfiguration: testOrderedAxisConfiguration,
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe('2015/16');
@@ -1549,11 +1549,11 @@ describe('createDataSetCategories', () => {
       };
 
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
+      const dataSetCategories = createDataSetCategories({
         axisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.value).toBe('ethnicity-major-chinese');
@@ -1594,11 +1594,11 @@ describe('createDataSetCategories', () => {
       };
 
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
+      const dataSetCategories = createDataSetCategories({
         axisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe(
@@ -1616,11 +1616,11 @@ describe('createDataSetCategories', () => {
       };
 
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
+      const dataSetCategories = createDataSetCategories({
         axisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.value).toBe('barnet');
@@ -1634,11 +1634,11 @@ describe('createDataSetCategories', () => {
         sortAsc: false,
       };
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
+      const dataSetCategories = createDataSetCategories({
         axisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe('State-funded primary');
@@ -1702,11 +1702,11 @@ describe('createDataSetCategories', () => {
       };
 
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
+      const dataSetCategories = createDataSetCategories({
         axisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe('Ethnicity Major Chinese');
@@ -1745,11 +1745,11 @@ describe('createDataSetCategories', () => {
       };
 
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
+      const dataSetCategories = createDataSetCategories({
         axisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe(
@@ -1767,11 +1767,11 @@ describe('createDataSetCategories', () => {
       };
 
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
+      const dataSetCategories = createDataSetCategories({
         axisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe('Barnet');
@@ -1780,11 +1780,11 @@ describe('createDataSetCategories', () => {
 
     test('orders by `order` when grouped by time period', () => {
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
-        testUnorderedAxisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+      const dataSetCategories = createDataSetCategories({
+        axisConfiguration: testUnorderedAxisConfiguration,
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe('2014/15');
@@ -1799,11 +1799,11 @@ describe('createDataSetCategories', () => {
       };
 
       const fullTable = mapFullTable(testTable);
-      const dataSetCategories = createDataSetCategories(
+      const dataSetCategories = createDataSetCategories({
         axisConfiguration,
-        fullTable.results,
-        fullTable.subjectMeta,
-      );
+        data: fullTable.results,
+        meta: fullTable.subjectMeta,
+      });
 
       expect(dataSetCategories).toHaveLength(2);
       expect(dataSetCategories[0].filter.label).toBe('State-funded primary');

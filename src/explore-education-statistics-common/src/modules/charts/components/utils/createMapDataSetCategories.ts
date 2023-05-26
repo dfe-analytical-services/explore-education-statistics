@@ -18,7 +18,12 @@ export default function createMapDataSetCategories(
   data: TableDataResult[],
   meta: FullTableMeta,
 ): MapDataSetCategory[] {
-  return createDataSetCategories(axis, data, meta)
+  return createDataSetCategories({
+    axisConfiguration: axis,
+    data,
+    meta,
+    includeNonNumericData: true,
+  })
     .map(category => {
       return {
         ...category,

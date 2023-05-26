@@ -4,6 +4,7 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import downloadTableOdsFile from '@common/modules/table-tool/components/utils/downloadTableOdsFile';
 import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
+import { Footnote } from '@common/services/types/footnotes';
 import downloadFile from '@common/utils/file/downloadFile';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -18,31 +19,41 @@ interface FormValues {
 
 interface Props {
   fileName: string;
-  fullTable: FullTable;
+  footnotes?: Footnote[];
+  fullTable?: FullTable;
   headingTag?: 'h2' | 'h3' | 'h4';
   headingSize?: 's' | 'm' | 'l';
   tableRef: RefObject<HTMLElement>;
+  tableTitle?: string;
   onCsvDownload: () => Blob | Promise<Blob>;
   onSubmit?: (type: FileFormat) => void;
 }
 
 const DownloadTable = ({
   fileName,
+  footnotes = [],
   fullTable,
   headingTag = 'h3',
   headingSize = 's',
   tableRef,
+  tableTitle = '',
   onCsvDownload,
   onSubmit,
 }: Props) => {
+  const tableFootnotes = fullTable
+    ? fullTable.subjectMeta.footnotes
+    : footnotes;
   const handleCsvDownload = async () => {
     const csv = await onCsvDownload();
     downloadFile(csv, fileName);
   };
 
   const handleOdsDownload = () => {
-    const title = generateTableTitle(fullTable.subjectMeta);
-    downloadTableOdsFile(fileName, fullTable.subjectMeta, tableRef, title);
+    const title = fullTable
+      ? generateTableTitle(fullTable.subjectMeta)
+      : tableTitle;
+
+    downloadTableOdsFile(fileName, tableFootnotes, tableRef, title);
   };
 
   return (

@@ -2,8 +2,9 @@ import Page from '@frontend/components/Page';
 import React from 'react';
 import { allowedCookies } from '@frontend/hooks/useCookies';
 import Link from '@frontend/components/Link';
+import { NextPage } from 'next';
 
-function CookiesPage() {
+const CookiesPage: NextPage = () => {
   return (
     <Page
       title="Details about cookies"
@@ -64,43 +65,37 @@ function CookiesPage() {
         </p>
         <p>We don’t allow Google to use or share our analytics data.</p>
         <p>Google Analytics sets the following cookies:</p>
-        <table className="govuk-table">
-          <thead className="govuk-table__head">
-            <tr className="govuk-table__row">
-              <th className="govuk-table__header" scope="col">
-                Name
-              </th>
-              <th className="govuk-table__header" scope="col">
-                Purpose
-              </th>
-              <th className="govuk-table__header" scope="col">
-                Expires
-              </th>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Purpose</th>
+              <th scope="col">Expires</th>
             </tr>
           </thead>
-          <tbody className="govuk-table__body">
-            <tr className="govuk-table__row">
-              <td className="govuk-table__cell">_ga</td>
-              <td className="govuk-table__cell">
+          <tbody>
+            <tr>
+              <td>_ga</td>
+              <td>
                 This helps us count how many people visit GOV.UK by tracking if
                 you’ve visited before
               </td>
-              <td className="govuk-table__cell">2 years</td>
+              <td>2 years</td>
             </tr>
-            <tr className="govuk-table__row">
-              <td className="govuk-table__cell">_gid</td>
-              <td className="govuk-table__cell">
+            <tr>
+              <td>_gid</td>
+              <td>
                 This helps us count how many people visit GOV.UK by tracking if
                 you’ve visited before
               </td>
-              <td className="govuk-table__cell">24 hours</td>
+              <td>24 hours</td>
             </tr>
-            <tr className="govuk-table__row">
-              <td className="govuk-table__cell">_gat</td>
-              <td className="govuk-table__cell">
+            <tr>
+              <td>_gat</td>
+              <td>
                 Used to manage the rate at which page view requests are made
               </td>
-              <td className="govuk-table__cell">1 minute</td>
+              <td>1 minute</td>
             </tr>
           </tbody>
         </table>
@@ -121,32 +116,32 @@ function CookiesPage() {
           knows not to show it again.
         </p>
 
-        <table className="govuk-table">
-          <thead className="govuk-table__head">
-            <tr className="govuk-table__row">
-              <th className="govuk-table__header" scope="col">
-                Name
-              </th>
-              <th className="govuk-table__header" scope="col">
-                Purpose
-              </th>
-              <th className="govuk-table__header" scope="col">
-                Expires
-              </th>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Purpose</th>
+              <th scope="col">Expires</th>
             </tr>
           </thead>
-          <tbody className="govuk-table__body">
-            <tr className="govuk-table__row">
-              <td className="govuk-table__cell">
-                {allowedCookies.bannerSeen.name}
-              </td>
-              <td className="govuk-table__cell">
+          <tbody>
+            <tr>
+              <td>{allowedCookies.bannerSeen.name}</td>
+              <td>
                 Saves a message to let us know that you’ve seen our cookie
                 message
               </td>
-              <td className="govuk-table__cell">
-                {allowedCookies.bannerSeen.duration}
+              <td>{allowedCookies.bannerSeen.duration}</td>
+            </tr>
+          </tbody>
+          <tbody>
+            <tr>
+              <td>{allowedCookies.userTestingBannerSeen.name}</td>
+              <td>
+                Saves a message to let us know that you’ve seen our user testing
+                invite message
               </td>
+              <td>{allowedCookies.userTestingBannerSeen.duration}</td>
             </tr>
           </tbody>
         </table>
@@ -158,31 +153,20 @@ function CookiesPage() {
           you return to GOV.UK: Explore education statistics.
         </p>
 
-        <table className="govuk-table">
-          <thead className="govuk-table__head">
-            <tr className="govuk-table__row">
-              <th className="govuk-table__header" scope="col">
-                Name
-              </th>
-              <th className="govuk-table__header" scope="col">
-                Purpose
-              </th>
-              <th className="govuk-table__header" scope="col">
-                Expires
-              </th>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Purpose</th>
+              <th scope="col">Expires</th>
             </tr>
           </thead>
-          <tbody className="govuk-table__body">
-            <tr className="govuk-table__row">
-              <td className="govuk-table__cell">
-                {allowedCookies.disableGA.name}
-              </td>
-              <td className="govuk-table__cell">
-                Disables Google Analytics tracking
-              </td>
-              <td className="govuk-table__cell">
-                {allowedCookies.disableGA.duration}
-              </td>
+
+          <tbody>
+            <tr>
+              <td>{allowedCookies.disableGA.name}</td>
+              <td>Disables Google Analytics tracking</td>
+              <td>{allowedCookies.disableGA.duration}</td>
             </tr>
           </tbody>
         </table>
@@ -199,40 +183,30 @@ function CookiesPage() {
         <h3>Microsoft Application Insights</h3>
         <p>Microsoft Application Insights collects telemetry information.</p>
 
-        <table className="govuk-table">
-          <thead className="govuk-table__head">
-            <tr className="govuk-table__row">
-              <th className="govuk-table__header" scope="col">
-                Name
-              </th>
-              <th className="govuk-table__header" scope="col">
-                Purpose
-              </th>
-              <th className="govuk-table__header" scope="col">
-                Expires
-              </th>
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Purpose</th>
+              <th scope="col">Expires</th>
             </tr>
           </thead>
-          <tbody className="govuk-table__body">
-            <tr className="govuk-table__row">
-              <td className="govuk-table__cell">ai_user</td>
-              <td className="govuk-table__cell">
-                Used to identify returning users
-              </td>
-              <td className="govuk-table__cell">1 year</td>
+          <tbody>
+            <tr>
+              <td>ai_user</td>
+              <td>Used to identify returning users</td>
+              <td>1 year</td>
             </tr>
-            <tr className="govuk-table__row">
-              <td className="govuk-table__cell">ai_session</td>
-              <td className="govuk-table__cell">
-                Anonymous session identifer to group a user's activities
-              </td>
-              <td className="govuk-table__cell">15 minutes</td>
+            <tr>
+              <td>ai_session</td>
+              <td>Anonymous session identifer to group a user's activities</td>
+              <td>15 minutes</td>
             </tr>
           </tbody>
         </table>
       </section>
     </Page>
   );
-}
+};
 
 export default CookiesPage;

@@ -25,6 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
             Guid releaseId,
             Stream outputStream,
             IEnumerable<Guid>? fileIds = null,
-            CancellationToken? cancellationToken = null);
+            CancellationToken cancellationToken = default);
     }
 }

@@ -63,11 +63,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             SetupCall(mocks.contentPersistenceHelper, ReleaseId, contentRelease);
 
             mocks.cacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
                 .ReturnsAsync(null);
 
             mocks.cacheService
-                .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
+                .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
                 .Returns(Task.CompletedTask);
 
             mocks.releaseSubjectService
@@ -112,11 +112,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             SetupCall(mocks.contentPersistenceHelper, ReleaseId, contentRelease);
 
             mocks.cacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(SubjectMetaViewModel)))
                 .ReturnsAsync(null);
 
             mocks.cacheService
-                .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
+                .Setup(s => s.SetItemAsync<object>(cacheKey, subjectMetaViewModel))
                 .Returns(Task.CompletedTask);
 
             mocks.releaseSubjectService

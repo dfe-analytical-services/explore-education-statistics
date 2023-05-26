@@ -6,12 +6,10 @@ exports[`FormNumberInput renders correctly with minimal props 1`] = `
 >
   Test input
 </label>
-<div class>
-  <input name="test"
-         class="govuk-input"
-         id="test-input"
-         type="number"
-         value
-  >
-</div>
+<input name="test"
+       class="govuk-input"
+       id="test-input"
+       type="number"
+       value
+>
 `;

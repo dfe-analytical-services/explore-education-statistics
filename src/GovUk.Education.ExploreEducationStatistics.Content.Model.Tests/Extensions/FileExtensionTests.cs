@@ -11,35 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
     public class FileExtensionTests
     {
         [Fact]
-        public void BatchesPath()
-        {
-            var dataFile = new File
-            {
-                Id = Guid.NewGuid(),
-                RootPath = Guid.NewGuid(),
-                Filename = "data.csv",
-                Type = Data
-            };
-
-            Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/", dataFile.BatchesPath());
-        }
-
-        [Fact]
-        public void BatchPath()
-        {
-            var dataFile = new File
-            {
-                Id = Guid.NewGuid(),
-                RootPath = Guid.NewGuid(),
-                Filename = "data.csv",
-                Type = Data
-            };
-
-            Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/{dataFile.Id}_000999",
-                dataFile.BatchPath(999));
-        }
-
-        [Fact]
         public void Path()
         {
             var ancillaryFile = new File
@@ -101,10 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void PublicPath()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
+            var releaseId = Guid.NewGuid();
 
             var ancillaryFile = new File
             {
@@ -138,27 +106,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Type = Image
             };
 
-            Assert.Equal($"{release.Id}/ancillary/{ancillaryFile.Id}",
-                ancillaryFile.PublicPath(release));
+            Assert.Equal($"{releaseId}/ancillary/{ancillaryFile.Id}",
+                ancillaryFile.PublicPath(releaseId: releaseId));
 
-            Assert.Equal($"{release.Id}/chart/{chartFile.Id}",
-                chartFile.PublicPath(release));
+            Assert.Equal($"{releaseId}/chart/{chartFile.Id}",
+                chartFile.PublicPath(releaseId: releaseId));
 
-            Assert.Equal($"{release.Id}/data/{dataFile.Id}",
-                dataFile.PublicPath(release));
+            Assert.Equal($"{releaseId}/data/{dataFile.Id}",
+                dataFile.PublicPath(releaseId: releaseId));
 
-            Assert.Equal($"{release.Id}/image/{imageFile.Id}",
-                imageFile.PublicPath(release));
+            Assert.Equal($"{releaseId}/image/{imageFile.Id}",
+                imageFile.PublicPath(releaseId: releaseId));
         }
 
         [Fact]
         public void PublicPath_FileTypeIsNotAPublicFileType()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
             EnumUtil.GetEnumValues<FileType>().ForEach(type =>
             {
                 if (!PublicFileTypes.Contains(type))
@@ -167,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     {
                         Type = type
                     };
-                    Assert.Throws<ArgumentOutOfRangeException>(() => file.PublicPath(release));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => file.PublicPath(releaseId: Guid.NewGuid()));
                 }
             });
         }
