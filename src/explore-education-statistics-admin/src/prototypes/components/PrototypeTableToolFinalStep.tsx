@@ -7,12 +7,12 @@ import TableHeadersForm from '@admin/prototypes/components/PrototypeTableHeaders
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import publicationService from '@common/services/publicationService';
 import Link from '@admin/components/Link';
 import tableBuilderService, {
   ReleaseTableDataQuery,
-  SelectedPublication,
 } from '@common/services/tableBuilderService';
 import React, { memo, ReactNode, useEffect, useRef, useState } from 'react';
 

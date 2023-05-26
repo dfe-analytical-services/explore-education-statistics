@@ -935,7 +935,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 result.AssertRight();
 
-                stream.Seek(0L, SeekOrigin.Begin);
+                stream.SeekToBeginning();
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -1251,7 +1251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 result.AssertRight();
 
-                stream.Seek(0L, SeekOrigin.Begin);
+                stream.SeekToBeginning();
 
                 Snapshot.Match(stream.ReadToEnd());
             }
@@ -1373,7 +1373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 result.AssertRight();
 
-                stream.Seek(0L, SeekOrigin.Begin);
+                stream.SeekToBeginning();
 
                 Snapshot.Match(stream.ReadToEnd());
             }

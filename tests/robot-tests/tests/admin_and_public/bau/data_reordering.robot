@@ -366,14 +366,14 @@ Select "Test Topic" publication
     user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject
     user clicks radio    ${SUBJECT_NAME}
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    3    Choose locations
-    user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
+    user checks previous table tool step contains    2    Data set    ${SUBJECT_NAME}
 
 Select all provider locations
     user opens details dropdown    Provider

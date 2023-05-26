@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         It.IsAny<Stream>(),
                         It.Is<IEnumerable<Guid>>(
                             ids => ids.SequenceEqual(ListOf(fileId1, fileId2))),
-                        It.IsAny<CancellationToken?>()
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         _release.Id,
                         It.IsAny<Stream>(),
                         null,
-                        It.IsAny<CancellationToken?>()
+                        It.IsAny<CancellationToken>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)

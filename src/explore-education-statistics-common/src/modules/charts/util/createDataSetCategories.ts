@@ -275,6 +275,13 @@ function getSortedDataSetCategoryRange(
     : sortedDataSetCategoriesRange.reverse();
 }
 
+interface Options {
+  axisConfiguration: AxisConfiguration;
+  data: TableDataResult[];
+  meta: FullTableMeta;
+  includeNonNumericData?: boolean;
+}
+
 /**
  * Create chart data that has been categorised by
  * filters, locations, time periods or indicators.
@@ -308,19 +315,19 @@ function getSortedDataSetCategoryRange(
  *
  * 5. Sort and filter out any invalid or empty categories.
  */
-export default function createDataSetCategories(
-  axisConfiguration: AxisConfiguration,
-  results: TableDataResult[],
-  meta: FullTableMeta,
+export default function createDataSetCategories({
+  axisConfiguration,
+  data,
+  meta,
   includeNonNumericData = false,
-): DataSetCategory[] {
+}: Options): DataSetCategory[] {
   const categoryFilters = getCategoryFilters(axisConfiguration, meta);
   const childDataSets = getChildDataSets(axisConfiguration, meta);
   const dedupedChildDataSets = dedupeDataSets(childDataSets);
 
   // Group result measures by data set key first to
   // allow result lookups to be MUCH faster.
-  const measuresByDataSet = groupResultMeasuresByDataSet(results);
+  const measuresByDataSet = groupResultMeasuresByDataSet(data);
 
   const childDataSetsWithValues = dedupedChildDataSets.reduce<
     Pair<ChildDataSet, number>[]
@@ -329,16 +336,10 @@ export default function createDataSetCategories(
     const rawValue = get(measuresByDataSet, getIndicatorPath(dataSet));
     const value = Number(rawValue);
 
-    if (includeNonNumericData && rawValue) {
-      acc.push([childDataSet, Number.isNaN(value) ? null : value] as Pair<
-        ChildDataSet,
-        number
-      >);
-      return acc;
-    }
-
     if (!Number.isNaN(value)) {
-      acc.push([childDataSet, value] as Pair<ChildDataSet, number>);
+      acc.push([childDataSet, value]);
+    } else if (includeNonNumericData && rawValue) {
+      acc.push([childDataSet, rawValue]);
     }
 
     return acc;

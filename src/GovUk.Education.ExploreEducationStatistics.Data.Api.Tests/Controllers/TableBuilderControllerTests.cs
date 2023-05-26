@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     content: new JsonNetContent(ObservationQueryContext),
                     headers: new Dictionary<string, string>
                     {
-                        { HeaderNames.Accept, "text/csv" }
+                        { HeaderNames.Accept, ContentTypes.Csv }
                     }
                 );
 
@@ -237,7 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     content: new JsonNetContent(ObservationQueryContext),
                     headers: new Dictionary<string, string>
                     {
-                        { HeaderNames.Accept, "text/csv" }
+                        { HeaderNames.Accept, ContentTypes.Csv }
                     }
                 );
 
@@ -253,11 +253,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
             BlobCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
             BlobCacheService
-                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
             var dataBlockService = new Mock<IDataBlockService>();
@@ -320,11 +320,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
             BlobCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
             BlobCacheService
-                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
             var dataBlockService = new Mock<IDataBlockService>(Strict);
@@ -363,11 +363,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
             BlobCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
             BlobCacheService
-                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
             var dataBlockService = new Mock<IDataBlockService>(Strict);
@@ -413,11 +413,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
             BlobCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
             BlobCacheService
-                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
             var dataBlockService = new Mock<IDataBlockService>(Strict);
@@ -499,11 +499,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
             BlobCacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .Setup(s => s.GetItemAsync(cacheKey, typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
             BlobCacheService
-                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Setup(s => s.SetItemAsync<object>(cacheKey, _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
             var dataBlockService = new Mock<IDataBlockService>(Strict);

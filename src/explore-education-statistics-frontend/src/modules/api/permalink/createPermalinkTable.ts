@@ -7,25 +7,29 @@ import generateTableTitle from '@common/modules/table-tool/utils/generateTableTi
 import logger from '@common/services/logger';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { TableDataResponse } from '@common/services/tableBuilderService';
 
 interface SuccessBody {
-  table: TableJson;
-  title: string;
+  json: TableJson;
+  caption: string;
 }
 
 /**
  * Endpoint to generate table json and title for permalinks.
- *
- * Expects req.body to be:
- * {
- *  fullTable: TableDataResponse,
- *  configuration: {
- *   tableHeaders: UnmappedTableHeadersConfig
- *  }
- * }
  */
+
+interface Request extends NextApiRequest {
+  body: {
+    fullTable: TableDataResponse;
+    configuration: {
+      tableHeaders: UnmappedTableHeadersConfig;
+    };
+  };
+}
+
 export default async function createPermalinkTable(
-  req: NextApiRequest,
+  req: Request,
   res: NextApiResponse<SuccessBody | ErrorBody>,
 ) {
   const {
@@ -51,10 +55,10 @@ export default async function createPermalinkTable(
       results: fullTable.results,
     });
 
-    const title = generateTableTitle(fullTable.subjectMeta);
+    const caption = generateTableTitle(fullTable.subjectMeta);
 
-    if (tableJson && title) {
-      return res.status(200).send({ table: tableJson, title });
+    if (tableJson && caption) {
+      return res.status(200).send({ json: tableJson, caption });
     }
     return res.status(500).send({ message: 'Cannot build table', status: 500 });
   } catch (error) {

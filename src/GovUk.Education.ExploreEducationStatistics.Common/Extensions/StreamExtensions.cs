@@ -14,9 +14,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             writer.Flush();
         }
 
-        public static string ReadToEnd(this Stream stream)
+        public static byte[] ReadFully(this Stream stream)
         {
-            using var reader = new StreamReader(stream, leaveOpen: true);
+            using var memoryStream = new MemoryStream();
+            stream.CopyTo(memoryStream);
+            return memoryStream.ToArray();
+        }
+
+        public static string ReadToEnd(this Stream stream, bool leaveOpen = false)
+        {
+            using var reader = new StreamReader(stream, leaveOpen);
             return reader.ReadToEnd();
         }
 
@@ -33,6 +40,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return BitConverter.ToString(hash)
                 .Replace("-", string.Empty)
                 .ToLowerInvariant();
+        }
+
+        public static void SeekToBeginning(this Stream stream)
+        {
+            if (stream.CanSeek)
+            {
+                stream.Seek(offset: 0, origin: SeekOrigin.Begin);
+            }
         }
     }
 }

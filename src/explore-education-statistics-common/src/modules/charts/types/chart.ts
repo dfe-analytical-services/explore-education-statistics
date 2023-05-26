@@ -72,11 +72,32 @@ export type AxesConfiguration = {
   [key in AxisType]?: AxisConfiguration;
 };
 
-export type DataClassification = 'EqualIntervals' | 'Quantiles' | 'Custom';
+export const dataGroupingTypes = {
+  EqualIntervals: 'Equal intervals',
+  Quantiles: 'Quantiles',
+  Custom: 'Custom',
+} as const;
+
+export type DataGroupingType = keyof typeof dataGroupingTypes;
 
 export interface CustomDataGroup {
   max: number;
   min: number;
+}
+
+export interface DataGroupingConfig {
+  type: DataGroupingType;
+  numberOfGroups?: number;
+  customGroups: CustomDataGroup[];
+}
+
+export interface MapDataSetConfig {
+  dataSet: DataSet;
+  dataGrouping: DataGroupingConfig;
+}
+
+export interface MapConfig {
+  dataSetConfigs: MapDataSetConfig[];
 }
 
 export interface ChartProps {
@@ -91,6 +112,7 @@ export interface ChartProps {
   legend?: LegendConfiguration;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
+  map?: MapConfig;
 }
 
 export interface StackedBarProps extends ChartProps {
@@ -126,9 +148,8 @@ export interface ChartDefinitionOptions {
   dataLabelPosition?: BarChartDataLabelPosition | LineChartDataLabelPosition;
   // Map options
   boundaryLevel?: number;
-  dataClassification?: DataClassification;
+  dataClassification?: DataGroupingType;
   dataGroups?: number;
-  customDataGroups?: CustomDataGroup[];
 }
 
 export interface ChartDefinition {

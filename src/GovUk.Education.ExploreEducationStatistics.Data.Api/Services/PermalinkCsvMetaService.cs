@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -52,33 +53,115 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         LegacyPermalink permalink,
         CancellationToken cancellationToken = default)
     {
-        var releaseSubject = await _releaseSubjectService
-            .FindForLatestPublishedVersion(subjectId: permalink.Query.SubjectId);
+        // The method of generating the csv is conditional on whether location id's are present in the permalink.
+        // A change made to add location id's to the observations took place first in EES-3203 followed by a change to
+        // add id's to the subject meta locations in EES-2955. These changes happened in Feb/March 2022.
+
+        var observationsHaveLocationIds =
+            permalink.FullTable.Results[0].LocationId !=
+            Guid.Empty; // LocationId is not nullable but it is possible for the value to be missing
+
+        var tableSubjectMetaLocationsHaveIds = LocationAttributeHasLeafNodeWithLocationId(
+            permalink.FullTable.SubjectMeta.LocationsHierarchical.First().Value.First());
+
+        var hasLocationIds = observationsHaveLocationIds && tableSubjectMetaLocationsHaveIds;
+        if (hasLocationIds)
+        {
+            // This method will prefer to use locations looked up from the database by location id because they are
+            // complete in terms of the attributes they contain from the original data set, compared to the locations
+            // hierarchies present in the table subject meta.
+
+            // It has a fallback to use the subject meta locations when they aren't found in the database.
+
+            // Locations are returned here in the csv meta keyed by location id for the purpose of writing the csv
+            // where they will be looked up using the location id's found in each observation.
+            return await GetCsvMeta(permalink.Query.SubjectId,
+                permalink.FullTable.SubjectMeta.AsSubjectResultMetaViewModel(),
+                cancellationToken);
+        }
+
+        // Permalinks without location id's need to be handled with a workaround.
+        // Writing the csv will use the location objects from each of the observations and ignore
+        // the table subject meta locations completely.
+
+        // A benefit to doing this is that we can generate a complete set of location attributes from the original
+        // data set because historically all the location values were encoded into each observation.
+
+        // If we were to use the table subject meta locations we would only get the location attributes that were
+        // relevant to the result.
+
+        // For example, recognising that an observation is for a local authority and pairing it with a local authority
+        // in the table subject meta wouldn't give us any more attributes beyond the local authority,
+        // or at best the local authority and region if generated after the LA-region location hierarchy was introduced.
+        // By using the location object within the observation we will also get the country.
+
+        var tableResultMeta = permalink.FullTable.SubjectMeta;
+        var releaseSubject = await _releaseSubjectService.FindForLatestPublishedVersion(permalink.Query.SubjectId);
 
         var csvStream = releaseSubject is not null
             ? await GetCsvStream(releaseSubject, cancellationToken)
             : null;
 
-        var subjectMeta = permalink.FullTable.SubjectMeta;
+        var locationCols = GetLocationsColumns(permalink.FullTable.Results);
 
-        var locations = await GetLocations(subjectMeta.LocationsHierarchical);
-
-        var filters = subjectMeta.Filters.Values.ToDictionary(
+        var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
             filter => filter.Name,
             filter => new FilterCsvMetaViewModel(filter)
         );
-        var indicators = subjectMeta.Indicators.ToDictionary(
+
+        var csvIndicators = tableResultMeta.Indicators.ToDictionary(
             indicator => indicator.Name,
             indicator => new IndicatorCsvMetaViewModel(indicator)
         );
 
-        var headers = await ListCsvHeaders(csvStream, filters, indicators, locations);
+        // Prefer using the data file stream over the observations locations to generate the headers
+        var headers = csvStream is not null
+            ? await ListCsvHeaders(csvStream, csvFilters, csvIndicators)
+            : ListCsvHeaders(csvFilters, csvIndicators, locationCols);
+
+        return new PermalinkCsvMetaViewModel
+        {
+            Filters = csvFilters,
+            Indicators = csvIndicators,
+            Headers = headers
+            // Locations are ignored here because they will be converted from each observation when writing the csv
+        };
+    }
+
+    public async Task<Either<ActionResult, PermalinkCsvMetaViewModel>> GetCsvMeta(
+        Guid subjectId,
+        SubjectResultMetaViewModel tableResultMeta,
+        CancellationToken cancellationToken = default)
+    {
+        var releaseSubject = await _releaseSubjectService
+            .FindForLatestPublishedVersion(subjectId: subjectId);
+
+        var csvStream = releaseSubject is not null
+            ? await GetCsvStream(releaseSubject, cancellationToken)
+            : null;
+
+        var locations = await GetLocations(tableResultMeta.Locations);
+
+        var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
+            filter => filter.Name,
+            filter => new FilterCsvMetaViewModel(filter)
+        );
+
+        var csvIndicators = tableResultMeta.Indicators.ToDictionary(
+            indicator => indicator.Name,
+            indicator => new IndicatorCsvMetaViewModel(indicator)
+        );
+
+        // Prefer using the data file stream over the table meta locations to generate the headers
+        var headers = csvStream is not null
+            ? await ListCsvHeaders(csvStream, csvFilters, csvIndicators)
+            : ListCsvHeaders(csvFilters, csvIndicators, locations);
 
         return new PermalinkCsvMetaViewModel
         {
             Locations = locations,
-            Filters = filters,
-            Indicators = indicators,
+            Filters = csvFilters,
+            Indicators = csvIndicators,
             Headers = headers
         };
     }
@@ -112,8 +195,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         }
     }
 
-    private static async Task<List<string>> ListCsvHeaders(
-        Stream? csvStream,
+    private static List<string> ListCsvHeaders(
         IDictionary<string, FilterCsvMetaViewModel> filters,
         IDictionary<string, IndicatorCsvMetaViewModel> indicators,
         IDictionary<Guid, Dictionary<string, string>> locations)
@@ -125,31 +207,62 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
             "geographic_level"
         };
 
-        if (csvStream is null)
+        var allLocationCols = LocationCsvUtils.AllCsvColumns();
+
+        // Strip out any location columns that may be completely empty.
+        var locationCols = locations
+            .SelectMany(location => location.Value)
+            .Where(attribute => !attribute.Value.IsNullOrEmpty())
+            .Select(attribute => attribute.Key)
+            .ToHashSet();
+
+        filteredHeaders.AddRange(allLocationCols.Where(locationCols.Contains));
+        filteredHeaders.AddRange(filters.Keys);
+        filteredHeaders.AddRange(indicators.Keys);
+
+        return filteredHeaders;
+    }
+
+    private static async Task<List<string>> ListCsvHeaders(
+        Stream csvStream,
+        IDictionary<string, FilterCsvMetaViewModel> filters,
+        IDictionary<string, IndicatorCsvMetaViewModel> indicators)
+    {
+        var filteredHeaders = new List<string>
         {
-            var allLocationCols = LocationCsvUtils.AllCsvColumns();
+            "time_period",
+            "time_identifier",
+            "geographic_level"
+        };
 
-            // Strip out any location columns that may be completely empty.
-            var locationCols = locations
-                .SelectMany(location => location.Value)
-                .Where(attribute => !attribute.Value.IsNullOrEmpty())
-                .Select(attribute => attribute.Key)
-                .ToHashSet();
+        var headers = await CsvUtils.GetCsvHeaders(csvStream);
 
-            filteredHeaders.AddRange(allLocationCols.Where(locationCols.Contains));
-            filteredHeaders.AddRange(filters.Keys);
-            filteredHeaders.AddRange(indicators.Keys);
-        }
-        else
+        var locationCols = LocationCsvUtils.AllCsvColumns().ToHashSet();
+
+        filteredHeaders.AddRange(headers.Where(locationCols.Contains));
+        filteredHeaders.AddRange(headers.Where(filters.ContainsKey));
+        filteredHeaders.AddRange(headers.Where(indicators.ContainsKey));
+
+        return filteredHeaders;
+    }
+
+    private static List<string> ListCsvHeaders(
+        IDictionary<string, FilterCsvMetaViewModel> filters,
+        IDictionary<string, IndicatorCsvMetaViewModel> indicators,
+        IReadOnlySet<string> locationCols)
+    {
+        var filteredHeaders = new List<string>
         {
-            var headers = await CsvUtils.GetCsvHeaders(csvStream);
+            "time_period",
+            "time_identifier",
+            "geographic_level"
+        };
 
-            var locationCols = LocationCsvUtils.AllCsvColumns().ToHashSet();
+        var allLocationCols = LocationCsvUtils.AllCsvColumns();
 
-            filteredHeaders.AddRange(headers.Where(locationCols.Contains));
-            filteredHeaders.AddRange(headers.Where(filters.ContainsKey));
-            filteredHeaders.AddRange(headers.Where(indicators.ContainsKey));
-        }
+        filteredHeaders.AddRange(allLocationCols.Where(locationCols.Contains));
+        filteredHeaders.AddRange(filters.Keys);
+        filteredHeaders.AddRange(indicators.Keys);
 
         return filteredHeaders;
     }
@@ -189,6 +302,28 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
                         .SelectMany(node => ParseLocationAttribute(node).CsvValues)
                         .ToDictionary(colValue => colValue.Key, colValue => colValue.Value)
             );
+    }
+
+    private static IReadOnlySet<string> GetLocationsColumns(List<ObservationViewModel> observations)
+    {
+        return observations
+            .Select(observation =>
+            {
+                // We've gone down this path because we detected the permalink has no location id's.
+                // Instead of a location id we expect there to be a location object.
+                // This existed historically before the location id's was added to ObservationViewModel.
+                if (observation.Location == null)
+                {
+                    throw new InvalidOperationException("Observation has no location");
+                }
+
+                return observation.Location;
+            })
+            .Distinct()
+            .SelectMany(locationViewModel => locationViewModel.GetCsvValues())
+            .Where(pair => !pair.Value.IsNullOrEmpty())
+            .Select(pair => pair.Key)
+            .ToHashSet();
     }
 
     private static List<LocationAttributePath> GetLocationAttributePaths(
@@ -267,6 +402,18 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
                 new Ward(viewModel.Value, viewModel.Label),
             _ => throw new ArgumentOutOfRangeException()
         };
+    }
+
+    private static bool LocationAttributeHasLeafNodeWithLocationId(LocationAttributeViewModel attribute)
+    {
+        if (attribute.Options is null)
+        {
+            // This is a leaf node
+            return attribute.Id.HasValue;
+        }
+
+        // Check the first child node recursively until we find a leaf node
+        return LocationAttributeHasLeafNodeWithLocationId(attribute.Options[0]);
     }
 
     private record LocationAttributePath(Guid Id, IList<LocationAttributeViewModel> Path);

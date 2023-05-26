@@ -9,6 +9,7 @@ using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -58,6 +59,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
+        public async Task DownloadBlobText()
+        {
+            var createdOn = DateTimeOffset.UtcNow;
+
+            var blobClient = MockBlobClient(
+                name: "path/to/test.pdf",
+                createdOn: createdOn,
+                contentLength: 10 * 1024,
+                contentType: "application/pdf",
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadContentAsync(content: "Test content");
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            var result = await service.DownloadBlobText(
+                containerName: PublicReleaseFiles,
+                path: "path/to/test.pdf");
+
+            result.AssertRight("Test content");
+        }
+
+        [Fact]
+        public async Task DownloadBlobText_NotFound()
+        {
+            var createdOn = DateTimeOffset.UtcNow;
+
+            var blobClient = MockBlobClient(
+                name: "path/to/test.pdf",
+                createdOn: createdOn,
+                contentLength: 10 * 1024,
+                contentType: "application/pdf",
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadContentAsyncNotFound();
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            var result = await service.DownloadBlobText(
+                containerName: PublicReleaseFiles,
+                path: "path/to/test.pdf");
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
         public async Task GetBlob()
         {
             var createdOn = DateTimeOffset.UtcNow;
@@ -98,15 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 metadata: new Dictionary<string, string>()
             );
 
-            var json = @"{ ""Value"": ""test-value"" }";
-
-            var response = new Mock<Response<BlobDownloadResult>>(Strict);
-
-            response.SetupGet(r => r.Value)
-                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
-
-            blobClient.Setup(s => s.DownloadContentAsync(default))
-                .ReturnsAsync(response.Object);
+            blobClient.SetupDownloadContentAsync(content: @"{ ""Value"": ""test-value"" }");
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -115,9 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var result = await service.GetDeserializedJson<TestClass>(PublicReleaseFiles, "path/to/test.pdf");
 
-            var expected = new TestClass("test-value");
-
-            Assert.Equal(expected, result);
+            result.AssertRight(new TestClass("test-value"));
         }
 
         [Fact]
@@ -133,15 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 metadata: new Dictionary<string, string>()
             );
 
-            var json = @"{ ""Value"": ""test-value"" }";
-
-            var response = new Mock<Response<BlobDownloadResult>>(Strict);
-
-            response.SetupGet(r => r.Value)
-                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
-
-            blobClient.Setup(s => s.DownloadContentAsync(default))
-                .ReturnsAsync(response.Object);
+            blobClient.SetupDownloadContentAsync(content: @"{ ""Value"": ""test-value"" }");
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -150,10 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var result = await service.GetDeserializedJson(PublicReleaseFiles, "path/to/test.pdf", typeof(TestClass));
 
-            var typedResult = Assert.IsType<TestClass>(result);
-            var expected = new TestClass("test-value");
-
-            Assert.Equal(expected, typedResult);
+            result.AssertRight(new TestClass("test-value"));
         }
 
         [Fact]
@@ -169,15 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 metadata: new Dictionary<string, string>()
             );
 
-            var json = "null";
-
-            var response = new Mock<Response<BlobDownloadResult>>(Strict);
-
-            response.SetupGet(r => r.Value)
-                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
-
-            blobClient.Setup(s => s.DownloadContentAsync(default))
-                .ReturnsAsync(response.Object);
+            blobClient.SetupDownloadContentAsync(content: "null");
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
@@ -186,7 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var result = await service.GetDeserializedJson<object>(PublicReleaseFiles, "path/to/test.pdf");
 
-            Assert.Null(result);
+            result.AssertRight(expected: null);
         }
 
         [Fact]
@@ -203,14 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 metadata: new Dictionary<string, string>()
             );
 
-
-            var response = new Mock<Response<BlobDownloadResult>>(Strict);
-
-            response.SetupGet(r => r.Value)
-                .Returns(BlobDownloadResult(BinaryData.FromString("")));
-
-            blobClient.Setup(s => s.DownloadContentAsync(default))
-                .ReturnsAsync(response.Object);
+            blobClient.SetupDownloadContentAsync(content: "");
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);

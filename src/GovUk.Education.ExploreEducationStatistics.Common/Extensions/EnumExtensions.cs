@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {

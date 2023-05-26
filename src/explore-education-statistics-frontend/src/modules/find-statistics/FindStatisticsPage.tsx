@@ -190,7 +190,7 @@ const FindStatisticsPage: NextPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-one-third">
           <SearchForm
-            searchTerm={search}
+            value={search}
             onSubmit={nextValue =>
               handleChangeFilter({ filterType: 'search', nextValue })
             }

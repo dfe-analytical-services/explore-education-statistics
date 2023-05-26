@@ -49,7 +49,7 @@ describe('permalink api route', () => {
     expect(res.statusCode).toBe(500);
   });
 
-  test('returns the table json and title when a valid request is sent', async () => {
+  test('returns the table json and caption when a valid request is sent', async () => {
     const { req, res } = createApiMocks({
       method: 'POST',
       body: {
@@ -210,8 +210,8 @@ describe('permalink api route', () => {
     expect(res.statusCode).toBe(200);
     // eslint-disable-next-line no-underscore-dangle
     expect(res._getData()).toEqual({
-      table: expectedTable,
-      title:
+      json: expectedTable,
+      caption:
         "Number of fixed period exclusions for 'Duration of fixed exclusions' in England for 2006/07",
     });
   });

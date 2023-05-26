@@ -15,11 +15,9 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import {
-  SelectedPublication,
-  Subject,
-  SubjectMeta,
-} from '@common/services/tableBuilderService';
+import styles from '@common/modules/table-tool/components/FiltersForm.module.scss';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
+import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 import {
@@ -190,6 +188,10 @@ const FiltersForm = ({
     [subjectMeta.filters],
   );
 
+  const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
+    filter => filter.totalValue,
+  );
+
   return (
     <FormProvider
       enableReinitialize
@@ -240,9 +242,20 @@ const FiltersForm = ({
                     <FormFieldset
                       error={getError('filters')}
                       hint={
-                        <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap">
-                          <span className="govuk-!-margin-bottom-2">
-                            Select at least one option from all categories
+                        <div className="dfe-flex dfe-justify-content--space-between dfe-flex-wrap dfe-align-items-start">
+                          <span
+                            className={`govuk-!-margin-bottom-2 ${styles.hintText}`}
+                          >
+                            {`Select at least one option from all categories.
+                            ${
+                              filtersIncludeTotal
+                                ? ` If no options are selected from a category then
+                                a 'Total' option may be selected automatically
+                                when creating a table. Where present, the
+                                'Total' option is usually an aggregate of all
+                                other options within a category.`
+                                : ''
+                            }`}
                           </span>
                           {orderedFilters.length > 1 && (
                             <ButtonText

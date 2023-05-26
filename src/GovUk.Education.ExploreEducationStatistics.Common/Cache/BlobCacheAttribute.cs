@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             Services.Clear();
         }
 
-        public override async Task<object?> Get(ICacheKey cacheKey, Type returnType)
+        public override object? Get(ICacheKey cacheKey, Type returnType)
         {
             if (cacheKey is IBlobCacheKey key)
             {
@@ -50,13 +50,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                     return null;
                 }
 
-                return await service.GetItem(key, returnType);
+                return service.GetItem(key, returnType);
             }
 
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
-        public override async Task Set(ICacheKey cacheKey, object value)
+        public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
+        {
+            if (cacheKey is IBlobCacheKey key)
+            {
+                var service = GetService();
+
+                if (service is null)
+                {
+                    return null;
+                }
+
+                return await service.GetItemAsync(key, returnType);
+            }
+
+            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+        }
+
+        public override void Set(ICacheKey cacheKey, object value)
         {
             if (cacheKey is IBlobCacheKey key)
             {
@@ -67,7 +84,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                     return;
                 }
 
-                await service.SetItem(key, value);
+                service.SetItem(key, value);
+
+                return;
+            }
+
+            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+        }
+
+        public override async Task SetAsync(ICacheKey cacheKey, object value)
+        {
+            if (cacheKey is IBlobCacheKey key)
+            {
+                var service = GetService();
+
+                if (service is null)
+                {
+                    return;
+                }
+
+                await service.SetItemAsync(key, value);
 
                 return;
             }

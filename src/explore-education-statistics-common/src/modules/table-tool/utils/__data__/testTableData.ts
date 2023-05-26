@@ -7,44 +7,68 @@ import {
 import { FullTable } from '../../types/fullTable';
 import { TableHeadersConfig } from '../../types/tableHeaders';
 
-const category1Filter1 = new CategoryFilter({
+const category1GroupTotalFilter1 = new CategoryFilter({
   value: 'category-1-filter-1',
   label: 'Total',
   group: 'Total',
   isTotal: true,
-  category: 'Category1',
+  category: 'Category 1',
 });
 
-const category1Filter2 = new CategoryFilter({
+const category1Group1Filter2 = new CategoryFilter({
   value: 'category-1-filter-2',
   label: 'Category 1 Filter 2',
   group: 'Group 1',
   isTotal: false,
-  category: 'Category1',
+  category: 'Category 1',
 });
 
-const category1Filter3 = new CategoryFilter({
+const category1Group1Filter3 = new CategoryFilter({
   value: 'category-1-filter-3',
   label: 'Category 1 Filter 3',
   group: 'Group 1',
   isTotal: false,
-  category: 'Category1',
+  category: 'Category 1',
 });
 
-const category2Filter1 = new CategoryFilter({
+const category1Group2Filter4 = new CategoryFilter({
+  value: 'category-1-filter-4',
+  label: 'Category 1 Filter 4',
+  group: 'Group 2',
+  isTotal: false,
+  category: 'Category 1',
+});
+
+const category2GroupDefaultFilter1 = new CategoryFilter({
   value: 'category-2-filter-1',
   label: 'Category 2 Filter 1',
   group: 'Default',
   isTotal: false,
-  category: 'Category2',
+  category: 'Category 2',
 });
 
-const category2Filter2 = new CategoryFilter({
+const category2GroupDefaultFilter2 = new CategoryFilter({
   value: 'category-2-filter-2',
   label: 'Category 2 Filter 2',
   group: 'Default',
   isTotal: false,
-  category: 'Category2',
+  category: 'Category 2',
+});
+
+const category3Group1Filter1 = new CategoryFilter({
+  value: 'category-3-filter-1',
+  label: 'Category 3 Filter 1',
+  group: 'Group 1',
+  isTotal: false,
+  category: 'Category 3',
+});
+
+const category3Group2Filter2 = new CategoryFilter({
+  value: 'category-3-filter-2',
+  label: 'Category 3 Filter 2',
+  group: 'Group 2',
+  isTotal: false,
+  category: 'Category 3',
 });
 
 const indicator1 = new Indicator({
@@ -103,6 +127,7 @@ const timePeriod2 = new TimePeriodFilter({
   order: 1,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const timePeriod3 = new TimePeriodFilter({
   label: '2014/15',
   year: 2014,
@@ -127,12 +152,12 @@ const testSubjectMeta1: FullTable['subjectMeta'] = {
   filters: {
     Category1: {
       name: 'category_1',
-      options: [category1Filter1],
+      options: [category1GroupTotalFilter1],
       order: 0,
     },
     Category2: {
       name: 'category_1',
-      options: [category2Filter1, category2Filter2],
+      options: [category2GroupDefaultFilter1, category2GroupDefaultFilter2],
       order: 1,
     },
   },
@@ -145,7 +170,7 @@ export const testTableWithOneLevelOfRowAndColHeaders: FullTable = {
   subjectMeta: testSubjectMeta1,
   results: [
     {
-      filters: [category2Filter1.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter1.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -154,7 +179,7 @@ export const testTableWithOneLevelOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter1.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -187,7 +212,7 @@ export const testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig: TableHead
   rowGroups: [[indicator1]],
 };
 
-export const testTableWithOneLevelOfRowsAndTwoLevelsofColHeadersConfig: TableHeadersConfig = {
+export const testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig: TableHeadersConfig = {
   columns: [location1, location2],
   columnGroups: [[timePeriod1]],
   rows: [indicator1],
@@ -198,7 +223,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
   subjectMeta: testSubjectMeta1,
   results: [
     {
-      filters: [category2Filter1.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter1.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -208,7 +233,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter2.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -218,7 +243,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter2.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -228,7 +253,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter1.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -238,7 +263,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter2.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -248,7 +273,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter2.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -258,7 +283,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter1.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -268,7 +293,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter1.id],
+      filters: [category2GroupDefaultFilter1.id, category1GroupTotalFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -282,7 +307,7 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
 
 export const testTableWithTwoLevelsOfRowAndColHeadersConfig: TableHeadersConfig = {
   columnGroups: [[location1, location2]],
-  rowGroups: [[category2Filter1, category2Filter2]],
+  rowGroups: [[category2GroupDefaultFilter1, category2GroupDefaultFilter2]],
   columns: [timePeriod1, timePeriod2],
   rows: [indicator1, indicator2],
 };
@@ -293,12 +318,12 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
     filters: {
       Category1: {
         name: 'category_1',
-        options: [category1Filter2, category1Filter3],
+        options: [category1Group1Filter2, category1Group1Filter3],
         order: 0,
       },
       Category2: {
         name: 'category_2',
-        options: [category2Filter1, category2Filter2],
+        options: [category2GroupDefaultFilter1, category2GroupDefaultFilter2],
         order: 1,
       },
     },
@@ -308,7 +333,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
   },
   results: [
     {
-      filters: [category2Filter2.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter2.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -318,7 +343,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter1.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location3.value,
       measures: {
@@ -328,7 +353,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter1.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -338,7 +363,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter2.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -348,7 +373,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter2.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter2.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -358,7 +383,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter2.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter2.id],
       geographicLevel: 'localAuthority',
       locationId: location4.value,
       measures: {
@@ -368,7 +393,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter2.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location4.value,
       measures: {
@@ -378,7 +403,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter2.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter2.id],
       geographicLevel: 'localAuthority',
       locationId: location3.value,
       measures: {
@@ -388,7 +413,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter2.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -398,7 +423,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter1.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location3.value,
       measures: {
@@ -408,7 +433,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter1.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -418,7 +443,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter2.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter2.id],
       geographicLevel: 'localAuthority',
       locationId: location3.value,
       measures: {
@@ -428,7 +453,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter1.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -438,7 +463,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter1.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -448,7 +473,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter2.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter2.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -458,7 +483,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter1.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location3.value,
       measures: {
@@ -468,7 +493,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter1.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location4.value,
       measures: {
@@ -478,7 +503,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter1.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -488,7 +513,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter2.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter2.id],
       geographicLevel: 'localAuthority',
       locationId: location4.value,
       measures: {
@@ -498,7 +523,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter2.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter2.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -508,7 +533,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter2.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location4.value,
       measures: {
@@ -518,7 +543,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter1.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location4.value,
       measures: {
@@ -528,7 +553,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter2.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -538,7 +563,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter1.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -548,7 +573,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter2.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter2.id],
       geographicLevel: 'localAuthority',
       locationId: location1.value,
       measures: {
@@ -558,7 +583,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter1.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location4.value,
       measures: {
@@ -568,7 +593,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter1.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location3.value,
       measures: {
@@ -578,7 +603,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter1.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter1.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -588,7 +613,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter1.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location4.value,
       measures: {
@@ -598,7 +623,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter2.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location3.value,
       measures: {
@@ -608,7 +633,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod2.id,
     },
     {
-      filters: [category2Filter2.id, category1Filter2.id],
+      filters: [category2GroupDefaultFilter2.id, category1Group1Filter2.id],
       geographicLevel: 'localAuthority',
       locationId: location3.value,
       measures: {
@@ -618,7 +643,7 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
       timePeriod: timePeriod1.id,
     },
     {
-      filters: [category1Filter3.id, category2Filter1.id],
+      filters: [category1Group1Filter3.id, category2GroupDefaultFilter1.id],
       geographicLevel: 'localAuthority',
       locationId: location2.value,
       measures: {
@@ -633,9 +658,114 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
 export const testTableWithThreeLevelsOfRowAndColHeadersConfig: TableHeadersConfig = {
   columns: [timePeriod1, timePeriod2],
   columnGroups: [
-    [category2Filter1, category2Filter2],
-    [category1Filter2, category1Filter3],
+    [category2GroupDefaultFilter1, category2GroupDefaultFilter2],
+    [category1Group1Filter2, category1Group1Filter3],
   ],
   rows: [indicator1, indicator2],
   rowGroups: [[location1, location2, location3, location4]],
+};
+
+export const testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabels: FullTable = {
+  subjectMeta: {
+    ...initialTableSubjectMeta,
+    filters: {
+      Category1: {
+        name: 'category_1',
+        options: [category1Group1Filter2, category1Group2Filter4],
+        order: 0,
+      },
+      Category3: {
+        name: 'category_3',
+        options: [category3Group1Filter1, category3Group2Filter2],
+        order: 1,
+      },
+    },
+    indicators: [indicator1],
+    locations: [location1],
+    timePeriodRange: [timePeriod1, timePeriod2],
+  },
+  results: [
+    {
+      filters: [category1Group1Filter2.id, category3Group1Filter1.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '20',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group1Filter2.id, category3Group1Filter1.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '7163',
+      },
+      timePeriod: timePeriod2.id,
+    },
+    {
+      filters: [category1Group1Filter2.id, category3Group2Filter2.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '44',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group1Filter2.id, category3Group2Filter2.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '32',
+      },
+      timePeriod: timePeriod2.id,
+    },
+    {
+      filters: [category1Group2Filter4.id, category3Group1Filter1.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '767',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group2Filter4.id, category3Group1Filter1.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '19340',
+      },
+      timePeriod: timePeriod2.id,
+    },
+    {
+      filters: [category1Group2Filter4.id, category3Group2Filter2.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '331',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group2Filter4.id, category3Group2Filter2.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '2458',
+      },
+      timePeriod: timePeriod2.id,
+    },
+  ],
+};
+
+export const testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabelsConfig: TableHeadersConfig = {
+  columnGroups: [
+    [category3Group1Filter1, category3Group2Filter2],
+    [category1Group1Filter2, category1Group2Filter4],
+  ],
+  columns: [timePeriod1, timePeriod2],
+  rowGroups: [[location1]],
+  rows: [indicator1],
 };

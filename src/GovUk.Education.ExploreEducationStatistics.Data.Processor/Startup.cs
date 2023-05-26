@@ -1,6 +1,5 @@
 ﻿using System;
 using Azure.Storage.Blobs;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -49,12 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         new StorageInstanceCreationUtil()))
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<IImporterService, ImporterService>()
-                .AddTransient<ISplitFileService, SplitFileService>()
-                .AddTransient<ImporterFilterService>()
                 .AddTransient<ImporterLocationService>()
                 .AddTransient<IImporterMetaService, ImporterMetaService>()
-                .AddTransient<ImporterFilterCache>()
-                .AddTransient<IBatchService, BatchService>()
                 .AddTransient<IDataImportService, DataImportService>()
                 .AddTransient<IValidatorService, ValidatorService>()
                 .AddSingleton<IDataArchiveService, DataArchiveService>()
@@ -71,7 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
         private static void HandleRestart(IServiceProvider serviceProvider)
         {
             var storageQueueService = serviceProvider.GetRequiredService<IStorageQueueService>();
-            storageQueueService.Clear(ImportsAvailableQueue).Wait();
             storageQueueService.Clear(ImportsPendingQueue).Wait();
             storageQueueService.Clear(RestartImportsQueue).Wait();
 

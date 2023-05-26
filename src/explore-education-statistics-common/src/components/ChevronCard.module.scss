@@ -2,17 +2,12 @@
 
 .card {
   border-top: 1px solid $govuk-border-colour;
-  margin: 0 govuk-spacing(3);
-  padding: govuk-spacing(1) 0 govuk-spacing(4) 0;
-
-  @include govuk-media-query($from: tablet) {
-    width: calc(50% - #{govuk-spacing(6)});
-  }
-}
-
-.wrapper {
-  padding: govuk-spacing(2) govuk-spacing(6) govuk-spacing(2) 0;
+  padding: govuk-spacing(3) govuk-spacing(6) govuk-spacing(6) 0;
   position: relative;
+
+  &.noBorder {
+    border-top: 0;
+  }
 }
 
 .link {
@@ -37,8 +32,8 @@
     display: block;
     height: 7px;
     position: absolute;
-    right: 5px;
-    top: 15px;
+    right: govuk-spacing(1);
+    top: govuk-spacing(5);
     transform: translateY(0) rotate(45deg) scale(1);
     width: 7px;
   }

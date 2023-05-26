@@ -1,4 +1,5 @@
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { Footnote } from '@common/services/types/footnotes';
 import { Dictionary } from '@common/types';
 import last from 'lodash/last';
 import sum from 'lodash/sum';
@@ -134,12 +135,10 @@ export function appendFootnotes(
 
 export default function downloadTableOdsFile(
   fileName: string,
-  subjectMeta: FullTableMeta,
+  footnotes: Footnote[],
   tableRef: RefObject<HTMLElement>,
   title: string,
 ): void {
-  const { footnotes } = subjectMeta;
-
   let tableEl: HTMLTableElement | null = null;
 
   if (tableRef.current) {

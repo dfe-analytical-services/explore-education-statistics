@@ -91,7 +91,7 @@ const ReleaseDataAndFiles = ({
               <ChevronCard
                 description="Download all data available in this release as a compressed ZIP file"
                 link={renderAllFilesLink}
-                showChevron={false}
+                noChevron
               />
             )}
           </>

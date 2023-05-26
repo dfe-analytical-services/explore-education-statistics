@@ -6,7 +6,11 @@ describe('generateLegendDataGroups', () => {
   test('returns an empty array when there are no values', () => {
     const dataClasses = generateLegendDataGroups({
       colour: 'rgba(0, 0, 0, 1)',
-      groups: 5,
+      dataGrouping: {
+        customGroups: [],
+        numberOfGroups: 5,
+        type: 'EqualIntervals',
+      },
       values: [],
     });
 
@@ -16,7 +20,11 @@ describe('generateLegendDataGroups', () => {
   test('returns group min/max values with custom `unit` option', () => {
     const dataClasses = generateLegendDataGroups({
       colour: 'rgba(0, 0, 0, 1)',
-      groups: 1,
+      dataGrouping: {
+        customGroups: [],
+        numberOfGroups: 1,
+        type: 'EqualIntervals',
+      },
       values: [1, 2],
       unit: '£',
     });
@@ -37,7 +45,11 @@ describe('generateLegendDataGroups', () => {
     const dataClasses = generateLegendDataGroups({
       colour: 'rgba(0, 0, 0, 1)',
       decimalPlaces: 3,
-      groups: 1,
+      dataGrouping: {
+        customGroups: [],
+        numberOfGroups: 1,
+        type: 'EqualIntervals',
+      },
       values: [1.0111, 2.38911],
     });
 
@@ -57,10 +69,13 @@ describe('generateLegendDataGroups', () => {
     test('creates 1 group when min/max are the same', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        // Doesn't matter how many groups are specified,
-        // will still only generate one group.
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          // Doesn't matter how many groups are specified,
+          // will still only generate one group.
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
         values: [1, 1],
       });
 
@@ -79,8 +94,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 1 group where min/max values do not exceed 2 d.p implicitly', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 1,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 1,
+          type: 'EqualIntervals',
+        },
         values: [1.0111, 2.38911],
       });
 
@@ -99,8 +117,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with equally sized integer ranges using integer values', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'EqualIntervals',
+        },
         values: [1, 4],
       });
 
@@ -127,8 +148,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with unequally sized integer ranges using integer values', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'EqualIntervals',
+        },
         values: [1, 5],
       });
 
@@ -160,8 +184,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with equally sized non-integer ranges using non-integer values', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'EqualIntervals',
+        },
         values: [2.2, 6.6],
       });
 
@@ -188,8 +215,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with equally sized non-integer ranges with 2 d.p when using non-integer values with 1 d.p and a range of 0.1', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'EqualIntervals',
+        },
         values: [3.2, 3.3],
       });
 
@@ -216,8 +246,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with equally sized integer ranges using integer values', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'EqualIntervals',
+        },
         values: [1, 3, 6],
       });
 
@@ -252,8 +285,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with unequally sized integer ranges using integer values', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'EqualIntervals',
+        },
         values: [1, 3, 5],
       });
 
@@ -288,8 +324,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with equally sized non-integer ranges using non-integer values with 1 d.p', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'EqualIntervals',
+        },
         values: [2.5, 5.1, 10],
       });
 
@@ -324,8 +363,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with equally sized non-integer ranges using non-integer values with 2 d.p', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'EqualIntervals',
+        },
         values: [3.33, 9.99, 13.32],
       });
 
@@ -360,8 +402,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with equally sized integer ranges using integer values', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
         values: [5, 1, 10],
       });
 
@@ -412,8 +457,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with unequally sized integer ranges using integer values', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
         values: [5, 1, 9],
       });
 
@@ -464,8 +512,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with equally sized non-integer ranges using non-integer values with 1 d.p', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
         values: [2.5, 10.3, 12.5],
       });
 
@@ -516,8 +567,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with equally sized non-integer ranges using non-integer values with 2 d.p', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'EqualIntervals',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'EqualIntervals',
+        },
         values: [2.45, 10.32, 25.45],
       });
 
@@ -570,10 +624,13 @@ describe('generateLegendDataGroups', () => {
     test('creates 1 group when min/max are the same', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        // Doesn't matter how many groups are specified,
-        // will still only generate one group.
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          // Doesn't matter how many groups are specified,
+          // will still only generate one group.
+          numberOfGroups: 5,
+          type: 'Quantiles',
+        },
         values: [1, 1],
       });
 
@@ -592,8 +649,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 1 group where min/max values do not exceed 2 d.p implicitly', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 1,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 1,
+          type: 'Quantiles',
+        },
         values: [1.0111, 2.38911],
       });
 
@@ -612,8 +672,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with integer ranges using integer values with even distribution and odd range', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'Quantiles',
+        },
         values: [1, 4],
       });
 
@@ -640,8 +703,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with integer ranges using integer values with even distribution and even range', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'Quantiles',
+        },
         values: [1, 5],
       });
 
@@ -668,8 +734,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with non-integer ranges using non-integer values with even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'Quantiles',
+        },
         values: [2.2, 6.6],
       });
 
@@ -696,8 +765,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with integer ranges using integer values with uneven distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'Quantiles',
+        },
         values: [1, 2, 3, 3, 8, 10],
       });
 
@@ -724,8 +796,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with non-integer ranges using non-integer values with uneven distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'Quantiles',
+        },
         values: [2.2, 3.3, 3.3, 6.6],
       });
 
@@ -752,8 +827,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 2 groups with non-integer ranges with 2 d.p using non-integer values with 1 d.p and a range of 0.1', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 2,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 2,
+          type: 'Quantiles',
+        },
         values: [2.2, 2.3],
       });
 
@@ -780,8 +858,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with integer ranges using integer values with even distribution and odd range', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'Quantiles',
+        },
         values: [1, 3, 6],
       });
 
@@ -816,8 +897,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with integer ranges using integer values with even distribution and even range', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'Quantiles',
+        },
         values: [1, 3, 5],
       });
 
@@ -852,8 +936,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with non-integer ranges using non-integer values with 1 d.p and even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'Quantiles',
+        },
         values: [2.5, 5.1, 10],
       });
 
@@ -888,8 +975,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with non-integer ranges using non-integer values with 2 d.p and even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'Quantiles',
+        },
         values: [3.33, 9.99, 13.32],
       });
 
@@ -924,8 +1014,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with integer ranges using integer values with uneven distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'Quantiles',
+        },
         values: [1, 2, 2, 3, 5, 6, 10],
       });
 
@@ -960,8 +1053,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 3 groups with non-integer ranges using non-integer values with uneven distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 3,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 3,
+          type: 'Quantiles',
+        },
         values: [2.5, 2.7, 2.7, 3.2, 5.1, 10],
       });
 
@@ -996,8 +1092,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with integer ranges using 5 integer values with even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'Quantiles',
+        },
         values: [1, 3, 5, 7, 10],
       });
 
@@ -1048,8 +1147,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with integer ranges using 3 integer values with even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'Quantiles',
+        },
         values: [5, 1, 9],
       });
 
@@ -1100,8 +1202,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with non-integer ranges using 3 non-integer values with 1 d.p and even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'Quantiles',
+        },
         values: [2.5, 10.4, 12.5],
       });
 
@@ -1152,8 +1257,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with non-integer ranges using 5 non-integer values with 1 d.p with even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'Quantiles',
+        },
         values: [2.5, 5.2, 7.4, 9.8, 12.5],
       });
 
@@ -1204,8 +1312,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with non-integer ranges using 3 non-integer values with 2 d.p and even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'Quantiles',
+        },
         values: [2.45, 10.32, 25.45],
       });
 
@@ -1256,8 +1367,11 @@ describe('generateLegendDataGroups', () => {
     test('creates 5 groups with non-integer ranges using non-integer values with even distribution', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Quantiles',
-        groups: 5,
+        dataGrouping: {
+          customGroups: [],
+          numberOfGroups: 5,
+          type: 'Quantiles',
+        },
         values: [2.5, 4.9, 5.2, 6.9, 7.4, 8.9, 9.8, 12.5],
       });
 
@@ -1310,15 +1424,17 @@ describe('generateLegendDataGroups', () => {
     test('returns custom groups for integer values and groups', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Custom',
-        customDataGroups: [
-          { min: 1, max: 45 },
-          {
-            min: 46,
-            max: 100,
-          },
-        ],
-        groups: 5,
+        dataGrouping: {
+          customGroups: [
+            { min: 1, max: 45 },
+            {
+              min: 46,
+              max: 100,
+            },
+          ],
+          numberOfGroups: 5,
+          type: 'Custom',
+        },
         values: [1, 24, 35, 45, 111],
       });
 
@@ -1345,15 +1461,17 @@ describe('generateLegendDataGroups', () => {
     test('returns groups for integer custom groups and non-integer values', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Custom',
-        customDataGroups: [
-          { min: 0, max: 5 },
-          {
-            min: 6,
-            max: 10,
-          },
-        ],
-        groups: 5,
+        dataGrouping: {
+          customGroups: [
+            { min: 0, max: 5 },
+            {
+              min: 6,
+              max: 10,
+            },
+          ],
+          numberOfGroups: 5,
+          type: 'Custom',
+        },
         values: [2.5, 4.9, 5.2, 6.9, 7.4, 8.9, 9.8, 12.5],
       });
 
@@ -1380,15 +1498,17 @@ describe('generateLegendDataGroups', () => {
     test('returns groups for non-integer custom groups and non-integer values with the same number of decimal places', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Custom',
-        customDataGroups: [
-          { min: 2.2, max: 5.5 },
-          {
-            min: 5.6,
-            max: 7.3,
-          },
-        ],
-        groups: 5,
+        dataGrouping: {
+          customGroups: [
+            { min: 2.2, max: 5.5 },
+            {
+              min: 5.6,
+              max: 7.3,
+            },
+          ],
+          numberOfGroups: 5,
+          type: 'Custom',
+        },
         values: [2.5, 4.9, 5.2, 6.9, 7.4, 8.9, 9.8, 12.5],
       });
 
@@ -1415,15 +1535,17 @@ describe('generateLegendDataGroups', () => {
     test('returns groups for non-integer custom groups and non-integer values with a different number of decimal places', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Custom',
-        customDataGroups: [
-          { min: 2, max: 5.5 },
-          {
-            min: 5.6,
-            max: 7.3,
-          },
-        ],
-        groups: 5,
+        dataGrouping: {
+          customGroups: [
+            { min: 2, max: 5.5 },
+            {
+              min: 5.6,
+              max: 7.3,
+            },
+          ],
+          numberOfGroups: 5,
+          type: 'Custom',
+        },
         values: [1.89, 2.55, 4.91, 5.52, 6.93, 7.28, 8.39, 9.83, 12.53],
       });
 
@@ -1450,16 +1572,18 @@ describe('generateLegendDataGroups', () => {
     test('handles more decimal places for non-integer custom groups and non-integer values with a different number of decimal places', () => {
       const dataClasses = generateLegendDataGroups({
         colour: 'rgba(0, 0, 0, 1)',
-        classification: 'Custom',
-        customDataGroups: [
-          { min: 1.123, max: 4.336 },
-          {
-            min: 6.988,
-            max: 10.569,
-          },
-        ],
+        dataGrouping: {
+          customGroups: [
+            { min: 1.123, max: 4.336 },
+            {
+              min: 6.988,
+              max: 10.569,
+            },
+          ],
+          numberOfGroups: 5,
+          type: 'Custom',
+        },
         decimalPlaces: 3,
-        groups: 5,
         values: [1.12345, 4.33642, 6.98765, 10.56935],
       });
 

@@ -64,7 +64,7 @@ public class PrivateReleaseFileBlobService : IReleaseFileBlobService
         );
     }
 
-    public Task<string> DownloadBlobText(
+    public Task<Either<ActionResult, string>> DownloadBlobText(
         ReleaseFile releaseFile,
         CancellationToken cancellationToken = default)
     {
@@ -78,7 +78,7 @@ public class PrivateReleaseFileBlobService : IReleaseFileBlobService
     public Task<Either<ActionResult, Stream>> DownloadToStream(
         ReleaseFile releaseFile,
         Stream stream,
-        CancellationToken? cancellationToken = null)
+        CancellationToken cancellationToken = default)
     {
         return _blobStorageService.DownloadToStream(
             containerName: PrivateReleaseFiles,
@@ -88,16 +88,16 @@ public class PrivateReleaseFileBlobService : IReleaseFileBlobService
         );
     }
 
-    public Task<object?> GetDeserializedJson(ReleaseFile releaseFile, Type target)
+    public Task<Either<ActionResult, object?>> GetDeserializedJson(ReleaseFile releaseFile, Type type)
     {
         return _blobStorageService.GetDeserializedJson(
             containerName: PrivateReleaseFiles,
             path: releaseFile.Path(),
-            target: target
+            type: type
         );
     }
 
-    public Task<T?> GetDeserializedJson<T>(ReleaseFile releaseFile) where T : class
+    public Task<Either<ActionResult, T?>> GetDeserializedJson<T>(ReleaseFile releaseFile) where T : class
     {
         return _blobStorageService.GetDeserializedJson<T>(PrivateReleaseFiles, releaseFile.Path());
     }

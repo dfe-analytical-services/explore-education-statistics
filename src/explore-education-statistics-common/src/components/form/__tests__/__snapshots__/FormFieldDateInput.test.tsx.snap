@@ -14,14 +14,12 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       >
         Day
       </label>
-      <div class>
-        <input name="startDate.day"
-               class="govuk-input govuk-input--width-2"
-               id="startDate-day"
-               type="number"
-               value
-        >
-      </div>
+      <input name="startDate.day"
+             class="govuk-input govuk-input--width-2"
+             id="startDate-day"
+             type="number"
+             value
+      >
     </div>
     <div class="govuk-form-group govuk-date-input__item">
       <label class="govuk-label"
@@ -29,14 +27,12 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       >
         Month
       </label>
-      <div class>
-        <input name="startDate.month"
-               class="govuk-input govuk-input--width-2"
-               id="startDate-month"
-               type="number"
-               value
-        >
-      </div>
+      <input name="startDate.month"
+             class="govuk-input govuk-input--width-2"
+             id="startDate-month"
+             type="number"
+             value
+      >
     </div>
     <div class="govuk-form-group govuk-date-input__item">
       <label class="govuk-label"
@@ -44,14 +40,12 @@ exports[`FormFieldDateInput renders correctly 1`] = `
       >
         Year
       </label>
-      <div class>
-        <input name="startDate.year"
-               class="govuk-input govuk-input--width-4"
-               id="startDate-year"
-               type="number"
-               value
-        >
-      </div>
+      <input name="startDate.year"
+             class="govuk-input govuk-input--width-4"
+             id="startDate-year"
+             type="number"
+             value
+      >
     </div>
   </fieldset>
 </div>

@@ -1,0 +1,6 @@
+time_period,time_identifier,geographic_level,country_code,country_name,old_la_code,new_la_code,la_name,filter_one,ind_one
+2018,Calendar year,Local authority,E92000001,England,330,E08000025,Birmingham,Value 1,
+2018,Calendar year,Local authority,E92000001,England,370,E08000016,Barnsley, Value 1,~
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,Value 1 ,a
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich, value 1 , 
+2019,Calendar year,Local authority,E92000001,England,203,E09000011,Greenwich,,

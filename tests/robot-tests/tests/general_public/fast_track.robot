@@ -27,7 +27,7 @@ Validate Publication selected step option
 
 Validate Subject selected step option
     [Tags]    NotAgainstDev    NotAgainstTest
-    user checks previous table tool step contains    2    Subject    Absence by characteristic
+    user checks previous table tool step contains    2    Data set    Absence by characteristic
 
 Validate other selected step options
     user checks previous table tool step contains    3    National    England

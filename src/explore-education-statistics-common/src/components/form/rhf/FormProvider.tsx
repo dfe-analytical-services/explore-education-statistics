@@ -25,6 +25,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
 }: FormProviderProps<TFormValues>) {
   const form = useForm<TFormValues>({
     defaultValues: initialValues,
+    mode: 'onBlur',
     resolver: validationSchema ? yupResolver(validationSchema) : undefined,
   });
 

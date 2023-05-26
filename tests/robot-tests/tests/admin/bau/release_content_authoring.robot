@@ -169,6 +169,11 @@ Switch to analyst1 to resolve comment for first text block
     ${comment}=    user gets unresolved comment    Test comment 1    ${block}
     ${author}=    get child element    ${comment}    testid:comment-author
     user waits until element contains    ${author}    Bau1 User1
+
+    # avoid clicking the 'set page view' span
+    user scrolls to element    ${comment}
+    user scrolls down    200
+
     # resolve the comment left by bau1
     user clicks button    Resolve    ${comment}
 

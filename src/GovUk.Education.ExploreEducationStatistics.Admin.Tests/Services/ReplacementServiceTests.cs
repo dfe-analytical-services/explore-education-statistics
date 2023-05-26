@@ -2270,7 +2270,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataBlockIndividualSchoolTypeFilterGroupPlan =
                     dataBlockSchoolTypeFilterPlan.Value.Groups.First(g =>
                         g.Key == originalIndividualSchoolTypeFilterGroup.Id);
-                    dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalIndividualSchoolTypeFilterGroup.Id);
 
                 Assert.Equal(originalIndividualSchoolTypeFilterGroup.Id,
                     dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Id);
@@ -2922,7 +2921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             {
                                 new()
                                 {
-                                    DataSet = new ChartLegendItemDataSet
+                                    DataSet = new ChartBaseDataSet
                                     {
                                         Filters = new List<Guid>
                                         {
@@ -3012,26 +3011,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
-                await contentDbContext.AddRangeAsync(originalFile, replacementFile);
-                await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
+                await contentDbContext.Releases.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
+                await contentDbContext.Files.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile1,
+                    originalReleaseFile2,
                     replacementReleaseFile);
-                await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddAsync(releaseContentBlock);
+                await contentDbContext.DataBlocks.AddRangeAsync(dataBlock);
+                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(statsReleaseVersion1, statsReleaseVersion2);
-                await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
-                await statisticsDbContext.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2,
+                await statisticsDbContext.Release.AddRangeAsync(statsReleaseVersion1, statsReleaseVersion2);
+                await statisticsDbContext.Subject.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(originalReleaseSubject1, originalReleaseSubject2,
                     replacementReleaseSubject);
-                await statisticsDbContext.AddRangeAsync(originalFilter1, originalFilter2,
+                await statisticsDbContext.Filter.AddRangeAsync(originalFilter1, originalFilter2,
                     replacementFilter1, replacementFilter2);
-                await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
-                await statisticsDbContext.AddAsync(originalLocation);
-                await statisticsDbContext.AddRangeAsync(footnoteForFilter, footnoteForFilterGroup,
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(originalIndicatorGroup,
+                    replacementIndicatorGroup);
+                await statisticsDbContext.Location.AddRangeAsync(originalLocation);
+                await statisticsDbContext.Footnote.AddRangeAsync(footnoteForFilter, footnoteForFilterGroup,
                     footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -3047,7 +3048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(cacheKey);
 
             mocks.cacheService
-                .Setup(service => service.DeleteItem(cacheKey))
+                .Setup(service => service.DeleteItemAsync(cacheKey))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -3075,16 +3076,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check that the original file was unlinked from the replacement before the mock call to remove it.
                 var originalFileUpdated = await contentDbContext.Files.FindAsync(originalFile.Id);
                 Assert.NotNull(originalFileUpdated);
-                Assert.Null(originalFileUpdated!.ReplacedById);
+                Assert.Null(originalFileUpdated.ReplacedById);
 
                 // Check that the replacement file was unlinked from the original.
                 var replacementFileUpdated = await contentDbContext.Files.FindAsync(replacementFile.Id);
                 Assert.NotNull(replacementFileUpdated);
-                Assert.Null(replacementFileUpdated!.ReplacingId);
+                Assert.Null(replacementFileUpdated.ReplacingId);
 
-                var replacedDataBlock = await contentDbContext.DataBlocks.FindAsync(dataBlock.Id);
-                Assert.NotNull(replacedDataBlock);
-                Assert.Equal(dataBlock.Name, replacedDataBlock!.Name);
+                var replacedDataBlock = await contentDbContext.DataBlocks.SingleAsync(db => db.Id == dataBlock.Id);
+                Assert.Equal(dataBlock.Name, replacedDataBlock.Name);
                 Assert.Equal(replacementSubject.Id, replacedDataBlock.Query.SubjectId);
 
                 Assert.Single(replacedDataBlock.Query.Indicators);
@@ -3128,22 +3128,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var chartMajorAxis = replacedDataBlock.Charts[0].Axes?["major"];
                 Assert.NotNull(chartMajorAxis);
-                var dataSet = Assert.Single(chartMajorAxis!.DataSets);
+                var dataSet = Assert.Single(chartMajorAxis.DataSets);
                 Assert.NotNull(dataSet);
                 Assert.Single(dataSet.Filters);
                 Assert.Equal(replacementFilterItem1.Id, dataSet.Filters[0]);
                 Assert.Equal(replacementIndicator.Id, dataSet.Indicator);
+                Assert.NotNull(dataSet.Location);
                 Assert.Equal(replacementLocation.Id, dataSet.Location.Value);
 
                 var chartLegendItems = replacedDataBlock.Charts[0].Legend?.Items;
                 Assert.NotNull(chartLegendItems);
-                var chartLegendItem = Assert.Single(chartLegendItems!);
+                var chartLegendItem = Assert.Single(chartLegendItems);
                 Assert.NotNull(chartLegendItem);
-                var filter = Assert.Single(chartLegendItem!.DataSet.Filters);
+                var filter = Assert.Single(chartLegendItem.DataSet.Filters);
                 Assert.Equal(replacementFilterItem1.Id, filter);
                 Assert.Equal(replacementIndicator.Id, chartLegendItem.DataSet.Indicator);
                 Assert.NotNull(chartLegendItem.DataSet.Location);
-                Assert.Equal(replacementLocation.Id, chartLegendItem.DataSet.Location!.Value);
+                Assert.Equal(replacementLocation.Id, chartLegendItem.DataSet.Location.Value);
 
                 var replacedFootnoteForFilter = await GetFootnoteById(statisticsDbContext, footnoteForFilter.Id);
                 Assert.NotNull(replacedFootnoteForFilter);
@@ -3224,6 +3225,386 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Check the sequence of filters and indicators remains untouched
                 Assert.Null(replacedReleaseSubject.FilterSequence);
                 Assert.Null(replacedReleaseSubject.IndicatorSequence);
+            }
+        }
+
+        [Fact]
+        public async Task Replace_MapChart_ReplacesChartDataSetConfigs()
+        {
+            var originalSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contentRelease = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication
+            };
+
+            var statsRelease = new Release
+            {
+                Id = contentRelease.Id
+            };
+
+            var originalFile = new File
+            {
+                Filename = "original.csv",
+                Type = FileType.Data,
+                SubjectId = originalSubject.Id
+            };
+
+            var replacementFile = new File
+            {
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+                SubjectId = replacementSubject.Id,
+                Replacing = originalFile
+            };
+
+            originalFile.ReplacedBy = replacementFile;
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = replacementFile
+            };
+
+            var originalReleaseSubject = new ReleaseSubject
+            {
+                Release = statsRelease,
+                Subject = originalSubject,
+                DataGuidance = "Data guidance"
+            };
+
+            var replacementReleaseSubject = new ReleaseSubject
+            {
+                Release = statsRelease,
+                Subject = replacementSubject,
+                DataGuidance = null
+            };
+
+            var originalFilterItem1 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var originalFilterItem2 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var replacementFilterItem1 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var replacementFilterItem2 = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var originalFilterGroup1 = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalFilterItem1
+                }
+            };
+
+            var originalFilterGroup2 = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalFilterItem2
+                }
+            };
+
+            var replacementFilterGroup1 = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementFilterItem1
+                }
+            };
+
+            var replacementFilterGroup2 = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementFilterItem2
+                }
+            };
+
+            var originalFilter1 = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = originalSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalFilterGroup1
+                }
+            };
+
+            var originalFilter2 = new Filter
+            {
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = originalSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalFilterGroup2
+                }
+            };
+
+            var replacementFilter1 = new Filter
+            {
+                Label = "Test filter 1 - not changing",
+                Name = "test_filter_1_not_changing",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementFilterGroup1
+                }
+            };
+
+            var replacementFilter2 = new Filter
+            {
+                Label = "Test filter 2 - not changing",
+                Name = "test_filter_2_not_changing",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementFilterGroup2
+                }
+            };
+
+            var originalIndicator = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var replacementIndicator = new Indicator
+            {
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var originalIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = originalSubject,
+                Indicators = new List<Indicator>
+                {
+                    originalIndicator
+                }
+            };
+
+            var replacementIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = replacementSubject,
+                Indicators = new List<Indicator>
+                {
+                    replacementIndicator
+                }
+            };
+
+            var originalLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                LocalAuthority = _derby
+            };
+
+            var replacementLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                LocalAuthority = _derby
+            };
+
+            var timePeriod = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Name = "Test DataBlock",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = originalSubject.Id,
+                    Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
+                    Indicators = new[] {originalIndicator.Id},
+                    LocationIds = ListOf(originalLocation.Id),
+                    TimePeriod = timePeriod
+                },
+                Table = new TableBuilderConfiguration(),
+                Charts = new List<IChart>
+                {
+                    new MapChart
+                    {
+                        Axes = new Dictionary<string, ChartAxisConfiguration>(),
+                        Map = new MapChartConfig
+                        {
+                            DataSetConfigs = new List<ChartDataSetConfig>
+                            {
+                                new()
+                                {
+                                    DataSet = new ChartBaseDataSet
+                                    {
+                                        Filters = new List<Guid>
+                                        {
+                                            originalFilterItem1.Id,
+                                            originalFilterItem2.Id
+                                        },
+                                        Indicator = originalIndicator.Id,
+                                        Location = new ChartDataSetLocation
+                                        {
+                                            Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
+                                            Value = originalLocation.Id
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                Release = contentRelease,
+                ContentBlock = dataBlock
+            };
+
+            var mocks = Mocks();
+
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>
+                {
+                    replacementLocation
+                });
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, CalendarYear),
+                    (2020, CalendarYear)
+                });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(contentRelease);
+                await contentDbContext.Files.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
+                await contentDbContext.DataBlocks.AddAsync(dataBlock);
+                await contentDbContext.ReleaseContentBlocks.AddAsync(releaseContentBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.Release.AddRangeAsync(statsRelease);
+                await statisticsDbContext.Subject.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(originalReleaseSubject,
+                    replacementReleaseSubject);
+                await statisticsDbContext.Filter.AddRangeAsync(originalFilter1,
+                    originalFilter2,
+                    replacementFilter1,
+                    replacementFilter2);
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(originalIndicatorGroup,
+                    replacementIndicatorGroup);
+                await statisticsDbContext.Location.AddRangeAsync(originalLocation);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
+                contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
+
+            var cacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+
+            mocks.cacheKeyService
+                .Setup(service => service
+                    .CreateCacheKeyForDataBlock(releaseContentBlock.ReleaseId, releaseContentBlock.ContentBlockId))
+                .ReturnsAsync(cacheKey);
+
+            mocks.cacheService
+                .Setup(service => service.DeleteItemAsync(cacheKey))
+                .Returns(Task.CompletedTask);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
+
+                var result = await replacementService.Replace(
+                    releaseId: contentRelease.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                mocks.ReleaseService.Verify(
+                    mock => mock.RemoveDataFiles(contentRelease.Id, originalFile.Id),
+                    Times.Once());
+
+                VerifyAllMocks(mocks);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var replacedDataBlock = await contentDbContext.DataBlocks.SingleAsync(db => db.Id == dataBlock.Id);
+
+                var mapChart = Assert.IsType<MapChart>(replacedDataBlock.Charts[0]);
+
+                var chartDataSetConfigs = mapChart.Map.DataSetConfigs;
+                Assert.NotNull(chartDataSetConfigs);
+                var chartDataSetConfig = Assert.Single(chartDataSetConfigs);
+
+                Assert.Equal(2, chartDataSetConfig.DataSet.Filters.Count);
+                Assert.Equal(replacementFilterItem1.Id, chartDataSetConfig.DataSet.Filters[0]);
+                Assert.Equal(replacementFilterItem2.Id, chartDataSetConfig.DataSet.Filters[1]);
+
+                Assert.Equal(replacementIndicator.Id, chartDataSetConfig.DataSet.Indicator);
+
+                Assert.NotNull(chartDataSetConfig.DataSet.Location);
+                Assert.Equal(replacementLocation.Id, chartDataSetConfig.DataSet.Location!.Value);
             }
         }
 

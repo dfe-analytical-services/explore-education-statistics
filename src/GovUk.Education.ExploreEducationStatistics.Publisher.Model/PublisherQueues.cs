@@ -10,9 +10,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public const string PublishTaxonomyQueue = "publish-taxonomy";
         public const string RetryReleasePublishingQueue = "retry";
         public const string NotifyChangeQueue = "notify";
-
-        // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-        public const string PermalinksMigrationQueue = "permalinks-migration";
-        public const string PermalinkMigrationQueue = "permalink-migration";
     }
 }

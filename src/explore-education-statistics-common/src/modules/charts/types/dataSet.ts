@@ -15,7 +15,7 @@ export interface ChartData {
 }
 
 export interface DataSet {
-  indicator: string;
+  indicator?: string;
   filters: string[];
   location?: LocationCompositeId;
   order?: number;
