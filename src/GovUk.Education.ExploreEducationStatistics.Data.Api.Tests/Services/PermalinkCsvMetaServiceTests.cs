@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -43,6 +45,944 @@ public class PermalinkCsvMetaServiceTests
             GeographicLevel.LocalAuthority, ListOf(GeographicLevel.Region.ToString())
         }
     };
+
+    [Fact]
+    public async Task GetCsvMeta_LegacyPermalink_WithoutLocationIds_DataFileExists()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+            .WithSubject(subject)
+            .GenerateList(2);
+
+        var filterItems = filters
+            .SelectMany(f => f.FilterGroups)
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var indicatorGroups = _fixture.DefaultIndicatorGroup()
+            .WithSubject(subject)
+            .ForIndex(0, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
+            )
+            .ForIndex(1, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
+            )
+            .GenerateList();
+
+        var indicators = indicatorGroups
+            .SelectMany(ig => ig.Indicators)
+            .ToList();
+
+        var locations = _fixture.DefaultLocation()
+            .ForRange(..2, l => l
+                .SetPresetRegion()
+                .SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(2..4, l => l
+                .SetPresetRegionAndLocalAuthority()
+                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+            .GenerateList(4);
+
+        var observations = _fixture.DefaultObservation()
+            .WithSubject(subject)
+            .WithMeasures(indicators)
+            .ForRange(..2, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[0])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(2..4, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[1])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(4..6, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[2])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .ForRange(6..8, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[3])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .GenerateList(8);
+
+        var releaseSubject = new ReleaseSubject
+        {
+            Release = _fixture.DefaultStatsRelease(),
+            Subject = subject
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            Release = new Content.Model.Release
+            {
+                Id = releaseSubject.Release.Id,
+            },
+            File = new File
+            {
+                SubjectId = subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Location.AddRangeAsync(locations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+
+            releaseSubjectService
+                .Setup(s => s.FindForLatestPublishedVersion(subject.Id))
+                .ReturnsAsync(releaseSubject);
+
+            // Ordering of CSV headers in meta should reflect the
+            // column ordering in the original data file's header.
+            var csv = string.Join(
+                ',',
+                "time_period",
+                "time_identifier",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name
+            );
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
+
+            releaseFileBlobService
+                .Setup(s => s.StreamBlob(
+                    It.Is<ReleaseFile>(rf =>
+                        rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId),
+                    null,
+                    default
+                ))
+                .ReturnsAsync(csv.ToStream());
+
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                releaseSubjectService: releaseSubjectService.Object,
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id
+            };
+
+            var permalink = new LegacyPermalink
+            {
+                Query = query,
+                FullTable = new PermalinkTableBuilderResult
+                {
+                    // Build the observations WITHOUT location id's here and include locations instead
+                    Results = observations
+                        .Select(observation =>
+                            ObservationViewModelBuilderTestUtils.BuildObservationViewModelWithoutLocationId(
+                                observation,
+                                indicators))
+                        .ToList(),
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                        // Build the locations WITHOUT location id's
+                        LocationsHierarchical = LocationViewModelBuilderTestUtils
+                            .BuildLocationAttributeViewModelsWithoutLocationIds(
+                                locations, _regionLocalAuthorityHierarchy)
+                            .ToDictionary(
+                                level => level.Key.ToString().CamelCase(),
+                                level => level.Value)
+                    }
+                }
+            };
+
+            var result = await service.GetCsvMeta(permalink);
+
+            VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(2, viewModel.Filters.Count);
+
+            var viewModelFilter0 = viewModel.Filters[filters[0].Name];
+            var viewModelFilter1 = viewModel.Filters[filters[1].Name];
+
+            Assert.Equal(filters[0].Id, viewModelFilter0.Id);
+            Assert.Equal(filters[0].Name, viewModelFilter0.Name);
+            Assert.Equal(filters[1].Id, viewModelFilter1.Id);
+            Assert.Equal(filters[1].Name, viewModelFilter1.Name);
+
+            var viewModelFilter0Items = viewModelFilter0.Items;
+            Assert.Equal(2, viewModelFilter0Items.Count);
+
+            var viewModelFilter0Item0 = viewModelFilter0Items[filterItems[0].Id];
+
+            Assert.Equal(filterItems[0].Id, viewModelFilter0Item0.Id);
+            Assert.Equal(filterItems[0].Label, viewModelFilter0Item0.Label);
+
+            var viewModelFilter0Item1 = viewModelFilter0Items[filterItems[1].Id];
+
+            Assert.Equal(filterItems[1].Id, viewModelFilter0Item1.Id);
+            Assert.Equal(filterItems[1].Label, viewModelFilter0Item1.Label);
+
+            var viewModelFilter1Items = viewModelFilter1.Items;
+            Assert.Equal(2, viewModelFilter1Items.Count);
+
+            var viewModelFilter1Item0 = viewModelFilter1Items[filterItems[2].Id];
+
+            Assert.Equal(filterItems[2].Id, viewModelFilter1Item0.Id);
+            Assert.Equal(filterItems[2].Label, viewModelFilter1Item0.Label);
+
+            var viewModelFilter1Item1 = viewModelFilter1Items[filterItems[3].Id];
+
+            Assert.Equal(filterItems[3].Id, viewModelFilter1Item1.Id);
+            Assert.Equal(filterItems[3].Label, viewModelFilter1Item1.Label);
+
+            Assert.Equal(3, viewModel.Indicators.Count);
+            AssertIndicatorCsvViewModel(indicators[0], viewModel.Indicators[indicators[0].Name]);
+            AssertIndicatorCsvViewModel(indicators[1], viewModel.Indicators[indicators[1].Name]);
+            AssertIndicatorCsvViewModel(indicators[2], viewModel.Indicators[indicators[2].Name]);
+
+            Assert.Empty(viewModel.Locations);
+
+            // Ordering of headers is same as original data file.
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
+
+    [Fact]
+    public async Task GetCsvMeta_LegacyPermalink_WithoutLocationIds_BlobNotFound_HeadersInDefaultOrder()
+    {
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+            .WithSubject(subject)
+            .GenerateList(2);
+
+        var filterItems = filters
+            .SelectMany(f => f.FilterGroups)
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var indicatorGroups = _fixture.DefaultIndicatorGroup()
+            .WithSubject(subject)
+            .ForIndex(0, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
+            )
+            .ForIndex(1, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
+            )
+            .GenerateList();
+
+        var indicators = indicatorGroups
+            .SelectMany(ig => ig.Indicators)
+            .ToList();
+
+        var locations = _fixture.DefaultLocation()
+            .ForRange(..2, l => l
+                .SetPresetRegion()
+                .SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(2..4, l => l
+                .SetPresetRegionAndLocalAuthority()
+                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+            .GenerateList(4);
+
+        var observations = _fixture.DefaultObservation()
+            .WithSubject(subject)
+            .WithMeasures(indicators)
+            .ForRange(..2, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[0])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(2..4, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[1])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(4..6, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[2])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .ForRange(6..8, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[3])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .GenerateList(8);
+
+        var releaseSubject = new ReleaseSubject
+        {
+            Release = _fixture.DefaultStatsRelease(),
+            Subject = subject
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            Release = new Content.Model.Release
+            {
+                Id = releaseSubject.Release.Id,
+            },
+            File = new File
+            {
+                SubjectId = subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Location.AddRangeAsync(locations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+
+            releaseSubjectService
+                .Setup(s => s.FindForLatestPublishedVersion(subject.Id))
+                .ReturnsAsync(releaseSubject);
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
+
+            releaseFileBlobService
+                .Setup(s => s.StreamBlob(
+                    It.Is<ReleaseFile>(rf =>
+                        rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId),
+                    null,
+                    default
+                ))
+                .ThrowsAsync(new FileNotFoundException("File not found"));
+
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                releaseSubjectService: releaseSubjectService.Object,
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id
+            };
+
+            var permalink = new LegacyPermalink
+            {
+                Query = query,
+                FullTable = new PermalinkTableBuilderResult
+                {
+                    // Build the observations WITHOUT location id's here and include locations instead
+                    Results = observations
+                        .Select(observation =>
+                            ObservationViewModelBuilderTestUtils.BuildObservationViewModelWithoutLocationId(
+                                observation,
+                                indicators))
+                        .ToList(),
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                        // Build the locations in the subject meta WITHOUT location id's
+                        LocationsHierarchical = LocationViewModelBuilderTestUtils
+                            .BuildLocationAttributeViewModelsWithoutLocationIds(
+                                locations, _regionLocalAuthorityHierarchy)
+                            .ToDictionary(
+                                level => level.Key.ToString().CamelCase(),
+                                level => level.Value)
+                    }
+                }
+            };
+
+            var result = await service.GetCsvMeta(permalink);
+
+            VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(2, viewModel.Filters.Count);
+
+            var viewModelFilter0 = viewModel.Filters[filters[0].Name];
+            var viewModelFilter1 = viewModel.Filters[filters[1].Name];
+
+            Assert.Equal(filters[0].Id, viewModelFilter0.Id);
+            Assert.Equal(filters[0].Name, viewModelFilter0.Name);
+            Assert.Equal(filters[1].Id, viewModelFilter1.Id);
+            Assert.Equal(filters[1].Name, viewModelFilter1.Name);
+
+            var viewModelFilter0Items = viewModelFilter0.Items;
+            Assert.Equal(2, viewModelFilter0Items.Count);
+
+            var viewModelFilter0Item0 = viewModelFilter0Items[filterItems[0].Id];
+
+            Assert.Equal(filterItems[0].Id, viewModelFilter0Item0.Id);
+            Assert.Equal(filterItems[0].Label, viewModelFilter0Item0.Label);
+
+            var viewModelFilter0Item1 = viewModelFilter0Items[filterItems[1].Id];
+
+            Assert.Equal(filterItems[1].Id, viewModelFilter0Item1.Id);
+            Assert.Equal(filterItems[1].Label, viewModelFilter0Item1.Label);
+
+            var viewModelFilter1Items = viewModelFilter1.Items;
+            Assert.Equal(2, viewModelFilter1Items.Count);
+
+            var viewModelFilter1Item0 = viewModelFilter1Items[filterItems[2].Id];
+
+            Assert.Equal(filterItems[2].Id, viewModelFilter1Item0.Id);
+            Assert.Equal(filterItems[2].Label, viewModelFilter1Item0.Label);
+
+            var viewModelFilter1Item1 = viewModelFilter1Items[filterItems[3].Id];
+
+            Assert.Equal(filterItems[3].Id, viewModelFilter1Item1.Id);
+            Assert.Equal(filterItems[3].Label, viewModelFilter1Item1.Label);
+
+            Assert.Equal(3, viewModel.Indicators.Count);
+            AssertIndicatorCsvViewModel(indicators[0], viewModel.Indicators[indicators[0].Name]);
+            AssertIndicatorCsvViewModel(indicators[1], viewModel.Indicators[indicators[1].Name]);
+            AssertIndicatorCsvViewModel(indicators[2], viewModel.Indicators[indicators[2].Name]);
+
+            Assert.Empty(viewModel.Locations);
+
+            // Headers are in a default ordering.
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_code",
+                "country_name",
+                "region_code",
+                "region_name",
+                "new_la_code",
+                "la_name",
+                filters[0].Name,
+                filters[1].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+                indicators[2].Name
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
+
+    [Fact]
+    public async Task GetCsvMeta_LegacyPermalink_SubjectMetaHasNoLocationIds()
+    {
+        // Set up a test where the observations have location id's but the subject meta locations do not.
+        // The changes to add location id's to each were made at different times and there was a period where
+        // the subject meta locations did not have location id's, but the observations had location id's as well as
+        // locations.
+
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+            .WithSubject(subject)
+            .GenerateList(2);
+
+        var filterItems = filters
+            .SelectMany(f => f.FilterGroups)
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var indicatorGroups = _fixture.DefaultIndicatorGroup()
+            .WithSubject(subject)
+            .ForIndex(0, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
+            )
+            .ForIndex(1, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
+            )
+            .GenerateList();
+
+        var indicators = indicatorGroups
+            .SelectMany(ig => ig.Indicators)
+            .ToList();
+
+        var locations = _fixture.DefaultLocation()
+            .ForRange(..2, l => l
+                .SetPresetRegion()
+                .SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(2..4, l => l
+                .SetPresetRegionAndLocalAuthority()
+                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+            .GenerateList(4);
+
+        var observations = _fixture.DefaultObservation()
+            .WithSubject(subject)
+            .WithMeasures(indicators)
+            .ForRange(..2, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[0])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(2..4, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[1])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(4..6, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[2])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .ForRange(6..8, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[3])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .GenerateList(8);
+
+        var releaseSubject = new ReleaseSubject
+        {
+            Release = _fixture.DefaultStatsRelease(),
+            Subject = subject
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            Release = new Content.Model.Release
+            {
+                Id = releaseSubject.Release.Id,
+            },
+            File = new File
+            {
+                SubjectId = subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Location.AddRangeAsync(locations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+
+            releaseSubjectService
+                .Setup(s => s.FindForLatestPublishedVersion(subject.Id))
+                .ReturnsAsync(releaseSubject);
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
+
+            releaseFileBlobService
+                .Setup(s => s.StreamBlob(
+                    It.Is<ReleaseFile>(rf =>
+                        rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId),
+                    null,
+                    default
+                ))
+                .ThrowsAsync(new FileNotFoundException("File not found"));
+
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                releaseSubjectService: releaseSubjectService.Object,
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id
+            };
+
+            var permalink = new LegacyPermalink
+            {
+                Query = query,
+                FullTable = new PermalinkTableBuilderResult
+                {
+                    // Build the observations WITH location id's AND locations
+                    Results = observations
+                        .Select(observation =>
+                            ObservationViewModelBuilderTestUtils.BuildObservationViewModelWithLocationIdAndLocation(
+                                observation,
+                                indicators))
+                        .ToList(),
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                        // Build the locations in the subject meta WITHOUT location id's
+                        LocationsHierarchical = LocationViewModelBuilderTestUtils
+                            .BuildLocationAttributeViewModelsWithoutLocationIds(
+                                locations, _regionLocalAuthorityHierarchy)
+                            .ToDictionary(
+                                level => level.Key.ToString().CamelCase(),
+                                level => level.Value)
+                    }
+                }
+            };
+
+            var result = await service.GetCsvMeta(permalink);
+
+            VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(2, viewModel.Filters.Count);
+
+            var viewModelFilter0 = viewModel.Filters[filters[0].Name];
+            var viewModelFilter1 = viewModel.Filters[filters[1].Name];
+
+            Assert.Equal(filters[0].Id, viewModelFilter0.Id);
+            Assert.Equal(filters[0].Name, viewModelFilter0.Name);
+            Assert.Equal(filters[1].Id, viewModelFilter1.Id);
+            Assert.Equal(filters[1].Name, viewModelFilter1.Name);
+
+            var viewModelFilter0Items = viewModelFilter0.Items;
+            Assert.Equal(2, viewModelFilter0Items.Count);
+
+            var viewModelFilter0Item0 = viewModelFilter0Items[filterItems[0].Id];
+
+            Assert.Equal(filterItems[0].Id, viewModelFilter0Item0.Id);
+            Assert.Equal(filterItems[0].Label, viewModelFilter0Item0.Label);
+
+            var viewModelFilter0Item1 = viewModelFilter0Items[filterItems[1].Id];
+
+            Assert.Equal(filterItems[1].Id, viewModelFilter0Item1.Id);
+            Assert.Equal(filterItems[1].Label, viewModelFilter0Item1.Label);
+
+            var viewModelFilter1Items = viewModelFilter1.Items;
+            Assert.Equal(2, viewModelFilter1Items.Count);
+
+            var viewModelFilter1Item0 = viewModelFilter1Items[filterItems[2].Id];
+
+            Assert.Equal(filterItems[2].Id, viewModelFilter1Item0.Id);
+            Assert.Equal(filterItems[2].Label, viewModelFilter1Item0.Label);
+
+            var viewModelFilter1Item1 = viewModelFilter1Items[filterItems[3].Id];
+
+            Assert.Equal(filterItems[3].Id, viewModelFilter1Item1.Id);
+            Assert.Equal(filterItems[3].Label, viewModelFilter1Item1.Label);
+
+            Assert.Equal(3, viewModel.Indicators.Count);
+            AssertIndicatorCsvViewModel(indicators[0], viewModel.Indicators[indicators[0].Name]);
+            AssertIndicatorCsvViewModel(indicators[1], viewModel.Indicators[indicators[1].Name]);
+            AssertIndicatorCsvViewModel(indicators[2], viewModel.Indicators[indicators[2].Name]);
+
+            Assert.Empty(viewModel.Locations);
+
+            // Headers are in a default ordering.
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_code",
+                "country_name",
+                "region_code",
+                "region_name",
+                "new_la_code",
+                "la_name",
+                filters[0].Name,
+                filters[1].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+                indicators[2].Name
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
+
+    [Fact]
+    public async Task GetCsvMeta_LegacyPermalink_LocationIdsExist()
+    {
+        // We don't have any other variations of unit tests for a LegacyPermalink
+        // *with* location id's other than this one, because after checking for the presence of location id's,
+        // the functionality should be the same internally as
+        // GetCsvMeta(Guid subjectId, SubjectResultMetaViewModel tableResultMeta, CancellationToken cancellationToken)
+        // which has unit tests covering all scenarios.
+
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+            .WithSubject(subject)
+            .GenerateList(2);
+
+        var filterItems = filters
+            .SelectMany(f => f.FilterGroups)
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var indicatorGroups = _fixture.DefaultIndicatorGroup()
+            .WithSubject(subject)
+            .ForIndex(0, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(1))
+            )
+            .ForIndex(1, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(2))
+            )
+            .GenerateList();
+
+        var indicators = indicatorGroups
+            .SelectMany(ig => ig.Indicators)
+            .ToList();
+
+        var locations = _fixture.DefaultLocation()
+            .ForRange(..2, l => l
+                .SetPresetRegion()
+                .SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(2..4, l => l
+                .SetPresetRegionAndLocalAuthority()
+                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+            .GenerateList(4);
+
+        var observations = _fixture.DefaultObservation()
+            .WithSubject(subject)
+            .WithMeasures(indicators)
+            .ForRange(..2, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[0])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(2..4, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[1])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(4..6, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[2])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .ForRange(6..8, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[3])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .GenerateList(8);
+
+        var releaseSubject = new ReleaseSubject
+        {
+            Release = _fixture.DefaultStatsRelease(),
+            Subject = subject
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            Release = new Content.Model.Release
+            {
+                Id = releaseSubject.Release.Id,
+            },
+            File = new File
+            {
+                SubjectId = subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Location.AddRangeAsync(locations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+
+            releaseSubjectService
+                .Setup(s => s.FindForLatestPublishedVersion(subject.Id))
+                .ReturnsAsync(releaseSubject);
+
+            // Ordering of CSV headers in meta should reflect the
+            // column ordering in the original data file's header.
+            var csv = string.Join(
+                ',',
+                "time_period",
+                "time_identifier",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name
+            );
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
+
+            releaseFileBlobService
+                .Setup(s => s.StreamBlob(
+                    It.Is<ReleaseFile>(rf =>
+                        rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId),
+                    null,
+                    default
+                ))
+                .ReturnsAsync(csv.ToStream());
+
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                releaseSubjectService: releaseSubjectService.Object,
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id
+            };
+
+            var permalink = new LegacyPermalink
+            {
+                Query = query,
+                FullTable = new PermalinkTableBuilderResult
+                {
+                    // Build the observations as normal with location id's and WITHOUT locations
+                    Results = observations
+                        .Select(observation =>
+                            ObservationViewModelBuilder.BuildObservation(observation, indicators.Select(i => i.Id)))
+                        .ToList(),
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Filters = FiltersMetaViewModelBuilder.BuildFilters(filters),
+                        Indicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators),
+                        // Build the locations in the subject meta as normal WITH location id's
+                        LocationsHierarchical = LocationViewModelBuilder
+                            .BuildLocationAttributeViewModels(locations, _regionLocalAuthorityHierarchy)
+                            .ToDictionary(
+                                level => level.Key.ToString().CamelCase(),
+                                level => level.Value)
+                    }
+                }
+            };
+
+            var result = await service.GetCsvMeta(permalink);
+
+            VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(2, viewModel.Filters.Count);
+
+            var viewModelFilter0 = viewModel.Filters[filters[0].Name];
+            var viewModelFilter1 = viewModel.Filters[filters[1].Name];
+
+            Assert.Equal(filters[0].Id, viewModelFilter0.Id);
+            Assert.Equal(filters[0].Name, viewModelFilter0.Name);
+            Assert.Equal(filters[1].Id, viewModelFilter1.Id);
+            Assert.Equal(filters[1].Name, viewModelFilter1.Name);
+
+            var viewModelFilter0Items = viewModelFilter0.Items;
+            Assert.Equal(2, viewModelFilter0Items.Count);
+
+            var viewModelFilter0Item0 = viewModelFilter0Items[filterItems[0].Id];
+
+            Assert.Equal(filterItems[0].Id, viewModelFilter0Item0.Id);
+            Assert.Equal(filterItems[0].Label, viewModelFilter0Item0.Label);
+
+            var viewModelFilter0Item1 = viewModelFilter0Items[filterItems[1].Id];
+
+            Assert.Equal(filterItems[1].Id, viewModelFilter0Item1.Id);
+            Assert.Equal(filterItems[1].Label, viewModelFilter0Item1.Label);
+
+            var viewModelFilter1Items = viewModelFilter1.Items;
+            Assert.Equal(2, viewModelFilter1Items.Count);
+
+            var viewModelFilter1Item0 = viewModelFilter1Items[filterItems[2].Id];
+
+            Assert.Equal(filterItems[2].Id, viewModelFilter1Item0.Id);
+            Assert.Equal(filterItems[2].Label, viewModelFilter1Item0.Label);
+
+            var viewModelFilter1Item1 = viewModelFilter1Items[filterItems[3].Id];
+
+            Assert.Equal(filterItems[3].Id, viewModelFilter1Item1.Id);
+            Assert.Equal(filterItems[3].Label, viewModelFilter1Item1.Label);
+
+            Assert.Equal(3, viewModel.Indicators.Count);
+            AssertIndicatorCsvViewModel(indicators[0], viewModel.Indicators[indicators[0].Name]);
+            AssertIndicatorCsvViewModel(indicators[1], viewModel.Indicators[indicators[1].Name]);
+            AssertIndicatorCsvViewModel(indicators[2], viewModel.Indicators[indicators[2].Name]);
+
+            Assert.Equal(4, viewModel.Locations.Count);
+            Assert.Equal(locations[0].GetCsvValues(), viewModel.Locations[locations[0].Id]);
+            Assert.Equal(locations[1].GetCsvValues(), viewModel.Locations[locations[1].Id]);
+            Assert.Equal(locations[2].GetCsvValues(), viewModel.Locations[locations[2].Id]);
+            Assert.Equal(locations[3].GetCsvValues(), viewModel.Locations[locations[3].Id]);
+
+            // Ordering of headers is same as original data file.
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
 
     [Fact]
     public async Task GetCsvMeta_SubjectNotFound()
@@ -478,10 +1418,10 @@ public class PermalinkCsvMetaServiceTests
 
             releaseFileBlobService
                 .Setup(s => s.StreamBlob(
-                        It.Is<ReleaseFile>(rf =>
-                            rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId),
-                        null,
-                        default
+                    It.Is<ReleaseFile>(rf =>
+                        rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId),
+                    null,
+                    default
                 ))
                 .ReturnsAsync(csv.ToStream());
 
@@ -693,10 +1633,10 @@ public class PermalinkCsvMetaServiceTests
 
             releaseFileBlobService
                 .Setup(s => s.StreamBlob(
-                        It.Is<ReleaseFile>(rf =>
-                            rf.FileId == releaseDataFile.FileId && rf.ReleaseId == releaseDataFile.ReleaseId),
-                        null,
-                        default
+                    It.Is<ReleaseFile>(rf =>
+                        rf.FileId == releaseDataFile.FileId && rf.ReleaseId == releaseDataFile.ReleaseId),
+                    null,
+                    default
                 ))
                 .ReturnsAsync(csv.ToStream());
 
