@@ -124,11 +124,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         cancellationToken
                     );
 
+                    // TODO EES-3755 Can we refactor this to use the SubjectCsvMetaService or use
+                    // TableBuilderService.QueryToCsvStream to get the csv directly? This would allow removing
+                    // PermalinkCsvMetaService when the snapshot work is complete.
                     var csvMetaTask = _permalinkCsvMetaService.GetCsvMeta(
                         request.Query.SubjectId,
-                        tableResult.SubjectMeta.Locations,
-                        tableResult.SubjectMeta.Filters,
-                        tableResult.SubjectMeta.Indicators,
+                        tableResult.SubjectMeta,
                         cancellationToken
                     );
 
@@ -315,13 +316,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             PermalinkCsvMetaViewModel meta,
             HashSet<string> locationHeaders)
         {
+            // Legacy permalinks created before location id's were introduced will have an empty location id
+            // but we can use the location object to get the location values instead
+            Dictionary<string, string>? legacyLocationValues = null;
+            if (observation.LocationId == Guid.Empty)
+            {
+                if (observation.Location == null)
+                {
+                    throw new InvalidOperationException("Observation without location id has no location");
+                }
+
+                legacyLocationValues = observation.Location.GetCsvValues();
+            }
+
             var timePeriod = observation.GetTimePeriodTuple();
 
             var row = new ExpandoObject() as IDictionary<string, object>;
 
             foreach (var header in meta.Headers)
             {
-                row[header] = GetCsvRowValue(header, observation, timePeriod, meta, locationHeaders);
+                row[header] = GetCsvRowValue(header,
+                    observation,
+                    timePeriod,
+                    meta,
+                    locationHeaders,
+                    legacyLocationValues);
             }
 
             return row;
@@ -332,7 +351,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             ObservationViewModel observation,
             (int Year, TimeIdentifier TimeIdentifier) timePeriod,
             PermalinkCsvMetaViewModel meta,
-            IReadOnlySet<string> locationHeaders)
+            IReadOnlySet<string> locationHeaders,
+            IReadOnlyDictionary<string, string>? legacyLocationValues)
         {
             switch (header)
             {
@@ -346,11 +366,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             if (locationHeaders.Contains(header))
             {
-                var location = meta.Locations[observation.LocationId];
-
-                if (location.TryGetValue(header, out var value))
+                if (legacyLocationValues != null)
                 {
-                    return value;
+                    // Prior to this we have determined the location id is missing
+                    // and got csv values from the observation location instead.
+                    // Return the value matching the csv header
+                    if (legacyLocationValues.TryGetValue(header, out var value))
+                    {
+                        return value;
+                    }
+                }
+                else
+                {
+                    var location = meta.Locations[observation.LocationId];
+
+                    if (location.TryGetValue(header, out var value))
+                    {
+                        return value;
+                    }
                 }
             }
 

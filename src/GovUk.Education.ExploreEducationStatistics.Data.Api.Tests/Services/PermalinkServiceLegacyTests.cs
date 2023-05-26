@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services;
 
 /// <summary>
 /// TODO EES-3755 Remove after Permalink snapshot migration work is complete
-/// and remove __snapshots__/PermalinkServiceLegacyTests.LegacyDownloadCsvToStream.snap
+/// and remove __snapshots__/PermalinkServiceLegacyTests.*.snap files
 /// </summary>
 public class PermalinkServiceLegacyTests
 {
@@ -1358,8 +1358,175 @@ public class PermalinkServiceLegacyTests
         permalinkCsvMetaService
             .Setup(s => s
                 .GetCsvMeta(
-                    It.Is<LegacyPermalink>(p => p.IsDeepEqualTo(permalinkForSerialization)),
-                    default))
+                    ItIs.DeepEqualTo(permalinkForSerialization),
+                    It.IsAny<CancellationToken>()))
+            .ReturnsAsync(csvMeta);
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Permalinks.AddAsync(permalink);
+
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            using var stream = new MemoryStream();
+
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                blobStorageService: blobStorageService.Object,
+                permalinkCsvMetaService: permalinkCsvMetaService.Object
+            );
+
+            var result = await service.LegacyDownloadCsvToStream(permalink.Id, stream);
+
+            MockUtils.VerifyAllMocks(blobStorageService, permalinkCsvMetaService);
+
+            result.AssertRight();
+
+            stream.SeekToBeginning();
+            var csv = stream.ReadToEnd();
+
+            Snapshot.Match(csv);
+        }
+    }
+
+    [Fact]
+    public async Task LegacyDownloadCsvToStream_PermalinkHasNoLocationIds()
+    {
+        // Setup test data with observations that have no location id's
+        // but have location objects instead to represent a historical permalink
+        // with observations that had a location object prior to location id being added.
+
+        // Setup the PermalinkCsvMetaService to return csv meta without locations
+        // since rows should be written using the location object to get the location values instead
+
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var filters = _fixture.DefaultFilter().GenerateList(2);
+
+        var filterItems = _fixture.DefaultFilterItem()
+            .ForRange(..2, fi => fi
+                .SetFilterGroup(_fixture.DefaultFilterGroup()
+                    .WithFilter(filters[0])
+                    .Generate()))
+            .ForRange(2..4, fi => fi
+                .SetFilterGroup(_fixture.DefaultFilterGroup()
+                    .WithFilter(filters[1])
+                    .Generate()))
+            .GenerateArray(4);
+
+        var indicators = _fixture.DefaultIndicator()
+            .ForRange(..1, i => i
+                .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                    .WithSubject(subject))
+            )
+            .ForRange(1..3, i => i
+                .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                    .WithSubject(subject))
+            )
+            .GenerateList(3);
+
+        var locations = _fixture.DefaultLocation()
+            .ForRange(..2, l => l
+                .SetPresetRegion()
+                .SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(2..4, l => l
+                .SetPresetRegionAndLocalAuthority()
+                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+            .GenerateList(4);
+
+        var observations = _fixture.DefaultObservation()
+            .WithSubject(subject)
+            .WithMeasures(indicators)
+            .ForRange(..2, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[0])
+                .SetTimePeriod(2022, AcademicYear))
+            .ForRange(2..4, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[1])
+                .SetTimePeriod(2022, AcademicYear))
+            .ForRange(4..6, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[2])
+                .SetTimePeriod(2023, AcademicYear))
+            .ForRange(6..8, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[3])
+                .SetTimePeriod(2023, AcademicYear))
+            .GenerateList(8);
+
+        var permalink = new Permalink
+        {
+            Id = Guid.NewGuid(),
+            Created = DateTime.UtcNow,
+            Legacy = true
+        };
+
+        var permalinkForSerialization = new LegacyPermalink
+        {
+            Id = permalink.Id,
+            Query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id
+            },
+            FullTable = new PermalinkTableBuilderResult
+            {
+                // Build the observations WITHOUT location id's here and include locations instead
+                Results = observations
+                    .Select(observation =>
+                        ObservationViewModelBuilderTestUtils.BuildObservationViewModelWithoutLocationId(
+                            observation,
+                            indicators))
+                    .ToList()
+            }
+        };
+
+        var csvMeta = new PermalinkCsvMetaViewModel
+        {
+            Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+            Indicators = indicators
+                .Select(i => new IndicatorCsvMetaViewModel(i))
+                .ToDictionary(i => i.Name),
+            Headers = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_code",
+                "country_name",
+                "region_code",
+                "region_name",
+                "new_la_code",
+                "la_name",
+                filters[0].Name,
+                filters[1].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+                indicators[2].Name
+            },
+            // Locations are not included in the csv meta here as we expect them to come from the observations
+            // instead
+        };
+
+        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+        blobStorageService.SetupGetDeserializedJson(
+            container: Permalinks,
+            path: permalink.Id.ToString(),
+            value: permalinkForSerialization,
+            settings: PermalinkService.LegacyPermalinkSerializerSettings);
+
+        var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(Strict);
+
+        permalinkCsvMetaService
+            .Setup(s => s
+                .GetCsvMeta(
+                    ItIs.DeepEqualTo(permalinkForSerialization),
+                    It.IsAny<CancellationToken>()))
             .ReturnsAsync(csvMeta);
 
         var contentDbContextId = Guid.NewGuid().ToString();
