@@ -1,7 +1,7 @@
 variables:
   BuildConfiguration: 'Release'
   CI: true
-  NODE_VERSION: 16.14.2
+  NODE_VERSION: 18.16.0
   DOTNET_VERSION: 6.0.x
 
 trigger:
