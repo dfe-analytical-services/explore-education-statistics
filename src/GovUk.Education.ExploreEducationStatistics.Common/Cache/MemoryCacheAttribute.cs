@@ -22,9 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         private static Dictionary<string, IMemoryCacheService> Services { get; set; } = new();
 
-        private static int? OverrideDurationInSeconds;
-        
-        private static CrontabSchedule? OverrideExpirySchedule;
+        private static int? _overrideDurationInSeconds;
+
+        private static CrontabSchedule? _overrideExpirySchedule;
 
         protected override Type BaseKey => typeof(IMemoryCacheKey);
         
@@ -43,22 +43,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             int durationInSeconds, 
             string? expiryScheduleCron = null,
             bool forceUpdate = false
-            ) : base(key, forceUpdate)
+        ) : base(key, forceUpdate)
         {
-            DurationInSeconds = OverrideDurationInSeconds ?? durationInSeconds;
-            ExpirySchedule = OverrideExpirySchedule ?? (
-                expiryScheduleCron != null ? CrontabSchedule.Parse(expiryScheduleCron) : null);
+            DurationInSeconds = durationInSeconds;
+            ExpirySchedule = expiryScheduleCron != null ? CrontabSchedule.Parse(expiryScheduleCron) : null;
         }
 
         public static void AddService(string name, IMemoryCacheService service)
         {
             Services[name] = service;
         }
-        public static void RemoveService(string name)
-        {
-            Services.Remove(name);
-        }
-
         public static void ClearServices()
         {
             Services.Clear();
@@ -66,51 +60,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         public static void SetOverrideConfiguration(IConfigurationSection? configurationSection)
         {
-            var durationInSeconds = configurationSection?.GetValue<int?>("DurationInSeconds");
-            
-            OverrideDurationInSeconds = durationInSeconds != null && durationInSeconds != -1 
-                ? durationInSeconds.Value : null;
-            
+            var overrideDurationInSeconds = configurationSection?.GetValue<int?>("DurationInSeconds");
+
+            _overrideDurationInSeconds = overrideDurationInSeconds != null && overrideDurationInSeconds != -1
+                ? overrideDurationInSeconds.Value : null;
+
             var overrideExpirySchedule = configurationSection?.GetValue<string?>("ExpirySchedule");
 
-            OverrideExpirySchedule = !overrideExpirySchedule.IsNullOrEmpty() 
+            _overrideExpirySchedule = !overrideExpirySchedule.IsNullOrEmpty()
                 ? CrontabSchedule.Parse(overrideExpirySchedule) : null;
         }
 
-        public override async Task<object?> Get(ICacheKey cacheKey, Type returnType)
+        public override object? Get(ICacheKey cacheKey, Type returnType)
         {
-            if (cacheKey is IMemoryCacheKey key)
+            if (cacheKey is not IMemoryCacheKey key)
             {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return null;
-                }
-
-                return await service.GetItem(key, returnType);
+                throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            var service = GetService();
+
+            return service?.GetItem(key, returnType);
         }
 
-        public override async Task Set(ICacheKey cacheKey, object value)
+        public override Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
         {
-            if (cacheKey is IMemoryCacheKey key)
+            if (cacheKey is not IMemoryCacheKey key)
             {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return;
-                }
-
-                var itemCachingConfiguration = new MemoryCacheConfiguration(DurationInSeconds, ExpirySchedule);
-                await service.SetItem(key, value, itemCachingConfiguration);
-                return;
+                throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            var service = GetService();
+
+            if (service is null)
+            {
+                return Task.FromResult<object?>(null);
+            }
+
+            var cachedItem = service.GetItem(key, returnType);
+            return Task.FromResult(cachedItem);
+        }
+
+        public override void Set(ICacheKey cacheKey, object value)
+        {
+            if (cacheKey is not IMemoryCacheKey key)
+            {
+                throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            }
+
+            var service = GetService();
+
+            service?.SetItem(key, value,
+                new MemoryCacheConfiguration(
+                    _overrideDurationInSeconds ?? DurationInSeconds,
+                    _overrideExpirySchedule ?? ExpirySchedule));
+        }
+
+        public override Task SetAsync(ICacheKey cacheKey, object value)
+        {
+            if (cacheKey is not IMemoryCacheKey key)
+            {
+                throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            }
+
+            var service = GetService();
+
+            if (service is null)
+            {
+                return Task.CompletedTask;
+            }
+
+            var itemCachingConfiguration = new MemoryCacheConfiguration(
+                _overrideDurationInSeconds ?? DurationInSeconds,
+                _overrideExpirySchedule ?? ExpirySchedule);
+            service.SetItem(key, value, itemCachingConfiguration);
+            return Task.CompletedTask;
         }
 
         private IMemoryCacheService? GetService()

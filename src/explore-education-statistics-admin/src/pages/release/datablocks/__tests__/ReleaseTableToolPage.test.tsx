@@ -55,6 +55,8 @@ describe('ReleaseTableToolPage', () => {
           size: '10 Mb',
           type: 'Data',
         },
+        filters: ['Filter 1'],
+        indicators: ['Indicator 1'],
       },
       {
         id: 'subject-2',
@@ -73,6 +75,8 @@ describe('ReleaseTableToolPage', () => {
           size: '20 Mb',
           type: 'Data',
         },
+        filters: ['Filter 1'],
+        indicators: ['Indicator 1'],
       },
     ]);
 
@@ -83,7 +87,7 @@ describe('ReleaseTableToolPage', () => {
 
       expect(stepHeadings).toHaveLength(1);
       expect(stepHeadings[0]).toHaveTextContent(
-        'Step 1 (current) Choose a subject',
+        'Step 1 (current) Select a data set',
       );
     });
 

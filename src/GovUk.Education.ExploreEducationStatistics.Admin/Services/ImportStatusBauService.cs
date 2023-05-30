@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -44,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             (dataImport, releaseFile) => new
                             {
                                 DataImport = dataImport,
-                                Release = releaseFile.Release
+                                releaseFile.Release
                             })
                         .Where(join => join.DataImport.Status != COMPLETE)
                         .OrderByDescending(join => join.DataImport.Created)
@@ -68,7 +69,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileId = file.Id,
                 DataFileName = file.Filename,
                 TotalRows = dataImport.TotalRows,
-                Batches = dataImport.NumBatches,
                 Status = dataImport.Status,
                 StagePercentageComplete = dataImport.StagePercentageComplete,
                 PercentageComplete = dataImport.PercentageComplete()

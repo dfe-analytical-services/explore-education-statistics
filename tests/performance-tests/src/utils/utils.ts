@@ -1,68 +1,30 @@
 import { RefinedResponse } from 'k6/http';
-import { AdminService } from './adminService';
 
-type DataFileImportHandler = (
-  adminService: AdminService,
-  releaseId: string,
-) => {
-  response: RefinedResponse<'text'>;
-  id: string;
-};
-const utils = {
-  getDataFileUploadStrategy({
-    filename,
-  }: {
-    filename: string;
-  }): {
-    filename: string;
-    isZip: boolean;
-    subjectName: string;
-    getOrImportSubject: DataFileImportHandler;
-  } {
-    const isZip = filename.endsWith('.zip');
-    const subjectName = filename;
+export function isRefinedResponse(
+  candidate: unknown,
+): candidate is RefinedResponse<'text'> {
+  return !!(
+    candidate &&
+    typeof candidate === 'object' &&
+    'error' in candidate &&
+    'error_code' in candidate
+  );
+}
 
-    /* eslint-disable no-restricted-globals */
-    const zipFile = isZip ? open(`admin/import/assets/${filename}`, 'b') : null;
-    const subjectFile = !isZip
-      ? open(`admin/import/assets/${filename}`, 'b')
-      : null;
-    const subjectMetaFile = !isZip
-      ? open(
-          `admin/import/assets/${filename.replace('.csv', '.meta.csv')}`,
-          'b',
-        )
-      : null;
-    /* eslint-enable no-restricted-globals */
+export function pickRandom<T>(arr: T[]) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
 
-    return {
-      isZip,
-      filename,
-      subjectName: filename,
-      getOrImportSubject: (adminService, releaseId) =>
-        isZip
-          ? adminService.uploadDataZipFile({
-              title: subjectName,
-              releaseId,
-              zipFile: {
-                file: zipFile as ArrayBuffer,
-                filename: `${subjectName}.zip`,
-              },
-            })
-          : adminService.uploadDataFile({
-              title: subjectName,
-              releaseId,
-              dataFile: {
-                file: subjectFile as ArrayBuffer,
-                filename: `${subjectName}.csv`,
-              },
-              metaFile: {
-                file: subjectMetaFile as ArrayBuffer,
-                filename: `${subjectName}.meta.csv`,
-              },
-            }),
-    };
-  },
-};
+export function pickRandomItems<T>(arr: T[], numberOfItems: number): T[] {
+  return arr
+    .sort(() => 0.5 - Math.random())
+    .slice(0, Math.ceil(numberOfItems * arr.length));
+}
 
-export default utils;
+export function stringifyWithoutNulls(obj: object) {
+  return JSON.stringify(obj, (_, value) => (!value ? undefined : value), 2);
+}
+
+export function parseIntOptional(int: string) {
+  return parseInt(int, 10) || undefined;
+}

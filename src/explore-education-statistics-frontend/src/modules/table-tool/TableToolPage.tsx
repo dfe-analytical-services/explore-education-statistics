@@ -3,12 +3,12 @@ import TableToolWizard, {
 } from '@common/modules/table-tool/components/TableToolWizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService, {
   FastTrackTable,
   FeaturedTable,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
@@ -20,7 +20,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useMemo, useState } from 'react';
-import { TableQueryErrorCode } from '@common/modules/table-tool/components/FiltersForm';
+import { useRouter } from 'next/router';
 
 const TableToolFinalStep = dynamic(
   () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
@@ -33,6 +33,7 @@ export interface TableToolPageProps {
   subjects?: Subject[];
   subjectMeta?: SubjectMeta;
   themeMeta: Theme[];
+  newPermalinks?: boolean; // TO DO - EES-4259 remove `newPermalinks` param and tidy up
 }
 
 const TableToolPage: NextPage<TableToolPageProps> = ({
@@ -42,8 +43,25 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   subjects,
   subjectMeta,
   themeMeta,
+  newPermalinks,
 }) => {
+  const router = useRouter();
   const [loadingFastTrack, setLoadingFastTrack] = useState(false);
+  const [currentStep, setCurrentStep] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    // Intercept the back button and activate the appropriate step
+    router.beforePopState(({ url }) => {
+      if (url === '/data-tables') {
+        // going back to publication step
+        setCurrentStep(1);
+      } else if (url.startsWith('/data-tables/[publicationSlug]')) {
+        // clicking back on any step after step 2 should take you to step 2
+        setCurrentStep(2);
+      }
+      return true;
+    });
+  }, [router]);
 
   useEffect(() => {
     if (fastTrack && subjectMeta) {
@@ -56,10 +74,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       return undefined;
     }
 
-    const filteredFeaturedTables = featuredTables.filter(
-      table => table.id !== fastTrack?.id,
-    );
-
     if (fastTrack && subjectMeta) {
       const fullTable = mapFullTable(fastTrack.fullTable);
       const tableHeaders = mapTableHeadersConfig(
@@ -70,7 +84,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
       return {
         initialStep: 6,
         subjects,
-        featuredTables: filteredFeaturedTables,
+        featuredTables,
         query: {
           ...fastTrack.query,
           releaseId: selectedPublication?.selectedRelease.id,
@@ -87,7 +101,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
     return {
       initialStep: 2,
       subjects,
-      featuredTables: filteredFeaturedTables,
+      featuredTables,
       query: {
         publicationId: selectedPublication?.id,
         releaseId: selectedPublication?.selectedRelease.id,
@@ -116,47 +130,23 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         themeMeta={themeMeta}
         initialState={initialState}
         loadingFastTrack={loadingFastTrack}
-        renderFeaturedTable={highlight => (
+        renderFeaturedTableLink={featuredTable => (
           <Link
-            to={`/data-tables/fast-track/${highlight.id}`}
+            to={`/data-tables/fast-track/${featuredTable.id}`}
             onClick={() => {
               setLoadingFastTrack(true);
+              setCurrentStep(undefined);
               logEvent({
                 category: 'Table tool',
                 action: 'Clicked to view featured table',
-                label: `Featured table name: ${highlight.name}`,
+                label: `Featured table name: ${featuredTable.name}`,
               });
             }}
           >
-            {highlight.name}
+            {featuredTable.name}
           </Link>
         )}
-        onTableQueryError={(
-          errorCode: TableQueryErrorCode,
-          publicationTitle: string,
-          subjectName: string,
-        ) => {
-          switch (errorCode) {
-            case 'QueryExceedsMaxAllowableTableSize': {
-              logEvent({
-                category: 'Table tool size error',
-                action: 'Table exceeded maximum size',
-                label: `${publicationTitle}/${subjectName}`,
-              });
-              break;
-            }
-            case 'RequestCancelled': {
-              logEvent({
-                category: 'Table tool query timeout error',
-                action: 'Table exceeded maximum timeout duration',
-                label: `${publicationTitle}/${subjectName}`,
-              });
-              break;
-            }
-            default:
-              break;
-          }
-        }}
+        currentStep={currentStep}
         finalStep={({
           query,
           selectedPublication: selectedPublicationDetails,
@@ -182,11 +172,57 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}
+                        newPermalinks={newPermalinks}
                       />
                     )}
                 </>
               )}
             </WizardStep>
+          );
+        }}
+        onPublicationFormSubmit={publication => {
+          router.push(
+            {
+              pathname: `/data-tables/${publication.slug}`,
+              query: newPermalinks ? { newPermalinks } : undefined,
+            },
+            undefined,
+            {
+              shallow: true,
+              scroll: false,
+            },
+          );
+        }}
+        onPublicationStepBack={async () => {
+          await router.push('/data-tables', undefined, { shallow: true });
+        }}
+        onStepChange={() => setCurrentStep(undefined)}
+        onSubjectFormSubmit={async ({ publication, release, subjectId }) => {
+          await router.push(
+            {
+              pathname: `/data-tables/${publication.slug}/${release.slug}`,
+              query: newPermalinks
+                ? { subjectId, newPermalinks }
+                : { subjectId },
+            },
+            undefined,
+            {
+              shallow: true,
+              scroll: false,
+            },
+          );
+        }}
+        onSubjectStepBack={async publication => {
+          await router.push(
+            {
+              pathname: `/data-tables/${publication?.slug}`,
+              query: newPermalinks ? { newPermalinks } : undefined,
+            },
+            undefined,
+            {
+              shallow: true,
+              scroll: false,
+            },
           );
         }}
         onSubmit={table => {
@@ -201,6 +237,28 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             label: window.location.pathname,
           });
         }}
+        onTableQueryError={(errorCode, publicationTitle, subjectName) => {
+          switch (errorCode) {
+            case 'QueryExceedsMaxAllowableTableSize': {
+              logEvent({
+                category: 'Table tool size error',
+                action: 'Table exceeded maximum size',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
+            case 'RequestCancelled': {
+              logEvent({
+                category: 'Table tool query timeout error',
+                action: 'Table exceeded maximum timeout duration',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
+            default:
+              break;
+          }
+        }}
       />
     </Page>
   );
@@ -209,9 +267,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
 export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async ({
   query,
 }) => {
-  const { publicationSlug = '', releaseSlug = '' } = query as Dictionary<
-    string
-  >;
+  const {
+    publicationSlug = '',
+    releaseSlug = '',
+    newPermalinks,
+  } = query as Dictionary<string>;
 
   const themeMeta = await publicationService.getPublicationTree({
     publicationFilter: 'DataTables',
@@ -226,6 +286,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     return {
       props: {
         themeMeta,
+        newPermalinks: !!newPermalinks,
       },
     };
   }
@@ -266,6 +327,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
       },
       subjects,
       featuredTables,
+      newPermalinks: !!newPermalinks,
     },
   };
 };

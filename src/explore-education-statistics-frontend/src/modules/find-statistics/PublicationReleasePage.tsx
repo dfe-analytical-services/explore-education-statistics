@@ -8,7 +8,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
+import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
@@ -339,12 +339,12 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             {!!otherReleasesCount && (
               <>
                 <h3 className="govuk-heading-s" id="past-releases">
-                  Past releases
+                  Releases in this series
                 </h3>
 
                 <Details
                   className="govuk-!-margin-bottom-4"
-                  summary={`View previous releases (${otherReleasesCount})`}
+                  summary={`View releases (${otherReleasesCount})`}
                   hiddenText={`for ${release.publication.title}`}
                   onToggle={open =>
                     open &&
@@ -455,12 +455,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
       {(release.downloadFiles ||
         !!release.relatedDashboardsSection?.content.length) && (
-        <ReleaseDataAccordion
+        <ReleaseDataAndFiles
           release={release}
-          renderAllFilesButton={
-            <ButtonLink
+          renderAllFilesLink={
+            <Link
               to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
-              variant="secondary"
               onClick={() => {
                 logEvent({
                   category: 'Downloads',
@@ -468,17 +467,26 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 });
               }}
             >
-              Download all data (zip)
-            </ButtonLink>
+              Download all data (ZIP)
+            </Link>
           }
-          renderCreateTablesButton={<CreateTablesButton release={release} />}
-          renderDataCatalogueLink={
-            <ButtonLink
-              to={`/data-catalogue/${release.publication.slug}/${release.slug}`}
-              variant="secondary"
+          renderCreateTablesLink={
+            <Link
+              to={
+                release.latestRelease
+                  ? `/data-tables/${release.publication.slug}`
+                  : `/data-tables/${release.publication.slug}/${release.slug}`
+              }
             >
-              Browse data files
-            </ButtonLink>
+              View or create your own tables
+            </Link>
+          }
+          renderDataCatalogueLink={
+            <Link
+              to={`/data-catalogue/${release.publication.slug}/${release.slug}`}
+            >
+              Data catalogue
+            </Link>
           }
           renderDownloadLink={file => {
             return (
@@ -497,16 +505,15 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             );
           }}
           renderDataGuidanceLink={
-            <ButtonLink
+            <Link
               to={
                 release.latestRelease
                   ? `/find-statistics/${release.publication.slug}/data-guidance`
                   : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
               }
-              variant="secondary"
             >
               Data guidance
-            </ButtonLink>
+            </Link>
           }
           onSectionOpen={accordionSection => {
             logEvent({
@@ -545,6 +552,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
       {release.content.length > 0 && (
         <Accordion
+          className="govuk-!-margin-top-9"
           id="content"
           onSectionOpen={accordionSection => {
             logEvent({
@@ -588,29 +596,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         }}
       />
     </Page>
-  );
-};
-
-interface CreateTableButtonProps {
-  release: Release;
-  className?: string;
-}
-
-const CreateTablesButton = ({ release, className }: CreateTableButtonProps) => {
-  return release.latestRelease ? (
-    <ButtonLink
-      className={className}
-      to={`/data-tables/${release.publication.slug}`}
-    >
-      Create tables
-    </ButtonLink>
-  ) : (
-    <ButtonLink
-      className={className}
-      to={`/data-tables/${release.publication.slug}/${release.slug}`}
-    >
-      Create tables
-    </ButtonLink>
   );
 };
 

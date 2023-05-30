@@ -174,15 +174,14 @@ describe('PublicationReleasePage', () => {
     const usefulInfo = within(screen.getByRole('complementary'));
 
     expect(
-      usefulInfo.getByRole('heading', { name: 'Past releases' }),
+      usefulInfo.getByRole('heading', { name: 'Releases in this series' }),
     ).toBeInTheDocument();
 
     const details = within(usefulInfo.getByRole('group'));
 
     userEvent.click(
       details.getByRole('button', {
-        name:
-          'View previous releases (5) for Pupil absence in schools in England',
+        name: 'View releases (5) for Pupil absence in schools in England',
       }),
     );
 

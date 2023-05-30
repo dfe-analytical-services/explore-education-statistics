@@ -28,7 +28,6 @@ export default class HttpClient {
   get<TJson>(
     url: string,
     headers?: HttpHeaders,
-    additionalAllowedHttpCodes?: number[],
   ): {
     json: TJson;
     response: RefinedResponse<'text'>;
@@ -42,12 +41,11 @@ export default class HttpClient {
       },
     });
 
-    const successCodes = [200, ...(additionalAllowedHttpCodes ?? [])];
-
-    if (this.checkResponseStatus && !successCodes.includes(response.status)) {
-      throw new Error(
-        `${response.status} error with GET to url ${this.baseUrl}${url}: ${response.body}`,
-      );
+    if (
+      (this.checkResponseStatus && response.status < 200) ||
+      response.status > 204
+    ) {
+      throw response;
     }
 
     return {
@@ -75,10 +73,11 @@ export default class HttpClient {
       },
     });
 
-    if (this.checkResponseStatus && response.status !== 200) {
-      throw new Error(
-        `${response.status} error with POST to url ${this.baseUrl}${url} with request body\n\n${data}: ${response.body}`,
-      );
+    if (
+      this.checkResponseStatus &&
+      (response.status < 200 || response.status > 204)
+    ) {
+      throw response;
     }
 
     return {
@@ -104,10 +103,11 @@ export default class HttpClient {
       },
     });
 
-    if (this.checkResponseStatus && response.status !== 200) {
-      throw new Error(
-        `${response.status} error with PATCH to url ${this.baseUrl}${url} with request body\n\n${data}: ${response.body}`,
-      );
+    if (
+      (this.checkResponseStatus && response.status < 200) ||
+      response.status > 204
+    ) {
+      throw response;
     }
 
     return {
@@ -131,16 +131,15 @@ export default class HttpClient {
     });
 
     if (this.checkResponseStatus && response.status !== 204) {
-      throw new Error(
-        `Error with DELETE to url ${this.baseUrl}${url}: ${response.body}`,
-      );
+      throw response;
     }
+
     return response;
   }
 
   private static getDefaultParams(accessToken?: string): RefinedParams<'text'> {
     return {
-      timeout: '300s',
+      timeout: '600s',
       headers: {
         ...(accessToken
           ? {

@@ -403,6 +403,15 @@ const ReleaseStatusForm = ({
               </FormattedDate>
               .
             </p>
+            <p>
+              Once confirmed, if you need to change or cancel the publishing for
+              any reason, you must come back to this page to change it yourself.
+              If you need any support, please contact{' '}
+              <a href="mailto:explore.statistics@education.gov.uk">
+                explore.statistics@education.gov.uk
+              </a>
+              .
+            </p>
             <p>Are you sure?</p>
           </ModalConfirm>
 

@@ -12,8 +12,8 @@ import generateLegendDataGroups, {
 import {
   AxisConfiguration,
   ChartProps,
-  CustomDataGroup,
-  DataClassification,
+  DataGroupingType,
+  MapConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
@@ -60,21 +60,24 @@ export interface MapBlockProps extends ChartProps {
     major: AxisConfiguration;
   };
   boundaryLevel?: number;
-  customDataGroups?: CustomDataGroup[];
+  // dataGroups & dataClassification to be removed when
+  // migrate old maps to use the new config
+  // https://dfedigital.atlassian.net/browse/EES-4271
   dataGroups?: number;
-  dataClassification?: DataClassification;
+  dataClassification?: DataGroupingType;
   id: string;
   legend: LegendConfiguration;
+  map?: MapConfig;
   maxBounds?: LatLngBounds;
   position?: { lat: number; lng: number };
 }
 
 export default function MapBlockInternal({
   id,
-  customDataGroups = [],
+  dataGroups: deprecatedDataGroups,
+  dataClassification: deprecatedDataClassification,
   data,
-  dataGroups = 5,
-  dataClassification = 'EqualIntervals',
+  map,
   meta,
   legend,
   position = { lat: 53.00986, lng: -3.2524038 },
@@ -104,10 +107,24 @@ export default function MapBlockInternal({
   const dataSetCategoryConfigs = useMemo<Dictionary<DataSetCategoryConfig>>(
     () =>
       keyBy(
-        getDataSetCategoryConfigs(dataSetCategories, legend.items, meta),
+        getDataSetCategoryConfigs({
+          dataSetCategories,
+          legendItems: legend.items,
+          meta,
+          dataSetConfigs: map?.dataSetConfigs,
+          deprecatedDataGroups,
+          deprecatedDataClassification,
+        }),
         dataSetConfig => dataSetConfig.dataKey,
       ),
-    [dataSetCategories, legend, meta],
+    [
+      dataSetCategories,
+      map?.dataSetConfigs,
+      legend,
+      meta,
+      deprecatedDataGroups,
+      deprecatedDataClassification,
+    ],
   );
 
   const dataSetOptions = useMemo<SelectOption[]>(() => {
@@ -229,9 +246,6 @@ export default function MapBlockInternal({
       } = generateFeaturesAndDataGroups({
         selectedDataSetConfig,
         dataSetCategories,
-        dataGroups,
-        classification: dataClassification,
-        customDataGroups,
       });
 
       setFeatures(newFeatures);
@@ -239,9 +253,6 @@ export default function MapBlockInternal({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
-    customDataGroups.length,
-    dataGroups,
-    dataClassification,
     dataSetCategories,
     dataSetCategoryConfigs,
     meta,
@@ -460,7 +471,7 @@ export default function MapBlockInternal({
             <h3 className="govuk-heading-s">
               Key to {selectedDataSetConfig?.config?.label}
             </h3>
-            <ul className="govuk-list">
+            <ul className="govuk-list" data-testid="mapBlock-legend">
               {legendDataGroups.map(({ min, max, colour }) => (
                 <li
                   key={`${min}-${max}-${colour}`}
@@ -512,16 +523,10 @@ export default function MapBlockInternal({
 }
 
 function generateFeaturesAndDataGroups({
-  classification,
-  customDataGroups,
   dataSetCategories,
-  dataGroups: groups,
   selectedDataSetConfig,
 }: {
-  classification: DataClassification;
-  customDataGroups: CustomDataGroup[];
   dataSetCategories: MapDataSetCategory[];
-  dataGroups: number;
   selectedDataSetConfig: DataSetCategoryConfig;
 }): {
   features: MapFeatureCollection;
@@ -547,10 +552,8 @@ function generateFeaturesAndDataGroups({
 
   const dataGroups = generateLegendDataGroups({
     colour,
-    classification,
-    customDataGroups,
+    dataGrouping: selectedDataSetConfig.dataGrouping,
     decimalPlaces,
-    groups,
     values,
     unit,
   });
@@ -558,7 +561,9 @@ function generateFeaturesAndDataGroups({
   // Default to white for areas not covered by custom data sets
   // to make it clearer which aren't covered by the groups.
   const defaultColour =
-    classification === 'Custom' ? 'rgba(255, 255, 255, 1)' : 'rgba(0,0,0,0)';
+    selectedDataSetConfig.dataGrouping?.type === 'Custom'
+      ? 'rgba(255, 255, 255, 1)'
+      : 'rgba(0,0,0,0)';
 
   const features: MapFeatureCollection = {
     type: 'FeatureCollection',
@@ -566,27 +571,29 @@ function generateFeaturesAndDataGroups({
       (acc, { dataSets, filter, geoJson }) => {
         const value = dataSets?.[selectedDataSetKey]?.value;
 
-        if (Number.isFinite(value)) {
-          const matchingDataGroup = dataGroups.find(dataClass => {
-            const roundedValue = Number(value.toFixed(dataClass.decimalPlaces));
-            return (
-              dataClass.minRaw <= roundedValue &&
-              roundedValue <= dataClass.maxRaw
-            );
-          });
+        const matchingDataGroup = Number.isFinite(value)
+          ? dataGroups.find(dataClass => {
+              const roundedValue = Number(
+                value.toFixed(dataClass.decimalPlaces),
+              );
+              return (
+                dataClass.minRaw <= roundedValue &&
+                roundedValue <= dataClass.maxRaw
+              );
+            })
+          : undefined;
 
-          acc.push({
-            ...geoJson,
-            id: filter.id,
-            properties: {
-              ...geoJson.properties,
-              dataSets,
-              // Default to transparent if no match
-              colour: matchingDataGroup?.colour ?? defaultColour,
-              data: value,
-            },
-          });
-        }
+        acc.push({
+          ...geoJson,
+          id: filter.id,
+          properties: {
+            ...geoJson.properties,
+            dataSets,
+            // Default to transparent if no match
+            colour: matchingDataGroup?.colour ?? defaultColour,
+            data: value,
+          },
+        });
 
         return acc;
       },

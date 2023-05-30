@@ -20,19 +20,13 @@ Validate page contents
     user waits until page contains accordion section    Pupils and schools
     user opens accordion section    Pupils and schools
 
-    user opens details dropdown    Exclusions
-    user checks page contains methodology link
-    ...    Exclusions
-    ...    Permanent and fixed-period exclusions in England
+    user checks page contains link with text and url
     ...    Pupil exclusion statistics: methodology
-    ...    %{PUBLIC_URL}/methodology/permanent-and-fixed-period-exclusions-in-england
+    ...    /methodology/permanent-and-fixed-period-exclusions-in-england
 
-    user opens details dropdown    Pupil absence
-    user checks page contains methodology link
-    ...    Pupil absence
-    ...    Pupil absence in schools in England
+    user checks page contains link with text and url
     ...    Pupil absence statistics: methodology
-    ...    %{PUBLIC_URL}/methodology/pupil-absence-in-schools-in-england
+    ...    /methodology/pupil-absence-in-schools-in-england
 
 Validate accordion sections exist
     user checks url contains    methodology

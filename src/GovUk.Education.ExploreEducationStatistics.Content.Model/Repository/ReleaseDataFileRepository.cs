@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
     {
         private readonly ContentDbContext _contentDbContext;
 
-        private static readonly List<FileType> SupportedFileTypes = new ()
+        private static readonly List<FileType> SupportedFileTypes = new()
         {
             Data,
             Metadata

@@ -39,6 +39,8 @@ describe('DownloadStep', () => {
         size: '20 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
     {
       id: 'test-subject-1',
@@ -57,6 +59,8 @@ describe('DownloadStep', () => {
         size: '10 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
     {
       id: 'test-subject-3',
@@ -75,6 +79,8 @@ describe('DownloadStep', () => {
         size: '30 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
   ];
 

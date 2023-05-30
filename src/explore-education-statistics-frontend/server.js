@@ -106,6 +106,7 @@ async function startServer(port = process.env.PORT || 3000) {
   }
 
   server.get('*', (req, res) => handleRequest(req, res));
+  server.post('*', (req, res) => handleRequest(req, res));
 
   server.listen(port, err => {
     if (err) {

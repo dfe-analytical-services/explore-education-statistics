@@ -1,20 +1,25 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 {
-    public class ChartDataSet
+    public class ChartBaseDataSet
     {
-        public Guid Indicator;
+        public Guid? Indicator;
         public List<Guid> Filters = new();
-        public ChartDataSetLocation Location;
-        public string TimePeriod;
+        public ChartDataSetLocation? Location;
+        public string? TimePeriod;
+    }
+
+    public class ChartDataSet : ChartBaseDataSet
+    {
         public int? Order;
 
         // TODO EES-1649 Migrate data set configs to legend item configs
-        public ChartDataSetConfiguration Config;
+        public ChartDataSetConfiguration? Config;
     }
 
     public class ChartDataSetLocation

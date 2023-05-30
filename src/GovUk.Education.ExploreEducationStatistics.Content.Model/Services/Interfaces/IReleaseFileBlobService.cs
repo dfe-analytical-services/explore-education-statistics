@@ -27,18 +27,18 @@ public interface IReleaseFileBlobService
         int? bufferSize = null,
         CancellationToken cancellationToken = default);
 
-    Task<string> DownloadBlobText(
+    Task<Either<ActionResult, string>> DownloadBlobText(
         ReleaseFile releaseFile,
         CancellationToken cancellationToken = default);
 
     Task<Either<ActionResult, Stream>> DownloadToStream(
         ReleaseFile releaseFile,
         Stream stream,
-        CancellationToken? cancellationToken = null);
+        CancellationToken cancellationToken = default);
 
-    Task<object?> GetDeserializedJson(ReleaseFile releaseFile, Type target);
+    Task<Either<ActionResult, object?>> GetDeserializedJson(ReleaseFile releaseFile, Type type);
 
-    Task<T?> GetDeserializedJson<T>(ReleaseFile releaseFile) where T : class;
+    Task<Either<ActionResult, T?>> GetDeserializedJson<T>(ReleaseFile releaseFile) where T : class;
 
     Task UploadFile(
         ReleaseFile releaseFile,
@@ -53,5 +53,4 @@ public interface IReleaseFileBlobService
         ReleaseFile releaseFile,
         T content,
         JsonSerializerSettings? settings = null);
-
 }

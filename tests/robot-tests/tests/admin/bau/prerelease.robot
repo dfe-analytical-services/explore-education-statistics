@@ -62,11 +62,11 @@ Add featured table
     user waits until h2 is visible    Data blocks
 
     user clicks link    Create data block
-    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until table tool wizard step is available    1    Select a data set
 
     user waits until page contains    UI test subject
     user clicks radio    UI test subject
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
 
     user chooses location, time period and filters
     user validates table rows
@@ -296,8 +296,6 @@ Validate contact banner is shown
     user checks testid element contains    notificationBanner    UI test team name: ui_test@test.com
 
 Validate metadata guidance page
-    user opens accordion section    Explore data and files
-    user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
@@ -350,13 +348,15 @@ Go back to prerelease content page again
 Go to prerelease table tool page
     user clicks link    Table tool
     user waits until h1 is visible    Create your own tables
-    user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
+    user waits until table tool wizard step is available    1    Select a data set    %{WAIT_SMALL}
 
 Validate featured tables
-    user waits until page contains element    id:featuredTables
-    user checks element count is x    css:#featuredTables li    1
-    user checks element should contain    css:#featuredTables li:first-child a    ${DATABLOCK_FEATURED_NAME}
-    user checks element should contain    css:#featuredTables li:first-child [id^="highlight-description"]
+    user clicks radio    UI test subject
+    user waits until page contains element    testid:featuredTables
+    user checks element count is x    css:[data-testid="featuredTables"] li    1
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child a
+    ...    ${DATABLOCK_FEATURED_NAME}
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child p
     ...    ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}
 
 Go to featured table and validate table
@@ -368,12 +368,11 @@ Create and validate custom table
 
     user waits until h1 is visible    Create your own tables
 
-    user clicks link    Create your own table
-    user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
+    user waits until table tool wizard step is available    1    Select a data set    %{WAIT_SMALL}
 
     user waits until page contains    UI test subject    %{WAIT_SMALL}
     user clicks radio    UI test subject
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
 
     user chooses location, time period and filters
     user validates table rows
@@ -409,8 +408,6 @@ Validate prerelease has started for Analyst user
     user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
 
 Validate public metdata guidance for Analyst user
-    user opens accordion section    Explore data and files
-    user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar year 2000    %{WAIT_SMALL}
@@ -469,13 +466,15 @@ Go to prerelease table tool page as Analyst user
     user clicks link    Table tool
 
     user waits until h1 is visible    Create your own tables
-    user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
+    user waits until table tool wizard step is available    1    Select a data set    %{WAIT_SMALL}
 
 Validate featured tables as Analyst user
-    user waits until page contains element    id:featuredTables    %{WAIT_SMALL}
-    user checks element count is x    css:#featuredTables li    1
-    user checks element should contain    css:#featuredTables li:first-child a    ${DATABLOCK_FEATURED_NAME}
-    user checks element should contain    css:#featuredTables li:first-child [id^="highlight-description"]
+    user clicks radio    UI test subject
+    user waits until page contains element    testid:featuredTables    %{WAIT_SMALL}
+    user checks element count is x    css:[data-testid="featuredTables"] li    1
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child a
+    ...    ${DATABLOCK_FEATURED_NAME}
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child p
     ...    ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}
 
 Go to featured table and validate table as Analyst user
@@ -487,12 +486,11 @@ Create and validate custom table as Analyst user
 
     user waits until h1 is visible    Create your own tables
 
-    user clicks link    Create your own table
-    user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
+    user waits until table tool wizard step is available    1    Select a data set    %{WAIT_SMALL}
 
     user waits until page contains    UI test subject    %{WAIT_SMALL}
     user clicks radio    UI test subject
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
 
     user chooses location, time period and filters
     user validates table rows

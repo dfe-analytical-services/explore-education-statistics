@@ -6,6 +6,8 @@ services:
       - k6_performance_test_network
     environment:
       - INFLUXDB_DB=k6
+    ports:
+      - "8086:8086"
 
   grafana:
     image: grafana/grafana:9.3.2

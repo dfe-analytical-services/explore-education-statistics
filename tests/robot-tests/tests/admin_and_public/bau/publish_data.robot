@@ -320,7 +320,7 @@ Navigate to Data blocks page
 Create new data block
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until table tool wizard step is available    1    Select a data set
 
 Select subject "${SUBJECT_2_NAME}"
     user waits until page contains    ${SUBJECT_2_NAME}
@@ -442,9 +442,9 @@ Navigate to published release page
 Check latest release is correct
     user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
-    user checks page contains    View previous releases (1)
+    user checks page contains    View releases (1)
 
-    user opens details dropdown    View previous releases (1)
+    user opens details dropdown    View releases (1)
     user waits until page contains other release    ${RELEASE_1_NAME}
     user checks page does not contain other release    ${RELEASE_2_NAME}
 
@@ -454,7 +454,7 @@ Check other release is correct
     user waits until page contains title caption    ${RELEASE_1_NAME}
 
     user waits until page contains link    View latest data: ${RELEASE_2_NAME}
-    user checks page contains    View previous releases (1)
+    user checks page contains    View releases (1)
     user waits until page contains other release    ${RELEASE_2_NAME}
     user checks page does not contain other release    ${RELEASE_1_NAME}
 
@@ -465,18 +465,17 @@ Select publication in table tool
     user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set or featured table
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject "${SUBJECT_2_NAME}" in table tool
-    user clicks link    Create your own table
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set or featured table
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
-    user waits until button is enabled    Next step    %{WAIT_SMALL}
-    user clicks button    Next step
+    user waits until button is enabled    Create your own table    %{WAIT_SMALL}
+    user clicks button    Create your own table
     user waits until table tool wizard step is available    3    Choose locations
-    user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
+    user checks previous table tool step contains    2    Data set    ${SUBJECT_2_NAME}
 
 Select locations in table tool
     user clicks element    testid:Expand Details Section Local authority
@@ -533,20 +532,19 @@ Validate table has footnotes
     user checks list has x items    testid:footnotes    3
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-Select table featured table from subjects step
+Select featured table from subjects step
     user clicks element    testid:wizardStep-2-goToButton
     user waits until h2 is visible    Go back to previous step
     user clicks button    Confirm
     user waits until page does not contain button    Confirm
 
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set or featured table
 
-    user clicks link    Featured tables
-    user waits until table tool wizard step is available    2    Choose a table
+    user clicks radio    ${SUBJECT_2_NAME}
 
-    user checks element count is x    css:#featuredTables li    1
-    user checks element should contain    css:#featuredTables li:first-child a    Test highlight name
-    user checks element should contain    css:#featuredTables li:first-child [id^="highlight-description"]
+    user checks element count is x    css:[data-testid="featuredTables"] li    1
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child a    Test highlight name
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child p
     ...    Test highlight description
 
     user clicks link    Test highlight name
@@ -616,8 +614,6 @@ Go to release page
     user waits until page contains title caption    ${RELEASE_2_NAME}
 
 Go to data guidance document
-    user opens accordion section    Explore data and files
-    user waits until h3 is visible    Open data
     user clicks link    Data guidance
 
     user waits until page contains title caption    ${RELEASE_2_NAME}

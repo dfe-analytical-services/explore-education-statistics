@@ -1,0 +1,253 @@
+schedules:
+- cron: 0 5,7,19 * * 1,2,3,4,5
+  branches:
+    include:
+    - dev
+  always: true
+pr: none
+
+name: $(date:yyyyMMdd)$(rev:.r)
+
+resources:
+  repositories:
+  - repository: self
+    type: git
+    ref: refs/heads/dev
+
+jobs:
+- job: 'Public'
+  displayName: Public UI tests
+  timeoutInMinutes: 160
+  cancelTimeoutInMinutes: 10
+  condition: succeededOrFailed()
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 5
+    fetchTags: false
+
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.10
+  # retryCountOnTaskFailure: 2
+    timeoutInMinutes: 5
+    inputs:
+      versionSpec: 3.10
+
+  - task: AzureKeyVault@2
+    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    inputs:
+      azureSubscription: 's101-datahub-development-spn-ees'
+      KeyVaultName: s101d01-kv-ees-01
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      RunAsPreJob: true
+
+  - task: PythonScript@0
+    displayName: Public UI tests
+    inputs:
+      scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2
+      workingDirectory: tests/robot-tests
+    env:
+      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
+      SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
+
+  #- task: PythonScript@0
+  #  displayName: Public UI tests - rerun failed suites
+  #  condition: not(succeeded())
+  #  inputs:
+  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+  #    arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2 --rerun-failed-suites
+  #    workingDirectory: tests/robot-tests
+
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: tests/robot-tests/test-results/xunit.xml
+      failTaskOnFailedTests: false
+
+  - task: PublishPipelineArtifact@1
+    displayName: Publish Test Pipeline Artifact
+    inputs:
+      path: tests/robot-tests/test-results/
+      artifactName: test-results-public
+
+- job: 'PublishAndAmend'
+  displayName: Publish release and amend suites
+  timeoutInMinutes: 160
+  cancelTimeoutInMinutes: 10
+  condition: succeededOrFailed()
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 5
+    fetchTags: false
+
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.10
+  # retryCountOnTaskFailure: 2
+    timeoutInMinutes: 5
+    inputs:
+      versionSpec: 3.10
+
+  - task: AzureKeyVault@2
+    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    inputs:
+      azureSubscription: 's101-datahub-development-spn-ees'
+      KeyVaultName: s101d01-kv-ees-01
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      RunAsPreJob: true
+
+  - task: PythonScript@0
+    displayName: Publish release and amend UI tests
+    condition: succeededOrFailed()
+    inputs:
+      scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2
+    #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained apersands.
+      workingDirectory: tests/robot-tests
+    env:
+      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
+      SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
+
+  #- task: PythonScript@0
+  #  displayName: 'Publish release and amend UI tests - rerun failed suites'
+  #  condition: not(succeeded())
+  #  inputs:
+  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+  #    arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2 --rerun-failed-suites
+  #    workingDirectory: tests/robot-tests
+
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    inputs:
+      testResultsFiles: tests/robot-tests/test-results/xunit.xml
+      failTaskOnFailedTests: false
+
+  - task: PublishPipelineArtifact@1
+    displayName: Publish Pipeline Artifact
+    inputs:
+      path: tests/robot-tests/test-results/
+      artifactName: test-results-admin-and-public-2
+
+- job: 'Admin'
+  displayName: Admin UI tests
+  timeoutInMinutes: 160
+  cancelTimeoutInMinutes: 10
+  condition: succeededOrFailed()
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 5
+    fetchTags: false
+
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.10
+  # retryCountOnTaskFailure: 2
+    timeoutInMinutes: 5
+    inputs:
+      versionSpec: 3.10
+
+  - task: AzureKeyVault@2
+    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    inputs:
+      azureSubscription: 's101-datahub-development-spn-ees'
+      KeyVaultName: s101d01-kv-ees-01
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      RunAsPreJob: true
+
+  - task: PythonScript@0
+    displayName: Admin UI tests
+    condition: succeededOrFailed()
+    inputs:
+      scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2
+      workingDirectory: tests/robot-tests
+    env:
+      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
+      SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
+
+  #- task: PythonScript@0
+  #  displayName: Admin UI tests - rerun failed suites
+  #  condition: not(succeeded())
+  #  inputs:
+  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2 --rerun-failed-suites
+  #    workingDirectory: tests/robot-tests
+
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    condition: succeededOrFailed()
+    inputs:
+      testResultsFiles: tests/robot-tests/test-results/xunit.xml
+      failTaskOnFailedTests: false
+
+  - task: PublishPipelineArtifact@1
+    displayName: Publish Test Pipeline Artifact
+    condition: succeededOrFailed()
+    inputs:
+      path: tests/robot-tests/test-results/
+      artifactName: test-results-admin
+      
+- job: 'AdminAndPublic'
+  displayName: Admin & public suites
+  timeoutInMinutes: 160
+  cancelTimeoutInMinutes: 10
+  condition: succeededOrFailed()
+  pool:
+    vmImage: ubuntu-20.04
+  steps:
+  - checkout: self
+    clean: true
+    fetchDepth: 5
+    fetchTags: false
+
+  - task: UsePythonVersion@0
+    displayName: Use Python 3.10
+  # retryCountOnTaskFailure: 2
+    timeoutInMinutes: 5
+    inputs:
+      versionSpec: 3.10
+
+  - task: AzureKeyVault@2
+    displayName: 'Azure Key Vault: s101d01-kv-ees-01'
+    inputs:
+      azureSubscription: 's101-datahub-development-spn-ees'
+      KeyVaultName: s101d01-kv-ees-01
+      SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
+      RunAsPreJob: true
+
+  - task: PythonScript@0
+    displayName: Admin public UI tests
+    inputs:
+      scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2
+      workingDirectory: tests/robot-tests
+    env:
+      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
+      SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
+
+  #- task: PythonScript@0
+  #  displayName: Admin public UI tests - rerun failed suites
+  #  condition: not(succeeded())
+  #  inputs:
+  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
+  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2 --rerun-failed-suites
+  #    workingDirectory: tests/robot-tests
+
+  - task: PublishTestResults@2
+    displayName: Publish Test Results
+    inputs:
+      testResultsFiles: tests/robot-tests/test-results/xunit.xml
+
+  - task: PublishPipelineArtifact@1
+    displayName: Publish Test Pipeline Artifact
+    inputs:
+      path: tests/robot-tests/test-results/
+      artifactName: test-results-admin-public

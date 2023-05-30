@@ -38,14 +38,19 @@ public static class CsvUtils
     /// Gets the lines of the provided CSV as lists of cell values.
     /// </summary>
     /// <remarks>
-    /// This is best used with CSVs that are of known small values.
+    /// This is best used with CSVs that are of known small values and should not be used for CSVs that
+    /// could be large, as this will load the entire contents into memory.
     /// This method uses and closes the provided Stream.
     /// </remarks>
     public static async Task<List<List<string>>> GetCsvRows(
         Func<Task<Stream>> streamProvider,
-        bool skipHeaderRow = true)
+        int startingRowIndex = 0)
     {
-        return (await Select(streamProvider, (cells, _) => cells, skipHeaderRow)).ToList();
+        return (await Select(
+            streamProvider, 
+            (cells, _, _) => cells, 
+            startingRowIndex))
+            .ToList();
     }
 
     /// <summary>
@@ -83,27 +88,35 @@ public static class CsvUtils
     /// <param name="streamProvider">The Stream of the CSV.</param>
     /// <param name="func">The function to execute against each row of the CSV. The function takes the cells and
     /// the index of the current row, and returns "true" to continue iterating, or "false" to finish looping early.
-    /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
+    /// The index is the zero-based index of the data row in the CSV, not including the header. Therefore the first
+    /// row of data under the header will have the index of "0".
     /// </param>
-    /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
+    /// <param name="startingRowIndex">Optional parameter to skip a number of rows to be iterated over. For instance,
+    /// if this is set to 0, the first row being iterated over will be the first line of data, whereas if this is set
+    /// to 1, the first row being iterated over will be the 2nd line of data.</param>
     public static async Task ForEachRow(
         Func<Task<Stream>> streamProvider,
-        Func<List<string>, int, Task<bool>> func,
-        bool skipHeaderRow = true)
+        Func<List<string>, int, bool, Task<bool>> func,
+        int startingRowIndex = 0)
     {
-        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-        {
-            // Skip the first record of the CSV when attaching the CsvDataReader to the
-            // CsvReader if we want to omit the header row from the rows being iterated over.
-            HasHeaderRecord = skipHeaderRow
-        };
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture);
 
         using var dataFileReader = new StreamReader(await streamProvider.Invoke());
         using var csvReader = new CsvReader(dataFileReader, config);
         using var csvDataReader = new CsvDataReader(csvReader);
+        var lastLine = !await csvReader.ReadAsync();
 
-        while (await csvReader.ReadAsync())
+        while (!lastLine)
         {
+            var currentRowIndex = csvReader.Parser.Row - 2;
+
+            if (currentRowIndex < startingRowIndex)
+            {
+                // Skipping this row as it is below startingRowIndex
+                lastLine = !await csvReader.ReadAsync();
+                continue;
+            }
+            
             var cellCount = csvDataReader.FieldCount;
 
             var cells = Enumerable
@@ -111,16 +124,71 @@ public static class CsvUtils
                 .Select(csvReader.GetField<string>)
                 .OfType<string>()
                 .ToList();
-
-            var currentRowIndex = csvReader.Parser.Row + (skipHeaderRow ? -1 : 0);
-
-            var result = await func.Invoke(cells, currentRowIndex);
+            
+            lastLine = !await csvReader.ReadAsync();
+            
+            var result = await func.Invoke(cells, currentRowIndex, lastLine);
 
             if (!result)
             {
                 break;
             }
         }
+    }
+    
+    /// <summary>
+    /// Execute a given function against batches of rows from the provided CSV. The batch
+    /// of rows (a list of lists of cells) and the index of the current batch being processed are
+    /// provided to the function.
+    /// </summary>
+    /// <param name="streamProvider">The Stream of the CSV.</param>
+    /// <param name="batchSize">The number of rows in each batch.</param>
+    /// <param name="func">
+    /// The function to execute against each batch of CSV rows. The function takes the rows 
+    /// the index of the current batch, and returns "true" to continue iterating, or "false" to finish looping early.
+    /// The index is a zero-based index. Therefore the first batch of rows will have the index of "0".
+    ///
+    /// Note that if using "startingBatchIndex", this will be included in the index provided to the function. For
+    /// example, if "startingBatchIndex" is "10", the first batch of rows provided to the first function execution will
+    /// be the 11th batch of rows from the CSV, and the index provided to the first function execution will be "10".  
+    /// </param>
+    /// <param name="startingBatchIndex">Optional parameter to skip a number of batches to be processed by the function.
+    /// For instance, if this is set to 0, the first batch being presented to the function will be the 1st X number
+    /// of rows (determined by "batchSize"), whereas if this is set to 1, the first batch being presented to the
+    /// function will contain the 2nd X number of rows of data.</param>
+    public static async Task Batch(
+        Func<Task<Stream>> streamProvider,
+        int batchSize,
+        Func<List<List<string>>, int, Task<bool>> func,
+        int startingBatchIndex = 0)
+    {
+        var linesInBatch = new List<List<string>>();
+        var batchIndex = 0;
+        var rowsProcessed = 0;
+        
+        await ForEachRow(
+            streamProvider,
+            async (cells, _, lastLine) =>
+            {
+                rowsProcessed++;
+                linesInBatch.Add(cells);
+
+                if (lastLine || rowsProcessed % batchSize == 0)
+                {
+                    var result = await func.Invoke(linesInBatch.ToList(), batchIndex + startingBatchIndex);
+
+                    if (!result)
+                    {
+                        return false;
+                    }
+
+                    batchIndex++;
+                    linesInBatch.Clear();
+                }
+
+                return true;
+            },
+            startingRowIndex: startingBatchIndex * batchSize);
     }
 
     /// <summary>
@@ -135,20 +203,22 @@ public static class CsvUtils
     /// the index of the current row.
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
-    /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
+    /// <param name="startingRowIndex">Optional parameter to skip a number of rows to be iterated over. For instance,
+    /// if this is set to 0, the first row being iterated over will be the first line of data, whereas if this is set
+    /// to 1, the first row being iterated over will be the 2nd line of data.</param>
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
-        Func<List<string>, int, Task> func,
-        bool skipHeaderRow = true)
+        Func<List<string>, int, bool, Task> func,
+        int startingRowIndex = 0)
     {
         return ForEachRow(
             streamProvider,
-            async (cells, index) =>
+            async (cells, index, lastLine) =>
             {
-                await func.Invoke(cells, index);
+                await func.Invoke(cells, index, lastLine);
                 return true;
             },
-            skipHeaderRow
+            startingRowIndex
         );
     }
 
@@ -164,20 +234,22 @@ public static class CsvUtils
     /// the index of the current row, and returns "true" to continue iterating, or "false" to finish looping early.
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
-    /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
+    /// <param name="startingRowIndex">Optional parameter to skip a number of rows to be iterated over. For instance,
+    /// if this is set to 0, the first row being iterated over will be the first line of data, whereas if this is set
+    /// to 1, the first row being iterated over will be the 2nd line of data.</param>
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
-        Func<List<string>, int, bool> action,
-        bool skipHeaderRow = true)
+        Func<List<string>, int, bool, bool> action,
+        int startingRowIndex = 0)
     {
         return ForEachRow(
             streamProvider,
-            (cells, index) =>
+            (cells, index, lastLine) =>
             {
-                var result = action.Invoke(cells, index);
+                var result = action.Invoke(cells, index, lastLine);
                 return Task.FromResult(result);
             },
-            skipHeaderRow
+            startingRowIndex
         );
     }
 
@@ -193,20 +265,22 @@ public static class CsvUtils
     /// the index of the current row.
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
-    /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
+    /// <param name="startingRowIndex">Optional parameter to skip a number of rows to be iterated over. For instance,
+    /// if this is set to 0, the first row being iterated over will be the first line of data, whereas if this is set
+    /// to 1, the first row being iterated over will be the 2nd line of data.</param>
     public static Task ForEachRow(
         Func<Task<Stream>> streamProvider,
-        Action<List<string>, int> action,
-        bool skipHeaderRow = true)
+        Action<List<string>, int, bool> action,
+        int startingRowIndex = 0)
     {
         return ForEachRow(
             streamProvider,
-            (cells, index) =>
+            (cells, index, lastLine) =>
             {
-                action.Invoke(cells, index);
+                action.Invoke(cells, index, lastLine);
                 return Task.FromResult(true);
             },
-            skipHeaderRow
+            startingRowIndex
         );
     }
 
@@ -223,18 +297,23 @@ public static class CsvUtils
     /// the index of the current row, and returns a new value per line of the CSV to generate a new List.
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
-    /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
+    /// <param name="startingRowIndex">Optional parameter to skip a number of rows to be iterated over. For instance,
+    /// if this is set to 0, the first row being iterated over will be the first line of data, whereas if this is set
+    /// to 1, the first row being iterated over will be the 2nd line of data.</param>
     public static async Task<List<TResult>> Select<TResult>(
         Func<Task<Stream>> streamProvider,
-        Func<List<string>, int, Task<TResult>> func,
-        bool skipHeaderRow = true)
+        Func<List<string>, int, bool, Task<TResult>> func,
+        int startingRowIndex = 0)
     {
         var list = new List<TResult>();
 
         await ForEachRow(
             streamProvider,
-            async (cells, index) => { list.Add(await func.Invoke(cells, index)); },
-            skipHeaderRow
+            async (cells, index, lastLine) =>
+            {
+                list.Add(await func.Invoke(cells, index, lastLine));
+            },
+            startingRowIndex
         );
 
         return list;
@@ -253,61 +332,22 @@ public static class CsvUtils
     /// the index of the current row, and returns a new value per line of the CSV to generate a new List.
     /// The index is the zero-based index of the row in the CSV, minus 1 if the CSV header was skipped.
     /// </param>
-    /// <param name="skipHeaderRow">Choose whether or not to skip a first header row in the executions.</param>
+    /// <param name="startingRowIndex">Optional parameter to skip a number of rows to be iterated over. For instance,
+    /// if this is set to 0, the first row being iterated over will be the first line of data, whereas if this is set
+    /// to 1, the first row being iterated over will be the 2nd line of data.</param>
     public static Task<List<TResult>> Select<TResult>(
         Func<Task<Stream>> streamProvider,
-        Func<List<string>, int, TResult> func,
-        bool skipHeaderRow = true)
+        Func<List<string>, int, bool, TResult> func,
+        int startingRowIndex = 0)
     {
         return Select(
             streamProvider,
-            (cells, index) =>
+            (cells, index, lastLine) =>
             {
-                var result = func.Invoke(cells, index);
+                var result = func.Invoke(cells, index, lastLine);
                 return Task.FromResult(result);
             },
-            skipHeaderRow
+            startingRowIndex
         );
-    }
-
-    public static T? BuildType<T>(
-        IReadOnlyList<string> rowValues,
-        List<string> colValues,
-        string column,
-        Func<string, T> func)
-    {
-        var value = Value(rowValues, colValues, column);
-        return value == null ? default : func(value);
-    }
-
-    public static T? BuildType<T>(
-        IReadOnlyList<string> rowValues,
-        List<string> colValues,
-        IEnumerable<string> columns,
-        Func<string[], T> func)
-    {
-        var values = Values(rowValues, colValues, columns);
-        return values.All(value => value == null) ? default : func(values!);
-    }
-
-    public static string?[] Values(IReadOnlyList<string> rowValues, List<string> colValues, IEnumerable<string> columns)
-    {
-        return columns.Select(c => Value(rowValues, colValues, c)).ToArray();
-    }
-
-    public static string? Value(
-        IReadOnlyList<string> rowValues,
-        List<string> colValues,
-        string column,
-        string? defaultValue = null)
-    {
-        if (!colValues.Contains(column))
-        {
-            return defaultValue;
-        }
-
-        var cellValue = rowValues[colValues.FindIndex(h => h.Equals(column))].Trim().NullIfWhiteSpace();
-
-        return cellValue ?? defaultValue;
     }
 }

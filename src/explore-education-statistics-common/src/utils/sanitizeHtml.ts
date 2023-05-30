@@ -13,6 +13,7 @@ export type SanitizeHtmlOptions = {
   allowedStyles?: Dictionary<Dictionary<RegExp[]>>;
   filterTags?: Dictionary<TagFilter>;
   transformTags?: Dictionary<string | sanitize.Transformer>;
+  parseStyleAttributes?: boolean;
 };
 
 export const defaultSanitizeOptions: SanitizeHtmlOptions = {
@@ -41,11 +42,6 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
     'th',
     'img',
   ],
-  allowedStyles: {
-    figure: {
-      width: [/^\d+%$/],
-    },
-  },
   allowedAttributes: {
     figure: ['class', 'style'],
     a: ['href', 'data-glossary', 'rel', 'target'],
@@ -56,11 +52,16 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
     h3: ['id'],
     h4: ['id'],
     h5: ['id'],
+    p: ['style'],
   },
   allowedSchemesByTag: {
     a: ['http', 'https', 'mailto', 'tel'],
     img: ['http', 'https'],
   },
+  // allowedStyles doesn't work in the browser so have to set parseStyleAttributes
+  // to false to allow all styles if need to any.
+  // https://github.com/apostrophecms/sanitize-html/issues/547
+  parseStyleAttributes: false,
 };
 
 export default function sanitizeHtml(

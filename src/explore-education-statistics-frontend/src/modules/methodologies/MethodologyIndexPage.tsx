@@ -1,15 +1,17 @@
 import AccordionSection from '@common/components/AccordionSection';
-import Details from '@common/components/Details';
 import RelatedInformation from '@common/components/RelatedInformation';
-import themeService, { MethodologyTheme } from '@common/services/themeService';
+import themeService, {
+  MethodologyTheme,
+  MethodologyTopic,
+} from '@common/services/themeService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
+import Accordion from '@common/components/Accordion';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
-import MethodologyList from '@frontend/modules/methodologies/components/MethodologyList';
+import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
-import Accordion from '@common/components/Accordion';
 
 interface Props {
   themes: MethodologyTheme[];
@@ -30,7 +32,12 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
             Browse to find out about the methodology behind specific education
             statistics and data and how and why they're collected and published.
           </p>
-          <PageSearchFormWithAnalytics inputLabel="Search to find the methodology behind specific education statistics and data." />
+          {themes.length > 0 && (
+            <PageSearchFormWithAnalytics
+              elementSelectors={['li', 'h2']}
+              inputLabel="Search to find the methodology behind specific education statistics and data."
+            />
+          )}
         </div>
         <div className="govuk-grid-column-one-third">
           <RelatedInformation>
@@ -69,17 +76,17 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
                 heading={themeTitle}
                 caption={themeSummary}
               >
-                {topics.map(
-                  ({ id: topicId, title: topicTitle, publications }) => (
-                    <Details
-                      key={topicId}
-                      summary={topicTitle}
-                      detailsId="topic"
-                    >
-                      <MethodologyList publications={publications} />
-                    </Details>
-                  ),
-                )}
+                <ul className="govuk-!-margin-top-0">
+                  {orderBy(getMethodologiesForTopics(topics), 'title').map(
+                    methodology => (
+                      <li key={methodology.id}>
+                        <Link to={`/methodology/${methodology.slug}`}>
+                          {methodology.title}
+                        </Link>
+                      </li>
+                    ),
+                  )}
+                </ul>
               </AccordionSection>
             ),
           )}
@@ -102,3 +109,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
 };
 
 export default MethodologyIndexPage;
+
+function getMethodologiesForTopics(topics: MethodologyTopic[]) {
+  return topics.flatMap(topic =>
+    topic.publications.flatMap(pub => pub.methodologies),
+  );
+}

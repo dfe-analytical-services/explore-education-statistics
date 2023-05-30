@@ -4,7 +4,8 @@ import naturalOrderBy, {
   OrderKeys,
 } from '@common/utils/array/naturalOrderBy';
 import classNames from 'classnames';
-import React, { FocusEventHandler, memo } from 'react';
+import omit from 'lodash/omit';
+import React, { FocusEventHandler, Ref, memo } from 'react';
 import FormFieldset, { FormFieldsetProps } from './FormFieldset';
 import FormRadio, {
   FormRadioProps,
@@ -16,20 +17,23 @@ export type RadioOption<Value extends string = string> = PartialBy<
   'id'
 > & {
   value: Value;
+  divider?: string;
 };
 
 export type BaseFormRadioGroupProps<Value extends string = string> = {
   disabled?: boolean;
   id: string;
   inline?: boolean;
+  inputRef?: Ref<HTMLInputElement>;
   name: string;
-  onBlur?: FocusEventHandler<HTMLInputElement>;
-  onChange?: RadioChangeEventHandler;
   options: RadioOption<Value>[];
-  small?: boolean;
   order?: OrderKeys<RadioOption<Value>>;
   orderDirection?: OrderDirection | OrderDirection[];
+  small?: boolean;
   value?: string;
+
+  onBlur?: FocusEventHandler<HTMLInputElement>;
+  onChange?: RadioChangeEventHandler;
 };
 
 /**
@@ -38,10 +42,11 @@ export type BaseFormRadioGroupProps<Value extends string = string> = {
 export const BaseFormRadioGroup = <Value extends string = string>({
   id,
   inline = false,
-  small = false,
   order = ['label'],
   orderDirection = ['asc'],
   options,
+  inputRef,
+  small = false,
   value = '',
   ...props
 }: BaseFormRadioGroupProps<Value>) => {
@@ -63,6 +68,7 @@ export const BaseFormRadioGroup = <Value extends string = string>({
           }
           checked={value === option.value}
           key={option.value}
+          inputRef={inputRef}
         />
       ))}
     </div>
@@ -93,7 +99,7 @@ const FormRadioGroup = <Value extends string = string>({
       onBlur={onFieldsetBlur}
       onFocus={onFieldsetFocus}
     >
-      <BaseFormRadioGroup {...props} />
+      <BaseFormRadioGroup {...omit(props, 'className')} />
     </FormFieldset>
   );
 };

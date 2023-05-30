@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -105,7 +106,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -250,7 +252,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -361,7 +364,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -460,7 +464,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -567,7 +572,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -652,7 +658,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -752,7 +759,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -892,7 +900,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -1017,7 +1026,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -1138,7 +1148,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 
@@ -1212,6 +1223,183 @@ public class SubjectCsvMetaServiceTests
                 "country_code",
                 "country_name",
                 filters[0].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
+
+    [Fact]
+    public async Task GetSubjectCsvMeta_Headers_MultipleReleaseFilesExist()
+    {
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+            .GenerateList(2);
+
+        var filterItems = filters
+            .SelectMany(f => f.FilterGroups)
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var indicatorGroups = _fixture.DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(2)))
+            .GenerateList();
+
+        var indicators = indicatorGroups
+            .SelectMany(ig => ig.Indicators)
+            .ToArray();
+
+        var observations = _fixture.DefaultObservation()
+            .ForInstance(o => o
+                .SetMeasures(indicators)
+                .SetFilterItems(filterItems[0], filterItems[1])
+                .SetLocation(_fixture.DefaultLocation()
+                    .WithPresetRegionAndLocalAuthority()
+                    .WithGeographicLevel(GeographicLevel.LocalAuthority))
+                .SetTimePeriod(2022, AcademicYear))
+            .GenerateList(1);
+
+        var releaseSubject = new ReleaseSubject
+        {
+            Release = _fixture.DefaultStatsRelease(),
+            Subject = _fixture.DefaultSubject()
+                .WithFilters(filters)
+                .WithIndicatorGroups(indicatorGroups)
+                .WithObservations(observations),
+        };
+
+        var release = new Content.Model.Release
+        {
+            Id = releaseSubject.Release.Id
+        };
+
+        var releaseDataFile = new ReleaseFile
+        {
+            Release = release,
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        // Create a file for the subject and release which is not a data file
+        var releaseMetadataFile = new ReleaseFile
+        {
+            Release = release,
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Metadata
+            }
+        };
+
+        // Create a data file for the subject but for a different release
+        var releaseDataFileOtherRelease = new ReleaseFile
+        {
+            Release = new Content.Model.Release
+            {
+                Id = Guid.NewGuid()
+            },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await contentDbContext.Releases.AddRangeAsync(release);
+            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseDataFile,
+                releaseMetadataFile,
+                releaseDataFileOtherRelease);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Filter.AddRangeAsync(filters);
+            await statisticsDbContext.Indicator.AddRangeAsync(indicators);
+            await statisticsDbContext.Observation.AddRangeAsync(observations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var csv = string.Join(
+                ',',
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name
+            );
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
+
+            releaseFileBlobService
+                .Setup(
+                    s => s.StreamBlob(
+                        It.Is<ReleaseFile>(
+                            rf => rf.FileId == releaseDataFile.FileId && rf.ReleaseId == releaseDataFile.ReleaseId
+                        ),
+                        null,
+                        default
+                    )
+                )
+                .ReturnsAsync(csv.ToStream());
+
+            var service = BuildService(
+                statisticsDbContext: statisticsDbContext,
+                contentDbContext: contentDbContext,
+                releaseFileBlobService: releaseFileBlobService.Object);
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = releaseSubject.SubjectId,
+                Indicators = indicators.Select(i => i.Id).ToList()
+            };
+
+            var result =
+                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+
+            VerifyAllMocks(releaseFileBlobService);
+
+            var viewModel = result.AssertRight();
+
+            // Order of headers is dictated by the order of headers in the data file CSV.
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].Name,
+                filters[0].Name,
+                indicators[2].Name,
                 indicators[0].Name,
                 indicators[1].Name,
             };
@@ -1360,7 +1548,8 @@ public class SubjectCsvMetaServiceTests
             },
             File = new File
             {
-                SubjectId = releaseSubject.Subject.Id
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
             }
         };
 

@@ -11,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 {
     public class ManageContentPageViewModel
     {
-        public ReleaseViewModel Release { get; set; } = new ();
+        public ReleaseViewModel Release { get; set; } = new();
 
-        public List<DataBlockViewModel> UnattachedDataBlocks { get; set; } = new ();
+        public List<DataBlockViewModel> UnattachedDataBlocks { get; set; } = new();
 
         public class ReleaseViewModel
         {

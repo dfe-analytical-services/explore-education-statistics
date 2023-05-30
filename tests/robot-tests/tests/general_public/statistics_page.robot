@@ -96,7 +96,7 @@ Remove release type filter
 
 Searching
     [Tags]    Local    Dev
-    user clicks element    id:searchTerm
+    user clicks element    id:searchForm-search
     user presses keys    Pupil absence in schools in England
     user clicks button    Search
     user checks page contains button    Pupil absence in schools in England
@@ -111,7 +111,7 @@ Removing search
 
 Clear all filters
     [Tags]    Local    Dev
-    user clicks element    id:searchTerm
+    user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
     user clicks radio    Pupils and schools

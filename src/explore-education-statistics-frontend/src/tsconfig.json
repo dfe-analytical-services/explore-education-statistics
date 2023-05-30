@@ -12,6 +12,9 @@
       ],
       "@frontend/*": [
         "./*"
+      ],
+      "@frontend-test/*": [
+        "../test/*"
       ]
     }
   },

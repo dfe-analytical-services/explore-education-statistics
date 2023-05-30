@@ -1,0 +1,5 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+ind_one,Indicator,Indicator one,,,,,
+filter_one,Filter,Filter one,,,,,
+additional_indicator,Indicator,Additional indicator,,,,,
+additional_filter,Filter,Additional filter,,,,,

@@ -1,10 +1,10 @@
 ﻿#nullable enable
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
@@ -16,15 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 {
     public class BlobCacheServiceTests
     {
-        private record SampleClass
-        {
-            public Guid Id { get; }
-
-            public SampleClass()
-            {
-                Id = Guid.NewGuid();
-            }
-        }
+        private record SampleClass(Guid Id);
 
         private class SampleCacheKey : IBlobCacheKey
         {
@@ -39,58 +31,82 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task SetItem()
+        public void SetItem()
+        {
+            var entity = new SampleClass(Guid.NewGuid());
+
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
+
+            var service = SetupBlobStorageCacheService();
+
+            Assert.Throws<NotImplementedException>(() => service.SetItem(cacheKey, typeof(SampleClass)));
+        }
+
+        [Fact]
+        public async Task SetItemAsync()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.UploadAsJson(PublicContent, cacheKey.Key, "test item", null))
-                .Returns(Task.CompletedTask);
+            blobStorageService.SetupUploadAsJson(
+                container: PublicContent,
+                path: cacheKey.Key,
+                content: "test item");
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            await service.SetItem(cacheKey, "test item");
+            await service.SetItemAsync(cacheKey, "test item");
 
             VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task DeleteItem()
+        public async Task DeleteItemAsync()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.DeleteBlob(PublicContent, cacheKey.Key))
-                .Returns(Task.CompletedTask);
+            blobStorageService.SetupDeleteBlob(PublicContent, cacheKey.Key);
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            await service.DeleteItem(cacheKey);
+            await service.DeleteItemAsync(cacheKey);
 
             VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
-        public async Task GetItem()
+        public void GetItem()
         {
-            var entity = new SampleClass();
+            var entity = new SampleClass(Guid.NewGuid());
+
+            var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
+
+            var service = SetupBlobStorageCacheService();
+
+            Assert.Throws<NotImplementedException>(() => service.GetItem(cacheKey, typeof(SampleClass)));
+        }
+
+        [Fact]
+        public async Task GetItemAsync()
+        {
+            var entity = new SampleClass(Guid.NewGuid());
 
             var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.GetDeserializedJson(
-                        PublicContent, cacheKey.Key, typeof(SampleClass), default))
-                .ReturnsAsync(entity);
+            blobStorageService.SetupGetDeserializedJson(
+                container: PublicContent,
+                path: cacheKey.Key,
+                value: entity,
+                type: entity.GetType());
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(cacheKey, typeof(SampleClass));
+            var result = await service.GetItemAsync(cacheKey, typeof(SampleClass));
             var typedResult = Assert.IsType<SampleClass>(result);
 
             Assert.Equal(entity, typedResult);
@@ -99,25 +115,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task GetItem_NullIfErrorDeserializingCachedEntity()
+        public async Task GetItemAsync_NullIfErrorDeserializingCachedEntity()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.GetDeserializedJson(
-                        PublicContent, cacheKey.Key, typeof(SampleClass), default))
-                .ThrowsAsync(new JsonException("Could not deserialize"));
+            blobStorageService.SetupGetDeserializedJsonThrows(
+                container: PublicContent,
+                path: cacheKey.Key,
+                type: typeof(SampleClass),
+                exception: new JsonException("Could not deserialize"));
 
-
-            blobStorageService.Setup(mock =>
-                    mock.DeleteBlob(PublicContent, cacheKey.Key))
-                .Returns(Task.CompletedTask);
+            blobStorageService.SetupDeleteBlob(PublicContent, cacheKey.Key);
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(cacheKey, typeof(SampleClass));
+            var result = await service.GetItemAsync(cacheKey, typeof(SampleClass));
 
             Assert.Null(result);
 
@@ -125,20 +139,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task GetItem_NullIfNoFileFoundException()
+        public async Task GetItemAsync_NullIfNotFound()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.GetDeserializedJson(
-                        PublicContent, cacheKey.Key, typeof(SampleClass), default))
-                .ThrowsAsync(new FileNotFoundException());
+            blobStorageService.SetupGetDeserializedJsonNotFound(
+                container: PublicContent,
+                path: cacheKey.Key,
+                type: typeof(SampleClass));
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(cacheKey, typeof(SampleClass));
+            var result = await service.GetItemAsync(cacheKey, typeof(SampleClass));
 
             Assert.Null(result);
 
@@ -146,20 +160,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         }
 
         [Fact]
-        public async Task GetItem_NullIfException()
+        public async Task GetItemAsync_NullIfException()
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.Setup(mock =>
-                    mock.GetDeserializedJson(
-                        PublicContent, cacheKey.Key, typeof(SampleClass), default))
-                .ThrowsAsync(new Exception("Something went wrong"));
+            blobStorageService.SetupGetDeserializedJsonThrows(
+                container: PublicContent,
+                path: cacheKey.Key,
+                type: typeof(SampleClass),
+                exception: new Exception("Something went wrong"));
 
             var service = SetupBlobStorageCacheService(blobStorageService: blobStorageService.Object);
 
-            var result = await service.GetItem(cacheKey, typeof(SampleClass));
+            var result = await service.GetItemAsync(cacheKey, typeof(SampleClass));
 
             Assert.Null(result);
 

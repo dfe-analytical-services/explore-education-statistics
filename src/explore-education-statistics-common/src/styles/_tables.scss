@@ -16,6 +16,14 @@ table,
     @extend .govuk-table__cell;
   }
 
+  th p {
+    font-weight: $govuk-font-weight-bold;
+  }
+
+  p:last-of-type {
+    margin-bottom: 0;
+  }
+
   .govuk-table__header--numeric,
   .govuk-table__cell--numeric {
     padding: govuk-spacing(2);

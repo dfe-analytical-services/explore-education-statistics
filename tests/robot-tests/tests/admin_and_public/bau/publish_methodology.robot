@@ -132,18 +132,12 @@ Verify that the methodology is visible on the public methodologies page with the
     user navigates to public methodologies page
     user waits until page contains accordion section    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user checks page contains methodology link
-    ...    %{TEST_TOPIC_NAME}
-    ...    ${PUBLICATION_NAME}
+    user checks page contains link with text and url
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLIC_METHODOLOGY_URL_ENDING}
 
 Verify that the methodology is publicly accessible
-    user clicks methodology link
-    ...    %{TEST_TOPIC_NAME}
-    ...    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME}
+    user clicks link    ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until page contains title caption    Methodology    %{WAIT_SMALL}
     ${METHODOLOGY_URL}=    get location
@@ -366,11 +360,8 @@ Verify that the amended methodology is visible on the public methodologies page
     user navigates to public methodologies page
     user waits until page contains accordion section    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
     user scrolls down    400
-    user checks page contains methodology link
-    ...    %{TEST_TOPIC_NAME}
-    ...    ${PUBLICATION_NAME}
+    user checks page contains link with text and url
     ...    ${PUBLICATION_NAME} - Amended methodology
     ...    ${PUBLIC_METHODOLOGY_URL_ENDING}
 

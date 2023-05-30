@@ -9,6 +9,7 @@ import PageHeader from './PageHeader';
 import PageMeta, { PageMetaProps } from './PageMeta';
 import PageTitle from './PageTitle';
 import TemporaryNotice from './TemporaryNotice';
+import UserTestingBanner from './UserTestingBanner';
 
 type Props = {
   title: string;
@@ -46,7 +47,7 @@ const Page = ({
         {...pageMeta}
       />
       <PageHeader />
-
+      <UserTestingBanner />
       {router.asPath.includes(
         'find-statistics/attendance-in-education-and-early-years-settings-during-the-coronavirus-covid-19-outbreak',
       ) && (

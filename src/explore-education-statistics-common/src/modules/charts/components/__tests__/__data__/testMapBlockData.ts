@@ -73,6 +73,7 @@ export const testMapConfiguration: Chart = {
   title: '',
   alt: '',
   height: 600,
+  map: { dataSetConfigs: [] },
 };
 
 export const testMapTableData: TableDataResponse = {

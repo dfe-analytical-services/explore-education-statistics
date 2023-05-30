@@ -1276,6 +1276,10 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
+        "PublicApp:Url": "[variables('publicAppUrl')]",
+        "PublicApp:BasicAuth": "[parameters('publicAppBasicAuth')]",
+        "PublicApp:BasicAuthUsername": "[parameters('publicAppBasicAuthUsername')]",
+        "PublicApp:BasicAuthPassword": "[parameters('publicAppBasicAuthPassword')]",
         "RequestTimeouts:TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }

@@ -14,6 +14,9 @@ public static class IndicatorGeneratorExtensions
     public static Generator<Indicator> WithDefaults(this Generator<Indicator> generator)
         => generator.ForInstance(s => s.SetDefaults());
 
+    public static Generator<Indicator> WithLabel(this Generator<Indicator> generator, string label)
+        => generator.ForInstance(s => s.SetLabel(label));
+
     public static Generator<Indicator> WithIndicatorGroup(
         this Generator<Indicator> generator,
         IndicatorGroup indicatorGroup)
@@ -32,6 +35,13 @@ public static class IndicatorGeneratorExtensions
             .Set(i => i.Name, (_, i) => i.Name.SnakeCase())
             .Set(i => i.Unit, Unit.Number)
             .Set(i => i.DecimalPlaces, 0);
+
+    public static InstanceSetters<Indicator> SetLabel(
+        this InstanceSetters<Indicator> setters,
+        string label)
+        => setters
+            .Set(f => f.Label, label)
+            .Set(f => f.Name, label.SnakeCase());
 
     public static InstanceSetters<Indicator> SetIndicatorGroup(
         this InstanceSetters<Indicator> setters,

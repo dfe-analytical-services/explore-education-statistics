@@ -287,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private Task InvalidateCachedReleaseSubjectMetadata(Guid releaseId, Guid subjectId)
         {
-            return _cacheService.DeleteItem(new PrivateSubjectMetaCacheKey(releaseId, subjectId));
+            return _cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseId, subjectId));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateFiltersForSubject(

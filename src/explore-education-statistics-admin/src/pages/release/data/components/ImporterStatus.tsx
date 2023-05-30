@@ -30,8 +30,6 @@ export const getImportStatusLabel = (
       return 'Importing';
     case 'STAGE_3':
       return 'Importing';
-    case 'STAGE_4':
-      return 'Importing';
     case 'COMPLETE':
       return 'Complete';
     case 'FAILED':
@@ -56,7 +54,6 @@ const getImportStatusColour = (
     case 'STAGE_1':
     case 'STAGE_2':
     case 'STAGE_3':
-    case 'STAGE_4':
     case 'CANCELLING':
       return 'orange';
     case 'COMPLETE':

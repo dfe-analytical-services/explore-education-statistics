@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
     public class ChartLegendItem
     {
-        public ChartLegendItemDataSet DataSet;
+        public ChartBaseDataSet DataSet;
         public string Label;
         public string Colour;
 
@@ -37,13 +37,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ChartInlinePosition? InlinePosition;
-    }
-
-    public class ChartLegendItemDataSet
-    {
-        public Guid? Indicator;
-        public List<Guid> Filters = new List<Guid>();
-        public ChartDataSetLocation? Location;
-        public string? TimePeriod;
     }
 }

@@ -296,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
             cacheService
-                .Setup(service => service.DeleteItem(new PrivateSubjectMetaCacheKey(release.Id, subject.Id)))
+                .Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(release.Id, subject.Id)))
                 .Returns(Task.CompletedTask);
 
             dataBlockService.Setup(service => service.GetDeletePlan(release.Id, subject))
@@ -450,10 +450,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
-            cacheService.Setup(service => service.DeleteItem(new PrivateSubjectMetaCacheKey(release.Id, subject.Id)))
+            cacheService.Setup(service => service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(release.Id, subject.Id)))
                 .Returns(Task.CompletedTask);
             cacheService.Setup(service =>
-                    service.DeleteItem(new PrivateSubjectMetaCacheKey(release.Id, replacementSubject.Id)))
+                    service.DeleteItemAsync(new PrivateSubjectMetaCacheKey(release.Id, replacementSubject.Id)))
                 .Returns(Task.CompletedTask);
 
             dataBlockService.Setup(service =>
@@ -1217,7 +1217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mock.SoftDeleteAllReleaseSubjects(release.Id)).Returns(Task.CompletedTask);
 
             cacheService
-                .Setup(mock => mock.DeleteCacheFolder(
+                .Setup(mock => mock.DeleteCacheFolderAsync(
                     ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(release.Id))))
                 .Returns(Task.CompletedTask);
 

@@ -16,6 +16,7 @@ import _tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
@@ -197,6 +198,7 @@ describe('PreReleaseTableToolPage', () => {
       id: 'block-1',
       name: 'Test highlight',
       description: 'Test highlight description',
+      subjectId: 'subject-1',
     },
   ];
   const testSubjects: Subject[] = [
@@ -217,6 +219,8 @@ describe('PreReleaseTableToolPage', () => {
         size: '10 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
   ];
 
@@ -276,24 +280,15 @@ describe('PreReleaseTableToolPage', () => {
       );
     });
     const step1 = within(screen.getByTestId('wizardStep-1'));
-    const tabs = step1.getAllByRole('tabpanel', { hidden: true });
 
-    expect(tabs).toHaveLength(2);
+    expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
 
-    expect(
-      within(tabs[0]).getByRole('heading', { name: 'Choose a table' }),
-    ).toBeInTheDocument();
-    expect(
-      within(tabs[0]).getByRole('link', { name: 'Test highlight' }),
-    ).toHaveAttribute(
+    userEvent.click(step1.getByLabelText('View all featured tables'));
+
+    expect(step1.getByRole('link', { name: 'Test highlight' })).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/prerelease/table-tool/block-1',
     );
-
-    expect(within(tabs[1]).getByLabelText('Test subject')).toBeInTheDocument();
-
-    expect(screen.queryByTestId('dataTableCaption')).not.toBeInTheDocument();
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('renders correctly on step 1 without featured tables', async () => {

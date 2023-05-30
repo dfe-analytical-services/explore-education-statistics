@@ -434,7 +434,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 cacheService
                     .Setup(s =>
-                        s.DeleteCacheFolder(
+                        s.DeleteCacheFolderAsync(
                             ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                     .Returns(Task.CompletedTask);
 
@@ -585,7 +585,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     cacheService
                         .InSequence(releaseCacheInvalidationSequence)
                         .Setup(s =>
-                            s.DeleteCacheFolder(
+                            s.DeleteCacheFolderAsync(
                                 ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                         .Returns(Task.CompletedTask));
 
@@ -873,7 +873,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 cacheService
                     .Setup(s =>
-                        s.DeleteCacheFolder(
+                        s.DeleteCacheFolderAsync(
                             ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                     .Returns(Task.CompletedTask);
 

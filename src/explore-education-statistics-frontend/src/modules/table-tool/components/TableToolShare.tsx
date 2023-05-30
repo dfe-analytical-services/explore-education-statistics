@@ -4,13 +4,12 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import UrlContainer from '@common/components/UrlContainer';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import permalinkService from '@common/services/permalinkService';
-import {
-  SelectedPublication,
-  TableDataQuery,
-} from '@common/services/tableBuilderService';
+import permalinkSnapshotService from '@common/services/permalinkSnapshotService';
+import { TableDataQuery } from '@common/services/tableBuilderService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import React, { useEffect, useState } from 'react';
 
@@ -21,12 +20,14 @@ interface Props {
   tableHeaders?: TableHeadersConfig;
   query: TableDataQuery;
   selectedPublication: SelectedPublication;
+  newPermalinks?: boolean; // TO DO - EES-4259 remove `newPermalinks` param and tidy up
 }
 
 const TableToolShare = ({
   tableHeaders,
   query,
   selectedPublication,
+  newPermalinks,
 }: Props) => {
   const [permalinkUrl, setPermalinkUrl] = useState('');
   const [permalinkLoading, setPermalinkLoading] = useState<boolean>(false);
@@ -42,17 +43,34 @@ const TableToolShare = ({
     }
     setPermalinkLoading(true);
 
-    const { id } = await permalinkService.createPermalink(
-      {
+    let id: string;
+
+    if (newPermalinks) {
+      const snapshotResponse = await permalinkSnapshotService.createPermalink({
         query,
         configuration: {
           tableHeaders: mapUnmappedTableHeaders(tableHeaders),
         },
-      },
-      selectedPublication.selectedRelease.id,
-    );
+      });
+      id = snapshotResponse.id;
+    } else {
+      const response = await permalinkService.createPermalink(
+        {
+          query,
+          configuration: {
+            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+          },
+        },
+        selectedPublication.selectedRelease.id,
+      );
+      id = response.id;
+    }
 
-    setPermalinkUrl(`${window.location.origin}/data-tables/permalink/${id}`);
+    const url = newPermalinks
+      ? `${process.env.PUBLIC_URL}data-tables/permalink/${id}?newPermalinks=true`
+      : `${process.env.PUBLIC_URL}data-tables/permalink/${id}`;
+
+    setPermalinkUrl(url);
     setPermalinkLoading(false);
 
     setScreenReaderMessage(`Shareable link generated. ${linkInstructions}`);

@@ -12,7 +12,7 @@ describe('SearchForm', () => {
   });
 
   test('renders correctly with an initial search term', () => {
-    render(<SearchForm searchTerm="find me" onSubmit={noop} />);
+    render(<SearchForm value="find me" onSubmit={noop} />);
     expect(screen.getByLabelText('Search')).toHaveValue('find me');
   });
 

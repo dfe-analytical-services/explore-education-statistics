@@ -84,12 +84,15 @@ export interface Subject {
   };
   geographicLevels: string[];
   file: FileInfo;
+  filters: string[];
+  indicators: string[];
 }
 
 export interface FeaturedTable {
   id: string;
   name: string;
   description?: string;
+  subjectId: string;
 }
 
 export interface SubjectMeta {
@@ -185,21 +188,6 @@ export interface TableDataResult {
 export interface TableDataResponse {
   results: TableDataResult[];
   subjectMeta: TableDataSubjectMeta;
-}
-
-export interface SelectedPublication {
-  id: string;
-  title: string;
-  slug: string;
-  selectedRelease: {
-    id: string;
-    slug: string;
-    latestData: boolean;
-    title: string;
-  };
-  latestRelease: {
-    title: string;
-  };
 }
 
 export interface FastTrackTable extends ConfiguredTable {

@@ -1,3 +1,5 @@
+@import '~govuk-frontend/govuk/base';
+
 .inlineHint {
   display: flex;
 
@@ -7,4 +9,10 @@
     margin: 0 !important; // Needed to override a very specific govuk style
     padding: 0;
   }
+}
+
+.divider {
+  clear: left;
+  float: left;
+  margin: govuk-spacing(4) 0;
 }

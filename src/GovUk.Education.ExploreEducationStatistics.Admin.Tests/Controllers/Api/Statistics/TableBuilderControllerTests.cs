@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             SetupCall(mocks.persistenceHelper, releaseContentBlock);
 
             mocks.cacheService
-                .Setup(s => s.GetItem(
+                .Setup(s => s.GetItemAsync(
                     ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
                     typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .ReturnsAsync(_tableBuilderResults);
 
             mocks.cacheService
-                .Setup(s => s.SetItem<object>(
+                .Setup(s => s.SetItemAsync<object>(
                     ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
                     _tableBuilderResults))
                 .Returns(Task.CompletedTask);

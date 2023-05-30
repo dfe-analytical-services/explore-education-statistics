@@ -200,7 +200,7 @@ Check subject order in data tables
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
 
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
     user checks radio in position has label    1    One

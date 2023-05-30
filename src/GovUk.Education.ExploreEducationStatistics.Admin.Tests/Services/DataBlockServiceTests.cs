@@ -751,7 +751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var cacheService = new Mock<IBlobCacheService>(Strict);
 
                 cacheService
-                    .Setup(s => s.DeleteItem(dataBlockCacheKey))
+                    .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
@@ -1115,7 +1115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var cacheService = new Mock<IBlobCacheService>(Strict);
 
                 cacheService
-                    .Setup(s => s.DeleteItem(dataBlockCacheKey))
+                    .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
@@ -1224,7 +1224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var cacheService = new Mock<IBlobCacheService>(Strict);
 
                 cacheService
-                    .Setup(s => s.DeleteItem(dataBlockCacheKey))
+                    .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
@@ -1352,7 +1352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var cacheService = new Mock<IBlobCacheService>(Strict);
 
                 cacheService
-                    .Setup(s => s.DeleteItem(dataBlockCacheKey))
+                    .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(

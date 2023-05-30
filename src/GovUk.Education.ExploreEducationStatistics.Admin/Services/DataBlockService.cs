@@ -377,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _cacheKeyService
                 .CreateCacheKeyForDataBlock(releaseId, dataBlockId)
-                .OnSuccessVoid(_cacheService.DeleteItem);
+                .OnSuccessVoid(_cacheService.DeleteItemAsync);
         }
 
         public async Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId)

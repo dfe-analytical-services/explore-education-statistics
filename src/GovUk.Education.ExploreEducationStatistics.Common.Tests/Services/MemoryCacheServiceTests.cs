@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -33,7 +32,7 @@ public class MemoryCacheServiceTests
     private readonly SampleCacheKey _cacheKey = new("Key");
 
     [Fact]
-    public async Task SetItem()
+    public void SetItem()
     {
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
@@ -47,11 +46,11 @@ public class MemoryCacheServiceTests
         // This should not be truncated as it does not carry over into the next hour.
         var expectedCacheExpiry = now.AddSeconds(45);
 
-        await SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
+        SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
         
     [Fact]
-    public async Task SetItem_ExpiryTimeTruncated_Hourly()
+    public void SetItem_ExpiryTimeTruncated_Hourly()
     {
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
@@ -65,11 +64,11 @@ public class MemoryCacheServiceTests
         // This should be truncated as it carries 15 seconds over into the next hour.
         var expectedCacheExpiry = now.AddSeconds(45 - 15);
 
-        await SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
+        SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
         
     [Fact]
-    public async Task SetItem_ExpiryTimeTruncated_Hourly_LastHourOfDay()
+    public void SetItem_ExpiryTimeTruncated_Hourly_LastHourOfDay()
     {
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
@@ -84,11 +83,11 @@ public class MemoryCacheServiceTests
         // This should be truncated as it carries 15 seconds over into the next hour.
         var expectedCacheExpiry = now.AddSeconds(45 - 15);
 
-        await SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
+        SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
         
     [Fact]
-    public async Task SetItem_ExpiryTimeNotTruncated_HalfHourly()
+    public void SetItem_ExpiryTimeNotTruncated_HalfHourly()
     {
         // The requested ExpirySchedule is half-hourly, meaning that cached items will have
         // their expiry times truncated if the requested cache duration would carry over into
@@ -102,11 +101,11 @@ public class MemoryCacheServiceTests
         // This should not be truncated as it does not carry over into the next half hour.
         var expectedCacheExpiry = now.AddSeconds(15);
 
-        await SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
+        SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
         
     [Fact]
-    public async Task SetItem_ExpiryTimeTruncated_HalfHourly()
+    public void SetItem_ExpiryTimeTruncated_HalfHourly()
     {
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
@@ -120,11 +119,11 @@ public class MemoryCacheServiceTests
         // This should be truncated as it carries 15 seconds over into the next half hour.
         var expectedCacheExpiry = now.AddSeconds(45 - 15);
 
-        await SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
+        SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
         
     [Fact]
-    public async Task SetItem_ExpiryTimeTruncated_HalfHourly_LastHalfHourOfDay()
+    public void SetItem_ExpiryTimeTruncated_HalfHourly_LastHalfHourOfDay()
     {
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
@@ -139,11 +138,11 @@ public class MemoryCacheServiceTests
         // This should be truncated as it carries 15 seconds over into the next half hour.
         var expectedCacheExpiry = now.AddSeconds(45 - 15);
 
-        await SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
+        SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
         
     [Fact]
-    public async Task SetItem_ExpiryTimeNotTruncated_NoExpirySchedule()
+    public void SetItem_ExpiryTimeNotTruncated_NoExpirySchedule()
     {
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
@@ -156,11 +155,11 @@ public class MemoryCacheServiceTests
         // schedule, the requested cache duration will be honoured.
         var expectedCacheExpiry = now.AddSeconds(6000);
 
-        await SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
+        SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
         
     [Fact]
-    public async Task SetItem_ExceptionHandledGracefullyWhenCachingItem()
+    public void SetItem_ExceptionHandledGracefullyWhenCachingItem()
     {
         var cacheConfiguration = new MemoryCacheConfiguration(6000);
 
@@ -171,12 +170,12 @@ public class MemoryCacheServiceTests
             .Throws(new Exception("Exception during \"SetItem\" call should have been handled gracefully"));
 
         var service = SetupService(memoryCache.Object);
-        await service.SetItem(_cacheKey, "test item", cacheConfiguration, DateTime.UtcNow);
+        service.SetItem(_cacheKey, "test item", cacheConfiguration, DateTime.UtcNow);
         VerifyAllMocks(memoryCache);
     }
 
     [Fact]
-    public async Task GetItem()
+    public void GetItem()
     {
         object entity = new SampleClass();
 
@@ -186,13 +185,13 @@ public class MemoryCacheServiceTests
 
         var service = SetupService(memoryCache);
 
-        var result = await service.GetItem(_cacheKey, typeof(SampleClass));
+        var result = service.GetItem(_cacheKey, typeof(SampleClass));
 
         Assert.Equal(entity, result);
     }
 
     [Fact]
-    public async Task GetItem_MoreSpecificSubtypeReturnsOk()
+    public void GetItem_MoreSpecificSubtypeReturnsOk()
     {
         object entity = new SampleClassSubtype();
 
@@ -202,13 +201,13 @@ public class MemoryCacheServiceTests
 
         var service = SetupService(memoryCache);
 
-        var result = await service.GetItem(_cacheKey, typeof(SampleClass));
+        var result = service.GetItem(_cacheKey, typeof(SampleClass));
 
         Assert.Equal(entity, result);
     }
 
     [Fact]
-    public async Task GetItem_NullIfLessSpecificSupertype()
+    public void GetItem_NullIfLessSpecificSupertype()
     {
         object entity = new SampleClassSuperclass();
         
@@ -218,23 +217,23 @@ public class MemoryCacheServiceTests
 
         var service = SetupService(memoryCache);
 
-        var result = await service.GetItem(_cacheKey, typeof(SampleClass));
+        var result = service.GetItem(_cacheKey, typeof(SampleClass));
 
         Assert.Null(result);
     }
 
     [Fact]
-    public async Task GetItem_NullIfCacheMiss()
+    public void GetItem_NullIfCacheMiss()
     {
         var service = SetupService();
 
-        var result = await service.GetItem(_cacheKey, typeof(SampleClass));
+        var result = service.GetItem(_cacheKey, typeof(SampleClass));
 
         Assert.Null(result);
     }
 
     [Fact]
-    public async Task GetItem_NullIfException()
+    public void GetItem_NullIfException()
     {
         var key = new SampleCacheKey("");
 
@@ -247,14 +246,14 @@ public class MemoryCacheServiceTests
 
         var service = SetupService(memoryCache.Object);
 
-        var result = await service.GetItem(key, typeof(SampleClass));
+        var result = service.GetItem(key, typeof(SampleClass));
         VerifyAllMocks(memoryCache);
 
         Assert.Null(result);
     }
 
     [Fact]
-    public async Task GetItem_NullIfIncorrectType()
+    public void GetItem_NullIfIncorrectType()
     {
         object entityOfIncorrectType = new SampleClass();
 
@@ -268,13 +267,13 @@ public class MemoryCacheServiceTests
 
         var service = SetupService(memoryCache.Object);
 
-        var result = await service.GetItem(key, typeof(string));
+        var result = service.GetItem(key, typeof(string));
         VerifyAllMocks(memoryCache);
 
         Assert.Null(result);
     }
 
-    private async Task SetItemAndAssertExpiryTime(
+    private void SetItemAndAssertExpiryTime(
         DateTime now,
         MemoryCacheConfiguration cacheConfiguration,
         DateTime expectedCacheExpiry)
@@ -289,7 +288,7 @@ public class MemoryCacheServiceTests
             .Returns(cacheEntry);
 
         var service = SetupService(memoryCache.Object);
-        await service.SetItem(_cacheKey, valueToCache, cacheConfiguration, now);
+        service.SetItem(_cacheKey, valueToCache, cacheConfiguration, now);
         VerifyAllMocks(memoryCache);
         
         Assert.Equal($"\"{valueToCache}\"".Length, cacheEntry.Size);
