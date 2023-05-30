@@ -1,3 +1,4 @@
+import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useMounted from '@common/hooks/useMounted';
@@ -11,9 +12,10 @@ import {
   FormRadioGroup,
   FormFieldset,
 } from '@common/components/form';
+import FormEditor from '@admin/components/form/FormEditor';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useState } from 'react';
 import { subjectsForRelease2 } from '../PrototypePublicationSubjects';
 
 interface FormValues {
@@ -24,12 +26,13 @@ interface Props extends InjectedWizardProps {
   onSubmit: (subjectId: string) => void;
 }
 
-const PrototypePrepareNextSubjectStep1 = ({
+const PrototypePrepareNextSubjectStep5 = ({
   onSubmit,
   ...stepProps
 }: Props) => {
   const { isMounted } = useMounted();
   const { isActive, goToNextStep } = stepProps;
+  const [versionType, setVersionType] = useState(false);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
@@ -65,38 +68,138 @@ const PrototypePrepareNextSubjectStep1 = ({
               <Form id="form">
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
-                    <div>
-                      <FormRadio
-                        name="test"
-                        id="test-radio-1"
-                        label="Minor version update"
-                        value="true"
-                      />
-                      <FormRadio
-                        name="test"
-                        id="test-radio-2"
-                        label="Major version update"
-                        value="false"
-                      />
-                    </div>
-                    <p>
-                      THIS IS A TEST2 To make updates to this API dataset, a new
-                      dataset needs to be selected to provide the underlying
-                      data. The chosen dataset should be a continuation of the
-                      current dataset and not have a drastically differing data
-                      structure.
-                    </p>
-                    <p>The following rules apply:</p>
-                    <ul className="govuk-!-margin-bottom-8">
-                      <li>
-                        existing facets (column variables) should map to
-                        equivalent facets in the new dataset
-                      </li>
-                      <li>
-                        existing facets (column variables) should not have been
-                        removed in the new dataset
-                      </li>
-                    </ul>
+                    <FormEditor
+                      id="description"
+                      label="Version notes"
+                      value=""
+                      hint="Use notes to highlight any extra guidance that may not be apparent in the automated changelog below."
+                      onChange={() => {}}
+                    />
+                    <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
+                      <legend className="govuk-legend govuk-fieldset__legend">
+                        <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                          Changes on current live version (v1.0)
+                        </h3>
+                      </legend>
+                      <div className="govuk-radios">
+                        <div className="govuk-radios__item">
+                          <input
+                            type="radio"
+                            className="govuk-radios__input"
+                            name="version-type"
+                            id="version-minor"
+                            checked={!versionType}
+                            onClick={() => {
+                              setVersionType(false);
+                            }}
+                          />
+                          <label
+                            className={classNames(
+                              'govuk-label',
+                              'govuk-radios__label',
+                            )}
+                            htmlFor="version-minor"
+                          >
+                            Minor
+                          </label>
+                        </div>
+
+                        <div className="govuk-radios__item">
+                          <input
+                            type="radio"
+                            className="govuk-radios__input"
+                            name="version-type"
+                            id="version-major"
+                            onClick={() => {
+                              setVersionType(true);
+                            }}
+                          />
+                          <label
+                            className={classNames(
+                              'govuk-label',
+                              'govuk-radios__label',
+                            )}
+                            htmlFor="version-major"
+                          >
+                            Major
+                          </label>
+                        </div>
+                      </div>
+                    </fieldset>
+
+                    {!versionType && (
+                      <>
+                        <h3>Minor update changelog</h3>
+                        <h3 className="govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-heading-s">
+                          New API data set version number
+                        </h3>
+                        <p>{versionType ? '2.0' : '1.1'}</p>
+                        <h4 className="govuk-!-margin-bottom-0">
+                          New locations
+                        </h4>
+                        <ul className="govuk-!-margin-bottom-6">
+                          <li>Leeds</li>
+                          <li>Doncaster</li>
+                        </ul>
+                        <h4 className="govuk-!-margin-bottom-0">
+                          Mapped locations
+                        </h4>
+                        <ul className="govuk-!-margin-bottom-6">
+                          <li>Darlington --{'>'} Darlington (new)</li>
+                          <li>
+                            Kingston upon Hull, City of --{'>'} Kingston upon
+                            Hull, City of (new)
+                          </li>
+                          <li>Northumberland --{'>'} Nortumberland (new)</li>
+                          <li>Sheffield--{'>'} Sheffield (new)</li>
+                        </ul>
+                        <h4 className="govuk-!-margin-bottom-0">New filters</h4>
+                        <ul className="govuk-!-margin-bottom-6">
+                          <li>Age 11</li>
+                          <li>Age 12</li>
+                        </ul>
+                        <h4 className="govuk-!-margin-bottom-0">
+                          Mapped filters
+                        </h4>
+                        <ul className="govuk-!-margin-bottom-6">
+                          <li>Age 10 --{'>'} Age 10 (new)</li>
+                          <li>
+                            Ethnicity Major Asian Total --{'>'} Ethnicity Major
+                            Asian Total (new)
+                          </li>
+                          <li>
+                            Ethnicity Major Black Total --{'>'} Ethnicity Major
+                            Black Total (new)
+                          </li>
+                          <li>Age 4 and under --{'>'} Age 4 and under (new)</li>
+                        </ul>
+                        <h4 className="govuk-!-margin-bottom-0">
+                          New indicators
+                        </h4>
+                        <ul className="govuk-!-margin-bottom-6">
+                          <li>Number of authorised other sessions</li>
+                          <li>Number of authorised reasons sessions</li>
+                        </ul>
+                        <h4 className="govuk-!-margin-bottom-0">
+                          Mapped indicators
+                        </h4>
+                        <ul className="govuk-!-margin-bottom-6">
+                          <li>
+                            Number of authorised holiday sessions --{'>'} Number
+                            of authorised holiday sessions (new)
+                          </li>
+                          <li>
+                            Authorised absence rate --{'>'} Number of Authorised
+                            absence rate (new)
+                          </li>
+                        </ul>
+                      </>
+                    )}
+                    {versionType && (
+                      <>
+                        <h3>Major update changelog</h3>
+                      </>
+                    )}
                   </>
                 </FormFieldset>
                 <WizardStepFormActions
@@ -117,12 +220,14 @@ const PrototypePrepareNextSubjectStep1 = ({
 
       <SummaryList noBorder>
         <SummaryListItem term="Dataset for next release">
-          THIS IS TEST 1
+          {!versionType ? 'Minor update' : 'Major update'}
         </SummaryListItem>
-        <SummaryListItem term="Next release">THIS IS TEST 2s</SummaryListItem>
+        <SummaryListItem term="Next release version">
+          {versionType ? '2.0' : '1.1'}
+        </SummaryListItem>
       </SummaryList>
     </WizardStepSummary>
   );
 };
 
-export default PrototypePrepareNextSubjectStep1;
+export default PrototypePrepareNextSubjectStep5;

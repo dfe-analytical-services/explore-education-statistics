@@ -16,6 +16,7 @@ import {
   unmappedLocations,
   newLocations,
   mappedLocations,
+  deletedLocations,
 } from './data/locations';
 import { unmappedFilters, newFilters, mappedFilters } from './data/filters';
 import {
@@ -79,13 +80,13 @@ const PrototypePrepareNextSubjectPage = ({
           <h2>Create new API data set version</h2>
 
           <SummaryList className="govuk-!-margin-bottom-8">
-            <SummaryListItem term="Current data set">
+            <SummaryListItem term="Current data set (live)">
               {release.title}
             </SummaryListItem>
-            <SummaryListItem term="Current data set version">
+            <SummaryListItem term="Current data set version (live)">
               {release.version}
             </SummaryListItem>
-            <SummaryListItem term="Current release">
+            <SummaryListItem term="Current release (live)">
               {release.release}
             </SummaryListItem>
           </SummaryList>
@@ -111,6 +112,7 @@ const PrototypePrepareNextSubjectPage = ({
                 />
               )}
             </WizardStep>
+
             <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep2
@@ -147,7 +149,6 @@ const PrototypePrepareNextSubjectPage = ({
             <WizardStep size="l">
               {stepProps => <PrototypePrepareNextSubjectStep5 {...stepProps} />}
             </WizardStep>
-
             <WizardStep size="l">
               {stepProps => <PrototypePrepareNextSubjectStep6 {...stepProps} />}
             </WizardStep>

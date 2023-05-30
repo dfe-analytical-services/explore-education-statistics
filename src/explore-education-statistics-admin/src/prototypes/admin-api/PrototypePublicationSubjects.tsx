@@ -39,20 +39,20 @@ export const subjectsForRelease2: PrototypeSubject[] = [
     id: 'id3',
     title: 'Children in need and episodes of need by local authority',
     release: 'Academic Year 2022/23',
-    version: '2.5',
+    version: '1.1',
   },
   {
     id: 'id4',
     title: 'A different subject',
     release: 'Academic Year 2022/23',
-    version: '2.5',
+    version: '1.1',
   },
   {
     id: 'id5',
     title:
       "Referrals and re-referrals to children's social care services by local authority",
     release: 'Academic Year 2022/23',
-    version: '2.5',
+    version: '1.1',
   },
 ];
 
