@@ -1,0 +1,51 @@
+variables:
+  BuildConfiguration: 'Release'
+  CI: true
+  NODE_VERSION: 16.14.2
+  DOTNET_VERSION: 6.0.x
+
+trigger:
+  branches:
+    include:
+      - main
+      - dev
+  paths:
+    exclude:
+    - infrastructure/
+pr: [ 'main', 'dev' ]
+
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+  - job: 'Frontend'
+    pool:
+      vmImage: 'ubuntu-20.04'
+      demands: azureps
+    steps:
+      - checkout: self
+
+      - task: NodeTool@0
+        displayName: 'Install Node.js $(NODE_VERSION)'
+        inputs:
+          versionSpec: $(NODE_VERSION)
+
+      - task: Docker@2
+        displayName: "auth"
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+        inputs:
+         command: 'login'
+         arguments: "--username ${username} --password ${password}"
+
+      - task: Docker@2
+        displayName: 'Build and push public frontend Docker image'
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+        inputs:
+          containerRegistry: 'eesdev2'
+          repository: 'eesfrontendcontainer'
+          command: 'buildAndPush'
+          Dockerfile: 'docker/Dockerfile.public-frontend'
+          buildContext: '$(System.DefaultWorkingDirectory)'
+          tags: $(Build.BuildNumber)
+          arguments: "--username ${username} --password ${password}"
