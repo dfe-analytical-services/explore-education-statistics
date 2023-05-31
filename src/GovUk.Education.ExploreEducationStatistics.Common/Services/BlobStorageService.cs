@@ -369,6 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                         if (blobProperties.ContentEncoding.IsNullOrEmpty())
                         {
                             await blob.DownloadToAsync(targetStream, cancellationToken);
+                            targetStream.SeekToBeginning();
                         }
                         else
                         {
