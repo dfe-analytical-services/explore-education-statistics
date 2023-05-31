@@ -42,7 +42,7 @@ jobs:
         displayName: 'Build and push public frontend Docker image'
         condition: ne(variables['Build.Reason'], 'PullRequest')
         inputs:
-          containerRegistry: 'eesdev2'
+          containerRegistry: 'eesregistrytest'
           repository: 'eesfrontendcontainer'
           command: 'buildAndPush'
           Dockerfile: 'docker/Dockerfile.public-frontend'
