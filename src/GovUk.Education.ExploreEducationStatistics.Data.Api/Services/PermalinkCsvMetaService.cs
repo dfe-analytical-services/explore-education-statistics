@@ -49,6 +49,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         _releaseFileBlobService = releaseFileBlobService;
     }
 
+    // TODO EES-3755 Remove after Permalink snapshot work is complete
     public async Task<Either<ActionResult, PermalinkCsvMetaViewModel>> GetCsvMeta(
         LegacyPermalink permalink,
         CancellationToken cancellationToken = default)
@@ -105,12 +106,12 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         var locationCols = GetLocationsColumns(permalink.FullTable.Results);
 
         var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
-            filter => filter.Name,
+            filter => filter.Name ?? filter.Legend.SnakeCase(),
             filter => new FilterCsvMetaViewModel(filter)
         );
 
         var csvIndicators = tableResultMeta.Indicators.ToDictionary(
-            indicator => indicator.Name,
+            indicator => indicator.Name ?? indicator.Label.SnakeCase(),
             indicator => new IndicatorCsvMetaViewModel(indicator)
         );
 
@@ -143,12 +144,14 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         var locations = await GetLocations(tableResultMeta.Locations);
 
         var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
-            filter => filter.Name,
+            // TODO EES-3755 Remove fallback after Permalink snapshot work is complete
+            filter => filter.Name ?? filter.Legend.SnakeCase(),
             filter => new FilterCsvMetaViewModel(filter)
         );
 
         var csvIndicators = tableResultMeta.Indicators.ToDictionary(
-            indicator => indicator.Name,
+            // TODO EES-3755 Remove fallback after Permalink snapshot work is complete
+            indicator => indicator.Name ?? indicator.Label.SnakeCase(),
             indicator => new IndicatorCsvMetaViewModel(indicator)
         );
 

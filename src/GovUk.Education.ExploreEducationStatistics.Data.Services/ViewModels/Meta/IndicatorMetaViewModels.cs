@@ -35,7 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public Guid Value { get; init; }
 
-        public string Name { get; init; } = string.Empty;
+        // TODO EES-3755 Change Name to not be nullable after Permalink snapshot work is complete.
+        // This type within Permalinks created before EES-613 has no Name.
+        public string? Name { get; init; } = string.Empty;
 
         public int? DecimalPlaces { get; init; }
 
