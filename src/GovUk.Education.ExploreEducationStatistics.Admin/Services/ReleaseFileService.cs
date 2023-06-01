@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             Stream outputStream,
             IEnumerable<Guid>? fileIds = null,
-            CancellationToken? cancellationToken = null)
+            CancellationToken cancellationToken = default)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(
                     releaseId,
@@ -220,14 +220,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             List<ReleaseFile> releaseFiles,
             Release release,
             Stream outputStream,
-            CancellationToken? cancellationToken)
+            CancellationToken cancellationToken)
         {
             using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create);
 
             foreach (var releaseFile in releaseFiles)
             {
                 // Stop immediately if we receive a cancellation request
-                if (cancellationToken?.IsCancellationRequested == true)
+                if (cancellationToken.IsCancellationRequested)
                 {
                     return;
                 }

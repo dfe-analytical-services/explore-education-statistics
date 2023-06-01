@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Data.Api.Cancellation.RequestTimeoutConfigurationKeys;
@@ -57,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             if (Request.AcceptsCsv(exact: true))
             {
-                Response.ContentDispositionAttachment("text/csv");
+                Response.ContentDispositionAttachment(ContentTypes.Csv);
 
                 await _tableBuilderService.QueryToCsvStream(query, Response.BodyWriter.AsStream(), cancellationToken);
 
@@ -82,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             if (Request.AcceptsCsv(exact: true))
             {
                 Response.ContentDispositionAttachment(
-                    contentType: "text/csv",
+                    contentType: ContentTypes.Csv,
                     filename: $"{releaseId}.csv");
 
                 await _tableBuilderService.QueryToCsvStream(

@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Mime;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
@@ -106,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task<BlobInfo> GetBlob(IBlobContainer containerName, string path)
         {
             var blob = await GetBlobClient(containerName, path);
-            var properties = (await blob.GetPropertiesAsync()).Value;
+            BlobProperties properties = await blob.GetPropertiesAsync();
 
             return new BlobInfo(
                 path: blob.Name,
@@ -143,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             var blobContainer = await GetBlobContainer(containerName);
 
-            _logger.LogInformation($"Deleting blobs from {blobContainer.Name}/{directoryPath}");
+            _logger.LogInformation("Deleting blobs from {containerName}/{path}", blobContainer.Name, directoryPath);
 
             string? continuationToken = null;
 
@@ -168,11 +167,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
                         if (excluded || !included)
                         {
-                            _logger.LogInformation($"Ignoring blob {blobContainer.Name}/{blob.Name}");
+                            _logger.LogInformation("Ignoring blob {containerName}/{path}", blobContainer.Name, blob.Name);
                             continue;
                         }
 
-                        _logger.LogInformation($"Deleting blob {blobContainer.Name}/{blob.Name}");
+                        _logger.LogInformation("Deleting blob {containerName}/{path}", blobContainer.Name, blob.Name);
 
                         deleteTasks.Add(blobContainer.DeleteBlobIfExistsAsync(blob.Name));
                     }
@@ -188,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             var blob = await GetBlobClient(containerName, path);
 
-            _logger.LogInformation($"Deleting blob {containerName}/{path}");
+            _logger.LogInformation("Deleting blob {containerName}/{path}", containerName, path);
 
             await blob.DeleteIfExistsAsync();
         }
@@ -202,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             var tempFilePath = await UploadToTemporaryFile(file);
 
-            _logger.LogInformation($"Uploading file to blob {containerName}/{path}");
+            _logger.LogInformation("Uploading file to blob {containerName}/{path}", containerName, path);
 
             await blob.UploadAsync(
                 path: tempFilePath,
@@ -289,67 +288,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string path,
             Stream stream,
             string contentType,
+            string? contentEncoding = null,
             CancellationToken cancellationToken = default)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobClient(path);
+            var blob = await GetBlobClient(containerName, path);
 
-            _logger.LogInformation($"Uploading {containerName}/{path}");
+            _logger.LogInformation("Uploading text to blob {containerName}/{path}", containerName, path);
 
-            if (stream.CanSeek)
+            var httpHeaders = new BlobHttpHeaders
             {
-                stream.Seek(0, SeekOrigin.Begin);
-            }
+                ContentEncoding = contentEncoding,
+                ContentType = contentType
+            };
 
-            await blob.UploadAsync(
-                content: stream,
-                httpHeaders: new BlobHttpHeaders
-                {
-                    ContentType = contentType,
-                },
-                cancellationToken: cancellationToken
-            );
+            var compress = contentEncoding != null;
+            if (compress)
+            {
+                await using var targetStream = new MemoryStream();
+                await CompressionUtils.CompressToStream(
+                    stream: stream,
+                    targetStream: targetStream,
+                    contentEncoding: contentEncoding!,
+                    cancellationToken: cancellationToken);
+                await blob.UploadAsync(
+                    content: targetStream,
+                    httpHeaders: httpHeaders,
+                    cancellationToken: cancellationToken
+                );
+            }
+            else
+            {
+                stream.SeekToBeginning();
+                await blob.UploadAsync(
+                    content: stream,
+                    httpHeaders: httpHeaders,
+                    cancellationToken: cancellationToken
+                );
+            }
         }
 
         public async Task UploadAsJson<T>(
             IBlobContainer containerName,
             string path,
             T content,
-            JsonSerializerSettings? settings)
+            string? contentEncoding = null,
+            JsonSerializerSettings? settings = null,
+            CancellationToken cancellationToken = default)
         {
-            var json = JsonConvert.SerializeObject(content, null, settings);
+            await using var stream = new MemoryStream();
+            await using var jsonWriter = new JsonTextWriter(new StreamWriter(stream, leaveOpen: true));
+            JsonSerializer.CreateDefault(settings).Serialize(jsonWriter, content, typeof(T));
+            await jsonWriter.FlushAsync(cancellationToken);
 
-            await UploadText(
+            await UploadStream(
                 containerName: containerName,
                 path: path,
-                content: json,
-                contentType: MediaTypeNames.Application.Json
-            );
+                stream: stream,
+                contentEncoding: contentEncoding,
+                contentType: MediaTypeNames.Application.Json,
+                cancellationToken: cancellationToken);
         }
 
         public async Task<Either<ActionResult, Stream>> DownloadToStream(
             IBlobContainer containerName,
             string path,
             Stream targetStream,
-            CancellationToken? cancellationToken = null)
+            bool decompress = true,
+            CancellationToken cancellationToken = default)
         {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlobClient(path);
+            return await GetBlobClientOrNotFound(containerName, path)
+                .OnSuccess(async blob =>
+                {
+                    if (decompress)
+                    {
+                        BlobProperties blobProperties =
+                            await blob.GetPropertiesAsync(cancellationToken: cancellationToken);
 
-            if (!await blob.ExistsAsync())
-            {
-                _logger.LogWarning($"Could not find file at {containerName}/{path}");
-                return new NotFoundResult();
-            }
+                        // Check the ContentEncoding property to determine if the blob
+                        // is compressed and only decompress if necessary.
+                        if (blobProperties.ContentEncoding.IsNullOrEmpty())
+                        {
+                            await blob.DownloadToAsync(targetStream, cancellationToken);
+                            targetStream.SeekToBeginning();
+                        }
+                        else
+                        {
+                            var blobStream = await blob.OpenReadAsync(cancellationToken: cancellationToken);
+                            await CompressionUtils.DecompressToStream(
+                                stream: blobStream,
+                                targetStream: targetStream,
+                                contentEncoding: blobProperties.ContentEncoding,
+                                cancellationToken: cancellationToken);
+                        }
+                    }
+                    else
+                    {
+                        await blob.DownloadToAsync(targetStream, cancellationToken);
+                        targetStream.SeekToBeginning();
+                    }
 
-            await blob.DownloadToAsync(targetStream, cancellationToken ?? CancellationToken.None);
-
-            if (targetStream.CanSeek)
-            {
-                targetStream.Seek(0, SeekOrigin.Begin);
-            }
-
-            return targetStream;
+                    return targetStream;
+                });
         }
 
         public async Task<Stream> StreamBlob(
@@ -375,7 +414,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
         }
 
-        public async Task<string> DownloadBlobText(
+        public async Task<Either<ActionResult, string>> DownloadBlobText(
             IBlobContainer containerName,
             string path,
             CancellationToken cancellationToken = default)
@@ -384,47 +423,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             try
             {
-                var response = await blob.DownloadContentAsync(cancellationToken);
-                return response.Value.Content.ToString();
-            }
-            catch (RequestFailedException exception)
-            {
-                if (exception.Status == 404)
+                BlobDownloadResult response = await blob.DownloadContentAsync(cancellationToken);
+
+                // Check the ContentEncoding property to determine if the blob
+                // is compressed and only decompress if necessary.
+                var contentEncoding = response.Details.ContentEncoding;
+                if (contentEncoding.IsNullOrEmpty())
                 {
-                    ThrowFileNotFoundException(containerName, path);
+                    return response.Content.ToString();
                 }
 
-                throw;
+                return await CompressionUtils.DecompressToString(
+                    bytes: response.Content.ToArray(),
+                    contentEncoding: contentEncoding,
+                    cancellationToken: cancellationToken);
+            }
+            catch (RequestFailedException exception)
+                when (exception.Status == 404)
+            {
+                return new NotFoundResult();
             }
         }
 
-        public async Task<object?> GetDeserializedJson(
+        public async Task<Either<ActionResult, object?>> GetDeserializedJson(
             IBlobContainer containerName,
             string path,
             Type type,
+            JsonSerializerSettings? settings = null,
             CancellationToken cancellationToken = default)
         {
-            var text = await DownloadBlobText(containerName, path, cancellationToken);
+            return await DownloadBlobText(containerName, path, cancellationToken)
+                .OnSuccess(text =>
+                {
+                    if (string.IsNullOrWhiteSpace(text))
+                    {
+                        throw new JsonException(
+                            $"Found empty file when trying to deserialize JSON for path: {path}");
+                    }
 
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                throw new JsonException(
-                    $"Found empty file when trying to deserialize JSON for path: {path}");
-            }
-
-            return JsonConvert.DeserializeObject(
-                text,
-                type
-            );
+                    return JsonConvert.DeserializeObject(
+                        value: text,
+                        type,
+                        settings
+                    );
+                });
         }
 
-        public async Task<T?> GetDeserializedJson<T>(
+        public async Task<Either<ActionResult, T?>> GetDeserializedJson<T>(
             IBlobContainer containerName,
             string path,
+            JsonSerializerSettings? settings = null,
             CancellationToken cancellationToken = default)
             where T : class
         {
-            return (T?) await GetDeserializedJson(containerName, path, typeof(T), cancellationToken);
+            return (await GetDeserializedJson(containerName, path, typeof(T), settings, cancellationToken))
+                .OnSuccess(deserialized => deserialized as T);
         }
 
         public async Task<List<BlobInfo>> CopyDirectory(
@@ -435,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IBlobStorageService.CopyDirectoryOptions? options = null)
         {
             _logger.LogInformation(
-                "Copying directory from {0}/{1} to {2}/{3}",
+                "Copying directory from {sourceContainer}/{sourcePath} to {destinationContainer}/{destinationPath}",
                 sourceContainerName,
                 sourceDirectoryPath,
                 destinationContainerName,
@@ -502,28 +555,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await DeleteBlobs(sourceContainerName, sourceDirectoryPath);
         }
 
-        private async Task UploadText(
-            IBlobContainer containerName,
-            string path,
-            string content,
-            string contentType)
-        {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobClient(path);
-
-            _logger.LogInformation($"Uploading text to blob {containerName}/{path}");
-
-            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-
-            await blob.UploadAsync(
-                content: stream,
-                httpHeaders: new BlobHttpHeaders
-                {
-                    ContentType = contentType,
-                }
-            );
-        }
-
         private void FileTransferredCallback(
             object sender,
             TransferEventArgs e,
@@ -544,7 +575,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
 
             _logger.LogInformation(
-                "Transferred {0}/{1} -> {2}/{3}",
+                "Transferred {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
                 source.Container.Name,
                 source.Name,
                 destination.Container.Name,
@@ -558,7 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var destination = (CloudBlockBlob) e.Destination;
 
             _logger.LogInformation(
-                "Failed to transfer {0}/{1} -> {2}/{3}. Error message: {4}",
+                "Failed to transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}. Error message: {errorMessage}",
                 source.Container.Name,
                 source.Name,
                 destination.Container.Name,
@@ -573,7 +604,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var destination = (CloudBlockBlob) e.Destination;
 
             _logger.LogInformation(
-                "Skipped transfer {0}/{1} -> {2}/{3}",
+                "Skipped transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
                 source.Container.Name,
                 source.Name,
                 destination.Container.Name,
@@ -585,6 +616,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             var blobContainer = await GetBlobContainer(containerName);
             return blobContainer.GetBlobClient(path);
+        }
+
+        private async Task<Either<ActionResult, BlobClient>> GetBlobClientOrNotFound(IBlobContainer containerName,
+            string path)
+        {
+            var blobClient = await GetBlobClient(containerName, path);
+            if (await blobClient.ExistsAsync())
+            {
+                return blobClient;
+            }
+
+            _logger.LogWarning("Could not find blob {containerName}/{path}", containerName, path);
+            return new NotFoundResult();
         }
 
         /**
@@ -601,7 +645,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var blobClient = storageAccount.CreateCloudBlobClient();
 
             var containerName = IsDevelopmentStorageAccount(blobClient) ? container.EmulatedName : container.Name;
-            
+
             var containerClient = blobClient.GetContainerReference(containerName);
 
             await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
@@ -616,7 +660,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer container)
         {
             var containerName = IsDevelopmentStorageAccount(_client) ? container.EmulatedName : container.Name;
-            
+
             var containerClient = _client.GetBlobContainerClient(containerName);
 
             await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(

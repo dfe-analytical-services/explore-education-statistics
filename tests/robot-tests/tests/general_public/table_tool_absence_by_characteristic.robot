@@ -16,16 +16,14 @@ Select "Pupil absence" publication
     user clicks radio    Pupils and schools
     user clicks radio    Pupil absence in schools in England
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    2    Choose a subject
+    user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
 
 Validate "Absence by characteristic" subject details
-    user opens details dropdown    More details    css:[data-testid="Radio item for Absence by characteristic"]
-    ${details}=    user gets details content element    More details
-    ...    css:[data-testid="Radio item for Absence by characteristic"]
+    user clicks radio    Absence by characteristic
     user checks summary list contains    Geographic levels    Local authority; Local authority district; National
-    ...    ${details}
-    user checks summary list contains    Time period    2012/13 to 2016/17    ${details}
+    user checks summary list contains    Time period    2012/13 to 2016/17
+    user checks summary list contains    Content    1
 
 Validate back takes you to step 1
     user goes back
@@ -34,14 +32,14 @@ Validate back takes you to step 1
 
 Select subject "Absence by characteristic"
     user clicks radio    Absence by characteristic
-    user clicks element    id:publicationSubjectForm-submit
+    user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    3    Choose locations
-    user checks previous table tool step contains    2    Subject    Absence by characteristic
+    user checks previous table tool step contains    2    Data set    Absence by characteristic
 
 Validate back takes you to step 2
     user goes back
-    user waits until table tool wizard step is available    2    Choose a subject
-    user clicks element    id:publicationSubjectForm-submit
+    user waits until table tool wizard step is available    2    Select a data set
+    user clicks element    id:publicationDataStepForm-submit
 
 Select Location Country, England
     user opens details dropdown    National

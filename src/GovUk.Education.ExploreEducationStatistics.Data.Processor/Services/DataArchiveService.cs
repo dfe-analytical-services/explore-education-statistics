@@ -1,6 +1,7 @@
 #nullable enable
 using System.IO.Compression;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -36,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     containerName: PrivateReleaseFiles,
                     path: import.File.Path(),
                     stream: stream,
-                    contentType: "text/csv");
+                    contentType: ContentTypes.Csv);
             }
 
             await using (var stream = metadataFile.Open())
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     containerName: PrivateReleaseFiles,
                     path: import.MetaFile.Path(),
                     stream: stream,
-                    contentType: "text/csv");
+                    contentType: ContentTypes.Csv);
             }
         }
     }

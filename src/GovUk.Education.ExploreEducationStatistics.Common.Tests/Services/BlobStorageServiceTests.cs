@@ -2,13 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.IO;
 using System.Linq;
+using System.Net.Mime;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -30,8 +34,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         [Fact]
         public async Task CheckBlobExists_BlobExists()
         {
+            const string path = "path/to/test.pdf";
+
             var blobClient = MockBlobClient(
-                name: "path/to/test.png",
+                name: path,
                 exists: true);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
@@ -39,14 +45,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
-            Assert.True(await service.CheckBlobExists(PublicReleaseFiles, "path/to/test.png"));
+            Assert.True(await service.CheckBlobExists(PublicReleaseFiles, path));
         }
 
         [Fact]
         public async Task CheckBlobExists_BlobDoesNotExist()
         {
+            const string path = "path/to/test.pdf";
+
             var blobClient = MockBlobClient(
-                name: "path/to/test.png",
+                name: path,
                 exists: false);
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
@@ -54,163 +62,238 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
-            Assert.False(await service.CheckBlobExists(PublicReleaseFiles, "path/to/test.png"));
+            Assert.False(await service.CheckBlobExists(PublicReleaseFiles, path));
+        }
+
+        [Fact]
+        public async Task DownloadBlobText()
+        {
+            const string path = "path/to/test.pdf";
+
+            var blobClient = MockBlobClient(
+                name: path,
+                createdOn: DateTimeOffset.UtcNow,
+                contentLength: 10 * 1024,
+                contentType: MediaTypeNames.Application.Pdf,
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadContentAsync(content: "Test content");
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            var result = await service.DownloadBlobText(
+                containerName: PublicReleaseFiles,
+                path: path);
+
+            result.AssertRight("Test content");
+        }
+
+        [Fact]
+        public async Task DownloadBlobText_NotFound()
+        {
+            const string path = "path/to/test.pdf";
+
+            var blobClient = MockBlobClient(
+                name: path,
+                createdOn: DateTimeOffset.UtcNow,
+                contentLength: 10 * 1024,
+                contentType: MediaTypeNames.Application.Pdf,
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadContentAsyncNotFound();
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            var result = await service.DownloadBlobText(
+                containerName: PublicReleaseFiles,
+                path: path);
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task DownloadToStream()
+        {
+            const string path = "path/to/test.pdf";
+
+            var blobClient = MockBlobClient(
+                name: path,
+                createdOn: DateTimeOffset.UtcNow,
+                contentLength: 10 * 1024,
+                contentType: MediaTypeNames.Application.Pdf,
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadToAsync("Test content");
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            await using var targetStream = new MemoryStream();
+            await service.DownloadToStream(
+                containerName: PublicReleaseFiles,
+                path: path,
+                targetStream: targetStream);
+
+            Assert.Equal(0, targetStream.Position);
+            Assert.Equal("Test content", targetStream.ReadToEnd());
+        }
+
+        [Fact]
+        public async Task DownloadToStream_NotFound()
+        {
+            const string path = "path/to/test.pdf";
+
+            var blobClient = MockBlobClient(
+                name: path,
+                createdOn: DateTimeOffset.UtcNow,
+                contentLength: 10 * 1024,
+                contentType: MediaTypeNames.Application.Pdf,
+                metadata: new Dictionary<string, string>(),
+                exists: false
+            );
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            var result = await service.DownloadToStream(
+                containerName: PublicReleaseFiles,
+                path: path,
+                new MemoryStream());
+
+            result.AssertNotFound();
         }
 
         [Fact]
         public async Task GetBlob()
         {
             var createdOn = DateTimeOffset.UtcNow;
-
-            var blobClient = MockBlobClient(
-                name: "path/to/test.pdf",
-                createdOn: createdOn,
-                contentLength: 10 * 1024,
-                contentType: "application/pdf",
-                metadata: new Dictionary<string, string>()
-            );
-
-            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
-            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
-
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
-
-            var result = await service.GetBlob(PublicReleaseFiles, "path/to/test.pdf");
-
-            Assert.Equal(createdOn, result.Created);
-            Assert.Equal(10 * 1024, result.ContentLength);
-            Assert.Equal("application/pdf", result.ContentType);
-            Assert.Equal("test.pdf", result.FileName);
-            Assert.Equal(new Dictionary<string, string>(), result.Meta);
-            Assert.Equal("path/to/test.pdf", result.Path);
-        }
-
-        [Fact]
-        public async Task GetDeserializedJson()
-        {
-            var createdOn = DateTimeOffset.UtcNow;
-
-            var blobClient = MockBlobClient(
-                name: "path/to/test.pdf",
-                createdOn: createdOn,
-                contentLength: 10 * 1024,
-                contentType: "application/pdf",
-                metadata: new Dictionary<string, string>()
-            );
-
-            var json = @"{ ""Value"": ""test-value"" }";
-
-            var response = new Mock<Response<BlobDownloadResult>>(Strict);
-
-            response.SetupGet(r => r.Value)
-                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
-
-            blobClient.Setup(s => s.DownloadContentAsync(default))
-                .ReturnsAsync(response.Object);
-
-            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
-            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
-
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
-
-            var result = await service.GetDeserializedJson<TestClass>(PublicReleaseFiles, "path/to/test.pdf");
-
-            var expected = new TestClass("test-value");
-
-            Assert.Equal(expected, result);
-        }
-
-        [Fact]
-        public async Task GetDeserializedJson_WithType()
-        {
-            var createdOn = DateTimeOffset.UtcNow;
-
-            var blobClient = MockBlobClient(
-                name: "path/to/test.pdf",
-                createdOn: createdOn,
-                contentLength: 10 * 1024,
-                contentType: "application/pdf",
-                metadata: new Dictionary<string, string>()
-            );
-
-            var json = @"{ ""Value"": ""test-value"" }";
-
-            var response = new Mock<Response<BlobDownloadResult>>(Strict);
-
-            response.SetupGet(r => r.Value)
-                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
-
-            blobClient.Setup(s => s.DownloadContentAsync(default))
-                .ReturnsAsync(response.Object);
-
-            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
-            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
-
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
-
-            var result = await service.GetDeserializedJson(PublicReleaseFiles, "path/to/test.pdf", typeof(TestClass));
-
-            var typedResult = Assert.IsType<TestClass>(result);
-            var expected = new TestClass("test-value");
-
-            Assert.Equal(expected, typedResult);
-        }
-
-        [Fact]
-        public async Task GetDeserializedJson_Null()
-        {
-            var createdOn = DateTimeOffset.UtcNow;
-
-            var blobClient = MockBlobClient(
-                name: "path/to/test.pdf",
-                createdOn: createdOn,
-                contentLength: 10 * 1024,
-                contentType: "application/pdf",
-                metadata: new Dictionary<string, string>()
-            );
-
-            var json = "null";
-
-            var response = new Mock<Response<BlobDownloadResult>>(Strict);
-
-            response.SetupGet(r => r.Value)
-                .Returns(BlobDownloadResult(BinaryData.FromString(json)));
-
-            blobClient.Setup(s => s.DownloadContentAsync(default))
-                .ReturnsAsync(response.Object);
-
-            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
-            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
-
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
-
-            var result = await service.GetDeserializedJson<object>(PublicReleaseFiles, "path/to/test.pdf");
-
-            Assert.Null(result);
-        }
-
-        [Fact]
-        public async Task GetDeserializedJson_ThrowsOnEmptyJson()
-        {
-            var createdOn = DateTimeOffset.UtcNow;
-            var path = "path/to/test.pdf";
+            const string path = "path/to/test.pdf";
 
             var blobClient = MockBlobClient(
                 name: path,
                 createdOn: createdOn,
                 contentLength: 10 * 1024,
-                contentType: "application/pdf",
+                contentType: MediaTypeNames.Application.Pdf,
                 metadata: new Dictionary<string, string>()
             );
 
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var response = new Mock<Response<BlobDownloadResult>>(Strict);
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
-            response.SetupGet(r => r.Value)
-                .Returns(BlobDownloadResult(BinaryData.FromString("")));
+            var result = await service.GetBlob(PublicReleaseFiles, path);
 
-            blobClient.Setup(s => s.DownloadContentAsync(default))
-                .ReturnsAsync(response.Object);
+            Assert.Equal(createdOn, result.Created);
+            Assert.Equal(10 * 1024, result.ContentLength);
+            Assert.Equal(MediaTypeNames.Application.Pdf, result.ContentType);
+            Assert.Equal("test.pdf", result.FileName);
+            Assert.Equal(new Dictionary<string, string>(), result.Meta);
+            Assert.Equal(path, result.Path);
+        }
+
+        [Fact]
+        public async Task GetDeserializedJson()
+        {
+            const string path = "path/to/test.pdf";
+
+            var blobClient = MockBlobClient(
+                name: path,
+                createdOn: DateTimeOffset.UtcNow,
+                contentLength: 10 * 1024,
+                contentType: MediaTypeNames.Application.Pdf,
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadContentAsync(content: @"{ ""Value"": ""test-value"" }");
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            var result = await service.GetDeserializedJson<TestClass>(PublicReleaseFiles, path);
+
+            result.AssertRight(new TestClass("test-value"));
+        }
+
+        [Fact]
+        public async Task GetDeserializedJson_WithType()
+        {
+            const string path = "path/to/test.pdf";
+
+            var blobClient = MockBlobClient(
+                name: path,
+                createdOn: DateTimeOffset.UtcNow,
+                contentLength: 10 * 1024,
+                contentType: MediaTypeNames.Application.Pdf,
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadContentAsync(content: @"{ ""Value"": ""test-value"" }");
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            var result = await service.GetDeserializedJson(PublicReleaseFiles, path, typeof(TestClass));
+
+            result.AssertRight(new TestClass("test-value"));
+        }
+
+        [Fact]
+        public async Task GetDeserializedJson_Null()
+        {
+            const string path = "path/to/test.pdf";
+
+            var blobClient = MockBlobClient(
+                name: path,
+                createdOn: DateTimeOffset.UtcNow,
+                contentLength: 10 * 1024,
+                contentType: MediaTypeNames.Application.Pdf,
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadContentAsync(content: "null");
+
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            var result = await service.GetDeserializedJson<object>(PublicReleaseFiles, path);
+
+            result.AssertRight(expected: null);
+        }
+
+        [Fact]
+        public async Task GetDeserializedJson_ThrowsOnEmptyJson()
+        {
+            const string path = "path/to/test.pdf";
+
+            var blobClient = MockBlobClient(
+                name: path,
+                createdOn: DateTimeOffset.UtcNow,
+                contentLength: 10 * 1024,
+                contentType: MediaTypeNames.Application.Pdf,
+                metadata: new Dictionary<string, string>()
+            );
+
+            blobClient.SetupDownloadContentAsync(content: "");
 
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);

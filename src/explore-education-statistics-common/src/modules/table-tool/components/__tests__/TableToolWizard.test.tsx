@@ -56,6 +56,8 @@ describe('TableToolWizard', () => {
         size: '10 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
     {
       id: 'subject-2',
@@ -74,6 +76,8 @@ describe('TableToolWizard', () => {
         size: '20 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
   ];
 
@@ -235,7 +239,7 @@ describe('TableToolWizard', () => {
 
       expect(stepHeadings).toHaveLength(1);
       expect(stepHeadings[0]).toHaveTextContent(
-        'Step 1 (current) Choose a subject',
+        'Step 1 (current) Select a data set',
       );
     });
   });
@@ -271,7 +275,7 @@ describe('TableToolWizard', () => {
 
       expect(stepHeadings).toHaveLength(5);
       expect(stepHeadings[0]).toHaveTextContent('Step 1 Choose a publication');
-      expect(stepHeadings[1]).toHaveTextContent('Step 2 Choose a subject');
+      expect(stepHeadings[1]).toHaveTextContent('Step 2 Select a data set');
       expect(stepHeadings[2]).toHaveTextContent('Step 3 Choose locations');
       expect(stepHeadings[3]).toHaveTextContent('Step 4 Choose time period');
       expect(stepHeadings[4]).toHaveTextContent(
@@ -292,7 +296,7 @@ describe('TableToolWizard', () => {
 
       const step2 = within(screen.getByTestId('wizardStep-2'));
       expect(
-        step2.getByText('Subject', { selector: 'dt' }),
+        step2.getByText('Data set', { selector: 'dt' }),
       ).toBeInTheDocument();
       expect(
         step2.getByText('Subject 1', { selector: 'dd' }),

@@ -10,14 +10,16 @@ import PreviousStepModalConfirm from '@common/modules/table-tool/components/Prev
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import { SubjectFormSubmitHandler } from '@common/modules/table-tool/components/SubjectForm';
-import SubjectStep from '@common/modules/table-tool/components/SubjectStep';
+import DataSetStep, {
+  DataSetFormSubmitHandler,
+} from '@common/modules/table-tool/components/DataSetStep';
 import TimePeriodForm, {
   TimePeriodFormSubmitHandler,
 } from '@common/modules/table-tool/components/TimePeriodForm';
 import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import applyTableHeadersOrder from '@common/modules/table-tool/utils/applyTableHeadersOrder';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
@@ -30,13 +32,11 @@ import publicationService, {
 import tableBuilderService, {
   FeaturedTable,
   ReleaseTableDataQuery,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { useRouter } from 'next/router';
 
 export interface InitialTableToolState {
   initialStep: number;
@@ -71,12 +71,13 @@ export interface TableToolWizardProps {
   hidePublicationStep?: boolean;
   initialState?: Partial<InitialTableToolState>;
   loadingFastTrack?: boolean;
-  renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
+  renderFeaturedTableLink?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
   showTableQueryErrorDownload?: boolean;
   themeMeta?: Theme[];
   currentStep?: number;
   onPublicationFormSubmit?: (publication: PublicationTreeSummary) => void;
+  onPublicationStepBack?: () => void;
   onStepChange?: (nextStep: number, previousStep: number) => void;
   onSubjectFormSubmit?(params: {
     publication: SelectedPublication;
@@ -92,24 +93,24 @@ export interface TableToolWizardProps {
   ) => void;
 }
 
-const TableToolWizard = ({
+export default function TableToolWizard({
   finalStep,
   hidePublicationStep,
   initialState = {},
   loadingFastTrack = false,
-  renderFeaturedTable,
+  renderFeaturedTableLink,
   scrollOnMount,
   showTableQueryErrorDownload = true,
   themeMeta = [],
   currentStep,
   onPublicationFormSubmit,
+  onPublicationStepBack,
   onStepChange,
   onSubjectFormSubmit,
   onSubjectStepBack,
   onSubmit,
   onTableQueryError,
-}: TableToolWizardProps) => {
-  const router = useRouter();
+}: TableToolWizardProps) {
   const [state, updateState] = useImmer<TableToolState>({
     initialStep: 1,
     subjects: [],
@@ -135,10 +136,6 @@ const TableToolWizard = ({
   const [reorderedTableHeaders, setReorderedTableHeaders] = useState<
     TableHeadersConfig
   >();
-
-  const handlePublicationStepBack = () => {
-    router.push('/data-tables', undefined, { shallow: true });
-  };
 
   const handlePublicationFormSubmit: PublicationFormSubmitHandler = async ({
     publication,
@@ -177,12 +174,14 @@ const TableToolWizard = ({
   };
 
   const handleSubjectStepBack = () => {
-    if (onSubjectStepBack) {
-      onSubjectStepBack(state.selectedPublication);
-    }
+    updateState(draft => {
+      draft.query.subjectId = '';
+    });
+
+    onSubjectStepBack?.(state.selectedPublication);
   };
 
-  const handleSubjectFormSubmit: SubjectFormSubmitHandler = async ({
+  const handleSubjectFormSubmit: DataSetFormSubmitHandler = async ({
     subjectId: selectedSubjectId,
   }) => {
     if (state.selectedPublication) {
@@ -424,7 +423,7 @@ const TableToolWizard = ({
             }}
           >
             {!hidePublicationStep && (
-              <WizardStep onBack={handlePublicationStepBack}>
+              <WizardStep size="l" onBack={onPublicationStepBack}>
                 {stepProps => (
                   <PublicationForm
                     {...stepProps}
@@ -437,20 +436,21 @@ const TableToolWizard = ({
                 )}
               </WizardStep>
             )}
-            <WizardStep onBack={handleSubjectStepBack}>
+            <WizardStep size="l" onBack={handleSubjectStepBack}>
               {stepProps => (
-                <SubjectStep
+                <DataSetStep
                   {...stepProps}
                   featuredTables={state.featuredTables}
+                  loadingFastTrack={loadingFastTrack}
+                  renderFeaturedTableLink={renderFeaturedTableLink}
+                  release={state.selectedPublication?.selectedRelease}
                   subjects={state.subjects}
                   subjectId={state.query.subjectId}
-                  renderFeaturedTable={renderFeaturedTable}
                   onSubmit={handleSubjectFormSubmit}
-                  loadingFastTrack={loadingFastTrack}
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleLocationStepBack}>
+            <WizardStep size="l" onBack={handleLocationStepBack}>
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
@@ -460,7 +460,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleTimePeriodStepBack}>
+            <WizardStep size="l" onBack={handleTimePeriodStepBack}>
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
@@ -470,7 +470,7 @@ const TableToolWizard = ({
                 />
               )}
             </WizardStep>
-            <WizardStep onBack={handleFiltersStepBack}>
+            <WizardStep size="l" onBack={handleFiltersStepBack}>
               {stepProps => (
                 <FiltersForm
                   {...stepProps}
@@ -506,6 +506,4 @@ const TableToolWizard = ({
       )}
     </ConfirmContextProvider>
   );
-};
-
-export default TableToolWizard;
+}

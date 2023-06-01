@@ -3,12 +3,12 @@ import TableToolWizard, {
 } from '@common/modules/table-tool/components/TableToolWizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService, {
   FastTrackTable,
   FeaturedTable,
-  SelectedPublication,
   Subject,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
@@ -130,20 +130,20 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         themeMeta={themeMeta}
         initialState={initialState}
         loadingFastTrack={loadingFastTrack}
-        renderFeaturedTable={highlight => (
+        renderFeaturedTableLink={featuredTable => (
           <Link
-            to={`/data-tables/fast-track/${highlight.id}`}
+            to={`/data-tables/fast-track/${featuredTable.id}`}
             onClick={() => {
               setLoadingFastTrack(true);
               setCurrentStep(undefined);
               logEvent({
                 category: 'Table tool',
                 action: 'Clicked to view featured table',
-                label: `Featured table name: ${highlight.name}`,
+                label: `Featured table name: ${featuredTable.name}`,
               });
             }}
           >
-            {highlight.name}
+            {featuredTable.name}
           </Link>
         )}
         currentStep={currentStep}
@@ -193,9 +193,12 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             },
           );
         }}
+        onPublicationStepBack={async () => {
+          await router.push('/data-tables', undefined, { shallow: true });
+        }}
         onStepChange={() => setCurrentStep(undefined)}
-        onSubjectFormSubmit={({ publication, release, subjectId }) => {
-          router.push(
+        onSubjectFormSubmit={async ({ publication, release, subjectId }) => {
+          await router.push(
             {
               pathname: `/data-tables/${publication.slug}/${release.slug}`,
               query: newPermalinks
@@ -209,8 +212,8 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             },
           );
         }}
-        onSubjectStepBack={publication => {
-          router.push(
+        onSubjectStepBack={async publication => {
+          await router.push(
             {
               pathname: `/data-tables/${publication?.slug}`,
               query: newPermalinks ? { newPermalinks } : undefined,

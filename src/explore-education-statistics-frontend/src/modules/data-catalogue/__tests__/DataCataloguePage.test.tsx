@@ -97,6 +97,8 @@ describe('DataCataloguePage', () => {
         size: '10 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
     {
       id: 'subject-2',
@@ -115,6 +117,8 @@ describe('DataCataloguePage', () => {
         size: '20 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
     {
       id: 'subject-3',
@@ -133,6 +137,8 @@ describe('DataCataloguePage', () => {
         size: '30 Mb',
         type: 'Data',
       },
+      filters: ['Filter 1'],
+      indicators: ['Indicator 1'],
     },
   ];
 

@@ -274,7 +274,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
-                { HeaderNames.Accept, "text/csv" }
+                { HeaderNames.Accept, ContentTypes.Csv }
             }
         );
 
@@ -304,7 +304,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             uri: $"/api/permalink-snapshot/{permalinkId}",
             headers: new Dictionary<string, string>
             {
-                { HeaderNames.Accept, "text/csv" }
+                { HeaderNames.Accept, ContentTypes.Csv }
             }
         );
 
@@ -333,7 +333,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
-                { HeaderNames.Accept, "text/csv" }
+                { HeaderNames.Accept, ContentTypes.Csv }
             }
         );
 
@@ -361,7 +361,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             uri: $"/api/permalink-snapshot/{permalinkId}",
             headers: new Dictionary<string, string>
             {
-                { HeaderNames.Accept, "text/csv" }
+                { HeaderNames.Accept, ContentTypes.Csv }
             }
         );
 

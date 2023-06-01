@@ -1753,11 +1753,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Single(f => f.Filename == metaFileName);
 
                 Assert.Equal(10240, dataFile.ContentLength);
-                Assert.Equal("text/csv", dataFile.ContentType);
+                Assert.Equal(ContentTypes.Csv, dataFile.ContentType);
                 Assert.Equal(FileType.Data, dataFile.Type);
 
                 Assert.Equal(10240, metaFile.ContentLength);
-                Assert.Equal("text/csv", metaFile.ContentType);
+                Assert.Equal(ContentTypes.Csv, metaFile.ContentType);
                 Assert.Equal(Metadata, metaFile.Type);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();

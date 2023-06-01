@@ -41,12 +41,9 @@ export default class Header {
     while (child) {
       if (child.text === this.text && child.span === this.span) {
         crossSpan += 1;
-      }
-
-      if (child.children.length === 1) {
         child = child.getFirstChild();
       } else {
-        child = undefined;
+        break;
       }
     }
 

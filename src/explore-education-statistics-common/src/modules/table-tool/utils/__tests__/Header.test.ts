@@ -80,6 +80,22 @@ describe('Header', () => {
 
       expect(header.crossSpan).toBe(1);
     });
+
+    test('returns 1 if non-identical child and identical grandchild', () => {
+      const header = new Header('1', '1').addChild(
+        new Header('2', '2').addChild(new Header('1', '1')),
+      );
+
+      expect(header.crossSpan).toBe(1);
+    });
+
+    test('returns 2 if identical child and non-identical grandchild', () => {
+      const header = new Header('1', '1').addChild(
+        new Header('1', '1').addChild(new Header('2', '2')),
+      );
+
+      expect(header.crossSpan).toBe(2);
+    });
   });
 
   describe('addChild', () => {
