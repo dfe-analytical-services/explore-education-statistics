@@ -8,7 +8,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import React from 'react';
 import Link from '@admin/components/Link';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -16,20 +16,20 @@ import { Form } from '@common/components/form';
 import Button from '@common/components/Button';
 import releaseAncillaryFileService from '@admin/services/releaseAncillaryFileService';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
-import ButtonText from '@common/components/ButtonText';
-import FormattedDate from '@common/components/FormattedDate';
 import AncillaryFileDetailsTable from '@admin/pages/release/data/components/AncillaryFileDetailsTable';
+import { useHistory, useParams } from 'react-router-dom';
 
 interface FormValues {
   file: File | null;
 }
 
-const ReleaseAncillaryFileReplacePage = ({
-  history,
-  match: {
-    params: { publicationId, releaseId, fileId },
-  },
-}: RouteComponentProps<ReleaseAncillaryFileReplaceRouteParams>) => {
+const ReleaseAncillaryFileReplacePage = () => {
+  const history = useHistory();
+
+  const { publicationId, releaseId, fileId } = useParams<
+    ReleaseAncillaryFileReplaceRouteParams
+  >();
+
   const {
     value: ancillaryFile,
     isLoading: ancillaryFileLoading,
