@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseFileService = releaseFileService;
         }
 
-        [HttpDelete("release/{releaseId}/ancillary/{id}")]
+        [HttpDelete("release/{releaseId:guid}/ancillary/{id:guid}")]
         public async Task<ActionResult> DeleteFile(
             Guid releaseId, Guid id)
         {
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpDelete("release/{releaseId}/chart/{id}")]
+        [HttpDelete("release/{releaseId:guid}/chart/{id:guid}")]
         public async Task<ActionResult> DeleteChartFile(
             Guid releaseId, Guid id)
         {
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 );
         }
 
-        [HttpGet("release/{releaseId}/file/{fileId}")]
+        [HttpGet("release/{releaseId:guid}/file/{fileId:guid}")]
         public async Task<ActionResult<FileInfo>> GetFile(Guid releaseId, Guid fileId)
         {
             return await _releaseFileService
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/file/{fileId}/download")]
+        [HttpGet("release/{releaseId:guid}/file/{fileId:guid}/download")]
         public async Task<ActionResult> Stream(Guid releaseId, Guid fileId)
         {
             return await _releaseFileService
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailures();
         }
 
-        [HttpPatch("release/{releaseId}/file/{fileId}")]
+        [HttpPatch("release/{releaseId:guid}/file/{fileId:guid}")]
         public async Task<ActionResult<Unit>> Update(
             Guid releaseId,
             Guid fileId,
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrNoContent();
         }
 
-        [HttpGet("release/{releaseId}/ancillary")]
+        [HttpGet("release/{releaseId:guid}/ancillary")]
         public async Task<ActionResult<IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId)
         {
             return await _releaseFileService
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/ancillary")]
+        [HttpPost("release/{releaseId:guid}/ancillary")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UploadAncillary(
@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/ancillary/{fileId}/replace")]
+        [HttpPost("release/{releaseId:guid}/ancillary/{fileId:guid}/replace")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> ReplaceAncillary(
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("release/{releaseId}/chart/{id}")]
+        [HttpPut("release/{releaseId:guid}/chart/{id:guid}")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UpdateChartFile(Guid releaseId, Guid id, IFormFile file)
@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/chart")]
+        [HttpPost("release/{releaseId:guid}/chart")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UploadChart(Guid releaseId, IFormFile file)

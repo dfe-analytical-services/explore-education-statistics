@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("api/publications/{publicationId}")]
+        [HttpGet("api/publications/{publicationId:guid}")]
         public async Task<ActionResult<PublicationViewModel>> GetPublication(
             [Required] Guid publicationId, [FromQuery] bool includePermissions = false)
         {
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("api/publication/{publicationId}/releases")]
+        [HttpGet("api/publication/{publicationId:guid}/releases")]
         public async Task<ActionResult<PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleases(
             [Required] Guid publicationId,
             [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("api/publications/{publicationId}")]
+        [HttpPut("api/publications/{publicationId:guid}")]
         public async Task<ActionResult<PublicationViewModel>> UpdatePublication(
             Guid publicationId,
             PublicationSaveRequest updatedPublication)
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         /// Only legacy releases with matching ids will be updated,
         /// and only non-null fields will be updated.
         /// This is useful for bulk updates e.g. re-ordering.
-        [HttpPatch("api/publications/{publicationId}/legacy-releases")]
+        [HttpPatch("api/publications/{publicationId:guid}/legacy-releases")]
         public async Task<ActionResult<List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId,
             List<LegacyReleasePartialUpdateViewModel> legacyReleases)
@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
         
-        [HttpGet("api/publications/{publicationId}/roles")]
+        [HttpGet("api/publications/{publicationId:guid}/roles")]
         public async Task<ActionResult<List<UserPublicationRoleViewModel>>> GetRoles(Guid publicationId)
         {
             return await _roleService

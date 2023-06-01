@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("topics/{topicId}")]
+        [HttpPut("topics/{topicId:guid}")]
         public async Task<ActionResult<TopicViewModel>> UpdateTopic(
             Guid topicId,
             TopicSaveViewModel topic)
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("topics/{topicId}")]
+        [HttpGet("topics/{topicId:guid}")]
         public async Task<ActionResult<TopicViewModel>> GetTopic(Guid topicId)
         {
             return await _topicService
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("topics/{topicId}")]
+        [HttpDelete("topics/{topicId:guid}")]
         public async Task<ActionResult> DeleteTopic(Guid topicId)
         {
             return await _topicService

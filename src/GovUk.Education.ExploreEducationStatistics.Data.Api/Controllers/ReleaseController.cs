@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _cacheKeyService = cacheKeyService;
         }
 
-        [HttpGet("releases/{releaseId}/subjects")]
+        [HttpGet("releases/{releaseId:guid}/subjects")]
         public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseId)
         {
             return await _cacheKeyService
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}/featured-tables")]
+        [HttpGet("releases/{releaseId:guid}/featured-tables")]
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
             return await _releaseService
