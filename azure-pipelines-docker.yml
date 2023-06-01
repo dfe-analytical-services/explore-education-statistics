@@ -48,4 +48,3 @@ jobs:
           Dockerfile: 'docker/Dockerfile.public-frontend'
           buildContext: '$(System.DefaultWorkingDirectory)'
           tags: $(Build.BuildNumber)
-          arguments: "--username ${username} --password ${password}"
