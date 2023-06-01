@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             _methodologyImageService = methodologyImageService;
         }
 
-        [HttpPost("methodologies/{methodologyId}/images")]
+        [HttpPost("methodologies/{methodologyId:guid}/images")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<ImageFileViewModel>> Upload(Guid methodologyId, IFormFile file)
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         /// <param name="fileId"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        [HttpGet("methodologies/{methodologyId}/images/{fileId}")]
+        [HttpGet("methodologies/{methodologyId:guid}/images/{fileId:guid}")]
         public async Task<ActionResult> Stream(Guid methodologyId, Guid fileId)
         {
             return await _methodologyImageService

@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             _commentService = commentService;
         }
 
-        [HttpGet("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments")]
+        [HttpGet("release/{releaseId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}/comments")]
         public async Task<ActionResult<List<CommentViewModel>>> GetComments(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId)
         {
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}/content/section/{contentSectionId}/block/{contentBlockId}/comments/add")]
+        [HttpPost("release/{releaseId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}/comments/add")]
         public async Task<ActionResult<CommentViewModel>> AddComment(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, CommentSaveRequest saveRequest)
         {
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("comment/{commentId}")]
+        [HttpPut("comment/{commentId:guid}")]
         public async Task<ActionResult<CommentViewModel>> UpdateComment(Guid commentId, 
             CommentSaveRequest saveRequest)
         {
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("comment/{commentId}")]
+        [HttpDelete("comment/{commentId:guid}")]
         public async Task<ActionResult> DeleteComment(Guid commentId)
         {
             return await _commentService

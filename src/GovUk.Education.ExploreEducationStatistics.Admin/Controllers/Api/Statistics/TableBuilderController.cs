@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _logger = logger;
         }
 
-        [HttpPost("release/{releaseId}")]
+        [HttpPost("release/{releaseId:guid}")]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             Guid releaseId, 
             [FromBody] ObservationQueryContext query,
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return tableBuilderResultViewModel.HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
+        [HttpGet("release/{releaseId:guid}/data-block/{dataBlockId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId,

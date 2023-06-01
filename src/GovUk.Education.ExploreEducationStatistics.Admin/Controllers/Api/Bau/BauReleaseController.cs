@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         /// </summary>
         /// <param name="releaseId"></param>
         /// <returns></returns>
-        [HttpPut("bau/release/{releaseId}/publish/content")]
+        [HttpPut("bau/release/{releaseId:guid}/publish/content")]
         public async Task<ActionResult<Unit>> RetryReleasePublishing(Guid releaseId)
         {
             return await _publishingService

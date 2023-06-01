@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releaseImageService = releaseImageService;
         }
 
-        [HttpPost("releases/{releaseId}/images")]
+        [HttpPost("releases/{releaseId:guid}/images")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<ImageFileViewModel>> Upload(Guid releaseId, IFormFile file)
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         /// <param name="fileId"></param>
         /// <returns></returns>
         [AllowAnonymous]
-        [HttpGet("releases/{releaseId}/images/{fileId}")]
+        [HttpGet("releases/{releaseId:guid}/images/{fileId:guid}")]
         public async Task<ActionResult> Stream(Guid releaseId, Guid fileId)
         {
             return await _releaseImageService

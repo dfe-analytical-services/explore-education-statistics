@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _releaseService = releaseService;
         }
 
-        [HttpGet("data/releases/{releaseId}/subjects")]
+        [HttpGet("data/releases/{releaseId:guid}/subjects")]
         public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseId)
         {
             return await _releaseService
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("data/releases/{releaseId}/featured-tables")]
+        [HttpGet("data/releases/{releaseId:guid}/featured-tables")]
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
             return await _releaseService

@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             _releaseNoteService = releaseNoteService;
         }
 
-        [HttpPost("release/{releaseId}/content/release-note")]
+        [HttpPost("release/{releaseId:guid}/content/release-note")]
         public async Task<ActionResult<List<ReleaseNoteViewModel>>> AddReleaseNote(ReleaseNoteSaveRequest saveRequest,
             Guid releaseId)
         {
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOr(result => Created(HttpContext.Request.Path, result));
         }
 
-        [HttpPut("release/{releaseId}/content/release-note/{releaseNoteId}")]
+        [HttpPut("release/{releaseId:guid}/content/release-note/{releaseNoteId:guid}")]
         public async Task<ActionResult<List<ReleaseNoteViewModel>>> UpdateReleaseNote(
             ReleaseNoteSaveRequest saveRequest, Guid releaseId, Guid releaseNoteId)
         {
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("release/{releaseId}/content/release-note/{releaseNoteId}")]
+        [HttpDelete("release/{releaseId:guid}/content/release-note/{releaseNoteId:guid}")]
         public async Task<ActionResult<List<ReleaseNoteViewModel>>> DeleteReleaseNote(Guid releaseId, Guid releaseNoteId)
         {
             return await _releaseNoteService
