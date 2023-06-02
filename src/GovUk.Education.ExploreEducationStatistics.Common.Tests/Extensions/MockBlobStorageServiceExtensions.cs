@@ -96,8 +96,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(exists);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDeleteBlob(
+        public static IReturnsResult<IBlobStorageService> SetupDeleteBlob( // @MarkFix
             this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string path)
+        {
+            return service.Setup(s => s.DeleteBlob(container, path))
+                .Returns(Task.CompletedTask);
+        }
+
+        public static IReturnsResult<IPrivateBlobStorageService> SetupDeleteBlob( // @MarkFix
+            this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string path)
         {

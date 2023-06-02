@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -18,23 +19,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     public class PublishingService : IPublishingService
     {
         private readonly string _publicStorageConnectionString;
-        private readonly IBlobStorageService _privateBlobStorageService;
-        private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
+        private readonly IPublicBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseService _releaseService;
         private readonly ILogger<PublishingService> _logger;
 
         public PublishingService(
-            string publicStorageConnectionString,
-            IBlobStorageService privateBlobStorageService,
-            IBlobStorageService publicBlobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
+            IPublicBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
             IPublicationRepository publicationRepository,
             IReleaseService releaseService,
-            ILogger<PublishingService> logger)
+            ILogger<PublishingService> logger,
+            IConfiguration configuration)
         {
-            _publicStorageConnectionString = publicStorageConnectionString;
+            _publicStorageConnectionString = configuration.GetValue<string>("PublicStorage");
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
             _methodologyService = methodologyService;
