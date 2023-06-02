@@ -38,14 +38,14 @@ jobs:
          command: 'login'
          arguments: "--username ${username} --password ${password}"
 
-      # - task: Docker@2
-      #   displayName: 'Build and push public frontend Docker image'
-      #   condition: ne(variables['Build.Reason'], 'PullRequest')
-      #   inputs:
-      #     containerRegistry: 'eesregistrytest'
-      #     repository: 'eesfrontendcontainer'
-      #     command: 'buildAndPush'
-      #     Dockerfile: 'docker/Dockerfile.public-frontend'
-      #     buildContext: '$(System.DefaultWorkingDirectory)'
-      #     tags: $(Build.BuildNumber)
+      - task: Docker@2
+        displayName: 'Build and push public frontend Docker image'
+        condition: ne(variables['Build.Reason'], 'PullRequest')
+        inputs:
+          containerRegistry: 'eesregistrytest'
+          repository: 'eesfrontendcontainer'
+          command: 'buildAndPush'
+          Dockerfile: 'docker/Dockerfile.public-frontend'
+          buildContext: '$(System.DefaultWorkingDirectory)'
+          tags: $(Build.BuildNumber)
 
