@@ -128,55 +128,55 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -184,34 +184,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-    
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
-    
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -322,55 +321,55 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -378,34 +377,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-    
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
-    
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         {
@@ -455,55 +453,55 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -511,34 +509,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-    
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
-    
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -608,55 +605,55 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -664,34 +661,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-    
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
-    
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -745,55 +741,55 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -801,34 +797,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-    
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
-    
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -910,55 +905,55 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -966,34 +961,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-    
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
-    
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1055,58 +1049,58 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporterMock = new Mock<TestObservationBatchImporter>
         {
             CallBase = true
         };
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -1114,26 +1108,25 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporterMock.Object);
-        
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
 
         // Cancel the import after the first batch of Observations is imported.
@@ -1143,13 +1136,13 @@ public class ProcessorStage3Tests : IDisposable
                     It.IsAny<StatisticsDbContext>(),
                     It.IsAny<IEnumerable<Observation>>()))
             .Callback(() => function.CancelImports(new CancelImportMessage(import.Id)));
-            
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1199,39 +1192,39 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -1239,34 +1232,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-        
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
 
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1334,55 +1326,55 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -1390,34 +1382,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-    
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
-    
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
@@ -1504,55 +1495,55 @@ public class ProcessorStage3Tests : IDisposable
             await statisticsDbContext.SaveChangesAsync();
         }
     
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
-    
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
+
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.File.Filename);
-    
+
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.File.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.File.Path(),
             dataFilePath);
-        
-        blobStorageService.SetupStreamBlob(
-            PrivateReleaseFiles, 
-            import.MetaFile.Path(), 
+
+        privateBlobStorageService.SetupStreamPrivateBlob(
+            PrivateReleaseFiles,
+            import.MetaFile.Path(),
             metaFilePath);
-        
+
         var dbContextSupplier = new InMemoryDbContextSupplier(
             contentDbContextId: _contentDbContextId,
             statisticsDbContextId: _statisticsDbContextId);
-    
+
         var databaseHelper = new InMemoryDatabaseHelper(dbContextSupplier);
-        
+
         var dataImportService = new DataImportService(
             dbContextSupplier,
             Mock.Of<ILogger<DataImportService>>());
-    
+
         var importerLocationCache = new ImporterLocationCache(Mock.Of<ILogger<ImporterLocationCache>>());
-    
+
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
             // Fill the ImporterLocationCache with all existing Locations on "startup" of the Importer.
             // Note that this occurs in Startup.cs.
             importerLocationCache.LoadLocations(statisticsDbContext);
         }
-    
+
         var guidGenerator = new SequentialGuidGenerator();
-    
+
         var importerMetaService = new ImporterMetaService(
-            guidGenerator, 
+            guidGenerator,
             databaseHelper);
-    
+
         var observationBatchImporter = new TestObservationBatchImporter();
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
-                guidGenerator, 
+                guidGenerator,
                 importerLocationCache,
                 Mock.Of<ILogger<ImporterLocationCache>>()),
             importerMetaService,
@@ -1560,34 +1551,33 @@ public class ProcessorStage3Tests : IDisposable
             Mock.Of<ILogger<ImporterService>>(),
             databaseHelper,
             observationBatchImporter);
-    
+
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-        
+            importerService);
+
         var processorService = new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(Strict),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             fileImportService,
             importerService,
             dataImportService,
             Mock.Of<IValidatorService>(Strict),
             Mock.Of<IDataArchiveService>(Strict),
             dbContextSupplier);
-        
+
         var function = BuildFunction(
-            processorService: processorService, 
+            processorService: processorService,
             dataImportService: dataImportService);
-    
+
         await function.ProcessUploads(
             new ImportMessage(import.Id),
             new ExecutionContext(),
             Mock.Of<ICollector<ImportMessage>>(Strict));
-        
-        VerifyAllMocks(blobStorageService);
+
+        VerifyAllMocks(privateBlobStorageService);
         
         await using (var contentDbContext = InMemoryContentDbContext(_contentDbContextId))
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
