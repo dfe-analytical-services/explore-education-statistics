@@ -104,10 +104,10 @@ Upload multiple ancillary files
     user opens accordion section    Test 1    id:file-uploads
 
     ${section_1}=    user gets accordion section content element    Test 1    id:file-uploads
-    user checks summary list contains    Title    Test 1    ${section_1}
-    user checks summary list contains    Summary    Test 1 summary    ${section_1}
-    user checks summary list contains    File    test-file-1.txt    ${section_1}
-    user checks summary list contains    File size    12 B    ${section_1}
+    user checks headed table body row contains    Title    Test 1    ${section_1}
+    user checks headed table body row contains    Summary    Test 1 summary    ${section_1}
+    user checks headed table body row contains    File    test-file-1.txt    ${section_1}
+    user checks headed table body row contains    File size    12 B    ${section_1}
 
     user enters text into element    label:Title    Test 2
     user enters text into element    label:Summary    Test 2 summary
@@ -118,10 +118,10 @@ Upload multiple ancillary files
     user opens accordion section    Test 2    id:file-uploads
 
     ${section_2}=    user gets accordion section content element    Test 2    id:file-uploads
-    user checks summary list contains    Title    Test 2    ${section_2}
-    user checks summary list contains    Summary    Test 2 summary    ${section_2}
-    user checks summary list contains    File    test-file-2.txt    ${section_2}
-    user checks summary list contains    File size    24 B    ${section_2}
+    user checks headed table body row contains    Title    Test 2    ${section_2}
+    user checks headed table body row contains    Summary    Test 2 summary    ${section_2}
+    user checks headed table body row contains    File    test-file-2.txt    ${section_2}
+    user checks headed table body row contains    File size    24 B    ${section_2}
 
     user checks there are x accordion sections    2    id:file-uploads
 
@@ -176,8 +176,8 @@ Validate ancillary file details were changed
     user opens accordion section    Test 2 updated    id:file-uploads
 
     ${section}=    user gets accordion section content element    Test 2 updated    id:file-uploads
-    user checks summary list contains    Title    Test 2 updated    ${section}
-    user checks summary list contains    Summary    Test 2 summary updated    ${section}
+    user checks headed table body row contains    Title    Test 2 updated    ${section}
+    user checks headed table body row contains    Summary    Test 2 summary updated    ${section}
 
 Delete ancillary file
     ${file_2_section}=    user gets accordion section content element    Test 2 updated    id:file-uploads

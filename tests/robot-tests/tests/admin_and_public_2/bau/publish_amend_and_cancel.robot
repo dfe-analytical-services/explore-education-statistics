@@ -235,6 +235,41 @@ Confirm data replacement
     user clicks button    Confirm data replacement
     user waits until h2 is visible    Data replacement complete
 
+Replace ancillary file during amendment
+    user clicks link    Data and files
+    user clicks link    Ancillary file uploads
+    user waits until h2 is visible    Uploaded files
+
+    user waits until page contains accordion section    Test ancillary file 1
+    user opens accordion section    Test ancillary file 1    id:file-uploads
+    ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
+    user clicks link    Edit file    ${section_1}
+    user waits until h2 is visible    Edit ancillary file details
+    user enters text into element    label:Title    Replacement ancillary file
+    user enters text into element    label:Summary    Replacement ancillary file summary updated
+
+    user clicks button    Save changes
+
+    user waits until h2 is visible    Uploaded files
+    user opens accordion section    Replacement ancillary file    id:file-uploads
+    ${section_1}=    user gets accordion section content element    Replacement ancillary file    id:file-uploads
+    user clicks link    Replace file    ${section_1}
+    user waits until h2 is visible    Replace ancillary file
+    user waits until h3 is visible    Upload replacement file
+    user chooses file    label:Upload file    ${FILES_DIR}test-file-2.txt
+    user clicks button    Upload file
+
+    user waits until page contains accordion section    Replacement ancillary file
+    user opens accordion section    Replacement ancillary file    id:file-uploads
+
+    ${section_1}=    user gets accordion section content element    Replacement ancillary file    id:file-uploads
+    user checks headed table body row contains    Title    Replacement ancillary file    ${section_1}
+    user checks headed table body row contains    Summary    Replacement ancillary file    ${section_1}
+    user checks headed table body row contains    File    test-file-2.txt    ${section_1}
+    user checks headed table body row contains    File size    24 B    ${section_1}
+
+    user checks there are x accordion sections    1    id:file-uploads
+
 Navigate to 'Footnotes' section for amendment
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
@@ -372,6 +407,22 @@ Verify that the Data and Files are unchanged
     user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
     user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
+
+Verify that the ancillary file is unchanged
+    user clicks link    Data and files
+    user clicks link    Ancillary file uploads
+    user waits until h2 is visible    Uploaded files
+    user waits until page contains accordion section    Test ancillary file 1
+
+    user opens accordion section    Test ancillary file 1    id:file-uploads
+
+    ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
+    user checks headed table body row contains    Title    Test ancillary file 1    ${section_1}
+    user checks headed table body row contains    Summary    Test ancillary file 1 summary    ${section_1}
+    user checks headed table body row contains    File    test-file-1.txt    ${section_1}
+    user checks headed table body row contains    File size    12 B    ${section_1}
+
+    user checks there are x accordion sections    1    id:file-uploads
 
 Verify that the footnotes are unchanged
     user clicks link    Footnotes

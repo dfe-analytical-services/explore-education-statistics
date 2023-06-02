@@ -66,10 +66,10 @@ Add ancillary file
     user opens accordion section    Test ancillary file 1    id:file-uploads
 
     ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
-    user checks summary list contains    Title    Test ancillary file 1    ${section_1}
-    user checks summary list contains    Summary    Test ancillary file 1 summary    ${section_1}
-    user checks summary list contains    File    test-file-1.txt    ${section_1}
-    user checks summary list contains    File size    12 B    ${section_1}
+    user checks headed table body row contains    Title    Test ancillary file 1    ${section_1}
+    user checks headed table body row contains    Summary    Test ancillary file 1 summary    ${section_1}
+    user checks headed table body row contains    File    test-file-1.txt    ${section_1}
+    user checks headed table body row contains    File size    12 B    ${section_1}
 
     user checks there are x accordion sections    1    id:file-uploads
 
@@ -526,6 +526,62 @@ Update existing data guidance for amendment
 
     user clicks button    Save guidance
 
+Replace ancillary file during amendment
+    user clicks link    Data and files
+    user clicks link    Ancillary file uploads
+    user waits until h2 is visible    Uploaded files
+
+    user waits until page contains accordion section    Test ancillary file 1
+    user opens accordion section    Test ancillary file 1    id:file-uploads
+    ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
+    user clicks link    Edit file    ${section_1}
+    user waits until h2 is visible    Edit ancillary file details
+    user enters text into element    label:Title    Replacement ancillary file
+    user enters text into element    label:Summary    Replacement ancillary file summary updated
+
+    user clicks button    Save changes
+
+    user waits until h2 is visible    Uploaded files
+    user opens accordion section    Replacement ancillary file    id:file-uploads
+    ${section_1}=    user gets accordion section content element    Replacement ancillary file    id:file-uploads
+    user clicks link    Replace file    ${section_1}
+    user waits until h2 is visible    Replace ancillary file
+    user waits until h3 is visible    Upload replacement file
+    user chooses file    label:Upload file    ${FILES_DIR}test-file-2.txt
+    user clicks button    Upload file
+
+    user waits until page contains accordion section    Replacement ancillary file
+    user opens accordion section    Replacement ancillary file    id:file-uploads
+
+    ${section_1}=    user gets accordion section content element    Replacement ancillary file    id:file-uploads
+    user checks headed table body row contains    Title    Replacement ancillary file    ${section_1}
+    user checks headed table body row contains    Summary    Replacement ancillary file    ${section_1}
+    user checks headed table body row contains    File    test-file-2.txt    ${section_1}
+    user checks headed table body row contains    File size    24 B    ${section_1}
+
+    user checks there are x accordion sections    1    id:file-uploads
+
+Add a second ancillary file to amendment
+    user clicks link    Data and files
+    user clicks link    Ancillary file uploads
+    user waits until h2 is visible    Add file to release
+
+    user enters text into element    label:Title    Test ancillary file 2
+    user enters text into element    label:Summary    Test ancillary file 2 summary
+    user chooses file    label:Upload file    ${FILES_DIR}test-file-2.txt
+    user clicks button    Upload file
+
+    user waits until page contains accordion section    Test ancillary file 2
+    user opens accordion section    Test ancillary file 2    id:file-uploads
+
+    ${section_2}=    user gets accordion section content element    Test ancillary file 2    id:file-uploads
+    user checks headed table body row contains    Title    Test ancillary file 2    ${section_2}
+    user checks headed table body row contains    Summary    Test ancillary file 2 summary    ${section_2}
+    user checks headed table body row contains    File    test-file-2.txt    ${section_2}
+    user checks headed table body row contains    File size    24 B    ${section_2}
+
+    user checks there are x accordion sections    2    id:file-uploads
+
 Navigate to 'Footnotes' section for amendment
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
@@ -546,27 +602,6 @@ Confirm amendment has footnotes
     user waits until page contains element    testid:Footnote - Applies to all data 1
     user waits until page contains element    testid:Footnote - Applies to all data 2
     user waits until page contains element    testid:Footnote - Applies to all data 3
-
-Add ancillary file to amendment
-    user clicks link    Data and files
-    user clicks link    Ancillary file uploads
-    user waits until h2 is visible    Add file to release
-
-    user enters text into element    label:Title    Test ancillary file 2
-    user enters text into element    label:Summary    Test ancillary file 2 summary
-    user chooses file    label:Upload file    ${FILES_DIR}test-file-2.txt
-    user clicks button    Upload file
-
-    user waits until page contains accordion section    Test ancillary file 2
-    user opens accordion section    Test ancillary file 2    id:file-uploads
-
-    ${section_2}=    user gets accordion section content element    Test ancillary file 2    id:file-uploads
-    user checks summary list contains    Title    Test ancillary file 2    ${section_2}
-    user checks summary list contains    Summary    Test ancillary file 2 summary    ${section_2}
-    user checks summary list contains    File    test-file-2.txt    ${section_2}
-    user checks summary list contains    File size    24 B    ${section_2}
-
-    user checks there are x accordion sections    2    id:file-uploads
 
 User navigates to Data blocks page
     user clicks link    Data blocks
@@ -764,10 +799,10 @@ Verify amendment files
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
     ${other_files_2}=    get child element    ${other_files}    css:li:nth-child(2)
 
-    user waits until element contains link    ${other_files_1}    Test ancillary file 1 (txt, 12 B)
-    user checks element should contain    ${other_files_1}    Test ancillary file 1 summary
-    download file    link:Test ancillary file 1 (txt, 12 B)    test_ancillary_file_1.txt
-    downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
+    user waits until element contains link    ${other_files_1}    Replacement ancillary file (txt, 24 B)
+    user checks element should contain    ${other_files_1}    Replacement ancillary file summary
+    download file    link:Replacement ancillary file (txt, 24 B)    replacement_ancillary_file.txt
+    downloaded file should have first line    replacement_ancillary_file.txt    Test file 2
 
     user waits until element contains link    ${other_files_2}    Test ancillary file 2 (txt, 24 B)
     user checks element should contain    ${other_files_2}    Test ancillary file 2 summary
