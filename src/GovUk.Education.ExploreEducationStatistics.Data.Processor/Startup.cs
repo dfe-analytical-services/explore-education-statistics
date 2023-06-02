@@ -30,19 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
                         providerOptions => providerOptions.EnableCustomRetryOnFailure()))
                 .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>()
-                .AddSingleton<IBlobStorageService, BlobStorageService>( // @MarkFix remove
-                    provider =>
-                    {
-                        var connectionString = GetConfigurationValue(provider, "CoreStorage");
-
-                        var blobStorageService = new BlobStorageService(
-                            connectionString,
-                            new BlobServiceClient(connectionString),
-                            provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                            new StorageInstanceCreationUtil()
-                        );
-                        return blobStorageService;
-                    })
                 .AddSingleton<IStorageQueueService, StorageQueueService>(provider =>
                     new StorageQueueService(
                         GetConfigurationValue(provider, "CoreStorage"),

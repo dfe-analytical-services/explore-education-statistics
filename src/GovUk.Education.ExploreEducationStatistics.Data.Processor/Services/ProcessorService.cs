@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ProcessorService : IProcessorService
     {
         private readonly ILogger<ProcessorService> _logger;
-        private readonly IBlobStorageService _blobStorageService; // @MarkFix private
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IFileImportService _fileImportService;
         private readonly IImporterService _importerService;
         private readonly IDataImportService _dataImportService;
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public ProcessorService(
             ILogger<ProcessorService> logger,
-            IBlobStorageService blobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
             IFileImportService fileImportService,
             IImporterService importerService,
             IDataImportService dataImportService,
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             IDbContextSupplier dbContextSupplier)
         {
             _logger = logger;
-            _blobStorageService = blobStorageService;
+            _privateBlobStorageService = privateBlobStorageService;
             _fileImportService = fileImportService;
             _importerService = importerService;
             _dataImportService = dataImportService;
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var subject = await statisticsDbContext.Subject.SingleAsync(subject => subject.Id == import.SubjectId);
 
-            var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
+            var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
             var metaFileCsvHeaders = await CsvUtils.GetCsvHeaders(metaFileStreamProvider);
             var metaFileCsvRows = await CsvUtils.GetCsvRows(metaFileStreamProvider);
