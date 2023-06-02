@@ -109,6 +109,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             );
         }
 
+        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStream(  // @MarkFix
+            this Mock<IPrivateBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            string content,
+            bool decompress = true,
+            CancellationToken cancellationToken = default)
+        {
+            return service.SetupDownloadToStream(
+                container,
+                path,
+                Encoding.UTF8.GetBytes(content),
+                decompress,
+                cancellationToken
+            );
+        }
+
         public static IReturnsResult<IBlobStorageService> SetupDownloadToStream( // @MarkFix
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
@@ -161,6 +178,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync((IBlobContainer _, string _, Stream stream, bool _, CancellationToken? _) => stream);
         }
 
+        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStream( // @MarkFix
+            this Mock<IPrivateBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            byte[] content,
+            bool decompress = true,
+            CancellationToken cancellationToken = default)
+        {
+            return service.Setup(
+                    s =>
+                        s.DownloadToStream(container, path, It.IsAny<Stream>(), decompress, cancellationToken)
+                )
+                .Callback<IBlobContainer, string, Stream, bool, CancellationToken?>(
+                    (_, _, stream, _, _) =>
+                    {
+                        stream.Write(content, 0, content.Length);
+
+                        if (stream.CanSeek)
+                        {
+                            stream.Position = 0;
+                        }
+                    }
+                )
+                .ReturnsAsync((IBlobContainer _, string _, Stream stream, bool _, CancellationToken? _) => stream);
+        }
+
         public static IReturnsResult<IBlobStorageService> SetupDownloadToStreamNotFound( // @MarkFix
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
@@ -177,6 +220,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
         public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStreamNotFound( // @MarkFix
             this Mock<IPublicBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            bool decompress = true,
+            CancellationToken cancellationToken = default)
+        {
+            return service.Setup(
+                    s =>
+                        s.DownloadToStream(container, path, It.IsAny<Stream>(), decompress, cancellationToken)
+                )
+                .ReturnsAsync(new NotFoundResult());
+        }
+
+        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStreamNotFound( // @MarkFix
+            this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string path,
             bool decompress = true,
