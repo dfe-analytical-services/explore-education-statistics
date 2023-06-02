@@ -64,19 +64,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-            blobStorageService
+            privateBlobStorageService
                 .SetupDownloadToStream(PrivateReleaseFiles, releaseFile.Path(), fileData);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    privateBlobStorageService: privateBlobStorageService.Object);
 
                 var result = await service.Stream(release.Id, releaseFile.File.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService);
 
                 var fileStreamResult = result.AssertRight();
 
@@ -167,18 +167,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
-            blobStorageService.SetupDownloadToStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
+            privateBlobStorageService.SetupDownloadToStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    privateBlobStorageService: privateBlobStorageService.Object);
 
                 var result = await service.Stream(release.Id, releaseFile.File.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService);
 
                 result.AssertNotFound();
             }
@@ -200,10 +200,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var formFile = CreateFormFileMock(filename, "image/png").Object;
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
 
-            blobStorageService.Setup(mock =>
+            privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
                         path.Contains(FilesPath(release.Id, Image))),
@@ -217,19 +217,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
                 var result = await service.Upload(release.Id, formFile);
 
-                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
 
                 Assert.True(result.IsRight);
 
                 fileUploadsValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(formFile, Image), Times.Once);
 
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, Image))),
@@ -264,13 +264,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Upload_ReleaseNotFound()
         {
             var formFile = CreateFormFileMock("image.png", "image/png").Object;
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
 
             await using (var contentDbContext = InMemoryApplicationDbContext())
             {
                 var service = SetupReleaseImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
                 var result = await service.Upload(Guid.NewGuid(), formFile);
@@ -278,13 +278,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 result.AssertNotFound();
             }
 
-            MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+            MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
         }
 
         private ReleaseImageService SetupReleaseImageService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IBlobStorageService? blobStorageService = null,
+            IPrivateBlobStorageService? privateBlobStorageService = null,
             IFileUploadsValidatorService? fileUploadsValidatorService = null,
             IReleaseFileRepository? releaseFileRepository = null,
             IUserService? userService = null)
@@ -295,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseImageService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                blobStorageService ?? new Mock<IBlobStorageService>(Strict).Object,
+                privateBlobStorageService ?? new Mock<IPrivateBlobStorageService>(Strict).Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>(Strict).Object,
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
