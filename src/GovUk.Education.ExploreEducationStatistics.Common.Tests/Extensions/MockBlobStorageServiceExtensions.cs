@@ -86,6 +86,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(exists);
         }
 
+        public static IReturnsResult<IPrivateBlobStorageService> SetupCheckBlobExists( // @MarkFix
+            this Mock<IPrivateBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            bool exists)
+        {
+            return service.Setup(s => s.CheckBlobExists(container, path))
+                .ReturnsAsync(exists);
+        }
+
         public static IReturnsResult<IBlobStorageService> SetupDeleteBlob(
             this Mock<IBlobStorageService> service,
             IBlobContainer container,

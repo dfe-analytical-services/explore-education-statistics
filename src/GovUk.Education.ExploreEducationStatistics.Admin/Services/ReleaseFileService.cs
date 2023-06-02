@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IFileRepository _fileRepository;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly IReleaseFileRepository _releaseFileRepository;
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public ReleaseFileService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IBlobStorageService blobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
             IFileRepository fileRepository,
             IFileUploadsValidatorService fileUploadsValidatorService,
             IReleaseFileRepository releaseFileRepository,
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
-            _blobStorageService = blobStorageService;
+            _privateBlobStorageService = privateBlobStorageService;
             _fileRepository = fileRepository;
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _releaseFileRepository = releaseFileRepository;
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _releaseFileRepository.Delete(releaseId, file.Id);
                         if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, file.Id))
                         {
-                            await _blobStorageService.DeleteBlob(
+                            await _privateBlobStorageService.DeleteBlob(
                                 PrivateReleaseFiles,
                                 file.Path());
 
@@ -175,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(_ => CheckFileExists(releaseId, fileId))
                 .OnSuccessCombineWith(file =>
-                    _blobStorageService.DownloadToStream(PrivateReleaseFiles, file.Path(), new MemoryStream()))
+                    _privateBlobStorageService.DownloadToStream(PrivateReleaseFiles, file.Path(), new MemoryStream()))
                 .OnSuccess(fileAndStream =>
                 {
                     var (file, stream) = fileAndStream;
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return;
                 }
 
-                var blobExists = await _blobStorageService.CheckBlobExists(
+                var blobExists = await _privateBlobStorageService.CheckBlobExists(
                     PrivateReleaseFiles,
                     releaseFile.Path()
                 );
@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 await using var entryStream = entry.Open();
 
-                await _blobStorageService.DownloadToStream(
+                await _privateBlobStorageService.DownloadToStream(
                     containerName: PrivateReleaseFiles,
                     path: releaseFile.Path(),
                     stream: entryStream,
@@ -333,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _contentDbContext.SaveChangesAsync();
 
-                    await _blobStorageService.UploadFile(
+                    await _privateBlobStorageService.UploadFile(
                         containerName: PrivateReleaseFiles,
                         path: releaseFile.Path(),
                         file: upload.File);
@@ -412,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             type: Chart,
                             createdById: _userService.GetUserId());
 
-                    await _blobStorageService.UploadFile(
+                    await _privateBlobStorageService.UploadFile(
                         containerName: PrivateReleaseFiles,
                         path: releaseFile.Path(),
                         file: formFile
