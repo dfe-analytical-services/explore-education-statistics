@@ -595,7 +595,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
-            services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
+
+            services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage")); // @MarkFix remove
+            services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+
             services.AddTransient<ITableStorageService, TableStorageService>(_ =>
                 new TableStorageService(
                     coreStorageConnectionString,
@@ -633,17 +637,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
             services.AddTransient<IBlobCacheService, BlobCacheService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
-
-            // Register any controllers that need specific dependencies
-            services.AddTransient(
-                provider => new BauCacheController(
-                    privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
-                    publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                    glossaryCacheService: provider.GetRequiredService<IGlossaryCacheService>(),
-                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
-                )
-            );
 
             /*
              * Swagger
