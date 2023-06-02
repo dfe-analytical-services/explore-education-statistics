@@ -49,19 +49,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicMethodologyFiles, methodologyFile.Path(), fileData);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 var fileStreamResult = result.AssertRight();
 
@@ -151,18 +151,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-            blobStorageService.SetupDownloadToStreamNotFound(PublicMethodologyFiles, methodologyFile.Path());
+            publicBlobStorageService.SetupDownloadToStreamNotFound(PublicMethodologyFiles, methodologyFile.Path());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertNotFound();
             }
@@ -171,11 +171,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static MethodologyImageService SetupMethodologyImageService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IBlobStorageService? blobStorageService = null)
+            IPublicBlobStorageService? publicBlobStorageService = null)
         {
             return new MethodologyImageService(
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                blobStorageService ?? new Mock<IBlobStorageService>(Strict).Object,
+                publicBlobStorageService ?? new Mock<IPublicBlobStorageService>(Strict).Object,
                 MockUtils.AlwaysTrueUserService().Object
             );
         }
