@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .Returns(Task.CompletedTask);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadToStream(
+        public static IReturnsResult<IBlobStorageService> SetupDownloadToStream(  // @MarkFix
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -92,7 +92,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             );
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadToStream(
+        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStream(  // @MarkFix
+            this Mock<IPublicBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            string content,
+            bool decompress = true,
+            CancellationToken cancellationToken = default)
+        {
+            return service.SetupDownloadToStream(
+                container,
+                path,
+                Encoding.UTF8.GetBytes(content),
+                decompress,
+                cancellationToken
+            );
+        }
+
+        public static IReturnsResult<IBlobStorageService> SetupDownloadToStream( // @MarkFix
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -118,7 +135,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync((IBlobContainer _, string _, Stream stream, bool _, CancellationToken? _) => stream);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadToStreamNotFound(
+        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStream( // @MarkFix
+            this Mock<IPublicBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            byte[] content,
+            bool decompress = true,
+            CancellationToken cancellationToken = default)
+        {
+            return service.Setup(
+                    s =>
+                        s.DownloadToStream(container, path, It.IsAny<Stream>(), decompress, cancellationToken)
+                )
+                .Callback<IBlobContainer, string, Stream, bool, CancellationToken?>(
+                    (_, _, stream, _, _) =>
+                    {
+                        stream.Write(content, 0, content.Length);
+
+                        if (stream.CanSeek)
+                        {
+                            stream.Position = 0;
+                        }
+                    }
+                )
+                .ReturnsAsync((IBlobContainer _, string _, Stream stream, bool _, CancellationToken? _) => stream);
+        }
+
+        public static IReturnsResult<IBlobStorageService> SetupDownloadToStreamNotFound( // @MarkFix
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -132,7 +175,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(new NotFoundResult());
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadBlobText(
+        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStreamNotFound( // @MarkFix
+            this Mock<IPublicBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            bool decompress = true,
+            CancellationToken cancellationToken = default)
+        {
+            return service.Setup(
+                    s =>
+                        s.DownloadToStream(container, path, It.IsAny<Stream>(), decompress, cancellationToken)
+                )
+                .ReturnsAsync(new NotFoundResult());
+        }
+
+        public static IReturnsResult<IBlobStorageService> SetupDownloadBlobText( // @MarkFix
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -144,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(blobText);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadBlobTextNotFound(
+        public static IReturnsResult<IBlobStorageService> SetupDownloadBlobTextNotFound( // @MarkFix
             this Mock<IBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -169,8 +226,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(value);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupGetDeserializedJson<T>(
-            this Mock<IBlobStorageService> service,
+        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJson<T>( // @MarkFix can make method work with public and private?
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
             T value,
@@ -197,6 +254,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 
         public static IReturnsResult<IBlobStorageService> SetupGetDeserializedJsonNotFound<T>(
             this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            JsonSerializerSettings? settings = null,
+            CancellationToken cancellationToken = default) where T : class
+        {
+            return service.Setup(s =>
+                    s.GetDeserializedJson<T>(container, path, settings, cancellationToken))
+                .ReturnsAsync(new NotFoundResult());
+        }
+
+        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJsonNotFound<T>( // @MarkFix
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
             JsonSerializerSettings? settings = null,

@@ -259,12 +259,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             Guid expectedPermalinkId;
 
             string? capturedTableCsvBlobPath = null;
-            blobStorageService.Setup(s => s.UploadStream(
+            publicBlobStorageService.Setup(s => s.UploadStream(
                     BlobContainers.PermalinkSnapshots,
                     It.Is<string>(path => path.EndsWith(".csv.zst")),
                     It.IsAny<Stream>(),
@@ -288,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Returns(Task.CompletedTask);
 
             string? capturedTableJsonBlobPath = null;
-            blobStorageService.Setup(s => s.UploadAsJson(
+            publicBlobStorageService.Setup(s => s.UploadAsJson(
                     BlobContainers.PermalinkSnapshots,
                     It.Is<string>(path => path.EndsWith(".json.zst")),
                     It.IsAny<PermalinkTableViewModel>(),
@@ -362,7 +362,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object,
                     permalinkCsvMetaService: permalinkCsvMetaService.Object,
                     releaseRepository: releaseRepository.Object,
@@ -372,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 var result = (await service.CreatePermalink(request)).AssertRight();
 
                 MockUtils.VerifyAllMocks(
-                    blobStorageService,
+                    publicBlobStorageService,
                     frontendService,
                     permalinkCsvMetaService,
                     releaseRepository,
@@ -577,12 +577,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             Guid expectedPermalinkId;
 
             string? capturedTableCsvBlobPath = null;
-            blobStorageService.Setup(s => s.UploadStream(
+            publicBlobStorageService.Setup(s => s.UploadStream(
                     BlobContainers.PermalinkSnapshots,
                     It.Is<string>(path => path.EndsWith(".csv.zst")),
                     It.IsAny<Stream>(),
@@ -606,7 +606,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Returns(Task.CompletedTask);
 
             string? capturedTableJsonBlobPath = null;
-            blobStorageService.Setup(s => s.UploadAsJson(
+            publicBlobStorageService.Setup(s => s.UploadAsJson(
                     BlobContainers.PermalinkSnapshots,
                     It.Is<string>(path => path.EndsWith(".json.zst")),
                     It.IsAny<PermalinkTableViewModel>(),
@@ -668,7 +668,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object,
                     permalinkCsvMetaService: permalinkCsvMetaService.Object,
                     tableBuilderService: tableBuilderService.Object);
@@ -676,7 +676,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 var result = (await service.CreatePermalink(release.Id, request)).AssertRight();
 
                 MockUtils.VerifyAllMocks(
-                    blobStorageService,
+                    publicBlobStorageService,
                     frontendService,
                     permalinkCsvMetaService,
                     tableBuilderService);
@@ -773,9 +773,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst",
                 value: table);
@@ -784,11 +784,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = (await service.GetPermalink(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(permalink.Created, result.Created);
@@ -822,20 +822,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJsonNotFound<PermalinkTableViewModel>(
+            publicBlobStorageService.SetupGetDeserializedJsonNotFound<PermalinkTableViewModel>(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.GetPermalink(permalink.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertNotFound();
             }
@@ -856,9 +856,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst",
                 value: new PermalinkTableViewModel());
@@ -867,11 +867,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = (await service.GetPermalink(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.SubjectRemoved, result.Status);
@@ -926,9 +926,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst",
                 value: new PermalinkTableViewModel());
@@ -937,11 +937,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = (await service.GetPermalink(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.Current, result.Status);
@@ -991,9 +991,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst",
                 value: new PermalinkTableViewModel());
@@ -1002,11 +1002,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = (await service.GetPermalink(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
@@ -1056,9 +1056,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst",
                 value: new PermalinkTableViewModel());
@@ -1067,11 +1067,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = (await service.GetPermalink(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
@@ -1124,9 +1124,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst",
                 value: new PermalinkTableViewModel());
@@ -1135,11 +1135,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = (await service.GetPermalink(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.SubjectReplacedOrRemoved, result.Status);
@@ -1184,9 +1184,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst",
                 value: new PermalinkTableViewModel());
@@ -1195,11 +1195,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = (await service.GetPermalink(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.PublicationSuperseded, result.Status);
@@ -1218,9 +1218,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadToStream(
+            publicBlobStorageService.SetupDownloadToStream(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.csv.zst",
                 content: "Test csv");
@@ -1231,12 +1231,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object
+                    publicBlobStorageService: publicBlobStorageService.Object
                 );
 
                 var result = await service.DownloadCsvToStream(permalink.Id, stream);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertRight();
 
@@ -1268,20 +1268,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadToStreamNotFound(
+            publicBlobStorageService.SetupDownloadToStreamNotFound(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.csv.zst");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.DownloadCsvToStream(permalink.Id, new MemoryStream());
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertNotFound();
             }
@@ -1409,15 +1409,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
                 value: legacyPermalink,
                 settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
-            blobStorageService.Setup(s => s.UploadStream(
+            publicBlobStorageService.Setup(s => s.UploadStream(
                     BlobContainers.PermalinkSnapshots,
                     $"{permalink.Id}.csv.zst",
                     It.IsAny<Stream>(),
@@ -1437,7 +1437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     })
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(s => s.UploadAsJson(
+            publicBlobStorageService.Setup(s => s.UploadAsJson(
                     BlobContainers.PermalinkSnapshots,
                     $"{permalink.Id}.json.zst",
                     It.IsAny<PermalinkTableViewModel>(),
@@ -1477,7 +1477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object,
                     permalinkCsvMetaService: permalinkCsvMetaService.Object);
 
@@ -1486,7 +1486,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 result.AssertRight();
 
                 MockUtils.VerifyAllMocks(
-                    blobStorageService,
+                    publicBlobStorageService,
                     frontendService,
                     permalinkCsvMetaService);
             }
@@ -1628,15 +1628,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
                 value: legacyPermalink,
                 settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
-            blobStorageService.Setup(s => s.UploadStream(
+            publicBlobStorageService.Setup(s => s.UploadStream(
                     BlobContainers.PermalinkSnapshots,
                     $"{permalink.Id}.csv.zst",
                     It.IsAny<Stream>(),
@@ -1656,7 +1656,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     })
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(s => s.UploadAsJson(
+            publicBlobStorageService.Setup(s => s.UploadAsJson(
                     BlobContainers.PermalinkSnapshots,
                     $"{permalink.Id}.json.zst",
                     It.IsAny<PermalinkTableViewModel>(),
@@ -1696,7 +1696,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object,
                     permalinkCsvMetaService: permalinkCsvMetaService.Object);
 
@@ -1705,7 +1705,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 result.AssertRight();
 
                 MockUtils.VerifyAllMocks(
-                    blobStorageService,
+                    publicBlobStorageService,
                     frontendService,
                     permalinkCsvMetaService);
             }
@@ -1854,15 +1854,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
                 value: legacyPermalink,
                 settings: PermalinkService.LegacyPermalinkSerializerSettings);
 
-            blobStorageService.Setup(s => s.UploadStream(
+            publicBlobStorageService.Setup(s => s.UploadStream(
                     BlobContainers.PermalinkSnapshots,
                     $"{permalink.Id}.csv.zst",
                     It.IsAny<Stream>(),
@@ -1882,7 +1882,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     })
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(s => s.UploadAsJson(
+            publicBlobStorageService.Setup(s => s.UploadAsJson(
                     BlobContainers.PermalinkSnapshots,
                     $"{permalink.Id}.json.zst",
                     It.IsAny<PermalinkTableViewModel>(),
@@ -1922,7 +1922,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object,
                     permalinkCsvMetaService: permalinkCsvMetaService.Object);
 
@@ -1931,7 +1931,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 result.AssertRight();
 
                 MockUtils.VerifyAllMocks(
-                    blobStorageService,
+                    publicBlobStorageService,
                     frontendService,
                     permalinkCsvMetaService);
             }
@@ -1989,9 +1989,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
+            publicBlobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
                 settings: PermalinkService.LegacyPermalinkSerializerSettings);
@@ -1999,11 +1999,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.MigratePermalink(permalink.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertNotFound();
             }
@@ -2087,9 +2087,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
                 value: new LegacyPermalink(
@@ -2110,12 +2110,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object);
 
                 var result = await service.MigratePermalink(permalink.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(publicBlobStorageService,
                     frontendService);
 
                 result.AssertNotFound();
@@ -2143,9 +2143,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupGetDeserializedJson(
+            publicBlobStorageService.SetupGetDeserializedJson(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
                 value: new LegacyPermalink(
@@ -2166,12 +2166,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     frontendService: frontendService.Object);
 
                 var result = await service.MigratePermalink(permalink.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(publicBlobStorageService,
                     frontendService);
 
                 result.AssertInternalServerError();
@@ -2201,7 +2201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             ContentDbContext? contentDbContext = null,
             ITableBuilderService? tableBuilderService = null,
             IPermalinkCsvMetaService? permalinkCsvMetaService = null,
-            IBlobStorageService? blobStorageService = null,
+            IPublicBlobStorageService? publicBlobStorageService = null,
             IFrontendService? frontendService = null,
             IReleaseRepository? releaseRepository = null,
             ISubjectRepository? subjectRepository = null,
@@ -2213,7 +2213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 contentDbContext,
                 tableBuilderService ?? Mock.Of<ITableBuilderService>(MockBehavior.Strict),
                 permalinkCsvMetaService ?? Mock.Of<IPermalinkCsvMetaService>(MockBehavior.Strict),
-                blobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
+                publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
                 frontendService ?? Mock.Of<IFrontendService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 publicationRepository ?? new PublicationRepository(contentDbContext),

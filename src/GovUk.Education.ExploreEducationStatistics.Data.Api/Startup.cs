@@ -143,7 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider => // @MarkFix remove
                 new BlobStorageService(
                         publicStorageConnectionString,
                         new BlobServiceClient(publicStorageConnectionString),
