@@ -17,8 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
     public static class MockBlobStorageServiceExtensions
     {
-        public static IReturnsResult<IBlobStorageService> SetupFindBlob(
+        public static IReturnsResult<IBlobStorageService> SetupFindBlob( // @MarkFix
             this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            BlobInfo? blob)
+        {
+            return service.Setup(s => s.FindBlob(container, path))
+                .ReturnsAsync(blob);
+        }
+
+        public static IReturnsResult<IPublicBlobStorageService> SetupFindBlob( // @MarkFix
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
             BlobInfo? blob)
@@ -56,8 +66,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return SetupListBlobs(service, container, expectedBlobPath, blobs.ToList());
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupCheckBlobExists(
+        public static IReturnsResult<IBlobStorageService> SetupCheckBlobExists( // @MarkFix
             this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            bool exists)
+        {
+            return service.Setup(s => s.CheckBlobExists(container, path))
+                .ReturnsAsync(exists);
+        }
+
+        public static IReturnsResult<IPublicBlobStorageService> SetupCheckBlobExists( // @MarkFix
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
             bool exists)
