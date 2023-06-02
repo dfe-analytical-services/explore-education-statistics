@@ -120,7 +120,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider => // @MarkFix remove
                 {
                     var connectionString = Configuration.GetValue<string>("PublicStorage");
 
