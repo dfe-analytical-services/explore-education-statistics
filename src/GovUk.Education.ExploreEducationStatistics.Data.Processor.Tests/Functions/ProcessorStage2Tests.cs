@@ -249,7 +249,7 @@ public class ProcessorStage2Tests
         var processorService = BuildProcessorService(
             dbContextSupplier,
             dataImportService: dataImportService,
-            blobStorageService: privateBlobStorageService.Object,
+            privateBlobStorageService: privateBlobStorageService.Object,
             importerService: importerService,
             fileImportService: fileImportService);
 
@@ -414,13 +414,13 @@ public class ProcessorStage2Tests
     private static ProcessorService BuildProcessorService(
         IDbContextSupplier dbContextSupplier,
         IDataImportService? dataImportService = null,
-        IBlobStorageService? blobStorageService = null,
+        IPrivateBlobStorageService? privateBlobStorageService = null,
         IImporterService? importerService = null,
         IFileImportService? fileImportService = null)
     {
         return new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(),
-            blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+            privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),
