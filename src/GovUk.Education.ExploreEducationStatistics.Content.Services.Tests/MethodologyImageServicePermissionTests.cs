@@ -55,12 +55,12 @@ public class MethodologyImageServicePermissionTests
 
     private MethodologyImageService BuildService(
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-        IBlobStorageService? blobStorageService = null,
+        IPublicBlobStorageService? publicBlobStorageService = null,
         IUserService? userService = null)
     {
         return new(
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            blobStorageService ?? Mock.Of<IBlobStorageService>(),
+            publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(),
             userService ?? Mock.Of<IUserService>()
         );
     }
