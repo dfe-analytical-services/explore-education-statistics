@@ -65,15 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                 .AddScoped<IReleaseCacheService, ReleaseCacheService>()
 
-                .AddScoped<IPublishingService, PublishingService>(provider =>
-                    new PublishingService(
-                        publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
-                        privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
-                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        methodologyService: provider.GetRequiredService<IMethodologyService>(),
-                        publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
-                        releaseService: provider.GetRequiredService<IReleaseService>(),
-                        logger: provider.GetRequiredService<ILogger<PublishingService>>()))
+                .AddScoped<IPublishingService, PublishingService>()
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
