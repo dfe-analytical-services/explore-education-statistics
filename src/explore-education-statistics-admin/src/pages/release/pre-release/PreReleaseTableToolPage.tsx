@@ -40,7 +40,7 @@ const PreReleaseTableToolPage = ({
     ]);
 
     const filteredFeaturedTables = featuredTables.filter(
-      highlight => highlight.id !== dataBlockId,
+      highlight => highlight.dataBlockId !== dataBlockId,
     );
 
     if (dataBlockId) {
@@ -117,7 +117,7 @@ const PreReleaseTableToolPage = ({
                   {
                     publicationId,
                     releaseId,
-                    dataBlockId: featuredTable.id,
+                    dataBlockId: featuredTable.dataBlockId,
                   },
                 )}
               >

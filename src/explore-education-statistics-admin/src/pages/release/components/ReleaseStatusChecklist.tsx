@@ -155,7 +155,7 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
             message: 'No next expected release date has been added',
             link: `#${formId}-nextReleaseDate-month`,
           };
-        case 'NoTableHighlights':
+        case 'NoFeaturedTables':
           return {
             message: 'No data blocks have been saved as featured tables',
             link: generatePath<ReleaseRouteParams>(

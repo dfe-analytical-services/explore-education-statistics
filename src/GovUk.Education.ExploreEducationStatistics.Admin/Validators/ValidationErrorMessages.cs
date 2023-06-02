@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoNextReleaseDate,
         NoDataFiles,
         NoFootnotesOnSubjects,
-        NoTableHighlights,
+        NoFeaturedTables,
         NoPublicPreReleaseAccessList,
         MethodologyNotApproved,
 
@@ -113,5 +113,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Key statistics
         DataBlockShouldBeUnattached,
         ProvidedKeyStatIdsDifferFromReleaseKeyStatIds,
+
+        // Featured tables
+        DataBlockAlreadyHasFeaturedTable,
+        ProvidedFeaturedTableIdsDifferFromReleaseFeaturedTableIds,
     }
 }
