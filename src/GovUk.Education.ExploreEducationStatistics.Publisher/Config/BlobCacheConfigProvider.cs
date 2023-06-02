@@ -1,13 +1,10 @@
 ﻿#nullable enable
 using System;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.WebJobs.Description;
 using Microsoft.Azure.WebJobs.Host.Config;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -31,30 +28,14 @@ public class BlobCacheConfigProvider : IExtensionConfigProvider
 
         using var scope = _scopeFactory.CreateScope();
 
-        var publicBlobCacheService = GetBlobCacheService(scope.ServiceProvider, "PublicStorage");
+        var publicBlobCacheService = GetBlobCacheService(scope.ServiceProvider);
         BlobCacheAttribute.AddService("public", publicBlobCacheService);
     }
 
-    private static IBlobCacheService GetBlobCacheService(IServiceProvider provider, string connectionStringKey)
+    private static IBlobCacheService GetBlobCacheService(IServiceProvider provider)
     {
         return new BlobCacheService(
-            blobStorageService: GetBlobStorageService(provider, connectionStringKey),
+            blobStorageService: provider.GetRequiredService<IPublicBlobStorageService>(), // @MarkFix works?
             logger: provider.GetRequiredService<ILogger<BlobCacheService>>());
-    }
-
-    private static IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
-    {
-        var connectionString = GetConfigurationValue(provider, connectionStringKey);
-        return new BlobStorageService(
-            connectionString,
-            new BlobServiceClient(connectionString),
-            provider.GetRequiredService<ILogger<BlobStorageService>>(),
-            new StorageInstanceCreationUtil());
-    }
-
-    private static string GetConfigurationValue(IServiceProvider provider, string key)
-    {
-        var configuration = provider.GetService<IConfiguration>();
-        return configuration.GetValue<string>(key);
     }
 }
