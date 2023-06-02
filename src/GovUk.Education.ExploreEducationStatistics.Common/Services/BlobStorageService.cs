@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         protected BlobStorageService() {}
 
-        public BlobStorageService( // @MarkFix remove
+        public BlobStorageService(
             string connectionString,
             BlobServiceClient client,
             ILogger<BlobStorageService> logger,

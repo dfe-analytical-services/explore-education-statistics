@@ -129,8 +129,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Services
             //
 
-            var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
-
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
@@ -147,12 +145,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
 
-            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider => // @MarkFix remove
-                new BlobStorageService(
-                    publicStorageConnectionString,
-                    new BlobServiceClient(publicStorageConnectionString),
-                    provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                    new StorageInstanceCreationUtil()));
             services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
 
             services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
