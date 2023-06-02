@@ -16,7 +16,7 @@ import {
   unmappedLocations,
   newLocations,
   mappedLocations,
-  deletedLocations,
+  // deletedLocations,
 } from './data/locations';
 import { unmappedFilters, newFilters, mappedFilters } from './data/filters';
 import {
@@ -112,7 +112,6 @@ const PrototypePrepareNextSubjectPage = ({
                 />
               )}
             </WizardStep>
-
             <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep2

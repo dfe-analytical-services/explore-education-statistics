@@ -6,33 +6,22 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import {
-  Form,
-  FormRadio,
-  FormRadioGroup,
-  FormFieldset,
-} from '@common/components/form';
-import FormEditor from '@admin/components/form/FormEditor';
-import Yup from '@common/validation/yup';
+import { Form, FormFieldset } from '@common/components/form';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
-import { subjectsForRelease2 } from '../PrototypePublicationSubjects';
+import ChangelogExample from './PrototypeChangelogExamples';
 
 interface FormValues {
   subjectId: string;
 }
 
-interface Props extends InjectedWizardProps {
-  onSubmit: (subjectId: string) => void;
-}
-
 const PrototypePrepareNextSubjectStep5 = ({
-  onSubmit,
   ...stepProps
-}: Props) => {
+}: InjectedWizardProps) => {
   const { isMounted } = useMounted();
   const { isActive, goToNextStep } = stepProps;
   const [versionType, setVersionType] = useState(false);
+  const [versionNotes, setVersionNotes] = useState('');
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
@@ -48,18 +37,6 @@ const PrototypePrepareNextSubjectStep5 = ({
             initialValues={{
               subjectId: '',
             }}
-            validationSchema={Yup.object({
-              subjectId: Yup.string().test({
-                name: 'whatevs',
-                message: `Time periods in the next dataset should be compatible with the current dataset.`,
-                test(values) {
-                  if (values !== 'id4') {
-                    return true;
-                  }
-                  return false;
-                },
-              }),
-            })}
             onSubmit={() => {
               goToNextStep();
             }}
@@ -68,13 +45,21 @@ const PrototypePrepareNextSubjectStep5 = ({
               <Form id="form">
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
-                    <FormEditor
-                      id="description"
-                      label="Version notes"
-                      value=""
-                      hint="Use notes to highlight any extra guidance that may not be apparent in the automated changelog below."
-                      onChange={() => {}}
+                    <label htmlFor="deprecationNotes">
+                      Version notes
+                      <span className="govuk-hint">
+                        Use notes to highlight any extra guidance that may not
+                        be apparent in the automated changelog below
+                      </span>
+                    </label>
+                    <textarea
+                      className="govuk-textarea"
+                      id="versionNotes"
+                      onChange={e => {
+                        setVersionNotes(e.target.value);
+                      }}
                     />
+
                     <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
                       <legend className="govuk-legend govuk-fieldset__legend">
                         <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
@@ -133,71 +118,18 @@ const PrototypePrepareNextSubjectStep5 = ({
                         <h3 className="govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-heading-s">
                           New API data set version number
                         </h3>
-                        <p>{versionType ? '2.0' : '1.1'}</p>
-                        <h4 className="govuk-!-margin-bottom-0">
-                          New locations
-                        </h4>
-                        <ul className="govuk-!-margin-bottom-6">
-                          <li>Leeds</li>
-                          <li>Doncaster</li>
-                        </ul>
-                        <h4 className="govuk-!-margin-bottom-0">
-                          Mapped locations
-                        </h4>
-                        <ul className="govuk-!-margin-bottom-6">
-                          <li>Darlington --{'>'} Darlington (new)</li>
-                          <li>
-                            Kingston upon Hull, City of --{'>'} Kingston upon
-                            Hull, City of (new)
-                          </li>
-                          <li>Northumberland --{'>'} Nortumberland (new)</li>
-                          <li>Sheffield--{'>'} Sheffield (new)</li>
-                        </ul>
-                        <h4 className="govuk-!-margin-bottom-0">New filters</h4>
-                        <ul className="govuk-!-margin-bottom-6">
-                          <li>Age 11</li>
-                          <li>Age 12</li>
-                        </ul>
-                        <h4 className="govuk-!-margin-bottom-0">
-                          Mapped filters
-                        </h4>
-                        <ul className="govuk-!-margin-bottom-6">
-                          <li>Age 10 --{'>'} Age 10 (new)</li>
-                          <li>
-                            Ethnicity Major Asian Total --{'>'} Ethnicity Major
-                            Asian Total (new)
-                          </li>
-                          <li>
-                            Ethnicity Major Black Total --{'>'} Ethnicity Major
-                            Black Total (new)
-                          </li>
-                          <li>Age 4 and under --{'>'} Age 4 and under (new)</li>
-                        </ul>
-                        <h4 className="govuk-!-margin-bottom-0">
-                          New indicators
-                        </h4>
-                        <ul className="govuk-!-margin-bottom-6">
-                          <li>Number of authorised other sessions</li>
-                          <li>Number of authorised reasons sessions</li>
-                        </ul>
-                        <h4 className="govuk-!-margin-bottom-0">
-                          Mapped indicators
-                        </h4>
-                        <ul className="govuk-!-margin-bottom-6">
-                          <li>
-                            Number of authorised holiday sessions --{'>'} Number
-                            of authorised holiday sessions (new)
-                          </li>
-                          <li>
-                            Authorised absence rate --{'>'} Number of Authorised
-                            absence rate (new)
-                          </li>
-                        </ul>
+                        <p>1.1</p>
+                        <ChangelogExample versionUpdate="Minor" />
                       </>
                     )}
                     {versionType && (
                       <>
                         <h3>Major update changelog</h3>
+                        <h3 className="govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-heading-s">
+                          New API data set version number
+                        </h3>
+                        <p>2.0</p>
+                        <ChangelogExample versionUpdate="Major" />
                       </>
                     )}
                   </>
@@ -224,6 +156,12 @@ const PrototypePrepareNextSubjectStep5 = ({
         </SummaryListItem>
         <SummaryListItem term="Next release version">
           {versionType ? '2.0' : '1.1'}
+        </SummaryListItem>
+        <SummaryListItem term="Notes">
+          <div style={{ whiteSpace: 'pre-wrap' }}>{versionNotes}</div>
+        </SummaryListItem>
+        <SummaryListItem term="Changelog">
+          <ChangelogExample versionUpdate={!versionType ? 'Minor' : 'Major'} />
         </SummaryListItem>
       </SummaryList>
     </WizardStepSummary>

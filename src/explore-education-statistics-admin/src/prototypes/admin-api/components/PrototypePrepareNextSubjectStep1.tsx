@@ -105,10 +105,7 @@ const PrototypePrepareNextSubjectStep1 = ({
   }
 
   return (
-    <WizardStepSummary
-      {...stepProps}
-      goToButtonText="Change data set for next release"
-    >
+    <WizardStepSummary {...stepProps} goToButtonText="Change data set">
       {stepHeading}
 
       <SummaryList noBorder>
