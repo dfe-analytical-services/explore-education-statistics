@@ -133,7 +133,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     );
                 }
             );
-            services.AddTransient<IBlobCacheService, BlobCacheService>();
+            services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
+                provider.GetRequiredService<IPublicBlobStorageService>(),
+                provider.GetRequiredService<ILogger<BlobCacheService>>()));
             services.AddSingleton<IMemoryCacheService>(provider =>
             {
                 var memoryCacheConfig = Configuration.GetSection("MemoryCache");
