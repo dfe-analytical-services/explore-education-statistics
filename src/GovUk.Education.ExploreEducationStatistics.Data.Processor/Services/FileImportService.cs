@@ -2,7 +2,6 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -18,23 +17,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class FileImportService : IFileImportService
     {
         private readonly ILogger<FileImportService> _logger;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IDataImportService _dataImportService;
         private readonly IImporterService _importerService;
-        private readonly IImporterMetaService _importerMetaService;
 
         public FileImportService(
             ILogger<FileImportService> logger,
-            IBlobStorageService blobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
             IDataImportService dataImportService,
-            IImporterService importerService,
-            IImporterMetaService importerMetaService)
+            IImporterService importerService)
         {
             _logger = logger;
-            _blobStorageService = blobStorageService;
+            _privateBlobStorageService = privateBlobStorageService;
             _dataImportService = dataImportService;
             _importerService = importerService;
-            _importerMetaService = importerMetaService;
         }
 
         public async Task ImportObservations(DataImport import, StatisticsDbContext context)
@@ -66,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             var subject = await context.Subject.SingleAsync(s => s.Id.Equals(import.SubjectId));
 
-            var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
-            var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
+            var datafileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
+            var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, import.MetaFile.Path());
 
             await _importerService.ImportObservations(
                 import,
@@ -88,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var import = await _dataImportService.GetImport(importId);
 
-            var datafileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
+            var datafileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, import.File.Path());
 
             await _importerService.ImportFiltersAndLocations(
                 import,

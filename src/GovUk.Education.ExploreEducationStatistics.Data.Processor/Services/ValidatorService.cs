@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         
         public ValidatorService(
             ILogger<ValidatorService> logger,
-            IBlobStorageService blobStorageService,
+            IBlobStorageService blobStorageService, // @MarkFix private
             IFileTypeService fileTypeService,
             IDataImportService dataImportService)
         {

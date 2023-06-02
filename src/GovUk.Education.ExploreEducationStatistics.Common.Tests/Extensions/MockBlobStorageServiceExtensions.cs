@@ -27,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(blob);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupStreamBlob(
-            this Mock<IBlobStorageService> service,
+        public static IReturnsResult<IPrivateBlobStorageService> SetupStreamPrivateBlob( // @MarkFix can we have a single method for public and private?
+            this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string expectedBlobPath,
             string filePathToStream)
