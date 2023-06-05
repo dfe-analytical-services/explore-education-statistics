@@ -205,12 +205,12 @@ public class ProcessorStage2Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
