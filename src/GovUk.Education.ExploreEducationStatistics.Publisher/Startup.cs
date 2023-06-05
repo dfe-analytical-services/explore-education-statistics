@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using AutoMapper;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -64,9 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentReleaseService, ContentReleaseService>()
                 .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                 .AddScoped<IReleaseCacheService, ReleaseCacheService>()
-
                 .AddScoped<IPublishingService, PublishingService>()
-
                 .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>()
                 .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                 .AddScoped<IContentService, ContentService>(provider =>

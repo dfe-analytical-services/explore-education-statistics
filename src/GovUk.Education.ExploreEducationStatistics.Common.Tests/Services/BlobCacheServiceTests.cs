@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.SetupUploadAsJson(
                 container: PublicContent,
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.SetupDeleteBlob(PublicContent, cacheKey.Key);
 
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 
             var cacheKey = new SampleCacheKey(PublicContent, entity.Id);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.SetupGetDeserializedJson(
                 container: PublicContent,
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.SetupGetDeserializedJsonThrows(
                 container: PublicContent,
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.SetupGetDeserializedJsonNotFound(
                 container: PublicContent,
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             var cacheKey = new SampleCacheKey(PublicContent, Guid.NewGuid());
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             blobStorageService.SetupGetDeserializedJsonThrows(
                 container: PublicContent,

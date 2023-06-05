@@ -136,12 +136,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -329,12 +329,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -461,12 +461,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -613,12 +613,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -749,12 +749,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -913,12 +913,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -1057,12 +1057,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -1334,12 +1334,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -1503,12 +1503,12 @@ public class ProcessorStage3Tests : IDisposable
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + import.MetaFile.Filename);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        privateBlobStorageService.SetupStreamPrivateBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);

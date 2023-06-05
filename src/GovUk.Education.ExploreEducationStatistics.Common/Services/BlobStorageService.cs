@@ -37,14 +37,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     /// changes that make it difficult to upgrade when relying on lower-level
     /// details e.g. Azure SDK v12 is an entirely new package compared to v11.
     /// </summary>
-    public class BlobStorageService : IBlobStorageService
+    public class BlobStorageService : IPrivateBlobStorageService, IPublicBlobStorageService
     {
-        protected string ConnectionString = null!;
-        protected BlobServiceClient Client = null!;
-        protected ILogger<IBlobStorageService> Logger = null!;
-        protected IStorageInstanceCreationUtil StorageInstanceCreationUtil = null!;
-
-        protected BlobStorageService() {}
+        private readonly string _connectionString;
+        private readonly BlobServiceClient _client;
+        private readonly ILogger<IBlobStorageService> _logger;
+        private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil;
 
         public BlobStorageService(
             string connectionString,
@@ -52,10 +50,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             ILogger<BlobStorageService> logger,
             IStorageInstanceCreationUtil storageInstanceCreationUtil)
         {
-            ConnectionString = connectionString;
-            Client = client;
-            Logger = logger;
-            StorageInstanceCreationUtil = storageInstanceCreationUtil;
+            _connectionString = connectionString;
+            _client = client;
+            _logger = logger;
+            _storageInstanceCreationUtil = storageInstanceCreationUtil;
         }
 
         public async Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
@@ -144,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             var blobContainer = await GetBlobContainer(containerName);
 
-            Logger.LogInformation("Deleting blobs from {containerName}/{path}", blobContainer.Name, directoryPath);
+            _logger.LogInformation("Deleting blobs from {containerName}/{path}", blobContainer.Name, directoryPath);
 
             string? continuationToken = null;
 
@@ -169,11 +167,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
                         if (excluded || !included)
                         {
-                            Logger.LogInformation("Ignoring blob {containerName}/{path}", blobContainer.Name, blob.Name);
+                            _logger.LogInformation("Ignoring blob {containerName}/{path}", blobContainer.Name, blob.Name);
                             continue;
                         }
 
-                        Logger.LogInformation("Deleting blob {containerName}/{path}", blobContainer.Name, blob.Name);
+                        _logger.LogInformation("Deleting blob {containerName}/{path}", blobContainer.Name, blob.Name);
 
                         deleteTasks.Add(blobContainer.DeleteBlobIfExistsAsync(blob.Name));
                     }
@@ -189,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             var blob = await GetBlobClient(containerName, path);
 
-            Logger.LogInformation("Deleting blob {containerName}/{path}", containerName, path);
+            _logger.LogInformation("Deleting blob {containerName}/{path}", containerName, path);
 
             await blob.DeleteIfExistsAsync();
         }
@@ -203,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             var tempFilePath = await UploadToTemporaryFile(file);
 
-            Logger.LogInformation("Uploading file to blob {containerName}/{path}", containerName, path);
+            _logger.LogInformation("Uploading file to blob {containerName}/{path}", containerName, path);
 
             await blob.UploadAsync(
                 path: tempFilePath,
@@ -223,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var destinationBlob = blobContainer.GetBlobClient(destinationPath);
             if (await destinationBlob.ExistsAsync())
             {
-                Logger.LogWarning(
+                _logger.LogWarning(
                     "Destination already exists while moving blob. Source: '{source}' Destination: '{destination}'",
                     sourcePath, destinationPath);
                 return false;
@@ -232,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var sourceBlob = blobContainer.GetBlobClient(sourcePath);
             if (!await sourceBlob.ExistsAsync())
             {
-                Logger.LogWarning(
+                _logger.LogWarning(
                     "Source blob not found while moving blob. Source: '{source}' Destination: '{destination}'",
                     sourcePath, destinationPath);
                 return false;
@@ -254,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 while (destinationProperties.CopyStatus == CopyStatus.Pending)
                 {
                     await Task.Delay(1000);
-                    Logger.LogInformation("Copy progress: {progress}", destinationProperties.CopyProgress);
+                    _logger.LogInformation("Copy progress: {progress}", destinationProperties.CopyProgress);
                     destinationProperties = await destinationBlob.GetPropertiesAsync();
                 }
 
@@ -295,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             var blob = await GetBlobClient(containerName, path);
 
-            Logger.LogInformation("Uploading text to blob {containerName}/{path}", containerName, path);
+            _logger.LogInformation("Uploading text to blob {containerName}/{path}", containerName, path);
 
             var httpHeaders = new BlobHttpHeaders
             {
@@ -489,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             string destinationDirectoryPath,
             IBlobStorageService.CopyDirectoryOptions? options = null)
         {
-            Logger.LogInformation(
+            _logger.LogInformation(
                 "Copying directory from {sourceContainer}/{sourcePath} to {destinationContainer}/{destinationPath}",
                 sourceContainerName,
                 sourceDirectoryPath,
@@ -576,7 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 )
             );
 
-            Logger.LogInformation(
+            _logger.LogInformation(
                 "Transferred {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
                 source.Container.Name,
                 source.Name,
@@ -590,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var source = (CloudBlockBlob) e.Source;
             var destination = (CloudBlockBlob) e.Destination;
 
-            Logger.LogInformation(
+            _logger.LogInformation(
                 "Failed to transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}. Error message: {errorMessage}",
                 source.Container.Name,
                 source.Name,
@@ -605,7 +603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var source = (CloudBlockBlob) e.Source;
             var destination = (CloudBlockBlob) e.Destination;
 
-            Logger.LogInformation(
+            _logger.LogInformation(
                 "Skipped transfer {sourceContainer}/{sourcePath} -> {destinationContainer}/{destinationPath}",
                 source.Container.Name,
                 source.Name,
@@ -629,7 +627,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 return blobClient;
             }
 
-            Logger.LogWarning("Could not find blob {containerName}/{path}", containerName, path);
+            _logger.LogWarning("Could not find blob {containerName}/{path}", containerName, path);
             return new NotFoundResult();
         }
 
@@ -643,15 +641,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IBlobContainer container,
             string? connectionString = null)
         {
-            var storageAccount = CloudStorageAccount.Parse(connectionString ?? ConnectionString);
+            var storageAccount = CloudStorageAccount.Parse(connectionString ?? _connectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
 
             var containerName = IsDevelopmentStorageAccount(blobClient) ? container.EmulatedName : container.Name;
 
             var containerClient = blobClient.GetContainerReference(containerName);
 
-            await StorageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-                ConnectionString,
+            await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
+                _connectionString,
                 AzureStorageType.Blob,
                 containerName,
                 () => containerClient.CreateIfNotExistsAsync());
@@ -661,12 +659,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer container)
         {
-            var containerName = IsDevelopmentStorageAccount(Client) ? container.EmulatedName : container.Name;
+            var containerName = IsDevelopmentStorageAccount(_client) ? container.EmulatedName : container.Name;
 
-            var containerClient = Client.GetBlobContainerClient(containerName);
+            var containerClient = _client.GetBlobContainerClient(containerName);
 
-            await StorageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-                ConnectionString,
+            await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
+                _connectionString,
                 AzureStorageType.Blob,
                 containerName,
                 () => containerClient.CreateIfNotExistsAsync());

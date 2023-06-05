@@ -1,7 +1,5 @@
 #nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -31,8 +29,6 @@ public class TestStartup
                 options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
             }
         );
-        
-        services.AddTransient<IBlobCacheService, BlobCacheService>(); // @MarkFix
     }
 
     public void Configure(IApplicationBuilder app)

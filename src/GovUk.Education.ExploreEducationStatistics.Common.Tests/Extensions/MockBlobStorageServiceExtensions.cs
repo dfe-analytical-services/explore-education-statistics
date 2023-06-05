@@ -17,17 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
     public static class MockBlobStorageServiceExtensions
     {
-        public static IReturnsResult<IBlobStorageService> SetupFindBlob( // @MarkFix
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            BlobInfo? blob)
-        {
-            return service.Setup(s => s.FindBlob(container, path))
-                .ReturnsAsync(blob);
-        }
-
-        public static IReturnsResult<IPublicBlobStorageService> SetupFindBlob( // @MarkFix
+        public static IReturnsResult<IPublicBlobStorageService> SetupFindBlob(
             this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -37,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(blob);
         }
 
-        public static IReturnsResult<IPrivateBlobStorageService> SetupStreamPrivateBlob( // @MarkFix can we have a single method for public and private?
+        public static IReturnsResult<IPrivateBlobStorageService> SetupStreamBlob(
             this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string expectedBlobPath,
@@ -47,36 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(() => File.OpenRead(filePathToStream));
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupListBlobs(
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string expectedBlobPath,
-            List<BlobInfo> blobList)
-        {
-            return service.Setup(s => s.ListBlobs(container, expectedBlobPath))
-                .ReturnsAsync(blobList);
-        }
-
-        public static IReturnsResult<IBlobStorageService> SetupListBlobs(
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string expectedBlobPath,
-            params BlobInfo[] blobs)
-        {
-            return SetupListBlobs(service, container, expectedBlobPath, blobs.ToList());
-        }
-
-        public static IReturnsResult<IBlobStorageService> SetupCheckBlobExists( // @MarkFix
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            bool exists)
-        {
-            return service.Setup(s => s.CheckBlobExists(container, path))
-                .ReturnsAsync(exists);
-        }
-
-        public static IReturnsResult<IPublicBlobStorageService> SetupCheckBlobExists( // @MarkFix
+        public static IReturnsResult<IPublicBlobStorageService> SetupCheckBlobExists(
             this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -86,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(exists);
         }
 
-        public static IReturnsResult<IPrivateBlobStorageService> SetupCheckBlobExists( // @MarkFix
+        public static IReturnsResult<IPrivateBlobStorageService> SetupCheckBlobExists(
             this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -96,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(exists);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDeleteBlob( // @MarkFix
-            this Mock<IBlobStorageService> service,
+        public static IReturnsResult<IPublicBlobStorageService> SetupDeleteBlob(
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path)
         {
@@ -105,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .Returns(Task.CompletedTask);
         }
 
-        public static IReturnsResult<IPrivateBlobStorageService> SetupDeleteBlob( // @MarkFix
+        public static IReturnsResult<IPrivateBlobStorageService> SetupDeleteBlob(
             this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string path)
@@ -114,24 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .Returns(Task.CompletedTask);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadToStream(  // @MarkFix
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            string content,
-            bool decompress = true,
-            CancellationToken cancellationToken = default)
-        {
-            return service.SetupDownloadToStream(
-                container,
-                path,
-                Encoding.UTF8.GetBytes(content),
-                decompress,
-                cancellationToken
-            );
-        }
-
-        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStream(  // @MarkFix
+        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStream(
             this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -148,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             );
         }
 
-        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStream(  // @MarkFix
+        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStream(
             this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -165,33 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             );
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadToStream( // @MarkFix
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            byte[] content,
-            bool decompress = true,
-            CancellationToken cancellationToken = default)
-        {
-            return service.Setup(
-                    s =>
-                        s.DownloadToStream(container, path, It.IsAny<Stream>(), decompress, cancellationToken)
-                )
-                .Callback<IBlobContainer, string, Stream, bool, CancellationToken?>(
-                    (_, _, stream, _, _) =>
-                    {
-                        stream.Write(content, 0, content.Length);
-
-                        if (stream.CanSeek)
-                        {
-                            stream.Position = 0;
-                        }
-                    }
-                )
-                .ReturnsAsync((IBlobContainer _, string _, Stream stream, bool _, CancellationToken? _) => stream);
-        }
-
-        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStream( // @MarkFix
+        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStream(
             this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -217,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync((IBlobContainer _, string _, Stream stream, bool _, CancellationToken? _) => stream);
         }
 
-        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStream( // @MarkFix
+        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStream(
             this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -243,21 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync((IBlobContainer _, string _, Stream stream, bool _, CancellationToken? _) => stream);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadToStreamNotFound( // @MarkFix
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            bool decompress = true,
-            CancellationToken cancellationToken = default)
-        {
-            return service.Setup(
-                    s =>
-                        s.DownloadToStream(container, path, It.IsAny<Stream>(), decompress, cancellationToken)
-                )
-                .ReturnsAsync(new NotFoundResult());
-        }
-
-        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStreamNotFound( // @MarkFix
+        public static IReturnsResult<IPublicBlobStorageService> SetupDownloadToStreamNotFound(
             this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -271,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(new NotFoundResult());
         }
 
-        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStreamNotFound( // @MarkFix
+        public static IReturnsResult<IPrivateBlobStorageService> SetupDownloadToStreamNotFound(
             this Mock<IPrivateBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -285,31 +189,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(new NotFoundResult());
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupDownloadBlobText( // @MarkFix
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            string blobText,
-            CancellationToken cancellationToken = default)
-        {
-            return service.Setup(s =>
-                    s.DownloadBlobText(container, path, cancellationToken))
-                .ReturnsAsync(blobText);
-        }
-
-        public static IReturnsResult<IBlobStorageService> SetupDownloadBlobTextNotFound( // @MarkFix
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            CancellationToken cancellationToken = default)
-        {
-            return service.Setup(s =>
-                    s.DownloadBlobText(container, path, cancellationToken))
-                .ReturnsAsync(new NotFoundResult());
-        }
-
-        public static IReturnsResult<IBlobStorageService> SetupGetDeserializedJson(
-            this Mock<IBlobStorageService> service,
+        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJson(
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
             object? value,
@@ -322,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(value);
         }
 
-        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJson<T>( // @MarkFix can make method work with public and private?
+        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJson<T>(
             this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -335,8 +216,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(value);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupGetDeserializedJsonNotFound(
-            this Mock<IBlobStorageService> service,
+        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJsonNotFound(
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
             Type type,
@@ -348,19 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(new NotFoundResult());
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupGetDeserializedJsonNotFound<T>(
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            JsonSerializerSettings? settings = null,
-            CancellationToken cancellationToken = default) where T : class
-        {
-            return service.Setup(s =>
-                    s.GetDeserializedJson<T>(container, path, settings, cancellationToken))
-                .ReturnsAsync(new NotFoundResult());
-        }
-
-        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJsonNotFound<T>( // @MarkFix
+        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJsonNotFound<T>(
             this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
@@ -372,8 +241,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(new NotFoundResult());
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupGetDeserializedJsonThrows(
-            this Mock<IBlobStorageService> service,
+        public static IReturnsResult<IPublicBlobStorageService> SetupGetDeserializedJsonThrows(
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
             Type type,
@@ -386,8 +255,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ThrowsAsync(exception);
         }
 
-        public static IReturnsResult<IBlobStorageService> SetupUploadAsJson<T>(
-            this Mock<IBlobStorageService> service,
+        public static IReturnsResult<IPublicBlobStorageService> SetupUploadAsJson<T>(
+            this Mock<IPublicBlobStorageService> service,
             IBlobContainer container,
             string path,
             T content,

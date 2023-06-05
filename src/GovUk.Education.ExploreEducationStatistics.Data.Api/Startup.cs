@@ -132,6 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
             services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
                 provider.GetRequiredService<IPublicBlobStorageService>(),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()
@@ -144,9 +145,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
-
             services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
             services.AddTransient<IFilterItemRepository, FilterItemRepository>();
             services.AddTransient<IFilterRepository, FilterRepository>();
