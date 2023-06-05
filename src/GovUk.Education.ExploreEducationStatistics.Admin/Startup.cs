@@ -8,7 +8,6 @@ using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -596,8 +595,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
 
-            services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+            services.AddSingleton<IPrivateBlobStorageService, BlobStorageService>(provider =>
+            {
+                var privateConnectionString = Configuration.GetValue<string>("CoreStorage");
+                return new BlobStorageService(
+                    connectionString: privateConnectionString,
+                    client: new BlobServiceClient(privateConnectionString),
+                    logger: provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                    storageInstanceCreationUtil: new StorageInstanceCreationUtil());
+            });
+            services.AddSingleton<IPublicBlobStorageService, BlobStorageService>(provider =>
+            {
+                var publicConnectionString = Configuration.GetValue<string>("PublicStorage");
+                return new BlobStorageService(
+                    connectionString: publicConnectionString,
+                    client: new BlobServiceClient(publicConnectionString),
+                    logger: provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                    storageInstanceCreationUtil: new StorageInstanceCreationUtil());
+            });
 
             services.AddTransient<ITableStorageService, TableStorageService>(_ =>
                 new TableStorageService(
@@ -638,7 +653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 new BlobCacheService(
                     provider.GetRequiredService<IPrivateBlobStorageService>(),
                     provider.GetRequiredService<ILogger<BlobCacheService>>()
-                    ));
+                ));
             services.AddTransient<ICacheKeyService, CacheKeyService>();
 
             /*

@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .EnableCustomRetryOnFailure()
-                            )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
-                            )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -120,7 +120,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+            services.AddSingleton<IPublicBlobStorageService, BlobStorageService>(provider =>
+            {
+                var publicConnectionString = Configuration.GetValue<string>("PublicStorage");
+                return new BlobStorageService(
+                    connectionString: publicConnectionString,
+                    client: new BlobServiceClient(publicConnectionString),
+                    logger: provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                    storageInstanceCreationUtil: new StorageInstanceCreationUtil());
+            });
             services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
                 provider.GetRequiredService<IPublicBlobStorageService>(),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()));
