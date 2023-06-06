@@ -91,14 +91,14 @@ Navigate to 'Data and files' page - 'Ancillary file uploads' tab
 Validate cannot upload empty ancillary file
     user enters text into element    label:Title    Empty test
     user chooses file    label:Upload file    ${FILES_DIR}empty-file.txt
-    user clicks button    Upload file
+    user clicks button    Add file
     user waits until page contains    Choose a file that is not empty
 
 Upload multiple ancillary files
     user enters text into element    label:Title    Test 1
     user enters text into element    label:Summary    Test 1 summary
     user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
-    user clicks button    Upload file
+    user clicks button    Add file
 
     user waits until page contains accordion section    Test 1
     user opens accordion section    Test 1    id:file-uploads
@@ -112,7 +112,7 @@ Upload multiple ancillary files
     user enters text into element    label:Title    Test 2
     user enters text into element    label:Summary    Test 2 summary
     user chooses file    label:Upload file    ${FILES_DIR}test-file-2.txt
-    user clicks button    Upload file
+    user clicks button    Add file
 
     user waits until page contains accordion section    Test 2
     user opens accordion section    Test 2    id:file-uploads
@@ -162,11 +162,11 @@ Change ancillary file details
     ${section}=    user gets accordion section content element    Test 2    id:file-uploads
     user clicks link    Edit file    ${section}
 
-    user waits until h2 is visible    Edit ancillary file details
+    user waits until h2 is visible    Edit ancillary file
     user enters text into element    label:Title    Test 2 updated
     user enters text into element    label:Summary    Test 2 summary updated
 
-    user clicks button    Save changes
+    user clicks button    Save file
 
 Validate ancillary file details were changed
     user waits until h2 is visible    Add file to release

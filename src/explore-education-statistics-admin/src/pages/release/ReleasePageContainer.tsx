@@ -11,9 +11,8 @@ import {
   releaseDataBlocksRoute,
   releaseDataFileReplacementCompleteRoute,
   releaseDataRoute,
-  releaseDataAncillaryRoute,
+  releaseAncillaryFilesRoute,
   releaseAncillaryFileRoute,
-  releaseAncillaryFileReplaceRoute,
   releaseDataFileRoute,
   releaseDataFileReplaceRoute,
   releaseFootnotesCreateRoute,
@@ -47,9 +46,8 @@ const navRoutes = [
 
 const routes = [
   ...navRoutes,
-  releaseDataAncillaryRoute,
+  releaseAncillaryFilesRoute,
   releaseAncillaryFileRoute,
-  releaseAncillaryFileReplaceRoute,
   releaseDataFileRoute,
   releaseDataFileReplaceRoute,
   releaseDataFileReplacementCompleteRoute,

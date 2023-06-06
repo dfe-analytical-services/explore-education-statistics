@@ -16,7 +16,6 @@ import ReleasePublishStatusPage from '@admin/pages/release/ReleaseStatusPage';
 import ReleaseSummaryEditPage from '@admin/pages/release/ReleaseSummaryEditPage';
 import ReleaseSummaryPage from '@admin/pages/release/ReleaseSummaryPage';
 import { RouteProps } from 'react-router';
-import ReleaseAncillaryFileReplacePage from '@admin/pages/release/data/ReleaseAncillaryFileReplacePage';
 
 export type ReleaseRouteParams = {
   publicationId: string;
@@ -32,10 +31,6 @@ export type ReleaseDataFileRouteParams = ReleaseRouteParams & {
 };
 
 export type ReleaseAncillaryFileRouteParams = ReleaseRouteParams & {
-  fileId: string;
-};
-
-export type ReleaseAncillaryFileReplaceRouteParams = ReleaseRouteParams & {
   fileId: string;
 };
 
@@ -70,7 +65,7 @@ export const releaseDataRoute: ReleaseRouteProps = {
   component: ReleaseDataPage,
 };
 
-export const releaseDataAncillaryRoute: ReleaseRouteProps = {
+export const releaseAncillaryFilesRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/data#file-uploads',
   title: 'Data and files',
   component: ReleaseDataPage,
@@ -80,13 +75,6 @@ export const releaseAncillaryFileRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/ancillary/:fileId',
   title: 'Ancillary file',
   component: ReleaseAncillaryFilePage,
-};
-
-export const releaseAncillaryFileReplaceRoute: ReleaseRouteProps = {
-  path:
-    '/publication/:publicationId/release/:releaseId/ancillary/:fileId/replace',
-  title: 'Replace ancillary file',
-  component: ReleaseAncillaryFileReplacePage,
 };
 
 export const releaseDataFileRoute: ReleaseRouteProps = {
