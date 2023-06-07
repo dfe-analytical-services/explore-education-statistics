@@ -36,7 +36,7 @@ jobs:
         condition: ne(variables['Build.Reason'], 'PullRequest')
         inputs:
           containerRegistry: 'eesacr'
-          repository: 'eesfrontendcontainer'
+          repository: 'ees-public-frontend'
           command: 'buildAndPush'
           Dockerfile: 'docker/Dockerfile.public-frontend'
           buildContext: '$(System.DefaultWorkingDirectory)'
