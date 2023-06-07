@@ -32,17 +32,10 @@ jobs:
           versionSpec: $(NODE_VERSION)
 
       - task: Docker@2
-        displayName: "auth"
-        condition: ne(variables['Build.Reason'], 'PullRequest')
-        inputs:
-         command: 'login'
-         arguments: "--username ${username} --password ${password}"
-
-      - task: Docker@2
         displayName: 'Build and push public frontend Docker image'
         condition: ne(variables['Build.Reason'], 'PullRequest')
         inputs:
-          containerRegistry: 'eesregistrytest'
+          containerRegistry: 'eesacr'
           repository: 'eesfrontendcontainer'
           command: 'buildAndPush'
           Dockerfile: 'docker/Dockerfile.public-frontend'
