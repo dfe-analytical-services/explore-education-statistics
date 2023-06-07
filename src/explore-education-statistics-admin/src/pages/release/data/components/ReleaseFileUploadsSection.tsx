@@ -1,19 +1,13 @@
-import Link from '@admin/components/Link';
-import AncillaryFileDetailsTable from '@admin/pages/release/data/components/AncillaryFileDetailsTable';
 import AncillaryFileForm, {
   AncillaryFileFormValues,
 } from '@admin/pages/release/data/components/AncillaryFileForm';
+import AncillaryFileSummaryList from '@admin/pages/release/data/components/AncillaryFileSummaryList';
 import releaseAncillaryFileQueries from '@admin/queries/releaseAncillaryFileQueries';
-import {
-  releaseAncillaryFileRoute,
-  ReleaseAncillaryFileRouteParams,
-} from '@admin/routes/releaseRoutes';
 import releaseAncillaryFileService, {
   AncillaryFile,
 } from '@admin/services/releaseAncillaryFileService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import ButtonText from '@common/components/ButtonText';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -22,7 +16,6 @@ import logger from '@common/services/logger';
 import Yup from '@common/validation/yup';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import React, { useCallback, useMemo, useState } from 'react';
-import { generatePath } from 'react-router';
 
 interface Props {
   publicationId: string;
@@ -120,31 +113,13 @@ export default function ReleaseFileUploadsSection({
                     <LoadingSpinner text="Deleting file" overlay />
                   )}
 
-                  <AncillaryFileDetailsTable
-                    ancillaryFile={file}
+                  <AncillaryFileSummaryList
+                    canUpdateRelease={canUpdateRelease}
+                    file={file}
+                    publicationId={publicationId}
                     releaseId={releaseId}
-                  >
-                    {canUpdateRelease && (
-                      <>
-                        <Link
-                          className="govuk-!-margin-right-4"
-                          to={generatePath<ReleaseAncillaryFileRouteParams>(
-                            releaseAncillaryFileRoute.path,
-                            {
-                              publicationId,
-                              releaseId,
-                              fileId: file.id,
-                            },
-                          )}
-                        >
-                          Edit file
-                        </Link>
-                        <ButtonText onClick={() => setDeleteFile(file)}>
-                          Delete file
-                        </ButtonText>
-                      </>
-                    )}
-                  </AncillaryFileDetailsTable>
+                    onDelete={() => setDeleteFile(file)}
+                  />
                 </div>
               </AccordionSection>
             ))}
