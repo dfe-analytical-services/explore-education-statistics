@@ -10,6 +10,7 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
@@ -133,25 +134,27 @@ const HorizontalBarBlock = ({
 
           <XAxis
             {...minorDomainTicks}
-            type="number"
-            hide={!axes.minor.visible}
             height={xAxisHeight}
+            hide={!axes.minor.visible}
             padding={{ left: 0, right: 20 }}
+            tick={axisTickStyle}
             tickMargin={10}
             tickFormatter={tick =>
               formatPretty(tick, minorAxisUnit, minorAxisDecimals)
             }
+            type="number"
           />
 
           <YAxis
             {...majorDomainTicks}
-            type="category"
             axisLine={!chartHasNegativeValues}
             dataKey="name"
             hide={!axes.major.visible}
+            tick={axisTickStyle}
+            tickFormatter={getCategoryLabel(dataSetCategories)}
+            type="category"
             unit={axes.major.unit}
             width={yAxisWidth}
-            tickFormatter={getCategoryLabel(dataSetCategories)}
           />
 
           <Tooltip
