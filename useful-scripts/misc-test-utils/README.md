@@ -16,7 +16,7 @@ This tool consists of 4 areas.
 
 
 ### Getting Started
-* Ensure you have Node / NPM installed and are using at least Node V12
+* Ensure you have Node / NPM installed and are using at least Node V16
 * Copy the `.env.example` file to `.env` (`cp .env.example .env`) and fill out with your own values.
 * If you want to upload a subject or publish a new release place a file containing a data and a meta file named `archive.zip` in the root of this directory (`~/misc-test-utils`)
 * Install dependencies: `npm ci`

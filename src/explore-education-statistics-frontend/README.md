@@ -1,76 +1,26 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create Next App](https://nextjs.org/docs/api-reference/create-next-app).
 
 ## Setup
 
-1. Create a new `.env` file from `.env.example` and replace any variables as required. `.env.example` 
-   should work as `.env` out-of-the-box.
-   
-2. Install NPM dependencies.
+1. A `.env` file is included by default with required values needed to run the frontend project locally. You can create a `.env.local` file to change environment variables without commiting these changes to the repository.
 
-    ```bash
-    npm install
-    ```
 
 ## Data API and Content API
 
 If running the app in development mode, you will need to run these APIs locally.
 
-This can be done by running the following _from the src directory_:
+This can be done by running the following from the 'root' directory:
+
 ```bash
-docker-compose up data-api content-api
+pnpm start data content
 ```
 
 ## Available Scripts
 
-In the project directory (i.e. explore-education-statics-frontend), you can run:
-
-### `npm start`
-
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
-
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
-
-### `npm run format`
-
-Formats the entire codebase using Prettier.
-
-### `npm run lint`
-
-Lints the entire codebase using TSLint and StyleLint.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run start:prod`
-
-After building the app for production, this runs the production-ready bundle. This command can be helpful if you are experiencing flakiness or performance issues when running UI / unit tests locally, as pages will load much quicker.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+See the root [README](../../README.md) for available scripts
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+You can learn more in the [Next.js documentation](https://nextjs.org/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).

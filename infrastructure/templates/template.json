@@ -718,6 +718,27 @@
     "dataFactoryConcurrency": {
       "type": "int",
       "defaultValue": 1
+    },
+    "dockerRegistryServerUrl": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The URL of the Docker registry."
+      }
+    },
+    "dockerRegistryServerUsername": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The username to log in to the Docker registry."
+      }
+    },
+    "dockerRegistryServerPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The password to log in to the Docker registry."
+      }
     }
   },
   "variables": {
@@ -1950,6 +1971,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
+      "kind": "app,linux,container",
       "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
       "identity": {
@@ -1975,11 +1997,16 @@
         "httpsOnly": true,
         "clientAffinityEnabled": false,
         "siteConfig": {
+          "acrUseManagedIdentityCreds": false,
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
-          "netFrameworkVersion": "v6.0",
+          "preWarmedInstanceCount": 1,
+          "framework": "node",
+          "WEBSITES_PORT": 3000,
+          "DOCKER_REGISTRY_SERVER_URL": "[parameters('dockerRegistryServerUrl')]",
+          "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('dockerRegistryServerUsername')]",
+          "DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('dockerRegistryServerPassword')]",
           "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -2014,8 +2041,7 @@
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
-        "WEBSITE_RUN_FROM_PACKAGE": "1"
+        "WEBSITE_NODE_DEFAULT_VERSION": "16.14.2"
       }
     },
     {
@@ -2025,6 +2051,7 @@
         "Name": "[first(split(parameters('skuPublic'), ' '))]"
       },
       "name": "[variables('publicPlanName')]",
+      "kind": "app,linux,container",
       "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {

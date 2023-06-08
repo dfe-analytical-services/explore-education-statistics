@@ -31,7 +31,6 @@ export interface AccordionSectionProps {
   id?: string;
   anchorLinkIdPrefix?: string;
   open?: boolean;
-  testId?: string;
   onToggle?: ToggleHandler;
 }
 

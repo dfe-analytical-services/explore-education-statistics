@@ -1,4 +1,4 @@
-import { NextApiHandler } from 'next';
+import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 
 export type Method =
   | 'get'
@@ -13,8 +13,8 @@ export type MethodsConfig = {
   [key in Method]?: NextApiHandler;
 };
 
-export default function withMethods(config: MethodsConfig): NextApiHandler {
-  return async (req, res) => {
+export default function withMethods(config: MethodsConfig) {
+  return async (req: NextApiRequest, res: NextApiResponse) => {
     const method = req.method?.toLowerCase() as Method;
     const handler = config[method];
 

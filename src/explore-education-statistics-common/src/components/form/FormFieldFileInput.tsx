@@ -24,6 +24,8 @@ function FormFieldFileInput<FormValues>(props: Props<FormValues>) {
   // undefined is the initial state, null is unselected state
   const [inputValue, setInputValue] = useState<File | null | undefined>();
 
+  const { onChange } = props;
+
   return (
     <FormField<File | null> {...props}>
       {({ id, field, helpers, meta }) => (
@@ -45,9 +47,7 @@ function FormFieldFileInput<FormValues>(props: Props<FormValues>) {
             id={id}
             onClick={toggleClicked.on}
             onChange={event => {
-              if (props.onChange) {
-                props.onChange(event);
-              }
+              onChange?.(event);
 
               if (event.isDefaultPrevented()) {
                 return;

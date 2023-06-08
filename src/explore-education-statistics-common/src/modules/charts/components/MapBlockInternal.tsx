@@ -39,7 +39,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
+import { GeoJSON, Map } from 'react-leaflet';
 
 export interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -59,7 +59,6 @@ export interface MapBlockProps extends ChartProps {
   axes: {
     major: AxisConfiguration;
   };
-  boundaryLevel?: number;
   // dataGroups & dataClassification to be removed when
   // migrate old maps to use the new config
   // https://dfedigital.atlassian.net/browse/EES-4271
@@ -68,7 +67,6 @@ export interface MapBlockProps extends ChartProps {
   id: string;
   legend: LegendConfiguration;
   map?: MapConfig;
-  maxBounds?: LatLngBounds;
   position?: { lat: number; lng: number };
 }
 
