@@ -1,3 +1,4 @@
+import { useMobileMedia } from '@common/hooks/useMedia';
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
@@ -58,6 +59,7 @@ const HorizontalBarBlock = ({
   dataLabelPosition,
 }: HorizontalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
+  const { isMedia: isMobileMedia } = useMobileMedia();
 
   if (
     axes === undefined ||
@@ -81,7 +83,13 @@ const HorizontalBarBlock = ({
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
 
-  const yAxisWidth = parseNumber(axes.major.size);
+  // Enforce a max y axis width on mobile as large widths cause
+  // the chart to not be visible.
+  const maxMobileYAxisWidth = 160;
+  const yAxisWidth =
+    isMobileMedia && axes.major.size && axes.major.size > maxMobileYAxisWidth
+      ? maxMobileYAxisWidth
+      : parseNumber(axes.major.size);
   const xAxisHeight = parseNumber(axes.minor.size);
 
   const dataSetCategoryConfigs = getDataSetCategoryConfigs({
@@ -153,6 +161,7 @@ const HorizontalBarBlock = ({
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
               />
             }
+            position={isMobileMedia ? { x: 0 } : undefined}
             wrapperStyle={{ zIndex: 1000 }}
           />
 
