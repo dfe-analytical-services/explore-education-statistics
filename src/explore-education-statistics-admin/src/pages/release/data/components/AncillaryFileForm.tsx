@@ -117,53 +117,51 @@ export default function AncillaryFileForm({
     >
       {form => (
         <Form id={formId}>
-          <div style={{ position: 'relative' }}>
-            <FormFieldTextInput<AncillaryFileFormValues>
-              className="govuk-!-width-one-half"
+          <FormFieldTextInput<AncillaryFileFormValues>
+            className="govuk-!-width-one-half"
+            disabled={form.isSubmitting}
+            label="Title"
+            name="title"
+          />
+
+          <FormFieldTextArea<AncillaryFileFormValues>
+            className="govuk-!-width-one-half"
+            disabled={form.isSubmitting}
+            label="Summary"
+            name="summary"
+          />
+
+          <FormFieldFileInput<AncillaryFileFormValues>
+            disabled={form.isSubmitting}
+            hint={initialValues?.file?.name}
+            label={fileFieldLabel}
+            name="file"
+          />
+
+          <ButtonGroup>
+            <Button type="submit" disabled={form.isSubmitting}>
+              {submitText}
+            </Button>
+
+            <ButtonText
               disabled={form.isSubmitting}
-              label="Title"
-              name="title"
+              onClick={() => {
+                onCancel?.();
+                form.resetForm();
+              }}
+            >
+              Cancel
+            </ButtonText>
+
+            <LoadingSpinner
+              alert
+              className="govuk-!-margin-left-2"
+              inline
+              loading={form.isSubmitting}
+              size="sm"
+              text={submittingText}
             />
-
-            <FormFieldTextArea<AncillaryFileFormValues>
-              className="govuk-!-width-one-half"
-              disabled={form.isSubmitting}
-              label="Summary"
-              name="summary"
-            />
-
-            <FormFieldFileInput<AncillaryFileFormValues>
-              disabled={form.isSubmitting}
-              hint={initialValues?.file?.name}
-              label={fileFieldLabel}
-              name="file"
-            />
-
-            <ButtonGroup>
-              <Button type="submit" disabled={form.isSubmitting}>
-                {submitText}
-              </Button>
-
-              <ButtonText
-                disabled={form.isSubmitting}
-                onClick={() => {
-                  onCancel?.();
-                  form.resetForm();
-                }}
-              >
-                Cancel
-              </ButtonText>
-
-              <LoadingSpinner
-                alert
-                className="govuk-!-margin-left-2"
-                inline
-                loading={form.isSubmitting}
-                size="sm"
-                text={submittingText}
-              />
-            </ButtonGroup>
-          </div>
+          </ButtonGroup>
         </Form>
       )}
     </Formik>
