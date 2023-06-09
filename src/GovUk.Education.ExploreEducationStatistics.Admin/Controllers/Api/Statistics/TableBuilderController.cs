@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -17,13 +15,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/data/[controller]")]
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class TableBuilderController : ControllerBase
@@ -31,38 +29,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserService _userService;
-        private readonly ILogger _logger;
 
         public TableBuilderController(
             ITableBuilderService tableBuilderService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IUserService userService,
-            ILogger<TableBuilderController> logger)
+            IUserService userService)
         {
             _tableBuilderService = tableBuilderService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
-            _logger = logger;
         }
 
-        [HttpPost("release/{releaseId}")]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query(
-            Guid releaseId, 
+        [HttpPost("data/tablebuilder/release/{releaseId}")]
+        [Produces("text/csv")]
+        public async Task Query(
+            Guid releaseId,
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
-            var stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
+            if (!Request.AcceptsCsv(exact: true))
+            {
+                throw new BadHttpRequestException("Request must have `Accept: text/csv` header");
+            }
 
-            var tableBuilderResultViewModel = _tableBuilderService.Query(releaseId, query, cancellationToken);
+            Response.ContentDispositionAttachment(
+                contentType: ContentTypes.Csv,
+                filename: $"{releaseId}.csv");
 
-            stopwatch.Stop();
-            _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);
-
-            return tableBuilderResultViewModel.HandleFailuresOrOk();
+            await _tableBuilderService.QueryToCsvStream(
+                releaseId,
+                query,
+                Response.BodyWriter.AsStream(),
+                cancellationToken
+            );
         }
 
-        [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
+        [HttpGet("data/tablebuilder/release/{releaseId}/data-block/{dataBlockId}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId,
@@ -84,14 +86,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
-            ReleaseContentBlock block, 
+            ReleaseContentBlock block,
             CancellationToken cancellationToken)
         {
             if (!(block.ContentBlock is DataBlock dataBlock))
             {
                 return new NotFoundResult();
             }
-            
+
             return await _userService
                 .CheckCanViewRelease(block.Release)
                 .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, dataBlock.Query, cancellationToken));
