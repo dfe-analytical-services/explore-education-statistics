@@ -368,14 +368,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         name: oldReleaseFile.Name,
                         summary: oldReleaseFile.Summary);
 
-                    _contentDbContext.Remove(oldReleaseFile);
-
-                    await _contentDbContext.SaveChangesAsync();
-
                     await _blobStorageService.UploadFile(
                         containerName: PrivateReleaseFiles,
                         path: newReleaseFile.Path(),
                         file: newFile);
+
+                    _contentDbContext.Remove(oldReleaseFile);
+                    await _contentDbContext.SaveChangesAsync();
+
+                    if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, oldReleaseFile.FileId))
+                    {
+                        await _blobStorageService.DeleteBlob(
+                            PrivateReleaseFiles,
+                            oldReleaseFile.File.Path());
+
+                        await _fileRepository.Delete(oldReleaseFile.FileId);
+                    }
 
                     return await ToAncillaryFileInfo(newReleaseFile);
                 });
