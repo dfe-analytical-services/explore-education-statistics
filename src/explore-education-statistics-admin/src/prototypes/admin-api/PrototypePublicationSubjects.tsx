@@ -5,6 +5,7 @@ import PrototypePublicationSubjectList from './components/PrototypePublicationSu
 import PrototypeAddPublicationSubject from './components/PrototypeAddPublicationSubject';
 import PrototypeEditPublicationSubjectTitle from './components/PrototypeEditPublicationSubjectTitle';
 import PrototypeEditPublicationSubject from './components/PrototypeEditPublicationSubject';
+import PrototypePreviewStagedSubject from './components/PrototypePreviewStagedDataset';
 
 export interface PublicationSubject {
   title: string;
@@ -87,24 +88,30 @@ const PrototypePublicationSubjects = () => {
     PublicationSubject | undefined
   >(undefined);
 
+  const [subjectToPreview, setSubjectToPreview] = useState<
+    PublicationSubject | undefined
+  >(undefined);
+
   const subjects =
     currentRelease === '2021-22' ? subjectsForRelease1 : subjectsForRelease2;
 
   if (subjectToEdit) {
     return (
-      <PrototypeEditPublicationSubjectTitle
-        publicationSubject={subjectToEdit}
-        onClose={() => setSubjectToEdit(undefined)}
-        onSubmit={updatedPublicationSubject => {
-          const updated = publicationSubjects.map(subject =>
-            subject.title === subjectToEdit.title
-              ? updatedPublicationSubject
-              : subject,
-          );
-          setPublicationSubjects(updated);
-          setSubjectToEdit(undefined);
-        }}
-      />
+      <>
+        <PrototypeEditPublicationSubjectTitle
+          publicationSubject={subjectToEdit}
+          onClose={() => setSubjectToEdit(undefined)}
+          onSubmit={updatedPublicationSubject => {
+            const updated = publicationSubjects.map(subject =>
+              subject.title === subjectToEdit.title
+                ? updatedPublicationSubject
+                : subject,
+            );
+            setPublicationSubjects(updated);
+            setSubjectToEdit(undefined);
+          }}
+        />
+      </>
     );
   }
 
@@ -145,8 +152,9 @@ const PrototypePublicationSubjects = () => {
       <PrototypePublicationSubjectList
         isCurrentReleasePublished={isCurrentReleasePublished}
         publicationSubjects={publicationSubjects}
-        // onEditTitle={setSubjectToEdit}
+        onEditTitle={setSubjectToEdit}
         onEditSubject={setSubjectToChange}
+        onPreviewSubject={setSubjectToPreview}
       />
     </>
   );

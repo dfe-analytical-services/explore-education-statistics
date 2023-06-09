@@ -63,7 +63,7 @@ const PrototypePrepareNextSubjectStep5 = ({
                     <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
                       <legend className="govuk-legend govuk-fieldset__legend">
                         <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                          Changes on current live version (v1.0)
+                          Changes on current live version (version 1.0)
                         </h3>
                       </legend>
                       <div className="govuk-radios">

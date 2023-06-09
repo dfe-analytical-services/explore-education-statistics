@@ -29,13 +29,13 @@ const PrototypeChangelogExample = ({ showNotes, versionUpdate }: Props) => {
           </ul>
           <h4 className="govuk-!-margin-bottom-0">Mapped locations</h4>
           <ul className="govuk-!-margin-bottom-6">
-            <li>Darlington --{'>'} Darlington (new)</li>
+            <li>Darlington MAPS TO Darlington (new)</li>
             <li>
-              Kingston upon Hull, City of --{'>'} Kingston upon Hull, City of
+              Kingston upon Hull, City of MAPS TO Kingston upon Hull, City of
               (new)
             </li>
-            <li>Northumberland --{'>'} Nortumberland (new)</li>
-            <li>Sheffield--{'>'} Sheffield (new)</li>
+            <li>Northumberland MAPS TO Nortumberland (new)</li>
+            <li>Sheffield MAPS TO Sheffield (new)</li>
           </ul>
           <h4 className="govuk-!-margin-bottom-0">New filters</h4>
           <ul className="govuk-!-margin-bottom-6">
@@ -44,16 +44,16 @@ const PrototypeChangelogExample = ({ showNotes, versionUpdate }: Props) => {
           </ul>
           <h4 className="govuk-!-margin-bottom-0">Mapped filters</h4>
           <ul className="govuk-!-margin-bottom-6">
-            <li>Age 10 --{'>'} Age 10 (new)</li>
+            <li>Age 10 MAPS TO Age 10 (new)</li>
             <li>
-              Ethnicity Major Asian Total --{'>'} Ethnicity Major Asian Total
+              Ethnicity Major Asian Total MAPS TO Ethnicity Major Asian Total
               (new)
             </li>
             <li>
-              Ethnicity Major Black Total --{'>'} Ethnicity Major Black Total
+              Ethnicity Major Black Total MAPS TO Ethnicity Major Black Total
               (new)
             </li>
-            <li>Age 4 and under --{'>'} Age 4 and under (new)</li>
+            <li>Age 4 and under MAPS TO Age 4 and under (new)</li>
           </ul>
           <h4 className="govuk-!-margin-bottom-0">New indicators</h4>
           <ul className="govuk-!-margin-bottom-6">
@@ -63,11 +63,11 @@ const PrototypeChangelogExample = ({ showNotes, versionUpdate }: Props) => {
           <h4 className="govuk-!-margin-bottom-0">Mapped indicators</h4>
           <ul className="govuk-!-margin-bottom-6">
             <li>
-              Number of authorised holiday sessions --{'>'} Number of authorised
+              Number of authorised holiday sessions MAPS TO Number of authorised
               holiday sessions (new)
             </li>
             <li>
-              Authorised absence rate --{'>'} Number of Authorised absence rate
+              Authorised absence rate MAPS TO Number of Authorised absence rate
               (new)
             </li>
           </ul>
@@ -83,13 +83,13 @@ const PrototypeChangelogExample = ({ showNotes, versionUpdate }: Props) => {
           </ul>
           <h4 className="govuk-!-margin-bottom-0">Mapped locations</h4>
           <ul className="govuk-!-margin-bottom-6">
-            <li>Darlington --{'>'} Darlington (new)</li>
+            <li>Darlington MAPS TO Darlington (new)</li>
             <li>
-              Kingston upon Hull, City of --{'>'} Kingston upon Hull, City of
+              Kingston upon Hull, City of MAPS TO Kingston upon Hull, City of
               (new)
             </li>
-            <li>Northumberland --{'>'} Nortumberland (new)</li>
-            <li>Sheffield--{'>'} Sheffield (new)</li>
+            <li>Northumberland MAPS TO Nortumberland (new)</li>
+            <li>Sheffield MAPS TO Sheffield (new)</li>
           </ul>
           <h4 className="govuk-!-margin-bottom-0">New filters</h4>
           <ul className="govuk-!-margin-bottom-6">
@@ -110,7 +110,7 @@ const PrototypeChangelogExample = ({ showNotes, versionUpdate }: Props) => {
           <h4 className="govuk-!-margin-bottom-0">Mapped indicators</h4>
           <ul className="govuk-!-margin-bottom-6">
             <li>
-              Authorised absence rate --{'>'} Number of Authorised absence rate
+              Authorised absence rate MAPS TO Number of Authorised absence rate
               (new)
             </li>
           </ul>

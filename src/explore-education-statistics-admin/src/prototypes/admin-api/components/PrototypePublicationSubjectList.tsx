@@ -21,15 +21,17 @@ import PreviewExample from './PrototypePreviewExample';
 interface Props {
   isCurrentReleasePublished?: boolean;
   publicationSubjects: PublicationSubject[];
-  // onEditTitle: (publicationSubject: PublicationSubject) => void;
+  onEditTitle: (publicationSubject: PublicationSubject) => void;
   onEditSubject: (publicationSubject: PublicationSubject) => void;
+  onPreviewSubject: (publicationSubject: PublicationSubject) => void;
 }
 
 const PrototypePublicationSubjectList = ({
   isCurrentReleasePublished,
   publicationSubjects,
-  // onEditTitle,
+  onEditTitle,
   onEditSubject,
+  onPreviewSubject,
 }: Props) => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [archiveList, setArchiveList] = useState(false);
@@ -37,19 +39,22 @@ const PrototypePublicationSubjectList = ({
   const [statusNotesModal, toggleStatusNotesModal] = useToggle(false);
   const [selectedVersion, setSelectedVersion] = useState('');
   const [showDeprecationNotes, setShowDeprecationNotes] = useState(false);
+
   const [selectedVersionStatus1, setSelectedVersionStatus1] = useState('Live');
-
   const [selectedVersionStatus2, setSelectedVersionStatus2] = useState('Live');
-
   const [selectedVersionStatus3, setSelectedVersionStatus3] = useState('Live');
   const [deprecationNotes1, setDeprecationNotes1] = useState('');
   const [deprecationNotes2, setDeprecationNotes2] = useState('');
   const [deprecationNotes3, setDeprecationNotes3] = useState('');
+  const [deprecationDate1, setDeprecationDate1] = useState('');
+  const [deprecationDate2, setDeprecationDate2] = useState('');
+  const [deprecationDate3, setDeprecationDate3] = useState('');
 
   const [previewInitialDataset, setPreviewInitialDataset] = useState(false);
   const [previewDataset, setPreviewDataset] = useState(false);
 
-  const [deprecationNotesValue, setDeprecationNotesValue] = useToggle(false);
+  const [deprecationNotesValue, setDeprecationNotesValue] = useState('');
+  const [deprecationDateValue, setDeprecationDateValue] = useState('');
 
   const params: any = useParams();
 
@@ -91,7 +96,7 @@ const PrototypePublicationSubjectList = ({
                         term={
                           subject.release === currentRelease
                             ? 'Next data set to publish'
-                            : 'Current data set'
+                            : 'Current data set (live)'
                         }
                       >
                         {isCurrentReleasePublished && nextSubject
@@ -102,7 +107,7 @@ const PrototypePublicationSubjectList = ({
                         term={
                           subject.release === currentRelease
                             ? 'Next release to publish'
-                            : 'Current release'
+                            : 'Current release (live)'
                         }
                       >
                         {isCurrentReleasePublished && nextSubject
@@ -142,17 +147,8 @@ const PrototypePublicationSubjectList = ({
                         {subject.release === currentRelease && (
                           <>
                             <div className="govuk-tag govuk-tag--yellow govuk-!-margin-right-3 govuk-!-margin-left-1">
-                              Staging
+                              Staging - unpublished
                             </div>{' '}
-                            <a
-                              href="#"
-                              onClick={e => {
-                                e.preventDefault();
-                                setPreviewInitialDataset(true);
-                              }}
-                            >
-                              Preview initial version
-                            </a>
                           </>
                         )}
                       </SummaryListItem>
@@ -168,23 +164,135 @@ const PrototypePublicationSubjectList = ({
                         <SummaryListItem term="Next API data set version">
                           {nextSubject.version}{' '}
                           <div className="govuk-tag govuk-tag--yellow govuk-!-margin-right-3 govuk-!-margin-left-1 ">
-                            Staging
+                            Staging - unpublished
                           </div>{' '}
-                          <a
-                            href="#"
-                            onClick={e => {
-                              e.preventDefault();
-                              setPreviewDataset(true);
-                            }}
-                          >
-                            Preview this version
-                          </a>
                         </SummaryListItem>
                       </SummaryList>
                     )}
+
+                    {!isCurrentReleasePublished && (
+                      <>
+                        <SummaryList
+                          noBorder
+                          className="govuk-margin-!-bottom-9"
+                        >
+                          <SummaryListItem term="Actions">
+                            <ButtonGroup className="dfe-justify-content--flex-start">
+                              {subject.release === currentRelease && (
+                                <ButtonText
+                                  className="govuk-!-margin-right-3 govuk-!-margin-left-0"
+                                  onClick={e => {
+                                    e.preventDefault();
+                                    setPreviewInitialDataset(
+                                      !previewInitialDataset,
+                                    );
+                                    // onPreviewSubject(publicationSubject);
+                                  }}
+                                >
+                                  {!previewInitialDataset
+                                    ? 'Preview staged data set'
+                                    : 'Close preview for staged data set'}{' '}
+                                  ({subject.version})
+                                </ButtonText>
+                              )}
+
+                              {subject.release === currentRelease && (
+                                <ButtonText
+                                  onClick={() =>
+                                    onEditSubject(publicationSubject)
+                                  }
+                                >
+                                  Change data set to be published
+                                </ButtonText>
+                              )}
+                              {nextSubject && (
+                                <>
+                                  <ButtonText
+                                    className="govuk-!-margin-left-0 govuk-!-margin-right-6"
+                                    onClick={e => {
+                                      e.preventDefault();
+                                      setPreviewDataset(!previewDataset);
+                                      setArchiveList(false);
+                                    }}
+                                  >
+                                    {!previewDataset
+                                      ? 'Preview staged data set'
+                                      : 'Close preview'}{' '}
+                                  </ButtonText>
+                                  <ButtonText
+                                    onClick={e => {
+                                      e.preventDefault();
+                                      setPreviewDataset(false);
+                                      setArchiveList(!archiveList);
+                                    }}
+                                  >
+                                    {!archiveList
+                                      ? 'View version history'
+                                      : 'Close version history'}{' '}
+                                  </ButtonText>
+                                  <ButtonText className="govuk-!-margin-left-6 govuk-!-margin-right-6">
+                                    Edit next data set
+                                  </ButtonText>
+                                  <ButtonText>Remove next data set</ButtonText>
+                                </>
+                              )}
+
+                              {/* <ButtonText
+                              onClick={() => onEditTitle(publicationSubject)}
+                            >
+                              Edit dataset title
+                            </ButtonText> */}
+
+                              {subject.release !== currentRelease &&
+                                !nextSubject && (
+                                  <Link
+                                    className="govuk-button"
+                                    to={`./2022-23/prepare-subject/${publicationSubject.subjectId}`}
+                                  >
+                                    Create new API data set version
+                                  </Link>
+                                )}
+
+                              {subject.release === currentRelease && (
+                                <ButtonText
+                                  variant="warning"
+                                  className="govuk-!-margin-left-6"
+                                >
+                                  Delete
+                                </ButtonText>
+                              )}
+                            </ButtonGroup>
+                          </SummaryListItem>
+                        </SummaryList>
+                        {previewInitialDataset && (
+                          <div className="govuk-!-margin-bottom-9">
+                            <h4 className="govuk-heading-m">
+                              Preview version 1.0
+                            </h4>
+                            <PreviewExample initialVersion />
+                          </div>
+                        )}
+                        {previewDataset && (
+                          <div className="govuk-!-margin-bottom-9">
+                            <h4 className="govuk-heading-m">
+                              Preview version 1.1
+                            </h4>
+                            <PreviewExample />
+                            <ButtonText
+                              onClick={e => {
+                                e.preventDefault();
+                                setPreviewDataset(false);
+                              }}
+                            >
+                              Close preview
+                            </ButtonText>
+                          </div>
+                        )}
+                      </>
+                    )}
                     {archiveList && (
                       <>
-                        <table className="govuk-!-margin-bottom-9">
+                        <table className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
                           <caption className="govuk-!-margin-bottom-3 govuk-table__caption govuk-table__caption--m">
                             Version history **Example set in the future**
                           </caption>
@@ -195,7 +303,10 @@ const PrototypePublicationSubjectList = ({
                               </th>
                               <th>Related release</th>
                               <th>Status</th>
-                              <th className="govuk-table__header--numeric">
+                              <th
+                                className="govuk-table__header--numeric"
+                                colSpan={2}
+                              >
                                 Actions
                               </th>
                             </tr>
@@ -215,6 +326,8 @@ const PrototypePublicationSubjectList = ({
                                 >
                                   {selectedVersionStatus1}
                                 </div>{' '}
+                              </td>
+                              <td className="govuk-table__header--numeric">
                                 {selectedVersionStatus1 === 'Deprecated' && (
                                   <>
                                     {' '}
@@ -227,11 +340,17 @@ const PrototypePublicationSubjectList = ({
                                         setDeprecationNotesValue(
                                           deprecationNotes1,
                                         );
+                                        setDeprecationDateValue(
+                                          deprecationDate1,
+                                        );
                                       }}
                                     >
                                       View notes
                                     </a>
                                   </>
+                                )}
+                                {selectedVersionStatus1 !== 'Deprecated' && (
+                                  <a href="#">View changelog</a>
                                 )}
                               </td>
                               <td className="govuk-table__header--numeric">
@@ -242,6 +361,7 @@ const PrototypePublicationSubjectList = ({
                                     setSelectedVersion('2.1');
                                     toggleStatusModal(true);
                                     setDeprecationNotesValue(deprecationNotes1);
+                                    setDeprecationDateValue(deprecationDate1);
                                   }}
                                 >
                                   Set status
@@ -262,6 +382,8 @@ const PrototypePublicationSubjectList = ({
                                 >
                                   {selectedVersionStatus2}
                                 </div>{' '}
+                              </td>
+                              <td className="govuk-table__header--numeric">
                                 {selectedVersionStatus2 === 'Deprecated' && (
                                   <>
                                     {' '}
@@ -274,11 +396,17 @@ const PrototypePublicationSubjectList = ({
                                         setDeprecationNotesValue(
                                           deprecationNotes2,
                                         );
+                                        setDeprecationDateValue(
+                                          deprecationDate2,
+                                        );
                                       }}
                                     >
                                       View notes
                                     </a>
                                   </>
+                                )}
+                                {selectedVersionStatus2 !== 'Deprecated' && (
+                                  <a href="#">View changelog</a>
                                 )}
                               </td>
                               <td className="govuk-table__header--numeric">
@@ -289,6 +417,7 @@ const PrototypePublicationSubjectList = ({
                                     setSelectedVersion('2.0');
                                     toggleStatusModal(true);
                                     setDeprecationNotesValue(deprecationNotes2);
+                                    setDeprecationDateValue(deprecationDate2);
                                   }}
                                 >
                                   Set status
@@ -309,6 +438,8 @@ const PrototypePublicationSubjectList = ({
                                 >
                                   {selectedVersionStatus3}
                                 </div>{' '}
+                              </td>
+                              <td className="govuk-table__header--numeric">
                                 {selectedVersionStatus3 === 'Deprecated' && (
                                   <>
                                     {' '}
@@ -321,11 +452,17 @@ const PrototypePublicationSubjectList = ({
                                         setDeprecationNotesValue(
                                           deprecationNotes3,
                                         );
+                                        setDeprecationDateValue(
+                                          deprecationDate3,
+                                        );
                                       }}
                                     >
                                       View notes
                                     </a>
                                   </>
+                                )}
+                                {selectedVersionStatus3 !== 'Deprecated' && (
+                                  <a href="#">View changelog</a>
                                 )}
                               </td>
                               <td className="govuk-table__header--numeric">
@@ -336,6 +473,7 @@ const PrototypePublicationSubjectList = ({
                                     setSelectedVersion('1.0');
                                     toggleStatusModal(true);
                                     setDeprecationNotesValue(deprecationNotes3);
+                                    setDeprecationDateValue(deprecationDate3);
                                   }}
                                 >
                                   Set status
@@ -350,7 +488,7 @@ const PrototypePublicationSubjectList = ({
                           className="govuk-!-width-one-half"
                         >
                           <form action="#">
-                            <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
+                            <fieldset className="govuk-fieldset govuk-!-margin-top-9">
                               <legend className="govuk-legend govuk-fieldset__legend">
                                 <h3 className="govuk-heading-m govuk-!-margin-bottom-2">
                                   Change status of this API data set
@@ -440,8 +578,10 @@ const PrototypePublicationSubjectList = ({
                                     <label htmlFor="deprecationNotes">
                                       Notes
                                       <span className="govuk-hint">
-                                        Explain why and when this data set is
-                                        being deprecrated
+                                        These notes will be appended to the
+                                        published API dataset. The notes are to
+                                        explain to the public users why this
+                                        data set is being deprecated.
                                       </span>
                                     </label>
                                     <textarea
@@ -461,12 +601,81 @@ const PrototypePublicationSubjectList = ({
                                     >
                                       {deprecationNotesValue}
                                     </textarea>
+                                    <fieldset className="govuk-fieldset govuk-!-margin-top-9">
+                                      <legend className="govuk-legend govuk-fieldset__legend">
+                                        <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
+                                          Date of deprecation
+                                        </h3>
+                                      </legend>
+                                      <p className="govuk-hint">
+                                        The date helps give users advance
+                                        warning of when the data set will be
+                                        deprecated
+                                      </p>
+                                      <div className="govuk-date-input">
+                                        <div className="govuk-date-input__item">
+                                          <div className="govuk-form-group">
+                                            <label
+                                              htmlFor="date-day"
+                                              className="govuk-label govuk-date-input__label"
+                                            >
+                                              Day (optional)
+                                            </label>
+                                            <input
+                                              type="number"
+                                              className="govuk-input govuk-date-input__input govuk-input--width-2"
+                                              name="date-day"
+                                              id="date-day"
+                                              inputMode="numeric"
+                                            />
+                                          </div>
+                                        </div>
+                                        <div className="govuk-date-input__item">
+                                          <div className="govuk-form-group">
+                                            <label
+                                              htmlFor="date-month-year"
+                                              className="govuk-label govuk-date-input__label"
+                                            >
+                                              Month / Year
+                                            </label>
+                                            <input
+                                              type="month"
+                                              className="govuk-input govuk-date-input__input"
+                                              name="date-month-year"
+                                              id="date-month-year"
+                                              inputMode="numeric"
+                                              defaultValue={
+                                                deprecationDateValue
+                                              }
+                                              onChange={e => {
+                                                if (selectedVersion === '2.1') {
+                                                  setDeprecationDate1(
+                                                    e.target.value,
+                                                  );
+                                                }
+                                                if (selectedVersion === '2.0') {
+                                                  setDeprecationDate2(
+                                                    e.target.value,
+                                                  );
+                                                }
+                                                if (selectedVersion === '1.0') {
+                                                  setDeprecationDate3(
+                                                    e.target.value,
+                                                  );
+                                                }
+                                              }}
+                                            />
+                                          </div>
+                                        </div>
+                                      </div>
+                                    </fieldset>
                                   </div>
                                 )}
                               </div>
                             </fieldset>
                           </form>
                           <Button
+                            className="govuk-!-margin-top-9"
                             onClick={() => {
                               toggleStatusModal(false);
                             }}
@@ -485,13 +694,46 @@ const PrototypePublicationSubjectList = ({
                             style={{ whiteSpace: 'pre-wrap' }}
                           >
                             {selectedVersion === '2.1' && (
-                              <>{deprecationNotes1}</>
+                              <>
+                                <p>{deprecationNotes1}</p>
+                                <h3 className="govuk-heading-s">
+                                  Deprecation date
+                                </h3>
+                                <input
+                                  style={{ border: 'none' }}
+                                  type="month"
+                                  readOnly
+                                  value={deprecationDate1}
+                                />
+                              </>
                             )}
                             {selectedVersion === '2.0' && (
-                              <>{deprecationNotes2}</>
+                              <>
+                                <p>{deprecationNotes2}</p>
+                                <h3 className="govuk-heading-s">
+                                  Deprecation date
+                                </h3>
+                                <input
+                                  style={{ border: 'none' }}
+                                  type="month"
+                                  readOnly
+                                  value={deprecationDate2}
+                                />
+                              </>
                             )}
                             {selectedVersion === '1.0' && (
-                              <>{deprecationNotes3}</>
+                              <>
+                                <p>{deprecationNotes3}</p>
+                                <h3 className="govuk-heading-s">
+                                  Deprecation date
+                                </h3>
+                                <input
+                                  style={{ border: 'none' }}
+                                  type="month"
+                                  readOnly
+                                  value={deprecationDate3}
+                                />
+                              </>
                             )}
                           </div>
                           <Button
@@ -502,110 +744,6 @@ const PrototypePublicationSubjectList = ({
                             Close
                           </Button>
                         </Modal>
-                      </>
-                    )}
-                    {!isCurrentReleasePublished && (
-                      <>
-                        <SummaryList
-                          noBorder
-                          className="govuk-margin-!-bottom-9"
-                        >
-                          <SummaryListItem term="Actions">
-                            <ButtonGroup className="dfe-justify-content--flex-end">
-                              {subject.release === currentRelease && (
-                                <ButtonText
-                                  onClick={() =>
-                                    onEditSubject(publicationSubject)
-                                  }
-                                >
-                                  Change data set to be published
-                                </ButtonText>
-                              )}
-                              {nextSubject && (
-                                <>
-                                  {/* <ButtonText
-                                    className="govuk-!-margin-left-6"
-                                    onClick={e => {
-                                      e.preventDefault();
-                                      setPreviewDataset(true);
-                                    }}
-                                  >
-                                    Preview API data set to be publishe
-                                  </ButtonText> */}
-                                  <ButtonText
-                                    onClick={e => {
-                                      e.preventDefault();
-                                      setArchiveList(!archiveList);
-                                    }}
-                                  >
-                                    View and manage previous versions
-                                  </ButtonText>
-                                  <ButtonText className="govuk-!-margin-left-6 govuk-!-margin-right-6">
-                                    Edit next data set
-                                  </ButtonText>
-                                  <ButtonText>Remove next data set</ButtonText>
-                                </>
-                              )}
-
-                              {/* <ButtonText
-                              onClick={() => onEditTitle(publicationSubject)}
-                            >
-                              Edit dataset title
-                            </ButtonText> */}
-
-                              {subject.release !== currentRelease &&
-                                !nextSubject && (
-                                  <Link
-                                    className="govuk-button"
-                                    to={`./2022-23/prepare-subject/${publicationSubject.subjectId}`}
-                                  >
-                                    Create new API data set version
-                                  </Link>
-                                )}
-
-                              {subject.release === currentRelease && (
-                                <ButtonText
-                                  variant="warning"
-                                  className="govuk-!-margin-left-6"
-                                >
-                                  Delete
-                                </ButtonText>
-                              )}
-                            </ButtonGroup>
-                          </SummaryListItem>
-                        </SummaryList>
-                        {previewInitialDataset && (
-                          <div className="govuk-!-margin-bottom-9">
-                            <h4 className="govuk-heading-m">
-                              Preview version 1.0
-                            </h4>
-                            <PreviewExample initialVersion />
-                            <ButtonText
-                              onClick={e => {
-                                e.preventDefault();
-                                setPreviewInitialDataset(false);
-                              }}
-                            >
-                              Hide preview
-                            </ButtonText>
-                          </div>
-                        )}
-                        {previewDataset && (
-                          <div className="govuk-!-margin-bottom-9">
-                            <h4 className="govuk-heading-m">
-                              Preview version 1.1
-                            </h4>
-                            <PreviewExample />
-                            <ButtonText
-                              onClick={e => {
-                                e.preventDefault();
-                                setPreviewDataset(false);
-                              }}
-                            >
-                              Hide preview
-                            </ButtonText>
-                          </div>
-                        )}
                       </>
                     )}
                   </AccordionSection>

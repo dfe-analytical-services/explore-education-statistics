@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import Button from '@common/components/Button';
+import UrlContainer from '@common/components/UrlContainer';
 import ChangelogExample from './PrototypeChangelogExamples';
 
 export const apiPreviewTabIds = {
@@ -16,9 +17,9 @@ interface Props {
 }
 
 const today = new Date();
-const time = `${
-  today.getHours() + 2
-} : ${today.getMinutes()} : ${today.getSeconds()}`;
+const time = `${today.getHours() + 2}:${
+  today.getMinutes() < 10 ? '0' : ''
+}${today.getMinutes()}`;
 
 const PrototypePreviewExample = ({ initialVersion }: Props) => {
   const [showToken, setShowToken] = useState(false);
@@ -49,10 +50,10 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
           </a>
         </TabsSection>
         <TabsSection title="Generate API data set preview token">
-          <div className="govuk-width-container govuk-!-margin-0">
+          <div>
             <h5 className="govuk-heading-m">Generate a preview token</h5>
             <p>This API data set is currently staged ready for publishing.</p>
-            <p>
+            <p className="govuk-width-container govuk-!-margin-0 govuk-!-margin-bottom-9">
               You can preview the data by generating a token. The token allows
               you to test the API and query data using any tool of your choice.
               The URL can only be used by you, and is valid for 2 hours after
@@ -63,15 +64,14 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
               <>
                 <h5 className="govuk-heading-m">API preview token</h5>
                 <p>
-                  Token expiry time: <strong>{time}</strong>
+                  Token expiry time: <strong>Today at {time}</strong>
                 </p>
-                <hr />
-                <pre>
-                  <a href="https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57">
-                    https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57
-                  </a>
-                </pre>
-                <hr />
+
+                <UrlContainer
+                  className="govuk-!-margin-bottom-6"
+                  url=" https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/9eee125b-5538-49b8-aa49-4fda877b5e57"
+                />
+
                 <p>
                   Please delete the token as soon as you have finished checking
                   the API data set.

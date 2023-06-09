@@ -3,6 +3,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Button from '@common/components/Button';
 import {
   Form,
+  FormRadio,
   FormFieldRadioGroup,
   FormTextSearchInput,
 } from '@common/components/form';
@@ -102,7 +103,7 @@ const PrototypeMapFacetModal = ({
             </SummaryList>
             <h3>Next dataset {name}</h3>
             <p>
-              Choose a {name} that will be mapped to the current dataset
+              Choose a {name} that will be mapped to the current data set
               location (see above).
             </p>
             <FormTextSearchInput
@@ -140,14 +141,19 @@ const PrototypeMapFacetModal = ({
                 />
               );
             })}
-            <hr />
-            No mapping available
           </div>
           <Button
             className="govuk-!-margin-bottom-0 govuk-!-margin-top-4"
             type="submit"
           >
             Update mapping
+          </Button>
+          <Button
+            variant="warning"
+            className="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-!-margin-left-4"
+            onClick={onClose}
+          >
+            No mapping available (major update)
           </Button>
         </Form>
       </Formik>

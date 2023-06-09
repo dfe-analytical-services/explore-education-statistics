@@ -84,7 +84,7 @@ const PrototypePrepareNextSubjectPage = ({
               {release.title}
             </SummaryListItem>
             <SummaryListItem term="Current data set version (live)">
-              {release.version}
+              {release.version} <div className="govuk-tag">Live</div>
             </SummaryListItem>
             <SummaryListItem term="Current release (live)">
               {release.release}
