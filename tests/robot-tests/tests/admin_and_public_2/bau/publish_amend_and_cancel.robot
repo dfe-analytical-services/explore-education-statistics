@@ -50,7 +50,7 @@ Add ancillary file
     user enters text into element    label:Title    Test ancillary file 1
     user enters text into element    label:Summary    Test ancillary file 1 summary
     user chooses file    label:Upload file    ${FILES_DIR}test-file-1.txt
-    user clicks button    Upload file
+    user clicks button    Add file
 
     user waits until page contains accordion section    Test ancillary file 1
 

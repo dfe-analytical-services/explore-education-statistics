@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("themes/{themeId}")]
+        [HttpPut("themes/{themeId:guid}")]
         public async Task<ActionResult<ThemeViewModel>> UpdateTheme(
             [Required] Guid themeId,
             ThemeSaveViewModel theme)
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
 
-        [HttpGet("themes/{themeId}")]
+        [HttpGet("themes/{themeId:guid}")]
         public async Task<ActionResult<ThemeViewModel>> GetTheme([Required] Guid themeId)
         {
             return await _themeService
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("themes/{themeId}")]
+        [HttpDelete("themes/{themeId:guid}")]
         public async Task<ActionResult> DeleteTheme([Required] Guid themeId)
         {
             return await _themeService
