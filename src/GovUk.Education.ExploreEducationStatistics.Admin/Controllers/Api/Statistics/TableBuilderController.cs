@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -23,7 +22,7 @@ using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/data/[controller]")]
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class TableBuilderController : ControllerBase
@@ -45,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _logger = logger;
         }
 
-        [HttpPost("release/{releaseId:guid}")]
+        [HttpPost("data/tablebuilder/release/{releaseId:guid}")]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             Guid releaseId, 
             [FromBody] ObservationQueryContext query,
@@ -62,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             return tableBuilderResultViewModel.HandleFailuresOrOk();
         }
 
-        [HttpGet("release/{releaseId:guid}/data-block/{dataBlockId:guid}")]
+        [HttpGet("data/tablebuilder/release/{releaseId:guid}/data-block/{dataBlockId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId,
