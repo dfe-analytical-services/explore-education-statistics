@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             _testApp = testApp;
         }
 
-        [Fact]
+        [Fact] // Test
         public async Task Query()
         {
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
