@@ -243,16 +243,21 @@ function mapTableBody(
       }),
     );
 
-    rowsJson.push(...rowsHeaderJson);
+    // TO DO - EES-4259 Can remove this check once the permalinks migration is done.
+    // Check for rowsHeaderJson because of some old permalinks with duplicate
+    // locations in the table headers - EES-4320.
+    if (rowsHeaderJson) {
+      rowsJson.push(...rowsHeaderJson);
 
-    rowsJson.push(
-      ...row.map<TableCellJson>(cell => {
-        return {
-          tag: 'td',
-          text: cell,
-        };
-      }),
-    );
+      rowsJson.push(
+        ...row.map<TableCellJson>(cell => {
+          return {
+            tag: 'td',
+            text: cell,
+          };
+        }),
+      );
+    }
 
     return rowsJson;
   });
