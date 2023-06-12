@@ -6,11 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -19,145 +18,97 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
-using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
-using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
     [Collection(CacheServiceTests)]
-    public class TableBuilderControllerTests : CacheServiceTestFixture
+    public class TableBuilderControllerTests :
+        CacheServiceTestFixture, IClassFixture<TestApplicationFactory<TestStartup>>
     {
-        private readonly Guid _releaseId = Guid.NewGuid();
+        private readonly WebApplicationFactory<TestStartup> _testApp;
+
+        public TableBuilderControllerTests(TestApplicationFactory<TestStartup> testApp)
+        {
+            _testApp = testApp;
+        }
+
+        private static readonly Guid ReleaseId = Guid.NewGuid();
+        private static readonly Guid SubjectId = Guid.NewGuid();
         private readonly Guid _dataBlockId = Guid.NewGuid();
+
+        private static readonly ObservationQueryContext ObservationQueryContext = new()
+        {
+            SubjectId = SubjectId,
+            Filters = new List<Guid>(),
+            Indicators = new List<Guid>(),
+            LocationIds = new List<Guid>(),
+            TimePeriod = new TimePeriodQuery
+            {
+                StartYear = 2021,
+                StartCode = CalendarYear,
+                EndYear = 2022,
+                EndCode = CalendarYear
+            }
+        };
 
         private readonly TableBuilderResultViewModel _tableBuilderResults = new()
         {
+            SubjectMeta = new SubjectResultMetaViewModel
+            {
+                TimePeriodRange = new List<TimePeriodMetaViewModel>
+                {
+                    new(2020, AcademicYear),
+                    new(2021, AcademicYear),
+                }
+            },
             Results = new List<ObservationViewModel>
             {
                 new()
                 {
-                    Id = Guid.NewGuid(),
-                    Filters = new List<Guid>
-                    {
-                        Guid.NewGuid()
-                    },
-                    LocationId = Guid.NewGuid(),
-                    Measures = new Dictionary<Guid, string>
-                    {
-                        { Guid.NewGuid(), "value" }
-                    },
-                    GeographicLevel = GeographicLevel.Country,
-                    TimePeriod = "2017/18"
+                    TimePeriod = "2020_AY"
+                },
+                new()
+                {
+                    TimePeriod = "2021_AY"
                 }
             },
-            SubjectMeta = new SubjectResultMetaViewModel
-            {
-                Filters = new Dictionary<string, FilterMetaViewModel>
-                {
-                    {
-                        "filter1", new FilterMetaViewModel
-                        {
-                            Hint = "A hint",
-                            Legend = "A legend",
-                            Name = "A name",
-                            Options = new Dictionary<string, FilterGroupMetaViewModel>
-                            {
-                                {
-                                    "option1", new FilterGroupMetaViewModel
-                                    {
-                                        Label = "filter",
-                                        Options = new List<FilterItemMetaViewModel>
-                                        {
-                                            new("label", Guid.NewGuid())
-                                        }
-                                    }
-                                }
-                            },
-                            TotalValue = Guid.NewGuid()
-                        }
-                    }
-                },
-                Footnotes = new List<FootnoteViewModel>
-                {
-                    new(Guid.NewGuid(), "footnote")
-                },
-                Indicators = new List<IndicatorMetaViewModel>
-                {
-                    new()
-                    {
-                        Label = "A label",
-                        Name = "A name",
-                        Unit = Unit.Percent,
-                        Value = Guid.NewGuid(),
-                        DecimalPlaces = 2
-                    }
-                },
-                BoundaryLevels = new List<BoundaryLevelViewModel>
-                {
-                    new(1234, "boundary")
-                },
-                Locations = new Dictionary<string, List<LocationAttributeViewModel>>
-                {
-                    {
-                        "location", new List<LocationAttributeViewModel>
-                        {
-                            new()
-                            {
-                                Label = "A label",
-                                Value = "A value",
-                                Level = GeographicLevel.Region,
-                                Options = new List<LocationAttributeViewModel>
-                                {
-                                    new()
-                                    {
-                                        Id = Guid.NewGuid(),
-                                        Label = "A label",
-                                        Value = "A value",
-                                        GeoJson = true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                },
-                PublicationName = "Publication name",
-                SubjectName = "Subject name",
-                GeoJsonAvailable = true,
-                TimePeriodRange = new List<TimePeriodMetaViewModel>
-                {
-                    new(1234, TimeIdentifier.April)
-                    {
-                        Label = "A label"
-                    }
-                }
-            }
         };
 
         private readonly ObservationQueryContext _query = new()
         {
-            SubjectId = Guid.NewGuid()
+            SubjectId = SubjectId,
         };
 
         [Fact]
         public async Task Query()
         {
-            var cancellationToken = new CancellationToken();
-
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            mocks.tableBuilderService
-                .Setup(s => s.Query(_releaseId, _query, cancellationToken))
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
+            tableBuilderService
+                .Setup(s => s.Query(
+                    ReleaseId,
+                    ItIs.DeepEqualTo(ObservationQueryContext),
+                    It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_tableBuilderResults);
 
-            var result = await controller.Query(_releaseId, _query, cancellationToken);
-            VerifyAllMocks(mocks);
+            var client = SetupApp(tableBuilderService: tableBuilderService.Object)
+                .CreateClient();
 
-            result.AssertOkResult();
+            var response = await client.PostAsync(
+                $"/api/data/tablebuilder/release/{ReleaseId}",
+                new JsonNetContent(ObservationQueryContext));
+
+            VerifyAllMocks(tableBuilderService);
+
+            response.AssertOk(_tableBuilderResults);
         }
 
         [Fact]
@@ -167,10 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var releaseContentBlock = new ReleaseContentBlock
             {
-                ReleaseId = _releaseId,
+                ReleaseId = ReleaseId,
                 Release = new Release
                 {
-                    Id = _releaseId,
+                    Id = ReleaseId,
                     Publication = new Publication
                     {
                         Id = Guid.NewGuid()
@@ -199,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(
                     s =>
                         s.Query(
-                            _releaseId,
+                            ReleaseId,
                             It.Is<ObservationQueryContext>(
                                 q => q.SubjectId == _query.SubjectId
                             ),
@@ -214,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
-            var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId, cancellationToken);
+            var result = await controller.QueryForDataBlock(ReleaseId, _dataBlockId, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(_tableBuilderResults);
@@ -227,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             SetupCall<ContentDbContext, ReleaseContentBlock>(mocks.persistenceHelper, null);
 
-            var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
+            var result = await controller.QueryForDataBlock(ReleaseId, _dataBlockId);
             VerifyAllMocks(mocks);
 
             result.AssertNotFoundResult();
@@ -238,10 +189,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var releaseContentBlock = new ReleaseContentBlock
             {
-                ReleaseId = _releaseId,
+                ReleaseId = ReleaseId,
                 Release = new Release
                 {
-                    Id = _releaseId,
+                    Id = ReleaseId,
                     Publication = new Publication
                     {
                         Id = Guid.NewGuid()
@@ -260,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var exception =
                 await Assert.ThrowsAsync<TargetInvocationException>(() =>
-                    controller.QueryForDataBlock(_releaseId, _dataBlockId));
+                    controller.QueryForDataBlock(ReleaseId, _dataBlockId));
             Assert.IsType<ArgumentException>(exception.InnerException);
         }
 
@@ -281,16 +232,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
             var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
             var userService = AlwaysTrueUserService();
-            var logger = new Mock<ILogger<TableBuilderController>>();
 
             var controller = new TableBuilderController(
                 tableBuilderService.Object,
                 persistenceHelper.Object,
-                userService.Object,
-                logger.Object
+                userService.Object
             );
 
             return (controller, (tableBuilderService, persistenceHelper, BlobCacheService));
+        }
+
+        private WebApplicationFactory<TestStartup> SetupApp(
+            ITableBuilderService? tableBuilderService = null,
+            IUserService? userService = null)
+        {
+            return _testApp
+                .ResetDbContexts()
+                .ConfigureServices(
+                    services =>
+                    {
+                        services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));//
+                        services.AddTransient(_ => userService ?? AlwaysTrueUserService().Object);
+                    }
+                );
         }
     }
 }
