@@ -4,7 +4,7 @@ import withMethods from '@frontend/middleware/withMethods';
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '20mb',
+      sizeLimit: '75mb',
     },
   },
 };
