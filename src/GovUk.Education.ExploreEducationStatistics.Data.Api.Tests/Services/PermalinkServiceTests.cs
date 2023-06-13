@@ -824,7 +824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            publicBlobStorageService.SetupGetDeserializedJsonNotFound<PermalinkTableViewModel>(
+            publicBlobStorageService.SetupGetDeserializedJsonNotFound<IPublicBlobStorageService, PermalinkTableViewModel>(
                 container: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst");
 
@@ -1991,7 +1991,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            publicBlobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
+            publicBlobStorageService.SetupGetDeserializedJsonNotFound<IPublicBlobStorageService, LegacyPermalink>(
                 container: BlobContainers.Permalinks,
                 path: permalink.Id.ToString(),
                 settings: PermalinkService.LegacyPermalinkSerializerSettings);

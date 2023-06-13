@@ -595,24 +595,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
 
-            services.AddSingleton<IPrivateBlobStorageService, BlobStorageService>(provider =>
-            {
-                var privateConnectionString = Configuration.GetValue<string>("CoreStorage");
-                return new BlobStorageService(
-                    connectionString: privateConnectionString,
-                    client: new BlobServiceClient(privateConnectionString),
-                    logger: provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                    storageInstanceCreationUtil: new StorageInstanceCreationUtil());
-            });
-            services.AddSingleton<IPublicBlobStorageService, BlobStorageService>(provider =>
-            {
-                var publicConnectionString = Configuration.GetValue<string>("PublicStorage");
-                return new BlobStorageService(
-                    connectionString: publicConnectionString,
-                    client: new BlobServiceClient(publicConnectionString),
-                    logger: provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                    storageInstanceCreationUtil: new StorageInstanceCreationUtil());
-            });
+            services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
 
             services.AddTransient<ITableStorageService, TableStorageService>(_ =>
                 new TableStorageService(
@@ -692,10 +676,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
-            var privateBlobCacheService = GetBlobCacheService(provider, "CoreStorage");
-            var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
-            BlobCacheAttribute.AddService("default", privateBlobCacheService);
-            BlobCacheAttribute.AddService("public", publicBlobCacheService);
+            var privateCacheService = new BlobCacheService(
+                new PrivateBlobStorageService(
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                    Configuration),
+                provider.GetRequiredService<ILogger<BlobCacheService>>()
+            );
+            var publicCacheService = new BlobCacheService(
+                new PublicBlobStorageService(
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                    Configuration),
+                provider.GetRequiredService<ILogger<BlobCacheService>>()
+            );
+            BlobCacheAttribute.AddService("default", privateCacheService);
+            BlobCacheAttribute.AddService("public", publicCacheService);
 
             UpdateDatabase(app, env);
 
@@ -840,23 +834,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .GetRequiredService<BootstrapUsersService>()
                     .AddBootstrapUsers();
             }
-        }
-
-        private IBlobCacheService GetBlobCacheService(IServiceProvider provider, string connectionStringKey)
-        {
-            return new BlobCacheService(
-                blobStorageService: GetBlobStorageService(provider, connectionStringKey),
-                logger: provider.GetRequiredService<ILogger<BlobCacheService>>());
-        }
-
-        private IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
-        {
-            var connectionString = Configuration.GetValue<string>(connectionStringKey);
-            return new BlobStorageService(
-                connectionString,
-                new BlobServiceClient(connectionString),
-                provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                new StorageInstanceCreationUtil());
         }
 
         private static void ApplyCustomMigrations(params ICustomMigration[] migrations)

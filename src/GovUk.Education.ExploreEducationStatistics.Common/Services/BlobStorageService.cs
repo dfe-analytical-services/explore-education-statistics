@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
@@ -37,18 +38,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     /// changes that make it difficult to upgrade when relying on lower-level
     /// details e.g. Azure SDK v12 is an entirely new package compared to v11.
     /// </summary>
-    public class BlobStorageService : IPrivateBlobStorageService, IPublicBlobStorageService
+    public abstract class BlobStorageService : IBlobStorageService
     {
         private readonly string _connectionString;
         private readonly BlobServiceClient _client;
         private readonly ILogger<IBlobStorageService> _logger;
         private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil;
 
-        public BlobStorageService(
-            string connectionString,
-            BlobServiceClient client,
-            ILogger<BlobStorageService> logger,
-            IStorageInstanceCreationUtil storageInstanceCreationUtil)
+        protected BlobStorageService(
+            string connectionStringConfigName,
+            ILogger<IBlobStorageService> logger,
+            IConfiguration configuration)
+        {
+            var privateConnectionString = configuration.GetValue<string>(connectionStringConfigName);
+            _connectionString = privateConnectionString;
+            _client = new BlobServiceClient(privateConnectionString);
+            _logger = logger;
+            _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
+        }
+
+        protected BlobStorageService(string connectionString, BlobServiceClient client, ILogger<IBlobStorageService> logger, IStorageInstanceCreationUtil storageInstanceCreationUtil)
         {
             _connectionString = connectionString;
             _client = client;

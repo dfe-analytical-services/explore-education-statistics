@@ -132,15 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
-            services.AddSingleton<IPublicBlobStorageService, BlobStorageService>(provider =>
-            {
-                var publicConnectionString = Configuration.GetValue<string>("PublicStorage");
-                return new BlobStorageService(
-                    connectionString: publicConnectionString,
-                    client: new BlobServiceClient(publicConnectionString),
-                    logger: provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                    storageInstanceCreationUtil: new StorageInstanceCreationUtil());
-            });
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
             services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
                 provider.GetRequiredService<IPublicBlobStorageService>(),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()

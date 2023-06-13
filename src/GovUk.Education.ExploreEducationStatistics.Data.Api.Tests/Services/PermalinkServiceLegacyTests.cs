@@ -697,7 +697,7 @@ public class PermalinkServiceLegacyTests
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        publicBlobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
+        publicBlobStorageService.SetupGetDeserializedJsonNotFound<IPublicBlobStorageService, LegacyPermalink>(
             container: Permalinks,
             path: permalink.Id.ToString(),
             settings: PermalinkService.LegacyPermalinkSerializerSettings);
@@ -1589,7 +1589,7 @@ public class PermalinkServiceLegacyTests
 
         var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        publicBlobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
+        publicBlobStorageService.SetupGetDeserializedJsonNotFound<IPublicBlobStorageService, LegacyPermalink>(
             container: Permalinks,
             path: permalink.Id.ToString(),
             settings: PermalinkService.LegacyPermalinkSerializerSettings);

@@ -2641,16 +2641,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var newFormFile = CreateFormFileMock("newAncillary.pdf", "application/pdf").Object;
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
 
-            blobStorageService.Setup(mock =>
+            privateBlobStorageService.Setup(mock =>
                     mock.DeleteBlob(
                         PrivateReleaseFiles,
                         releaseFile.File.Path()))
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(mock =>
+            privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
                         path.Contains(FilesPath(release.Id, Ancillary))),
@@ -2664,7 +2664,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
                 var result = await service.ReplaceAncillary(
@@ -2673,14 +2673,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     newFile: newFormFile
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
 
                 var fileInfo = result.AssertRight();
 
                 fileUploadsValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(newFormFile, Ancillary), Times.Once);
 
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, Ancillary))),
@@ -2767,10 +2767,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
 
             var newFormFile = CreateFormFileMock("newAncillary.pdf", "application/pdf").Object;
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
 
-            blobStorageService.Setup(mock =>
+            privateBlobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
                         path.Contains(FilesPath(release.Id, Ancillary))),
@@ -2784,7 +2784,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
                 var result = await service.ReplaceAncillary(
@@ -2793,14 +2793,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     newFile: newFormFile
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
 
                 var fileInfo = result.AssertRight();
 
                 fileUploadsValidatorService.Verify(mock =>
                     mock.ValidateFileForUpload(newFormFile, Ancillary), Times.Once);
 
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, Ancillary))),

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -9,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -120,15 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddSingleton<IPublicBlobStorageService, BlobStorageService>(provider =>
-            {
-                var publicConnectionString = Configuration.GetValue<string>("PublicStorage");
-                return new BlobStorageService(
-                    connectionString: publicConnectionString,
-                    client: new BlobServiceClient(publicConnectionString),
-                    logger: provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                    storageInstanceCreationUtil: new StorageInstanceCreationUtil());
-            });
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
             services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
                 provider.GetRequiredService<IPublicBlobStorageService>(),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()));

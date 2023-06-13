@@ -37,15 +37,10 @@ public class BlobCacheConfigProvider : IExtensionConfigProvider
 
     private static IBlobCacheService GetPublicBlobCacheService(IServiceProvider provider)
     {
-        var configuration = provider.GetService<IConfiguration>();
-        var publicConnectionString = configuration.GetValue<string>("PublicStorage");
-
-        var publicBlobStorageService = new BlobStorageService(
-            publicConnectionString,
-            new BlobServiceClient(publicConnectionString),
+        var publicBlobStorageService = new PublicBlobStorageService(
             provider.GetRequiredService<ILogger<BlobStorageService>>(),
-            new StorageInstanceCreationUtil());
-        
+            provider.GetRequiredService<IConfiguration>());
+
         return new BlobCacheService(
             publicBlobStorageService,
             provider.GetRequiredService<ILogger<BlobCacheService>>());

@@ -368,7 +368,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         name: oldReleaseFile.Name,
                         summary: oldReleaseFile.Summary);
 
-                    await _blobStorageService.UploadFile(
+                    await _privateBlobStorageService.UploadFile(
                         containerName: PrivateReleaseFiles,
                         path: newReleaseFile.Path(),
                         file: newFile);
@@ -378,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, oldReleaseFile.FileId))
                     {
-                        await _blobStorageService.DeleteBlob(
+                        await _privateBlobStorageService.DeleteBlob(
                             PrivateReleaseFiles,
                             oldReleaseFile.File.Path());
 
