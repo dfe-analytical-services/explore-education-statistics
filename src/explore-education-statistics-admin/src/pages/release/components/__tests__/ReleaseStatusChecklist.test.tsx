@@ -91,7 +91,7 @@ describe('ReleaseStatusChecklist', () => {
               },
               { code: 'NoNextReleaseDate' },
               { code: 'NoFootnotesOnSubjects', totalSubjects: 3 },
-              { code: 'NoTableHighlights' },
+              { code: 'NoFeaturedTables' },
               { code: 'NoDataFiles' },
               { code: 'NoPublicPreReleaseAccessList' },
             ],

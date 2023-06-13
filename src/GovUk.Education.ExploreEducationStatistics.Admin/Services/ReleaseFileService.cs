@@ -342,6 +342,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public Task<Either<ActionResult, FileInfo>> ReplaceAncillary(
+            Guid releaseId,
+            Guid fileId,
+            IFormFile newFile)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(async () => await _fileUploadsValidatorService.ValidateFileForUpload(newFile, Ancillary))
+                .OnSuccess(_ => _persistenceHelper.CheckEntityExists<ReleaseFile>(query =>
+                    query
+                        .Include(rf => rf.File)
+                        .Where(rf => rf.FileId == fileId && rf.ReleaseId == releaseId))
+                )
+                .OnSuccess(async oldReleaseFile =>
+                {
+                    var newReleaseFile = await _releaseFileRepository.Create(
+                        releaseId: releaseId,
+                        filename: newFile.FileName,
+                        contentLength: newFile.Length,
+                        contentType: newFile.ContentType,
+                        type: Ancillary,
+                        createdById: _userService.GetUserId(),
+                        name: oldReleaseFile.Name,
+                        summary: oldReleaseFile.Summary);
+
+                    await _blobStorageService.UploadFile(
+                        containerName: PrivateReleaseFiles,
+                        path: newReleaseFile.Path(),
+                        file: newFile);
+
+                    _contentDbContext.Remove(oldReleaseFile);
+                    await _contentDbContext.SaveChangesAsync();
+
+                    if (!await _releaseFileRepository.FileIsLinkedToOtherReleases(releaseId, oldReleaseFile.FileId))
+                    {
+                        await _blobStorageService.DeleteBlob(
+                            PrivateReleaseFiles,
+                            oldReleaseFile.File.Path());
+
+                        await _fileRepository.Delete(oldReleaseFile.FileId);
+                    }
+
+                    return await ToAncillaryFileInfo(newReleaseFile);
+                });
+        }
+
         public Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
             IFormFile formFile,
             Guid? replacingId = null)

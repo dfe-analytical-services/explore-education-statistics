@@ -510,6 +510,246 @@ public class PermalinkCsvMetaServiceTests
     }
 
     [Fact]
+    public async Task GetCsvMeta_LegacyPermalink_FilterAndIndicatorViewModelsHaveNoName()
+    {
+        // This test covers a scenario for Permalinks created before EES-613.
+        // Prior to EES-613, the FilterMetaViewModel and IndicatorMetaViewModel had no Name property.
+
+        // We generate filter and indicator test data as normal.
+        // When setting up the view models for the Permalink we set the Name property of the view model to null.
+
+        var subject = _fixture.DefaultSubject().Generate();
+
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+            .WithSubject(subject)
+            .ForIndex(0, s => s.SetLabel("Filter 0"))
+            .ForIndex(1, s => s.SetLabel("Filter 1"))
+            .GenerateList(2);
+
+        var filterItems = filters
+            .SelectMany(f => f.FilterGroups)
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var indicatorGroups = _fixture.DefaultIndicatorGroup()
+            .WithSubject(subject)
+            .ForIndex(0, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator()
+                    .WithLabel("Indicator 0")
+                    .Generate(1))
+            )
+            .ForIndex(1, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator()
+                    .ForIndex(0, s => s.SetLabel("Indicator 1"))
+                    .ForIndex(1, s => s.SetLabel("Indicator 2"))
+                    .Generate(2))
+            )
+            .GenerateList();
+
+        var indicators = indicatorGroups
+            .SelectMany(ig => ig.Indicators)
+            .ToList();
+
+        var locations = _fixture.DefaultLocation()
+            .ForRange(..2, l => l
+                .SetPresetRegion()
+                .SetGeographicLevel(GeographicLevel.Region))
+            .ForRange(2..4, l => l
+                .SetPresetRegionAndLocalAuthority()
+                .SetGeographicLevel(GeographicLevel.LocalAuthority))
+            .GenerateList(4);
+
+        var observations = _fixture.DefaultObservation()
+            .WithSubject(subject)
+            .WithMeasures(indicators)
+            .ForRange(..2, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[0])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(2..4, o => o
+                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetLocation(locations[1])
+                .SetTimePeriod(2022, TimeIdentifier.AcademicYear))
+            .ForRange(4..6, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[2])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .ForRange(6..8, o => o
+                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetLocation(locations[3])
+                .SetTimePeriod(2023, TimeIdentifier.AcademicYear))
+            .GenerateList(8);
+
+        var releaseSubject = new ReleaseSubject
+        {
+            Release = _fixture.DefaultStatsRelease(),
+            Subject = subject
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            Release = new Content.Model.Release
+            {
+                Id = releaseSubject.Release.Id,
+            },
+            File = new File
+            {
+                SubjectId = subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Location.AddRangeAsync(locations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var releaseSubjectService = new Mock<IReleaseSubjectService>(Strict);
+
+            releaseSubjectService
+                .Setup(s => s.FindForLatestPublishedVersion(subject.Id))
+                .ReturnsAsync(releaseSubject);
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
+
+            releaseFileBlobService
+                .Setup(s => s.StreamBlob(
+                    It.Is<ReleaseFile>(rf =>
+                        rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId),
+                    null,
+                    default
+                ))
+                .ThrowsAsync(new FileNotFoundException("File not found"));
+
+            var service = BuildService(
+                contentDbContext: contentDbContext,
+                statisticsDbContext: statisticsDbContext,
+                releaseSubjectService: releaseSubjectService.Object,
+                releaseFileBlobService: releaseFileBlobService.Object
+            );
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id
+            };
+
+            var permalinkFilters = FiltersMetaViewModelBuilder.BuildFilters(filters);
+
+            // Remove name from each FilterMetaViewModel
+            var permalinkFiltersWithoutNames = permalinkFilters.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value with
+                {
+                    Name = null
+                });
+
+            var permalinkIndicators = IndicatorsMetaViewModelBuilder.BuildIndicators(indicators);
+
+            // Remove name from each IndicatorMetaViewModel
+            var permalinkIndicatorsWithoutNames = permalinkIndicators
+                .Select(viewModel => viewModel with
+                {
+                    Name = null
+                })
+                .ToList();
+
+            var permalink = new LegacyPermalink
+            {
+                Query = query,
+                FullTable = new PermalinkTableBuilderResult
+                {
+                    // Build the observations without location id's here and include locations instead.
+                    // This is the case for early permalinks created without filter/indicator names.
+                    Results = observations
+                        .Select(observation =>
+                            ObservationViewModelBuilderTestUtils.BuildObservationViewModelWithoutLocationId(
+                                observation,
+                                indicators))
+                        .ToList(),
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Filters = permalinkFiltersWithoutNames,
+                        Indicators = permalinkIndicatorsWithoutNames,
+                        // Build the locations in the subject meta without location id's.
+                        // This is the case for early permalinks created without filter/indicator names.
+                        LocationsHierarchical = LocationViewModelBuilderTestUtils
+                            .BuildLocationAttributeViewModelsWithoutLocationIds(
+                                locations, _regionLocalAuthorityHierarchy)
+                            .ToDictionary(
+                                level => level.Key.ToString().CamelCase(),
+                                level => level.Value)
+                    }
+                }
+            };
+
+            var result = await service.GetCsvMeta(permalink);
+
+            VerifyAllMocks(releaseSubjectService, releaseFileBlobService);
+
+            var viewModel = result.AssertRight();
+
+            Assert.Equal(2, viewModel.Filters.Count);
+
+            // Expect filter view models to have names based on snake case of filter names
+            const string expectedViewModelFilter0Name = "filter_0";
+            const string expectedViewModelFilter1Name = "filter_1";
+
+            var viewModelFilter0 = viewModel.Filters[expectedViewModelFilter0Name];
+            var viewModelFilter1 = viewModel.Filters[expectedViewModelFilter1Name];
+
+            Assert.Equal(expectedViewModelFilter0Name, viewModelFilter0.Name);
+            Assert.Equal(expectedViewModelFilter1Name, viewModelFilter1.Name);
+
+            Assert.Equal(3, viewModel.Indicators.Count);
+
+            // Expect indicator view models to have names based on snake case of indicator names
+            const string expectedViewModelIndicator0Name = "indicator_0";
+            const string expectedViewModelIndicator1Name = "indicator_1";
+            const string expectedViewModelIndicator2Name = "indicator_2";
+
+            var viewModelIndicator0 = viewModel.Indicators[expectedViewModelIndicator0Name];
+            var viewModelIndicator1 = viewModel.Indicators[expectedViewModelIndicator1Name];
+            var viewModelIndicator2 = viewModel.Indicators[expectedViewModelIndicator2Name];
+
+            Assert.Equal(expectedViewModelIndicator0Name, viewModelIndicator0.Name);
+            Assert.Equal(expectedViewModelIndicator1Name, viewModelIndicator1.Name);
+            Assert.Equal(expectedViewModelIndicator2Name, viewModelIndicator2.Name);
+
+            // Filters/indicator columns have the expected names
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_code",
+                "country_name",
+                "region_code",
+                "region_name",
+                "new_la_code",
+                "la_name",
+                expectedViewModelFilter0Name,
+                expectedViewModelFilter1Name,
+                expectedViewModelIndicator0Name,
+                expectedViewModelIndicator1Name,
+                expectedViewModelIndicator2Name
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
+
+    [Fact]
     public async Task GetCsvMeta_LegacyPermalink_SubjectMetaHasNoLocationIds()
     {
         // Set up a test where the observations have location id's but the subject meta locations do not.

@@ -316,14 +316,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             PermalinkCsvMetaViewModel meta,
             HashSet<string> locationHeaders)
         {
-            // Legacy permalinks created before location id's were introduced will have an empty location id
-            // but we can use the location object to get the location values instead
+            // Legacy permalinks created before location id's were introduced may have observations with an empty
+            // location id and will have have no locations worked out from the table subject meta.
             Dictionary<string, string>? legacyLocationValues = null;
-            if (observation.LocationId == Guid.Empty)
+            if (observation.LocationId == Guid.Empty || !meta.Locations.Any())
             {
+                // We can use the location object to get the location values instead, providing that it exists
                 if (observation.Location == null)
                 {
-                    throw new InvalidOperationException("Observation without location id has no location");
+                    throw new InvalidOperationException(
+                        "Found observation with no location while mapping csv row for permalink without location id's");
                 }
 
                 legacyLocationValues = observation.Location.GetCsvValues();

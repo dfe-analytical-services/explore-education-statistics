@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             _methodologyAmendmentService = methodologyAmendmentService;
         }
 
-        [HttpPut("publication/{publicationId:guid}/methodology/{methodologyId}")]
+        [HttpPut("publication/{publicationId:guid}/methodology/{methodologyId:guid}")]
         public async Task<ActionResult<Unit>> AdoptMethodology(Guid publicationId, Guid methodologyId)
         {
             return await _methodologyService
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("publication/{publicationId:guid}/methodology/{methodologyId}")]
+        [HttpDelete("publication/{publicationId:guid}/methodology/{methodologyId:guid}")]
         public async Task<ActionResult> DropMethodology(Guid publicationId, Guid methodologyId)
         {
             return await _methodologyService

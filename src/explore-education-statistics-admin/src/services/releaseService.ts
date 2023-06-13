@@ -151,7 +151,7 @@ export type ReleaseChecklistWarning =
         | 'NoMethodology'
         | 'NoNextReleaseDate'
         | 'NoDataFiles'
-        | 'NoTableHighlights'
+        | 'NoFeaturedTables'
         | 'NoPublicPreReleaseAccessList';
     }
   | {

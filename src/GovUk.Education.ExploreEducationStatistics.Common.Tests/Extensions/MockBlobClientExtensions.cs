@@ -1,9 +1,11 @@
 ﻿#nullable enable
 using System;
+using System.IO;
 using System.Threading;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Moq;
 using Moq.Language.Flow;
 
@@ -56,7 +58,7 @@ public static class MockBlobClientExtensions
         response.SetupGet(r => r.Value)
             .Returns(blobDownloadResult);
 
-        return blobClient.Setup(s => s.DownloadContentAsync(cancellationToken))
+        return blobClient.Setup(client => client.DownloadContentAsync(cancellationToken))
             .ReturnsAsync(response.Object);
     }
 
@@ -64,7 +66,28 @@ public static class MockBlobClientExtensions
         this Mock<BlobClient> blobClient,
         CancellationToken cancellationToken = default)
     {
-        return blobClient.Setup(s => s.DownloadContentAsync(cancellationToken))
+        return blobClient.Setup(client => client.DownloadContentAsync(cancellationToken))
             .ThrowsAsync(new RequestFailedException(status: 404, message: "Blob not found"));
+    }
+
+    public static IReturnsResult<BlobClient> SetupDownloadToAsync(
+        this Mock<BlobClient> blobClient,
+        string content,
+        CancellationToken cancellationToken = default)
+    {
+        return blobClient.SetupDownloadToAsync(content.ToStream(), cancellationToken);
+    }
+
+    public static IReturnsResult<BlobClient> SetupDownloadToAsync(
+        this Mock<BlobClient> blobClient,
+        Stream sourceStream,
+        CancellationToken cancellationToken = default)
+    {
+        return blobClient.Setup(client =>
+                client.DownloadToAsync(It.IsAny<Stream>(), cancellationToken))
+            .Callback<Stream, CancellationToken>(
+                (destinationStream, token) =>
+                    sourceStream.CopyToAsync(destinationStream, token))
+            .ReturnsAsync(new Mock<Response>().Object);
     }
 }

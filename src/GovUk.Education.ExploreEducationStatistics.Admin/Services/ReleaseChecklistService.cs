@@ -189,11 +189,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     warnings.Add(new NoFootnotesOnSubjectsWarning(subjectsWithNoFootnotes.Count));
                 }
 
-                var tableHighlights = await GetDataBlocksWithHighlights(release);
-
-                if (!tableHighlights.Any())
+                if (!await HasFeaturedTable(release.Id))
                 {
-                    warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoTableHighlights));
+                    warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoFeaturedTables));
                 }
             }
 
@@ -218,15 +216,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private async Task<List<DataBlockSummaryViewModel>> GetDataBlocksWithHighlights(Release release)
+        private async Task<bool> HasFeaturedTable(Guid releaseId)
         {
-            return (await _dataBlockService.List(release.Id))
-                .FoldRight(
-                    dataBlocks => dataBlocks
-                        .Where(dataBlock => !dataBlock.HighlightName.IsNullOrEmpty())
-                        .ToList(),
-                    new List<DataBlockSummaryViewModel>()
-                );
+            var dataBlocks = await _dataBlockService.ListDataBlocks(releaseId);
+            var dataBlockIds = dataBlocks.Select(dataBlock => dataBlock.Id);
+            return await _contentDbContext.FeaturedTables
+                .AnyAsync(ft => dataBlockIds.Contains(ft.DataBlockId));
         }
     }
 }

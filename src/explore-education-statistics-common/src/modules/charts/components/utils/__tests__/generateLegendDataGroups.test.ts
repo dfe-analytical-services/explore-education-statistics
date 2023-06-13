@@ -1606,5 +1606,53 @@ describe('generateLegendDataGroups', () => {
         },
       ]);
     });
+
+    test('handles custom groups with a mixture of integer and non-integer groups', () => {
+      const dataClasses = generateLegendDataGroups({
+        colour: 'rgba(0, 0, 0, 1)',
+        dataGrouping: {
+          customGroups: [
+            { min: 0, max: 1 },
+            {
+              min: 1.01,
+              max: 1.2,
+            },
+          ],
+
+          type: 'Custom',
+        },
+        unit: '%',
+        decimalPlaces: 2,
+        values: [
+          1.13516,
+          1.0764,
+          1.20243,
+          0.9777,
+          1.07861,
+          0.9045,
+          0.83771,
+          0.8458,
+        ],
+      });
+
+      expect(dataClasses).toEqual<LegendDataGroup[]>([
+        {
+          colour: 'rgba(128, 128, 128, 1)',
+          decimalPlaces: 2,
+          min: '0%',
+          max: '1%',
+          minRaw: -0.005,
+          maxRaw: 1.004,
+        },
+        {
+          colour: 'rgba(0, 0, 0, 1)',
+          decimalPlaces: 2,
+          min: '1.01%',
+          max: '1.2%',
+          minRaw: 1.005,
+          maxRaw: 1.204,
+        },
+      ]);
+    });
   });
 });

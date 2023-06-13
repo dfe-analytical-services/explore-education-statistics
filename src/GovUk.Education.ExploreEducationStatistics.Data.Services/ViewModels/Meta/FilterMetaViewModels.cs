@@ -9,9 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
     {
         public Guid Id { get; init; }
         public string? Hint { get; init; }
-        public string? Legend { get; init; }
+        public string Legend { get; init; } = string.Empty;
         public Dictionary<string, FilterGroupMetaViewModel> Options { get; init; } = new();
-        public string Name { get; init; } = string.Empty;
+        // TODO EES-3755 Change Name to not be nullable after Permalink snapshot work is complete.
+        // This type within Permalinks created before EES-613 has no Name.
+        public string? Name { get; init; } = string.Empty;
         public Guid? TotalValue { get; init; }
         public int Order { get; init; }
 

@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Manag
             _manageContentPageService = manageContentPageService;
         }
 
-        [HttpGet("release/{releaseId}/content")]
+        [HttpGet("release/{releaseId:guid}/content")]
         public async Task<ActionResult<ManageContentPageViewModel>> GetManageContentPageData(Guid releaseId)
         {
             return await _manageContentPageService

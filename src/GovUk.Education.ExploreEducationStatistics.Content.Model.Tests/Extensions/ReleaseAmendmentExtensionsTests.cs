@@ -604,17 +604,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var originalDataBlock = (DataBlock)release.ContentBlocks.Single().ContentBlock;
             var amendmentDataBlock = Assert.IsType<DataBlock>(amendment.ContentBlocks.Single().ContentBlock);
             Assert.Equal(originalDataBlock.Name, amendmentDataBlock.Name);
-            Assert.NotEqual(
-                originalDataBlock.Id,
-                amendmentDataBlock.Id);
+            Assert.NotEqual(originalDataBlock.Id, amendmentDataBlock.Id);
 
             // Check original and amendment data blocks are linked to correct key stats
             Assert.Equal(originalDataBlock.Id, originalKeyStatDataBlock.DataBlockId);
-            Assert.Equal(
-                amendmentDataBlock.Id,
-                amendmentKeyStatDataBlock.DataBlockId);
+            Assert.Equal(amendmentDataBlock.Id, amendmentKeyStatDataBlock.DataBlockId);
         }
 
+        [Fact]
+        public void CreateAmendment_CopiesFeaturedTables()
+        {
+            var dataBlock = new DataBlock
+            {
+                Name = "DataBlock name",
+            };
+            var releaseId = Guid.NewGuid();
+            var release = new Release
+            {
+                Id = releaseId,
+                Version = 1,
+                Published = DateTime.Parse("2020-10-10T13:00:00"),
+                PublishScheduled = DateTime.Parse("2020-10-09T12:00:00"),
+                FeaturedTables = new List<FeaturedTable>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = "Featured table 1",
+                        Description = "Featured table 1 description",
+                        Order = 0,
+                        DataBlock = dataBlock,
+                        ReleaseId = releaseId,
+                        Created = new DateTime(2023, 01, 01),
+                        Updated = new DateTime(2023, 01, 02),
+                    },
+                },
+                ContentBlocks = new List<ReleaseContentBlock>
+                {
+                    new()
+                    {
+                        ContentBlock = dataBlock,
+                    },
+                },
+            };
+
+            var createdDate = DateTime.Now;
+            var createdById = Guid.NewGuid();
+
+            var amendment = release.CreateAmendment(createdDate, createdById);
+
+            Assert.NotEqual(release.Id, amendment.Id);
+            Assert.Equal(2, amendment.Version);
+            Assert.Equal(release.Id, amendment.PreviousVersionId);
+
+            Assert.Null(amendment.Published);
+            Assert.Null(amendment.PublishScheduled);
+            Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);
+
+            var amendmentFeaturedTable = Assert.Single(amendment.FeaturedTables);
+
+            var originalFeaturedTable = release.FeaturedTables[0];
+            Assert.NotEqual(originalFeaturedTable.Id, amendmentFeaturedTable.Id);
+            Assert.Equal(originalFeaturedTable.Name, amendmentFeaturedTable.Name);
+            Assert.Equal(originalFeaturedTable.Description, amendmentFeaturedTable.Description);
+            Assert.Equal(originalFeaturedTable.Order, amendmentFeaturedTable.Order);
+            Assert.Equal(originalFeaturedTable.Created, amendmentFeaturedTable.Created);
+            Assert.Equal(originalFeaturedTable.Updated, amendmentFeaturedTable.Updated);
+
+            var originalDataBlock = (DataBlock)release.ContentBlocks.Single().ContentBlock;
+            var amendmentDataBlock = Assert.IsType<DataBlock>(amendment.ContentBlocks.Single().ContentBlock);
+            Assert.Equal(originalDataBlock.Name, amendmentDataBlock.Name);
+            Assert.NotEqual(originalDataBlock.Id, amendmentDataBlock.Id);
+
+            // Check original and amendment data blocks/releases are linked to correct featured table
+            Assert.Equal(release.Id, originalFeaturedTable.ReleaseId);
+            Assert.Equal(originalDataBlock.Id, originalFeaturedTable.DataBlockId);
+            Assert.Equal(amendment.Id, amendmentFeaturedTable.ReleaseId);
+            Assert.Equal(amendmentDataBlock.Id, amendmentFeaturedTable.DataBlockId);
+        }
 
         [Fact]
         public void CreateAmendment_UpdatesFastTrackLinkIds()

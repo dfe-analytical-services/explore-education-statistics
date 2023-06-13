@@ -196,6 +196,7 @@ describe('PreReleaseTableToolPage', () => {
   const testFeaturedTables: FeaturedTable[] = [
     {
       id: 'block-1',
+      dataBlockId: 'block-1',
       name: 'Test highlight',
       description: 'Test highlight description',
       subjectId: 'subject-1',

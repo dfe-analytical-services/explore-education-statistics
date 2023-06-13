@@ -468,7 +468,7 @@ export default function MapBlockInternal({
         </div>
         {selectedDataSetConfig && (
           <div className="govuk-grid-column-one-third">
-            <h3 className="govuk-heading-s">
+            <h3 className="govuk-heading-s dfe-word-break--break-word">
               Key to {selectedDataSetConfig?.config?.label}
             </h3>
             <ul className="govuk-list" data-testid="mapBlock-legend">

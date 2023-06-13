@@ -49,7 +49,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
@@ -197,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
-                            )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -208,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
-                        )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -220,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .AddBulkOperationSupport()
                                 .EnableCustomRetryOnFailure()
-                            )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -492,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     userService: provider.GetRequiredService<IUserService>(),
                     persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
                     publicationCacheService: provider.GetRequiredService<IPublicationCacheService>())
-                );
+            );
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
             services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
@@ -530,6 +529,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IEmbedBlockService, EmbedBlockService>();
             services.AddTransient<IReleaseContentBlockService, ReleaseContentBlockService>();
             services.AddTransient<IKeyStatisticService, KeyStatisticService>();
+            services.AddTransient<IFeaturedTableService, FeaturedTableService>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
@@ -575,7 +575,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
-            services.AddTransient<IReleaseContentBlockRepository, ReleaseContentBlockRepository>();
             services.AddTransient<IReleaseContentSectionRepository, ReleaseContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<Content.Model.Repository.Interfaces.IReleaseRepository,

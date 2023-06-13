@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -31,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IReleaseFileService _releaseFileService;
-        private readonly IReleaseContentBlockRepository _releaseContentBlockRepository;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
         private readonly IBlobCacheService _cacheService;
@@ -40,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public DataBlockService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseFileService releaseFileService,
-            IReleaseContentBlockRepository releaseContentBlockRepository,
             IUserService userService,
             IMapper mapper,
             IBlobCacheService cacheService,
@@ -49,7 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
             _persistenceHelper = persistenceHelper;
             _releaseFileService = releaseFileService;
-            _releaseContentBlockRepository = releaseContentBlockRepository;
             _userService = userService;
             _mapper = mapper;
             _cacheService = cacheService;
@@ -95,9 +91,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var dataBlockIds = deletePlan.DependentDataBlocks
                         .Select(db => db.Id)
                         .ToList();
+
                     var keyStats = _context.KeyStatisticsDataBlock
                         .Where(ks => dataBlockIds.Contains(ks.DataBlockId));
                     _context.KeyStatisticsDataBlock.RemoveRange(keyStats);
+
+                    var featuredTables = _context.FeaturedTables
+                        .Where(ft => dataBlockIds.Contains(ft.DataBlockId));
+                    _context.FeaturedTables.RemoveRange(featuredTables);
+
                     await _context.SaveChangesAsync();
 
                     await RemoveChartFileReleaseLinks(deletePlan);
@@ -116,7 +118,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await GetReleaseContentBlock(id)
                 .OnSuccessDo(rcb => _userService.CheckCanViewRelease(rcb.Release))
                 .OnSuccess(CheckIsDataBlock)
-                .OnSuccess(dataBlock => _mapper.Map<DataBlockViewModel>(dataBlock));
+                .OnSuccess(async dataBlock =>
+                {
+                    // Remove as part of EES-4273 - we fetch these from the FeaturedTables table now
+                    dataBlock.HighlightName = null;
+                    dataBlock.HighlightDescription = null;
+
+                    var viewModel = _mapper.Map<DataBlockViewModel>(dataBlock);
+
+                    var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(
+                        ft => ft.DataBlockId == dataBlock.Id);
+
+                    if (featuredTable != null)
+                    {
+                        viewModel.HighlightName = featuredTable.Name;
+                        viewModel.HighlightDescription = featuredTable.Description;
+                    }
+
+                    return viewModel;
+                });
         }
 
         public async Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseId)
@@ -125,14 +145,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(async release =>
                     {
-                        var dataBlocks = await _releaseContentBlockRepository.GetAll<DataBlock>(release.Id);
+                        var dataBlocks = await ListDataBlocks(release.Id);
 
                         var dataBlockIdsAttachedToKeyStats = await _context.KeyStatisticsDataBlock
                             .Where(ks => ks.ReleaseId == release.Id)
                             .Select(ks => ks.DataBlockId)
                             .ToListAsync();
+
+                        var featuredTables = await _context.FeaturedTables
+                            .Where(ks => ks.ReleaseId == release.Id)
+                            .ToListAsync();
+
                         return dataBlocks.Select(block =>
                             {
+                                var featuredTable = featuredTables
+                                    .SingleOrDefault(ft => ft.DataBlockId == block.Id);
+
                                 var inContent = block.ContentSectionId != null
                                                 || dataBlockIdsAttachedToKeyStats.Contains(block.Id);
                                 return new DataBlockSummaryViewModel
@@ -141,8 +169,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     Heading = block.Heading,
                                     Name = block.Name,
                                     Created = block.Created,
-                                    HighlightName = block.HighlightName,
-                                    HighlightDescription = block.HighlightDescription,
+                                    HighlightName = featuredTable?.Name ?? null,
+                                    HighlightDescription = featuredTable?.Description ?? null,
                                     Source = block.Source,
                                     ChartsCount = block.Charts.Count,
                                     InContent = inContent,
@@ -178,6 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _mapper.Map(dataBlockUpdate, dataBlock);
 
                             _context.DataBlocks.Update(dataBlock);
+
                             await _context.SaveChangesAsync();
                         })
                         .OnSuccessDo(() => InvalidateCachedDataBlock(rcb.ReleaseId, rcb.ContentBlockId)))
@@ -240,6 +269,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(f => fileIds.Contains(f.Id))
                 .ToListAsync();
 
+            var featuredTable = await _context.FeaturedTables
+                .SingleOrDefaultAsync(ft => ft.DataBlockId == block.Id);
+
             return new DependentDataBlock
             {
                 Id = block.Id,
@@ -252,6 +284,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }).ToList(),
                 IsKeyStatistic = await _context.KeyStatisticsDataBlock
                     .AnyAsync(ks => ks.DataBlockId == block.Id),
+                FeaturedTable = featuredTable != null
+                    ? new FeaturedTableBasicViewModel
+                    {
+                        Name = featuredTable.Name,
+                        Description = featuredTable.Description,
+                    }
+                    : null,
             };
         }
 
@@ -409,6 +448,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                        .AllAsync(ks =>
                            ks.DataBlockId != dataBlock.Id);
         }
+
+        public async Task<List<DataBlock>> ListDataBlocks(Guid releaseId)
+        {
+            return await _context
+                    .ReleaseContentBlocks
+                    .Where(releaseContentBlock => releaseContentBlock.ReleaseId == releaseId)
+                    .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
+                    .OfType<DataBlock>()
+                    .ToListAsync();
+        }
     }
 
     public class DependentDataBlock
@@ -418,6 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public string? ContentSectionHeading { get; set; }
         public List<InfographicFileInfo> InfographicFilesInfo { get; set; } = new();
         public bool IsKeyStatistic { get; set; }
+        public FeaturedTableBasicViewModel? FeaturedTable { get; set; }
     }
 
     public class InfographicFileInfo

@@ -55,6 +55,10 @@ describe('ReleaseDataBlocksPage', () => {
         contentSectionHeading: 'Section 1',
         infographicFilesInfo: [],
         isKeyStatistic: true,
+        featuredTable: {
+          name: 'Featured table name',
+          description: 'Featured table description',
+        },
       },
     ],
   };

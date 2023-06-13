@@ -1718,6 +1718,232 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
+        public async Task MigratePermalink_SubjectMetaHasNoLocationIds()
+        {
+            // This tests a scenario where a permalink table subject meta has no location id's,
+            // but the observations do have location id's.
+
+            // This was possible in the window between deploying #3182 (EES-3203) which added location id's into the
+            // ObservationViewModel, and #3196 (EES-2955) which added location id's to the subject
+            // meta locations. 
+
+            // Setup test data with observations that have have location id's in addition to location objects.
+
+            // Setup the PermalinkCsvMetaService to return csv meta without locations which will happen
+            // when there is no table subject meta location id's.
+
+            // Rows should be written using the observation's location object to get the location values instead.
+
+            var permalink = new Permalink
+            {
+                Id = Guid.NewGuid(),
+                Legacy = true
+            };
+
+            var subject = _fixture.DefaultSubject().Generate();
+
+            var filters = _fixture.DefaultFilter().GenerateList(2);
+
+            var filterItems = _fixture.DefaultFilterItem()
+                .ForRange(..2, fi => fi
+                    .SetFilterGroup(_fixture.DefaultFilterGroup()
+                        .WithFilter(filters[0])
+                        .Generate()))
+                .ForRange(2..4, fi => fi
+                    .SetFilterGroup(_fixture.DefaultFilterGroup()
+                        .WithFilter(filters[1])
+                        .Generate()))
+                .GenerateArray();
+
+            var indicators = _fixture.DefaultIndicator()
+                .ForRange(..1, i => i
+                    .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                        .WithSubject(subject))
+                )
+                .ForRange(1..3, i => i
+                    .SetIndicatorGroup(_fixture.DefaultIndicatorGroup()
+                        .WithSubject(subject))
+                )
+                .GenerateList(3);
+
+            var locations = _fixture.DefaultLocation()
+                .ForRange(..2, l => l
+                    .SetPresetRegion()
+                    .SetGeographicLevel(GeographicLevel.Region))
+                .ForRange(2..4, l => l
+                    .SetPresetRegionAndLocalAuthority()
+                    .SetGeographicLevel(GeographicLevel.LocalAuthority))
+                .GenerateList(4);
+
+            var observations = _fixture.DefaultObservation()
+                .WithSubject(subject)
+                .WithMeasures(indicators)
+                .ForRange(..2, o => o
+                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetLocation(locations[0])
+                    .SetTimePeriod(2022, AcademicYear))
+                .ForRange(2..4, o => o
+                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetLocation(locations[1])
+                    .SetTimePeriod(2022, AcademicYear))
+                .ForRange(4..6, o => o
+                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetLocation(locations[2])
+                    .SetTimePeriod(2023, AcademicYear))
+                .ForRange(6..8, o => o
+                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetLocation(locations[3])
+                    .SetTimePeriod(2023, AcademicYear))
+                .GenerateList(8);
+
+            var footnotes = _fixture
+                .DefaultFootnote()
+                .GenerateList(2);
+
+            var legacyPermalink = new LegacyPermalink(
+                permalink.Id,
+                DateTime.UtcNow,
+                new TableBuilderConfiguration(),
+                new PermalinkTableBuilderResult
+                {
+                    SubjectMeta = new PermalinkResultSubjectMeta
+                    {
+                        Footnotes = FootnotesViewModelBuilder.BuildFootnotes(footnotes)
+                    },
+                    // Build the observations WITH location id's AND locations
+                    Results = observations
+                        .Select(observation =>
+                            ObservationViewModelBuilderTestUtils.BuildObservationViewModelWithLocationIdAndLocation(
+                                observation,
+                                indicators))
+                        .ToList()
+                },
+                new ObservationQueryContext());
+
+            var csvMeta = new PermalinkCsvMetaViewModel
+            {
+                Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+                Indicators = indicators
+                    .Select(i => new IndicatorCsvMetaViewModel(i))
+                    .ToDictionary(i => i.Name),
+                Headers = new List<string>
+                {
+                    "time_period",
+                    "time_identifier",
+                    "geographic_level",
+                    "country_code",
+                    "country_name",
+                    "region_code",
+                    "region_name",
+                    "new_la_code",
+                    "la_name",
+                    filters[0].Name,
+                    filters[1].Name,
+                    indicators[0].Name,
+                    indicators[1].Name,
+                    indicators[2].Name
+                }
+                // Locations are not included in the csv meta here as we expect them to come from the observations
+                // instead
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Permalinks.AddRangeAsync(permalink);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupGetDeserializedJson(
+                container: BlobContainers.Permalinks,
+                path: permalink.Id.ToString(),
+                value: legacyPermalink,
+                settings: PermalinkService.LegacyPermalinkSerializerSettings);
+
+            blobStorageService.Setup(s => s.UploadStream(
+                    BlobContainers.PermalinkSnapshots,
+                    $"{permalink.Id}.csv.zst",
+                    It.IsAny<Stream>(),
+                    ContentTypes.Csv,
+                    ContentEncodings.Zstd,
+                    It.IsAny<CancellationToken>()
+                ))
+                .Callback<IBlobContainer, string, Stream, string, string, CancellationToken>(
+                    (_, _, stream, _, _, _) =>
+                    {
+                        // Capture the csv from the uploaded stream
+                        stream.SeekToBeginning();
+                        var csv = stream.ReadToEnd();
+
+                        // Compare the captured csv upload with the expected csv
+                        Snapshot.Match(csv, SnapshotNameExtension.Create("csv"));
+                    })
+                .Returns(Task.CompletedTask);
+
+            blobStorageService.Setup(s => s.UploadAsJson(
+                    BlobContainers.PermalinkSnapshots,
+                    $"{permalink.Id}.json.zst",
+                    It.IsAny<PermalinkTableViewModel>(),
+                    ContentEncodings.Zstd,
+                    null,
+                    It.IsAny<CancellationToken>()
+                ))
+                .Callback<IBlobContainer,
+                    string,
+                    PermalinkTableViewModel,
+                    string,
+                    JsonSerializerSettings?,
+                    CancellationToken>(
+                    (_, _, table, _, _, _) =>
+                    {
+                        // Compare the captured table upload with the expected json
+                        Snapshot.Match(table, SnapshotNameExtension.Create("json"));
+                    })
+                .Returns(Task.CompletedTask);
+
+            var frontendService = new Mock<IFrontendService>(MockBehavior.Strict);
+
+            frontendService.Setup(s => s.CreateTable(
+                ItIs.DeepEqualTo(legacyPermalink),
+                It.IsAny<CancellationToken>())
+            ).ReturnsAsync(_frontendTableResponse);
+
+            var permalinkCsvMetaService = new Mock<IPermalinkCsvMetaService>(MockBehavior.Strict);
+
+            permalinkCsvMetaService
+                .Setup(s => s
+                    .GetCsvMeta(ItIs.DeepEqualTo(legacyPermalink),
+                        It.IsAny<CancellationToken>()))
+                .ReturnsAsync(csvMeta);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    frontendService: frontendService.Object,
+                    permalinkCsvMetaService: permalinkCsvMetaService.Object);
+
+                var result = await service.MigratePermalink(permalink.Id);
+
+                result.AssertRight();
+
+                MockUtils.VerifyAllMocks(
+                    blobStorageService,
+                    frontendService,
+                    permalinkCsvMetaService);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var saved = contentDbContext.Permalinks.Single(p => p.Id == permalink.Id);
+                Assert.True(saved.LegacyHasSnapshot);
+            }
+        }
+
+        [Fact]
         public async Task MigratePermalink_PermalinkNotFound()
         {
             var permalink = new Permalink

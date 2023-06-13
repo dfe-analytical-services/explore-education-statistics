@@ -519,14 +519,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return replacedReleaseDataFile.Order;
             }
 
-            var maxOrder = await _contentDbContext.ReleaseFiles
+            var currentMaxOrder = await _contentDbContext.ReleaseFiles
                 .Include(releaseFile => releaseFile.File)
                 .Where(releaseFile => releaseFile.ReleaseId == releaseId
                                       && releaseFile.File.Type == FileType.Data
                                       && releaseFile.File.ReplacingId == null)
                 .MaxAsync(releaseFile => (int?)releaseFile.Order);
 
-            return maxOrder.HasValue ? maxOrder.Value + 1 : 0;
+            return currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
         }
     }
 }

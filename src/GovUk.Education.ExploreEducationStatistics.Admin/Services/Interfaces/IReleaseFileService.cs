@@ -50,6 +50,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseId,
             ReleaseAncillaryFileUploadViewModel upload);
 
+        Task<Either<ActionResult, FileInfo>> ReplaceAncillary(
+            Guid releaseId,
+            Guid fileId,
+            IFormFile newFile);
+
         Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
             IFormFile formFile,
             Guid? replacingId = null);

@@ -630,7 +630,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(r => r.ContentBlocks)
                 .ThenInclude(r => r.ContentBlock)
                 .Include(r => r.KeyStatistics)
-                .ThenInclude(ks => (ks as KeyStatisticDataBlock)!.DataBlock);
+                .ThenInclude(ks => (ks as KeyStatisticDataBlock)!.DataBlock)
+                .Include(r => r.FeaturedTables);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)

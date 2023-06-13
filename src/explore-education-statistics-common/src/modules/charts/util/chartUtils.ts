@@ -39,3 +39,5 @@ export const legendInlinePositions: LegendInlinePosition[] = ['above', 'below'];
 export const lineChartDataLabelPositions = ['above', 'below'];
 
 export const barChartDataLabelPositions = ['inside', 'outside'];
+
+export const axisTickStyle = { fill: '#0b0c0c' };

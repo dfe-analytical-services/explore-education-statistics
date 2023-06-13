@@ -380,7 +380,13 @@ const ReleaseDataUploadsSection = ({
                       {block.isKeyStatistic && (
                         <p>
                           A key statistic associated with this data block will
-                          also be removed.
+                          be removed.
+                        </p>
+                      )}
+                      {block.featuredTable && (
+                        <p>
+                          The featured table "{`${block.featuredTable?.name}`}"
+                          using this data block will be removed.
                         </p>
                       )}
                     </li>

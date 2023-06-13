@@ -84,6 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<KeyStatistic> KeyStatistics { get; set; } = new();
 
+        public List<FeaturedTable> FeaturedTables { get; set; } = new();
+
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
         public string DataGuidance { get; set; } = string.Empty;
