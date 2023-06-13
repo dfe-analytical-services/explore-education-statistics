@@ -844,7 +844,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         else
                         {
                             throw new InvalidOperationException(
-                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location?.Value}"
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location.Value}"
                             );
                         }
                     }
