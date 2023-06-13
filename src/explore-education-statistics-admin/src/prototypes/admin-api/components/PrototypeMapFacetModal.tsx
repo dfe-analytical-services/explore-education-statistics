@@ -142,19 +142,21 @@ const PrototypeMapFacetModal = ({
               );
             })}
           </div>
-          <Button
-            className="govuk-!-margin-bottom-0 govuk-!-margin-top-4"
-            type="submit"
-          >
-            Update mapping
-          </Button>
-          <Button
-            variant="warning"
-            className="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-!-margin-left-4"
-            onClick={onClose}
-          >
-            No mapping available (major update)
-          </Button>
+          <div className="dfe-flex dfe-justify-content--space-between">
+            <Button
+              className="govuk-!-margin-bottom-0 govuk-!-margin-top-4"
+              type="submit"
+            >
+              Update mapping
+            </Button>
+            <Button
+              variant="warning"
+              className="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-!-margin-left-4"
+              onClick={onClose}
+            >
+              No mapping available (major update)
+            </Button>
+          </div>
         </Form>
       </Formik>
     </Modal>

@@ -233,7 +233,11 @@ const PrototypePublicationSubjectList = ({
                                   <ButtonText className="govuk-!-margin-left-6 govuk-!-margin-right-6">
                                     Edit next data set
                                   </ButtonText>
-                                  <ButtonText>Remove next data set</ButtonText>
+                                  <div style={{ marginLeft: 'auto' }}>
+                                    <ButtonText variant="warning">
+                                      Remove next data set
+                                    </ButtonText>
+                                  </div>
                                 </>
                               )}
 
@@ -245,21 +249,25 @@ const PrototypePublicationSubjectList = ({
 
                               {subject.release !== currentRelease &&
                                 !nextSubject && (
-                                  <Link
-                                    className="govuk-button"
-                                    to={`./2022-23/prepare-subject/${publicationSubject.subjectId}`}
-                                  >
-                                    Create new API data set version
-                                  </Link>
+                                  <div style={{ marginLeft: 'auto' }}>
+                                    <Link
+                                      className="govuk-button"
+                                      to={`./2022-23/prepare-subject/${publicationSubject.subjectId}`}
+                                    >
+                                      Create new API data set version
+                                    </Link>
+                                  </div>
                                 )}
 
                               {subject.release === currentRelease && (
-                                <ButtonText
-                                  variant="warning"
-                                  className="govuk-!-margin-left-6"
-                                >
-                                  Delete
-                                </ButtonText>
+                                <div style={{ marginLeft: 'auto' }}>
+                                  <ButtonText
+                                    variant="warning"
+                                    className="govuk-!-margin-left-6"
+                                  >
+                                    Delete
+                                  </ButtonText>
+                                </div>
                               )}
                             </ButtonGroup>
                           </SummaryListItem>
@@ -362,6 +370,13 @@ const PrototypePublicationSubjectList = ({
                                     toggleStatusModal(true);
                                     setDeprecationNotesValue(deprecationNotes1);
                                     setDeprecationDateValue(deprecationDate1);
+                                    if (
+                                      selectedVersionStatus1 === 'Deprecated'
+                                    ) {
+                                      setShowDeprecationNotes(true);
+                                    } else {
+                                      setShowDeprecationNotes(false);
+                                    }
                                   }}
                                 >
                                   Set status
@@ -418,6 +433,13 @@ const PrototypePublicationSubjectList = ({
                                     toggleStatusModal(true);
                                     setDeprecationNotesValue(deprecationNotes2);
                                     setDeprecationDateValue(deprecationDate2);
+                                    if (
+                                      selectedVersionStatus2 === 'Deprecated'
+                                    ) {
+                                      setShowDeprecationNotes(true);
+                                    } else {
+                                      setShowDeprecationNotes(false);
+                                    }
                                   }}
                                 >
                                   Set status
@@ -474,6 +496,14 @@ const PrototypePublicationSubjectList = ({
                                     toggleStatusModal(true);
                                     setDeprecationNotesValue(deprecationNotes3);
                                     setDeprecationDateValue(deprecationDate3);
+
+                                    if (
+                                      selectedVersionStatus3 === 'Deprecated'
+                                    ) {
+                                      setShowDeprecationNotes(true);
+                                    } else {
+                                      setShowDeprecationNotes(false);
+                                    }
                                   }}
                                 >
                                   Set status
@@ -550,15 +580,17 @@ const PrototypePublicationSubjectList = ({
                                         selectedVersionStatus3 === 'Deprecated')
                                     }
                                     onClick={() => {
-                                      setShowDeprecationNotes(true);
                                       if (selectedVersion === '2.1') {
                                         setSelectedVersionStatus1('Deprecated');
+                                        setShowDeprecationNotes(true);
                                       }
                                       if (selectedVersion === '2.0') {
                                         setSelectedVersionStatus2('Deprecated');
+                                        setShowDeprecationNotes(true);
                                       }
                                       if (selectedVersion === '1.0') {
                                         setSelectedVersionStatus3('Deprecated');
+                                        setShowDeprecationNotes(true);
                                       }
                                     }}
                                   />
@@ -573,13 +605,13 @@ const PrototypePublicationSubjectList = ({
                                   </label>
                                 </div>
                                 {showDeprecationNotes && (
-                                  <div className="govuk-!-margin-top-9">
+                                  <div className="govuk-radios__conditional">
                                     {' '}
                                     <label htmlFor="deprecationNotes">
                                       Notes
                                       <span className="govuk-hint">
                                         These notes will be appended to the
-                                        published API dataset. The notes are to
+                                        published API dataset. They are used to
                                         explain to the public users why this
                                         data set is being deprecated.
                                       </span>
@@ -610,7 +642,9 @@ const PrototypePublicationSubjectList = ({
                                       <p className="govuk-hint">
                                         The date helps give users advance
                                         warning of when the data set will be
-                                        deprecated
+                                        deprecated. If you don't yet know a
+                                        precise date, just add an estimated
+                                        month leaving the day blank.
                                       </p>
                                       <div className="govuk-date-input">
                                         <div className="govuk-date-input__item">
@@ -619,7 +653,7 @@ const PrototypePublicationSubjectList = ({
                                               htmlFor="date-day"
                                               className="govuk-label govuk-date-input__label"
                                             >
-                                              Day (optional)
+                                              Day
                                             </label>
                                             <input
                                               type="number"
