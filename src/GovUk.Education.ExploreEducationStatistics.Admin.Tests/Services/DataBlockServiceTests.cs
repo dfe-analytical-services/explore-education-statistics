@@ -18,8 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -41,8 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Heading = "Test heading",
                 Name = "Test name",
-                HighlightName = "Test highlight name",
-                HighlightDescription = "Test highlight description",
                 Source = "Test source",
                 Order = 5,
                 Query = new ObservationQueryContext
@@ -62,11 +58,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Rows = new List<TableHeader>
                         {
-                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                            new (Guid.NewGuid().ToString(), TableHeaderType.Indicator)
                         },
                         Columns = new List<TableHeader>
                         {
-                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
+                            new (Guid.NewGuid().ToString(), TableHeaderType.Filter)
                         }
                     }
                 },
@@ -81,11 +77,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
+            var featuredTable = new FeaturedTable
+            {
+                Name = "Featured table name",
+                Description = "Featured table description",
+                DataBlock = dataBlock,
+            };
+
             var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.ReleaseContentBlocks.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = new Release(),
+                        ContentBlock = dataBlock,
+                    }
+                );
+                await context.FeaturedTables.AddAsync(featuredTable);
+                await context.SaveChangesAsync();
+            }
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
+                var service = BuildDataBlockService(context);
+                var result = await service.Get(dataBlock.Id);
+
+                var retrievedResult = result.AssertRight();
+
+                Assert.Equal(dataBlock.Heading, retrievedResult.Heading);
+                Assert.Equal(dataBlock.Name, retrievedResult.Name);
+                Assert.Equal(dataBlock.Source, retrievedResult.Source);
+                Assert.Equal(dataBlock.Order, retrievedResult.Order);
+
+                Assert.Equal(featuredTable.Name, retrievedResult.HighlightName);
+                Assert.Equal(featuredTable.Description, retrievedResult.HighlightDescription);
+
+                dataBlock.Query.AssertDeepEqualTo(retrievedResult.Query);
+                dataBlock.Table.AssertDeepEqualTo(retrievedResult.Table);
+                dataBlock.Charts.AssertDeepEqualTo(retrievedResult.Charts);
+            }
+        }
+
+        [Fact]
+        public async Task Get_NoFeaturedTable()
+        {
+            var dataBlock = new DataBlock
+            {
+                Name = "Test name",
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.ReleaseContentBlocks.AddAsync(
                     new ReleaseContentBlock
                     {
                         Release = new Release(),
@@ -102,16 +147,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var retrievedResult = result.AssertRight();
 
-                Assert.Equal(dataBlock.Heading, retrievedResult.Heading);
                 Assert.Equal(dataBlock.Name, retrievedResult.Name);
-                Assert.Equal(dataBlock.HighlightName, retrievedResult.HighlightName);
-                Assert.Equal(dataBlock.HighlightDescription, retrievedResult.HighlightDescription);
-                Assert.Equal(dataBlock.Source, retrievedResult.Source);
-                Assert.Equal(dataBlock.Order, retrievedResult.Order);
 
-                dataBlock.Query.AssertDeepEqualTo(retrievedResult.Query);
-                dataBlock.Table.AssertDeepEqualTo(retrievedResult.Table);
-                dataBlock.Charts.AssertDeepEqualTo(retrievedResult.Charts);
+                Assert.Null(retrievedResult.HighlightName);
+                Assert.Null(retrievedResult.HighlightDescription);
             }
         }
 
@@ -206,8 +245,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Heading = "Test heading 1",
                 Name = "Test name 1",
-                HighlightName = "Test highlight name 1",
-                HighlightDescription = "Test highlight description 1",
                 Source = "Test source 1",
                 Order = 5,
                 Created = new DateTime(2000, 1, 1),
@@ -247,13 +284,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
             };
+            var featuredTable1 = new FeaturedTable
+            {
+                Name = "Test highlight name 1",
+                Description = "Test highlight description 1",
+                DataBlock = dataBlock1,
+            };
 
             var dataBlock2 = new DataBlock
             {
                 Heading = "Test heading 2",
                 Name = "Test name 2",
-                HighlightName = "Test highlight name 2",
-                HighlightDescription = "Test highlight description 2",
                 Source = "Test source 2",
                 Order = 7,
                 Created = new DateTime(2001, 2, 2),
@@ -284,6 +325,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 Charts = new List<IChart>()
             };
+            var featuredTable2 = new FeaturedTable
+            {
+                Name = "Test highlight name 2",
+                Description = "Test highlight description 2",
+                DataBlock = dataBlock2,
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -301,6 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ContentBlock = dataBlock2
                     }
                 );
+                await context.FeaturedTables.AddRangeAsync(featuredTable1, featuredTable2);
                 await context.SaveChangesAsync();
             }
 
@@ -387,8 +435,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Heading = "Test heading 1",
                 Name = "Test name 1",
-                HighlightName = "Test highlight name 1",
-                HighlightDescription = "Test highlight description 1",
                 Source = "Test source 1",
                 Order = 5,
                 Created = new DateTime(2000, 1, 1),
@@ -428,6 +474,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
             };
+            var featuredTable1 = new FeaturedTable
+            {
+                Name = "Test highlight name 1",
+                Description = "Test highlight description 1",
+                DataBlock = dataBlock1,
+            };
 
             var dataBlock2 = new DataBlock
             {
@@ -450,6 +502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ContentBlock = dataBlock2
                     }
                 );
+                await context.FeaturedTables.AddAsync(featuredTable1);
                 await context.SaveChangesAsync();
             }
 
@@ -533,6 +586,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
                 Assert.Equal(dataBlock.ContentSection.Heading, dependentBlocks[0].ContentSectionHeading);
                 Assert.False(dependentBlocks[0].IsKeyStatistic);
+                Assert.Null(dependentBlocks[0].FeaturedTable);
 
                 Assert.Single(dependentBlocks[0].InfographicFilesInfo);
 
@@ -587,6 +641,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task GetDeletePlan_DependentDataBlockIncludesFeaturedTableDetails()
+        {
+            var release = new Release();
+
+            var dataBlock = new DataBlock();
+
+            var featuredTable = new FeaturedTable
+            {
+                Name = "Featured table name",
+                Description = "Featured table description",
+                DataBlock = dataBlock,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock
+                    }
+                );
+                await context.FeaturedTables.AddAsync(featuredTable);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.GetDeletePlan(release.Id, dataBlock.Id);
+
+                var deletePlan = result.AssertRight();
+
+                Assert.Equal(release.Id, deletePlan.ReleaseId);
+
+                var dependentBlocks = deletePlan.DependentDataBlocks;
+
+                Assert.Single(dependentBlocks);
+
+                Assert.Equal(dataBlock.Id, dependentBlocks[0].Id);
+                Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
+                Assert.Null(dataBlock.ContentSection);
+                Assert.NotNull(dependentBlocks[0].FeaturedTable);
+                Assert.Equal(featuredTable.Name, dependentBlocks[0].FeaturedTable!.Name);
+                Assert.Equal(featuredTable.Description, dependentBlocks[0].FeaturedTable!.Description);
+            }
+        }
 
         [Fact]
         public async Task GetDeletePlan_NotFound()
@@ -843,8 +946,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Heading = "Test heading",
                 Name = "Test name",
-                HighlightName = "Test highlight name",
-                HighlightDescription = "Test highlight description",
                 Source = "Test source",
                 Query = new ObservationQueryContext
                 {
@@ -863,11 +964,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Rows = new List<TableHeader>
                         {
-                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                            new (Guid.NewGuid().ToString(), TableHeaderType.Indicator)
                         },
                         Columns = new List<TableHeader>
                         {
-                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
+                            new (Guid.NewGuid().ToString(), TableHeaderType.Filter)
                         }
                     }
                 },
@@ -891,8 +992,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(createRequest.Heading, viewModel.Heading);
                 Assert.Equal(createRequest.Name, viewModel.Name);
-                Assert.Equal(createRequest.HighlightName, viewModel.HighlightName);
-                Assert.Equal(createRequest.HighlightDescription, viewModel.HighlightDescription);
                 Assert.Equal(createRequest.Source, viewModel.Source);
 
                 createRequest.Query.AssertDeepEqualTo(viewModel.Query);
@@ -911,12 +1010,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Validate Created date is in the DB, even if not returned in result
                 Assert.True(dataBlock.Created.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created!.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created.Value).Milliseconds, 0, 1500);
 
                 Assert.Equal(createRequest.Heading, dataBlock.Heading);
                 Assert.Equal(createRequest.Name, dataBlock.Name);
-                Assert.Equal(createRequest.HighlightName, dataBlock.HighlightName);
-                Assert.Equal(createRequest.HighlightDescription, dataBlock.HighlightDescription);
                 Assert.Equal(createRequest.Source, dataBlock.Source);
 
                 createRequest.Query.AssertDeepEqualTo(dataBlock.Query);
@@ -928,7 +1025,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .FirstOrDefaultAsync(r => r.Id == release.Id);
 
                 Assert.NotNull(savedRelease);
-                Assert.Single(savedRelease!.ContentBlocks);
+                Assert.Single(savedRelease.ContentBlocks);
                 Assert.Equal(dataBlock, savedRelease.ContentBlocks[0].ContentBlock);
             }
         }
@@ -1088,8 +1185,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Heading = "New heading",
                 Name = "New name",
-                HighlightName = "New highlight name",
-                HighlightDescription = "New highlight description",
                 Source = "New source",
                 Charts = new List<IChart>
                 {
@@ -1132,8 +1227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Id, updateResult.Id);
                 Assert.Equal(updateRequest.Heading, updateResult.Heading);
                 Assert.Equal(updateRequest.Name, updateResult.Name);
-                Assert.Equal(updateRequest.HighlightName, updateResult.HighlightName);
-                Assert.Equal(updateRequest.HighlightDescription, updateResult.HighlightDescription);
                 Assert.Equal(updateRequest.Source, updateResult.Source);
                 Assert.Equal(dataBlock.Order, updateResult.Order);
 
@@ -1146,10 +1239,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
 
-                Assert.Equal(updateRequest.Heading, updatedDataBlock!.Heading);
+                Assert.NotNull(updatedDataBlock);
+                Assert.Equal(updateRequest.Heading, updatedDataBlock.Heading);
                 Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
-                Assert.Equal(updateRequest.HighlightName, updatedDataBlock.HighlightName);
-                Assert.Equal(updateRequest.HighlightDescription, updatedDataBlock.HighlightDescription);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
 
                 updateRequest.Query.AssertDeepEqualTo(updatedDataBlock.Query);
@@ -1472,30 +1564,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetUnattachedDataBlocks_NoRelease()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = BuildDataBlockService(contentDbContext: contentDbContext);
-                var result = await service.GetUnattachedDataBlocks(
-                    Guid.NewGuid());
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            var service = BuildDataBlockService(contentDbContext: contentDbContext);
+            var result = await service.GetUnattachedDataBlocks(
+                Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
+            result.AssertNotFound();
         }
 
         private static DataBlockService BuildDataBlockService(
-            ContentDbContext? contentDbContext = null,
+            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IReleaseFileService? releaseFileService = null,
-            IReleaseContentBlockRepository? releaseContentBlockRepository = null,
             IUserService? userService = null,
             IBlobCacheService? cacheService = null,
             ICacheKeyService? cacheKeyService = null)
         {
             var service = new DataBlockService(
-                contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
+                contentDbContext,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
-                releaseContentBlockRepository ?? new ReleaseContentBlockRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 AdminMapper(),
                 cacheService ?? Mock.Of<IBlobCacheService>(Strict),

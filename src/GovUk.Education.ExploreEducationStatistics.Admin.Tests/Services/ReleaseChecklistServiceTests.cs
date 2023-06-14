@@ -307,12 +307,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<File>());
 
                 dataBlockService
-                    .Setup(s => s.List(release.Id))
+                    .Setup(s => s.ListDataBlocks(release.Id))
                     .ReturnsAsync(
-                        new List<DataBlockSummaryViewModel>
+                        new List<DataBlock>
                         {
-                            new DataBlockSummaryViewModel(),
-                            new DataBlockSummaryViewModel(),
+                            new DataBlock(),
+                            new DataBlock(),
                         }
                     );
 
@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(NoFootnotesOnSubjects, noFootnotesWarning.Code);
                 Assert.Equal(1, noFootnotesWarning.TotalSubjects);
 
-                Assert.Equal(NoTableHighlights, checklist.Warnings[3].Code);
+                Assert.Equal(NoFeaturedTables, checklist.Warnings[3].Code);
                 Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[4].Code);
             }
 
@@ -479,6 +479,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var dataBlockId = Guid.NewGuid();
+
             var releaseContentSection2 = new ReleaseContentSection
             {
                 Release = release,
@@ -487,9 +489,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Type = ContentSectionType.Generic,
                     Content = new List<ContentBlock>
                     {
-                        new DataBlock()
+                        new DataBlock { Id = dataBlockId },
                     }
                 }
+            };
+
+            var featuredTable = new FeaturedTable
+            {
+                DataBlockId = dataBlockId,
             };
 
             var releaseContentSection3 = new ReleaseContentSection
@@ -517,6 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseContentSection2,
                     releaseContentSection3,
                     originalRelease);
+                await context.FeaturedTables.AddRangeAsync(featuredTable);
                 await context.SaveChangesAsync();
             }
 
@@ -565,14 +573,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<Subject>());
 
                 dataBlockService
-                    .Setup(s => s.List(release.Id))
+                    .Setup(s => s.ListDataBlocks(release.Id))
                     .ReturnsAsync(
-                        new List<DataBlockSummaryViewModel>
+                        new List<DataBlock>
                         {
-                            new DataBlockSummaryViewModel
-                            {
-                                HighlightName = "Test highlight name"
-                            },
+                            new() { Id = dataBlockId, },
                         }
                     );
 

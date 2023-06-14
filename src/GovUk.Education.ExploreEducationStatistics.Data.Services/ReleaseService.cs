@@ -154,29 +154,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
-            var subjectsToInclude = GetPublishedSubjectIds(releaseId);
+            var publishedSubjectIds = GetPublishedSubjectIds(releaseId);
 
-            var releaseContentBlocks = await _contentDbContext.ReleaseContentBlocks
-                .Include(rcb => rcb.ContentBlock)
-                .Where(rcb => rcb.ReleaseId == releaseId)
-                .Select(rcb => rcb.ContentBlock)
-                .OfType<DataBlock>()
-                .Where(dataBlock => !string.IsNullOrEmpty(dataBlock.HighlightName))
+            var releaseDataBlockList = (await _contentDbContext.ReleaseContentBlocks
+                    .Include(rcb => rcb.ContentBlock)
+                    .Where(rcb => rcb.ReleaseId == releaseId)
+                    .Select(rcb => rcb.ContentBlock)
+                    .OfType<DataBlock>()
+                    .ToListAsync()) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
+                .Where(dataBlock => publishedSubjectIds.Contains(dataBlock.Query.SubjectId))
+                .ToList();
+
+            var releaseDataBlockIdList = releaseDataBlockList.Select(db => db.Id).ToList();
+
+            var featuredTables = await _contentDbContext.FeaturedTables
+                .Include(ft => ft.DataBlock)
+                .Where(ft => releaseDataBlockIdList.Contains(ft.DataBlockId))
+                .OrderBy(ft => ft.Order)
+                .ThenBy(ft => ft.Name)
                 .ToListAsync();
 
-            // Need to query on materialized list due to JSON serialized query
-            return releaseContentBlocks
-                .Where(dataBlock => subjectsToInclude.Contains(dataBlock.Query.SubjectId))
-                .Select(
-                    dataBlock => new FeaturedTableViewModel
-                    (
-                        dataBlock.Id,
-                        dataBlock.HighlightName ?? string.Empty,
-                        dataBlock.HighlightDescription ?? string.Empty,
-                        dataBlock.Query.SubjectId
-                    )
-                )
-                .OrderBy(featuredTable => featuredTable.Name)
+            return featuredTables
+                .Select(ft => new FeaturedTableViewModel(
+                    ft.Id, ft.Name, ft.Description, ft.DataBlock.Query.SubjectId, ft.DataBlockId))
                 .ToList();
         }
 

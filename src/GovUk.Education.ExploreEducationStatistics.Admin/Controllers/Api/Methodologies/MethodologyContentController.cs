@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
             _contentService = contentService;
         }
 
-        [HttpGet("methodology/{methodologyId}/content")]
+        [HttpGet("methodology/{methodologyId:guid}/content")]
         public async Task<ActionResult<ManageMethodologyContentViewModel>> GetContent(Guid methodologyId)
         {
             return await _contentService
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("methodology/{methodologyId}/content/sections/order")]
+        [HttpPut("methodology/{methodologyId:guid}/content/sections/order")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> ReorderSections(
             Guid methodologyId, Dictionary<Guid, int> newSectionOrder)
         {
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("methodology/{methodologyId}/content/sections/add")]
+        [HttpPost("methodology/{methodologyId:guid}/content/sections/add")]
         public async Task<ActionResult<ContentSectionViewModel>> AddContentSection(
             Guid methodologyId,
             [FromQuery] MethodologyContentService.ContentListType type,
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("methodology/{methodologyId}/content/section/{contentSectionId}/heading")]
+        [HttpPut("methodology/{methodologyId:guid}/content/section/{contentSectionId:guid}/heading")]
         public async Task<ActionResult<ContentSectionViewModel>> UpdateContentSectionHeading(
             Guid methodologyId, Guid contentSectionId, ContentSectionHeadingUpdateRequest request)
         {
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("methodology/{methodologyId}/content/section/{contentSectionId}")]
+        [HttpDelete("methodology/{methodologyId:guid}/content/section/{contentSectionId:guid}")]
         public async Task<ActionResult<List<ContentSectionViewModel>>> RemoveContentSection(
             Guid methodologyId, Guid contentSectionId)
         {
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("methodology/{methodologyId}/content/section/{contentSectionId}")]
+        [HttpGet("methodology/{methodologyId:guid}/content/section/{contentSectionId:guid}")]
         public async Task<ActionResult<ContentSectionViewModel>> GetContentSection(Guid methodologyId,
             Guid contentSectionId)
         {
@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("methodology/{methodologyId}/content/section/{contentSectionId}/blocks/order")]
+        [HttpPut("methodology/{methodologyId:guid}/content/section/{contentSectionId:guid}/blocks/order")]
         public async Task<ActionResult<List<IContentBlockViewModel>>> ReorderContentBlocks(
             Guid methodologyId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
         {
@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("methodology/{methodologyId}/content/section/{contentSectionId}/blocks/add")]
+        [HttpPost("methodology/{methodologyId:guid}/content/section/{contentSectionId:guid}/blocks/add")]
         public async Task<ActionResult<IContentBlockViewModel>> AddContentBlock(
             Guid methodologyId, Guid contentSectionId, ContentBlockAddRequest request)
         {
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("methodology/{methodologyId}/content/section/{contentSectionId}/block/{contentBlockId}")]
+        [HttpDelete("methodology/{methodologyId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}")]
         public async Task<ActionResult<List<IContentBlockViewModel>>> RemoveContentBlock(
             Guid methodologyId, Guid contentSectionId, Guid contentBlockId)
         {
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("methodology/{methodologyId}/content/section/{contentSectionId}/block/{contentBlockId}")]
+        [HttpPut("methodology/{methodologyId:guid}/content/section/{contentSectionId:guid}/block/{contentBlockId:guid}")]
         public async Task<ActionResult<IContentBlockViewModel>> UpdateTextBasedContentBlock(
             Guid methodologyId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request)
         {

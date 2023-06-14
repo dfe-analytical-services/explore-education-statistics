@@ -69,11 +69,11 @@ public class KeyStatisticService : IKeyStatisticService
                 keyStatisticDataBlock.ReleaseId = releaseId;
                 keyStatisticDataBlock.CreatedById = _userService.GetUserId();
 
-                var order = await _context.KeyStatistics
+                var currentMaxOrder = await _context.KeyStatistics
                     .Where(ks => ks.ReleaseId == releaseId)
                     .Select(ks => ks.Order)
                     .MaxAsync(order => (int?)order);
-                keyStatisticDataBlock.Order = order.HasValue ? order.Value + 1 : 0;
+                keyStatisticDataBlock.Order = currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
 
                 await _context.KeyStatisticsDataBlock.AddAsync(keyStatisticDataBlock);
                 await _context.SaveChangesAsync();
@@ -94,11 +94,11 @@ public class KeyStatisticService : IKeyStatisticService
                 keyStatisticText.ReleaseId = releaseId;
                 keyStatisticText.CreatedById = _userService.GetUserId();
 
-                var order = await _context.KeyStatistics
+                var currentMaxOrder = await _context.KeyStatistics
                     .Where(ks => ks.ReleaseId == releaseId)
                     .Select(ks => ks.Order)
                     .MaxAsync(order => (int?)order);
-                keyStatisticText.Order = order.HasValue ? order.Value + 1 : 0;
+                keyStatisticText.Order = currentMaxOrder.HasValue ? currentMaxOrder.Value + 1 : 0;
 
                 await _context.KeyStatisticsText.AddAsync(keyStatisticText);
                 await _context.SaveChangesAsync();

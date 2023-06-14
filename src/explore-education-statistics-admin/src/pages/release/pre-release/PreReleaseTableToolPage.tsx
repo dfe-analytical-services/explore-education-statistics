@@ -39,10 +39,6 @@ const PreReleaseTableToolPage = ({
       tableBuilderService.listReleaseSubjects(releaseId),
     ]);
 
-    const filteredFeaturedTables = featuredTables.filter(
-      highlight => highlight.id !== dataBlockId,
-    );
-
     if (dataBlockId) {
       const { table, query } = await dataBlockService.getDataBlock(dataBlockId);
 
@@ -60,7 +56,7 @@ const PreReleaseTableToolPage = ({
       return {
         initialStep: 5,
         subjects,
-        featuredTables: filteredFeaturedTables,
+        featuredTables,
         query: {
           ...query,
           publicationId,
@@ -77,7 +73,7 @@ const PreReleaseTableToolPage = ({
     return {
       initialStep: 1,
       subjects,
-      featuredTables: filteredFeaturedTables,
+      featuredTables,
       query: {
         publicationId,
         releaseId,
@@ -117,7 +113,7 @@ const PreReleaseTableToolPage = ({
                   {
                     publicationId,
                     releaseId,
-                    dataBlockId: featuredTable.id,
+                    dataBlockId: featuredTable.dataBlockId,
                   },
                 )}
               >

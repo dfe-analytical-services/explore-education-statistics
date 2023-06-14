@@ -48,17 +48,17 @@ function mapFile({ name, ...file }: AncillaryFileInfo): AncillaryFile {
 }
 
 const releaseAncillaryFileService = {
-  getAncillaryFiles(releaseId: string): Promise<AncillaryFile[]> {
+  listFiles(releaseId: string): Promise<AncillaryFile[]> {
     return client
       .get<AncillaryFileInfo[]>(`/release/${releaseId}/ancillary`)
       .then(response => response.map(mapFile));
   },
-  getAncillaryFile(releaseId: string, fileId: string): Promise<AncillaryFile> {
+  getFile(releaseId: string, fileId: string): Promise<AncillaryFile> {
     return client
       .get<AncillaryFileInfo>(`/release/${releaseId}/file/${fileId}`)
       .then(mapFile);
   },
-  async uploadAncillaryFile(
+  async createFile(
     releaseId: string,
     request: UploadAncillaryFileRequest,
   ): Promise<AncillaryFile> {
@@ -74,7 +74,22 @@ const releaseAncillaryFileService = {
 
     return mapFile(file);
   },
-  deleteAncillaryFile(releaseId: string, fileId: string): Promise<void> {
+  async replaceFile(
+    releaseId: string,
+    fileId: string,
+    newFile: File,
+  ): Promise<AncillaryFile> {
+    const data = new FormData();
+    data.append('newFile', newFile);
+
+    const file = await client.put<AncillaryFileInfo>(
+      `release/${releaseId}/ancillary/${fileId}`,
+      data,
+    );
+
+    return mapFile(file);
+  },
+  deleteFile(releaseId: string, fileId: string): Promise<void> {
     return client.delete<void>(`/release/${releaseId}/ancillary/${fileId}`);
   },
   downloadFile(releaseId: string, id: string, fileName: string): Promise<void> {

@@ -20,7 +20,7 @@ interface Props {
   publication: Publication | ContentPublication;
 }
 const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
-  const [featuredTableId, setFeaturedTableId] = useState<string>();
+  const [dataBlockId, setDataBlockId] = useState<string>();
 
   const { value: initialState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
@@ -30,14 +30,8 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
       tableBuilderService.listReleaseSubjects(releaseId),
     ]);
 
-    const filteredFeaturedTables = featuredTables.filter(
-      table => table.id !== featuredTableId,
-    );
-
-    if (featuredTableId) {
-      const { table, query } = await dataBlockService.getDataBlock(
-        featuredTableId,
-      );
+    if (dataBlockId) {
+      const { table, query } = await dataBlockService.getDataBlock(dataBlockId);
 
       const [subjectMeta, tableData] = await Promise.all([
         tableBuilderService.getSubjectMeta(query.subjectId, releaseId),
@@ -53,7 +47,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
       return {
         initialStep: 5,
         subjects,
-        featuredTables: filteredFeaturedTables,
+        featuredTables,
         query: {
           ...query,
           publicationId: publication.id,
@@ -70,7 +64,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
     return {
       initialStep: 1,
       subjects,
-      featuredTables: filteredFeaturedTables,
+      featuredTables,
       query: {
         publicationId: publication.id,
         releaseId,
@@ -80,7 +74,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
         locationIds: [],
       },
     };
-  }, [releaseId, featuredTableId]);
+  }, [releaseId, dataBlockId]);
 
   return (
     <LoadingSpinner loading={isLoading}>
@@ -92,11 +86,11 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
             themeMeta={[]}
             hidePublicationStep
             initialState={initialState}
-            onSubjectStepBack={() => setFeaturedTableId(undefined)}
+            onSubjectStepBack={() => setDataBlockId(undefined)}
             renderFeaturedTableLink={featuredTable => (
               <ButtonText
                 onClick={() => {
-                  setFeaturedTableId(featuredTable.id);
+                  setDataBlockId(featuredTable.dataBlockId);
                 }}
               >
                 {featuredTable.name}

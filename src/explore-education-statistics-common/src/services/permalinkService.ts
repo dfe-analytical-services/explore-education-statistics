@@ -49,7 +49,11 @@ export default {
     return dataApi.post(`/permalink`, query);
   },
   async getPermalink(id: string): Promise<Permalink> {
-    return deduplicatePermalinkLocations(await dataApi.get(`/permalink/${id}`));
+    const permalink: Permalink = await dataApi.get(`/permalink/${id}`);
+    return {
+      ...permalink,
+      fullTable: deduplicatePermalinkLocations(permalink.fullTable),
+    };
   },
   async getPermalinkCsv(id: string): Promise<Blob> {
     return dataApi.get(`/permalink/${id}`, {

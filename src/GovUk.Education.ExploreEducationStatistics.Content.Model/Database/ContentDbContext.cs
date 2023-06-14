@@ -68,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public virtual DbSet<EmbedBlock> EmbedBlocks { get; set; }
         public virtual DbSet<EmbedBlockLink> EmbedBlockLinks { get; set; }
+        public virtual DbSet<FeaturedTable> FeaturedTables { get; set; }
         public virtual DbSet<MethodologyNote> MethodologyNotes { get; set; }
         public virtual DbSet<Permalink> Permalinks { get; set; } = null!;
         public virtual DbSet<Contact> Contacts { get; set; }
@@ -387,10 +388,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(block => block.Heading)
                 .HasColumnName("DataBlock_Heading");
 
+            // TODO EES-4273 Remove
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.HighlightName)
                 .HasColumnName("DataBlock_HighlightName");
 
+            // TODO EES-4273 Remove
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.HighlightDescription)
                 .HasColumnName("DataBlock_HighlightDescription");
@@ -432,6 +435,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("Body");
+
+            modelBuilder.Entity<FeaturedTable>()
+                .HasOne(ft => ft.DataBlock)
+                .WithOne();
 
             modelBuilder.Entity<Permalink>()
                 .Property(permalink => permalink.Created)
