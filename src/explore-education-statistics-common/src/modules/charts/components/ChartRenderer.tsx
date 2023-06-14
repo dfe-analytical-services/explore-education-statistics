@@ -29,7 +29,9 @@ export type ChartRendererProps = {
     } & HorizontalBarProps)
   | ({
       type: 'map';
-    } & Omit<MapBlockProps, 'id'>)
+    } & Omit<MapBlockProps, 'id'> & {
+        boundaryLevel?: number;
+      })
   | ({
       type: 'infographic';
     } & InfographicChartProps)

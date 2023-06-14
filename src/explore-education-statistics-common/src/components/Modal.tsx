@@ -8,7 +8,6 @@ export interface ModalProps {
   className?: string;
   closeOnOutsideClick?: boolean;
   closeOnEsc?: boolean;
-  disabled?: boolean;
   fullScreen?: boolean;
   hideTitle?: boolean;
   open?: boolean;
