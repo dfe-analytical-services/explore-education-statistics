@@ -35,11 +35,11 @@ function HelpSupportPage() {
           </section>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Find statistics and data</h2>
-            The service contains all of DfE's published official
-            statistics.
+            The service contains all of DfE's published official statistics.
             <p>
               To find specific sets of statistics currently published via the
-              service, browse our <a href="/find-statistics">Find statistics and data</a> section.
+              service, browse our{' '}
+              <a href="/find-statistics">Find statistics and data</a> section.
             </p>
             <p>
               To find out about the methodology behind the specific statistics
@@ -60,10 +60,8 @@ function HelpSupportPage() {
             </h2>
             <p>
               To create your own tables and explore the data we have available
-              via the service use the table tool
-              available in our{' '}
-              <a href="/data-tables">Create your own tables</a>{' '}
-              section.
+              via the service use the table tool available in our{' '}
+              <a href="/data-tables">Create your own tables</a> section.
             </p>
             <p>
               You can use our table tool to choose the data and area of
@@ -72,12 +70,12 @@ function HelpSupportPage() {
             </p>
             <p>
               Once you've created your table, you can download the data it
-              contains for your own offline analysis, or share a permanement 
+              contains for your own offline analysis, or share a permanement
               webpage of the created table.
             </p>
             <p>
-              You can also download full data files of those statistics currently
-              published via the service through our{' '}
+              You can also download full data files of those statistics
+              currently published via the service through our{' '}
               <a href="/data-catalogue">Data catalogue</a>.
             </p>
             <p>
@@ -94,8 +92,7 @@ function HelpSupportPage() {
             <p>
               Sign up by selecting the 'Sign up for email alerts' link found at
               the top of the pages found under{' '}
-              <a href="/find-statistics">Find statistics and data</a>
-              .
+              <a href="/find-statistics">Find statistics and data</a>.
             </p>
             <p>
               You'll then be sent an email alert with a link to the latest
