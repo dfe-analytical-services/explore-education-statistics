@@ -32,7 +32,7 @@ const PrototypePreviewSubject = ({
         className="govuk-!-margin-bottom-6 govuk-!-padding-left-3 govuk-link govuk-back-link"
         onClick={onClose}
       >
-        Back to API datasets
+        Back to API data sets
       </ButtonText>
 
       <section>
@@ -58,7 +58,7 @@ const PrototypePreviewSubject = ({
               <FormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"
-                label="Available datasets"
+                label="Available data sets"
                 options={subjects.map(s => ({
                   label: s.title,
                   value: s.id,

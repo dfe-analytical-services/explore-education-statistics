@@ -13,7 +13,7 @@ interface Props {
   grouped: boolean;
   heading: string;
   items: [Facet, Facet][];
-  type: 'mapped' | 'unmapped' | 'new';
+  type: 'mapped' | 'unmapped' | 'new' | 'noMappings';
   onClick?: (id: string) => void;
 }
 
@@ -27,8 +27,8 @@ const PrototypeFacetList = ({
   const Inner = () => (
     <div className={styles.container}>
       <div aria-hidden className="dfe-flex">
-        <span className={styles.heading}>Current dataset</span>
-        <span className={styles.heading}>New dataset</span>
+        <span className={styles.heading}>Current data set</span>
+        <span className={styles.heading}>New data set</span>
       </div>
       {items.map((item, index) => {
         return (

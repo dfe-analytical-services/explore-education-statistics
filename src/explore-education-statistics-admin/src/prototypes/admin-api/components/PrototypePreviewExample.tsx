@@ -39,7 +39,7 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
               </div>
             )}
             {!initialVersion && (
-              <ChangelogExample versionUpdate="Minor" showNotes />
+              <ChangelogExample /> // TO DO this won't be in context so will need to fix
             )}
           </>
         </TabsSection>

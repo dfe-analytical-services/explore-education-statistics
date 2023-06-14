@@ -24,7 +24,7 @@ interface Props {
   name: string;
   newItems: MapItem[];
   onClose: () => void;
-  onSubmit: (id: string) => void;
+  onSubmit: (id?: string) => void;
 }
 
 const PrototypeMapFacetModal = ({
@@ -71,7 +71,7 @@ const PrototypeMapFacetModal = ({
       >
         <Form id="form" showSubmitError>
           <div className={styles.inner}>
-            <h3>Current dataset {name}</h3>
+            <h3>Current data set {name}</h3>
             <SummaryList className="govuk-!-margin-bottom-5">
               <SummaryListItem term="Label">{itemToMap.label}</SummaryListItem>
               {itemToMap.group && (
@@ -101,7 +101,7 @@ const PrototypeMapFacetModal = ({
                 {itemToMap.id}
               </SummaryListItem>
             </SummaryList>
-            <h3>Next dataset {name}</h3>
+            <h3>Next data set {name}</h3>
             <p>
               Choose a {name} that will be mapped to the current data set
               location (see above).
@@ -152,7 +152,7 @@ const PrototypeMapFacetModal = ({
             <Button
               variant="warning"
               className="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-!-margin-left-4"
-              onClick={onClose}
+              onClick={() => onSubmit()}
             >
               No mapping available (major update)
             </Button>

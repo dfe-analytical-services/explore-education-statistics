@@ -1,4 +1,3 @@
-import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useMounted from '@common/hooks/useMounted';
@@ -6,13 +5,23 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
-import { Form, FormFieldset } from '@common/components/form';
+import {
+  Form,
+  FormFieldRadioGroup,
+  FormFieldTextArea,
+  FormFieldset,
+} from '@common/components/form';
 import { Formik } from 'formik';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ChangelogExample from './PrototypeChangelogExamples';
+import {
+  VersionType,
+  usePrototypeNextSubjectContext,
+} from '../contexts/PrototypeNextSubjectContext';
 
 interface FormValues {
-  subjectId: string;
+  versionNotes?: string;
+  versionType: VersionType;
 }
 
 const PrototypePrepareNextSubjectStep5 = ({
@@ -20,8 +29,32 @@ const PrototypePrepareNextSubjectStep5 = ({
 }: InjectedWizardProps) => {
   const { isMounted } = useMounted();
   const { isActive, goToNextStep } = stepProps;
-  const [versionType, setVersionType] = useState(false);
-  const [versionNotes, setVersionNotes] = useState('');
+
+  const {
+    versionNotes,
+    versionType,
+    setVersionNotes,
+    setVersionType,
+    locations,
+    filters,
+    indicators,
+  } = usePrototypeNextSubjectContext();
+
+  const [initialVersionType, setInitialVersionType] = useState<VersionType>(
+    versionType,
+  );
+
+  useEffect(() => {
+    if (
+      locations.noMappingItems.length ||
+      filters.noMappingItems.length ||
+      indicators.noMappingItems.length
+    ) {
+      setInitialVersionType('major');
+      setVersionType('major');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locations, filters, indicators]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
@@ -35,9 +68,12 @@ const PrototypePrepareNextSubjectStep5 = ({
         <div className="govuk-grid-column-two-thirds">
           <Formik<FormValues>
             initialValues={{
-              subjectId: '',
+              versionNotes,
+              versionType: initialVersionType,
             }}
-            onSubmit={() => {
+            onSubmit={values => {
+              setVersionNotes(values.versionNotes);
+              setVersionType(values.versionType);
               goToNextStep();
             }}
           >
@@ -45,97 +81,51 @@ const PrototypePrepareNextSubjectStep5 = ({
               <Form id="form">
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
-                    <label htmlFor="deprecationNotes">
-                      Version notes
-                      <span className="govuk-hint">
-                        Use notes to highlight any extra guidance that may not
-                        be apparent in the automated changelog below
-                      </span>
-                    </label>
-                    <textarea
-                      className="govuk-textarea"
-                      id="versionNotes"
-                      onChange={e => {
-                        setVersionNotes(e.target.value);
-                      }}
+                    <FormFieldTextArea<FormValues>
+                      hint="Use notes to highlight any extra guidance that may not
+                      be apparent in the automated changelog below"
+                      label="Version notes"
+                      name="versionNotes"
+                      rows={3}
                     />
 
                     <fieldset className="govuk-fieldset govuk-!-margin-top-9 govuk-!-margin-bottom-9">
-                      <legend className="govuk-legend govuk-fieldset__legend">
-                        <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-                          Changes on current live version (version 1.0)
-                        </h3>
-                      </legend>
-                      <div className="govuk-radios">
-                        <div className="govuk-radios__item">
-                          <input
-                            type="radio"
-                            className="govuk-radios__input"
-                            name="version-type"
-                            id="version-minor"
-                            checked={!versionType}
-                            onClick={() => {
-                              setVersionType(false);
-                            }}
-                          />
-                          <label
-                            className={classNames(
-                              'govuk-label',
-                              'govuk-radios__label',
-                            )}
-                            htmlFor="version-minor"
-                          >
-                            Minor
-                          </label>
-                        </div>
-
-                        <div className="govuk-radios__item">
-                          <input
-                            type="radio"
-                            className="govuk-radios__input"
-                            name="version-type"
-                            id="version-major"
-                            onClick={() => {
-                              setVersionType(true);
-                            }}
-                          />
-                          <label
-                            className={classNames(
-                              'govuk-label',
-                              'govuk-radios__label',
-                            )}
-                            htmlFor="version-major"
-                          >
-                            Major
-                          </label>
-                        </div>
-                      </div>
+                      <FormFieldRadioGroup<FormValues>
+                        legend="Changes on current live version (version 1.0)"
+                        name="versionType"
+                        onChange={event =>
+                          setVersionType(event.target.value as VersionType)
+                        }
+                        order={[]}
+                        options={[
+                          {
+                            label: 'Minor',
+                            value: 'minor',
+                            disabled: initialVersionType === 'major',
+                          },
+                          {
+                            label: 'Major',
+                            value: 'major',
+                          },
+                        ]}
+                      />
                     </fieldset>
 
-                    {!versionType && (
-                      <>
-                        <h3>Minor update changelog</h3>
-                        <h3 className="govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-heading-s">
-                          New API data set version number
-                        </h3>
-                        <p>1.1</p>
-                        <ChangelogExample versionUpdate="Minor" />
-                      </>
-                    )}
-                    {versionType && (
-                      <>
-                        <h3>Major update changelog</h3>
-                        <h3 className="govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-heading-s">
-                          New API data set version number
-                        </h3>
-                        <p>2.0</p>
-                        <ChangelogExample versionUpdate="Major" />
-                      </>
-                    )}
+                    <h3>
+                      {versionType === 'major'
+                        ? 'Major update changelog'
+                        : 'Minor update changelog'}
+                    </h3>
+                    <p className="govuk-!-margin-top-6 govuk-!-margin-bottom-0 govuk-heading-s">
+                      New API data set version number
+                    </p>
+                    <p>{versionType === 'major' ? '2.0' : '1.1'}</p>
+
+                    <ChangelogExample />
                   </>
                 </FormFieldset>
                 <WizardStepFormActions
-                  submitText="Next step - complete this API dataset version"
+                  submitText="Next step - complete this API data set version"
                   {...stepProps}
                 />
               </Form>
@@ -152,16 +142,16 @@ const PrototypePrepareNextSubjectStep5 = ({
 
       <SummaryList noBorder>
         <SummaryListItem term="Dataset for next release">
-          {!versionType ? 'Minor update' : 'Major update'}
+          {versionType === 'minor' ? 'Minor update' : 'Major update'}
         </SummaryListItem>
         <SummaryListItem term="Next release version">
-          {versionType ? '2.0' : '1.1'}
+          {versionType === 'major' ? '2.0' : '1.1'}
         </SummaryListItem>
         <SummaryListItem term="Notes">
           <div style={{ whiteSpace: 'pre-wrap' }}>{versionNotes}</div>
         </SummaryListItem>
         <SummaryListItem term="Changelog">
-          <ChangelogExample versionUpdate={!versionType ? 'Minor' : 'Major'} />
+          <ChangelogExample />
         </SummaryListItem>
       </SummaryList>
     </WizardStepSummary>

@@ -15,6 +15,13 @@ export const unmappedLocations: MapItem[] = [
     label: 'Kingston upon Hull, City of',
     region: 'Yorkshire and The Humber',
   },
+  {
+    id: 'location-9',
+    code: 'E000000009',
+    level: 'Local Authority',
+    label: 'Chester',
+    region: 'Cheshire',
+  },
 ];
 
 export const newLocations: MapItem[] = [

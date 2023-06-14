@@ -9,53 +9,62 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Link from '@admin/components/Link';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import capitalize from 'lodash/capitalize';
 import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
+import FormattedDate from '@common/components/FormattedDate';
+
 import {
   subjectsForRelease1,
   PublicationSubject,
   subjectsForRelease2,
 } from '../PrototypePublicationSubjects';
 import PreviewExample from './PrototypePreviewExample';
+import PrototypeChangeStatusForm, {
+  StatusFormValues,
+} from './PrototypeChangeStatusForm';
 
 interface Props {
   isCurrentReleasePublished?: boolean;
   publicationSubjects: PublicationSubject[];
-  onEditTitle: (publicationSubject: PublicationSubject) => void;
   onEditSubject: (publicationSubject: PublicationSubject) => void;
-  onPreviewSubject: (publicationSubject: PublicationSubject) => void;
 }
 
 const PrototypePublicationSubjectList = ({
   isCurrentReleasePublished,
   publicationSubjects,
-  onEditTitle,
   onEditSubject,
-  onPreviewSubject,
 }: Props) => {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [archiveList, setArchiveList] = useState(false);
   const [statusModal, toggleStatusModal] = useToggle(false);
   const [statusNotesModal, toggleStatusNotesModal] = useToggle(false);
+  const [changelogModal, toggleChangelogModal] = useToggle(false);
   const [selectedVersion, setSelectedVersion] = useState('');
-  const [showDeprecationNotes, setShowDeprecationNotes] = useState(false);
-
-  const [selectedVersionStatus1, setSelectedVersionStatus1] = useState('Live');
-  const [selectedVersionStatus2, setSelectedVersionStatus2] = useState('Live');
-  const [selectedVersionStatus3, setSelectedVersionStatus3] = useState('Live');
-  const [deprecationNotes1, setDeprecationNotes1] = useState('');
-  const [deprecationNotes2, setDeprecationNotes2] = useState('');
-  const [deprecationNotes3, setDeprecationNotes3] = useState('');
-  const [deprecationDate1, setDeprecationDate1] = useState('');
-  const [deprecationDate2, setDeprecationDate2] = useState('');
-  const [deprecationDate3, setDeprecationDate3] = useState('');
 
   const [previewInitialDataset, setPreviewInitialDataset] = useState(false);
   const [previewDataset, setPreviewDataset] = useState(false);
 
-  const [deprecationNotesValue, setDeprecationNotesValue] = useState('');
-  const [deprecationDateValue, setDeprecationDateValue] = useState('');
+  const [version1Status, setVersion1Status] = useState<StatusFormValues>({
+    status: 'live',
+  });
+  const [version2Status, setVersion2Status] = useState<StatusFormValues>({
+    status: 'live',
+  });
+  const [version3Status, setVersion3Status] = useState<StatusFormValues>({
+    status: 'live',
+  });
 
+  function getStatus() {
+    if (selectedVersion === '2.1') {
+      return version1Status;
+    }
+    if (selectedVersion === '2.0') {
+      return version2Status;
+    }
+    return version3Status;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const params: any = useParams();
 
   const currentRelease =
@@ -89,7 +98,7 @@ const PrototypePublicationSubjectList = ({
                     }
                     headingTag="h3"
                     open
-                    key={publicationSubject.title}
+                    key={publicationSubject.subjectId}
                   >
                     <SummaryList className="govuk-!-margin-bottom-9">
                       <SummaryListItem
@@ -181,12 +190,10 @@ const PrototypePublicationSubjectList = ({
                               {subject.release === currentRelease && (
                                 <ButtonText
                                   className="govuk-!-margin-right-3 govuk-!-margin-left-0"
-                                  onClick={e => {
-                                    e.preventDefault();
+                                  onClick={() => {
                                     setPreviewInitialDataset(
                                       !previewInitialDataset,
                                     );
-                                    // onPreviewSubject(publicationSubject);
                                   }}
                                 >
                                   {!previewInitialDataset
@@ -327,16 +334,16 @@ const PrototypePublicationSubjectList = ({
                                 <div
                                   className={classNames(
                                     'govuk-tag',
-                                    selectedVersionStatus1 === 'Deprecated'
+                                    version1Status.status === 'deprecated'
                                       ? 'govuk-tag--red'
                                       : '',
                                   )}
                                 >
-                                  {selectedVersionStatus1}
+                                  {capitalize(version1Status.status)}
                                 </div>{' '}
                               </td>
                               <td className="govuk-table__header--numeric">
-                                {selectedVersionStatus1 === 'Deprecated' && (
+                                {version1Status.status === 'deprecated' && (
                                   <>
                                     {' '}
                                     <a
@@ -344,21 +351,17 @@ const PrototypePublicationSubjectList = ({
                                       onClick={e => {
                                         e.preventDefault();
                                         setSelectedVersion('2.1');
-                                        toggleStatusNotesModal(true);
-                                        setDeprecationNotesValue(
-                                          deprecationNotes1,
-                                        );
-                                        setDeprecationDateValue(
-                                          deprecationDate1,
-                                        );
+                                        toggleStatusNotesModal.on();
                                       }}
                                     >
                                       View notes
                                     </a>
                                   </>
                                 )}
-                                {selectedVersionStatus1 !== 'Deprecated' && (
-                                  <a href="#">View changelog</a>
+                                {version1Status.status !== 'deprecated' && (
+                                  <ButtonText onClick={toggleChangelogModal.on}>
+                                    View changelog
+                                  </ButtonText>
                                 )}
                               </td>
                               <td className="govuk-table__header--numeric">
@@ -367,16 +370,7 @@ const PrototypePublicationSubjectList = ({
                                   onClick={e => {
                                     e.preventDefault();
                                     setSelectedVersion('2.1');
-                                    toggleStatusModal(true);
-                                    setDeprecationNotesValue(deprecationNotes1);
-                                    setDeprecationDateValue(deprecationDate1);
-                                    if (
-                                      selectedVersionStatus1 === 'Deprecated'
-                                    ) {
-                                      setShowDeprecationNotes(true);
-                                    } else {
-                                      setShowDeprecationNotes(false);
-                                    }
+                                    toggleStatusModal.on();
                                   }}
                                 >
                                   Set status
@@ -390,16 +384,16 @@ const PrototypePublicationSubjectList = ({
                                 <div
                                   className={classNames(
                                     'govuk-tag',
-                                    selectedVersionStatus2 === 'Deprecated'
+                                    version2Status.status === 'deprecated'
                                       ? 'govuk-tag--red'
                                       : '',
                                   )}
                                 >
-                                  {selectedVersionStatus2}
+                                  {version2Status.status}
                                 </div>{' '}
                               </td>
                               <td className="govuk-table__header--numeric">
-                                {selectedVersionStatus2 === 'Deprecated' && (
+                                {version2Status.status === 'deprecated' && (
                                   <>
                                     {' '}
                                     <a
@@ -407,21 +401,17 @@ const PrototypePublicationSubjectList = ({
                                       onClick={e => {
                                         e.preventDefault();
                                         setSelectedVersion('2.0');
-                                        toggleStatusNotesModal(true);
-                                        setDeprecationNotesValue(
-                                          deprecationNotes2,
-                                        );
-                                        setDeprecationDateValue(
-                                          deprecationDate2,
-                                        );
+                                        toggleStatusNotesModal.on();
                                       }}
                                     >
                                       View notes
                                     </a>
                                   </>
                                 )}
-                                {selectedVersionStatus2 !== 'Deprecated' && (
-                                  <a href="#">View changelog</a>
+                                {version2Status.status !== 'deprecated' && (
+                                  <ButtonText onClick={toggleChangelogModal.on}>
+                                    View changelog
+                                  </ButtonText>
                                 )}
                               </td>
                               <td className="govuk-table__header--numeric">
@@ -430,16 +420,7 @@ const PrototypePublicationSubjectList = ({
                                   onClick={e => {
                                     e.preventDefault();
                                     setSelectedVersion('2.0');
-                                    toggleStatusModal(true);
-                                    setDeprecationNotesValue(deprecationNotes2);
-                                    setDeprecationDateValue(deprecationDate2);
-                                    if (
-                                      selectedVersionStatus2 === 'Deprecated'
-                                    ) {
-                                      setShowDeprecationNotes(true);
-                                    } else {
-                                      setShowDeprecationNotes(false);
-                                    }
+                                    toggleStatusModal.on();
                                   }}
                                 >
                                   Set status
@@ -453,16 +434,16 @@ const PrototypePublicationSubjectList = ({
                                 <div
                                   className={classNames(
                                     'govuk-tag',
-                                    selectedVersionStatus3 === 'Deprecated'
+                                    version3Status.status === 'deprecated'
                                       ? 'govuk-tag--red'
                                       : '',
                                   )}
                                 >
-                                  {selectedVersionStatus3}
+                                  {version3Status.status}
                                 </div>{' '}
                               </td>
                               <td className="govuk-table__header--numeric">
-                                {selectedVersionStatus3 === 'Deprecated' && (
+                                {version3Status.status === 'deprecated' && (
                                   <>
                                     {' '}
                                     <a
@@ -470,21 +451,17 @@ const PrototypePublicationSubjectList = ({
                                       onClick={e => {
                                         e.preventDefault();
                                         setSelectedVersion('1.0');
-                                        toggleStatusNotesModal(true);
-                                        setDeprecationNotesValue(
-                                          deprecationNotes3,
-                                        );
-                                        setDeprecationDateValue(
-                                          deprecationDate3,
-                                        );
+                                        toggleStatusNotesModal.on();
                                       }}
                                     >
                                       View notes
                                     </a>
                                   </>
                                 )}
-                                {selectedVersionStatus3 !== 'Deprecated' && (
-                                  <a href="#">View changelog</a>
+                                {version3Status.status !== 'deprecated' && (
+                                  <ButtonText onClick={toggleChangelogModal.on}>
+                                    View changelog
+                                  </ButtonText>
                                 )}
                               </td>
                               <td className="govuk-table__header--numeric">
@@ -493,17 +470,7 @@ const PrototypePublicationSubjectList = ({
                                   onClick={e => {
                                     e.preventDefault();
                                     setSelectedVersion('1.0');
-                                    toggleStatusModal(true);
-                                    setDeprecationNotesValue(deprecationNotes3);
-                                    setDeprecationDateValue(deprecationDate3);
-
-                                    if (
-                                      selectedVersionStatus3 === 'Deprecated'
-                                    ) {
-                                      setShowDeprecationNotes(true);
-                                    } else {
-                                      setShowDeprecationNotes(false);
-                                    }
+                                    toggleStatusModal.on();
                                   }}
                                 >
                                   Set status
@@ -517,206 +484,21 @@ const PrototypePublicationSubjectList = ({
                           title={`API data set version ${selectedVersion}`}
                           className="govuk-!-width-one-half"
                         >
-                          <form action="#">
-                            <fieldset className="govuk-fieldset govuk-!-margin-top-9">
-                              <legend className="govuk-legend govuk-fieldset__legend">
-                                <h3 className="govuk-heading-m govuk-!-margin-bottom-2">
-                                  Change status of this API data set
-                                </h3>
-                              </legend>
-                              <div className="govuk-radios">
-                                <div className="govuk-radios__item">
-                                  <input
-                                    type="radio"
-                                    className="govuk-radios__input"
-                                    name="versionStatus"
-                                    id="versionActive"
-                                    checked={
-                                      (selectedVersion === '2.1' &&
-                                        selectedVersionStatus1 === 'Live') ||
-                                      (selectedVersion === '2.0' &&
-                                        selectedVersionStatus2 === 'Live') ||
-                                      (selectedVersion === '1.0' &&
-                                        selectedVersionStatus3 === 'Live')
-                                    }
-                                    onClick={() => {
-                                      setShowDeprecationNotes(false);
-                                      if (selectedVersion === '2.1') {
-                                        setSelectedVersionStatus1('Live');
-                                      }
-                                      if (selectedVersion === '2.0') {
-                                        setSelectedVersionStatus2('Live');
-                                      }
-                                      if (selectedVersion === '1.0') {
-                                        setSelectedVersionStatus3('Live');
-                                      }
-                                    }}
-                                  />
-                                  <label
-                                    className={classNames(
-                                      'govuk-label',
-                                      'govuk-radios__label',
-                                    )}
-                                    htmlFor="version-minor"
-                                  >
-                                    Live
-                                  </label>
-                                </div>
-
-                                <div className="govuk-radios__item">
-                                  <input
-                                    type="radio"
-                                    className="govuk-radios__input"
-                                    name="versionStatus"
-                                    id="versionDeprecated"
-                                    checked={
-                                      (selectedVersion === '2.1' &&
-                                        selectedVersionStatus1 ===
-                                          'Deprecated') ||
-                                      (selectedVersion === '2.0' &&
-                                        selectedVersionStatus2 ===
-                                          'Deprecated') ||
-                                      (selectedVersion === '1.0' &&
-                                        selectedVersionStatus3 === 'Deprecated')
-                                    }
-                                    onClick={() => {
-                                      if (selectedVersion === '2.1') {
-                                        setSelectedVersionStatus1('Deprecated');
-                                        setShowDeprecationNotes(true);
-                                      }
-                                      if (selectedVersion === '2.0') {
-                                        setSelectedVersionStatus2('Deprecated');
-                                        setShowDeprecationNotes(true);
-                                      }
-                                      if (selectedVersion === '1.0') {
-                                        setSelectedVersionStatus3('Deprecated');
-                                        setShowDeprecationNotes(true);
-                                      }
-                                    }}
-                                  />
-                                  <label
-                                    className={classNames(
-                                      'govuk-label',
-                                      'govuk-radios__label',
-                                    )}
-                                    htmlFor="version-major"
-                                  >
-                                    Deprecate
-                                  </label>
-                                </div>
-                                {showDeprecationNotes && (
-                                  <div className="govuk-radios__conditional">
-                                    {' '}
-                                    <label htmlFor="deprecationNotes">
-                                      Notes
-                                      <span className="govuk-hint">
-                                        These notes will be appended to the
-                                        published API dataset. They are used to
-                                        explain to the public users why this
-                                        data set is being deprecated.
-                                      </span>
-                                    </label>
-                                    <textarea
-                                      className="govuk-textarea"
-                                      id="deprectationNotes"
-                                      onChange={e => {
-                                        if (selectedVersion === '2.1') {
-                                          setDeprecationNotes1(e.target.value);
-                                        }
-                                        if (selectedVersion === '2.0') {
-                                          setDeprecationNotes2(e.target.value);
-                                        }
-                                        if (selectedVersion === '1.0') {
-                                          setDeprecationNotes3(e.target.value);
-                                        }
-                                      }}
-                                    >
-                                      {deprecationNotesValue}
-                                    </textarea>
-                                    <fieldset className="govuk-fieldset govuk-!-margin-top-9">
-                                      <legend className="govuk-legend govuk-fieldset__legend">
-                                        <h3 className="govuk-heading-s govuk-!-margin-bottom-2">
-                                          Date of deprecation
-                                        </h3>
-                                      </legend>
-                                      <p className="govuk-hint">
-                                        The date helps give users advance
-                                        warning of when the data set will be
-                                        deprecated. If you don't yet know a
-                                        precise date, just add an estimated
-                                        month leaving the day blank.
-                                      </p>
-                                      <div className="govuk-date-input">
-                                        <div className="govuk-date-input__item">
-                                          <div className="govuk-form-group">
-                                            <label
-                                              htmlFor="date-day"
-                                              className="govuk-label govuk-date-input__label"
-                                            >
-                                              Day
-                                            </label>
-                                            <input
-                                              type="number"
-                                              className="govuk-input govuk-date-input__input govuk-input--width-2"
-                                              name="date-day"
-                                              id="date-day"
-                                              inputMode="numeric"
-                                            />
-                                          </div>
-                                        </div>
-                                        <div className="govuk-date-input__item">
-                                          <div className="govuk-form-group">
-                                            <label
-                                              htmlFor="date-month-year"
-                                              className="govuk-label govuk-date-input__label"
-                                            >
-                                              Month / Year
-                                            </label>
-                                            <input
-                                              type="month"
-                                              className="govuk-input govuk-date-input__input"
-                                              name="date-month-year"
-                                              id="date-month-year"
-                                              inputMode="numeric"
-                                              defaultValue={
-                                                deprecationDateValue
-                                              }
-                                              onChange={e => {
-                                                if (selectedVersion === '2.1') {
-                                                  setDeprecationDate1(
-                                                    e.target.value,
-                                                  );
-                                                }
-                                                if (selectedVersion === '2.0') {
-                                                  setDeprecationDate2(
-                                                    e.target.value,
-                                                  );
-                                                }
-                                                if (selectedVersion === '1.0') {
-                                                  setDeprecationDate3(
-                                                    e.target.value,
-                                                  );
-                                                }
-                                              }}
-                                            />
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </fieldset>
-                                  </div>
-                                )}
-                              </div>
-                            </fieldset>
-                          </form>
-                          <Button
-                            className="govuk-!-margin-top-9"
-                            onClick={() => {
-                              toggleStatusModal(false);
+                          <PrototypeChangeStatusForm
+                            selectedStatus={getStatus()}
+                            onSubmit={values => {
+                              if (selectedVersion === '2.1') {
+                                setVersion1Status(values);
+                              } else if (selectedVersion === '2.0') {
+                                setVersion2Status(values);
+                              } else {
+                                setVersion3Status(values);
+                              }
+                              toggleStatusModal.off();
                             }}
-                          >
-                            Update
-                          </Button>
+                          />
                         </Modal>
+
                         <Modal
                           open={statusNotesModal}
                           title={`Deprecated API data set, version ${selectedVersion}`}
@@ -729,44 +511,50 @@ const PrototypePublicationSubjectList = ({
                           >
                             {selectedVersion === '2.1' && (
                               <>
-                                <p>{deprecationNotes1}</p>
+                                <p>{version1Status.notes}</p>
                                 <h3 className="govuk-heading-s">
                                   Deprecation date
                                 </h3>
-                                <input
-                                  style={{ border: 'none' }}
-                                  type="month"
-                                  readOnly
-                                  value={deprecationDate1}
-                                />
+
+                                <p>
+                                  {version1Status.date && (
+                                    <FormattedDate format="d MMM yyyy">
+                                      {version1Status.date}
+                                    </FormattedDate>
+                                  )}
+                                </p>
                               </>
                             )}
                             {selectedVersion === '2.0' && (
                               <>
-                                <p>{deprecationNotes2}</p>
+                                <p>{version2Status.notes}</p>
                                 <h3 className="govuk-heading-s">
                                   Deprecation date
                                 </h3>
-                                <input
-                                  style={{ border: 'none' }}
-                                  type="month"
-                                  readOnly
-                                  value={deprecationDate2}
-                                />
+
+                                <p>
+                                  {version2Status.date && (
+                                    <FormattedDate format="d MMM yyyy">
+                                      {version2Status.date}
+                                    </FormattedDate>
+                                  )}
+                                </p>
                               </>
                             )}
                             {selectedVersion === '1.0' && (
                               <>
-                                <p>{deprecationNotes3}</p>
+                                <p>{version3Status.notes}</p>
                                 <h3 className="govuk-heading-s">
                                   Deprecation date
                                 </h3>
-                                <input
-                                  style={{ border: 'none' }}
-                                  type="month"
-                                  readOnly
-                                  value={deprecationDate3}
-                                />
+
+                                <p>
+                                  {version3Status.date && (
+                                    <FormattedDate format="d MMM yyyy">
+                                      {version3Status.date}
+                                    </FormattedDate>
+                                  )}
+                                </p>
                               </>
                             )}
                           </div>
@@ -777,6 +565,28 @@ const PrototypePublicationSubjectList = ({
                           >
                             Close
                           </Button>
+                        </Modal>
+
+                        <Modal
+                          open={changelogModal}
+                          title="Changelog"
+                          className="govuk-!-width-one-half"
+                          onExit={toggleChangelogModal.off}
+                        >
+                          <>
+                            <h3>Version notes</h3>
+                            <p>
+                              This is a minor update on the previous version,
+                              some new locations, filters and indicators have
+                              been added to the data set since the previous
+                              release, please see the details in the changelog
+                              below.
+                            </p>
+
+                            <Button onClick={toggleChangelogModal.off}>
+                              Close
+                            </Button>
+                          </>
                         </Modal>
                       </>
                     )}

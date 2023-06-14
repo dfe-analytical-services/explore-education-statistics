@@ -9,48 +9,50 @@ import { Form, FormFieldset } from '@common/components/form';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import Yup from '@common/validation/yup';
-import isEqual from 'lodash/isEqual';
+import capitalize from 'lodash/capitalize';
 import PrototypeFacetList from './PrototypeFacetList';
 import PrototypeMapFacetModal from './PrototypeMapFacetModal';
 import { MapItem } from '../PrototypePrepareNextSubjectPage';
 import PrototypeUnmapFacetModal from './PrototypeUnmapFacetModal';
+import PrototypeRemoveNoMappingFacetModal from './PrototypeRemoveNoMappingFacetModal';
+import {
+  FacetType,
+  Items,
+  usePrototypeNextSubjectContext,
+} from '../contexts/PrototypeNextSubjectContext';
 
 interface Props extends InjectedWizardProps {
-  mappedItems: MapItem[];
-  newItems: MapItem[];
-  unmappedItems: MapItem[];
-  name: string;
+  name: FacetType;
 }
 
-const PrototypePrepareNextSubjectStep2 = ({
-  mappedItems: initialMappedItems,
-  newItems: initialNewItems,
-  unmappedItems: initialUnmappedItems,
-  name,
-  ...stepProps
-}: Props) => {
+const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
+  const namePlural = `${name}s`;
   const { isActive, goToNextStep } = stepProps;
   const { isMounted } = useMounted();
+
+  const state = usePrototypeNextSubjectContext();
+  const allItems = state[namePlural as keyof typeof state] as Items;
+
+  const { mappedItems, unmappedItems, newItems, noMappingItems } = allItems;
+  const {
+    onAddNoMappingItem,
+    onMapItem,
+    onRemoveNoMappingItem,
+    onUnmapItem,
+  } = state;
+
   const [itemToMap, setItemToMap] = useState<MapItem | undefined>(undefined);
   const [itemToUnmap, setItemToUnmap] = useState<
     [MapItem, MapItem] | undefined
   >(undefined);
-  const namePlural = `${name}s`;
+  const [itemToRemoveNoMapping, setItemToRemoveNoMapping] = useState<
+    MapItem | undefined
+  >(undefined);
 
   const grouping = name === 'location' ? 'Local authority' : 'Characteristic';
 
   const getCaption = (item: MapItem) =>
     name === 'location' ? `${item.code}, ${item.region}` : item.group;
-
-  const [unmappedItems, setUnmappedItems] = useState<MapItem[]>(
-    initialUnmappedItems,
-  );
-  const [newItems, setNewItems] = useState<MapItem[]>(initialNewItems);
-  const [mappedItems, setMappedItems] = useState<[MapItem, MapItem][]>(
-    initialMappedItems.map(item => {
-      return [item, item];
-    }),
-  );
 
   let nextStep = 'view changelog';
 
@@ -79,7 +81,7 @@ const PrototypePrepareNextSubjectStep2 = ({
               validationSchema={Yup.object({
                 unmapped: Yup.array().test({
                   name: 'whatevs',
-                  message: `All ${namePlural} from the current dataset should be mapped to the next dataset`,
+                  message: `All ${namePlural} from the current data set should be mapped to the next data set`,
                   test() {
                     if (!unmappedItems.length) {
                       return true;
@@ -97,42 +99,43 @@ const PrototypePrepareNextSubjectStep2 = ({
                   <FormFieldset id="downloadFiles" legend={stepHeading}>
                     <>
                       <p>
-                        Existing {namePlural} in the publication dataset need to
-                        be mapped to an equivalent location in the new dataset.
-                        We try to automatically match up {namePlural} that
+                        Existing {namePlural} in the publication data set need
+                        to be mapped to an equivalent location in the new data
+                        set. We try to automatically match up {namePlural} that
                         appear to be a good fit, but you should double-check
                         these choices.
                       </p>
                       <p>
-                        Any facets in the new dataset that have not been mapped
-                        will become new {namePlural} in the publication dataset.
+                        Any facets in the new data set that have not been mapped
+                        will become new {namePlural} in the publication data
+                        set.
                       </p>
                     </>
                   </FormFieldset>
 
+                  <h3>
+                    New {namePlural} ({newItems.length}){' '}
+                    <span className="govuk-tag govuk-tag--grey">
+                      No action required
+                    </span>
+                  </h3>
+
+                  <PrototypeFacetList
+                    heading={`${grouping} (${newItems.length})`}
+                    items={newItems.map(item => [
+                      { label: '' },
+                      {
+                        label: item.label,
+                        id: item.id,
+                        caption: getCaption(item),
+                      },
+                    ])}
+                    type="new"
+                    grouped={name !== 'indicator'}
+                  />
+
                   {unmappedItems.length > 0 && (
                     <>
-                      <h3>
-                        New {namePlural} ({newItems.length}){' '}
-                        <span className="govuk-tag govuk-tag--grey">
-                          No action required
-                        </span>
-                      </h3>
-
-                      <PrototypeFacetList
-                        heading={`${grouping} (${newItems.length})`}
-                        items={newItems.map(item => [
-                          { label: '' },
-                          {
-                            label: item.label,
-                            id: item.id,
-                            caption: getCaption(item),
-                          },
-                        ])}
-                        type="new"
-                        grouped={name !== 'indicator'}
-                      />
-
                       <FormFieldset
                         className="govuk-!-margin-top-6"
                         id="unmapped"
@@ -141,7 +144,7 @@ const PrototypePrepareNextSubjectStep2 = ({
                             <span style={{ textTransform: 'capitalize' }}>
                               {namePlural}{' '}
                             </span>
-                            that cannot be found in the new dataset (
+                            that cannot be found in the new data set (
                             {unmappedItems.length} of{' '}
                             {mappedItems.length + unmappedItems.length}){' '}
                             <span className="govuk-tag govuk-tag--red">
@@ -152,7 +155,7 @@ const PrototypePrepareNextSubjectStep2 = ({
                         legendSize="m"
                         error={
                           form.submitCount > 0 && unmappedItems.length
-                            ? `All ${namePlural} from the current dataset should be mapped to the next dataset`
+                            ? `All ${namePlural} from the current data set should be mapped to the next data set`
                             : undefined
                         }
                       >
@@ -181,10 +184,8 @@ const PrototypePrepareNextSubjectStep2 = ({
                   {mappedItems.length > 0 && (
                     <>
                       <h3>
-                        <span style={{ textTransform: 'capitalize' }}>
-                          {namePlural}{' '}
-                        </span>
-                        mapped to the new dataset ({mappedItems.length} of{' '}
+                        {capitalize(namePlural)} mapped to the new data set (
+                        {mappedItems.length} of{' '}
                         {mappedItems.length + unmappedItems.length}){' '}
                         <span className="govuk-tag">Please check</span>
                       </h3>
@@ -210,7 +211,7 @@ const PrototypePrepareNextSubjectStep2 = ({
                           },
                         ])}
                         type="mapped"
-                        grouped
+                        grouped={name !== 'indicator'}
                         onClick={id =>
                           setItemToUnmap(
                             mappedItems.find(item => item[0].id === id),
@@ -219,9 +220,41 @@ const PrototypePrepareNextSubjectStep2 = ({
                       />
                     </>
                   )}
+
+                  {noMappingItems.length > 0 && (
+                    <>
+                      <h3>
+                        {capitalize(namePlural)} with no mappings available (
+                        {noMappingItems.length}){' '}
+                        <span className="govuk-tag govuk-tag--red">
+                          Major updates
+                        </span>
+                      </h3>
+
+                      <PrototypeFacetList
+                        heading={`${grouping} (${noMappingItems.length})`}
+                        items={noMappingItems.map(item => [
+                          {
+                            label: item.label,
+                            id: item.id,
+                            caption: getCaption(item),
+                          },
+                          { label: 'No mapping available' },
+                        ])}
+                        type="noMappings"
+                        grouped={name !== 'indicator'}
+                        onClick={id =>
+                          setItemToRemoveNoMapping(
+                            noMappingItems.find(item => item.id === id),
+                          )
+                        }
+                      />
+                    </>
+                  )}
+
                   <WizardStepFormActions
-                    submitText={`Next -  ${nextStep}`}
                     {...stepProps}
+                    submitText={`Next -  ${nextStep}`}
                   />
                 </Form>
               )}
@@ -236,17 +269,12 @@ const PrototypePrepareNextSubjectStep2 = ({
             newItems={newItems}
             onClose={() => setItemToMap(undefined)}
             onSubmit={itemToMapToId => {
-              const newItem = newItems.find(item => item.id === itemToMapToId);
-              if (!newItem) {
-                return;
+              // no mapping available
+              if (!itemToMapToId) {
+                onAddNoMappingItem(itemToMap, name);
+              } else {
+                onMapItem(itemToMapToId, itemToMap, name);
               }
-              setUnmappedItems(items =>
-                items.filter(item => item.id !== itemToMap.id),
-              );
-              setNewItems(items =>
-                items.filter(item => item.id !== itemToMapToId),
-              );
-              setMappedItems(items => [[itemToMap, newItem], ...items]);
               setItemToMap(undefined);
             }}
           />
@@ -258,12 +286,20 @@ const PrototypePrepareNextSubjectStep2 = ({
             name={name}
             onClose={() => setItemToUnmap(undefined)}
             onSubmit={() => {
-              setMappedItems(
-                mappedItems.filter(item => !isEqual(item, itemToUnmap)),
-              );
-              setUnmappedItems(items => [itemToUnmap[0], ...items]);
-              setNewItems(items => [itemToUnmap[1], ...items]);
+              onUnmapItem(itemToUnmap, name);
               setItemToUnmap(undefined);
+            }}
+          />
+        )}
+
+        {itemToRemoveNoMapping && (
+          <PrototypeRemoveNoMappingFacetModal
+            item={itemToRemoveNoMapping}
+            name={name}
+            onClose={() => setItemToRemoveNoMapping(undefined)}
+            onSubmit={() => {
+              onRemoveNoMappingItem(itemToRemoveNoMapping, name);
+              setItemToRemoveNoMapping(undefined);
             }}
           />
         )}
@@ -284,6 +320,11 @@ const PrototypePrepareNextSubjectStep2 = ({
         </SummaryListItem>
         <SummaryListItem term={`New ${namePlural}`}>
           {newItems.length}
+        </SummaryListItem>
+        <SummaryListItem
+          term={`${capitalize(namePlural)} with no mappings available`}
+        >
+          {noMappingItems.length}
         </SummaryListItem>
       </SummaryList>
     </WizardStepSummary>

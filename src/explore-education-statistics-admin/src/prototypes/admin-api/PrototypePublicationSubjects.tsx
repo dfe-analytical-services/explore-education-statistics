@@ -5,7 +5,7 @@ import PrototypePublicationSubjectList from './components/PrototypePublicationSu
 import PrototypeAddPublicationSubject from './components/PrototypeAddPublicationSubject';
 import PrototypeEditPublicationSubjectTitle from './components/PrototypeEditPublicationSubjectTitle';
 import PrototypeEditPublicationSubject from './components/PrototypeEditPublicationSubject';
-import PrototypePreviewStagedSubject from './components/PrototypePreviewStagedDataset';
+import { PrototypeNextSubjectContextProvider } from './contexts/PrototypeNextSubjectContext';
 
 export interface PublicationSubject {
   title: string;
@@ -88,10 +88,6 @@ const PrototypePublicationSubjects = () => {
     PublicationSubject | undefined
   >(undefined);
 
-  const [subjectToPreview, setSubjectToPreview] = useState<
-    PublicationSubject | undefined
-  >(undefined);
-
   const subjects =
     currentRelease === '2021-22' ? subjectsForRelease1 : subjectsForRelease2;
 
@@ -135,7 +131,27 @@ const PrototypePublicationSubjects = () => {
   }
 
   return (
-    <>
+    <PrototypeNextSubjectContextProvider
+      locations={{
+        newItems: [],
+        mappedItems: [],
+        unmappedItems: [],
+        noMappingItems: [],
+      }}
+      filters={{
+        newItems: [],
+        mappedItems: [],
+        unmappedItems: [],
+        noMappingItems: [],
+      }}
+      indicators={{
+        newItems: [],
+        mappedItems: [],
+        unmappedItems: [],
+        noMappingItems: [],
+      }}
+      versionType="minor"
+    >
       <PrototypeAddPublicationSubject
         isCurrentReleasePublished={isCurrentReleasePublished}
         subjects={subjects.filter(subject => {
@@ -152,11 +168,9 @@ const PrototypePublicationSubjects = () => {
       <PrototypePublicationSubjectList
         isCurrentReleasePublished={isCurrentReleasePublished}
         publicationSubjects={publicationSubjects}
-        onEditTitle={setSubjectToEdit}
         onEditSubject={setSubjectToChange}
-        onPreviewSubject={setSubjectToPreview}
       />
-    </>
+    </PrototypeNextSubjectContextProvider>
   );
 };
 export default PrototypePublicationSubjects;

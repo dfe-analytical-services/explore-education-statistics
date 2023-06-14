@@ -16,7 +16,6 @@ import {
   unmappedLocations,
   newLocations,
   mappedLocations,
-  // deletedLocations,
 } from './data/locations';
 import { unmappedFilters, newFilters, mappedFilters } from './data/filters';
 import {
@@ -26,6 +25,7 @@ import {
 } from './data/indicators';
 import PrototypePrepareNextSubjectStep5 from './components/PrototypePrepareNextSubjectStep5';
 import PrototypePrepareNextSubjectStep6 from './components/PrototypePrepareNextSubjectStep6';
+import { PrototypeNextSubjectContextProvider } from './contexts/PrototypeNextSubjectContext';
 
 export interface MapItem {
   id: string;
@@ -67,7 +67,33 @@ const PrototypePrepareNextSubjectPage = ({
   };
 
   return (
-    <>
+    <PrototypeNextSubjectContextProvider
+      locations={{
+        newItems: newLocations,
+        mappedItems: mappedLocations.map(item => {
+          return [item, item];
+        }),
+        unmappedItems: unmappedLocations,
+        noMappingItems: [],
+      }}
+      filters={{
+        newItems: newFilters,
+        mappedItems: mappedFilters.map(item => {
+          return [item, item];
+        }),
+        unmappedItems: unmappedFilters,
+        noMappingItems: [],
+      }}
+      indicators={{
+        newItems: newIndicators,
+        mappedItems: mappedIndicators.map(item => {
+          return [item, item];
+        }),
+        unmappedItems: unmappedIndicators,
+        noMappingItems: [],
+      }}
+      versionType="minor"
+    >
       <Link
         className="govuk-!-margin-bottom-6 govuk-!-padding-left-3 govuk-link govuk-back-link"
         to="/prototypes/admin-api/data/2022-23#subjects"
@@ -115,33 +141,24 @@ const PrototypePrepareNextSubjectPage = ({
             <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep2
-                  newItems={newLocations}
-                  mappedItems={mappedLocations}
-                  unmappedItems={unmappedLocations}
+                  {...stepProps}
                   name="location"
-                  {...stepProps}
                 />
               )}
             </WizardStep>
             <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep2
-                  newItems={newFilters}
-                  mappedItems={mappedFilters}
-                  unmappedItems={unmappedFilters}
+                  {...stepProps}
                   name="filter"
-                  {...stepProps}
                 />
               )}
             </WizardStep>
             <WizardStep size="l">
               {stepProps => (
                 <PrototypePrepareNextSubjectStep2
-                  newItems={newIndicators}
-                  mappedItems={mappedIndicators}
-                  unmappedItems={unmappedIndicators}
-                  name="indicator"
                   {...stepProps}
+                  name="indicator"
                 />
               )}
             </WizardStep>
@@ -156,7 +173,7 @@ const PrototypePrepareNextSubjectPage = ({
       ) : (
         <p>No publication subject.</p>
       )}
-    </>
+    </PrototypeNextSubjectContextProvider>
   );
 };
 export default PrototypePrepareNextSubjectPage;

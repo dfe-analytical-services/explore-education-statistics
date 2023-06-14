@@ -32,12 +32,12 @@ const PrototypeEditPublicationSubject = ({
         className="govuk-!-margin-bottom-6 govuk-!-padding-left-3 govuk-link govuk-back-link"
         onClick={onClose}
       >
-        Back to API datasets
+        Back to API data sets
       </ButtonText>
 
       <section>
         <span className="govuk-caption-l">{publicationSubject.title}</span>
-        <h2>Change dataset to publish</h2>
+        <h2>Change data set to publish</h2>
 
         <Formik<FormValues>
           initialValues={{
@@ -58,7 +58,7 @@ const PrototypeEditPublicationSubject = ({
               <FormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"
-                label="Available datasets"
+                label="Available data sets"
                 options={subjects.map(s => ({
                   label: s.title,
                   value: s.id,
