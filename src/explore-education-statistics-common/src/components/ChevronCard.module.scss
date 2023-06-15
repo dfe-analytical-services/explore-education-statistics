@@ -37,9 +37,11 @@
     transform: translateY(0) rotate(45deg) scale(1);
     width: 7px;
   }
+
   &:focus::before {
     border-color: $govuk-focus-text-colour;
   }
+
   &:hover::before {
     border-color: $govuk-link-hover-colour;
   }

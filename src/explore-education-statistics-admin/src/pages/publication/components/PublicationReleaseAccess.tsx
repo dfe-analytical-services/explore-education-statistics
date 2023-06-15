@@ -11,12 +11,12 @@ import userService from '@admin/services/userService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import WarningMessage from '@common/components/WarningMessage';
-import React from 'react';
 import { generatePath } from 'react-router-dom';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { useQuery } from '@tanstack/react-query';
 import releasePermissionQueries from '@admin/queries/releasePermissionQueries';
+import React from 'react';
 
 interface Props {
   publicationId: string;
@@ -45,9 +45,9 @@ const PublicationReleaseAccess = ({
     ...releasePermissionQueries.listInvites(release.id),
   });
 
-  const approvers = roles.filter(role => role.role === 'Approver');
+  const approvers = roles.filter(({ role }) => role === 'Approver');
   const approverInvites = invites.filter(invite => invite.role === 'Approver');
-  const contributors = roles.filter(role => role.role === 'Contributor');
+  const contributors = roles.filter(({ role }) => role === 'Contributor');
   const contributorInvites = invites.filter(
     invite => invite.role === 'Contributor',
   );

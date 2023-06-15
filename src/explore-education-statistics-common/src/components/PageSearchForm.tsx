@@ -195,6 +195,7 @@ const PageSearchForm = ({
         }}
         inputLabel={inputLabel}
         listBoxLabelId={`${id}-resultsLabel`}
+        // eslint-disable-next-line react/no-unstable-nested-components
         listBoxLabel={() => (
           <div
             id={`${id}-resultsLabel`}

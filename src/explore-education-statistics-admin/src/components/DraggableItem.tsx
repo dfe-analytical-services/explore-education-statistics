@@ -61,6 +61,7 @@ const DraggableItem = ({
           ref={draggableProvided.innerRef}
         >
           {!hideDragHandle && (
+            // eslint-disable-next-line react/jsx-no-useless-fragment
             <>
               {overrideDragHandle ??
                 DragHandle({ className: dragHandleClassName })}

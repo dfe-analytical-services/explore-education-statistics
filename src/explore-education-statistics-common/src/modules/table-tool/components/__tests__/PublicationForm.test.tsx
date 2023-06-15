@@ -1,3 +1,4 @@
+import flushPromises from '@common-test/flushPromises';
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
@@ -225,16 +226,15 @@ describe('PublicationForm', () => {
   });
 
   test('renders publication options filtered by title when using search field', async () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
 
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    await userEvent.type(
-      screen.getByLabelText('Search publications'),
-      'find me',
-    );
+    userEvent.type(screen.getByLabelText('Search publications'), 'find me');
 
     jest.runOnlyPendingTimers();
 
@@ -243,6 +243,7 @@ describe('PublicationForm', () => {
         name: /Select a publication/,
       }),
     ).queryAllByRole('radio');
+
     expect(publicationRadios).toHaveLength(2);
 
     expect(publicationRadios[0]).toEqual(
@@ -258,16 +259,15 @@ describe('PublicationForm', () => {
   });
 
   test('renders the theme as a hint on the publication options when using search field', async () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
 
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    await userEvent.type(
-      screen.getByLabelText('Search publications'),
-      'find me',
-    );
+    userEvent.type(screen.getByLabelText('Search publications'), 'find me');
 
     jest.runOnlyPendingTimers();
 
@@ -292,16 +292,15 @@ describe('PublicationForm', () => {
   });
 
   test('renders publication options filtered by case-insensitive title', async () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
 
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    await userEvent.type(
-      screen.getByLabelText('Search publications'),
-      'FiND Me',
-    );
+    userEvent.type(screen.getByLabelText('Search publications'), 'FiND Me');
 
     jest.runOnlyPendingTimers();
 
@@ -325,13 +324,15 @@ describe('PublicationForm', () => {
   });
 
   test('renders the `no publications found` message when there are no search results', async () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
 
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    await userEvent.type(screen.getByLabelText('Search publications'), 'Nope');
+    userEvent.type(screen.getByLabelText('Search publications'), 'Nope');
 
     jest.runOnlyPendingTimers();
 
@@ -346,13 +347,15 @@ describe('PublicationForm', () => {
   });
 
   test('does not throw error if regex sensitive search term is used', async () => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
 
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    await userEvent.type(screen.getByLabelText('Search publications'), '[');
+    userEvent.type(screen.getByLabelText('Search publications'), '[');
 
     expect(() => {
       jest.runOnlyPendingTimers();
@@ -505,6 +508,8 @@ describe('PublicationForm', () => {
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    await flushPromises();
 
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledTimes(1);

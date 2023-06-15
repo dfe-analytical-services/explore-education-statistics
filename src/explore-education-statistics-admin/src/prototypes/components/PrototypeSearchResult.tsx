@@ -1,5 +1,5 @@
-import FormattedDate from '@common/components/FormattedDate';
 import React from 'react';
+import FormattedDate from '@common/components/FormattedDate';
 
 interface Props {
   title: string;

@@ -26,6 +26,7 @@ import React, { ReactNode } from 'react';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 jest.mock('@admin/services/releaseContentService');
+jest.mock('@admin/services/dataBlockService');
 
 const releaseContentService = _releaseContentService as jest.Mocked<
   typeof _releaseContentService
@@ -304,7 +305,7 @@ describe('ReleaseEditableBlock', () => {
 
     expect(screen.getByText('Save & close')).toBeInTheDocument();
 
-    await userEvent.type(screen.getByRole('textbox'), 'test');
+    userEvent.type(screen.getByRole('textbox'), 'test');
 
     userEvent.click(screen.getByRole('button', { name: 'Save & close' }));
 
@@ -319,7 +320,9 @@ describe('ReleaseEditableBlock', () => {
       screen.getByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
 
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
 
     // After editing the block, another timeout triggers to refresh
     // the lock, but we shouldn't action this if the user has already
@@ -476,8 +479,9 @@ describe('ReleaseEditableBlock', () => {
   test('renders unlocked state when current user is idle for too long', async () => {
     mockDate.set('2022-02-16T12:00:00Z');
 
-    jest.useFakeTimers();
-
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
     jest
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
@@ -557,9 +561,8 @@ describe('ReleaseEditableBlock', () => {
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
 
-    let onContentBlockLocked: (
-      event: ReleaseContentBlockLockEvent,
-    ) => void = noop;
+    let onContentBlockLocked: (event: ReleaseContentBlockLockEvent) => void =
+      noop;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ContentBlockLocked') {
@@ -638,8 +641,9 @@ describe('ReleaseEditableBlock', () => {
     // Lock is about to expire
     mockDate.set('2022-02-16T12:09:00Z');
 
-    jest.useFakeTimers();
-
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
     jest
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
@@ -693,7 +697,7 @@ describe('ReleaseEditableBlock', () => {
     expect(connectionMock.invoke).not.toHaveBeenCalled();
 
     // Interact with textbox
-    await userEvent.type(screen.getByRole('textbox'), 'Test text');
+    userEvent.type(screen.getByRole('textbox'), 'Test text');
 
     jest.advanceTimersByTime(60_000);
 
@@ -728,9 +732,8 @@ describe('ReleaseEditableBlock', () => {
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
 
-    let onContentBlockLocked: (
-      event: ReleaseContentBlockLockEvent,
-    ) => void = noop;
+    let onContentBlockLocked: (event: ReleaseContentBlockLockEvent) => void =
+      noop;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ContentBlockLocked') {

@@ -14,9 +14,10 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
-import Yup from '@common/validation/yup';
+import { generatePath, useHistory, useParams, withRouter } from 'react-router';
 import React from 'react';
-import { generatePath, RouteComponentProps, withRouter } from 'react-router';
+import { ReleaseType } from '@common/services/types/releaseType';
+import Yup from '@common/validation/yup';
 
 export interface FormValues extends ReleaseSummaryFormValues {
   templateReleaseId: string;
@@ -41,11 +42,9 @@ interface Model {
   publication: Publication;
 }
 
-const ReleaseCreatePage = ({
-  match,
-  history,
-}: RouteComponentProps<MatchProps>) => {
-  const { publicationId } = match.params;
+const ReleaseCreatePage = () => {
+  const { publicationId } = useParams<MatchProps>();
+  const history = useHistory();
 
   const { value: model } = useAsyncRetry<Model>(async () => {
     const [templateRelease, publication] = await Promise.all([
@@ -78,8 +77,6 @@ const ReleaseCreatePage = ({
       }),
     );
   }, errorMappings);
-
-  const handleCancel = () => history.push(dashboardRoute.path);
 
   return (
     <Page
@@ -125,18 +122,20 @@ const ReleaseCreatePage = ({
                 .value ?? '',
             timePeriodCoverageStartYear: '',
             templateReleaseId: '',
-            releaseType: undefined,
+            releaseType: undefined as unknown as ReleaseType,
           } as FormValues)
         }
-        validationSchema={baseRules =>
-          baseRules.shape({
-            templateReleaseId: model?.templateRelease
-              ? Yup.string().required('Choose a template')
-              : Yup.string(),
-          })
-        }
+        validationSchema={baseSchema => {
+          return model?.templateRelease
+            ? baseSchema.concat(
+                Yup.object<FormValues>().shape({
+                  templateReleaseId: Yup.string(),
+                }),
+              )
+            : baseSchema;
+        }}
         onSubmit={handleSubmit}
-        onCancel={handleCancel}
+        onCancel={() => history.push(dashboardRoute.path)}
         additionalFields={
           model?.templateRelease && (
             <FormFieldRadioGroup<FormValues>

@@ -62,10 +62,11 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
   const handleSubmit = useFormSubmit<DataGuidanceFormValues>(
     async (values, helpers) => {
       await minDelay(async () => {
-        const updatedGuidance = await releaseDataGuidanceService.updateDataGuidance(
-          releaseId,
-          values,
-        );
+        const updatedGuidance =
+          await releaseDataGuidanceService.updateDataGuidance(
+            releaseId,
+            values,
+          );
 
         setDataGuidance({ value: updatedGuidance });
 
@@ -105,6 +106,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
 
       <LoadingSpinner loading={isLoading}>
         {dataGuidance && (
+          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {dataGuidance.subjects.length > 0 ? (
               <Formik<DataGuidanceFormValues>
@@ -148,6 +150,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                           label="Main guidance content"
                         />
                       ) : (
+                        // eslint-disable-next-line react/jsx-no-useless-fragment
                         <>
                           {!canUpdateRelease && !dataGuidance?.content ? (
                             <InsetText>
@@ -229,6 +232,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                 }}
               </Formik>
             ) : (
+              // eslint-disable-next-line react/jsx-no-useless-fragment
               <>
                 {canUpdateRelease ? (
                   <WarningMessage>

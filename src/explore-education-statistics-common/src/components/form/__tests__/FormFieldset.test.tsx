@@ -1,7 +1,7 @@
 import { getAllDescribedBy } from '@common-test/queries';
 import { FormIdContextProvider } from '@common/components/form/contexts/FormIdContext';
-import React from 'react';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 import FormFieldset from '../FormFieldset';
 
 describe('FormFieldset', () => {

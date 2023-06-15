@@ -741,7 +741,10 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array()
+              .of(Yup.string())
+              .min(1, 'Select at least one option')
+              .required('Select at least one option'),
           })}
         >
           {() => (
@@ -786,7 +789,10 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array()
+              .of(Yup.string())
+              .min(1, 'Select at least one option')
+              .required('Select at least one option'),
           })}
         >
           {() => (
@@ -842,7 +848,10 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array()
+              .of(Yup.string())
+              .min(1, 'Select at least one option')
+              .required('Select at least one option'),
           })}
         >
           {() => (
@@ -931,7 +940,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
 
     expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute('checked');
 
-    await userEvent.type(searchInput, '2');
+    userEvent.type(searchInput, '2');
 
     jest.runAllTimers();
 

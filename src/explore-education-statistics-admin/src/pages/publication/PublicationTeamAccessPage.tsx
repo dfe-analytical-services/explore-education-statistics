@@ -13,12 +13,12 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
-import { RouteComponentProps } from 'react-router';
 import { generatePath, useHistory } from 'react-router-dom';
 import { UserPublicationRole } from '@admin/services/userService';
 import orderBy from 'lodash/orderBy';
 import ButtonLink from '@admin/components/ButtonLink';
 import PublicationReleaseAccess from '@admin/pages/publication/components/PublicationReleaseAccess';
+import { useParams } from 'react-router';
 
 interface Model {
   releases: ReleaseSummary[];
@@ -28,11 +28,10 @@ interface Model {
   permissions: PublicationPermissions;
 }
 
-const PublicationTeamAccessPage = ({
-  match,
-}: RouteComponentProps<PublicationTeamRouteParams>) => {
+const PublicationTeamAccessPage = () => {
   const history = useHistory();
-  const { releaseId } = match.params;
+  const { releaseId } = useParams<PublicationTeamRouteParams>();
+
   const { publicationId, permissions } = usePublicationContext();
   const [currentReleaseId, setCurrentReleaseId] = useState(releaseId ?? '');
 
@@ -161,6 +160,7 @@ const PublicationTeamAccessPage = ({
         )}
 
       {model.permissions.canViewReleaseTeamAccess && (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {model?.releases.length ? (
             <>

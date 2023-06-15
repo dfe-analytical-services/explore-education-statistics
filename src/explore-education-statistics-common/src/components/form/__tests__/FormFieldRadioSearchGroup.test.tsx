@@ -5,8 +5,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Formik } from 'formik';
 import noop from 'lodash/noop';
-import React from 'react';
 import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
+import React from 'react';
 
 jest.mock('lodash/debounce');
 
@@ -342,7 +342,7 @@ describe('FormFieldRadioSearchGroup', () => {
 
       const searchInput = screen.getByLabelText('Search') as HTMLInputElement;
 
-      await userEvent.type(searchInput, '2');
+      userEvent.type(searchInput, '2');
 
       jest.runAllTimers();
       const radios = screen.getAllByRole('radio');
@@ -384,7 +384,7 @@ describe('FormFieldRadioSearchGroup', () => {
       fireEvent.click(radio1);
       expect(radio1.checked).toBe(true);
 
-      await userEvent.type(searchInput, '2');
+      userEvent.type(searchInput, '2');
 
       jest.runAllTimers();
       expect(screen.getAllByRole('radio')).toHaveLength(2);

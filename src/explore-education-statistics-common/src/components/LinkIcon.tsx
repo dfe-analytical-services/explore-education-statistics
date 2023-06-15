@@ -1,6 +1,10 @@
 import React from 'react';
 
-const LinkIcon = ({ className }: { className?: string }) => (
+interface Props {
+  className?: string;
+}
+
+const LinkIcon = ({ className }: Props) => (
   <svg
     className={className}
     xmlns="http://www.w3.org/2000/svg"

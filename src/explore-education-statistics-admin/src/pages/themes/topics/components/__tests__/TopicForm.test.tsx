@@ -41,7 +41,7 @@ describe('ThemeForm', () => {
 
     render(<TopicForm onSubmit={handleSubmit} />);
 
-    await userEvent.type(screen.getByLabelText('Title'), 'Test title');
+    userEvent.type(screen.getByLabelText('Title'), 'Test title');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -77,7 +77,7 @@ describe('ThemeForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      await userEvent.clear(screen.getByLabelText('Title'));
+      userEvent.clear(screen.getByLabelText('Title'));
 
       userEvent.click(screen.getByRole('button', { name: 'Save topic' }));
 
@@ -91,7 +91,7 @@ describe('ThemeForm', () => {
 
       render(<TopicForm onSubmit={handleSubmit} />);
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Updated title');
+      userEvent.type(screen.getByLabelText('Title'), 'Updated title');
 
       expect(handleSubmit).not.toHaveBeenCalled();
 

@@ -1,4 +1,5 @@
 import Page from '@admin/components/Page';
+import Link from '@admin/components/Link';
 import React from 'react';
 
 const PageNotFoundPage = () => {
@@ -13,9 +14,9 @@ const PageNotFoundPage = () => {
       <p>
         If the web address is correct or you clicked a link or button and ended
         up on this page,{' '}
-        <a className="govuk-link" href="/contact-us">
+        <Link className="govuk-link" to="/contact-us">
           contact our Explore education statistics team
-        </a>{' '}
+        </Link>{' '}
         if you need any help or support.
       </p>
     </Page>

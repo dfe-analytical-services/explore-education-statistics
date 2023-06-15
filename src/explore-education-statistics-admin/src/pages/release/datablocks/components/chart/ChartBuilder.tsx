@@ -50,7 +50,7 @@ import {
   isServerValidationError,
   ServerValidationErrorResponse,
 } from '@common/validation/serverValidations';
-import produce from 'immer';
+import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 
@@ -134,9 +134,8 @@ const ChartBuilder = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
-  const [submitError, setSubmitError] = useState<
-    ServerValidationErrorResponse
-  >();
+  const [submitError, setSubmitError] =
+    useState<ServerValidationErrorResponse>();
 
   const dataSetsUnits = useMemo(
     () =>
@@ -241,7 +240,6 @@ const ChartBuilder = ({
 
     try {
       await onChartDelete(filterChartProps(chartProps));
-
       actions.resetState();
     } finally {
       setDeleting(false);

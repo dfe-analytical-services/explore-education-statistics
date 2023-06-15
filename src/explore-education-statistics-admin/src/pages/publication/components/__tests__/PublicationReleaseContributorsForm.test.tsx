@@ -1,10 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import PublicationReleaseContributorsForm from '@admin/pages/publication/components/PublicationReleaseContributorsForm';
 import _releasePermissionService, {
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 jest.mock('@admin/services/releasePermissionService');
 

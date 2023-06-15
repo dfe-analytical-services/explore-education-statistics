@@ -3,8 +3,8 @@ import useToggle from '@common/hooks/useToggle';
 import ButtonLink from '@frontend/components/ButtonLink';
 import { DataBlock } from '@common/services/types/blocks';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import React from 'react';
 
 interface Props {
   block: DataBlock;

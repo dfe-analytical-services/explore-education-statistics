@@ -4,8 +4,8 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import { ReleaseSummary } from '@common/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import noop from 'lodash/noop';
+import React from 'react';
 
 describe('ReleaseStep', () => {
   const testReleases: ReleaseSummary[] = [
@@ -83,7 +83,7 @@ describe('ReleaseStep', () => {
 
     expect(screen.getAllByRole('radio')).toHaveLength(3);
 
-    await userEvent.type(screen.getByLabelText(/Search/), '2020/21');
+    userEvent.type(screen.getByLabelText(/Search/), '2020/21');
 
     await waitFor(() => {
       expect(screen.getAllByRole('radio')).toHaveLength(1);

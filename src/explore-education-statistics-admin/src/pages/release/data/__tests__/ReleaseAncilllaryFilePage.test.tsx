@@ -9,8 +9,8 @@ import _releaseAncillaryFileService, {
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory, MemoryHistory } from 'history';
-import React from 'react';
 import { generatePath, Route, Router } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/releaseAncillaryFileService');
 
@@ -113,12 +113,12 @@ describe('ReleaseAncillaryFilePage', () => {
     const title = screen.getByLabelText('Title');
 
     userEvent.clear(title);
-    await userEvent.type(title, 'Updated test title');
+    userEvent.type(title, 'Updated test title');
 
     const summary = screen.getByLabelText('Summary');
 
     userEvent.clear(summary);
-    await userEvent.type(summary, 'Updated test summary');
+    userEvent.type(summary, 'Updated test summary');
 
     userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
 

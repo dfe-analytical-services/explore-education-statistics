@@ -11,9 +11,11 @@ class MockedDate extends RealDate {
 
     switch (dateArgs.length) {
       case 0:
+        // eslint-disable-next-line no-constructor-return
         return now !== null ? now : new RealDate();
       default:
         // @ts-ignore
+        // eslint-disable-next-line no-constructor-return
         return new RealDate(...dateArgs);
     }
   }

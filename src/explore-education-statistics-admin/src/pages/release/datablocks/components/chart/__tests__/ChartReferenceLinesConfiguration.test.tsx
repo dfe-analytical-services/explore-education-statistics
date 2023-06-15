@@ -11,8 +11,8 @@ import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
 import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
+import React from 'react';
 
 describe('ChartReferenceLinesConfiguration', () => {
   const testAxisConfiguration: AxisConfiguration = {
@@ -553,7 +553,7 @@ describe('ChartReferenceLinesConfiguration', () => {
       '2014_AY',
     ]);
 
-    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
     expect(handleAddLine).not.toHaveBeenCalled();
 
@@ -601,7 +601,7 @@ describe('ChartReferenceLinesConfiguration', () => {
       'state-funded-primary',
     ]);
 
-    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
@@ -648,7 +648,7 @@ describe('ChartReferenceLinesConfiguration', () => {
       barnsleyId,
     );
 
-    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
@@ -694,7 +694,7 @@ describe('ChartReferenceLinesConfiguration', () => {
       'authorised-absence-sessions',
     ]);
 
-    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
@@ -729,8 +729,8 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
     expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-    await userEvent.type(referenceLines.getByLabelText('Position'), '3000');
-    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    userEvent.type(referenceLines.getByLabelText('Position'), '3000');
+    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
@@ -768,7 +768,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
       '2014_AY',
     ]);
-    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
     expect(referenceLines.getByLabelText('Style')).toHaveValue('dashed');
 

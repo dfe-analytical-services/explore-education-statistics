@@ -134,12 +134,15 @@ const LocationFiltersForm = ({
       enableReinitialize
       initialValues={initialFormValues}
       validateOnBlur={false}
-      validationSchema={Yup.object<LocationFormValues>({
-        locations: Yup.mixed().test(
+      validationSchema={Yup.object<LocationFormValues>().shape({
+        locations: Yup.object().test(
           'required',
           'Select at least one location',
-          (value: Dictionary<string[]>) =>
-            Object.values(value).some(groupOptions => groupOptions.length > 0),
+          (value: Dictionary<string[]>) => {
+            return Object.values(value).some(
+              groupOptions => groupOptions.length > 0,
+            );
+          },
         ),
       })}
       onSubmit={async values => {

@@ -1,8 +1,8 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
+import React from 'react';
 
 describe('EditableBlockWrapper', () => {
   test('renders the child block', () => {

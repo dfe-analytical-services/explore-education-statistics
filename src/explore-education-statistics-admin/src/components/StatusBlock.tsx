@@ -1,5 +1,5 @@
-import Tag from '@common/components/Tag';
 import React from 'react';
+import Tag from '@common/components/Tag';
 
 export type StatusBlockColors = 'blue' | 'orange' | 'red' | 'green';
 
@@ -7,7 +7,7 @@ export interface StatusBlockProps {
   className?: string;
   checklistStyle?: boolean;
   color?: StatusBlockColors;
-  id?: string | undefined;
+  id?: string;
   text: string;
 }
 

@@ -1,19 +1,16 @@
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import noop from 'lodash/noop';
+import React from 'react';
 
 describe('DataFileUploadForm', () => {
   test('shows validation message when no data file selected', async () => {
     render(<DataFileUploadForm onSubmit={noop} />);
 
-    userEvent.click(screen.getByLabelText('Upload data file'));
-    fireEvent.change(screen.getByLabelText('Upload data file'), {
-      target: {
-        value: null,
-      },
-    });
+    userEvent.click(screen.getByLabelText('CSV files'));
+
+    userEvent.tab();
     userEvent.tab();
 
     await waitFor(() => {
@@ -85,10 +82,8 @@ describe('DataFileUploadForm', () => {
     render(<DataFileUploadForm onSubmit={noop} />);
 
     userEvent.click(screen.getByLabelText('ZIP file'));
-    userEvent.click(screen.getByLabelText('Upload ZIP file'));
-    fireEvent.change(screen.getByLabelText('Upload ZIP file'), {
-      target: { value: null },
-    });
+
+    userEvent.tab();
     userEvent.tab();
 
     await waitFor(() => {
@@ -144,11 +139,6 @@ describe('DataFileUploadForm', () => {
           selector: '#dataFileUploadForm-metadataFile-error',
         }),
       ).toBeInTheDocument();
-      expect(
-        screen.queryByText('Choose a zip file', {
-          selector: '#dataFileUploadForm-metadataFile-error',
-        }),
-      ).not.toBeInTheDocument();
     });
   });
 

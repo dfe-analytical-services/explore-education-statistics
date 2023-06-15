@@ -13,27 +13,25 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import { generatePath, useParams } from 'react-router';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
 
-const PreReleaseMethodologyPage = ({
-  match,
-}: RouteComponentProps<PreReleaseMethodologyRouteParams>) => {
-  const { methodologyId, publicationId, releaseId } = match.params;
+const PreReleaseMethodologyPage = () => {
+  const { methodologyId, publicationId, releaseId } =
+    useParams<PreReleaseMethodologyRouteParams>();
 
-  const { value, isLoading } = useAsyncHandledRetry<
-    MethodologyContextState
-  >(async () => {
-    const methodology = await methodologyContentService.getMethodologyContent(
-      methodologyId,
-    );
+  const { value, isLoading } =
+    useAsyncHandledRetry<MethodologyContextState>(async () => {
+      const methodology = await methodologyContentService.getMethodologyContent(
+        methodologyId,
+      );
 
-    return {
-      methodology,
-      canUpdateMethodology: false,
-      isPreRelease: true,
-    };
-  }, [methodologyId]);
+      return {
+        methodology,
+        canUpdateMethodology: false,
+        isPreRelease: true,
+      };
+    }, [methodologyId]);
 
   return (
     <div className="govuk-width-container">

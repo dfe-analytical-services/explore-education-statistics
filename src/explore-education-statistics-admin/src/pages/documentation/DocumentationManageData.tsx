@@ -1,7 +1,7 @@
-import React from 'react';
 import Link from '@admin/components/Link';
 import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
+import React from 'react';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageDataTab from './images/guidance/guidance-data-tab.png';

@@ -1,7 +1,8 @@
-import FileSchema from '@common/validation/yup/file';
+/* eslint-disable import/no-anonymous-default-export */
 import * as yup from 'yup';
 
 import './number';
+import FileSchema from './file';
 
 export default {
   ...yup,

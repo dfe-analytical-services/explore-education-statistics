@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import noop from 'lodash/noop';
 import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
+import React from 'react';
 
 describe('MethodologySummaryForm', () => {
   test('renders the form with initial values', () => {
@@ -74,7 +74,7 @@ describe('MethodologySummaryForm', () => {
     );
 
     userEvent.click(screen.getByLabelText('Set an alternative title'));
-    await userEvent.type(
+    userEvent.type(
       screen.getByLabelText('Enter methodology title'),
       'an alternative title',
     );

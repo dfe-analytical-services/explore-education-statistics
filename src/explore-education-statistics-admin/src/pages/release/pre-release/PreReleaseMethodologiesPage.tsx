@@ -16,18 +16,16 @@ import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import { generatePath, useParams } from 'react-router';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
   methodologyVersions: MethodologyVersionSummary[];
 }
 
-const PreReleaseMethodologiesPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+const PreReleaseMethodologiesPage = () => {
+  const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [externalMethodology, methodologyVersions] = await Promise.all([
@@ -48,6 +46,7 @@ const PreReleaseMethodologiesPage = ({
       <PageTitle title="Methodologies" />
       <LoadingSpinner loading={isLoading}>
         {model && (
+          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {model.methodologyVersions?.length === 0 &&
             !model.externalMethodology ? (
@@ -56,39 +55,37 @@ const PreReleaseMethodologiesPage = ({
               <ul className="govuk-list">
                 {model.methodologyVersions.map(methodology => (
                   <li key={methodology.id}>
-                    <>
-                      <Link
-                        to={generatePath<PreReleaseMethodologyRouteParams>(
-                          preReleaseMethodologyRoute.path,
-                          {
-                            publicationId,
-                            releaseId,
-                            methodologyId:
-                              methodology.status === 'Draft' &&
-                              methodology.previousVersionId
-                                ? methodology.previousVersionId
-                                : methodology.id,
-                          },
+                    <Link
+                      to={generatePath<PreReleaseMethodologyRouteParams>(
+                        preReleaseMethodologyRoute.path,
+                        {
+                          publicationId,
+                          releaseId,
+                          methodologyId:
+                            methodology.status === 'Draft' &&
+                            methodology.previousVersionId
+                              ? methodology.previousVersionId
+                              : methodology.id,
+                        },
+                      )}
+                    >
+                      {`${methodology.title} ${
+                        methodology.owned ? '(Owned)' : '(Adopted)'
+                      }`}
+                    </Link>
+                    <TagGroup className="govuk-!-margin-left-2">
+                      {methodology.status === 'Approved' &&
+                        !methodology.published && <Tag>Approved</Tag>}
+
+                      {((methodology.amendment &&
+                        methodology.status === 'Draft') ||
+                        methodology.published) && <Tag>Published</Tag>}
+
+                      {methodology.amendment &&
+                        methodology.status === 'Approved' && (
+                          <Tag>Amendment</Tag>
                         )}
-                      >
-                        {`${methodology.title} ${
-                          methodology.owned ? '(Owned)' : '(Adopted)'
-                        }`}
-                      </Link>
-                      <TagGroup className="govuk-!-margin-left-2">
-                        {methodology.status === 'Approved' &&
-                          !methodology.published && <Tag>Approved</Tag>}
-
-                        {((methodology.amendment &&
-                          methodology.status === 'Draft') ||
-                          methodology.published) && <Tag>Published</Tag>}
-
-                        {methodology.amendment &&
-                          methodology.status === 'Approved' && (
-                            <Tag>Amendment</Tag>
-                          )}
-                      </TagGroup>
-                    </>
+                    </TagGroup>
                   </li>
                 ))}
 

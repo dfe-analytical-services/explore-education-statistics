@@ -1,7 +1,7 @@
+import React from 'react';
 import glossaryService from '@admin/services/glossaryService';
 import ContentHtml from '@common/components/ContentHtml';
 import classNames from 'classnames';
-import React from 'react';
 import styles from './PreviewHtml.module.scss';
 
 interface Props {

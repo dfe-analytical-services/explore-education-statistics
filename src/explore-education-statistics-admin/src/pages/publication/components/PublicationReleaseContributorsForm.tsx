@@ -12,8 +12,8 @@ import ButtonText from '@common/components/ButtonText';
 import WarningMessage from '@common/components/WarningMessage';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { Formik } from 'formik';
-import React from 'react';
 import { generatePath, useHistory } from 'react-router-dom';
+import React from 'react';
 
 interface AddExistingUsersFormValues {
   userIds: string[];
@@ -81,7 +81,7 @@ const PublicationReleaseContributorsForm = ({
   const releaseContributorIds = releaseContributors.map(c => c.userId);
   const initialValues: AddExistingUsersFormValues = {
     userIds: publicationContributors
-      .map(c => c.userId)
+      .map(contributor => contributor.userId)
       .filter(id => releaseContributorIds.includes(id)),
   };
 
@@ -100,10 +100,10 @@ const PublicationReleaseContributorsForm = ({
               disabled={form.isSubmitting}
               selectAll
               small
-              options={publicationContributors.map(c => {
+              options={publicationContributors.map(contributor => {
                 return {
-                  label: `${c.userDisplayName} (${c.userEmail})`,
-                  value: c.userId,
+                  label: `${contributor.userDisplayName} (${contributor.userEmail})`,
+                  value: contributor.userId,
                 };
               })}
             />

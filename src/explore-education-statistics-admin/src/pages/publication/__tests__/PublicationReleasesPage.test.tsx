@@ -8,8 +8,8 @@ import _publicationService, {
 import _releaseService from '@admin/services/releaseService';
 import { screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
-import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;

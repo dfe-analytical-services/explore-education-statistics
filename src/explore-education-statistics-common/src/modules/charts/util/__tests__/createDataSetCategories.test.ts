@@ -3,7 +3,7 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import produce from 'immer';
+import { produce } from 'immer';
 
 describe('createDataSetCategories', () => {
   const testTable: TableDataResponse = {
@@ -437,10 +437,8 @@ describe('createDataSetCategories', () => {
 
     expect(category1DataSets).toHaveLength(2);
 
-    const [
-      [dataSet1Key, dataSet1],
-      [dataSet2Key, dataSet2],
-    ] = category1DataSets;
+    const [[dataSet1Key, dataSet1], [dataSet2Key, dataSet2]] =
+      category1DataSets;
 
     expect(JSON.parse(dataSet1Key)).toEqual({
       indicator: 'authorised-absence-sessions',
@@ -486,10 +484,8 @@ describe('createDataSetCategories', () => {
 
     expect(category2DataSets).toHaveLength(2);
 
-    const [
-      [dataSet3Key, dataSet3],
-      [dataSet4Key, dataSet4],
-    ] = category2DataSets;
+    const [[dataSet3Key, dataSet3], [dataSet4Key, dataSet4]] =
+      category2DataSets;
 
     expect(JSON.parse(dataSet3Key)).toEqual({
       indicator: 'authorised-absence-sessions',
@@ -564,10 +560,8 @@ describe('createDataSetCategories', () => {
 
     expect(category1DataSets).toHaveLength(2);
 
-    const [
-      [dataSet1Key, dataSet1],
-      [dataSet2Key, dataSet2],
-    ] = category1DataSets;
+    const [[dataSet1Key, dataSet1], [dataSet2Key, dataSet2]] =
+      category1DataSets;
 
     expect(JSON.parse(dataSet1Key)).toEqual({
       indicator: 'authorised-absence-sessions',
@@ -607,10 +601,8 @@ describe('createDataSetCategories', () => {
 
     expect(category2DataSets).toHaveLength(2);
 
-    const [
-      [dataSet3Key, dataSet3],
-      [dataSet4Key, dataSet4],
-    ] = category2DataSets;
+    const [[dataSet3Key, dataSet3], [dataSet4Key, dataSet4]] =
+      category2DataSets;
 
     expect(JSON.parse(dataSet3Key)).toEqual({
       indicator: 'authorised-absence-sessions',
@@ -930,10 +922,8 @@ describe('createDataSetCategories', () => {
 
     expect(category1DataSets).toHaveLength(2);
 
-    const [
-      [dataSet1Key, dataSet1],
-      [dataSet2Key, dataSet2],
-    ] = category1DataSets;
+    const [[dataSet1Key, dataSet1], [dataSet2Key, dataSet2]] =
+      category1DataSets;
 
     expect(JSON.parse(dataSet1Key)).toEqual({
       indicator: 'authorised-absence-sessions',
@@ -979,10 +969,8 @@ describe('createDataSetCategories', () => {
 
     expect(category2DataSets).toHaveLength(2);
 
-    const [
-      [dataSet3Key, dataSet3],
-      [dataSet4Key, dataSet4],
-    ] = category2DataSets;
+    const [[dataSet3Key, dataSet3], [dataSet4Key, dataSet4]] =
+      category2DataSets;
 
     expect(JSON.parse(dataSet3Key)).toEqual({
       indicator: 'authorised-absence-sessions',
@@ -1081,12 +1069,13 @@ describe('createDataSetCategories', () => {
     };
 
     const updatedTestTable = produce(testTable, draft => {
-      draft.subjectMeta.filters.Characteristic.options.EthnicGroupMajor.options = [
-        {
-          label: 'Ethnicity Major Chinese',
-          value: 'ethnicity-major-chinese',
-        },
-      ];
+      draft.subjectMeta.filters.Characteristic.options.EthnicGroupMajor.options =
+        [
+          {
+            label: 'Ethnicity Major Chinese',
+            value: 'ethnicity-major-chinese',
+          },
+        ];
       draft.subjectMeta.filters.SchoolType.options.Default.options = [
         {
           label: 'State-funded primary',
@@ -1280,16 +1269,17 @@ describe('createDataSetCategories', () => {
     };
 
     const updatedTestTable = produce(testTable, draft => {
-      draft.subjectMeta.filters.Characteristic.options.EthnicGroupMajor.options = [
-        {
-          label: 'Ethnicity Major Chinese',
-          value: 'ethnicity-major-chinese',
-        },
-        {
-          label: 'Ethnicity another',
-          value: 'ethnicity-another',
-        },
-      ];
+      draft.subjectMeta.filters.Characteristic.options.EthnicGroupMajor.options =
+        [
+          {
+            label: 'Ethnicity Major Chinese',
+            value: 'ethnicity-major-chinese',
+          },
+          {
+            label: 'Ethnicity another',
+            value: 'ethnicity-another',
+          },
+        ];
       draft.subjectMeta.filters.SchoolType.options.Default.options = [
         {
           label: 'State-funded primary',

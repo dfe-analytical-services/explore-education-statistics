@@ -10,7 +10,7 @@ import { RefObject, useEffect } from 'react';
  * for outside of the element can also be specified.
  */
 export default function useClickAway<
-  K extends keyof DocumentEventMap = 'click'
+  K extends keyof DocumentEventMap = 'click',
 >(
   ref: RefObject<HTMLElement | null>,
   onClickAway: (event: DocumentEventMap[K]) => void,

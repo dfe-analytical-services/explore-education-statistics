@@ -40,14 +40,10 @@ interface ScheduledReleasesTableProps {
 }
 
 const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
-  const [
-    showScheduledStatusGuidance,
-    toggleScheduledStatusGuidance,
-  ] = useToggle(false);
-  const [
-    showScheduledStagesGuidance,
-    toggleScheduledStagesGuidance,
-  ] = useToggle(false);
+  const [showScheduledStatusGuidance, toggleScheduledStatusGuidance] =
+    useToggle(false);
+  const [showScheduledStagesGuidance, toggleScheduledStagesGuidance] =
+    useToggle(false);
 
   const releasesByPublication: Dictionary<Release[]> = useMemo(() => {
     return releases.reduce<Dictionary<Release[]>>((acc, release) => {
@@ -65,6 +61,7 @@ const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
       {releases.length === 0 ? (
         <p>There are currently no scheduled releases</p>
       ) : (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {releasesByPublication &&
             Object.keys(releasesByPublication).length > 0 && (

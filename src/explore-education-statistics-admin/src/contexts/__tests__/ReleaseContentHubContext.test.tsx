@@ -23,6 +23,7 @@ describe('ReleaseContentHubContext', () => {
   });
 
   afterEach(() => {
+    jest.runOnlyPendingTimers();
     jest.useRealTimers();
   });
 

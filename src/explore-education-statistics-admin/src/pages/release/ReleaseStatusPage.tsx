@@ -17,17 +17,17 @@ import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
+import { Dictionary } from '@common/types';
 import {
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
-import React from 'react';
 import { useLocation } from 'react-router';
+import React from 'react';
+import Link from '@admin/components/Link';
 
-const statusMap: {
-  [keyof: string]: string;
-} = {
+const statusMap: Dictionary<string> = {
   Draft: 'In Draft',
   HigherLevelReview: 'Awaiting higher review',
   Approved: 'Approved',
@@ -45,10 +45,7 @@ const ReleaseStatusPage = () => {
     onReleaseChange,
   } = useReleaseContext();
 
-  const {
-    value: release,
-    setState: setRelease,
-  } = useAsyncHandledRetry(
+  const { value: release, setState: setRelease } = useAsyncHandledRetry(
     async () =>
       lastLocation && lastLocation !== location
         ? releaseService.getRelease(releaseId)
@@ -174,12 +171,11 @@ const ReleaseStatusPage = () => {
                       <td>{status.approvalStatus}</td>
                       <td>{status.internalReleaseNote}</td>
                       <td>{`${status.releaseVersion + 1}`}</td>{' '}
-                      {/* +1 because version starts from 0 in DB */}
                       <td>
                         {status.createdByEmail ? (
-                          <a href={`mailto:${status.createdByEmail}`}>
+                          <Link to={`mailto:${status.createdByEmail}`}>
                             {status.createdByEmail}
-                          </a>
+                          </Link>
                         ) : (
                           'Not available'
                         )}

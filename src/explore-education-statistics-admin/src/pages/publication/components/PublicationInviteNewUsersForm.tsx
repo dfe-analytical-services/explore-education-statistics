@@ -16,9 +16,9 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Form, Formik } from 'formik';
-import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { generatePath } from 'react-router';
+import React from 'react';
 
 interface InviteContributorFormValues {
   email: string;

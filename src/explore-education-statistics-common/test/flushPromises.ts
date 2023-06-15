@@ -9,6 +9,13 @@
  * be flushed before we can observe them being resolved correctly.
  * @see https://stackoverflow.com/questions/52177631/jest-timer-and-promise-dont-work-well-settimeout-and-async-function
  */
-export default function flushPromises() {
-  return new Promise(resolve => setImmediate(resolve));
+export default async function flushPromises() {
+  do {
+    jest.runAllTimers();
+    // eslint-disable-next-line no-await-in-loop
+    await new Promise(jest.requireActual('timers').setImmediate);
+  } while (jest.getTimerCount() > 0);
 }
+// export default async function flushPromises() {
+//   return new Promise(jest.requireActual('timers').setImmediate);
+// }

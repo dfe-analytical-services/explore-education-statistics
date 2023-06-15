@@ -1,7 +1,7 @@
-import React from 'react';
 import { RouteChildrenProps } from 'react-router';
 import Page from '@admin/components/Page';
 import Link from '@admin/components/Link';
+import React from 'react';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
 import imageReleaseFind from './images/guidance/guidance-edit-release-find.png';

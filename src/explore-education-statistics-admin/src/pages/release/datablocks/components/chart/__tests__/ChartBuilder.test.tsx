@@ -43,9 +43,11 @@ describe('ChartBuilder', () => {
     expect(screen.getByText('Choose chart type')).toBeInTheDocument();
 
     expect(screen.getByRole('button', { name: 'Line' })).toBeInTheDocument();
+
     expect(
       screen.getByRole('button', { name: 'Vertical bar' }),
     ).toBeInTheDocument();
+
     expect(
       screen.getByRole('button', { name: 'Horizontal bar' }),
     ).toBeInTheDocument();
@@ -122,13 +124,23 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Line' }));
+      userEvent.click(
+        screen.getByText('Line', {
+          selector: 'button',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Data sets', {
+            selector: '[role="tab"]',
+          }),
+        ).toBeInTheDocument();
+      });
 
       userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
 
-      expect(
-        screen.getByRole('heading', { name: 'Data sets' }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Add data set')).toBeInTheDocument();
 
       userEvent.selectOptions(
         screen.getByLabelText('Characteristic'),
@@ -148,7 +160,9 @@ describe('ChartBuilder', () => {
       );
       userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
 
-      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
+      expect(screen.getByText('Add data set')).toBeInTheDocument();
+
+      userEvent.click(screen.getByText('Add data set'));
 
       await waitFor(() => {
         expect(screen.getByText('Remove all')).toBeInTheDocument();
@@ -207,6 +221,14 @@ describe('ChartBuilder', () => {
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Line' }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Data sets', {
+            selector: '[role="tab"]',
+          }),
+        ).toBeInTheDocument();
+      });
 
       userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
 
@@ -270,7 +292,19 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(screen.getByRole('button', { name: 'Line' }));
+      userEvent.click(
+        screen.getByText('Line', {
+          selector: 'button',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Data sets', {
+            selector: '[role="tab"]',
+          }),
+        ).toBeInTheDocument();
+      });
 
       userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
 

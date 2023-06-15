@@ -11,7 +11,7 @@ import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router';
 
 interface Model {
   publication: Publication;
@@ -20,29 +20,23 @@ interface Model {
   releaseContributors: UserReleaseRole[];
 }
 
-const PublicationReleaseContributorsPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+const PublicationReleaseContributorsPage = () => {
+  const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [
-      publication,
-      release,
-      publicationContributors,
-      releaseRoles,
-    ] = await Promise.all([
-      publicationService.getPublication(publicationId),
-      releaseService.getRelease(releaseId),
-      releasePermissionService.listPublicationContributors(publicationId),
-      releasePermissionService.listRoles(releaseId),
-    ]);
+    const [publication, release, publicationContributors, releaseRoles] =
+      await Promise.all([
+        publicationService.getPublication(publicationId),
+        releaseService.getRelease(releaseId),
+        releasePermissionService.listPublicationContributors(publicationId),
+        releasePermissionService.listRoles(releaseId),
+      ]);
     return {
       publication,
       release,
       publicationContributors,
       releaseContributors: releaseRoles.filter(
-        role => role.role === 'Contributor',
+        ({ role }) => role === 'Contributor',
       ),
     };
   }, [publicationId, releaseId]);
@@ -51,12 +45,8 @@ const PublicationReleaseContributorsPage = ({
     return <LoadingSpinner />;
   }
 
-  const {
-    publication,
-    release,
-    publicationContributors,
-    releaseContributors,
-  } = model;
+  const { publication, release, publicationContributors, releaseContributors } =
+    model;
 
   return (
     <LoadingSpinner

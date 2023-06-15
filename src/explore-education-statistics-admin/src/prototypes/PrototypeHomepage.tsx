@@ -1,6 +1,6 @@
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
-import React from 'react';
 import classNames from 'classnames';
+import React from 'react';
 import styles from './PrototypePublicPage.module.scss';
 
 const PrototypeHomepage = () => {

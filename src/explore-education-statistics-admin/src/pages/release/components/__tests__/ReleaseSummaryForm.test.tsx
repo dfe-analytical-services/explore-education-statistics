@@ -3,9 +3,9 @@ import _metaService, {
 } from '@admin/services/metaService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
-import React from 'react';
 import { releaseTypes } from '@common/services/types/releaseType';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
 } from '../ReleaseSummaryForm';
@@ -172,7 +172,7 @@ describe('ReleaseSummaryForm', () => {
       name: 'Create new release',
     });
 
-    await userEvent.type(inputYear, '2');
+    userEvent.type(inputYear, '2');
     userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
     userEvent.click(buttonCreate);
 
@@ -226,7 +226,7 @@ describe('ReleaseSummaryForm', () => {
       name: 'Create new release',
     });
 
-    await userEvent.type(inputYear, '202021');
+    userEvent.type(inputYear, '202021');
     userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
     userEvent.click(buttonCreate);
 
@@ -285,7 +285,7 @@ describe('ReleaseSummaryForm', () => {
       name: 'Create new release',
     });
 
-    await userEvent.type(inputYear, '1966');
+    userEvent.type(inputYear, '1966');
     userEvent.click(buttonCreate);
 
     await waitFor(() => {
@@ -378,7 +378,7 @@ describe('ReleaseSummaryForm', () => {
     const inputYear = screen.getByLabelText(
       testTimeIdentifiers[0].category.label,
     );
-    await userEvent.type(inputYear, '1966');
+    userEvent.type(inputYear, '1966');
 
     const radioOptionReleaseTypeNationalStats = screen.getByLabelText(
       releaseTypes.NationalStatistics,

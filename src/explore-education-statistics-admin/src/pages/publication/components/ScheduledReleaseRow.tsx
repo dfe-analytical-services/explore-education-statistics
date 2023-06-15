@@ -9,8 +9,8 @@ import {
 import { ReleaseSummary } from '@admin/services/releaseService';
 import FormattedDate from '@common/components/FormattedDate';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import React from 'react';
 import { generatePath } from 'react-router';
+import React from 'react';
 
 interface Props {
   publicationId: string;

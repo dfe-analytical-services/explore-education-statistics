@@ -7,17 +7,14 @@ import {
 } from '@admin/routes/methodologyRoutes';
 import methodologyService from '@admin/services/methodologyService';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
+import { generatePath, useHistory } from 'react-router';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
 
-const MethodologySummaryEditPage = ({
-  history,
-}: RouteComponentProps<MethodologyRouteParams>) => {
-  const {
-    methodologyId,
-    methodology,
-    onMethodologyChange,
-  } = useMethodologyContext();
+const MethodologySummaryEditPage = () => {
+  const { methodologyId, methodology, onMethodologyChange } =
+    useMethodologyContext();
+
+  const history = useHistory<MethodologyRouteParams>();
 
   const handleSubmit = async ({ title }: MethodologySummaryFormValues) => {
     if (!methodology) {

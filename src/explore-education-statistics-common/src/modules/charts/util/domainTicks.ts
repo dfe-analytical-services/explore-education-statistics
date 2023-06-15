@@ -51,8 +51,8 @@ function getNiceMinMaxValue(initialValue: number, isMin = false): number {
 function calculateMinorTicks(
   min: number,
   max: number,
-  spacing = 5,
   config?: TickConfig,
+  spacing = 5,
 ): number[] | undefined {
   if (config === 'startEnd') {
     return [min, max];
@@ -166,8 +166,8 @@ export function getMinorAxisDomainTicks(
   const ticks = calculateMinorTicks(
     axisDomain.min,
     axisDomain.max,
-    axis.tickSpacing,
     axis.tickConfig,
+    axis.tickSpacing,
   );
 
   return {

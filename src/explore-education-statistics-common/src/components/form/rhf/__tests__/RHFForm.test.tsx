@@ -18,7 +18,7 @@ describe('Form', () => {
           lastName: Yup.string().required('Last name is required'),
         })}
       >
-        <RHFForm id="test-form" onSubmit={Promise.resolve}>
+        <RHFForm id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -53,7 +53,7 @@ describe('Form', () => {
           lastName: Yup.string().required('Last name is required'),
         })}
       >
-        <RHFForm id="test-form" onSubmit={Promise.resolve}>
+        <RHFForm id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -86,7 +86,7 @@ describe('Form', () => {
           }),
         })}
       >
-        <RHFForm id="test-form" onSubmit={Promise.resolve}>
+        <RHFForm id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -119,7 +119,7 @@ describe('Form', () => {
           }),
         })}
       >
-        <RHFForm id="test-form" onSubmit={Promise.resolve}>
+        <RHFForm id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -147,7 +147,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
       >
         <RHFForm id="test-form" onSubmit={handleSubmitForm}>
@@ -171,7 +171,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
       >
         <RHFForm
@@ -293,7 +293,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
@@ -339,11 +339,11 @@ describe('Form', () => {
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
             <input
               id="test-form-firstName"
               // eslint-disable-next-line react/jsx-props-no-spreading
@@ -371,11 +371,11 @@ describe('Form', () => {
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
             <label htmlFor="firstName">First name</label>
             <input
               id="firstName"
@@ -420,11 +420,11 @@ describe('Form', () => {
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
             <label htmlFor="firstName">First name</label>
             <input
               id="firstName"

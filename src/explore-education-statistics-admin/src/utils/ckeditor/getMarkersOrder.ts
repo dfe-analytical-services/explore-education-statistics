@@ -1,6 +1,7 @@
+// Get the order of the markers based on their position in the editor.
+
 import { Marker } from '@admin/types/ckeditor';
 
-// Get the order of the markers based on their position in the editor.
 // Used to order the comments list.
 const getMarkersOrder = (markers: Marker[]): string[] => {
   return [...markers]

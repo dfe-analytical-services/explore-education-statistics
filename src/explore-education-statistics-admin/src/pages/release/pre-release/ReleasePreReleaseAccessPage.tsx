@@ -11,8 +11,8 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { generatePath } from 'react-router';
+import React from 'react';
 
 export const releasePreReleaseAccessPageTabs = {
   users: 'preReleaseAccess-users',
@@ -26,9 +26,10 @@ const ReleasePreReleaseAccessPage = () => {
     value: release,
     isLoading,
     setState: setRelease,
-  } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
-    releaseId,
-  ]);
+  } = useAsyncHandledRetry(
+    () => releaseService.getRelease(releaseId),
+    [releaseId],
+  );
 
   const { value: canUpdateRelease = false } = useAsyncHandledRetry(
     () => permissionService.canUpdateRelease(releaseId),
@@ -75,12 +76,15 @@ const ReleasePreReleaseAccessPage = () => {
                 <p>
                   <UrlContainer
                     data-testid="prerelease-url"
-                    url={`${window.location.origin}${generatePath<
-                      ReleaseRouteParams
-                    >(preReleaseContentRoute.path, {
-                      publicationId: release.publicationId,
-                      releaseId: release.id,
-                    })}`}
+                    url={`${
+                      window.location.origin
+                    }${generatePath<ReleaseRouteParams>(
+                      preReleaseContentRoute.path,
+                      {
+                        publicationId: release.publicationId,
+                        releaseId: release.id,
+                      },
+                    )}`}
                   />
                 </p>
               </>

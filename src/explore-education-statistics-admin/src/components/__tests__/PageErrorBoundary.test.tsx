@@ -1,7 +1,7 @@
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
+import { IAxiosError } from '@common-test/createAxiosErrorMock';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import { render, screen, waitFor } from '@testing-library/react';
-import { AxiosError } from 'axios';
 import React, { useEffect } from 'react';
 import { MemoryRouter } from 'react-router';
 
@@ -38,11 +38,13 @@ describe('PageErrorBoundary', () => {
   });
 
   test('calling `handleError` with 401 error renders Forbidden page', async () => {
-    const error: Partial<AxiosError> = {
+    const error: IAxiosError = {
       name: 'Error',
       message: 'Forbidden',
       isAxiosError: true,
       request: {},
+      toJSON: () => ({}),
+      config: {},
       response: {
         config: {},
         data: {},
@@ -82,11 +84,13 @@ describe('PageErrorBoundary', () => {
   });
 
   test('calling `handleError` with 404 error renders Not Found page', async () => {
-    const error: Partial<AxiosError> = {
+    const error: IAxiosError = {
       name: 'Error',
       message: 'Not Found',
       isAxiosError: true,
       request: {},
+      toJSON: () => ({}),
+      config: {},
       response: {
         config: {},
         data: {},

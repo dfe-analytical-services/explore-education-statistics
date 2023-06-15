@@ -11,8 +11,8 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import classNames from 'classnames';
 import { useField } from 'formik';
-import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
+import React from 'react';
 
 interface Props {
   id: string;
@@ -27,10 +27,8 @@ export default function TableHeadersAxis({
   name,
   onMoveGroupToOtherAxis,
 }: Props) {
-  const {
-    groupDraggingActive,
-    groupDraggingEnabled,
-  } = useTableHeadersContext();
+  const { groupDraggingActive, groupDraggingEnabled } =
+    useTableHeadersContext();
   const [field, meta] = useField(name);
 
   return (

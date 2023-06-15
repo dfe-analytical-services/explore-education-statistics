@@ -370,16 +370,16 @@ describe('EditableKeyStatDataBlock', () => {
       });
 
       userEvent.clear(screen.getByLabelText('Trend'));
-      await userEvent.type(screen.getByLabelText('Trend'), 'New trend');
+      userEvent.type(screen.getByLabelText('Trend'), 'New trend');
 
       userEvent.clear(screen.getByLabelText('Guidance title'));
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Guidance title'),
         'New guidance title',
       );
 
       userEvent.clear(screen.getByLabelText('Guidance text'));
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Guidance text'),
         'New guidance text',
       );
@@ -426,7 +426,7 @@ describe('EditableKeyStatDataBlock', () => {
       });
 
       userEvent.clear(screen.getByLabelText('Guidance title'));
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Guidance title'),
         '  New guidance title  ',
       );

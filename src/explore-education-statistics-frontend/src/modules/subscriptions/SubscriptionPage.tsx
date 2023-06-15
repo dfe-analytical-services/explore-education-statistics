@@ -13,6 +13,7 @@ import classNames from 'classnames';
 import { Formik } from 'formik';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useState } from 'react';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import styles from './SubscriptionPage.module.scss';
 
 interface FormValues {
@@ -43,7 +44,7 @@ const SubscriptionPage: NextPage<Props> = ({
       const { id, title } = data;
 
       await notificationService.subscribeToPublication({
-        email,
+        email: email.trim(),
         id,
         slug,
         title,
@@ -53,8 +54,8 @@ const SubscriptionPage: NextPage<Props> = ({
     }
   };
 
-  let message;
-  let title;
+  let message = '';
+  let title = '';
 
   if (unsubscribed) {
     title = 'Unsubscribed';
@@ -135,23 +136,25 @@ const SubscriptionPage: NextPage<Props> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const { slug, unsubscribed = '', verified = '' } = query as Dictionary<
-    string
-  >;
-
-  const data = await publicationService.getPublicationTitle(slug as string);
-
-  return {
-    props: {
-      data,
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const {
       slug,
-      unsubscribed,
-      verified,
-    },
-  };
-};
+      unsubscribed = '',
+      verified = '',
+    } = query as Dictionary<string>;
+
+    const data = await publicationService.getPublicationTitle(slug as string);
+
+    return {
+      props: {
+        data,
+        slug,
+        unsubscribed,
+        verified,
+      },
+    };
+  },
+);
 
 export default SubscriptionPage;

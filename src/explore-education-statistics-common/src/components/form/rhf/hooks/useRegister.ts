@@ -12,7 +12,7 @@ import { useMemo } from 'react';
  */
 export default function useRegister<
   TFieldValues extends FieldValues,
-  TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+  TFieldName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >(
   name: TFieldName,
   register: UseFormRegister<TFieldValues>,

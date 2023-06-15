@@ -4,9 +4,9 @@ import EditableEmbedForm, {
 } from '@admin/components/editable/EditableEmbedForm';
 import Gate from '@common/components/Gate';
 import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
-import React from 'react';
 import { EmbedBlock as EmbedBlockType } from '@common/services/types/blocks';
 import Modal from '@common/components/Modal';
+import React from 'react';
 import useToggle from '@common/hooks/useToggle';
 
 interface Props {

@@ -6,6 +6,11 @@ describe('useDebouncedEffect', () => {
     jest.useFakeTimers();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.runOnlyPendingTimers();
+  });
+
   test('calls effect after specified timeout', () => {
     const effect = jest.fn();
 

@@ -1,3 +1,4 @@
+import Link from '@frontend/components/Link';
 import classNames from 'classnames';
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import React from 'react';
@@ -38,12 +39,12 @@ const PageHeader = ({ wide }: Props) => (
           </a>
         </div>
         <div className="govuk-header__content">
-          <a
-            href="/"
+          <Link
+            to="/"
             className="govuk-header__link govuk-header__link--service-name"
           >
             Explore education statistics
-          </a>
+          </Link>
         </div>
       </div>
     </header>

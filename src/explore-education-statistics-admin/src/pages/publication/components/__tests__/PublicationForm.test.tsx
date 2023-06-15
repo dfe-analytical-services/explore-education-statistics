@@ -163,7 +163,7 @@ describe('PublicationForm', () => {
       expect(screen.getByLabelText('Team email address')).toBeInTheDocument();
     });
 
-    await userEvent.type(
+    userEvent.type(
       screen.getByLabelText('Team email address'),
       'not a valid email',
     );
@@ -207,23 +207,20 @@ describe('PublicationForm', () => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
     });
 
-    await userEvent.type(
-      screen.getByLabelText('Publication title'),
-      'Test title',
-    );
+    userEvent.type(screen.getByLabelText('Publication title'), 'Test title');
 
-    await userEvent.type(
+    userEvent.type(
       screen.getByLabelText('Publication summary'),
       'Test summary',
     );
 
-    await userEvent.type(screen.getByLabelText('Team name'), 'Test team');
-    await userEvent.type(
+    userEvent.type(screen.getByLabelText('Team name'), 'Test team');
+    userEvent.type(
       screen.getByLabelText('Team email address'),
       'team@test.com',
     );
-    await userEvent.type(screen.getByLabelText('Contact name'), 'John Smith');
-    await userEvent.type(
+    userEvent.type(screen.getByLabelText('Contact name'), 'John Smith');
+    userEvent.type(
       screen.getByLabelText('Contact telephone number'),
       '0123456789',
     );

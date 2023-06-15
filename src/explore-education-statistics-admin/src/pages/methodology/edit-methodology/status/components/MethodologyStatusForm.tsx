@@ -14,7 +14,6 @@ import Yup from '@common/validation/yup';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { Formik } from 'formik';
 import React from 'react';
-import { StringSchema } from 'yup';
 
 export interface FormValues {
   status: MethodologyStatus;
@@ -51,15 +50,15 @@ const MethodologyStatusForm = ({
         status: Yup.mixed().required('Choose a status'),
         latestInternalReleaseNote: Yup.string().when('status', {
           is: 'Approved',
-          then: Yup.string().required('Enter an internal note'),
+          then: s => s.required('Enter an internal note'),
         }),
         publishingStrategy: Yup.string().when('status', {
           is: 'Approved',
-          then: Yup.string().required('Choose when to publish'),
-        }) as StringSchema<FormValues['publishingStrategy']>,
+          then: s => s.required('Choose when to publish'),
+        }),
         withReleaseId: Yup.string().when('publishingStrategy', {
           is: 'WithRelease',
-          then: Yup.string().required('Choose a release'),
+          then: s => s.required('Choose a release'),
         }),
       })}
     >

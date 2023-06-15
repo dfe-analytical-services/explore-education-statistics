@@ -7,13 +7,12 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import publicationService from '@admin/services/publicationService';
+import { generatePath } from 'react-router-dom';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router-dom';
+import { useParams } from 'react-router';
 
-const ReleaseTableToolPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { releaseId, publicationId } = match.params;
+const ReleaseTableToolPage = () => {
+  const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
   const { value: publication, isLoading } = useAsyncHandledRetry(
     () => publicationService.getPublication(publicationId),

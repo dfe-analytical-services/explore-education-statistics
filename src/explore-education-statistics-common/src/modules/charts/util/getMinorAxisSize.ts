@@ -29,6 +29,7 @@ const getMinorAxisSize = ({
   const highestValueLength = dataSetCategories
     .reduce((acc, dataSetCategory) => {
       const value = Object.values(dataSetCategory.dataSets).reduce(
+        // eslint-disable-next-line default-param-last
         (acc2 = acc, dataSet) => (dataSet.value > acc2 ? dataSet.value : acc2),
         0,
       );

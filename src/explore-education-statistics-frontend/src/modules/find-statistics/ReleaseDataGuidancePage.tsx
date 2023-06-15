@@ -4,14 +4,14 @@ import releaseDataGuidanceService, {
 } from '@common/services/releaseDataGuidanceService';
 import Page from '@frontend/components/Page';
 import Link from '@frontend/components/Link';
-import { GetServerSideProps } from 'next';
-import React from 'react';
+import { GetServerSideProps, NextPage } from 'next';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 
 interface Props {
   release: ReleaseDataGuidanceSummary;
 }
 
-const ReleaseDataGuidancePage = ({ release }: Props) => {
+const ReleaseDataGuidancePage: NextPage<Props> = ({ release }) => {
   return (
     <Page
       title={release.publication.title}
@@ -47,21 +47,21 @@ const ReleaseDataGuidancePage = ({ release }: Props) => {
 
 export default ReleaseDataGuidancePage;
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const { publication, release } = query as {
-    publication: string;
-    release: string;
-  };
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const { publication, release } = query as {
+      publication: string;
+      release: string;
+    };
 
-  const data = await (release
-    ? releaseDataGuidanceService.getReleaseDataGuidance(publication, release)
-    : releaseDataGuidanceService.getLatestReleaseDataGuidance(publication));
+    const data = await (release
+      ? releaseDataGuidanceService.getReleaseDataGuidance(publication, release)
+      : releaseDataGuidanceService.getLatestReleaseDataGuidance(publication));
 
-  return {
-    props: {
-      release: data,
-    },
-  };
-};
+    return {
+      props: {
+        release: data,
+      },
+    };
+  },
+);

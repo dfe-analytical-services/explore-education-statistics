@@ -1,7 +1,9 @@
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
+import { NextPage } from 'next';
 import React from 'react';
 
-function HelpSupportPage() {
+const HelpSupportPage: NextPage = () => {
   return (
     <Page title="Help and support">
       <div className="govuk-grid-row">
@@ -51,12 +53,13 @@ function HelpSupportPage() {
                 Statistics at DfE
               </a>{' '}
               pages GOV.UK browse our{' '}
-              <a href="/find-statistics">Find statistics and data</a> section.
+              <Link to="/find-statistics">Find statistics and data</Link>{' '}
+              section.
             </p>
             <p>
               You can also download data files of those statistics currently
               published via the service through our{' '}
-              <a href="/data-catalogue">Data catalogue</a> section.
+              <Link to="/data-catalogue">Data catalogue</Link> section.
             </p>
             <p>
               These files are currently only available in csv format but other
@@ -74,13 +77,14 @@ function HelpSupportPage() {
               To find out about the methodology behind the specific statistics
               and data set currently published via the service and how and why
               they're collected and published browse our{' '}
-              <a href="/methodology">Education statistics: methodology</a>{' '}
+              <Link to="/methodology">Education statistics: methodology</Link>{' '}
               section.
             </p>
             <p>
               For a list of definitions and terms used across education
               statistics and data visit our{' '}
-              <a href="/glossary">Education statistics: glossary</a> section.
+              <Link to="/glossary">Education statistics: glossary</Link>{' '}
+              section.
             </p>
           </section>
           <section className="govuk-section-break--xl">
@@ -90,8 +94,8 @@ function HelpSupportPage() {
             <p>
               To create your own tables and explore the national and regional
               data we have available via the service use the table tool
-              available in our <a href="/data-tables">Create your own tables</a>{' '}
-              section.
+              available in our{' '}
+              <Link to="/data-tables">Create your own tables</Link> section.
             </p>
             <p>
               You can use our table tool to choose the data and area of
@@ -112,7 +116,7 @@ function HelpSupportPage() {
             <p>
               Sign up by selecting the 'Sign up for email alerts' link found at
               the top of the pages found under{' '}
-              <a href="/find-statistics">Find statistics and data</a>
+              <Link to="/find-statistics">Find statistics and data</Link>
             </p>
             <p>
               You'll then be sent an email alert with a link to the latest
@@ -138,22 +142,22 @@ function HelpSupportPage() {
             <div className="govuk-inset-text">
               <p className="govuk-!-margin-top-0">
                 Email:{' '}
-                <a href="mailto:explore.statistics@education.gov.uk">
+                <Link to="mailto:explore.statistics@education.gov.uk">
                   explore.statistics@education.gov.uk
-                </a>
+                </Link>
               </p>
             </div>
             <p>
               If you have any specific statistical or subject-related queries,
               contact the team or named statistician listed in the 'Contact us'
               sections of the pages found under{' '}
-              <a href="/find-statistics">Find statistics and data</a>.
+              <Link to="/find-statistics">Find statistics and data</Link>.
             </p>
           </section>
         </div>
       </div>
     </Page>
   );
-}
+};
 
 export default HelpSupportPage;

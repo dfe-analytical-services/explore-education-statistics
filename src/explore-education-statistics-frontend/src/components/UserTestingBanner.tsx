@@ -1,8 +1,8 @@
 import useMounted from '@common/hooks/useMounted';
 import { useCookies } from '@frontend/hooks/useCookies';
-import React from 'react';
 import ButtonText from '@common/components/ButtonText';
 import classNames from 'classnames';
+import React from 'react';
 import styles from './UserTestingBanner.module.scss';
 import Link from './Link';
 

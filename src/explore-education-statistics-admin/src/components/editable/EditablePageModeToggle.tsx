@@ -1,7 +1,7 @@
+import React from 'react';
 import { EditingMode, useEditingContext } from '@admin/contexts/EditingContext';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import useToggle from '@common/hooks/useToggle';
-import React from 'react';
 import classNames from 'classnames';
 import styles from './EditablePageModeToggle.module.scss';
 

@@ -7,9 +7,9 @@ import {
   fireEvent,
   within,
 } from '@testing-library/react';
-import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 describe('RoleForm', () => {
   const testUser: User = {

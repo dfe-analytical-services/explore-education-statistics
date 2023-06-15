@@ -41,38 +41,35 @@ const TableQueryError = ({
   }, []);
 
   const values = useWatch();
-  const {
-    errorMessage,
-    downloadOptionMessage,
-    nonDownloadOptionMessage,
-  } = useMemo<ErrorMessageText>(() => {
-    switch (errorCode) {
-      case 'QueryExceedsMaxAllowableTableSize':
-        return {
-          errorMessage:
-            'Could not create table as the filters chosen may exceed the maximum allowed table size.',
-          downloadOptionMessage:
-            'Select different filters or download the subject data.',
-          nonDownloadOptionMessage: 'Select different filters and try again.',
-        };
-      case 'RequestCancelled':
-        return {
-          errorMessage:
-            'Could not create table as the filters chosen took too long to respond.',
-          downloadOptionMessage:
-            'Select different filters, try again later or download the subject data.',
-          nonDownloadOptionMessage:
-            'Select different filters or try again later.',
-        };
-      default:
-        return {
-          errorMessage: 'Could not create table.',
-          downloadOptionMessage:
-            'Try again later or download the subject data.',
-          nonDownloadOptionMessage: 'Try again later.',
-        };
-    }
-  }, [errorCode]);
+  const { errorMessage, downloadOptionMessage, nonDownloadOptionMessage } =
+    useMemo<ErrorMessageText>(() => {
+      switch (errorCode) {
+        case 'QueryExceedsMaxAllowableTableSize':
+          return {
+            errorMessage:
+              'Could not create table as the filters chosen may exceed the maximum allowed table size.',
+            downloadOptionMessage:
+              'Select different filters or download the subject data.',
+            nonDownloadOptionMessage: 'Select different filters and try again.',
+          };
+        case 'RequestCancelled':
+          return {
+            errorMessage:
+              'Could not create table as the filters chosen took too long to respond.',
+            downloadOptionMessage:
+              'Select different filters, try again later or download the subject data.',
+            nonDownloadOptionMessage:
+              'Select different filters or try again later.',
+          };
+        default:
+          return {
+            errorMessage: 'Could not create table.',
+            downloadOptionMessage:
+              'Try again later or download the subject data.',
+            nonDownloadOptionMessage: 'Try again later.',
+          };
+      }
+    }, [errorCode]);
 
   if (!isEqual(values, previousValues)) {
     return null;

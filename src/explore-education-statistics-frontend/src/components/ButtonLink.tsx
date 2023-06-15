@@ -1,10 +1,10 @@
 import classNames from 'classnames';
 import Link from 'next/link';
-import React from 'react';
 import {
   SetCommonButtonLink,
   ButtonLinkType,
 } from '@common/components/ButtonLink';
+import React from 'react';
 import { LinkProps } from './Link';
 
 type Props = {

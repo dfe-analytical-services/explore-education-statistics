@@ -4,8 +4,7 @@
 
   Amendments to the original file are marked within this file with the word "HIVE".
 */
-import React from 'react';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import authService from './AuthorizeService';
 import { AuthenticationResultStatus } from './AuthorizeService';
 import {

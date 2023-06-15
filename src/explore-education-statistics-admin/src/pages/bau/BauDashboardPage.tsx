@@ -1,7 +1,7 @@
+import React from 'react';
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import React from 'react';
 
 const BauDashboardPage = () => {
   const { user } = useAuthContext();

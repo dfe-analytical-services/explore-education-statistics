@@ -58,7 +58,7 @@ describe('FormCheckboxSearchGroup', () => {
 
       const searchInput = screen.getByLabelText('Search options');
 
-      await userEvent.type(searchInput, '2');
+      userEvent.type(searchInput, '2');
 
       jest.runAllTimers();
 
@@ -90,7 +90,7 @@ describe('FormCheckboxSearchGroup', () => {
 
       const searchInput = screen.getByLabelText('Search options');
 
-      await userEvent.type(searchInput, '2');
+      userEvent.type(searchInput, '2');
 
       jest.runAllTimers();
 
@@ -280,7 +280,7 @@ describe('FormCheckboxSearchGroup', () => {
       );
 
       const searchInput = screen.getByLabelText('Search options');
-      await userEvent.type(searchInput, 'ch');
+      userEvent.type(searchInput, 'ch');
 
       jest.runAllTimers();
 
@@ -355,7 +355,7 @@ describe('FormCheckboxSearchGroup', () => {
 
     const searchInput = screen.getByLabelText('Search options');
 
-    await userEvent.type(searchInput, '[');
+    userEvent.type(searchInput, '[');
 
     expect(() => {
       jest.runAllTimers();

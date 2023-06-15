@@ -27,6 +27,7 @@ export default class Header {
       return 0;
     }
 
+    // eslint-disable-next-line no-unsafe-optional-chaining
     return this.parent?.depth + 1;
   }
 

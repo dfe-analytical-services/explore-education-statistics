@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import { Release } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';

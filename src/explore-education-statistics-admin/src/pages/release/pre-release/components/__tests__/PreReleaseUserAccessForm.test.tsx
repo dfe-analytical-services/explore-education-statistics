@@ -3,8 +3,8 @@ import _preReleaseUserService, {
 } from '@admin/services/preReleaseUserService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import PreReleaseUserAccessForm from '@admin/pages/release/pre-release/components/PreReleaseUserAccessForm';
+import React from 'react';
 
 const preReleaseUserService = _preReleaseUserService as jest.Mocked<
   typeof _preReleaseUserService
@@ -144,7 +144,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       const emailsTextarea = screen.getByLabelText('Invite new users by email');
       // type values up to but not exceeding the limit of lines
-      await userEvent.type(emailsTextarea, `test@test.com{enter}`.repeat(50));
+      userEvent.type(emailsTextarea, `test@test.com{enter}`.repeat(50));
       userEvent.tab();
 
       await waitFor(() => {
@@ -156,7 +156,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
 
       // now exceed the limit
-      await userEvent.type(emailsTextarea, `test@test.com`);
+      userEvent.type(emailsTextarea, `test@test.com`);
       userEvent.tab();
 
       await waitFor(() => {
@@ -179,7 +179,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         'test@test.com{enter}invalid-1{enter}invalid-2',
       );
@@ -205,7 +205,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         'test@test.com@test',
       );
@@ -234,7 +234,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         'test@test.',
       );
@@ -282,7 +282,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         'test@test.com{enter}invalid-1{enter}invalid-2',
       );
@@ -309,7 +309,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         ' {enter} {enter} test1@test.com {enter} {enter} test2@test.com {enter} {enter} test3@test.com {enter} ',
       );
@@ -317,13 +317,10 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
 
       await waitFor(() => {
-        expect(
-          preReleaseUserService.getInvitePlan,
-        ).toHaveBeenCalledWith('release-1', [
-          'test1@test.com',
-          'test2@test.com',
-          'test3@test.com',
-        ]);
+        expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
+          'release-1',
+          ['test1@test.com', 'test2@test.com', 'test3@test.com'],
+        );
       });
     });
 
@@ -338,7 +335,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         "special_'%+-.characters@test.com{enter}" +
           'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com{enter}' +
@@ -351,15 +348,16 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
 
       await waitFor(() => {
-        expect(
-          preReleaseUserService.getInvitePlan,
-        ).toHaveBeenCalledWith('release-1', [
-          "special_'%+-.characters@test.com",
-          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com',
-          'test@test.co.uk',
-          'test@test.uk',
-          'test@education.gov.uk',
-        ]);
+        expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
+          'release-1',
+          [
+            "special_'%+-.characters@test.com",
+            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com',
+            'test@test.co.uk',
+            'test@test.uk',
+            'test@education.gov.uk',
+          ],
+        );
       });
     });
 
@@ -374,7 +372,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         'test1@test.com{enter}test2@test.com{enter}test3@test.com',
       );
@@ -394,13 +392,10 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
 
       await waitFor(() => {
-        expect(
-          preReleaseUserService.getInvitePlan,
-        ).toHaveBeenCalledWith('release-1', [
-          'test1@test.com',
-          'test2@test.com',
-          'test3@test.com',
-        ]);
+        expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
+          'release-1',
+          ['test1@test.com', 'test2@test.com', 'test3@test.com'],
+        );
       });
 
       await waitFor(() => {
@@ -467,7 +462,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         'test@test.com',
       );
@@ -512,7 +507,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         'test@test.com',
       );
@@ -549,7 +544,7 @@ describe('PreReleaseUserAccessForm', () => {
         ).toBeInTheDocument();
       });
 
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Invite new users by email'),
         'test3@test.com{enter}test4@test.com{enter}test5@test.com',
       );
@@ -579,13 +574,10 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
-        expect(
-          preReleaseUserService.inviteUsers,
-        ).toHaveBeenCalledWith('release-1', [
-          'test3@test.com',
-          'test4@test.com',
-          'test5@test.com',
-        ]);
+        expect(preReleaseUserService.inviteUsers).toHaveBeenCalledWith(
+          'release-1',
+          ['test3@test.com', 'test4@test.com', 'test5@test.com'],
+        );
       });
 
       expect(

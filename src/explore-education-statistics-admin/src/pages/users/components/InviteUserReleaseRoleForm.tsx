@@ -6,7 +6,7 @@ import React, { useMemo } from 'react';
 import { IdTitlePair } from '@admin/services/types/common';
 import { InviteUserReleaseRole } from '@admin/pages/users/UserInvitePage';
 import ButtonText from '@common/components/ButtonText';
-import { keyBy } from 'lodash';
+import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 
 interface FormValues {

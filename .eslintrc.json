@@ -1,6 +1,6 @@
 {
   "parser": "@typescript-eslint/parser",
-  "plugins": ["@typescript-eslint", "react-hooks"],
+  "plugins": ["@typescript-eslint", "react-hooks", "jest"],
   "settings": {
     "import/resolver": {
       "typescript": {
@@ -9,6 +9,9 @@
     },
     "react": {
       "version": "detect"
+    },
+    "next": {
+      "rootDir": "src/explore-education-statistics-frontend"
     }
   },
   "env": {
@@ -22,6 +25,8 @@
     "plugin:react/recommended",
     "plugin:jsx-a11y/recommended",
     "plugin:import/typescript",
+    "plugin:react-hooks/recommended",
+    "plugin:@next/next/recommended",
     "prettier",
     "prettier/prettier"
   ],
@@ -42,6 +47,17 @@
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "import/no-unresolved": "off",
     "react/forbid-prop-types": "off",
+    "@next/next/no-html-link-for-pages": ["error", "src/pages"],
+    "react/function-component-definition": "off",
+    "import/no-import-module-exports": "off",
+    "no-promise-executor-return": "off",
+    "react/no-unstable-nested-components": "off",
+    "no-restricted-exports": [
+      "error",
+      {
+        "restrictedNamedExports": ["!default"]
+      }
+    ],
     "react/no-unescaped-entities": [
       "error",
       {
@@ -65,10 +81,13 @@
     ],
     "react/jsx-curly-newline": "off",
     "react/jsx-one-expression-per-line": "off",
-    "react/jsx-props-no-spreading": ["error", {
-      "html": "enforce",
-      "custom": "ignore"
-    }],
+    "react/jsx-props-no-spreading": [
+      "error",
+      {
+        "html": "enforce",
+        "custom": "ignore"
+      }
+    ],
     "react/jsx-wrap-multilines": ["error", { "prop": "ignore" }],
     "react/require-default-props": "off",
     "react/sort-comp": [
@@ -126,19 +145,30 @@
       }
     ],
     "no-console": "warn",
-    "no-param-reassign": ["error", {
-      "props": true,
-      "ignorePropertyModificationsFor": ["draft", "acc"]
-    }],
+    "no-param-reassign": [
+      "error",
+      {
+        "props": true,
+        "ignorePropertyModificationsFor": ["draft", "acc"]
+      }
+    ],
     "no-shadow": "off",
     "no-use-before-define": "off",
     "no-useless-constructor": "off",
-    "spaced-comment": ["warn", "always", { "markers": ["/"] }]
+    "no-unreachable": "error",
+    "no-underscore-dangle": "error",
+    "valid-typeof": "error",
+    "getter-return": "warn",
+    "react/require-render-return": "error",
+    "react/react-in-jsx-scope": "off",
+    "spaced-comment": ["warn", "always", { "markers": ["/"] }],
+    "@next/next/no-img-element": "off"
   },
   "overrides": [
     {
       "files": ["**/*.js"],
       "rules": {
+        "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-var-requires": "off",
         "global-require": "off",
         "import/no-dynamic-require": "off",

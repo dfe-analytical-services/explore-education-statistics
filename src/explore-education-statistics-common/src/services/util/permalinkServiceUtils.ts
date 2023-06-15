@@ -46,20 +46,19 @@ function deduplicatePermalinkLocations(permalink: Permalink): Permalink {
 
   // We populate our deduplicated locations in a bit of a hacky way,
   // but this is probably the easiest way of doing it.
-  const mergeGroupedOptions = (level: string) => (
-    groupedOptions: LocationOption[],
-  ) => {
-    const mergedOption = mergeLocationLabels(groupedOptions);
+  const mergeGroupedOptions =
+    (level: string) => (groupedOptions: LocationOption[]) => {
+      const mergedOption = mergeLocationLabels(groupedOptions);
 
-    if (groupedOptions.length > 1) {
-      deduplicatedOptions.push({
-        ...mergedOption,
-        level,
-      });
-    }
+      if (groupedOptions.length > 1) {
+        deduplicatedOptions.push({
+          ...mergedOption,
+          level,
+        });
+      }
 
-    return mergedOption;
-  };
+      return mergedOption;
+    };
 
   const mergedLocations = mapValues(locations, (levelOptions, level) => {
     const hasNestedOptions = levelOptions.some(location => location.options);

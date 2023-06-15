@@ -1,19 +1,7 @@
-import BaseDocument, {
-  DocumentContext,
-  Head,
-  Html,
-  Main,
-  NextScript,
-} from 'next/document';
-import React from 'react';
+import BaseDocument, { Head, Html, Main, NextScript } from 'next/document';
 
 class Document extends BaseDocument {
-  public static async getInitialProps(ctx: DocumentContext) {
-    const initialProps = await BaseDocument.getInitialProps(ctx);
-    return { ...initialProps };
-  }
-
-  public render() {
+  render() {
     return (
       <Html lang="en" className="govuk-template app-html-class">
         <Head>
@@ -24,7 +12,6 @@ class Document extends BaseDocument {
               <meta httpEquiv="cache-control" content="no-cache" />
             </>
           )}
-
           <link
             rel="shortcut icon"
             sizes="16x16 32x32 48x48"

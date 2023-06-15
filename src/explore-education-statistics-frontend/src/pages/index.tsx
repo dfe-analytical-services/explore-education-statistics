@@ -1,9 +1,10 @@
 import ButtonLink from '@frontend/components/ButtonLink';
+import { NextPage } from 'next';
 import React from 'react';
 import Link from '../components/Link';
 import Page from '../components/Page';
 
-function HomePage() {
+const HomePage: NextPage = () => {
   return (
     <Page title="Explore our statistics and data" isHomepage>
       <div className="govuk-grid-row dfe-card__container">
@@ -106,36 +107,36 @@ function HomePage() {
             services provided by the Department for Education (DfE):
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
+            <Link to="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
               Statistics at DfE
-            </a>
+            </Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Find out more about latest news, announcements, forthcoming releases
             and ad hoc publications, as well as related education statistics.
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://www.gov.uk/school-performance-tables">
+            <Link to="https://www.gov.uk/school-performance-tables">
               Find and compare schools in England
-            </a>
+            </Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Search for and check the performance of primary, secondary and
             special needs schools and colleges.
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://www.get-information-schools.service.gov.uk/">
+            <Link to="https://www.get-information-schools.service.gov.uk/">
               Get information about schools
-            </a>
+            </Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Search to find and download information about schools, colleges,
             educational organisations and governors in England.
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
-            <a href="https://schools-financial-benchmarking.service.gov.uk/">
+            <Link to="https://schools-financial-benchmarking.service.gov.uk/">
               Schools financial benchmarking
-            </a>
+            </Link>
           </h3>
           <p className="govuk-caption-m govuk-!-margin-top-1">
             Compare your school&apos;s income and expenditure with other schools
@@ -165,12 +166,12 @@ function HomePage() {
       <p className="govuk-caption-m govuk-!-margin-top-1">
         Email
         <br />
-        <a href="mailto:explore.statistics@education.gov.uk">
+        <Link to="mailto:explore.statistics@education.gov.uk">
           explore.statistics@education.gov.uk
-        </a>
+        </Link>
       </p>
     </Page>
   );
-}
+};
 
 export default HomePage;

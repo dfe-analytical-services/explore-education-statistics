@@ -1,20 +1,106 @@
 /* eslint-disable no-param-reassign */
+const path = require('path');
 const flowRight = require('lodash/fp/flowRight');
 const withTranspileModules = require('next-transpile-modules');
-const path = require('path');
 
-const nextConfig = {
-  env: {
-    BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
+const cspConnectSrc = [
+  "'self'",
+  process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace('/api', ''),
+  process.env.NEXT_PUBLIC_DATA_API_BASE_URL.replace('/api', ''),
+  process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL.replace('/api', ''),
+  'https://www.google-analytics.com',
+  'https://dc.services.visualstudio.com/v2/track',
+];
+
+const cspScriptSrc = [
+  "'self'",
+  'https://www.google-analytics.com/',
+  "'unsafe-inline'",
+  "'unsafe-eval'",
+];
+
+const frameScriptSrc = [
+  "'self'",
+  'https://department-for-education.shinyapps.io/',
+  'https://dfe-analytical-services.github.io/',
+];
+
+const ContentSecurityPolicy = `
+  default-src 'self';
+  script-src ${cspScriptSrc.join(' ')};
+  style-src 'self' 'unsafe-inline';
+  img-src * blob: data: https://www.google-analytics.com/;
+  media-src 'self' blob: data:;
+  font-src 'self';
+  connect-src ${
+    process.env.NODE_ENV !== 'production' ? '*' : cspConnectSrc.join(' ')
+  };
+  frame-src ${frameScriptSrc.join(' ')};
+  frame-ancestors 'self';
+  child-src 'self';
+`;
+
+const securityHeaders = [
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+  {
+    key: 'Content-Security-Policy',
+    value: ContentSecurityPolicy.replace(/\n/g, ''),
   },
-  publicRuntimeConfig: {
-    APP_ENV: process.env.APP_ENV,
-    CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
-    DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
-    NOTIFICATION_API_BASE_URL: process.env.NOTIFICATION_API_BASE_URL,
-    APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
-    GA_TRACKING_ID: process.env.GA_TRACKING_ID,
-    PUBLIC_URL: process.env.PUBLIC_URL,
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
+  {
+    key: 'Referrer-Policy',
+    value: 'origin-when-cross-origin',
+  },
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+  {
+    key: 'X-Frame-Options',
+    value: 'DENY',
+  },
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+  {
+    key: 'X-Content-Type-Options',
+    value: 'nosniff',
+  },
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
+  {
+    key: 'X-DNS-Prefetch-Control',
+    value: 'on',
+  },
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+  {
+    key: 'Strict-Transport-Security',
+    value: 'max-age=31536000; includeSubDomains; preload',
+  },
+  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Feature-Policy
+  {
+    key: 'Permissions-Policy',
+    value: 'camera=(), microphone=(), geolocation=()',
+  },
+];
+
+/**
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
+  reactStrictMode: true,
+  poweredByHeader: false,
+  swcMinify: false,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+  images: {
+    remotePatterns: [
+      {
+        hostname: process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace(
+          '/api',
+          '',
+        ),
+      },
+    ],
+    formats: ['image/avif', 'image/webp'],
+  },
+  env: {
+    NEXT_PUBLIC_BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
   },
   async redirects() {
     return [
@@ -35,7 +121,25 @@ const nextConfig = {
       },
     ];
   },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: securityHeaders,
+      },
+      {
+        source: '/fonts/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
   webpack(config, options) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { dev, isServer } = options;
 
     if (isServer) {
@@ -44,7 +148,7 @@ const nextConfig = {
       config.plugins.push(
         new ForkTsCheckerPlugin({
           typescript: {
-            configFile: path.resolve(__dirname, 'src/tsconfig.json'),
+            configFile: path.resolve(__dirname, 'tsconfig.json'),
           },
         }),
       );

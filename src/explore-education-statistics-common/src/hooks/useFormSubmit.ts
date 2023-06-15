@@ -14,6 +14,7 @@ export type UseFormSubmit<FormValues> = (
 
 function useFormSubmit<FormValues>(
   onSubmit: UseFormSubmit<FormValues>,
+  // eslint-disable-next-line default-param-last
   errorMappers:
     | FieldMessageMapper<FormValues>[]
     | ((values: FormValues) => FieldMessageMapper<FormValues>[]) = [],

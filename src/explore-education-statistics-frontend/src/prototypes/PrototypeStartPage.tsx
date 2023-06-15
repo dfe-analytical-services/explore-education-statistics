@@ -30,26 +30,26 @@ const StartPage = () => {
             <li>download data files for your own analysis</li>
           </ul>
           <div className="govuk-inset-text">
-            <a
+            <Link
               className="govuk-link"
-              href="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics"
+              to="https://www.education-ni.gov.uk/topics/statistics-and-research/statistics"
             >
               Northern Ireland
-            </a>
+            </Link>
             ,{' '}
-            <a
+            <Link
               className="govuk-link"
-              href="https://www2.gov.scot/Topics/Statistics/Browse/School-Education"
+              to="https://www2.gov.scot/Topics/Statistics/Browse/School-Education"
             >
               Scotland
-            </a>
+            </Link>
             , and{' '}
-            <a
+            <Link
               className="govuk-link"
-              href="https://gov.wales/statistics-and-research/?topic=Education+and+skills&lang=en"
+              to="https://gov.wales/statistics-and-research/?topic=Education+and+skills&lang=en"
             >
               Wales
-            </a>{' '}
+            </Link>{' '}
             have their own websites to help you explore education statistics.
           </div>
           <Link to="/" className="govuk-button govuk-button--start">
@@ -64,20 +64,14 @@ const StartPage = () => {
           </p>
           <ul className="govuk-list-bullet">
             <li>
-              <a
-                className="govuk-link"
-                href="https://www.gov.uk/school-performance-tables"
-              >
+              <Link to="https://www.gov.uk/school-performance-tables">
                 Find and compare schools in England
-              </a>
+              </Link>
             </li>
             <li>
-              <a
-                className="govuk-link"
-                href="https://www.get-information-schools.service.gov.uk"
-              >
+              <Link to="https://www.get-information-schools.service.gov.uk">
                 Get information about schools
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -88,36 +82,24 @@ const StartPage = () => {
             </h2>
             <ul className="govuk-list">
               <li>
-                <a
-                  className="govuk-link"
-                  href="https://www.gov.uk/government/organisations/department-for-education/about/statistics"
-                >
+                <Link to="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
                   Statistics at DfE
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  className="govuk-link"
-                  href="https://www.gov.uk/government/statistics/announcements?utf8=%E2%9C%93&amp;organisations%5B%5D=department-for-education"
-                >
+                <Link to="https://www.gov.uk/government/statistics/announcements?utf8=%E2%9C%93&amp;organisations%5B%5D=department-for-education">
                   DfE statistics: release calendar
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  className="govuk-link"
-                  href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education"
-                >
+                <Link to="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
                   Standards for official statistics published by DfE
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  className="govuk-link"
-                  href="https://www.statisticsauthority.gov.uk/code-of-practice"
-                >
+                <Link to="https://www.statisticsauthority.gov.uk/code-of-practice">
                   UK Statistics Authority: Code of Practice for Statistics
-                </a>
+                </Link>
               </li>
             </ul>
           </aside>

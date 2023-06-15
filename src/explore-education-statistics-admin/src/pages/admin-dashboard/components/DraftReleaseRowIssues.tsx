@@ -1,9 +1,9 @@
+import React from 'react';
 import releaseService from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import TagGroup from '@common/components/TagGroup';
 
 interface Props {
@@ -11,13 +11,12 @@ interface Props {
 }
 
 const DraftReleaseRowIssues = ({ releaseId }: Props) => {
-  const {
-    value: checklist,
-    isLoading: isLoadingChecklist,
-  } = useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
+  const { value: checklist, isLoading: isLoadingChecklist } =
+    useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
 
   const totalIssues = checklist
-    ? checklist?.errors?.length + checklist?.warnings.length
+    ? // eslint-disable-next-line no-unsafe-optional-chaining
+      checklist?.errors?.length + checklist?.warnings.length
     : 0;
 
   return (

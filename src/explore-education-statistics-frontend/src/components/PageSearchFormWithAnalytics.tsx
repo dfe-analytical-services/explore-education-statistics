@@ -1,9 +1,9 @@
 /* eslint-disable react/destructuring-assignment */
-import React from 'react';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import PageSearchForm, {
   PageSearchFormProps,
 } from '@common/components/PageSearchForm';
+import React from 'react';
 
 const PageSearchFormWithAnalytics = (props: PageSearchFormProps) => {
   const { id, onSearch } = props;

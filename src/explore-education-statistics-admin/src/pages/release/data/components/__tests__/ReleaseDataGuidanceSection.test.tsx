@@ -585,7 +585,7 @@ describe('ReleaseDataGuidanceSection', () => {
       });
 
       userEvent.clear(screen.getByLabelText('Main guidance content'));
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Main guidance content'),
         '<p>Updated main guidance content</p>',
       );
@@ -596,13 +596,13 @@ describe('ReleaseDataGuidanceSection', () => {
       const subject2 = within(subjects[1]);
 
       userEvent.clear(subject1.getByLabelText('File guidance content'));
-      await userEvent.type(
+      userEvent.type(
         subject1.getByLabelText('File guidance content'),
         '<p>Updated subject 1 guidance content</p>',
       );
 
       userEvent.clear(subject2.getByLabelText('File guidance content'));
-      await userEvent.type(
+      userEvent.type(
         subject2.getByLabelText('File guidance content'),
         '<p>Updated subject 2 guidance content</p>',
       );

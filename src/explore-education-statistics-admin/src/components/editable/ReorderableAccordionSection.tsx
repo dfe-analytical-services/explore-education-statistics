@@ -51,6 +51,7 @@ const ReorderableAccordionSection = (
     >
       <AccordionSection {...props} id={id} heading={heading} header={header}>
         {sectionProps => (
+          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {typeof children === 'function' ? children(sectionProps) : children}
           </>

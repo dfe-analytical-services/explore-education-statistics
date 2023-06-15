@@ -55,19 +55,17 @@ const AdminDashboardPage = () => {
             </Link>
           </p>
 
-          <>
-            <p>
-              This is your administration dashboard, here you can manage
-              publications, releases and methodologies.
-            </p>
-            {isBauUser && (
-              <ul className="govuk-!-margin-bottom-6">
-                <li>
-                  <Link to="/themes">manage themes and topics</Link>
-                </li>
-              </ul>
-            )}
-          </>
+          <p>
+            This is your administration dashboard, here you can manage
+            publications, releases and methodologies.
+          </p>
+          {isBauUser && (
+            <ul className="govuk-!-margin-bottom-6">
+              <li>
+                <Link to="/themes">manage themes and topics</Link>
+              </li>
+            </ul>
+          )}
         </div>
 
         <div className="govuk-grid-column-one-third">

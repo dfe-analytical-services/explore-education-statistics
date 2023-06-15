@@ -1,7 +1,7 @@
+import React from 'react';
 import { UserDetails } from '@admin/services/types/user';
 import WarningMessage from '@common/components/WarningMessage';
 import { format } from 'date-fns';
-import React from 'react';
 
 interface Props {
   lockedBy: UserDetails;

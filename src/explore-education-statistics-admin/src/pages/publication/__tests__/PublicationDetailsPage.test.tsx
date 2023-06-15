@@ -8,10 +8,10 @@ import _publicationService, {
 import _themeService, { Theme } from '@admin/services/themeService';
 import { PublicationSummary } from '@common/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 jest.mock('@admin/services/themeService');
 const themeService = _themeService as jest.Mocked<typeof _themeService>;

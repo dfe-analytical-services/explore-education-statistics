@@ -11,11 +11,11 @@ import _publicationService, {
 } from '@admin/services/publicationService';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
-import produce from 'immer';
+import { produce } from 'immer';
+import React from 'react';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/publicationService');

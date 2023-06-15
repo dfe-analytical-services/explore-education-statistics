@@ -21,29 +21,28 @@ import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useRef } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
   canUpdateRelease: boolean;
 }
 
-const ReleaseDataBlockEditPage = ({
-  match,
-  history,
-}: RouteComponentProps<ReleaseDataBlockRouteParams>) => {
-  const {
-    params: { publicationId, releaseId, dataBlockId },
-  } = match;
+const ReleaseDataBlockEditPage = () => {
+  const { dataBlockId, publicationId, releaseId } =
+    useParams<ReleaseDataBlockRouteParams>();
+  const history = useHistory();
 
   const config = useConfig();
   const pageRef = useRef<HTMLDivElement>(null);
 
   const [isDeleting, toggleDeleting] = useToggle(false);
 
-  const { value: model, isLoading, setState: setModel } = useAsyncHandledRetry<
-    Model
-  >(async () => {
+  const {
+    value: model,
+    isLoading,
+    setState: setModel,
+  } = useAsyncHandledRetry<Model>(async () => {
     const [dataBlock, canUpdateRelease] = await Promise.all([
       dataBlocksService.getDataBlock(dataBlockId),
       permissionService.canUpdateRelease(releaseId),

@@ -11,9 +11,9 @@ import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 jest.mock('@admin/services/dataReplacementService');
 jest.mock('@admin/services/releaseDataFileService');

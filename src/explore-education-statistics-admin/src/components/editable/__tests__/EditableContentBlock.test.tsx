@@ -1,3 +1,4 @@
+import React from 'react';
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
@@ -5,7 +6,6 @@ import { getDescribedBy } from '@common-test/queries';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
 
 describe('EditableContentBlock', () => {
   const testMarkdown = `

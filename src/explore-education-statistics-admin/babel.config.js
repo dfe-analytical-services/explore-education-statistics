@@ -1,5 +1,5 @@
 module.exports = {
-  presets: [['react-app', { flow: false, typescript: true }]],
+  presets: [['react-app', { typescript: true }]],
   plugins: [
     // needed to silence a warning about loose mode in unit tests
     // and admin webpack logs
@@ -13,6 +13,14 @@ module.exports = {
     test: {
       plugins: [
         'explore-education-statistics-common/babel-url-import-meta-plugin.js',
+      ],
+      presets: [
+        [
+          '@babel/preset-react',
+          {
+            runtime: 'automatic',
+          },
+        ],
       ],
     },
   },

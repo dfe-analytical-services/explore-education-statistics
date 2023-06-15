@@ -1,14 +1,12 @@
 import React from 'react';
 
-const DragIcon = ({
-  className,
-  height = '1rem',
-  width = '1rem',
-}: {
+interface Props {
   className?: string;
   height?: string;
   width?: string;
-}) => (
+}
+
+const DragIcon = ({ className, height = '1rem', width = '1rem' }: Props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     version="1.1"

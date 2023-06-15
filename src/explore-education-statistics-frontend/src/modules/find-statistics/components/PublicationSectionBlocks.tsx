@@ -13,8 +13,8 @@ import {
   logEvent,
   logOutboundLink,
 } from '@frontend/services/googleAnalyticsService';
-import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import React from 'react';
 
 export interface PublicationSectionBlocksProps {
   release: Release;
@@ -31,7 +31,7 @@ const PublicationSectionBlocks = ({
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
     releaseId: release.id,
-    rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+    rootUrl: process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace('/api', ''),
   });
 
   return blocks.length > 0 ? (

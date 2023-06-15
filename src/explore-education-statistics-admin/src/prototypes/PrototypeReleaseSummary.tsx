@@ -1,6 +1,5 @@
 import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
-import React from 'react';
 import RelatedAside from '@common/components/RelatedAside';
 import Button from '@common/components/Button';
 import SummaryList from '@common/components/SummaryList';
@@ -8,6 +7,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Details from '@common/components/Details';
 import Tag from '@common/components/Tag';
 import InsetText from '@common/components/InsetText';
+import React from 'react';
 import NavBar from './components/PrototypeNavBar';
 import styles from './PrototypePublicPage.module.scss';
 

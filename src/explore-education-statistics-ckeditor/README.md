@@ -4,7 +4,9 @@ A custom CKEditor build including custom EES plugins.
 
 ## Building the editor
 
-Create the build: `pnpm build`
+Install dependencies: `npm install`
+
+Create the build: `npm run build`
 
 This will build the CKEditor 5 to the `build` directory which is imported into EES Admin.
 

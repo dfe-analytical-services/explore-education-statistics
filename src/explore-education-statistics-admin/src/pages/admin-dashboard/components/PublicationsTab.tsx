@@ -21,9 +21,8 @@ const PublicationsTab = ({ isBauUser }: Props) => {
   const location = useLocation();
   const history = useHistory();
 
-  const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<
-    ThemeTopicParams
-  >('dashboardThemeTopic', undefined);
+  const [savedThemeTopic, setSavedThemeTopic] =
+    useStorageItem<ThemeTopicParams>('dashboardThemeTopic', undefined);
 
   const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
     themeService.getThemes,
@@ -119,6 +118,7 @@ const PublicationsTab = ({ isBauUser }: Props) => {
       </ul>
 
       {isBauUser && (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {themes && themes.length > 0 && (
             <FormThemeTopicSelect
@@ -166,6 +166,7 @@ const PublicationsTab = ({ isBauUser }: Props) => {
           </p>
         </>
       ) : (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {selectedTheme && selectedTopic ? (
             <TopicPublications
@@ -174,6 +175,7 @@ const PublicationsTab = ({ isBauUser }: Props) => {
               topic={selectedTopic}
             />
           ) : (
+            // eslint-disable-next-line react/jsx-no-useless-fragment
             <>
               {themes?.map(theme => {
                 return theme.topics.map(topic => (

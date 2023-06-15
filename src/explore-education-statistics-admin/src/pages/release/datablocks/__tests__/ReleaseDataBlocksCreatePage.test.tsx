@@ -6,9 +6,9 @@ import {
 import _permissionService from '@admin/services/permissionService';
 import ReleaseDataBlockCreatePage from '@admin/pages/release/datablocks/ReleaseDataBlockCreatePage';
 import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import { generatePath, MemoryRouter } from 'react-router';
 import { Route } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/permissionService');
 

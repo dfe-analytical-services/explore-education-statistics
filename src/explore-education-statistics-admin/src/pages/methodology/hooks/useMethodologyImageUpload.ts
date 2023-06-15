@@ -1,4 +1,3 @@
-import { ImageUploadResult } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -6,6 +5,7 @@ import {
 import { CancellablePromise } from '@common/types/promise';
 import { useCallback, useRef } from 'react';
 import methodologyImageService from '@admin/services/methodologyImageService';
+import { ImageUploadResult } from '@admin/types/ckeditor';
 
 interface UseImageUploadReturn {
   handleImageUpload: ImageUploadHandler;

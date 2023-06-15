@@ -16,6 +16,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef } from 'react';
 import { Dictionary } from '@common/types';
 import DataTableCaption from '@common/modules/table-tool/components/DataTableCaption';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 
 const captionId = 'dataTableCaption';
 const footnotesId = 'dataTableFootnotes';
@@ -135,24 +136,24 @@ const PermalinkPage: NextPage<Props> = ({ data, newPermalinks }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const { newPermalinks, permalink } = query as Dictionary<string>;
-  // TO DO - EES-4259 remove `newPermalinks` and tidy up
-  let data: Permalink | PermalinkSnapshot;
-  if (newPermalinks) {
-    data = await permalinkSnapshotService.getPermalink(permalink);
-  } else {
-    data = await permalinkService.getPermalink(permalink);
-  }
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const { newPermalinks, permalink } = query as Dictionary<string>;
+    // TO DO - EES-4259 remove `newPermalinks` and tidy up
+    let data: Permalink | PermalinkSnapshot;
+    if (newPermalinks) {
+      data = await permalinkSnapshotService.getPermalink(permalink);
+    } else {
+      data = await permalinkService.getPermalink(permalink);
+    }
 
-  return {
-    props: {
-      data,
-      newPermalinks: !!newPermalinks,
-    },
-  };
-};
+    return {
+      props: {
+        data,
+        newPermalinks: !!newPermalinks,
+      },
+    };
+  },
+);
 
 export default PermalinkPage;

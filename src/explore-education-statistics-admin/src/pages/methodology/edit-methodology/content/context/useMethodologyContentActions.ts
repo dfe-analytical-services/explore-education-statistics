@@ -49,15 +49,14 @@ export default function useMethodologyContentActions() {
     bodyContent: string;
     sectionKey: ContentSectionKeys;
   }) {
-    const updateBlock = await methodologyContentService.updateContentSectionBlock(
-      {
+    const updateBlock =
+      await methodologyContentService.updateContentSectionBlock({
         methodologyId,
         sectionId,
         blockId,
         block: { body: bodyContent },
         sectionKey,
-      },
-    );
+      });
     dispatch({
       type: 'UPDATE_BLOCK_FROM_SECTION',
       payload: {
@@ -109,14 +108,13 @@ export default function useMethodologyContentActions() {
     order: Dictionary<number>;
     sectionKey: ContentSectionKeys;
   }) {
-    const sectionContent = await methodologyContentService.updateContentSectionBlocksOrder(
-      {
+    const sectionContent =
+      await methodologyContentService.updateContentSectionBlocksOrder({
         methodologyId,
         sectionId,
         order,
         sectionKey,
-      },
-    );
+      });
     dispatch({
       type: 'UPDATE_SECTION_CONTENT',
       payload: {

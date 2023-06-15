@@ -117,7 +117,10 @@ describe('FormFieldCheckboxGroupsMenu', () => {
           test: [],
         }}
         validationSchema={Yup.object({
-          test: Yup.array().required('Select at least one option'),
+          test: Yup.array()
+            .of(Yup.string())
+            .min(1, 'Select at least one option')
+            .required('Select at least one option'),
         })}
       >
         <RHFForm id="testForm" onSubmit={Promise.resolve}>
@@ -164,7 +167,10 @@ describe('FormFieldCheckboxGroupsMenu', () => {
           test: [],
         }}
         validationSchema={Yup.object({
-          test: Yup.array().required('Select at least one option'),
+          test: Yup.array()
+            .of(Yup.string())
+            .min(1, 'Select at least one option')
+            .required(),
         })}
       >
         <RHFForm id="testForm" onSubmit={Promise.resolve}>

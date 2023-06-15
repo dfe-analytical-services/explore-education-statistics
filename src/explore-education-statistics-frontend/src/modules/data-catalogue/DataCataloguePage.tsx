@@ -143,6 +143,7 @@ const DataCataloguePage: NextPage<Props> = ({
     });
   };
 
+  // eslint-disable-next-line react/no-unstable-nested-components
   const PublicationStep = (props: InjectedWizardProps) => {
     return (
       <PublicationForm
@@ -212,10 +213,8 @@ const DataCataloguePage: NextPage<Props> = ({
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async context => {
-  const {
-    publicationSlug = '',
-    releaseSlug = '',
-  } = context.query as Dictionary<string>;
+  const { publicationSlug = '', releaseSlug = '' } =
+    context.query as Dictionary<string>;
 
   const themes = await publicationService.getPublicationTree({
     publicationFilter: 'DataCatalogue',

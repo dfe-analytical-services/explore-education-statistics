@@ -1,10 +1,10 @@
+import React from 'react';
 import CommentsList from '@admin/components/comments/CommentsList';
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
 
 describe('CommentsList', () => {
   const testMarkersOrder: string[] = ['comment-4', 'comment-2', 'comment-3'];

@@ -21,10 +21,8 @@ const MethodologyAccordion = ({
   title,
 }: MethodologyAccordionProps) => {
   const { editingMode } = useEditingContext();
-  const {
-    addContentSection,
-    updateContentSectionsOrder,
-  } = useMethodologyContentActions();
+  const { addContentSection, updateContentSectionsOrder } =
+    useMethodologyContentActions();
 
   const onAddSection = useCallback(
     () =>
@@ -59,8 +57,9 @@ const MethodologyAccordion = ({
     sectionKey === 'annexes' &&
     editingMode !== 'edit' &&
     methodology.annexes.length < 1
-  )
+  ) {
     return null;
+  }
   return (
     <EditableAccordion
       id={id}

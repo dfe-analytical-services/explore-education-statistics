@@ -56,22 +56,20 @@ export default function useBlockLock({
 }: BlockLockOptions): BlockLockState {
   const { user } = useAuthContext();
 
-  const [
-    { value, setState, isLoading: isLocking, error },
-    startLock,
-  ] = useAsyncCallback<BlockLock | undefined>(getLock, [], {
-    keepStaleValue: true,
-    initialState: initialLock
-      ? {
-          isLoading: false,
-          value: {
-            locked: initialLock.locked,
-            lockedUntil: initialLock.lockedUntil,
-            lockedBy: initialLock.lockedBy,
-          },
-        }
-      : undefined,
-  });
+  const [{ value, setState, isLoading: isLocking, error }, startLock] =
+    useAsyncCallback<BlockLock | undefined>(getLock, [], {
+      keepStaleValue: true,
+      initialState: initialLock
+        ? {
+            isLoading: false,
+            value: {
+              locked: initialLock.locked,
+              lockedUntil: initialLock.lockedUntil,
+              lockedBy: initialLock.lockedBy,
+            },
+          }
+        : undefined,
+    });
 
   const { locked, lockedBy, lockedUntil } = value ?? {};
 

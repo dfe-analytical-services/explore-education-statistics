@@ -11,8 +11,8 @@ import _publicationService, {
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
+import { produce } from 'immer';
 import React from 'react';
-import produce from 'immer';
 
 jest.mock('@common/services/downloadService');
 jest.mock('@common/services/publicationService');

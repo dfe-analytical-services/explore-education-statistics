@@ -2,8 +2,7 @@
 /* Code originally from the api-authorization folder from running
   "dotnet new react -o <output_directory_name> -au Individual"
 */
-import React from 'react';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { Route, Redirect } from 'react-router-dom';
 import {
   ApplicationPaths,

@@ -6,9 +6,9 @@ import _publicationService, {
   ExternalMethodology,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/publicationService');

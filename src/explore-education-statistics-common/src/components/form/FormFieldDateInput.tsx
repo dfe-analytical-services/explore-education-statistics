@@ -45,7 +45,8 @@ function FormFieldDateInput<FormValues>({
       return {
         day: field.value?.getDate(),
         month: field.value?.getMonth()
-          ? field.value?.getMonth() + 1
+          ? // eslint-disable-next-line no-unsafe-optional-chaining
+            field && field.value?.getMonth() + 1
           : undefined,
         year: field.value?.getFullYear(),
       };

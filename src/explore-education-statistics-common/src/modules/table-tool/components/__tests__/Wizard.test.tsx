@@ -742,6 +742,7 @@ describe('Wizard', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
+    await flushPromises();
     await waitFor(() => {
       expect(step1).toBeVisible();
       expect(step2).toBeVisible();
@@ -832,6 +833,8 @@ describe('Wizard', () => {
     expect(step2).toHaveAttribute('aria-current', 'step');
 
     jest.advanceTimersByTime(500);
+
+    await flushPromises();
 
     await waitFor(() => {
       expect(step1).toHaveAttribute('aria-current', 'step');

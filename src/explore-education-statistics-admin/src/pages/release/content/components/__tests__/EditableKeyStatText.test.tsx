@@ -2,10 +2,10 @@ import EditableKeyStatText from '@admin/pages/release/content/components/Editabl
 import { KeyStatisticText } from '@common/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
-import React from 'react';
 import userEvent from '@testing-library/user-event';
 import { KeyStatTextFormValues } from '@admin/pages/release/content/components/EditableKeyStatTextForm';
 import _keyStatisticService from '@admin/services/keyStatisticService';
+import React from 'react';
 
 jest.mock('@admin/services/keyStatisticService');
 const keyStatisticService = _keyStatisticService as jest.Mocked<
@@ -221,22 +221,22 @@ describe('EditableKeyStatText', () => {
       });
 
       userEvent.clear(screen.getByLabelText('Title'));
-      await userEvent.type(screen.getByLabelText('Title'), 'New title');
+      userEvent.type(screen.getByLabelText('Title'), 'New title');
 
       userEvent.clear(screen.getByLabelText('Statistic'));
-      await userEvent.type(screen.getByLabelText('Statistic'), 'New stat');
+      userEvent.type(screen.getByLabelText('Statistic'), 'New stat');
 
       userEvent.clear(screen.getByLabelText('Trend'));
-      await userEvent.type(screen.getByLabelText('Trend'), 'New trend');
+      userEvent.type(screen.getByLabelText('Trend'), 'New trend');
 
       userEvent.clear(screen.getByLabelText('Guidance title'));
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Guidance title'),
         'New guidance title',
       );
 
       userEvent.clear(screen.getByLabelText('Guidance text'));
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Guidance text'),
         'New guidance text',
       );
@@ -276,7 +276,7 @@ describe('EditableKeyStatText', () => {
       });
 
       userEvent.clear(screen.getByLabelText('Guidance title'));
-      await userEvent.type(
+      userEvent.type(
         screen.getByLabelText('Guidance title'),
         '   New guidance title  ',
       );

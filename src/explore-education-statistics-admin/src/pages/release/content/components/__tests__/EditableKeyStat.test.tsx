@@ -217,8 +217,8 @@ describe('EditableKeyStat', () => {
         expect(screen.getByLabelText('Trend')).toBeInTheDocument();
       });
 
-      await userEvent.type(screen.getByLabelText('Trend'), ' - New');
-      await userEvent.type(screen.getByLabelText('Guidance title'), ' - New');
+      userEvent.type(screen.getByLabelText('Trend'), ' - New');
+      userEvent.type(screen.getByLabelText('Guidance title'), ' - New');
 
       expect(
         keyStatisticService.updateKeyStatisticDataBlock,

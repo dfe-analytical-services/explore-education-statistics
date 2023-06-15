@@ -2,8 +2,8 @@ import AdoptMethodologyForm from '@admin/pages/methodology/adopt-methodology/com
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import noop from 'lodash/noop';
+import React from 'react';
 
 describe('AdoptMethodologyForm', () => {
   const testMethodologies: MethodologyVersion[] = [

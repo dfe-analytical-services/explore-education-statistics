@@ -1,13 +1,12 @@
 import { Contact } from '@common/services/publicationService';
 import React from 'react';
 
-const ContactUsSection = ({
-  publicationContact,
-  publicationTitle,
-}: {
+interface Props {
   publicationContact: Contact;
   publicationTitle: string;
-}) => {
+}
+
+const ContactUsSection = ({ publicationContact, publicationTitle }: Props) => {
   return (
     <>
       <p>

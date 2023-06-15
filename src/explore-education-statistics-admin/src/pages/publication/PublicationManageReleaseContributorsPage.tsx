@@ -7,8 +7,8 @@ import releasePermissionService, {
 import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import { useParams } from 'react-router';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
 
 interface Model {
   release: Release;
@@ -16,12 +16,10 @@ interface Model {
   releaseContributors: UserReleaseRole[];
 }
 
-const PublicationManageReleaseContributorsPage = ({
-  match,
-}: RouteComponentProps<PublicationManageTeamRouteParams>) => {
+const PublicationManageReleaseContributorsPage = () => {
   const { publicationId } = usePublicationContext();
 
-  const { releaseId } = match.params;
+  const { releaseId } = useParams<PublicationManageTeamRouteParams>();
 
   const { value, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [release, publicationContributors, releaseRoles] = await Promise.all([
@@ -33,13 +31,16 @@ const PublicationManageReleaseContributorsPage = ({
       release,
       publicationContributors,
       releaseContributors: releaseRoles.filter(
-        role => role.role === 'Contributor',
+        ({ role }) => role === 'Contributor',
       ),
     };
   }, [publicationId, releaseId]);
 
-  const { release, publicationContributors = [], releaseContributors = [] } =
-    value ?? {};
+  const {
+    release,
+    publicationContributors = [],
+    releaseContributors = [],
+  } = value ?? {};
 
   return (
     <LoadingSpinner loading={isLoading}>

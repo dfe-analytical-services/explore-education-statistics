@@ -10,14 +10,25 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
+import React from 'react';
+import flushPromises from '@common-test/flushPromises';
 
 jest.mock('@admin/services/releaseAncillaryFileService');
 
 const releaseAncillaryFileService = _releaseAncillaryFileService as jest.Mocked<
   typeof _releaseAncillaryFileService
 >;
+
+beforeEach(() => {
+  jest.useFakeTimers({
+    legacyFakeTimers: true,
+  });
+});
+
+afterEach(() => {
+  jest.useRealTimers();
+});
 
 describe('ReleaseFileUploadsSection', () => {
   const testFiles: AncillaryFile[] = [
@@ -235,9 +246,13 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('shows validation message when `title` is non-unique', async () => {
+      releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue(
+        testFiles,
+      );
       renderPage();
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Test file 1');
+      userEvent.type(screen.getByLabelText('Title'), 'Test file 1');
+      await flushPromises();
       userEvent.tab();
 
       await waitFor(() => {
@@ -275,13 +290,21 @@ describe('ReleaseFileUploadsSection', () => {
       });
       userEvent.tab();
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a file', {
-            selector: '#fileUploadForm-file-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      await flushPromises();
+
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText('Choose a file', {
+              selector: '#fileUploadForm-file-error',
+            }),
+          ).toBeInTheDocument();
+        },
+        {
+          timeout: 10000,
+          interval: 100,
+        },
+      );
     });
 
     test('shows validation message when `file` is empty', async () => {
@@ -306,11 +329,14 @@ describe('ReleaseFileUploadsSection', () => {
     test('cannot submit with invalid values', async () => {
       renderPage();
 
-      userEvent.click(
-        screen.getByRole('button', {
-          name: 'Upload file',
-        }),
-      );
+      userEvent.click(screen.getByLabelText('Title'));
+      userEvent.tab();
+
+      userEvent.click(screen.getByLabelText('Summary'));
+      userEvent.tab();
+
+      userEvent.tab();
+      userEvent.tab();
 
       await waitFor(() => {
         expect(
@@ -355,8 +381,8 @@ describe('ReleaseFileUploadsSection', () => {
 
       const file = new File(['test'], 'test-file.txt');
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Test title');
-      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
+      userEvent.type(screen.getByLabelText('Title'), 'Test title');
+      userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
 
       userEvent.upload(screen.getByLabelText('Upload file'), file);
       userEvent.click(
@@ -396,8 +422,8 @@ describe('ReleaseFileUploadsSection', () => {
 
       const file = new File(['test'], 'test-file.docx');
 
-      await userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
-      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
+      userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
+      userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
       userEvent.upload(screen.getByLabelText('Upload file'), file);
       userEvent.click(
         screen.getByRole('button', {

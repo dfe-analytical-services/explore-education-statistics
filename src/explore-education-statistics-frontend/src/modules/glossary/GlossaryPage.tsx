@@ -5,7 +5,6 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import sanitizeHtml, {
   defaultSanitizeOptions,
@@ -13,6 +12,7 @@ import sanitizeHtml, {
 } from '@common/utils/sanitizeHtml';
 import { GlossaryCategory } from '@common/services/types/glossary';
 import glossaryService from '@frontend/services/glossaryService';
+import React from 'react';
 
 export interface Props {
   categories: GlossaryCategory[];
@@ -71,29 +71,27 @@ const GlossaryPage: NextPage<Props> = ({ categories = [] }) => {
             heading={category.heading}
             id={`glossary-${category.heading}`}
           >
-            <>
-              {category.entries.length ? (
-                category.entries.map(entry => (
+            {category.entries.length ? (
+              category.entries.map(entry => (
+                <div
+                  id={entry.slug}
+                  key={entry.slug}
+                  className="govuk-!-margin-bottom-7"
+                >
+                  <h3>{entry.title}</h3>
                   <div
-                    id={entry.slug}
-                    key={entry.slug}
-                    className="govuk-!-margin-bottom-7"
-                  >
-                    <h3>{entry.title}</h3>
-                    <div
-                      // eslint-disable-next-line react/no-danger
-                      dangerouslySetInnerHTML={{
-                        __html: sanitizeHtml(entry.body, sanitizeHtmlOptions),
-                      }}
-                    />
-                  </div>
-                ))
-              ) : (
-                <p className="govuk-inset-text">
-                  There are currently no entries under this section.
-                </p>
-              )}
-            </>
+                    // eslint-disable-next-line react/no-danger
+                    dangerouslySetInnerHTML={{
+                      __html: sanitizeHtml(entry.body, sanitizeHtmlOptions),
+                    }}
+                  />
+                </div>
+              ))
+            ) : (
+              <p className="govuk-inset-text">
+                There are currently no entries under this section.
+              </p>
+            )}
           </AccordionSection>
         ))}
       </Accordion>

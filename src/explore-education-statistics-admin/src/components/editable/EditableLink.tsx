@@ -1,7 +1,7 @@
+import React from 'react';
 import Link, { LinkProps } from '@admin/components/Link';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import Button from '@common/components/Button';
-import React from 'react';
 
 interface Props extends LinkProps {
   to: string;

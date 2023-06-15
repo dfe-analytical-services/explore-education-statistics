@@ -460,7 +460,9 @@ describe('FormFieldCheckboxSearchGroup', () => {
           }}
           onSubmit={() => undefined}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array()
+              .min(1, 'Select at least one option')
+              .required('Select at least one option'),
           })}
         >
           {() => (
@@ -481,14 +483,16 @@ describe('FormFieldCheckboxSearchGroup', () => {
       const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
 
       expect(checkbox.checked).toBe(true);
+
       expect(
         screen.queryByText('Select at least one option'),
       ).not.toBeInTheDocument();
 
       userEvent.click(checkbox);
 
+      expect(checkbox.checked).toBe(false);
+
       await waitFor(() => {
-        expect(checkbox.checked).toBe(false);
         expect(
           screen.queryByText('Select at least one option'),
         ).toBeInTheDocument();

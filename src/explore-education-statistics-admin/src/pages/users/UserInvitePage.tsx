@@ -15,8 +15,6 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
-import React from 'react';
-import { RouteComponentProps } from 'react-router';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -25,6 +23,8 @@ import InviteUserReleaseRoleForm from '@admin/pages/users/components/InviteUserR
 import publicationService from '@admin/services/publicationService';
 import { PublicationSummary } from '@common/services/publicationService';
 import InviteUserPublicationRoleForm from '@admin/pages/users/components/InviteUserPublicationRoleForm';
+import React from 'react';
+import { useHistory } from 'react-router';
 
 export interface InviteUserReleaseRole {
   releaseId: string;
@@ -61,24 +61,21 @@ interface InviteUserModel {
   publications: PublicationSummary[];
 }
 
-const UserInvitePage = ({
-  history,
-}: RouteComponentProps & ErrorControlState) => {
+const UserInvitePage = () => {
   const formId = 'inviteUserForm';
 
-  const { value: model, isLoading } = useAsyncHandledRetry<
-    InviteUserModel
-  >(async () => {
-    const [roles, resourceRoles, releases, publications] = await Promise.all([
-      userService.getRoles(),
-      userService.getResourceRoles(),
-      userService.getReleases(),
-      publicationService.getPublicationSummaries(),
-    ]);
-    return { roles, resourceRoles, releases, publications };
-  }, []);
+  const history = useHistory<ErrorControlState>();
 
-  const cancelHandler = () => history.push('/administration/users/invites');
+  const { value: model, isLoading } =
+    useAsyncHandledRetry<InviteUserModel>(async () => {
+      const [roles, resourceRoles, releases, publications] = await Promise.all([
+        userService.getRoles(),
+        userService.getResourceRoles(),
+        userService.getReleases(),
+        publicationService.getPublicationSummaries(),
+      ]);
+      return { roles, resourceRoles, releases, publications };
+    }, []);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     const userReleaseRoles = values.userReleaseRoles.map(userReleaseRole => {
@@ -202,7 +199,13 @@ const UserInvitePage = ({
 
                 <ButtonGroup className="govuk-!-margin-top-6">
                   <Button type="submit">Send invite</Button>
-                  <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
+                  <ButtonText
+                    onClick={() =>
+                      history.push('/administration/users/invites')
+                    }
+                  >
+                    Cancel
+                  </ButtonText>
                 </ButtonGroup>
               </Form>
             );

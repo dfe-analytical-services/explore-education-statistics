@@ -1,6 +1,6 @@
+import React from 'react';
 import NavLink from '@admin/components/NavLink';
 import classNames from 'classnames';
-import React from 'react';
 import styles from './NavBar.module.scss';
 
 interface Props {

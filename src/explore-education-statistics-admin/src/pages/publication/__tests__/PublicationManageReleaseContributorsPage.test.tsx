@@ -14,9 +14,9 @@ import _releasePermissionService, {
 } from '@admin/services/releasePermissionService';
 import { render, screen, waitFor } from '@testing-library/react';
 import { generatePath, Route } from 'react-router';
-import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
+import React from 'react';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;

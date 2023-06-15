@@ -6,9 +6,9 @@ import _themeService from '@common/services/themeService';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/__data__/testThemeData';
 import { screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
 import mockRouter from 'next-router-mock';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 jest.mock('@common/hooks/useMedia', () => ({
   useMobileMedia: () => {

@@ -9,18 +9,16 @@ import publicationService, {
   Publication,
 } from '@admin/services/publicationService';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useHistory, useParams } from 'react-router';
 
 interface Model {
   publication: Publication;
   externalMethodology?: ExternalMethodology;
 }
 
-const ExternalMethodologyPage = ({
-  history,
-  match,
-}: RouteComponentProps<{ publicationId: string }>) => {
-  const { publicationId } = match.params;
+const ExternalMethodologyPage = () => {
+  const { publicationId } = useParams<{ publicationId: string }>();
+  const history = useHistory();
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [publication, externalMethodology] = await Promise.all([

@@ -9,9 +9,9 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import styles from '@common/modules/find-statistics/components/KeyStat.module.scss';
 import { KeyStatisticText } from '@common/services/publicationService';
 import { Formik } from 'formik';
-import React from 'react';
 import classNames from 'classnames';
 import Yup from '@common/validation/yup';
+import React from 'react';
 
 export interface KeyStatTextFormValues {
   title: string;
@@ -24,7 +24,7 @@ export interface KeyStatTextFormValues {
 interface EditableKeyStatTextFormProps {
   keyStat?: KeyStatisticText;
   isReordering?: boolean;
-  onSubmit: (values: KeyStatTextFormValues) => void;
+  onSubmit: (values: KeyStatTextFormValues) => Promise<void>;
   onCancel: () => void;
   testId: string;
 }

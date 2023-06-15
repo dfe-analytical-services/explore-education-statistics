@@ -1,5 +1,4 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { generatePath, MemoryRouter } from 'react-router';
 import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
@@ -9,6 +8,7 @@ import {
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import { Route } from 'react-router-dom';
+import React from 'react';
 
 const testMethodology: MethodologyVersion = {
   id: 'm1',

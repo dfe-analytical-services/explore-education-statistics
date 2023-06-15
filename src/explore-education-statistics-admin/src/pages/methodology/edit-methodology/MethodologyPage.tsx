@@ -16,8 +16,14 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import Tag from '@common/components/Tag';
+import {
+  generatePath,
+  Route,
+  Switch,
+  useHistory,
+  useParams,
+} from 'react-router';
 import React from 'react';
-import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
@@ -30,11 +36,10 @@ const routes: MethodologyRouteProps[] = [
   methodologySummaryEditRoute,
 ];
 
-const MethodologyPage = ({
-  match,
-  location,
-}: RouteComponentProps<MethodologyRouteParams>) => {
-  const { methodologyId } = match.params;
+const MethodologyPage = () => {
+  const { methodologyId } = useParams<MethodologyRouteParams>();
+
+  const history = useHistory();
 
   const {
     value: methodology,
@@ -49,7 +54,7 @@ const MethodologyPage = ({
       route =>
         generatePath<MethodologyRouteParams>(route.path, {
           methodologyId,
-        }) === location.pathname,
+        }) === history.location.pathname,
     ) || 0;
 
   const previousRoute =

@@ -9,9 +9,9 @@ import {
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
-import React from 'react';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import React from 'react';
 import ReleaseNotesSection from './ReleaseNotesSection';
 
 interface ReleaseTypeIcon {

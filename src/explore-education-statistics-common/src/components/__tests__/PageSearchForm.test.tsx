@@ -6,13 +6,16 @@ import TabsSection from '@common/components/TabsSection';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import flushPromises from '@common-test/flushPromises';
 import PageSearchForm from '../PageSearchForm';
 
 const labelText = 'Find on this page';
 
 describe('PageSearchForm', () => {
   beforeEach(() => {
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      legacyFakeTimers: true,
+    });
   });
 
   afterEach(() => {
@@ -53,7 +56,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'To');
+    userEvent.type(screen.getByLabelText(labelText), 'To');
 
     jest.runOnlyPendingTimers();
 
@@ -98,7 +101,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -143,7 +146,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'TEST');
+    userEvent.type(screen.getByLabelText(labelText), 'TEST');
 
     jest.runOnlyPendingTimers();
 
@@ -192,7 +195,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'TE');
+    userEvent.type(screen.getByLabelText(labelText), 'TE');
 
     jest.runOnlyPendingTimers();
 
@@ -241,7 +244,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -299,7 +302,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -337,7 +340,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -374,7 +377,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -415,7 +418,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -448,18 +451,16 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
     userEvent.click(container.querySelector('[role="option"]') as HTMLElement);
+    await flushPromises();
+    const target = container.querySelector('#target');
 
-    await waitFor(() => {
-      const target = container.querySelector('#target');
-
-      expect(target).toHaveFocus();
-      expect(target).toHaveScrolledIntoView();
-    });
+    expect(target).toHaveFocus();
+    expect(target).toHaveScrolledIntoView();
   });
 
   test('pressing Enter on result scrolls and focuses the element', async () => {
@@ -472,7 +473,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -480,13 +481,11 @@ describe('PageSearchForm', () => {
 
     fireEvent.keyDown(listBox, { key: 'ArrowDown' });
     fireEvent.keyDown(listBox, { key: 'Enter' });
+    await flushPromises();
 
-    await waitFor(() => {
-      const target = container.querySelector('#target');
-
-      expect(target).toHaveFocus();
-      expect(target).toHaveScrolledIntoView();
-    });
+    const target = container.querySelector('#target');
+    expect(target).toHaveFocus();
+    expect(target).toHaveScrolledIntoView();
   });
 
   test('opens parent accordion of selected result', async () => {
@@ -506,7 +505,7 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -538,7 +537,7 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -547,10 +546,9 @@ describe('PageSearchForm', () => {
     expect(summary).toHaveAttribute('aria-expanded', 'false');
 
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
+    await flushPromises();
 
-    await waitFor(() => {
-      expect(summary).toHaveAttribute('aria-expanded', 'true');
-    });
+    expect(summary).toHaveAttribute('aria-expanded', 'true');
   });
 
   test('opens parent tab section of selected result', async () => {
@@ -573,7 +571,7 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -586,11 +584,9 @@ describe('PageSearchForm', () => {
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
 
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
-
-    await waitFor(() => {
-      expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
-      expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
-    });
+    await flushPromises();
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
   });
 
   test('opens nested sections of selected result', async () => {
@@ -619,7 +615,7 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    await userEvent.type(screen.getByLabelText(labelText), 'Test');
+    userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -629,10 +625,14 @@ describe('PageSearchForm', () => {
     const tabs = container.querySelectorAll('[role="tab"]');
     const summary = container.querySelector('summary');
 
+    expect(accordionSection).toHaveAttribute('aria-expanded', 'false');
+
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
+    await flushPromises();
+
+    expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
 
     await waitFor(() => {
-      expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
       expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
       expect(summary).toHaveAttribute('aria-expanded', 'true');
     });

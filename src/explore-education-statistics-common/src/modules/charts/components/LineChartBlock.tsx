@@ -190,6 +190,7 @@ const LineChartBlock = ({
               dot={getDot(config.symbol)}
               strokeWidth="2"
               strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
+              // eslint-disable-next-line react/no-unstable-nested-components
               label={(props: LabelProps & { index: number }) => (
                 <LineChartLabel
                   colour={config.colour}
@@ -316,16 +317,15 @@ export const lineChartBlockDefinition: ChartDefinition = {
 
 export default memo(LineChartBlock);
 
-const getDot = (symbol: ChartSymbol | 'none' = 'circle') => ({
-  ref,
-  ...props
-}: SymbolsProps) => {
-  if (symbol === 'none') {
-    return undefined;
-  }
+const getDot =
+  (symbol: ChartSymbol | 'none' = 'circle') =>
+  ({ ref, ...props }: SymbolsProps) => {
+    if (symbol === 'none') {
+      return undefined;
+    }
 
-  return <Symbols {...props} ref={ref as never} type={symbol} />;
-};
+    return <Symbols {...props} ref={ref as never} type={symbol} />;
+  };
 
 const getLegendType = (
   symbol: LegendType | undefined = 'square',

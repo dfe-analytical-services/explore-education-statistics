@@ -17,10 +17,8 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const { editingMode } = useEditingContext();
 
-  const {
-    attachContentSectionBlock,
-    deleteContentSectionBlock,
-  } = useReleaseContentActions();
+  const { attachContentSectionBlock, deleteContentSectionBlock } =
+    useReleaseContentActions();
 
   if (editingMode !== 'edit') {
     return null;
@@ -84,40 +82,38 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
   }
 
   return (
-    <>
-      <DataBlockSelectForm
-        id="secondaryStats-dataBlockSelectForm"
-        releaseId={release.id}
-        label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
-        onSelect={async selectedDataBlockId => {
-          await Promise.all(
-            release.keyStatisticsSecondarySection.content.map(async content => {
-              await deleteContentSectionBlock({
-                releaseId: release.id,
-                sectionId: release.keyStatisticsSecondarySection.id,
-                blockId: content.id,
-                sectionKey: 'keyStatisticsSecondarySection',
-              });
-            }),
-          );
+    <DataBlockSelectForm
+      id="secondaryStats-dataBlockSelectForm"
+      releaseId={release.id}
+      label="Select a data block to show alongside the headline facts and figures as secondary headline statistics."
+      onSelect={async selectedDataBlockId => {
+        await Promise.all(
+          release.keyStatisticsSecondarySection.content.map(async content => {
+            await deleteContentSectionBlock({
+              releaseId: release.id,
+              sectionId: release.keyStatisticsSecondarySection.id,
+              blockId: content.id,
+              sectionKey: 'keyStatisticsSecondarySection',
+            });
+          }),
+        );
 
-          await attachContentSectionBlock({
-            releaseId: release.id,
-            sectionId: release.keyStatisticsSecondarySection.id,
-            sectionKey: 'keyStatisticsSecondarySection',
-            block: {
-              contentBlockId: selectedDataBlockId,
-              order: 0,
-            },
-          });
+        await attachContentSectionBlock({
+          releaseId: release.id,
+          sectionId: release.keyStatisticsSecondarySection.id,
+          sectionKey: 'keyStatisticsSecondarySection',
+          block: {
+            contentBlockId: selectedDataBlockId,
+            order: 0,
+          },
+        });
 
-          setIsFormOpen(false);
-        }}
-        onCancel={() => {
-          setIsFormOpen(false);
-        }}
-      />
-    </>
+        setIsFormOpen(false);
+      }}
+      onCancel={() => {
+        setIsFormOpen(false);
+      }}
+    />
   );
 };
 

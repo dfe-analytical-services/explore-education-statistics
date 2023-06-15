@@ -84,6 +84,7 @@ const DraftReleasesTable = ({
       {releases.length === 0 ? (
         <p>There are currently no draft releases</p>
       ) : (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {releasesByPublication &&
             Object.keys(releasesByPublication).length > 0 && (

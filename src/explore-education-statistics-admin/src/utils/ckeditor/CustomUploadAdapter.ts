@@ -20,7 +20,7 @@ export default class CustomUploadAdapter implements UploadAdapter {
   ) {}
 
   async upload(): Promise<ImageUploadResult> {
-    const file = await this.loader.file;
+    const file = (await this.loader.file) as File;
 
     this.request = this.onUpload(file, this.handleProgress);
 

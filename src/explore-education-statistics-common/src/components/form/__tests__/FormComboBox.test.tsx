@@ -1,7 +1,7 @@
-import React from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import FormComboBox from '../FormComboBox';
 
 describe('FormComboBox', () => {
@@ -34,7 +34,7 @@ describe('FormComboBox', () => {
       />,
     );
 
-    await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+    userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
     const options = screen.queryAllByRole('option');
 
@@ -60,7 +60,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option') as HTMLInputElement;
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
 
       const option1 = screen.getByText('Option 1');
       const option2 = screen.getByText('Option 2');
@@ -100,7 +100,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const option1 = screen.getByText('Option 1');
       const option2 = screen.getByText('Option 2');
@@ -140,7 +140,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const listBox = screen.getByRole('listbox');
 
@@ -165,7 +165,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const option1 = screen.getByText('Option 1');
       const option2 = screen.getByText('Option 2');
@@ -207,7 +207,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option');
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
 
       expect(input).toHaveValue('Test');
       expect(screen.getByRole('listbox')).toBeInTheDocument();
@@ -235,7 +235,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option');
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
 
       expect(input).toHaveValue('Test');
       expect(screen.getByRole('listbox')).toBeInTheDocument();
@@ -264,7 +264,7 @@ describe('FormComboBox', () => {
         </div>,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       userEvent.click(screen.getByText('Target'));
 
@@ -289,7 +289,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const listBox = screen.getByRole('listbox');
 
@@ -362,7 +362,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const listBox = screen.getByRole('listbox');
 
@@ -399,7 +399,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const listBox = screen.getByRole('combobox');
 
@@ -472,7 +472,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const comboBox = screen.getByRole('combobox');
 
@@ -506,7 +506,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const input = screen.getByLabelText('Choose option');
 
@@ -533,7 +533,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option') as HTMLInputElement;
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
 
       input.selectionStart = 2;
       input.selectionEnd = 2;
@@ -557,7 +557,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const listBox = screen.getByRole('listbox');
 
@@ -579,7 +579,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option') as HTMLInputElement;
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
 
       input.selectionStart = 2;
       input.selectionEnd = 2;
@@ -605,7 +605,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option') as HTMLInputElement;
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
 
       input.value = 'Test';
       input.selectionStart = 2;
@@ -633,7 +633,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option') as HTMLInputElement;
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
       input.selectionStart = 2;
       input.selectionEnd = 2;
 
@@ -659,7 +659,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       expect(onSelect).not.toHaveBeenCalled();
 
@@ -682,7 +682,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const listBox = screen.getByRole('listbox');
 
@@ -703,7 +703,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       const listBox = screen.getByRole('listbox');
 
@@ -726,7 +726,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option') as HTMLInputElement;
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
 
       const listBox = screen.getByRole('listbox');
 
@@ -758,7 +758,7 @@ describe('FormComboBox', () => {
 
       const input = screen.getByLabelText('Choose option') as HTMLInputElement;
 
-      await userEvent.type(input, 'Test');
+      userEvent.type(input, 'Test');
 
       expect(input).toHaveAttribute('value', 'Test');
       expect(screen.queryAllByRole('option')).toHaveLength(3);
@@ -782,7 +782,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       expect(onSelect).not.toHaveBeenCalled();
 
@@ -802,7 +802,7 @@ describe('FormComboBox', () => {
         />,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       userEvent.click(screen.getByText('Option 2'));
 
@@ -824,7 +824,7 @@ describe('FormComboBox', () => {
         </div>,
       );
 
-      await userEvent.type(screen.getByLabelText('Choose option'), 'Test');
+      userEvent.type(screen.getByLabelText('Choose option'), 'Test');
 
       expect(screen.queryAllByRole('option')).toHaveLength(3);
 

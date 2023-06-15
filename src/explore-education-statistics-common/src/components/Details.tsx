@@ -1,9 +1,9 @@
 import useMounted from '@common/hooks/useMounted';
 import useToggle from '@common/hooks/useToggle';
 import findAllParents from '@common/utils/dom/findAllParents';
-import { formatTestId } from '@common/utils/test-utils';
 import classNames from 'classnames';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import formatTestId from '@common/utils/test-utils';
 import styles from './Details.module.scss';
 import VisuallyHidden from './VisuallyHidden';
 

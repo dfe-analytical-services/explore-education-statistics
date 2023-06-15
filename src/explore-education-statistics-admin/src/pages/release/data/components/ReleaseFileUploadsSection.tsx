@@ -77,7 +77,7 @@ const ReleaseFileUploadsSection = ({
     setState: setFiles,
     isLoading,
   } = useAsyncHandledRetry(
-    () => releaseAncillaryFileService.getAncillaryFiles(releaseId),
+    async () => releaseAncillaryFileService.getAncillaryFiles(releaseId),
     [releaseId],
   );
 
@@ -141,7 +141,7 @@ const ReleaseFileUploadsSection = ({
             .test({
               name: 'unique',
               message: 'Enter a unique title',
-              test(value: string) {
+              test(value) {
                 if (!value) {
                   return true;
                 }
