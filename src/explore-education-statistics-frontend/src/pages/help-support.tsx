@@ -70,7 +70,7 @@ function HelpSupportPage() {
             </p>
             <p>
               Once you've created your table, you can download the data it
-              contains for your own offline analysis, or share a permanement
+              contains for your own offline analysis, or share a permanent
               webpage of the created table.
             </p>
             <p>
