@@ -6,7 +6,8 @@ import {
 import _releaseAncillaryFileService, {
   AncillaryFile,
 } from '@admin/services/releaseAncillaryFileService';
-import { render, screen, waitFor } from '@testing-library/react';
+import render from '@common-test/render';
+import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory, MemoryHistory } from 'history';
 import { generatePath, Route, Router } from 'react-router-dom';
@@ -21,9 +22,9 @@ const releaseAncillaryFileService = _releaseAncillaryFileService as jest.Mocked<
 describe('ReleaseAncillaryFilePage', () => {
   const testFile: AncillaryFile = {
     id: 'file-1',
-    title: 'Test title',
-    summary: 'Test summary',
-    filename: 'test-file.txt',
+    title: 'Test title 1',
+    summary: 'Test summary 1',
+    filename: 'test-file-1.txt',
     fileSize: {
       size: 20,
       unit: 'kB',
@@ -33,17 +34,19 @@ describe('ReleaseAncillaryFilePage', () => {
   };
 
   test('renders form with initial values', async () => {
-    releaseAncillaryFileService.getAncillaryFile.mockResolvedValue(testFile);
+    releaseAncillaryFileService.getFile.mockResolvedValue(testFile);
+    releaseAncillaryFileService.listFiles.mockResolvedValue([testFile]);
 
     await renderPage();
 
-    expect(screen.getByLabelText('Title')).toHaveValue('Test title');
+    expect(screen.getByLabelText('Title')).toHaveValue('Test title 1');
   });
 
   test('does not render form if unable to get ancillary file details', async () => {
-    releaseAncillaryFileService.getAncillaryFile.mockRejectedValue(
+    releaseAncillaryFileService.getFile.mockRejectedValue(
       new Error('Could not find ancillary file'),
     );
+    releaseAncillaryFileService.listFiles.mockResolvedValue([]);
 
     await renderPage();
 
@@ -53,60 +56,9 @@ describe('ReleaseAncillaryFilePage', () => {
     expect(screen.queryByLabelText('Title')).not.toBeInTheDocument();
   });
 
-  test('shows validation message if `title` field is empty', async () => {
-    releaseAncillaryFileService.getAncillaryFile.mockResolvedValue(testFile);
-
-    await renderPage();
-
-    userEvent.clear(screen.getByLabelText('Title'));
-    userEvent.tab();
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Enter a title' }),
-      ).toHaveAttribute('href', '#ancillaryFileForm-title');
-    });
-  });
-
-  test('shows validation message if `summary` field is empty', async () => {
-    releaseAncillaryFileService.getAncillaryFile.mockResolvedValue(testFile);
-
-    await renderPage();
-
-    userEvent.clear(screen.getByLabelText('Summary'));
-    userEvent.tab();
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Enter a summary' }),
-      ).toHaveAttribute('href', '#ancillaryFileForm-summary');
-    });
-  });
-
-  test('shows validation messages if submitted form is invalid', async () => {
-    releaseAncillaryFileService.getAncillaryFile.mockResolvedValue({
-      ...testFile,
-      title: '',
-      summary: '',
-    });
-
-    await renderPage();
-
-    userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
-
-    await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Enter a title' }),
-      ).toHaveAttribute('href', '#ancillaryFileForm-title');
-    });
-
-    expect(
-      screen.getByRole('link', { name: 'Enter a summary' }),
-    ).toHaveAttribute('href', '#ancillaryFileForm-summary');
-  });
-
-  test('successfully submitting form sends update request to service', async () => {
-    releaseAncillaryFileService.getAncillaryFile.mockResolvedValue(testFile);
+  test('successfully submitting form sends service requests', async () => {
+    releaseAncillaryFileService.getFile.mockResolvedValue(testFile);
+    releaseAncillaryFileService.listFiles.mockResolvedValue([testFile]);
 
     await renderPage();
 
@@ -120,7 +72,11 @@ describe('ReleaseAncillaryFilePage', () => {
     userEvent.clear(summary);
     userEvent.type(summary, 'Updated test summary');
 
-    userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    const file = new File(['test'], 'test.txt');
+
+    userEvent.upload(screen.getByLabelText('Upload new file'), file);
+
+    userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 
     await waitFor(() => {
       expect(releaseAncillaryFileService.updateFile).toHaveBeenCalledWith<
@@ -129,17 +85,21 @@ describe('ReleaseAncillaryFilePage', () => {
         title: 'Updated test title',
         summary: 'Updated test summary',
       });
+      expect(releaseAncillaryFileService.replaceFile).toHaveBeenCalledWith<
+        Parameters<typeof releaseAncillaryFileService.replaceFile>
+      >('release-1', 'file-1', file);
     });
   });
 
   test('successfully submitting form redirects to ancillary files page', async () => {
-    releaseAncillaryFileService.getAncillaryFile.mockResolvedValue(testFile);
+    releaseAncillaryFileService.getFile.mockResolvedValue(testFile);
+    releaseAncillaryFileService.listFiles.mockResolvedValue([testFile]);
 
     const history = createMemoryHistory();
 
     await renderPage(history);
 
-    userEvent.click(screen.getByRole('button', { name: 'Save changes' }));
+    userEvent.click(screen.getByRole('button', { name: 'Save file' }));
 
     await waitFor(() => {
       expect(history.location.pathname).toBe(
@@ -171,9 +131,7 @@ describe('ReleaseAncillaryFilePage', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByText('Edit ancillary file details'),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Edit ancillary file')).toBeInTheDocument();
     });
   }
 });

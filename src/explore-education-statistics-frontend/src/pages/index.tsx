@@ -72,6 +72,16 @@ const HomePage: NextPage = () => {
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h3 className="govuk-!-margin-bottom-1">
+            <Link to="https://www.gov.uk/search/research-and-statistics?content_store_document_type=upcoming_statistics&organisations%5B%5D=department-for-education&order=updated-newest">
+              Statistics release calendar
+            </Link>
+          </h3>
+          <p className="govuk-caption-m">
+            Browse our upcoming official statistics releases and their expected
+            publication dates.
+          </p>
+
+          <h3 className="govuk-!-margin-bottom-1">
             <Link to="/data-catalogue">Data catalogue</Link>
           </h3>
           <p className="govuk-caption-m">

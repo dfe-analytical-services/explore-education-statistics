@@ -23,12 +23,6 @@ const HelpSupportPage: NextPage = () => {
               the range of education-related statistics and data it provides.
             </p>
             <p>
-              We will be adding and publishing more of the official statistics
-              and data DfE collects on schools, further and higher education and
-              children and young people to the service as and when they are
-              officially released by DfE.
-            </p>
-            <p>
               All the statistics and data published this service are produced in
               line with the UK Statistical Authority's{' '}
               <a href="https://www.statisticsauthority.gov.uk/code-of-practice/">
@@ -43,35 +37,11 @@ const HelpSupportPage: NextPage = () => {
           </section>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Find statistics and data</h2>
-            The service does not currently contain all of DfE's official
-            statistics and data and more will be added as and when they are
-            officially released by DfE.
+            The service contains all of DfE's published official statistics.
             <p>
               To find specific sets of statistics currently published via the
-              service and links to those which can still be found on the{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
-                Statistics at DfE
-              </a>{' '}
-              pages GOV.UK browse our{' '}
-              <Link to="/find-statistics">Find statistics and data</Link>{' '}
-              section.
-            </p>
-            <p>
-              You can also download data files of those statistics currently
-              published via the service through our{' '}
-              <Link to="/data-catalogue">Data catalogue</Link> section.
-            </p>
-            <p>
-              These files are currently only available in csv format but other
-              formats will be made available in the future.
-            </p>
-            <p>
-              However, to download data files of those statistics not yet
-              currently available through the service you'll need to visit the{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
-                Statistics at DfE
-              </a>{' '}
-              pages GOV.UK.
+              service, browse our{' '}
+              <Link to="/find-statistics">Find statistics and data</Link> section.
             </p>
             <p>
               To find out about the methodology behind the specific statistics
@@ -92,9 +62,8 @@ const HelpSupportPage: NextPage = () => {
               Creating and downloading data tables
             </h2>
             <p>
-              To create your own tables and explore the national and regional
-              data we have available via the service use the table tool
-              available in our{' '}
+              To create your own tables and explore the data we have available
+              via the service use the table tool available in our{' '}
               <Link to="/data-tables">Create your own tables</Link> section.
             </p>
             <p>
@@ -104,19 +73,29 @@ const HelpSupportPage: NextPage = () => {
             </p>
             <p>
               Once you've created your table, you can download the data it
-              contains for your own offline analysis.
+              contains for your own offline analysis, or share a permanent
+              webpage of the created table.
+            </p>
+            <p>
+              You can also download full data files of those statistics
+              currently published via the service through our{' '}
+              <Link to="/data-catalogue">Data catalogue</Link>.
+            </p>
+            <p>
+              These files are currently only available in CSV format but other
+              formats will be made available in the future.
             </p>
           </section>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-m">Sign up for email alerts</h2>
             <p>
               You can sign up to receive emails when new statistics and data are
-              released and published through our service.
+              published through our service.
             </p>
             <p>
               Sign up by selecting the 'Sign up for email alerts' link found at
               the top of the pages found under{' '}
-              <Link to="/find-statistics">Find statistics and data</Link>
+              <Link to="/find-statistics">Find statistics and data</Link>.
             </p>
             <p>
               You'll then be sent an email alert with a link to the latest

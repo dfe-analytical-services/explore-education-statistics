@@ -2,13 +2,8 @@ import ReleaseFileUploadsSection from '@admin/pages/release/data/components/Rele
 import _releaseAncillaryFileService, {
   AncillaryFile,
 } from '@admin/services/releaseAncillaryFileService';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import render from '@common-test/render';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import React from 'react';
@@ -71,14 +66,14 @@ describe('ReleaseFileUploadsSection', () => {
   }
 
   test('renders list of uploaded files', async () => {
-    releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue(testFiles);
+    releaseAncillaryFileService.listFiles.mockResolvedValue(testFiles);
 
     renderPage();
 
     await waitFor(() => {
-      expect(
-        releaseAncillaryFileService.getAncillaryFiles,
-      ).toHaveBeenCalledWith('release-1');
+      expect(releaseAncillaryFileService.listFiles).toHaveBeenCalledWith(
+        'release-1',
+      );
 
       expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
     });
@@ -121,7 +116,7 @@ describe('ReleaseFileUploadsSection', () => {
   });
 
   test('renders empty message when there are no files', async () => {
-    releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue([]);
+    releaseAncillaryFileService.listFiles.mockResolvedValue([]);
 
     renderPage();
 
@@ -129,16 +124,16 @@ describe('ReleaseFileUploadsSection', () => {
       expect(screen.queryAllByTestId('accordionSection')).toHaveLength(0);
     });
 
-    expect(
-      screen.getByText('No files have been uploaded.'),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText('No files have been uploaded.'),
+      ).toBeInTheDocument();
+    });
   });
 
   describe('deleting file', () => {
     test('clicking delete file button shows modal to confirm deletion', async () => {
-      releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue(
-        testFiles,
-      );
+      releaseAncillaryFileService.listFiles.mockResolvedValue(testFiles);
 
       renderPage();
 
@@ -173,9 +168,7 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('confirming deletion removes the file section', async () => {
-      releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue(
-        testFiles,
-      );
+      releaseAncillaryFileService.listFiles.mockResolvedValue(testFiles);
 
       renderPage();
 
@@ -205,18 +198,28 @@ describe('ReleaseFileUploadsSection', () => {
 
       expect(screen.getByRole('dialog')).toBeInTheDocument();
 
+      expect(releaseAncillaryFileService.deleteFile).not.toHaveBeenCalled();
+
       userEvent.click(
         within(screen.getByRole('dialog')).getByRole('button', {
           name: 'Confirm',
         }),
       );
 
+      releaseAncillaryFileService.listFiles.mockResolvedValue([testFiles[0]]);
+
       await waitFor(() => {
-        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
+        expect(releaseAncillaryFileService.deleteFile).toHaveBeenCalledWith<
+          Parameters<typeof releaseAncillaryFileService.deleteFile>
+        >('release-1', 'file-2');
       });
 
+      const updatedSections = screen.getAllByTestId('accordionSection');
+
+      expect(updatedSections).toHaveLength(1);
+
       expect(
-        within(screen.getByTestId('accordionSection')).getByRole('button', {
+        within(updatedSections[0]).getByRole('button', {
           name: 'Test file 1',
         }),
       ).toBeInTheDocument();
@@ -225,58 +228,7 @@ describe('ReleaseFileUploadsSection', () => {
 
   describe('uploading file', () => {
     beforeEach(() => {
-      releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue(
-        testFiles,
-      );
-    });
-
-    test('show validation message when no `title`', async () => {
-      renderPage();
-
-      userEvent.click(screen.getByLabelText('Title'));
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Enter a title', {
-            selector: '#fileUploadForm-title-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when `title` is non-unique', async () => {
-      releaseAncillaryFileService.getAncillaryFiles.mockResolvedValue(
-        testFiles,
-      );
-      renderPage();
-
-      userEvent.type(screen.getByLabelText('Title'), 'Test file 1');
-      await flushPromises();
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Enter a unique title', {
-            selector: '#fileUploadForm-title-error',
-          }),
-        ).toBeInTheDocument();
-      });
-    });
-
-    test('shows validation message when no `summary`', async () => {
-      renderPage();
-
-      userEvent.click(screen.getByLabelText('Summary'));
-      userEvent.tab();
-
-      await waitFor(() => {
-        expect(
-          screen.getByText('Enter a summary', {
-            selector: '#fileUploadForm-summary-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      releaseAncillaryFileService.listFiles.mockResolvedValue(testFiles);
     });
 
     test('shows validation message when no `file` selected', async () => {
@@ -290,37 +242,28 @@ describe('ReleaseFileUploadsSection', () => {
       });
       userEvent.tab();
 
-      await flushPromises();
-
-      await waitFor(
-        () => {
-          expect(
-            screen.getByText('Choose a file', {
-              selector: '#fileUploadForm-file-error',
-            }),
-          ).toBeInTheDocument();
-        },
-        {
-          timeout: 10000,
-          interval: 100,
-        },
-      );
+      await waitFor(() => {
+        expect(
+          screen.getByText('Choose a file', {
+            selector: '#ancillaryFileForm-file-error',
+          }),
+        ).toBeInTheDocument();
+      });
     });
 
-    test('shows validation message when `file` is empty', async () => {
+    test('shows validation message when `file` uploaded is an empty file', async () => {
       renderPage();
 
-      const file = new File([''], 'test.txt', {
-        type: 'text/plain',
-      });
-
-      userEvent.upload(screen.getByLabelText('Upload file'), file);
-      userEvent.tab();
+      userEvent.upload(
+        screen.getByLabelText('Upload file'),
+        new File([''], 'test.txt'),
+      );
+      userEvent.click(screen.getByRole('button', { name: 'Add file' }));
 
       await waitFor(() => {
         expect(
           screen.getByText('Choose a file that is not empty', {
-            selector: '#fileUploadForm-file-error',
+            selector: '#ancillaryFileForm-file-error',
           }),
         ).toBeInTheDocument();
       });
@@ -329,42 +272,37 @@ describe('ReleaseFileUploadsSection', () => {
     test('cannot submit with invalid values', async () => {
       renderPage();
 
-      userEvent.click(screen.getByLabelText('Title'));
-      userEvent.tab();
-
-      userEvent.click(screen.getByLabelText('Summary'));
-      userEvent.tab();
-
-      userEvent.tab();
-      userEvent.tab();
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Add file',
+        }),
+      );
 
       await waitFor(() => {
-        expect(
-          releaseAncillaryFileService.uploadAncillaryFile,
-        ).not.toHaveBeenCalled();
+        expect(releaseAncillaryFileService.createFile).not.toHaveBeenCalled();
 
         expect(
           screen.getByText('Enter a title', {
-            selector: '#fileUploadForm-title-error',
+            selector: '#ancillaryFileForm-title-error',
           }),
         ).toBeInTheDocument();
 
         expect(
           screen.getByText('Enter a summary', {
-            selector: '#fileUploadForm-summary-error',
+            selector: '#ancillaryFileForm-summary-error',
           }),
         ).toBeInTheDocument();
 
         expect(
           screen.getByText('Choose a file', {
-            selector: '#fileUploadForm-file-error',
+            selector: '#ancillaryFileForm-file-error',
           }),
         ).toBeInTheDocument();
       });
     });
 
     test('can submit with valid values', async () => {
-      releaseAncillaryFileService.uploadAncillaryFile.mockResolvedValue({
+      releaseAncillaryFileService.createFile.mockResolvedValue({
         id: 'test-file',
         title: 'Test title',
         summary: 'Test summary',
@@ -387,15 +325,13 @@ describe('ReleaseFileUploadsSection', () => {
       userEvent.upload(screen.getByLabelText('Upload file'), file);
       userEvent.click(
         screen.getByRole('button', {
-          name: 'Upload file',
+          name: 'Add file',
         }),
       );
 
       await waitFor(() => {
-        expect(
-          releaseAncillaryFileService.uploadAncillaryFile,
-        ).toHaveBeenCalledWith<
-          Parameters<typeof releaseAncillaryFileService.uploadAncillaryFile>
+        expect(releaseAncillaryFileService.createFile).toHaveBeenCalledWith<
+          Parameters<typeof releaseAncillaryFileService.createFile>
         >('release-1', {
           title: 'Test title',
           summary: 'Test summary',
@@ -405,7 +341,7 @@ describe('ReleaseFileUploadsSection', () => {
     });
 
     test('renders with uploaded file appended to list of files', async () => {
-      releaseAncillaryFileService.uploadAncillaryFile.mockResolvedValue({
+      const newTestFile: AncillaryFile = {
         id: 'test-file',
         title: 'Test file 3',
         summary: 'Test summary 3',
@@ -416,7 +352,8 @@ describe('ReleaseFileUploadsSection', () => {
         },
         userName: 'test@test.com',
         created: '2021-05-25T00:00:00',
-      });
+      };
+      releaseAncillaryFileService.createFile.mockResolvedValue(newTestFile);
 
       renderPage();
 
@@ -425,17 +362,21 @@ describe('ReleaseFileUploadsSection', () => {
       userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
       userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
       userEvent.upload(screen.getByLabelText('Upload file'), file);
+
       userEvent.click(
         screen.getByRole('button', {
-          name: 'Upload file',
+          name: 'Add file',
         }),
       );
 
+      releaseAncillaryFileService.listFiles.mockResolvedValue([
+        ...testFiles,
+        newTestFile,
+      ]);
+
       await waitFor(() => {
-        expect(
-          releaseAncillaryFileService.uploadAncillaryFile,
-        ).toHaveBeenCalledWith<
-          Parameters<typeof releaseAncillaryFileService.uploadAncillaryFile>
+        expect(releaseAncillaryFileService.createFile).toHaveBeenCalledWith<
+          Parameters<typeof releaseAncillaryFileService.createFile>
         >('release-1', {
           title: 'Test file 3',
           summary: 'Test summary 3',

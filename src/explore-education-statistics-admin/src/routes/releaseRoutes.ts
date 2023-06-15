@@ -65,7 +65,7 @@ export const releaseDataRoute: ReleaseRouteProps = {
   component: ReleaseDataPage,
 };
 
-export const releaseDataAncillaryRoute: ReleaseRouteProps = {
+export const releaseAncillaryFilesRoute: ReleaseRouteProps = {
   path: '/publication/:publicationId/release/:releaseId/data#file-uploads',
   title: 'Data and files',
   component: ReleaseDataPage,

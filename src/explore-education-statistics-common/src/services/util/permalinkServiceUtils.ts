@@ -1,7 +1,7 @@
-import { Permalink } from '@common/services/permalinkService';
 import {
   FilterOption,
   LocationOption,
+  TableDataResponse,
 } from '@common/services/tableBuilderService';
 import combineMeasuresWithDuplicateLocationCodes from '@common/services/util/combineMeasuresWithDuplicateLocationCodes';
 import groupBy from 'lodash/groupBy';
@@ -26,17 +26,17 @@ import uniq from 'lodash/uniq';
  * by Location id without returning other results for different Locations that share the
  * same geographic level and code.
  */
-function deduplicatePermalinkLocations(permalink: Permalink): Permalink {
-  const { fullTable: tableData } = permalink;
-
+function deduplicatePermalinkLocations(
+  tableData: TableDataResponse,
+): TableDataResponse {
   if (!tableData.subjectMeta || tableData.results.length === 0) {
-    return permalink;
+    return tableData;
   }
 
   // Absence of the 'location' field in the first result tells that this isn't a
   // a historical Permalink which needs deduplication.
   if (!tableData.results[0].location) {
-    return permalink;
+    return tableData;
   }
 
   const { subjectMeta } = tableData;
@@ -92,15 +92,12 @@ function deduplicatePermalinkLocations(permalink: Permalink): Permalink {
   );
 
   return {
-    ...permalink,
-    fullTable: {
-      ...tableData,
-      subjectMeta: {
-        ...subjectMeta,
-        locations: mergedLocations,
-      },
-      results: mergedResults,
+    ...tableData,
+    subjectMeta: {
+      ...subjectMeta,
+      locations: mergedLocations,
     },
+    results: mergedResults,
   };
 }
 

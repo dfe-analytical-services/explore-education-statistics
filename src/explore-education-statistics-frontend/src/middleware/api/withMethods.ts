@@ -19,9 +19,10 @@ export default function withMethods(config: MethodsConfig) {
     const handler = config[method];
 
     if (!handler) {
-      return res.status(405).end();
+      res.status(405).end();
+      return;
     }
 
-    return handler(req, res);
+    handler(req, res);
   };
 }

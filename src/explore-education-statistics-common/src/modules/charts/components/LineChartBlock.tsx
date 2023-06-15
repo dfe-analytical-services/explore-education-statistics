@@ -12,6 +12,7 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
@@ -155,25 +156,27 @@ const LineChartBlock = ({
 
           <YAxis
             {...minorDomainTicks}
-            type="number"
             hide={!axes.minor.visible}
-            width={yAxisWidth}
+            tick={axisTickStyle}
             tickFormatter={tick =>
               formatPretty(tick, minorAxisUnit, minorAxisDecimals)
             }
+            type="number"
+            width={yAxisWidth}
           />
 
           <XAxis
             {...majorDomainTicks}
-            type="category"
             axisLine={!chartHasNegativeValues}
             dataKey="name"
-            hide={!axes.major.visible}
-            unit={axes.major.unit}
             height={xAxisHeight}
+            hide={!axes.major.visible}
             padding={{ left: 20, right: 20 }}
+            tick={axisTickStyle}
             tickMargin={10}
             tickFormatter={getCategoryLabel(dataSetCategories)}
+            type="category"
+            unit={axes.major.unit}
           />
 
           {dataSetCategoryConfigs.map(({ config, dataKey, dataSet }) => (

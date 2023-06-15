@@ -4,7 +4,7 @@ import createPermalinkTable from '@frontend/modules/api/permalink/createPermalin
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '20mb',
+      sizeLimit: '75mb',
     },
   },
 };

@@ -20,14 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _dataGuidanceService = dataGuidanceService;
         }
 
-        [HttpGet("release/{releaseId}/data-guidance")]
+        [HttpGet("release/{releaseId:guid}/data-guidance")]
         public async Task<ActionResult<DataGuidanceViewModel>> Get(Guid releaseId)
         {
             return await _dataGuidanceService.Get(releaseId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("release/{releaseId}/data-guidance")]
+        [HttpPatch("release/{releaseId:guid}/data-guidance")]
         public async Task<ActionResult<DataGuidanceViewModel>> Update(Guid releaseId,
             DataGuidanceUpdateViewModel request)
         {

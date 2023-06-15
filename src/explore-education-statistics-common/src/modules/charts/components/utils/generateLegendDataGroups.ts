@@ -170,14 +170,21 @@ export default function generateLegendDataGroups({
         return acc;
       }, []);
     }
-    case 'Custom':
-      return (
-        customGroups?.map((group, index) => {
-          const groupDecimals = Math.max(
+    case 'Custom': {
+      const highestGroupDecimalPlaces = customGroups.reduce<number>(
+        (acc, group) => {
+          const dp = Math.max(
             countDecimalPlaces(group.min) ?? 0,
             countDecimalPlaces(group.max) ?? 0,
           );
-          const groupValueIncrement = 1 / 10 ** groupDecimals;
+          return dp > acc ? dp : acc;
+        },
+        0,
+      );
+
+      return (
+        customGroups?.map((group, index) => {
+          const groupValueIncrement = 1 / 10 ** highestGroupDecimalPlaces;
 
           // Adjust the raw values when there are decimals involved so values aren't missed out of the groups.
           // eg. if there's two groups: 40 - 50% and 51% - 60%
@@ -185,28 +192,28 @@ export default function generateLegendDataGroups({
           // 50.6% should go in the 51 - 60% group
           // To ensure this happens we adjust the raw values to 49.5 - 50.4% and 50.5 - 60.4%
           const minRaw =
-            implicitDecimalPlaces !== groupDecimals
+            implicitDecimalPlaces !== highestGroupDecimalPlaces
               ? Number(
                   (group.min - groupValueIncrement / 2).toFixed(
-                    groupDecimals + 1,
+                    highestGroupDecimalPlaces + 1,
                   ),
                 )
               : group.min;
 
           const maxRaw =
-            implicitDecimalPlaces !== groupDecimals
+            implicitDecimalPlaces !== highestGroupDecimalPlaces
               ? Number(
                   (
                     group.max +
                     groupValueIncrement / 2 -
                     groupValueIncrement / 10
-                  ).toFixed(groupDecimals + 1),
+                  ).toFixed(highestGroupDecimalPlaces + 1),
                 )
               : group.max;
 
           return {
             colour: colourScale((index + 1) * (1 / customGroups.length)),
-            decimalPlaces: groupDecimals,
+            decimalPlaces: highestGroupDecimalPlaces,
             min: formatPretty(group.min, unit, countDecimalPlaces(group.min)),
             max: formatPretty(group.max, unit, countDecimalPlaces(group.max)),
             minRaw,
@@ -214,7 +221,7 @@ export default function generateLegendDataGroups({
           };
         }) ?? []
       );
-
+    }
     default:
       throw new Error('Invalid data classification');
   }

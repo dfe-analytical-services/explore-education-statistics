@@ -1,3 +1,4 @@
+import { useMobileMedia } from '@common/hooks/useMedia';
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
@@ -9,6 +10,7 @@ import {
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
+import { axisTickStyle } from '@common/modules/charts/util/chartUtils';
 import createDataSetCategories, {
   toChartData,
 } from '@common/modules/charts/util/createDataSetCategories';
@@ -58,6 +60,7 @@ const HorizontalBarBlock = ({
   dataLabelPosition,
 }: HorizontalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
+  const { isMedia: isMobileMedia } = useMobileMedia();
 
   if (
     axes === undefined ||
@@ -81,7 +84,13 @@ const HorizontalBarBlock = ({
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
 
-  const yAxisWidth = parseNumber(axes.major.size);
+  // Enforce a max y axis width on mobile as large widths cause
+  // the chart to not be visible.
+  const maxMobileYAxisWidth = 160;
+  const yAxisWidth =
+    isMobileMedia && axes.major.size && axes.major.size > maxMobileYAxisWidth
+      ? maxMobileYAxisWidth
+      : parseNumber(axes.major.size);
   const xAxisHeight = parseNumber(axes.minor.size);
 
   const dataSetCategoryConfigs = getDataSetCategoryConfigs({
@@ -125,25 +134,27 @@ const HorizontalBarBlock = ({
 
           <XAxis
             {...minorDomainTicks}
-            type="number"
-            hide={!axes.minor.visible}
             height={xAxisHeight}
+            hide={!axes.minor.visible}
             padding={{ left: 0, right: 20 }}
+            tick={axisTickStyle}
             tickMargin={10}
             tickFormatter={tick =>
               formatPretty(tick, minorAxisUnit, minorAxisDecimals)
             }
+            type="number"
           />
 
           <YAxis
             {...majorDomainTicks}
-            type="category"
             axisLine={!chartHasNegativeValues}
             dataKey="name"
             hide={!axes.major.visible}
+            tick={axisTickStyle}
+            tickFormatter={getCategoryLabel(dataSetCategories)}
+            type="category"
             unit={axes.major.unit}
             width={yAxisWidth}
-            tickFormatter={getCategoryLabel(dataSetCategories)}
           />
 
           <Tooltip
@@ -153,6 +164,7 @@ const HorizontalBarBlock = ({
                 dataSetCategoryConfigs={dataSetCategoryConfigs}
               />
             }
+            position={isMobileMedia ? { x: 0 } : undefined}
             wrapperStyle={{ zIndex: 1000 }}
           />
 

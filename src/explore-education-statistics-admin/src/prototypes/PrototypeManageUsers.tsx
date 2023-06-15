@@ -11,6 +11,7 @@ import Details from '@common/components/Details';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
+import classNames from 'classnames';
 
 const PrototypeManageUsers = () => {
   const [showDeleteUserModal, toggleDeleteUserModal] = useToggle(false);
@@ -342,11 +343,13 @@ const PrototypeManageUsers = () => {
                   </legend>
                   {currentReleases.map((item, index) => (
                     <div
-                      className={`dfe-flex dfe-align-items--center dfe-justify-content--space-between ${
-                        index < currentReleases.length - 1
-                          ? 'dfe-flex-underline'
-                          : ''
-                      }`}
+                      className={classNames(
+                        'dfe-flex dfe-align-items--center dfe-justify-content--space-between',
+                        {
+                          'dfe-flex-underline':
+                            index < currentReleases.length - 1,
+                        },
+                      )}
                       // eslint-disable-next-line react/no-array-index-key
                       key={index.toString()}
                     >
