@@ -26,32 +26,11 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
   return (
     <>
       <Tabs id="api-preview-tabs">
-        <TabsSection title="Changelog">
-          <>
-            {initialVersion && (
-              <div className="govuk-width-container govuk-!-margin-0">
-                <h5 className="govuk-heading-m">Changelog</h5>
-                <p>
-                  This is the initial version of the API data set, changes will
-                  only appear on this page when future versions of this data set
-                  are published.
-                </p>
-              </div>
-            )}
-            {!initialVersion && (
-              <ChangelogExample /> // TO DO this won't be in context so will need to fix
-            )}
-          </>
-        </TabsSection>
-        <TabsSection title="Data guidance">
-          <h5 className="govuk-heading-m">Data guidance</h5>
-          <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/">
-            Explore education statistics API documentation
-          </a>
-        </TabsSection>
-        <TabsSection title="Generate API data set preview token">
+        <TabsSection title="Preview API data set">
           <div>
-            <h5 className="govuk-heading-m">Generate a preview token</h5>
+            <h5 className="govuk-heading-m">
+              Generate API data set preview token
+            </h5>
             <p>This API data set is currently staged ready for publishing.</p>
             <p className="govuk-width-container govuk-!-margin-0 govuk-!-margin-bottom-9">
               You can preview the data by generating a token. The token allows
@@ -96,6 +75,29 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
               </Button>
             )}
           </div>
+        </TabsSection>
+        <TabsSection title="Data guidance">
+          <h5 className="govuk-heading-m">Data guidance</h5>
+          <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/">
+            Explore education statistics API documentation
+          </a>
+        </TabsSection>
+        <TabsSection title="Changelog">
+          <>
+            {initialVersion && (
+              <div className="govuk-width-container govuk-!-margin-0">
+                <h5 className="govuk-heading-m">Changelog</h5>
+                <p>
+                  This is the initial version of the API data set, changes will
+                  only appear on this page when future versions of this data set
+                  are published.
+                </p>
+              </div>
+            )}
+            {!initialVersion && (
+              <ChangelogExample /> // TO DO this won't be in context so will need to fix
+            )}
+          </>
         </TabsSection>
       </Tabs>
     </>

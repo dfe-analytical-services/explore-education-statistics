@@ -187,7 +187,9 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                         {capitalize(namePlural)} mapped to the new data set (
                         {mappedItems.length} of{' '}
                         {mappedItems.length + unmappedItems.length}){' '}
-                        <span className="govuk-tag">Please check</span>
+                        <span className="govuk-tag">
+                          Minor updates - Please check
+                        </span>
                       </h3>
 
                       <div className="govuk-hint">
@@ -227,9 +229,19 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                         {capitalize(namePlural)} with no mappings available (
                         {noMappingItems.length}){' '}
                         <span className="govuk-tag govuk-tag--red">
-                          Major updates
+                          Major updates - please check
                         </span>
                       </h3>
+
+                      <div className="govuk-hint">
+                        The list below shows {namePlural} that do not have
+                        mappings available in the new data set, please be aware
+                        this will create a major version update, this could
+                        create breaking changes for users of this new data set.
+                        If you need to make any changes to the list below,
+                        selecting a {name} will allow you to reset and then
+                        choose a mapping if appropriate.
+                      </div>
 
                       <PrototypeFacetList
                         heading={`${grouping} (${noMappingItems.length})`}

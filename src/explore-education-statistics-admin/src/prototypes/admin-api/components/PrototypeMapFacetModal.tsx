@@ -147,7 +147,7 @@ const PrototypeMapFacetModal = ({
               className="govuk-!-margin-bottom-0 govuk-!-margin-top-4"
               type="submit"
             >
-              Update mapping
+              Update mapping (minor update)
             </Button>
             <Button
               variant="warning"
