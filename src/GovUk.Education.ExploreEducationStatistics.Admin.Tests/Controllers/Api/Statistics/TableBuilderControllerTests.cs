@@ -1,11 +1,14 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -20,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -109,6 +113,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             VerifyAllMocks(tableBuilderService);
 
             response.AssertOk(_tableBuilderResults);
+        }
+
+        [Fact]
+        public async Task Query_Csv()
+        {
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
+            tableBuilderService
+                .Setup(s => s.QueryToCsvStream(
+                    ReleaseId,
+                    ItIs.DeepEqualTo(ObservationQueryContext),
+                    It.IsAny<Stream>(),
+                    It.IsAny<CancellationToken>()))
+                .ReturnsAsync(Unit.Instance)
+                .Callback<Guid, ObservationQueryContext, Stream, CancellationToken>(
+                    (_, _, stream, _) => { stream.WriteText("Test csv"); });
+
+            var client = SetupApp(tableBuilderService: tableBuilderService.Object)
+                .CreateClient();
+
+            var response = await client.PostAsync(
+                $"/api/data/tablebuilder/release/{ReleaseId}",
+                content: new JsonNetContent(ObservationQueryContext),
+                headers: new Dictionary<string, string>
+                {
+                    { HeaderNames.Accept, ContentTypes.Csv}
+                });
+
+            VerifyAllMocks(tableBuilderService);
+
+            response.AssertOk("Test csv");
         }
 
         [Fact]
