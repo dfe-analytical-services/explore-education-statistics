@@ -3,7 +3,9 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import Button from '@common/components/Button';
 import UrlContainer from '@common/components/UrlContainer';
+import useStorageItem from '@common/hooks/useStorageItem';
 import ChangelogExample from './PrototypeChangelogExamples';
+import { Changelog } from '../contexts/PrototypeNextSubjectContext';
 
 export const apiPreviewTabIds = {
   dataGuidance: 'data-guidance',
@@ -23,6 +25,8 @@ const time = `${today.getHours() + 2}:${
 
 const PrototypePreviewExample = ({ initialVersion }: Props) => {
   const [showToken, setShowToken] = useState(false);
+  const [changelog] = useStorageItem<Changelog>('changelog');
+
   return (
     <>
       <Tabs id="api-preview-tabs">
@@ -94,8 +98,8 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
                 </p>
               </div>
             )}
-            {!initialVersion && (
-              <ChangelogExample /> // TO DO this won't be in context so will need to fix
+            {!initialVersion && changelog && (
+              <ChangelogExample changelog={changelog} />
             )}
           </>
         </TabsSection>

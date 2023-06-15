@@ -5,11 +5,12 @@ import {
   FormFieldTextArea,
 } from '@common/components/form';
 import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
+import { PartialDate } from '@common/utils/date/partialDate';
 import { Formik } from 'formik';
 import React from 'react';
 
 export interface StatusFormValues {
-  date?: Date;
+  date?: PartialDate;
   notes?: string;
   status: 'live' | 'deprecated';
 }
@@ -59,6 +60,7 @@ const PrototypeChangeStatusForm = ({ selectedStatus, onSubmit }: Props) => {
                         legend=" Date of deprecation"
                         legendSize="s"
                         hint="The date helps give users advance warning of when the data set will be deprecated. If you don't yet know a precise date, just add an estimated month leaving the day blank."
+                        type="partialDate"
                       />
                     </>
                   ),

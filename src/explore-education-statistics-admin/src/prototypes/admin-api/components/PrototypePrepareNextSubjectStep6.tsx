@@ -1,14 +1,29 @@
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import useStorageItem from '@common/hooks/useStorageItem';
 import Button from '@common/components/Button';
 import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import {
+  usePrototypeNextSubjectContext,
+  Changelog,
+} from '../contexts/PrototypeNextSubjectContext';
 
 const PrototypePrepareNextSubjectStep6 = ({
   ...stepProps
 }: InjectedWizardProps) => {
   const history = useHistory();
+  const {
+    versionNotes,
+    versionType,
+    locations,
+    filters,
+    indicators,
+  } = usePrototypeNextSubjectContext();
+
+  // save in local storage as no db
+  const [_, setChangelog] = useStorageItem<Changelog>('changelog');
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>Complete linking</WizardStepHeading>
@@ -37,6 +52,13 @@ const PrototypePrepareNextSubjectStep6 = ({
 
           <Button
             onClick={() => {
+              setChangelog({
+                locations,
+                filters,
+                indicators,
+                versionNotes,
+                versionType,
+              });
               history.push('/prototypes/admin-api/data/2022-23#subjects');
             }}
           >

@@ -52,6 +52,9 @@ const PrototypePrepareNextSubjectStep5 = ({
     ) {
       setInitialVersionType('major');
       setVersionType('major');
+    } else {
+      setInitialVersionType('minor');
+      setVersionType('minor');
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [locations, filters, indicators]);
@@ -121,7 +124,15 @@ const PrototypePrepareNextSubjectStep5 = ({
                     </p>
                     <p>{versionType === 'major' ? '2.0' : '1.1'}</p>
 
-                    <ChangelogExample />
+                    <ChangelogExample
+                      changelog={{
+                        locations,
+                        filters,
+                        indicators,
+                        versionType,
+                        versionNotes,
+                      }}
+                    />
                   </>
                 </FormFieldset>
                 <WizardStepFormActions
@@ -151,7 +162,15 @@ const PrototypePrepareNextSubjectStep5 = ({
           <div style={{ whiteSpace: 'pre-wrap' }}>{versionNotes}</div>
         </SummaryListItem>
         <SummaryListItem term="Changelog">
-          <ChangelogExample />
+          <ChangelogExample
+            changelog={{
+              locations,
+              filters,
+              indicators,
+              versionType,
+              versionNotes,
+            }}
+          />
         </SummaryListItem>
       </SummaryList>
     </WizardStepSummary>

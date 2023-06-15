@@ -13,7 +13,7 @@ import capitalize from 'lodash/capitalize';
 import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
 import FormattedDate from '@common/components/FormattedDate';
-
+import { formatPartialDate } from '@common/utils/date/partialDate';
 import {
   subjectsForRelease1,
   PublicationSubject,
@@ -516,13 +516,23 @@ const PrototypePublicationSubjectList = ({
                                   Deprecation date
                                 </h3>
 
-                                <p>
-                                  {version1Status.date && (
-                                    <FormattedDate format="d MMM yyyy">
-                                      {version1Status.date}
-                                    </FormattedDate>
-                                  )}
-                                </p>
+                                {version1Status.date && (
+                                  <p>
+                                    {version1Status.date.day ? (
+                                      <FormattedDate format="d MMM yyyy">
+                                        {
+                                          new Date(
+                                            `${version1Status.date.month}/${version1Status.date.day}/${version1Status.date.year}`,
+                                          )
+                                        }
+                                      </FormattedDate>
+                                    ) : (
+                                      <time>
+                                        {formatPartialDate(version1Status.date)}
+                                      </time>
+                                    )}
+                                  </p>
+                                )}
                               </>
                             )}
                             {selectedVersion === '2.0' && (
@@ -532,13 +542,23 @@ const PrototypePublicationSubjectList = ({
                                   Deprecation date
                                 </h3>
 
-                                <p>
-                                  {version2Status.date && (
-                                    <FormattedDate format="d MMM yyyy">
-                                      {version2Status.date}
-                                    </FormattedDate>
-                                  )}
-                                </p>
+                                {version2Status.date && (
+                                  <p>
+                                    {version2Status.date.day ? (
+                                      <FormattedDate format="d MMM yyyy">
+                                        {
+                                          new Date(
+                                            `${version2Status.date.month}/${version2Status.date.day}/${version2Status.date.year}`,
+                                          )
+                                        }
+                                      </FormattedDate>
+                                    ) : (
+                                      <time>
+                                        {formatPartialDate(version2Status.date)}
+                                      </time>
+                                    )}
+                                  </p>
+                                )}
                               </>
                             )}
                             {selectedVersion === '1.0' && (
@@ -548,13 +568,23 @@ const PrototypePublicationSubjectList = ({
                                   Deprecation date
                                 </h3>
 
-                                <p>
-                                  {version3Status.date && (
-                                    <FormattedDate format="d MMM yyyy">
-                                      {version3Status.date}
-                                    </FormattedDate>
-                                  )}
-                                </p>
+                                {version3Status.date && (
+                                  <p>
+                                    {version3Status.date.day ? (
+                                      <FormattedDate format="d MMM yyyy">
+                                        {
+                                          new Date(
+                                            `${version3Status.date.month}/${version3Status.date.day}/${version3Status.date.year}`,
+                                          )
+                                        }
+                                      </FormattedDate>
+                                    ) : (
+                                      <time>
+                                        {formatPartialDate(version3Status.date)}
+                                      </time>
+                                    )}
+                                  </p>
+                                )}
                               </>
                             )}
                           </div>

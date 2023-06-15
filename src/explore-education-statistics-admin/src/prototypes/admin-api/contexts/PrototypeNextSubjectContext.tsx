@@ -19,6 +19,14 @@ export interface Items {
 export type VersionType = 'major' | 'minor';
 export type FacetType = 'location' | 'filter' | 'indicator';
 
+export interface Changelog {
+  locations: Items;
+  filters: Items;
+  indicators: Items;
+  versionNotes?: string;
+  versionType: VersionType;
+}
+
 export interface PrototypeNextSubjectContextState {
   locations: Items;
   filters: Items;

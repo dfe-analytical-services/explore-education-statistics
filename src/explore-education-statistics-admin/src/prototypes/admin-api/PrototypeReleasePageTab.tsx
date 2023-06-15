@@ -3,6 +3,7 @@ import useStorageItem from '@common/hooks/useStorageItem';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { PublicationSubject } from './PrototypePublicationSubjects';
+import { Changelog } from './contexts/PrototypeNextSubjectContext';
 
 const ReleaseDataPage = () => {
   const history = useHistory();
@@ -14,6 +15,7 @@ const ReleaseDataPage = () => {
     'publishedReleases',
     [],
   );
+  const [_, setChangelog] = useStorageItem<Changelog | undefined>('changelog');
 
   return (
     <>
@@ -23,6 +25,7 @@ const ReleaseDataPage = () => {
         onClick={() => {
           setSavedPublicationSubjects([]);
           setPublishedReleases([]);
+          setChangelog(undefined);
           history.push('/prototypes/admin-api/data/2021-22#subjects');
         }}
       >

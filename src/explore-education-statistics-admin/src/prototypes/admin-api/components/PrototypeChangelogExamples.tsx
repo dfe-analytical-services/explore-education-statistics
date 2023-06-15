@@ -1,25 +1,17 @@
 import React from 'react';
-import { usePrototypeNextSubjectContext } from '../contexts/PrototypeNextSubjectContext';
+import { Changelog } from '../contexts/PrototypeNextSubjectContext';
 
-const PrototypeChangelogExample = () => {
-  const {
-    versionType,
-    locations,
-    filters,
-    indicators,
-  } = usePrototypeNextSubjectContext();
+const PrototypeChangelogExample = ({ changelog }: { changelog: Changelog }) => {
+  const { locations, filters, indicators, versionNotes } = changelog;
+
   return (
     <>
       <h3>Changelog</h3>
 
-      {versionType === 'minor' && (
+      {versionNotes && (
         <>
           <h4>Version notes</h4>
-          <p>
-            This is a minor update on the previous version, some new locations,
-            filters and indicators have been added to the data set since the
-            previous release, please see the details in the changelog below.
-          </p>
+          <p>{versionNotes}</p>
         </>
       )}
 
