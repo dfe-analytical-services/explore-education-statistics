@@ -123,12 +123,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Name { get; set; }
 
-        // TODO EES-4273 Remove
-        public string? HighlightName { get; set; }
-
-        // TODO EES-4273 Remove
-        public string? HighlightDescription { get; set; }
-
         public string Source { get; set; }
 
         public ObservationQueryContext Query { get; set; }
