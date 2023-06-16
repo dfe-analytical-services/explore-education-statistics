@@ -2,6 +2,7 @@ import argparse
 import csv
 import os
 import time
+from datetime import datetime
 
 import certifi
 import requests
@@ -11,7 +12,7 @@ This is a script for measuring the response time of permalink requests.
 It uses the public frontend request `GET {public_base_url}/data-tables/permalink/{permalink_id}.
 It reads a CSV file named 'permalinks.csv' and outputs a CSV file named 'response_times.csv'.
 
-Usage: `pipenv run python time_permalink_requests.py [-h] [--public-url [PUBLIC_URL]] [--sleep [SLEEP]] [--timeout [TIMEOUT]]`
+Usage: `pipenv run python time_permalink_requests.py [-h] [--env {local,dev,test,preprod,prod}] [--snapshot | --no-snapshot] [--sleep [SLEEP]] [--timeout [TIMEOUT]]`
 
 Instructions:
 
@@ -41,16 +42,30 @@ a57e9ae9-b442-4005-caec-08db3b6d5a38
 
 
 class TimePermalinkRequests:
-    def __init__(self, public_url: str, sleep: float, timeout: float):
-        self.public_url = public_url
+    PUBLIC_URLS = {
+        "local": "http://localhost:3000",
+        "dev": "https://dev.explore-education-statistics.service.gov.uk",
+        "test": "https://test.explore-education-statistics.service.gov.uk",
+        "preprod": "https://pre-production.explore-education-statistics.service.gov.uk",
+        "prod": "https://explore-education-statistics.service.gov.uk",
+    }
+
+    def __init__(self, env: str, snapshot: bool, sleep: float, timeout: float):
+        self.env = (env,)
+        self.public_url = TimePermalinkRequests.PUBLIC_URLS[env]
+        self.snapshot = snapshot
         self.session = requests.Session()
-        self.timeout = timeout
         self.sleep = sleep
+        self.timeout = timeout
         self.http_headers = {"Accept-Encoding": "gzip, deflate, br"}
+        self.results_dir = f"responses_{env}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
     def _time_permalink_request(self, permalink_id: str) -> tuple[int, float, int, str]:
+        url = f"{self.public_url}/data-tables/permalink/{permalink_id}"
+        if self.snapshot:
+            url += "?newPermalinks=true"
         response = self.session.get(
-            f"{self.public_url}/data-tables/permalink/{permalink_id}",
+            url,
             headers=self.http_headers,
             timeout=self.timeout,
             verify=certifi.where(),
@@ -66,7 +81,7 @@ class TimePermalinkRequests:
         return response.status_code, response_time, content_length, content_length_formatted
 
     def _time_permalink_requests(self, permalinks: list[list[str]]) -> None:
-        with open("response_times.csv", "w", newline="") as output_file:
+        with open(os.path.join(self.results_dir, "responses.csv"), "w", newline="") as output_file:
             output_writer = csv.writer(output_file)
 
             output_writer.writerow(
@@ -133,6 +148,9 @@ class TimePermalinkRequests:
             return f"{length / (1024 * 1024):.2f} Mb"
 
     def main(self):
+        if not os.path.exists(self.results_dir):
+            os.makedirs(self.results_dir)
+
         with open("permalinks.csv", "r") as permalinks_csv_file:
             csv_reader = csv.reader(permalinks_csv_file)
 
@@ -151,13 +169,21 @@ if __name__ == "__main__":
     )
 
     ap.add_argument(
-        "--public-url",
-        dest="public_url",
-        default="http://localhost:3000",
-        nargs="?",
-        help="URL of the Public site e.g. http://localhost:3000",
+        "--env",
+        dest="env",
+        default="local",
+        choices=["local", "dev", "test", "preprod", "prod"],
+        help="The environment to run against",
         type=str,
         required=False,
+    )
+
+    ap.add_argument(
+        "--snapshot",
+        dest="snapshot",
+        default=False,
+        help="Request the permalink page using the snapshot feature flag",
+        action=argparse.BooleanOptionalAction,
     )
 
     ap.add_argument(
@@ -182,5 +208,7 @@ if __name__ == "__main__":
 
     args = ap.parse_args()
 
-    time_permalink_requests = TimePermalinkRequests(public_url=args.public_url, sleep=args.sleep, timeout=args.timeout)
+    time_permalink_requests = TimePermalinkRequests(
+        env=args.env, snapshot=args.snapshot, sleep=args.sleep, timeout=args.timeout
+    )
     time_permalink_requests.main()
