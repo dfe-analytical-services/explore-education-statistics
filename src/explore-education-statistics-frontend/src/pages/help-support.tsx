@@ -41,7 +41,8 @@ const HelpSupportPage: NextPage = () => {
             <p>
               To find specific sets of statistics currently published via the
               service, browse our{' '}
-              <Link to="/find-statistics">Find statistics and data</Link> section.
+              <Link to="/find-statistics">Find statistics and data</Link>{' '}
+              section.
             </p>
             <p>
               To find out about the methodology behind the specific statistics

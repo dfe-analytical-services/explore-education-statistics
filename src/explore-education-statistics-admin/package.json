@@ -60,6 +60,7 @@
     "postcss-preset-env": "^7.8.3",
     "process": "^0.11.10",
     "qs": "^6.11.2",
+    "querystring": "0.2.1",
     "react": "17.0.2",
     "react-app-polyfill": "^2.0.0",
     "react-beautiful-dnd": "^13.1.1",

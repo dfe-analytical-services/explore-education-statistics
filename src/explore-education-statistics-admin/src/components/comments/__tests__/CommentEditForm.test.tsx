@@ -69,7 +69,7 @@ describe('CommentEditForm', () => {
       />,
     );
 
-    await userEvent.clear(
+    userEvent.clear(
       screen.getByRole('textbox', {
         name: 'Comment',
       }),

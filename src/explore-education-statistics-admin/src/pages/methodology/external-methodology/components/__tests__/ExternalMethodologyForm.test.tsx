@@ -44,7 +44,7 @@ describe('ExternalMethodologyForm', () => {
   test('show validation error when no external methodology URL', async () => {
     render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
-    await userEvent.clear(screen.getByLabelText('URL'));
+    userEvent.clear(screen.getByLabelText('URL'));
     userEvent.tab();
 
     await waitFor(() => {

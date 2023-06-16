@@ -108,14 +108,13 @@ export default function useMethodologyContentActions() {
     order: Dictionary<number>;
     sectionKey: ContentSectionKeys;
   }) {
-    const sectionContent = await methodologyContentService.updateContentSectionBlocksOrder(
-      {
+    const sectionContent =
+      await methodologyContentService.updateContentSectionBlocksOrder({
         methodologyId,
         sectionId,
         order,
         sectionKey,
-      },
-    );
+      });
     dispatch({
       type: 'UPDATE_SECTION_CONTENT',
       payload: {

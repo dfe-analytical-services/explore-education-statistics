@@ -213,6 +213,7 @@ describe('ReleaseFileUploadsSection', () => {
           Parameters<typeof releaseAncillaryFileService.deleteFile>
         >('release-1', 'file-2');
       });
+      await flushPromises();
 
       const updatedSections = screen.getAllByTestId('accordionSection');
 
@@ -383,7 +384,7 @@ describe('ReleaseFileUploadsSection', () => {
           file,
         });
       });
-
+      await flushPromises();
       const sections = screen.getAllByTestId('accordionSection');
 
       expect(sections).toHaveLength(3);

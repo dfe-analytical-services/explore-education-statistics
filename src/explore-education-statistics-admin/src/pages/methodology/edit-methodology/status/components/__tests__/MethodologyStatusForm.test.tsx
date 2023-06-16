@@ -238,7 +238,7 @@ describe('MethodologyStatusForm', () => {
 
     userEvent.type(screen.getByLabelText('Internal note'), 'Test release note');
 
-    await userEvent.selectOptions(screen.getByLabelText('Select release'), [
+    userEvent.selectOptions(screen.getByLabelText('Select release'), [
       'test-release-1',
     ]);
 

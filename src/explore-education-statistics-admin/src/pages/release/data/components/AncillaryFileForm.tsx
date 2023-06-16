@@ -112,8 +112,10 @@ export default function AncillaryFileForm({
             },
           }),
         summary: Yup.string().required('Enter a summary'),
-        file: Yup.file().minSize(0, 'Choose a file that is not empty'),
-      }).concat(validationSchema ?? Yup.object())}
+        file: Yup.file()
+          .minSize(0, 'Choose a file that is not empty')
+          .notRequired(),
+      }).concat(validationSchema ?? Yup.object().notRequired())}
     >
       {form => (
         <Form id={formId}>

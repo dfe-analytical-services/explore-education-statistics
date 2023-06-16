@@ -96,8 +96,8 @@ describe('ThemeForm', () => {
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
-      await userEvent.clear(screen.getByLabelText('Title'));
-      await userEvent.clear(screen.getByLabelText('Summary'));
+      userEvent.clear(screen.getByLabelText('Title'));
+      userEvent.clear(screen.getByLabelText('Summary'));
 
       userEvent.click(screen.getByRole('button', { name: 'Save theme' }));
 

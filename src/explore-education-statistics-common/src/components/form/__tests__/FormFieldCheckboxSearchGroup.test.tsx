@@ -579,7 +579,7 @@ describe('FormFieldCheckboxSearchGroup', () => {
 
     expect(screen.getByLabelText('Checkbox 1')).toHaveAttribute('checked');
 
-    await userEvent.type(searchInput, '2');
+    userEvent.type(searchInput, '2');
 
     jest.runAllTimers();
 

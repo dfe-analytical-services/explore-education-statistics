@@ -33,7 +33,7 @@ describe('MethodologyEditableBlock', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders HTML block with correct image urls', () => {
+  test('renders HTML block with correct image urls', async () => {
     const image1SrcSet =
       '/api/methodologies/{methodologyId}/images/some-image-id-100 100w, ' +
       '/api/methodologies/{methodologyId}/images/some-image-id-200 200w, ' +
@@ -61,22 +61,24 @@ describe('MethodologyEditableBlock', () => {
       />,
     );
 
-    expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 1')).toHaveAttribute(
       'src',
       '/api/methodologies/methodology-1/images/some-image-id',
     );
-    expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(
+
+    expect(screen.getByAltText('Test image 1')).toHaveAttribute(
       'srcset',
       '/api/methodologies/methodology-1/images/some-image-id-100 100w, ' +
         '/api/methodologies/methodology-1/images/some-image-id-200 200w, ' +
         '/api/methodologies/methodology-1/images/some-image-id-300 300w',
     );
 
-    expect(screen.getByRole('img', { name: 'Test image 2' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 2')).toHaveAttribute(
       'src',
       'https://test/some-image-url.jpg',
     );
-    expect(screen.getByRole('img', { name: 'Test image 2' })).toHaveAttribute(
+
+    expect(screen.getByAltText('Test image 2')).toHaveAttribute(
       'srcset',
       image2SrcSet,
     );

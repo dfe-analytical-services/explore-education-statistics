@@ -44,7 +44,7 @@ describe('AncillaryFileForm', () => {
     );
 
     userEvent.clear(screen.getByLabelText('Title'));
-    await userEvent.type(screen.getByLabelText('Title'), 'Test title');
+    userEvent.type(screen.getByLabelText('Title'), 'Test title');
     userEvent.tab();
 
     await waitFor(() => {
@@ -113,8 +113,8 @@ describe('AncillaryFileForm', () => {
 
     render(<AncillaryFileForm onSubmit={handleSubmit} />);
 
-    await userEvent.type(screen.getByLabelText('Title'), 'Test title');
-    await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
+    userEvent.type(screen.getByLabelText('Title'), 'Test title');
+    userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
 
     const testFile = new File(['test'], 'test.txt');
 

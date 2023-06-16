@@ -116,22 +116,22 @@ describe('ReleaseEditableBlock', () => {
       />,
     );
 
-    expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 1')).toHaveAttribute(
       'src',
       '/api/releases/release-1/images/some-image-id',
     );
-    expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 1')).toHaveAttribute(
       'srcset',
       '/api/releases/release-1/images/some-image-id-100 100w, ' +
         '/api/releases/release-1/images/some-image-id-200 200w, ' +
         '/api/releases/release-1/images/some-image-id-300 300w',
     );
 
-    expect(screen.getByRole('img', { name: 'Test image 2' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 2')).toHaveAttribute(
       'src',
       'https://test/some-image-url.jpg',
     );
-    expect(screen.getByRole('img', { name: 'Test image 2' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 2')).toHaveAttribute(
       'srcset',
       image2SrcSet,
     );

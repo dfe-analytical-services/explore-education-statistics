@@ -232,19 +232,19 @@ describe('DataBlockDetailsForm', () => {
 
     render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
 
-    await userEvent.type(screen.getByLabelText('Name'), 'Test name');
-    await userEvent.type(screen.getByLabelText('Table title'), 'Test title');
-    await userEvent.type(screen.getByLabelText('Source'), 'Test source');
+    userEvent.type(screen.getByLabelText('Name'), 'Test name');
+    userEvent.type(screen.getByLabelText('Table title'), 'Test title');
+    userEvent.type(screen.getByLabelText('Source'), 'Test source');
 
     userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
-    await userEvent.type(
+    userEvent.type(
       screen.getByLabelText('Featured table name'),
       '   Test highlight name   ',
     );
-    await userEvent.type(
+    userEvent.type(
       screen.getByLabelText('Featured table description'),
       '    Test highlight description    ',
     );

@@ -82,7 +82,7 @@ importers:
         version: 9.0.5(stylelint@15.7.0)
       stylelint-config-sass-guidelines:
         specifier: ^10.0.0
-        version: 10.0.0(postcss@8.4.21)(stylelint@15.7.0)
+        version: 10.0.0(postcss@8.4.24)(stylelint@15.7.0)
       stylelint-prettier:
         specifier: ^3.0.0
         version: 3.0.0(prettier@2.8.8)(stylelint@15.7.0)
@@ -263,6 +263,9 @@ importers:
       qs:
         specifier: ^6.11.2
         version: 6.11.2
+      querystring:
+        specifier: 0.2.1
+        version: 0.2.1
       react:
         specifier: 17.0.2
         version: 17.0.2
@@ -14830,13 +14833,13 @@ packages:
       postcss: 7.0.39
     dev: true
 
-  /postcss-scss@4.0.6(postcss@8.4.21):
+  /postcss-scss@4.0.6(postcss@8.4.24):
     resolution: {integrity: sha512-rLDPhJY4z/i4nVFZ27j9GqLxj1pwxE80eAzUNRMXtcpipFYIeowerzBgG3yJhMtObGEXidtIgbUpQ3eLDsf5OQ==}
     engines: {node: '>=12.0'}
     peerDependencies:
       postcss: ^8.4.19
     dependencies:
-      postcss: 8.4.21
+      postcss: 8.4.24
     dev: true
 
   /postcss-selector-not@6.0.1(postcss@8.4.21):
@@ -15188,6 +15191,12 @@ packages:
     resolution: {integrity: sha512-773xhDQnZBMFobEiztv8LIl70ch5MSF/jUQVlhwFyBILqq96anmoctVIYz+ZRp0qbCKATTn6ev02M3r7Ga5vqA==}
     engines: {node: '>=0.4.x'}
     dev: true
+
+  /querystring@0.2.1:
+    resolution: {integrity: sha512-wkvS7mL/JMugcup3/rMitHmd9ecIGd2lhFhK9N3UUQ450h66d1r3Y9nvXzQAW1Lq+wyx61k/1pfKS5KuKiyEbg==}
+    engines: {node: '>=0.4.x'}
+    deprecated: The querystring API is considered Legacy. new code should use the URLSearchParams API instead.
+    dev: false
 
   /querystringify@2.2.0:
     resolution: {integrity: sha512-FIqgj2EUvTa7R50u0rGsyTftzjYmv/a3hO345bZNrqabNqjtgiDMgmo4mkUjd+nzU5oF3dClKqFIPUKybUyqoQ==}
@@ -17020,15 +17029,15 @@ packages:
       stylelint: 15.7.0
     dev: true
 
-  /stylelint-config-sass-guidelines@10.0.0(postcss@8.4.21)(stylelint@15.7.0):
+  /stylelint-config-sass-guidelines@10.0.0(postcss@8.4.24)(stylelint@15.7.0):
     resolution: {integrity: sha512-+Rr2Dd4b72CWA4qoj1Kk+y449nP/WJsrD0nzQAWkmPPIuyVcy2GMIcfNr0Z8JJOLjRvtlkKxa49FCNXMePBikQ==}
     engines: {node: ^14.13.1 || >=16.13.0 || >=18.0.0}
     peerDependencies:
       postcss: ^8.4.21
       stylelint: ^15.2.0
     dependencies:
-      postcss: 8.4.21
-      postcss-scss: 4.0.6(postcss@8.4.21)
+      postcss: 8.4.24
+      postcss-scss: 4.0.6(postcss@8.4.24)
       stylelint: 15.7.0
       stylelint-scss: 4.7.0(stylelint@15.7.0)
     dev: true

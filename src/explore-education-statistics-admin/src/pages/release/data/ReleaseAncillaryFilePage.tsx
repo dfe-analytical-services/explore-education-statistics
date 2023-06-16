@@ -13,14 +13,13 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router';
 
-export default function ReleaseAncillaryFilePage({
-  history,
-  match: {
-    params: { publicationId, releaseId, fileId },
-  },
-}: RouteComponentProps<ReleaseAncillaryFileRouteParams>) {
+export default function ReleaseAncillaryFilePage() {
+  const { fileId, publicationId, releaseId } =
+    useParams<ReleaseAncillaryFileRouteParams>();
+  const history = useHistory();
+
   const { data: file, isLoading: isLoadingFile } = useQuery(
     releaseAncillaryFileQueries.get(releaseId, fileId),
   );
