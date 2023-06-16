@@ -388,16 +388,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(block => block.Heading)
                 .HasColumnName("DataBlock_Heading");
 
-            // TODO EES-4273 Remove
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.HighlightName)
-                .HasColumnName("DataBlock_HighlightName");
-
-            // TODO EES-4273 Remove
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.HighlightDescription)
-                .HasColumnName("DataBlock_HighlightDescription");
-
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Query)
                 .HasColumnName("DataBlock_Query")
