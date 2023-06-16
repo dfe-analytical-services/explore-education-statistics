@@ -2,6 +2,7 @@ import argparse
 import csv
 import os
 import time
+from datetime import datetime
 
 import certifi
 import requests
@@ -9,9 +10,9 @@ import requests
 """
 This is the script for migrating legacy permalinks to permalink snapshots.
 It uses a Data API migration endpoint `PUT /api/permalink/{permalinkId}/snapshot`.
-It reads a CSV file named 'permalinks.csv' and outputs a CSV file named 'migration_results.csv'.
+It reads a CSV file named 'permalinks.csv' and outputs a CSV file named 'migration_results_{env}_{datetime}.csv'.
 
-Usage: `pipenv run python migrate_legacy_permalinks.py [-h] [--data-api-url [DATA_API_URL]] [--sleep [SLEEP]] [--timeout [TIMEOUT]]`
+Usage: `pipenv run python migrate_legacy_permalinks.py [-h] [--env {local,dev,test,preprod,prod}] [--sleep [SLEEP]] [--timeout [TIMEOUT]]`
 
 Instructions:
 
@@ -43,8 +44,17 @@ a57e9ae9-b442-4005-caec-08db3b6d5a38
 
 
 class MigrateLegacyPermalinks:
-    def __init__(self, data_api_url: str, sleep: float, timeout: float):
-        self.data_api_url = data_api_url
+    DATA_API_URLS = {
+        "local": "http://localhost:5000/api",
+        "dev": "https://data.dev.explore-education-statistics.service.gov.uk/api",
+        "test": "https://data.test.explore-education-statistics.service.gov.uk/api",
+        "preprod": "https://data.pre-production.explore-education-statistics.service.gov.uk/api",
+        "prod": "https://data.explore-education-statistics.service.gov.uk/api",
+    }
+
+    def __init__(self, env: str, sleep: float, timeout: float):
+        self.env = env
+        self.data_api_url = MigrateLegacyPermalinks.DATA_API_URLS[env]
         self.session = requests.Session()
         self.timeout = timeout
         self.sleep = sleep
@@ -67,7 +77,8 @@ class MigrateLegacyPermalinks:
         return response.status_code, response_time
 
     def _migrate_permalinks(self, permalinks: list[list[str]]) -> None:
-        with open("migration_results.csv", "w", newline="") as output_file:
+        output_filename = f"migration_results_{self.env}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        with open(output_filename, "w", newline="") as output_file:
             output_writer = csv.writer(output_file)
 
             output_writer.writerow(
@@ -136,11 +147,11 @@ if __name__ == "__main__":
     )
 
     ap.add_argument(
-        "--data-api-url",
-        dest="data_api_url",
-        default="http://localhost:5000/api",
-        nargs="?",
-        help="URL of the Data API e.g. http://localhost:5000/api",
+        "--env",
+        dest="env",
+        default="local",
+        choices=["local", "dev", "test", "preprod", "prod"],
+        help="The environment to run against",
         type=str,
         required=False,
     )
@@ -167,5 +178,5 @@ if __name__ == "__main__":
 
     args = ap.parse_args()
 
-    migrator = MigrateLegacyPermalinks(data_api_url=args.data_api_url, sleep=args.sleep, timeout=args.timeout)
+    migrator = MigrateLegacyPermalinks(env=args.env, sleep=args.sleep, timeout=args.timeout)
     migrator.main()
