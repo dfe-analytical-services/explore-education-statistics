@@ -661,7 +661,7 @@ describe('ChartLegendConfiguration', () => {
 
     userEvent.selectOptions(legendItem1.getByLabelText('Position'), 'below');
 
-    expect(handleChange).toHaveBeenCalledWith<[LegendConfiguration]>({
+    expect(handleChange).toHaveBeenCalledWith<LegendConfiguration[]>({
       position: 'inline',
       items: [
         {
