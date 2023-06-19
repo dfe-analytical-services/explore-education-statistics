@@ -105,7 +105,12 @@ user checks chart x axis ticks
 user mouses over line chart point
     [Arguments]    ${locator}    ${line}    ${number}
     user waits until parent contains element    ${locator}
-    ...    css:.recharts-line-dots:nth-of-type(${line}) .recharts-symbols:nth-of-type(${number})
+    ...    xpath://*[@class="recharts-layer recharts-line-dots"]//*[@class="recharts-symbols"][${number}]
+
+    Log To Console    PASSING HERE FAILING BELOW
+
+    Sleep    100000
+    # failing here
     ${element}=    get child element    ${locator}
     ...    css:.recharts-line-dots:nth-of-type(${line}) .recharts-symbols:nth-of-type(${number})
     user waits until element is visible    ${element}
@@ -114,7 +119,7 @@ user mouses over line chart point
 user mouses over chart bar
     [Arguments]    ${locator}    ${number}
     user waits until parent contains element    ${locator}
-    ...    css:.recharts-bar-rectangles .recharts-bar-rectangle:nth-of-type(${number})
+    ...    css:.recharts-bar-rectangles .recharts-bar-rectangle:nth-of-type(${number})    %{WAIT_SMALL}
     ${element}=    get child element    ${locator}
     ...    css:.recharts-bar-rectangles .recharts-bar-rectangle:nth-of-type(${number})
     user waits until element is visible    ${element}
