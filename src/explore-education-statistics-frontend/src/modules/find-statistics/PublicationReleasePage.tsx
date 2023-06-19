@@ -25,10 +25,7 @@ import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWith
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
 import PublicationReleaseHelpAndSupportSection from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
-import {
-  logEvent,
-  logOutboundLink,
-} from '@frontend/services/googleAnalyticsService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import glossaryService from '@frontend/services/glossaryService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
@@ -204,13 +201,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               key={block.id}
               block={block}
               getGlossaryEntry={glossaryService.getEntry}
-              trackContentLinks={(url, newTab) => {
-                logOutboundLink(
-                  `Publication release summary link: ${url}`,
-                  url,
-                  newTab,
-                );
-              }}
               trackGlossaryLinks={glossaryEntrySlug =>
                 logEvent({
                   category: `Publication Release Summary Glossary Link`,
@@ -424,18 +414,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     {release.relatedInformation &&
                       release.relatedInformation.map(link => (
                         <li key={link.id}>
-                          <a
-                            href={link.url}
-                            onClick={e => {
-                              e.preventDefault();
-                              logOutboundLink(
-                                `Publication release related page link: ${link.url}`,
-                                link.url,
-                              );
-                            }}
-                          >
-                            {link.description}
-                          </a>
+                          <a href={link.url}>{link.description}</a>
                         </li>
                       ))}
                   </ul>
@@ -529,13 +508,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     key={block.id}
                     block={block}
                     getGlossaryEntry={glossaryService.getEntry}
-                    trackContentLinks={(url, newTab) => {
-                      logOutboundLink(
-                        `Publication release related dashboards link: ${url}`,
-                        url,
-                        newTab,
-                      );
-                    }}
                     trackGlossaryLinks={glossaryEntrySlug =>
                       logEvent({
                         category: `Publication Release Related Dashboards Glossary Link`,

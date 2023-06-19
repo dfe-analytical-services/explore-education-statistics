@@ -9,10 +9,7 @@ import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/u
 import { Release } from '@common/services/publicationService';
 import { Block } from '@common/services/types/blocks';
 import glossaryService from '@frontend/services/glossaryService';
-import {
-  logEvent,
-  logOutboundLink,
-} from '@frontend/services/googleAnalyticsService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 
@@ -84,13 +81,6 @@ const PublicationSectionBlocks = ({
             block={block}
             transformImageAttributes={transformImageAttributes}
             getGlossaryEntry={glossaryService.getEntry}
-            trackContentLinks={(url, newTab) => {
-              logOutboundLink(
-                `Publication release content link: ${url}`,
-                url,
-                newTab,
-              );
-            }}
             trackGlossaryLinks={glossaryEntrySlug =>
               logEvent({
                 category: `Publication Release Content Glossary Link`,

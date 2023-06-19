@@ -1,4 +1,4 @@
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga4';
 
 let initialised = false;
 let gaTrackingId = '';
@@ -30,8 +30,7 @@ export function disableGoogleAnalytics() {
 
 export const logPageView = () => {
   if (initialised) {
-    ReactGA.set({ page: window.location.pathname });
-    ReactGA.pageview(window.location.pathname);
+    ReactGA.send({ hitType: 'pageview' });
   }
 };
 
@@ -54,37 +53,3 @@ export function logEvent({ category, action, label, value }: AnalyticsEvent) {
     value,
   });
 }
-
-export function logOutboundLink(label: string, url: string, newTab?: boolean) {
-  // we don't want to attempt to log outbound links if the user has disabled analytics
-  // but we still want any links that are external to open in a new tab
-
-  function openLink() {
-    if (newTab) {
-      window.open(url, '_blank');
-      return;
-    }
-    document.location.href = url;
-  }
-
-  if (!initialised) {
-    openLink();
-    return;
-  }
-
-  ReactGA.outboundLink(
-    {
-      label,
-    },
-
-    function hitCallback() {
-      openLink();
-    },
-  );
-}
-
-export const logException = (description: string, fatal = false) => {
-  if (initialised) {
-    ReactGA.exception({ description, fatal });
-  }
-};
