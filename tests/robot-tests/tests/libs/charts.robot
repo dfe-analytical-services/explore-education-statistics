@@ -109,10 +109,10 @@ user mouses over line chart point
 
     Log To Console    PASSING HERE FAILING BELOW
 
-    Sleep    100000
+    # Sleep    100000
     # failing here
     ${element}=    get child element    ${locator}
-    ...    css:.recharts-line-dots:nth-of-type(${line}) .recharts-symbols:nth-of-type(${number})
+    ...    css:.recharts-symbols:nth-of-type(${number})
     user waits until element is visible    ${element}
     user mouses over element    ${element}
 
