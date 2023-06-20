@@ -131,7 +131,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                       },
                     ])}
                     type="new"
-                    grouped={name !== 'indicator'}
+                    grouped
                   />
 
                   {unmappedItems.length > 0 && (
@@ -181,6 +181,8 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                     </>
                   )}
 
+                  <h2>Summary of {name} changes in this data set</h2>
+
                   {mappedItems.length > 0 && (
                     <>
                       <h3>
@@ -213,7 +215,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                           },
                         ])}
                         type="mapped"
-                        grouped={name !== 'indicator'}
+                        grouped
                         onClick={id =>
                           setItemToUnmap(
                             mappedItems.find(item => item[0].id === id),
@@ -228,7 +230,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                       <h3>
                         {capitalize(namePlural)} with no mappings available (
                         {noMappingItems.length}){' '}
-                        <span className="govuk-tag govuk-tag--red">
+                        <span className="govuk-tag">
                           Major updates - please check
                         </span>
                       </h3>
@@ -254,7 +256,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                           { label: 'No mapping available' },
                         ])}
                         type="noMappings"
-                        grouped={name !== 'indicator'}
+                        grouped
                         onClick={id =>
                           setItemToRemoveNoMapping(
                             noMappingItems.find(item => item.id === id),

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import classNames from 'classnames';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import Button from '@common/components/Button';
+import ButtonText from '@common/components/ButtonText';
 import UrlContainer from '@common/components/UrlContainer';
 import useStorageItem from '@common/hooks/useStorageItem';
 import ChangelogExample from './PrototypeChangelogExamples';
@@ -19,13 +21,39 @@ interface Props {
 }
 
 const today = new Date();
+const monthNames = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
+
+const timeNow = `${today.getHours()}:${
+  today.getMinutes() < 10 ? '0' : ''
+}${today.getMinutes()}`;
+
 const time = `${today.getHours() + 2}:${
   today.getMinutes() < 10 ? '0' : ''
 }${today.getMinutes()}`;
 
+const date = `${today.getDate() < 10 ? '0' : ''} ${today.getDate()}  ${
+  monthNames[today.getMonth()]
+}
+ ${today.getFullYear()}`;
+
 const PrototypePreviewExample = ({ initialVersion }: Props) => {
+  const [tokenTerms, setTokenTerms] = useState(false);
   const [showToken, setShowToken] = useState(false);
   const [changelog] = useStorageItem<Changelog>('changelog');
+  const [deleteToken, setDeleteToken] = useState(false);
 
   return (
     <>
@@ -35,15 +63,50 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
             <h5 className="govuk-heading-m">
               Generate API data set preview token
             </h5>
-            <p>This API data set is currently staged ready for publishing.</p>
-            <p className="govuk-width-container govuk-!-margin-0 govuk-!-margin-bottom-9">
-              You can preview the data by generating a token. The token allows
-              you to test the API and query data using any tool of your choice.
-              The URL can only be used by you, and is valid for 2 hours after
-              creation.
-            </p>
+            <div className="govuk-width-container govuk-!-margin-0 govuk-!-margin-bottom-9">
+              <p>This API data set is currently staged ready for publishing.</p>
+              <p>
+                You can preview the data by generating a token. The token allows
+                you to test the API and query data using any tool of your
+                choice. The URL can only be used by you, and is valid for 2
+                hours after creation.
+              </p>
+              <p>
+                <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/">
+                  View API documentation
+                </a>
+              </p>
+            </div>
+            {!showToken && (
+              <div className="govuk-form-group">
+                <fieldset className="govuk-fieldset">
+                  <legend>
+                    <h5 className="govuk-heading-m">Terms of usage</h5>
+                  </legend>
+                  <div className="govuk-checkboxes">
+                    <div className="govuk-checkboxes__item">
+                      <input
+                        type="checkbox"
+                        className="govuk-checkboxes__input"
+                        id="tokenAgreeTerms"
+                        onClick={() => {
+                          setTokenTerms(!tokenTerms);
+                        }}
+                      />{' '}
+                      <label
+                        htmlFor="tokenAgreeTerms"
+                        className="govuk-label govuk-checkboxes__label"
+                      >
+                        I agree not to share this token with anyone outside of
+                        the department
+                      </label>
+                    </div>
+                  </div>
+                </fieldset>
+              </div>
+            )}
 
-            {showToken && (
+            {showToken && tokenTerms && (
               <>
                 <h5 className="govuk-heading-m">API preview token</h5>
                 <p>
@@ -59,10 +122,12 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
                   Please delete the token as soon as you have finished checking
                   the API data set.
                 </p>
+
                 <Button
                   variant="warning"
                   onClick={() => {
                     setShowToken(false);
+                    setTokenTerms(false);
                   }}
                 >
                   Delete token
@@ -71,8 +136,10 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
             )}
             {!showToken && (
               <Button
+                disabled={!tokenTerms}
                 onClick={() => {
                   setShowToken(true);
+                  setDeleteToken(false);
                 }}
               >
                 Generate token
@@ -80,12 +147,92 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
             )}
           </div>
         </TabsSection>
-        <TabsSection title="Data guidance">
-          <h5 className="govuk-heading-m">Data guidance</h5>
-          <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/">
-            Explore education statistics API documentation
-          </a>
+
+        <TabsSection title="API token log">
+          <>
+            <table>
+              <caption>
+                <h5 className="govuk-heading-m">API token log</h5>
+              </caption>
+              <thead>
+                <tr>
+                  <th>Created by</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Status</th>
+                  <th className="govuk-table__header--numeric">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {showToken && (
+                  <tr>
+                    <td>John Smith</td>
+                    <td>{date}</td>
+                    <td>{timeNow}</td>
+                    <td>
+                      <span
+                        className={classNames('govuk-tag', [
+                          deleteToken && 'govuk-tag--red',
+                        ])}
+                      >
+                        {deleteToken ? `Deleted at ${timeNow}` : 'Active'}
+                      </span>
+                    </td>
+                    <td className="govuk-table__header--numeric">
+                      {!deleteToken ? (
+                        <ButtonText
+                          variant="warning"
+                          onClick={e => {
+                            setDeleteToken(true);
+                          }}
+                        >
+                          Delete token
+                        </ButtonText>
+                      ) : (
+                        <>N/A</>
+                      )}
+                    </td>
+                  </tr>
+                )}
+                <tr>
+                  <td>John Smith</td>
+                  <td>19 June 2023</td>
+                  <td>14:30</td>
+                  <td>
+                    <span className="govuk-tag govuk-tag--grey">
+                      Expired at 16:30
+                    </span>
+                  </td>
+                  <td className="govuk-table__header--numeric">N/A</td>
+                </tr>
+                <tr>
+                  <td>John Smith</td>
+                  <td>17 June 2023</td>
+                  <td>10:25</td>
+                  <td>
+                    <span className="govuk-tag govuk-tag--grey">
+                      Expired at 12:25
+                    </span>
+                  </td>
+                  <td className="govuk-table__header--numeric">N/A</td>
+                </tr>
+                <tr>
+                  <td>John Smith</td>
+                  <td>17 June 2023</td>
+                  <td>11:37</td>
+                  <td>
+                    <span className="govuk-tag govuk-tag--grey">
+                      Expired at 13:27
+                    </span>
+                  </td>
+                  <td className="govuk-table__header--numeric">N/A</td>
+                </tr>
+              </tbody>
+            </table>
+            <a href="#">View next 10 entries</a>
+          </>
         </TabsSection>
+
         <TabsSection title="Changelog">
           <>
             {initialVersion && (

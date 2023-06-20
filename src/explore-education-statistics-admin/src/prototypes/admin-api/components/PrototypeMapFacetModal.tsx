@@ -150,7 +150,7 @@ const PrototypeMapFacetModal = ({
               Update mapping (minor update)
             </Button>
             <Button
-              variant="warning"
+              variant="secondary"
               className="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-!-margin-left-4"
               onClick={() => onSubmit()}
             >

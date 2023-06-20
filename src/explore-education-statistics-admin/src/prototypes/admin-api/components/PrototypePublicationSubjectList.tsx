@@ -100,7 +100,13 @@ const PrototypePublicationSubjectList = ({
                     open
                     key={publicationSubject.subjectId}
                   >
-                    <SummaryList className="govuk-!-margin-bottom-9">
+                    <SummaryList
+                      className={
+                        nextSubject
+                          ? 'govuk-!-margin-bottom-9'
+                          : 'govuk-!-margin-bottom-0'
+                      }
+                    >
                       <SummaryListItem
                         term={
                           subject.release === currentRelease
@@ -163,7 +169,7 @@ const PrototypePublicationSubjectList = ({
                       </SummaryListItem>
                     </SummaryList>
                     {nextSubject && !isCurrentReleasePublished && (
-                      <SummaryList>
+                      <SummaryList className="govuk-!-margin-bottom-0">
                         <SummaryListItem term="Next API data set to publish">
                           {nextSubject.title}
                         </SummaryListItem>

@@ -49,8 +49,7 @@ const PrototypeFacet = ({ item, itemType, onClick }: Props) => {
         }}
         type="button"
         className={classNames(styles.item, {
-          [styles.itemWarning]:
-            itemType === 'unmapped' || itemType === 'noMappings',
+          [styles.itemWarning]: itemType === 'unmapped',
         })}
       >
         <Inner />
