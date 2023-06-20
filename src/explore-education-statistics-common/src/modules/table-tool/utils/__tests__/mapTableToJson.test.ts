@@ -6,10 +6,8 @@ import {
   testTableWithOneLevelOfRowAndColHeaders,
   testTableWithOneLevelOfRowAndColHeadersConfig,
   testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig,
-  testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig,
+  testTableWithOneLevelOfRowsAndTwoLevelsofColHeadersConfig,
   testTableWithMissingTimePeriod,
-  testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabelsConfig,
-  testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabels,
 } from '@common/modules/table-tool/utils/__data__/testTableData';
 import mapTableToJson, {
   TableCellJson,
@@ -122,7 +120,7 @@ describe('mapTableToJson', () => {
 
   test('returns the correct JSON for  a table with two levels of col headers and one level of row headers', () => {
     const result = mapTableToJson({
-      tableHeadersConfig: testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig,
+      tableHeadersConfig: testTableWithOneLevelOfRowsAndTwoLevelsofColHeadersConfig,
       subjectMeta: testTableWithOneLevelOfRowAndColHeaders.subjectMeta,
       results: testTableWithOneLevelOfRowAndColHeaders.results,
     }).tableJson;
@@ -515,136 +513,6 @@ describe('mapTableToJson', () => {
     ]);
   });
 
-  test('correctly adds groups across three levels of column headers with same labels', () => {
-    const result = mapTableToJson({
-      tableHeadersConfig: testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabelsConfig,
-      subjectMeta:
-        testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabels.subjectMeta,
-      results:
-        testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabels.results,
-    }).tableJson;
-
-    expect(result.thead).toEqual<TableCellJson[][]>([
-      [
-        { colSpan: 1, rowSpan: 5, tag: 'td' },
-        {
-          colSpan: 4,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Group 1',
-        },
-        {
-          colSpan: 4,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Group 2',
-        },
-      ],
-      [
-        {
-          colSpan: 4,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Category 3 Filter 1',
-        },
-        {
-          colSpan: 4,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Category 3 Filter 2',
-        },
-      ],
-      [
-        {
-          colSpan: 2,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Group 1',
-        },
-        {
-          colSpan: 2,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Group 2',
-        },
-        {
-          colSpan: 2,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Group 1',
-        },
-        {
-          colSpan: 2,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Group 2',
-        },
-      ],
-      [
-        {
-          colSpan: 2,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Category 1 Filter 2',
-        },
-        {
-          colSpan: 2,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Category 1 Filter 4',
-        },
-        {
-          colSpan: 2,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Category 1 Filter 2',
-        },
-        {
-          colSpan: 2,
-          rowSpan: 1,
-          scope: 'colgroup',
-          tag: 'th',
-          text: 'Category 1 Filter 4',
-        },
-      ],
-      [
-        { colSpan: 1, rowSpan: 1, scope: 'col', tag: 'th', text: '2012/13' },
-        { colSpan: 1, rowSpan: 1, scope: 'col', tag: 'th', text: '2013/14' },
-        { colSpan: 1, rowSpan: 1, scope: 'col', tag: 'th', text: '2012/13' },
-        { colSpan: 1, rowSpan: 1, scope: 'col', tag: 'th', text: '2013/14' },
-        { colSpan: 1, rowSpan: 1, scope: 'col', tag: 'th', text: '2012/13' },
-        { colSpan: 1, rowSpan: 1, scope: 'col', tag: 'th', text: '2013/14' },
-        { colSpan: 1, rowSpan: 1, scope: 'col', tag: 'th', text: '2012/13' },
-        { colSpan: 1, rowSpan: 1, scope: 'col', tag: 'th', text: '2013/14' },
-      ],
-    ]);
-
-    expect(result.tbody).toEqual<TableCellJson[][]>([
-      [
-        { colSpan: 1, rowSpan: 1, scope: 'row', tag: 'th', text: 'LA 1' },
-        { tag: 'td', text: '20' },
-        { tag: 'td', text: '7,163' },
-        { tag: 'td', text: '767' },
-        { tag: 'td', text: '19,340' },
-        { tag: 'td', text: '44' },
-        { tag: 'td', text: '32' },
-        { tag: 'td', text: '331' },
-        { tag: 'td', text: '2,458' },
-      ],
-    ]);
-  });
-
   describe('hasMissingRowsOrColumns', () => {
     const testQuery: ReleaseTableDataQuery = {
       subjectId: 'subject-1-id',
@@ -662,7 +530,6 @@ describe('mapTableToJson', () => {
       indicators: ['indicator-1', 'indicator-2'],
       locationIds: ['la-1', 'la-2'],
     };
-
     test('is false when no rows or columns are excluded', () => {
       const result = mapTableToJson({
         tableHeadersConfig: testTableWithOneLevelOfRowAndColHeadersConfig,

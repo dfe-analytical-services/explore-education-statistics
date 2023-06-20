@@ -2,10 +2,10 @@ import { Filter } from '@common/modules/table-tool/types/filters';
 import last from 'lodash/last';
 
 export class FilterGroup extends Filter {
-  constructor(label: string, level: number) {
+  constructor(label: string) {
     super({
       label,
-      value: `${label} (level: ${level})`,
+      value: label,
     });
   }
 }
@@ -13,7 +13,7 @@ export class FilterGroup extends Filter {
 /**
  * Optimize a set of filters for the best viewing experience.
  *
- * Typically, we add or remove filters depending on whether they are
+ * Typically we add or remove filters depending on whether they are
  * actually needed for the user to understand the table.
  */
 export default function optimizeFilters(
@@ -33,18 +33,24 @@ export default function optimizeFilters(
     optimizedFilters = filters.length > 1 ? filters.slice(0, -1) : filters;
   }
 
-  // Add additional filter groups to our filters if required.
-  return optimizedFilters.flatMap((filter, index) => {
-    const firstSubGroup = headerConfig[index][0].group;
+  return (
+    optimizedFilters
+      // Add additional filter sub groups
+      // to our filters if required.
+      .flatMap((filter, index) => {
+        const firstSubGroup = headerConfig[index][0].group;
 
-    // Don't bother showing a single group as this adds
-    // additional groups to a potentially crowded table.
-    const hasMultipleGroups = headerConfig[index].some(
-      header => header.group !== firstSubGroup,
-    );
+        // Don't bother showing a single subgroup as this adds
+        // additional groups to a potentially crowded table.
+        const hasMultipleSubGroups = headerConfig[index].some(
+          header => header.group !== firstSubGroup,
+        );
 
-    return filter.group && filter.group !== 'Default' && hasMultipleGroups
-      ? [new FilterGroup(filter.group, index), filter]
-      : filter;
-  });
+        return hasMultipleSubGroups &&
+          filter.group &&
+          filter.group !== 'Default'
+          ? [new FilterGroup(filter.group), filter]
+          : filter;
+      })
+  );
 }
