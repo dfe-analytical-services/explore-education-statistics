@@ -98,7 +98,7 @@ Create table
     [Documentation]    EES-615
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
-    user waits until element contains    css:[data-testid="dataTableCaption"]
+    user waits until element contains    testid:dataTableCaption
     ...    Admission Numbers for 'UI test subject' in Barnsley, Birmingham, Camden, Greenwich, Nailsea Youngwood and 1 other location between 2005 and 2018
 
 Validate table rows
@@ -183,14 +183,9 @@ Validate table rows
     user checks table cell in offset row contains    ${row}    4    1    5,669
 
 Save data block
-    user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
-    user enters text into element    id:dataBlockDetailsForm-heading    UI test table title
-    user enters text into element    id:dataBlockDetailsForm-source    UI test source
-
-    user clicks checkbox    Set as a featured table for this publication
-    user waits until page contains element    id:dataBlockDetailsForm-highlightName
-    user enters text into element    id:dataBlockDetailsForm-highlightName    UI test featured table name
-    user enters text into element    id:dataBlockDetailsForm-highlightDescription    UI test featured table description
+    user enters text into element    label:Name    ${DATABLOCK_NAME}
+    user enters text into element    label:Table title    UI test table title
+    user enters text into element    label:Source    UI test source
 
     user clicks button    Save data block
     user waits until page contains    Delete this data block
@@ -200,17 +195,81 @@ Validate data block is in list
     user waits until h2 is visible    Data blocks
 
     user waits until table is visible
-    user checks table column heading contains    1    1    Name
-    user checks table column heading contains    1    2    Has chart
-    user checks table column heading contains    1    3    In content
-    user checks table column heading contains    1    4    Featured table name
-    user checks table column heading contains    1    5    Created date
-    user checks table column heading contains    1    6    Actions
+    user checks table column heading contains    1    1    Name    testid:dataBlocks
+    user checks table column heading contains    1    2    Has chart    testid:dataBlocks
+    user checks table column heading contains    1    3    In content    testid:dataBlocks
+    user checks table column heading contains    1    4    Created date    testid:dataBlocks
+    user checks table column heading contains    1    5    Actions    testid:dataBlocks
 
-    user checks table body has x rows    1
-    user checks table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks table cell contains    1    3    No
-    user checks table cell contains    1    4    UI test featured table name
+    user checks table body has x rows    1    testid:dataBlocks
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
+    user checks table cell contains    1    3    No    testid:dataBlocks
+
+Start creating a featured table
+    user clicks link    Create data block
+    user waits until table tool wizard step is available    1    Select a data set
+
+Select subject "UI test subject"
+    user waits until page contains    UI test subject    %{WAIT_SMALL}
+    user clicks radio    UI test subject
+    user clicks element    id:publicationDataStepForm-submit
+    user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
+    user checks previous table tool step contains    1    Data set    UI test subject
+
+Select locations
+    user opens details dropdown    Opportunity area
+    user clicks checkbox    Bolton 001
+
+    user clicks element    id:locationFiltersForm-submit
+    user waits until table tool wizard step is available    3    Choose time period    90
+
+Select time period
+    user waits until page contains element    id:timePeriodForm-start
+    user chooses select option    id:timePeriodForm-start    2009
+    user chooses select option    id:timePeriodForm-end    2017
+    user clicks element    id:timePeriodForm-submit
+    user waits until table tool wizard step is available    4    Choose your filters
+    user checks previous table tool step contains    3    Time period    2009 to 2017    %{WAIT_MEDIUM}
+
+Select indicators
+    user checks indicator checkbox is checked    Admission Numbers
+
+Create table
+    [Documentation]    EES-615
+    user clicks element    id:filtersForm-submit
+    user waits until results table appears    %{WAIT_LONG}
+    user waits until element contains    testid:dataTableCaption
+    ...    Admission Numbers for 'UI test subject' in Bolton 001 between 2009 and 2017
+
+Save data block
+    user enters text into element    label:Name    UI test featured table
+    user enters text into element    label:Table title    UI test featured table title
+    user enters text into element    label:Source    UI test featured table source
+
+    user clicks checkbox    Set as a featured table for this publication
+    user waits until page contains element    label:Featured table name
+    user enters text into element    label:Featured table name    UI test featured table name
+    user enters text into element    label:Featured table description    UI test featured table description
+
+    user clicks button    Save data block
+    user waits until page contains    Delete this data block
+
+Validate data block is in list
+    user clicks link    Back
+    user waits until h2 is visible    Data blocks
+
+    user waits until table is visible
+    user checks table column heading contains    1    1    Data block name    testid:featuredTables
+    user checks table column heading contains    1    2    Has chart    testid:featuredTables
+    user checks table column heading contains    1    3    In content    testid:featuredTables
+    user checks table column heading contains    1    4    Featured table name    testid:featuredTables
+    user checks table column heading contains    1    5    Created date    testid:featuredTables
+    user checks table column heading contains    1    6    Actions    testid:featuredTables
+
+    user checks table body has x rows    1    testid:featuredTables
+    user checks table cell contains    1    1    UI test featured table    testid:featuredTables
+    user checks table cell contains    1    3    No    testid:featuredTables
+    user checks table cell contains    1    4    UI test featured table name    testid:featuredTables
 
 Embed data block into release content
     user clicks link    Content
@@ -351,15 +410,15 @@ Validate marked as 'In content' on data block list
     user waits until h2 is visible    Data blocks
 
     user waits until table is visible
-    user checks table column heading contains    1    1    Name
-    user checks table column heading contains    1    3    In content
+    user checks table column heading contains    1    1    Name    testid:dataBlocks
+    user checks table column heading contains    1    3    In content    testid:dataBlocks
 
     user checks table body has x rows    1
-    user checks table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks table cell contains    1    3    Yes
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
+    user checks table cell contains    1    3    Yes    testid:dataBlocks
 
 Navigate to Chart tab
-    user clicks link    Edit block
+    user clicks link    Edit block    testid:dataBlocks
 
     user waits until h2 is visible    Edit data block
     user waits until h2 is visible    ${DATABLOCK_NAME}
@@ -377,10 +436,10 @@ Navigate to Chart tab
 Configure basic line chart
     user clicks button    Line
     user clicks radio    Set an alternative title
-    user enters text into element    id:chartConfigurationForm-title    Test chart title
-    user enters text into element    id:chartConfigurationForm-alt    Test chart alt
-    user enters text into element    id:chartConfigurationForm-height    400
-    user enters text into element    id:chartConfigurationForm-width    900
+    user enters text into element    label:Enter chart title    Test chart title
+    user enters text into element    label:Alt text    Test chart alt
+    user enters text into element    label:Height (pixels)    400
+    user enters text into element    label:Width (pixels)    900
 
 Validate changing data sets
     user clicks link    Data sets
@@ -463,12 +522,12 @@ Save chart and validate marked as 'Has chart' in data blocks list
     user waits until h2 is visible    Data blocks
 
     user waits until table is visible
-    user checks table column heading contains    1    1    Name
-    user checks table column heading contains    1    2    Has chart
+    user checks table column heading contains    1    1    Name    testid:dataBlocks
+    user checks table column heading contains    1    2    Has chart    testid:dataBlocks
 
     user checks table body has x rows    1
-    user checks table cell contains    1    1    ${DATABLOCK_NAME}
-    user checks table cell contains    1    2    Yes
+    user checks table cell contains    1    1    ${DATABLOCK_NAME}    testid:dataBlocks
+    user checks table cell contains    1    2    Yes    testid:dataBlocks
 
 Validate line chart embeds correctly
     user clicks link    Content
@@ -902,9 +961,13 @@ Delete data block
     user clicks button    Delete this data block
     user waits until page does not contain loading spinner
     user clicks button    Confirm
+    user waits until page does not contain button    Confirm
 
-    user waits until h2 is visible    Data blocks
-    user waits until page contains    No data blocks have been created.
+Delete featured table
+    user clicks button    Delete block
+    user waits until page does not contain loading spinner
+    user clicks button    Confirm
+    user waits until page does not contain button    Confirm
 
 
 *** Keywords ***

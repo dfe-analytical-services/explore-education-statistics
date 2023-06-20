@@ -62,6 +62,7 @@ describe('DataSetStep', () => {
       description: 'Test featured description 1',
       subjectId: 'subject-1',
       dataBlockId: 'dataBlock-1',
+      order: 0,
     },
     {
       id: 'featured-2',
@@ -69,6 +70,7 @@ describe('DataSetStep', () => {
       description: 'Test featured description 2 find me',
       subjectId: 'subject-1',
       dataBlockId: 'dataBlock-2',
+      order: 1,
     },
     {
       id: 'featured-3',
@@ -76,6 +78,7 @@ describe('DataSetStep', () => {
       description: 'Test featured description 3',
       subjectId: 'subject-3',
       dataBlockId: 'dataBlock-3',
+      order: 3,
     },
   ];
 
