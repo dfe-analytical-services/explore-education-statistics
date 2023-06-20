@@ -420,7 +420,6 @@ Configure line chart data sets
     user clicks element    id:chartBuilderPreview
 
 Validate basic line chart preview
-# Parent 'id:chartBuilderPreview' did not contain 'css:.recharts-line-dots:nth-of-type(1) .recharts-symbols:nth-of-type(1)' in 45 seconds.
     user waits until element contains line chart    id:chartBuilderPreview
 
     user checks chart title contains    id:chartBuilderPreview    Test chart title
@@ -431,12 +430,8 @@ Validate basic line chart preview
 
     user checks chart y axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
     user checks chart x axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
-    # ------------------------------------------------------------------
 
-    # Sleep    100000
     user mouses over line chart point    id:chartBuilderPreview    1    1
-
-    # ------------------------------------------------------------------
 
     user checks chart tooltip label contains    id:chartBuilderPreview    2005
     user checks chart tooltip item contains    id:chartBuilderPreview    1

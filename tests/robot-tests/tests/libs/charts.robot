@@ -107,10 +107,6 @@ user mouses over line chart point
     user waits until parent contains element    ${locator}
     ...    xpath://*[@class="recharts-layer recharts-line-dots"]//*[@class="recharts-symbols"][${number}]
 
-    Log To Console    PASSING HERE FAILING BELOW
-
-    # Sleep    100000
-    # failing here
     ${element}=    get child element    ${locator}
     ...    css:.recharts-symbols:nth-of-type(${number})
     user waits until element is visible    ${element}
