@@ -1,4 +1,3 @@
-/* eslint-disable react/display-name */
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
@@ -322,6 +321,7 @@ export default memo(LineChartBlock);
 
 const getDot =
   (symbol: ChartSymbol | 'none' = 'circle') =>
+  // eslint-disable-next-line react/display-name
   ({ ref, ...props }: SymbolsProps) => {
     if (symbol === 'none') {
       return undefined;

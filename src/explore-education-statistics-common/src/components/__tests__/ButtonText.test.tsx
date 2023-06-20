@@ -68,8 +68,7 @@ describe('ButtonText', () => {
     expect(button).toBeDisabled();
 
     jest.advanceTimersByTime(1000);
-    // Flushes promise queue so any state change is triggered
-    // await flushPromises();
+
     await waitFor(() => {
       // Button is still disabled
       expect(button).toBeDisabled();

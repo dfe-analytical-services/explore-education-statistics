@@ -139,7 +139,6 @@ const nextConfig = {
     ];
   },
   webpack(config, options) {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { dev, isServer } = options;
 
     if (isServer) {

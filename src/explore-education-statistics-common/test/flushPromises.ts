@@ -16,6 +16,3 @@ export default async function flushPromises() {
     await new Promise(jest.requireActual('timers').setImmediate);
   } while (jest.getTimerCount() > 0);
 }
-// export default async function flushPromises() {
-//   return new Promise(jest.requireActual('timers').setImmediate);
-// }

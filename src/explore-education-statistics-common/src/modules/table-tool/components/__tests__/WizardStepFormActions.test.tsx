@@ -104,7 +104,6 @@ describe('WizardStepFormActions', () => {
 
     userEvent.click(screen.getByText('Previous step'));
 
-    // await flushPromises();
     await waitFor(() => {
       expect(goToPreviousStep).not.toHaveBeenCalled();
     });

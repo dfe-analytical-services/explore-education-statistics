@@ -78,15 +78,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         { name: 'Find statistics and data', link: '/find-statistics' },
       ]}
     >
-      <button
-        onClick={() => {
-          throw new Error('test');
-        }}
-        type="button"
-      >
-        kaboom
-      </button>
-
       <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
         {release.publication?.isSuperseded ? (
           <WarningMessage testId="superseded-warning">
