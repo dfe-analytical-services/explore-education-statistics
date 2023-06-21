@@ -5,9 +5,9 @@ import _dataReplacementService, {
 } from '@admin/services/dataReplacementService';
 import _footnoteService from '@admin/services/footnoteService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/dataReplacementService');

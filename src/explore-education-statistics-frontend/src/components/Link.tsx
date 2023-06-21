@@ -32,6 +32,7 @@ const Link = ({
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       href={isAbsolute ? (to as string) : undefined}
+      rel={isAbsolute ? 'external' : undefined}
       className={classNames(
         'govuk-link',
         {

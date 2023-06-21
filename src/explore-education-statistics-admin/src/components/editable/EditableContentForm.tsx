@@ -1,7 +1,6 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import { Element } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -20,6 +19,7 @@ import classNames from 'classnames';
 import { Formik, FormikHelpers } from 'formik';
 import React, { useCallback, useRef } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
+import { Element } from '@admin/types/ckeditor';
 
 interface FormValues {
   content: string;
@@ -91,15 +91,13 @@ const EditableContentForm = ({
     return error;
   }, []);
 
-  const [
-    { isLoading: isAutoSaving, error: autoSaveError },
-    handleAutoSave,
-  ] = useAsyncCallback(
-    async (nextContent: string) => {
-      await onAutoSave?.(nextContent);
-    },
-    [onAutoSave],
-  );
+  const [{ isLoading: isAutoSaving, error: autoSaveError }, handleAutoSave] =
+    useAsyncCallback(
+      async (nextContent: string) => {
+        await onAutoSave?.(nextContent);
+      },
+      [onAutoSave],
+    );
 
   const handleSubmit = useCallback(
     async (values: FormValues, helpers: FormikHelpers<FormValues>) => {

@@ -18,12 +18,10 @@ const PrototypeManageUsers = () => {
   const [showBau, setShowBau] = useState(false);
   const [showHelpStatusModal, toggleHelpStatusModal] = useToggle(false);
   const [showHelpIssuesModal, toggleHelpIssuesModal] = useToggle(false);
-  const [showScheduledStatusModal, toggleScheduledStatusModal] = useToggle(
-    false,
-  );
-  const [showScheduledStagesModal, toggleScheduledStagesModal] = useToggle(
-    false,
-  );
+  const [showScheduledStatusModal, toggleScheduledStatusModal] =
+    useToggle(false);
+  const [showScheduledStagesModal, toggleScheduledStagesModal] =
+    useToggle(false);
 
   return (
     <PrototypePage

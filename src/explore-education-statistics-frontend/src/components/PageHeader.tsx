@@ -1,5 +1,6 @@
 import logo from 'govuk-frontend/govuk/assets/images/govuk-logotype-crown.png';
 import React from 'react';
+import Link from './Link';
 
 const PageHeader = () => (
   <>
@@ -26,12 +27,12 @@ const PageHeader = () => (
             </a>
           </div>
           <div className="govuk-header__content">
-            <a
-              href="/"
+            <Link
+              to="/"
               className="govuk-header__link govuk-header__link--service-name"
             >
               Explore education statistics
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -6,6 +6,11 @@ describe('useInterval', () => {
     jest.useFakeTimers();
   });
 
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.runOnlyPendingTimers();
+  });
+
   test('calls callback at regular intervals', () => {
     const callback = jest.fn();
 

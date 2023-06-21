@@ -23,23 +23,21 @@ const TableTabSection = ({
   return (
     <>
       {onReorderTableHeaders && (
-        <>
-          <TableHeadersForm
-            initialValues={tableHeaders}
-            onSubmit={nextTableHeaders => {
-              onReorderTableHeaders(nextTableHeaders);
-              if (dataTableRef.current) {
-                // add a short delay so the reordering form is closed before it scrolls.
-                setTimeout(() => {
-                  dataTableRef?.current?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start',
-                  });
-                }, 200);
-              }
-            }}
-          />
-        </>
+        <TableHeadersForm
+          initialValues={tableHeaders}
+          onSubmit={nextTableHeaders => {
+            onReorderTableHeaders(nextTableHeaders);
+            if (dataTableRef.current) {
+              // add a short delay so the reordering form is closed before it scrolls.
+              setTimeout(() => {
+                dataTableRef?.current?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }, 200);
+            }
+          }}
+        />
       )}
 
       <TimePeriodDataTable

@@ -17,6 +17,7 @@ import {
   ChartDefinition,
   BarChartDataLabelPosition,
   LineChartDataLabelPosition,
+  TitleType,
 } from '@common/modules/charts/types/chart';
 import { LegendPosition } from '@common/modules/charts/types/legend';
 import {
@@ -79,11 +80,8 @@ const ChartConfiguration = ({
   onChange,
   onSubmit,
 }: Props) => {
-  const {
-    hasSubmitted,
-    updateForm,
-    submitForms,
-  } = useChartBuilderFormsContext();
+  const { hasSubmitted, updateForm, submitForms } =
+    useChartBuilderFormsContext();
 
   const dataLabelPositionOptions = useMemo(() => {
     const options =
@@ -98,16 +96,18 @@ const ChartConfiguration = ({
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
-      titleType: Yup.mixed<FormValues['titleType']>()
+      titleType: Yup.mixed<TitleType>()
         .oneOf(['default', 'alternative'])
         .required('Choose a title type'),
-      title: Yup.string()
-        .when('titleType', {
-          is: 'alternative',
-          then: Yup.string().required('Enter a chart title'),
-          otherwise: Yup.string,
-        })
-        .required('Enter chart title'),
+      title: Yup.string().when('titleType', {
+        is: 'alternative',
+        then(s) {
+          return s.required('Enter chart title');
+        },
+        otherwise(s) {
+          return s.notRequired();
+        },
+      }),
       alt: Yup.string()
         .required('Enter chart alt text')
         .test({
@@ -137,10 +137,9 @@ const ChartConfiguration = ({
       schema = schema.shape({
         fileId: Yup.string(),
         file: Yup.file()
-          .nullable()
           .when('fileId', {
-            is: value => !value,
-            then: Yup.file().required('Select an infographic file to upload'),
+            is: (value: string) => !value,
+            then: s => s.required('Select an infographic file to upload'),
           })
           .minSize(0, 'The infographic cannot be an empty file'),
       });

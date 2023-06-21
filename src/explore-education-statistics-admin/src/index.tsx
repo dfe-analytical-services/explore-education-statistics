@@ -1,11 +1,9 @@
 import '@admin/polyfill';
 import configureAxios from '@admin/services/utils/configureAxios';
-import { enableES5 } from 'immer';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 
-enableES5();
 configureAxios();
 
 import('./App').then(({ default: App }) => {

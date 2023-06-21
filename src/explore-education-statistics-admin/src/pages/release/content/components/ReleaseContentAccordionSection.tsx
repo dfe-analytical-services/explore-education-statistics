@@ -32,11 +32,8 @@ const ReleaseContentAccordionSection = ({
 }: ReleaseContentAccordionSectionProps) => {
   const { id: sectionId, caption, content: sectionContent = [] } = section;
 
-  const {
-    editingMode,
-    unsavedCommentDeletions,
-    unsavedBlocks,
-  } = useEditingContext();
+  const { editingMode, unsavedCommentDeletions, unsavedBlocks } =
+    useEditingContext();
 
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
@@ -236,6 +233,7 @@ const ReleaseContentAccordionSection = ({
                   </Button>
                 )}
                 {user?.permissions.isBauUser && (
+                  // eslint-disable-next-line react/jsx-no-useless-fragment
                   <>
                     {!showEmbedDashboardForm && (
                       <Button

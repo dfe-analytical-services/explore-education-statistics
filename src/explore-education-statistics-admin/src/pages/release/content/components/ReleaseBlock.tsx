@@ -4,9 +4,9 @@ import ContentBlockRenderer from '@common/modules/find-statistics/components/Con
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import EmbedBlock from '@common/modules/find-statistics/components/EmbedBlock';
 import { Block } from '@common/services/types/blocks';
-import React from 'react';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import Gate from '@common/components/Gate';
+import React from 'react';
 
 interface Props {
   block: Block;
@@ -21,35 +21,39 @@ const ReleaseBlock = ({ block, releaseId, visible }: Props) => {
     releaseId,
   });
 
-  if (block.type === 'EmbedBlockLink') {
-    return (
-      <Gate condition={!!visible} key={block.id}>
-        <EmbedBlock url={block.url} title={block.title} />
-      </Gate>
-    );
-  }
+  switch (block.type) {
+    case 'EmbedBlockLink': {
+      return (
+        <Gate condition={!!visible} key={block.id}>
+          <EmbedBlock url={block.url} title={block.title} />
+        </Gate>
+      );
+    }
 
-  if (block.type === 'DataBlock') {
-    return (
-      <Gate condition={!!visible}>
-        <DataBlockTabs
+    case 'DataBlock': {
+      return (
+        <Gate condition={!!visible}>
+          <DataBlockTabs
+            key={block.id}
+            dataBlock={block}
+            releaseId={releaseId}
+            getInfographic={getChartFile}
+          />
+        </Gate>
+      );
+    }
+
+    default: {
+      return (
+        <ContentBlockRenderer
           key={block.id}
-          dataBlock={block}
-          releaseId={releaseId}
-          getInfographic={getChartFile}
+          block={block}
+          transformImageAttributes={transformImageAttributes}
+          getGlossaryEntry={glossaryService.getEntry}
         />
-      </Gate>
-    );
+      );
+    }
   }
-
-  return (
-    <ContentBlockRenderer
-      key={block.id}
-      block={block}
-      transformImageAttributes={transformImageAttributes}
-      getGlossaryEntry={glossaryService.getEntry}
-    />
-  );
 };
 
 export default ReleaseBlock;

@@ -31,9 +31,8 @@ const TableToolFinalStep = ({
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const hasTableError = false;
-  const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersConfig
-  >();
+  const [currentTableHeaders, setCurrentTableHeaders] =
+    useState<TableHeadersConfig>();
   const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
 
   const tableHeadersFormId = 'tableHeaderForm';
@@ -163,6 +162,7 @@ const TableToolFinalStep = ({
         contactDetails={publication?.contact}
         methodologyLinks={getMethodologyLinks()}
         releaseLink={
+          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {selectedPublication.selectedRelease.latestData ? (
               <Link to={`/find-statistics/${selectedPublication.slug}`}>

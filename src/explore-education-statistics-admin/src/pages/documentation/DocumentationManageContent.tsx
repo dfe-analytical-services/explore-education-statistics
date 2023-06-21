@@ -3,7 +3,6 @@ import Link from '@admin/components/Link';
 import React from 'react';
 import StepNav from './components/StepByStep';
 import StepNavItem from './components/StepByStepItem';
-
 import imageContentEdit from './images/guidance/guidance-content-edit.png';
 import imageCommentAdd from './images/guidance/guidance-content-comments-add.png';
 import imageCommentSave from './images/guidance/guidance-content-comment-save.png';

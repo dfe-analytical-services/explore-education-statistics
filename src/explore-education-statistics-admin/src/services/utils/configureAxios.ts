@@ -9,7 +9,9 @@ const configureAxios = () => {
 
   clients.forEach(client => {
     client.axios.interceptors.request.use(
-      async config => {
+      // any due to https://github.com/axios/axios/issues/5573
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      async (config): Promise<any> => {
         const token = await authService.getAccessToken();
 
         if (token) {

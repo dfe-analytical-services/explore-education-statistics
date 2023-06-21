@@ -17,14 +17,13 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService from '@common/services/tableBuilderService';
-import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import React from 'react';
 
-const PreReleaseTableToolPage = ({
-  match,
-}: RouteComponentProps<PreReleaseTableToolRouteParams>) => {
-  const { publicationId, releaseId, dataBlockId } = match.params;
+const PreReleaseTableToolPage = () => {
+  const { publicationId, releaseId, dataBlockId } =
+    useParams<PreReleaseTableToolRouteParams>();
 
   const { value: publication } = useAsyncHandledRetry(
     () => publicationService.getPublication(publicationId),

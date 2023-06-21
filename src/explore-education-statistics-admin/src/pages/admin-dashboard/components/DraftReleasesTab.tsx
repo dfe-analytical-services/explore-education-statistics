@@ -1,7 +1,7 @@
+import React from 'react';
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
 import { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import React from 'react';
 
 interface Props {
   isBauUser: boolean;

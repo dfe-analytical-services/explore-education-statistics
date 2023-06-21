@@ -20,7 +20,7 @@ interface Props<TFormValues extends FieldValues>
 }
 
 export default function RHFFormFieldCheckboxGroupsMenu<
-  TFormValues extends FieldValues
+  TFormValues extends FieldValues,
 >(props: Props<TFormValues>) {
   const { hiddenText, legend, name, open = false, onToggle } = props;
 

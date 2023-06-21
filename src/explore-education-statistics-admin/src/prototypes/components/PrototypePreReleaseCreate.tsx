@@ -65,71 +65,67 @@ const PrototypeCreatePreRelease = () => {
         </>
       )}
       {addNewPreRelease && (
-        <>
-          <form
-            id="createPreRelease"
-            className="govuk-!-margin-bottom-9 govuk-width-container govuk-!-margin-left-0"
+        <form
+          id="createPreRelease"
+          className="govuk-!-margin-bottom-9 govuk-width-container govuk-!-margin-left-0"
+        >
+          <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h2 className="govuk-fieldset__heading">
+              {editPreRelease ? 'Edit' : 'Create'} public pre-release access
+              list
+            </h2>
+          </legend>
+          <div className="govuk-!-margin-bottom-7">
+            <FormEditor
+              id="description"
+              label="Public access list details"
+              value={editPreRelease ? formText : formIntro}
+              onChange={() => setAddNewPreRelease(true)}
+            />
+          </div>
+          <Button
+            className="govuk-!-margin-right-3"
+            onClick={() => {
+              setPreviewPreRelease(true);
+              setAddNewPreRelease(false);
+            }}
           >
-            <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-              <h2 className="govuk-fieldset__heading">
-                {editPreRelease ? 'Edit' : 'Create'} public pre-release access
-                list
-              </h2>
-            </legend>
-            <div className="govuk-!-margin-bottom-7">
-              <FormEditor
-                id="description"
-                label="Public access list details"
-                value={editPreRelease ? formText : formIntro}
-                onChange={() => setAddNewPreRelease(true)}
-              />
-            </div>
-            <Button
-              className="govuk-!-margin-right-3"
-              onClick={() => {
-                setPreviewPreRelease(true);
-                setAddNewPreRelease(false);
-              }}
-            >
-              Save
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setAddNewPreRelease(false);
-                setCreatePreRelease(true);
-              }}
-            >
-              Cancel
-            </Button>
-          </form>
-        </>
+            Save
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setAddNewPreRelease(false);
+              setCreatePreRelease(true);
+            }}
+          >
+            Cancel
+          </Button>
+        </form>
       )}
       {previewPreRelease && (
-        <>
-          <div className="govuk-width-container govuk-!-margin-left-0">
-            <PageTitle
-              title="An example publication"
-              caption="Academic year 2018/19"
-            />
-            <h2 className="govuk-heading-m">Pre-release access list</h2>
+        <div className="govuk-width-container govuk-!-margin-left-0">
+          <PageTitle
+            title="An example publication"
+            caption="Academic year 2018/19"
+          />
+          <h2 className="govuk-heading-m">Pre-release access list</h2>
 
-            <h3 className="govuk-heading-s">Published 23 July 2020</h3>
+          <h3 className="govuk-heading-s">Published 23 July 2020</h3>
 
-            <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
-              <ContentHtml html={formText || ''} />
-            </div>
-            <Button
-              onClick={() => {
-                setPreviewPreRelease(false);
-                setEditPreRelease(true);
-                setAddNewPreRelease(true);
-              }}
-            >
-              Edit public metadata
-            </Button>
+          <div className="govuk-!-margin-top-9 govuk-!-margin-bottom-9">
+            <ContentHtml html={formText || ''} />
           </div>
-        </>
+          <Button
+            onClick={() => {
+              setPreviewPreRelease(false);
+              setEditPreRelease(true);
+              setAddNewPreRelease(true);
+            }}
+          >
+            Edit public metadata
+          </Button>
+        </div>
       )}
     </>
   );

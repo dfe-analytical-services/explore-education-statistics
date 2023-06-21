@@ -298,9 +298,9 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    await userEvent.type(screen.getByLabelText('Day'), '10');
-    await userEvent.type(screen.getByLabelText('Month'), '12');
-    await userEvent.type(screen.getByLabelText('Year'), '2020');
+    userEvent.type(screen.getByLabelText('Day'), '10');
+    userEvent.type(screen.getByLabelText('Month'), '12');
+    userEvent.type(screen.getByLabelText('Year'), '2020');
 
     expect(screen.getByLabelText('Day')).toHaveValue(10);
     expect(screen.getByLabelText('Month')).toHaveValue(12);
@@ -328,9 +328,9 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    await userEvent.type(screen.getByLabelText('Day'), '32');
-    await userEvent.type(screen.getByLabelText('Month'), '12');
-    await userEvent.type(screen.getByLabelText('Year'), '2020');
+    userEvent.type(screen.getByLabelText('Day'), '32');
+    userEvent.type(screen.getByLabelText('Month'), '12');
+    userEvent.type(screen.getByLabelText('Year'), '2020');
 
     expect(screen.getByLabelText('Day')).toHaveValue(32);
     expect(screen.getByLabelText('Month')).toHaveValue(12);
@@ -358,7 +358,7 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    await userEvent.type(screen.getByLabelText('Day'), '10');
+    userEvent.type(screen.getByLabelText('Day'), '10');
 
     expect(screen.getByLabelText('Day')).toHaveValue(10);
     expect(onChange).toHaveBeenCalledWith(undefined);
@@ -420,9 +420,9 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    await userEvent.type(screen.getByLabelText('Day'), '15');
-    await userEvent.type(screen.getByLabelText('Month'), '6');
-    await userEvent.type(screen.getByLabelText('Year'), '2020');
+    userEvent.type(screen.getByLabelText('Day'), '15');
+    userEvent.type(screen.getByLabelText('Month'), '6');
+    userEvent.type(screen.getByLabelText('Year'), '2020');
 
     expect(screen.getByLabelText('Day')).toHaveValue(15);
     expect(screen.getByLabelText('Month')).toHaveValue(6);
@@ -455,7 +455,7 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    await userEvent.type(screen.getByLabelText('Day'), '15');
+    userEvent.type(screen.getByLabelText('Day'), '15');
 
     expect(screen.getByLabelText('Day')).toHaveValue(15);
 
@@ -484,9 +484,9 @@ describe('FormFieldDateInput', () => {
       </Formik>,
     );
 
-    await userEvent.type(screen.getByLabelText('Day'), '32');
-    await userEvent.type(screen.getByLabelText('Month'), '6');
-    await userEvent.type(screen.getByLabelText('Year'), '2020');
+    userEvent.type(screen.getByLabelText('Day'), '32');
+    userEvent.type(screen.getByLabelText('Month'), '6');
+    userEvent.type(screen.getByLabelText('Year'), '2020');
 
     expect(screen.getByLabelText('Day')).toHaveValue(32);
     expect(screen.getByLabelText('Month')).toHaveValue(6);

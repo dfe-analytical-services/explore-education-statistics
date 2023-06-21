@@ -5,6 +5,7 @@
   }
 }
 
+/* stylelint-disable rule-empty-line-before */
 :global(.js-enabled) {
   .accordion :global(.govuk-accordion__controls) {
     @media print {

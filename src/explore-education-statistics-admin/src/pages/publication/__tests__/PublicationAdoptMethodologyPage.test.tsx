@@ -7,10 +7,10 @@ import _publicationService, {
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
+import React from 'react';
 
 jest.mock('@admin/services/publicationService');
 

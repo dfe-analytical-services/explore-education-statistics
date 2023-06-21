@@ -80,11 +80,8 @@ const FormEditor = ({
   const editorInstance = useRef<EditorType>();
   const commentsPlugin = useRef<CommentsPlugin>();
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
-  const {
-    currentInteraction,
-    selectedComment,
-    setMarkersOrder,
-  } = useCommentsContext();
+  const { currentInteraction, selectedComment, setMarkersOrder } =
+    useCommentsContext();
   const config = useCKEditorConfig({
     allowComments,
     allowedHeadings,
@@ -296,9 +293,8 @@ const FormEditor = ({
           })}
           data-testid={testId && isFocused ? `${testId}-focused` : testId}
           ref={thisRef => {
-            const editorElement = thisRef?.querySelector<HTMLDivElement>(
-              '[role="textbox"]',
-            );
+            const editorElement =
+              thisRef?.querySelector<HTMLDivElement>('[role="textbox"]');
 
             if (editorElement) {
               editorRef.current = editorElement;

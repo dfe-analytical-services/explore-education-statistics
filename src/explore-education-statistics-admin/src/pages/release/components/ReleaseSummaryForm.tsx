@@ -36,13 +36,13 @@ interface Props<FormValues extends ReleaseSummaryFormValues> {
   ) => FormValues;
   validationSchema?: (
     baseSchema: ObjectSchema<ReleaseSummaryFormValues>,
-  ) => ObjectSchema<FormValues>;
+  ) => ObjectSchema<FormValues | ReleaseSummaryFormValues>;
   onSubmit: (values: FormValues, actions: FormikHelpers<FormValues>) => void;
   onCancel: () => void;
 }
 
 const ReleaseSummaryForm = <
-  FormValues extends ReleaseSummaryFormValues = ReleaseSummaryFormValues
+  FormValues extends ReleaseSummaryFormValues = ReleaseSummaryFormValues,
 >({
   additionalFields,
   submitText,
@@ -53,7 +53,7 @@ const ReleaseSummaryForm = <
 }: Props<FormValues>) => {
   const { value: timePeriodCoverageGroups, isLoading } = useAsyncRetry<
     TimePeriodCoverageGroup[]
-  >(() => metaService.getTimePeriodCoverageGroups());
+  >(async () => metaService.getTimePeriodCoverageGroups());
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -85,12 +85,13 @@ const ReleaseSummaryForm = <
     );
   };
 
-  const baseSchema = Yup.object<ReleaseSummaryFormValues>({
+  const baseSchema: ObjectSchema<ReleaseSummaryFormValues> = Yup.object({
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string()
       .required('Enter a year')
       .length(4, 'Year must be exactly 4 characters'),
-    releaseType: Yup.mixed<ReleaseSummaryFormValues['releaseType']>()
+
+    releaseType: Yup.string<ReleaseType>()
       .required('Choose a release type')
       .oneOf(Object.keys(releaseTypes) as ReleaseType[]),
   });

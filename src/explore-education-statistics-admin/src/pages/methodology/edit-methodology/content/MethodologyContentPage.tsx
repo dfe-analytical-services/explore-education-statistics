@@ -20,15 +20,12 @@ import {
 } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import { useParams } from 'react-router';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
 
 export const MethodologyContentPageInternal = () => {
-  const {
-    methodology,
-    canUpdateMethodology,
-    isPreRelease,
-  } = useMethodologyContentState();
+  const { methodology, canUpdateMethodology, isPreRelease } =
+    useMethodologyContentState();
 
   const canUpdateContent =
     !isPreRelease && canUpdateMethodology && methodology.status === 'Draft';
@@ -103,26 +100,23 @@ export const MethodologyContentPageInternal = () => {
   );
 };
 
-const MethodologyContentPage = ({
-  match,
-}: RouteComponentProps<MethodologyRouteParams>) => {
-  const { methodologyId } = match.params;
+const MethodologyContentPage = () => {
+  const { methodologyId } = useParams<MethodologyRouteParams>();
 
-  const { value, isLoading } = useAsyncHandledRetry<
-    MethodologyContextState
-  >(async () => {
-    const methodology = await methodologyContentService.getMethodologyContent(
-      methodologyId,
-    );
-    const canUpdateMethodology = await permissionService.canUpdateMethodology(
-      methodologyId,
-    );
+  const { value, isLoading } =
+    useAsyncHandledRetry<MethodologyContextState>(async () => {
+      const methodology = await methodologyContentService.getMethodologyContent(
+        methodologyId,
+      );
+      const canUpdateMethodology = await permissionService.canUpdateMethodology(
+        methodologyId,
+      );
 
-    return {
-      methodology,
-      canUpdateMethodology,
-    };
-  }, [methodologyId]);
+      return {
+        methodology,
+        canUpdateMethodology,
+      };
+    }, [methodologyId]);
 
   return (
     <LoadingSpinner loading={isLoading}>

@@ -1,3 +1,4 @@
+import flushPromises from '@common-test/flushPromises';
 import ModalConfirm from '@common/components/ModalConfirm';
 import delay from '@common/utils/delay';
 import {
@@ -116,6 +117,8 @@ describe('ModalConfirm', () => {
 
       jest.advanceTimersByTime(500);
 
+      await flushPromises();
+
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
@@ -144,6 +147,8 @@ describe('ModalConfirm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       jest.advanceTimersByTime(500);
+
+      await flushPromises();
 
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
@@ -259,6 +264,8 @@ describe('ModalConfirm', () => {
 
       jest.advanceTimersByTime(500);
 
+      await flushPromises();
+
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
@@ -287,6 +294,8 @@ describe('ModalConfirm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       jest.advanceTimersByTime(500);
+
+      await flushPromises();
 
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();

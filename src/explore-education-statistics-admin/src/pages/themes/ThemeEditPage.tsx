@@ -6,14 +6,12 @@ import themeService from '@admin/services/themeService';
 import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import { useHistory, useParams } from 'react-router';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
 
-const ThemeEditPage = ({
-  history,
-  match,
-}: RouteComponentProps<ThemeParams>) => {
-  const { themeId } = match.params;
+const ThemeEditPage = () => {
+  const { themeId } = useParams<ThemeParams>();
+  const history = useHistory();
 
   const { value: theme, isLoading } = useAsyncHandledRetry(
     () => themeService.getTheme(themeId),

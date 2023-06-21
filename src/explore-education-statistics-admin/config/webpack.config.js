@@ -316,6 +316,8 @@ module.exports = webpackEnv => {
         path: require.resolve('path-browserify'),
         // EES - Add `process` polyfill for compat with react-markdown
         process: require.resolve('process/browser'),
+        // EES - node core modules are no longer polyfilled by default in webpack 5
+        querystring: require.resolve('querystring'),
       },
       plugins: [
         // Prevents users from importing files from outside of src/ (or node_modules/).

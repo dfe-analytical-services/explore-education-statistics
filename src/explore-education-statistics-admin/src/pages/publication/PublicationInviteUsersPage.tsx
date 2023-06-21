@@ -5,23 +5,16 @@ import publicationService from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router';
 
-const PublicationInviteUsersPage = ({
-  match,
-}: RouteComponentProps<PublicationManageTeamRouteParams>) => {
+const PublicationInviteUsersPage = () => {
   const { publicationId, publication } = usePublicationContext();
+  const { releaseId } = useParams<PublicationManageTeamRouteParams>();
 
-  const { releaseId } = match.params;
+  const { value: allReleases = { results: [] }, isLoading } =
+    useAsyncHandledRetry(() => publicationService.listReleases(publicationId));
 
-  const {
-    value: allReleases = { results: [] },
-    isLoading,
-  } = useAsyncHandledRetry(() =>
-    publicationService.listReleases(publicationId),
-  );
-
-  const releases = allReleases.results;
+  const { results: releases } = allReleases;
 
   return (
     <LoadingSpinner loading={isLoading}>

@@ -1,9 +1,9 @@
+import React from 'react';
 import FormThemeTopicSelect, {
   FormThemeTopicSelectProps,
 } from '@admin/components/form/FormThemeTopicSelect';
 import { OmitStrict } from '@common/types';
 import { useField } from 'formik';
-import React from 'react';
 
 interface FormFieldThemeTopicSelectProps<FormValues>
   extends OmitStrict<FormThemeTopicSelectProps, 'error' | 'topicId'> {

@@ -4,6 +4,7 @@ import exec from 'k6/execution';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
+import { RefinedResponse } from 'k6/http';
 import createAdminService, {
   getDataFileUploadStrategy,
 } from '../../../utils/adminService';
@@ -61,11 +62,8 @@ export const tableQueryFailureCount = new Counter(
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
-const {
-  adminUrl,
-  dataApiUrl,
-  supportsRefreshTokens,
-} = environmentAndUsers.environment;
+const { adminUrl, dataApiUrl, supportsRefreshTokens } =
+  environmentAndUsers.environment;
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
@@ -158,12 +156,8 @@ function getOrCreateReleaseWithSubject() {
 export function setup(): SetupData {
   const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
-  const {
-    themeId,
-    topicId,
-    releaseId,
-    subjectId,
-  } = getOrCreateReleaseWithSubject();
+  const { themeId, topicId, releaseId, subjectId } =
+    getOrCreateReleaseWithSubject();
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
 
@@ -191,8 +185,10 @@ const performTest = ({ subjectId, subjectMeta }: SetupData) => {
 
   if (
     check(response, {
-      'response code was 200': res => res.status === 200,
-      'response should contain table builder results': _ => results.length > 0,
+      'response code was 200': (res: RefinedResponse<'text'>) =>
+        res.status === 200,
+      'response should contain table builder results': (_: unknown) =>
+        results.length > 0,
     })
   ) {
     const tableQuerySpeed = Date.now() - startTimeMillis;

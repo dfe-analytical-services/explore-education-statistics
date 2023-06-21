@@ -107,7 +107,8 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
       return;
     }
 
-    const destinationId = destination.droppableId as keyof TableHeadersFormValues;
+    const destinationId =
+      destination.droppableId as keyof TableHeadersFormValues;
     const sourceId = source.droppableId as keyof TableHeadersFormValues;
 
     // Moving group within its axis
@@ -193,10 +194,28 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                 }}
                 validationSchema={Yup.object<TableHeadersFormValues>({
                   rowGroups: Yup.array()
-                    .of(Yup.array().of<Filter>(Yup.object()).ensure())
+                    .of(
+                      Yup.array()
+                        .of<Omit<Filter, 'id'>>(
+                          Yup.object({
+                            label: Yup.string().required('Label is required'),
+                            value: Yup.string().required('Value is required'),
+                          }),
+                        )
+                        .ensure(),
+                    )
                     .min(1, 'Must have at least one row group'),
                   columnGroups: Yup.array()
-                    .of(Yup.array().of<Filter>(Yup.object()).ensure())
+                    .of(
+                      Yup.array()
+                        .of<Omit<Filter, 'id'>>(
+                          Yup.object({
+                            label: Yup.string().required('Label is required'),
+                            value: Yup.string().required('Value is required'),
+                          }),
+                        )
+                        .ensure(),
+                    )
                     .min(1, 'Must have at least one column group'),
                 })}
                 validateOnBlur={false}

@@ -8,13 +8,13 @@ import {
 import legacyReleaseService from '@admin/services/legacyReleaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import { generatePath, useHistory, useParams } from 'react-router';
 import React from 'react';
-import { generatePath, RouteComponentProps, useHistory } from 'react-router';
 
-const PublicationLegacyReleaseEditPage = ({
-  match,
-}: RouteComponentProps<PublicationEditLegacyReleaseRouteParams>) => {
-  const { legacyReleaseId } = match.params;
+const PublicationLegacyReleaseEditPage = () => {
+  const { legacyReleaseId } =
+    useParams<PublicationEditLegacyReleaseRouteParams>();
+
   const { publicationId } = usePublicationContext();
   const history = useHistory();
 

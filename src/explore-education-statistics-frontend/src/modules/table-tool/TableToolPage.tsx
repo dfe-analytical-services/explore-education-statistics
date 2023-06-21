@@ -147,6 +147,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           </Link>
         )}
         currentStep={currentStep}
+        // eslint-disable-next-line react/no-unstable-nested-components
         finalStep={({
           query,
           selectedPublication: selectedPublicationDetails,
@@ -264,9 +265,9 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async ({
-  query,
-}) => {
+export const getServerSideProps: GetServerSideProps<
+  TableToolPageProps
+> = async ({ query }) => {
   const {
     publicationSlug = '',
     releaseSlug = '',
@@ -291,9 +292,10 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     };
   }
 
-  const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
-    publicationSlug,
-  );
+  const latestRelease =
+    await publicationService.getLatestPublicationReleaseSummary(
+      publicationSlug,
+    );
 
   const selectedRelease =
     !releaseSlug || latestRelease.slug === releaseSlug

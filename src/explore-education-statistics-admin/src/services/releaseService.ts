@@ -142,7 +142,7 @@ export const ReleaseChecklistErrorCode = [
 ] as const;
 
 export type ReleaseChecklistError = {
-  code: typeof ReleaseChecklistErrorCode[number];
+  code: (typeof ReleaseChecklistErrorCode)[number];
 };
 
 export type ReleaseChecklistWarning =

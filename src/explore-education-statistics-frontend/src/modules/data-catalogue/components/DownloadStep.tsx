@@ -138,7 +138,10 @@ const DownloadStep = ({
       initialValues={initialValues}
       validateOnBlur={false}
       validationSchema={Yup.object<DownloadFormValues>({
-        files: Yup.array().of(Yup.string()).required('Choose a file'),
+        files: Yup.array()
+          .of(Yup.string())
+          .min(1, 'Choose a file')
+          .required('Choose a file'),
       })}
       onSubmit={handleSubmit}
     >

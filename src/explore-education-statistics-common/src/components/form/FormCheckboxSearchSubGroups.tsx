@@ -123,12 +123,13 @@ const FormCheckboxSearchSubGroups = ({
     [filteredOptions, value],
   );
 
-  const handleAllGroupsChange: MouseEventHandler<HTMLButtonElement> = useCallback(
-    event => {
-      onAllChange?.(event, isAllChecked, filteredOptions);
-    },
-    [isAllChecked, onAllChange, filteredOptions],
-  );
+  const handleAllGroupsChange: MouseEventHandler<HTMLButtonElement> =
+    useCallback(
+      event => {
+        onAllChange?.(event, isAllChecked, filteredOptions);
+      },
+      [isAllChecked, onAllChange, filteredOptions],
+    );
 
   return (
     <FormFieldset {...fieldsetProps} useFormId={false}>

@@ -68,6 +68,7 @@
 .content {
   background-color: govuk-colour('white');
   display: none;
+
   .open & {
     display: block;
   }

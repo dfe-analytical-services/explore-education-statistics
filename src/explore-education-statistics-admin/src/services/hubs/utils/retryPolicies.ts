@@ -4,7 +4,7 @@ import {
   linearBackoffDelay,
 } from '@common/utils/math/retryBackoffDelays';
 import { IRetryPolicy, RetryContext } from '@microsoft/signalr';
-import { clamp } from 'lodash';
+import clamp from 'lodash/clamp';
 
 // Defaults to 10 minutes
 const DEFAULT_MAX_RETRY_TIME = 600000;

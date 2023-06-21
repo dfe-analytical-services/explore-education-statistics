@@ -26,9 +26,8 @@ export default function useReleaseContentActions() {
 
   const updateUnattachedDataBlocks = useCallback(
     async ({ releaseId }: { releaseId: string }) => {
-      const unattachedDataBlocks = await dataBlockService.getUnattachedDataBlocks(
-        releaseId,
-      );
+      const unattachedDataBlocks =
+        await dataBlockService.getUnattachedDataBlocks(releaseId);
 
       dispatch({
         type: 'SET_UNATTACHED_DATABLOCKS',
@@ -111,12 +110,13 @@ export default function useReleaseContentActions() {
       blockId: string;
       comment: CommentCreate;
     }): Promise<Comment> => {
-      const newComment = await releaseContentCommentService.addContentSectionComment(
-        releaseId,
-        sectionId,
-        blockId,
-        comment,
-      );
+      const newComment =
+        await releaseContentCommentService.addContentSectionComment(
+          releaseId,
+          sectionId,
+          blockId,
+          comment,
+        );
 
       dispatch({
         type: 'ADD_BLOCK_COMMENT',
@@ -170,9 +170,8 @@ export default function useReleaseContentActions() {
       blockId: string;
       comment: Comment;
     }) => {
-      const updatedComment = await releaseContentCommentService.updateContentSectionComment(
-        comment,
-      );
+      const updatedComment =
+        await releaseContentCommentService.updateContentSectionComment(comment);
 
       dispatch({
         type: 'UPDATE_BLOCK_COMMENT',
@@ -330,11 +329,12 @@ export default function useReleaseContentActions() {
       sectionKey: ContentSectionKeys;
       order: Dictionary<number>;
     }) => {
-      const sectionContent = await releaseContentService.updateContentSectionBlocksOrder(
-        releaseId,
-        sectionId,
-        order,
-      );
+      const sectionContent =
+        await releaseContentService.updateContentSectionBlocksOrder(
+          releaseId,
+          sectionId,
+          order,
+        );
 
       dispatch({
         type: 'UPDATE_SECTION_CONTENT',
@@ -438,10 +438,10 @@ export default function useReleaseContentActions() {
 
   const addKeyStatisticDataBlock = useCallback(
     async ({ releaseId, dataBlockId }) => {
-      const keyStatisticDataBlock = await keyStatisticService.createKeyStatisticDataBlock(
-        releaseId,
-        { dataBlockId },
-      );
+      const keyStatisticDataBlock =
+        await keyStatisticService.createKeyStatisticDataBlock(releaseId, {
+          dataBlockId,
+        });
       dispatch({
         type: 'ADD_KEY_STATISTIC',
         payload: { keyStatistic: keyStatisticDataBlock },
@@ -452,10 +452,11 @@ export default function useReleaseContentActions() {
 
   const addKeyStatisticText = useCallback(
     async ({ releaseId, keyStatisticText }) => {
-      const createdKeyStatText = await keyStatisticService.createKeyStatisticText(
-        releaseId,
-        keyStatisticText,
-      );
+      const createdKeyStatText =
+        await keyStatisticService.createKeyStatisticText(
+          releaseId,
+          keyStatisticText,
+        );
       dispatch({
         type: 'ADD_KEY_STATISTIC',
         payload: { keyStatistic: createdKeyStatText },
@@ -474,11 +475,12 @@ export default function useReleaseContentActions() {
       keyStatisticId: string;
       request: KeyStatisticDataBlockUpdateRequest;
     }) => {
-      const updatedKeyStatisticDataBlock = await keyStatisticService.updateKeyStatisticDataBlock(
-        releaseId,
-        keyStatisticId,
-        request,
-      );
+      const updatedKeyStatisticDataBlock =
+        await keyStatisticService.updateKeyStatisticDataBlock(
+          releaseId,
+          keyStatisticId,
+          request,
+        );
       dispatch({
         type: 'UPDATE_KEY_STATISTIC',
         payload: { keyStatistic: updatedKeyStatisticDataBlock },
@@ -497,11 +499,12 @@ export default function useReleaseContentActions() {
       keyStatisticId: string;
       request: KeyStatisticTextUpdateRequest;
     }) => {
-      const updatedKeyStatisticText = await keyStatisticService.updateKeyStatisticText(
-        releaseId,
-        keyStatisticId,
-        request,
-      );
+      const updatedKeyStatisticText =
+        await keyStatisticService.updateKeyStatisticText(
+          releaseId,
+          keyStatisticId,
+          request,
+        );
       dispatch({
         type: 'UPDATE_KEY_STATISTIC',
         payload: { keyStatistic: updatedKeyStatisticText },
@@ -536,10 +539,11 @@ export default function useReleaseContentActions() {
       releaseId: string;
       keyStatistics: KeyStatistic[];
     }) => {
-      const reorderedKeyStatistics = await keyStatisticService.reorderKeyStatistics(
-        releaseId,
-        keyStatistics.map(ks => ks.id),
-      );
+      const reorderedKeyStatistics =
+        await keyStatisticService.reorderKeyStatistics(
+          releaseId,
+          keyStatistics.map(ks => ks.id),
+        );
 
       dispatch({
         type: 'SET_KEY_STATISTICS',

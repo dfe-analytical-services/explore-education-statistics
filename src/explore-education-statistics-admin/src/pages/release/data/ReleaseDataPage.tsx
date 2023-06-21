@@ -22,11 +22,8 @@ const ReleaseDataPage = () => {
   const { release, releaseId } = useReleaseContext();
   const [dataFiles, setDataFiles] = useState<DataFile[]>([]);
 
-  const {
-    value: canUpdateRelease = false,
-    isLoading,
-  } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
+  const { value: canUpdateRelease = false, isLoading } = useAsyncHandledRetry(
+    async () => permissionService.canUpdateRelease(releaseId),
     [releaseId],
   );
 

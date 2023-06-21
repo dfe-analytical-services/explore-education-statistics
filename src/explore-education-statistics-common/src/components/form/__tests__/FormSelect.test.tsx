@@ -1,5 +1,5 @@
-import React from 'react';
 import { render } from '@testing-library/react';
+import React from 'react';
 import FormSelect from '../FormSelect';
 
 describe('FormSelect', () => {
@@ -165,9 +165,8 @@ describe('FormSelect', () => {
       'test-input-error',
     );
 
-    const ariaDescribedBy = getByLabelText('Test input').getAttribute(
-      'aria-describedby',
-    );
+    const ariaDescribedBy =
+      getByLabelText('Test input').getAttribute('aria-describedby');
 
     expect(ariaDescribedBy).toContain('test-input-error');
     expect(ariaDescribedBy).toContain('test-input-hint');

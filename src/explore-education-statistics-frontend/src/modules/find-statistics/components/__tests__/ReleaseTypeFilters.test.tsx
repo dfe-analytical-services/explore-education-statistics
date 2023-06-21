@@ -1,8 +1,8 @@
 import ReleaseTypeFilters from '@frontend/modules/find-statistics/components/ReleaseTypeFilters';
 import { render, screen, within } from '@testing-library/react';
-import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 describe('ReleaseTypeFilters', () => {
   test('renders correctly', () => {

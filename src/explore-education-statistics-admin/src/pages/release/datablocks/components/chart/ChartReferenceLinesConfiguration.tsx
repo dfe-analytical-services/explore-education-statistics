@@ -147,7 +147,7 @@ export default function ChartReferenceLinesConfiguration({
                     : `Enter a position within the ${
                         axis === 'x' ? 'Y' : 'X'
                       } axis min/max range`,
-                test: (value: number) => {
+                test: value => {
                   if (typeof value !== 'number') {
                     return true;
                   }
@@ -163,17 +163,29 @@ export default function ChartReferenceLinesConfiguration({
               position: Yup.string()
                 .required('Enter position')
                 .test({
-                  name: 'axisPosition',
+                  name: 'axiosPosition',
                   message: `Enter a position within the ${
                     axis === 'x' ? 'X' : 'Y'
                   } axis min/max range`,
-                  test: (value: number) => {
+                  test: value => {
                     return type === 'minor' && minorAxisDomain
-                      ? value >= minorAxisDomain?.min &&
-                          value <= minorAxisDomain.max
+                      ? (value as unknown as number) >= minorAxisDomain?.min &&
+                          (value as unknown as number) <= minorAxisDomain.max
                       : true;
                   },
                 }),
+              // .test({
+              //   name: 'axisPosition',
+              //   message: `Enter a position within the ${
+              //     axis === 'x' ? 'X' : 'Y'
+              //   } axis min/max range`,
+              //   test: (value: number) => {
+              //     return type === 'minor' && minorAxisDomain
+              //       ? value >= minorAxisDomain?.min &&
+              //           value <= minorAxisDomain.max
+              //       : true;
+              //   },
+              // }),
               style: Yup.string()
                 .required('Enter style')
                 .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),

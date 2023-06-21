@@ -10,9 +10,9 @@ import _publicationService from '@admin/services/publicationService';
 import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
 import { generatePath, MemoryRouter } from 'react-router';
 import { Route } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<

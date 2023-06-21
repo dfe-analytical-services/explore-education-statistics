@@ -70,7 +70,7 @@ export interface ChartBuilderFormContextProviderProps {
   definition?: ChartDefinition;
   id?: string;
   initialForms?: ChartBuilderForms;
-  onSubmit?: () => void;
+  onSubmit?: () => Promise<void>;
 }
 
 export const ChartBuilderFormsContextProvider = ({
@@ -209,8 +209,10 @@ export const ChartBuilderFormsContextProvider = ({
       updateForm,
       submitForms,
       isSubmitting,
-      isValid: formValues.every(form => form.isValid),
-      hasSubmitted: formValues.some(form => form.submitCount > 0),
+      isValid: formValues.every((form: ChartBuilderForm) => form.isValid),
+      hasSubmitted: formValues.some(
+        (form: ChartBuilderForm) => form.submitCount > 0,
+      ),
     };
   }, [forms, isSubmitting, submitForms, updateForm]);
 

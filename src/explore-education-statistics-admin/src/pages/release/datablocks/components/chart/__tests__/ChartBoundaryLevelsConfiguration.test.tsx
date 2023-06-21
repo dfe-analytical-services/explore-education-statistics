@@ -126,7 +126,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
 
     userEvent.selectOptions(screen.getByLabelText('Boundary level'), ['2']);
 
-    expect(handleChange).toHaveBeenCalledWith<[ChartOptions]>({
+    expect(handleChange).toHaveBeenCalledWith<ChartOptions[]>({
       ...testDefaultChartOptions,
       boundaryLevel: 2,
     });
@@ -175,7 +175,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({
+      expect(handleSubmit).toHaveBeenCalledWith<ChartOptions[]>({
         ...testDefaultChartOptions,
         boundaryLevel: 2,
       });
@@ -202,7 +202,7 @@ describe('ChartBoundaryLevelsConfiguration', () => {
     userEvent.click(screen.getByRole('button', { name: 'Save chart options' }));
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith<[ChartOptions]>({
+      expect(handleSubmit).toHaveBeenCalledWith<ChartOptions[]>({
         ...testDefaultChartOptions,
         boundaryLevel: 3,
       });

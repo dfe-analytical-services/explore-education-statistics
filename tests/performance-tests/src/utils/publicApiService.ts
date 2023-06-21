@@ -7,11 +7,11 @@ const applicationJsonHeaders = {
 
 export const datSetQueryNodeTypes = ['criteria', 'and', 'or', 'not'] as const;
 
-export type DataSetQueryNodeType = typeof datSetQueryNodeTypes[number];
+export type DataSetQueryNodeType = (typeof datSetQueryNodeTypes)[number];
 
 export const dataSetQueryIdOperators = ['eq', 'notEq', 'in', 'notIn'] as const;
 
-export type DataSetQueryIdOperator = typeof dataSetQueryIdOperators[number];
+export type DataSetQueryIdOperator = (typeof dataSetQueryIdOperators)[number];
 
 export const dataSetQueryComparableOperators = [
   'eq',
@@ -24,7 +24,8 @@ export const dataSetQueryComparableOperators = [
   'lte',
 ] as const;
 
-export type DataSetQueryComparableOperator = typeof dataSetQueryComparableOperators[number];
+export type DataSetQueryComparableOperator =
+  (typeof dataSetQueryComparableOperators)[number];
 
 export interface Publication {
   id: string;

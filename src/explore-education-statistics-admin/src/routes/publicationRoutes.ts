@@ -78,11 +78,12 @@ export const publicationTeamAccessRoute: PublicationRouteProps = {
   component: PublicationTeamAccessPage,
 };
 
-export const publicationManageReleaseContributorsPageRoute: PublicationRouteProps = {
-  path: '/publication/:publicationId/team/:releaseId/manage-contributors',
-  title: 'Add contributors',
-  component: PublicationManageReleaseContributorsPage,
-};
+export const publicationManageReleaseContributorsPageRoute: PublicationRouteProps =
+  {
+    path: '/publication/:publicationId/team/:releaseId/manage-contributors',
+    title: 'Add contributors',
+    component: PublicationManageReleaseContributorsPage,
+  };
 
 export const publicationInviteUsersPageRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/team/:releaseId/invite-users',

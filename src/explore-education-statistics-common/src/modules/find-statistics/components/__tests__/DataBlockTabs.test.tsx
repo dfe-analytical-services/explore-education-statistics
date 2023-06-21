@@ -14,9 +14,9 @@ import { Chart, DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor } from '@testing-library/dom';
 import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
-import React from 'react';
 import { forceVisible } from 'react-lazyload';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import React from 'react';
 
 jest.mock('@common/services/tableBuilderService');
 

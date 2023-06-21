@@ -7,19 +7,20 @@ import {
 import publicationService, {
   ExternalMethodology,
 } from '@admin/services/publicationService';
-import React from 'react';
 import { generatePath, useHistory } from 'react-router';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import React from 'react';
 
 const PublicationExternalMethodologyPage = () => {
   const history = useHistory();
   const { publicationId, publication, onReload } = usePublicationContext();
   const { value: externalMethodology, isLoading } = useAsyncHandledRetry<
     ExternalMethodology | undefined
-  >(async () => publicationService.getExternalMethodology(publicationId), [
-    publicationId,
-  ]);
+  >(
+    async () => publicationService.getExternalMethodology(publicationId),
+    [publicationId],
+  );
 
   const returnRoute = generatePath<PublicationRouteParams>(
     publicationMethodologiesRoute.path,

@@ -6,6 +6,7 @@ import useToggle from '@common/hooks/useToggle';
 import { OmitStrict } from '@common/types';
 import reorder from '@common/utils/reorder';
 import React, {
+  Children,
   cloneElement,
   isValidElement,
   ReactElement,
@@ -46,7 +47,7 @@ const ReorderableAccordion = (props: ReorderableAccordionProps) => {
   >([]);
 
   useEffect(() => {
-    const nextSections = React.Children.toArray(children).filter(
+    const nextSections = Children.toArray(children).filter(
       isValidElement,
     ) as ReactElement<ReorderableAccordionSectionProps>[];
 

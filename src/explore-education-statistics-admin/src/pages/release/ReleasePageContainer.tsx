@@ -29,10 +29,16 @@ import releaseService from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
-import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import {
+  generatePath,
+  Route,
+  Switch,
+  useLocation,
+  useParams,
+} from 'react-router';
 import { publicationReleasesRoute } from '@admin/routes/publicationRoutes';
 import { PublicationRouteParams } from '@admin/routes/routes';
+import React from 'react';
 
 const navRoutes = [
   releaseSummaryRoute,
@@ -64,18 +70,18 @@ interface MatchProps {
   releaseId: string;
 }
 
-const ReleasePageContainer = ({
-  match,
-  location,
-}: RouteComponentProps<MatchProps>) => {
-  const { publicationId, releaseId } = match.params;
+const ReleasePageContainer = () => {
+  const { publicationId, releaseId } = useParams<MatchProps>();
+  const location = useLocation();
+
   const {
     value: release,
     setState: setRelease,
     isLoading: loadingRelease,
-  } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
-    releaseId,
-  ]);
+  } = useAsyncHandledRetry(
+    () => releaseService.getRelease(releaseId),
+    [releaseId],
+  );
 
   const currentRouteIndex =
     navRoutes.findIndex(

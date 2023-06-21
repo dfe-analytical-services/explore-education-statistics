@@ -22,15 +22,14 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
+import { generatePath, useHistory, useParams } from 'react-router';
 import React from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
 
-const ReleaseDataFileReplacePage = ({
-  history,
-  match: {
-    params: { publicationId, releaseId, fileId },
-  },
-}: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
+const ReleaseDataFileReplacePage = () => {
+  const history = useHistory();
+  const { fileId, publicationId, releaseId } =
+    useParams<ReleaseDataFileReplaceRouteParams>();
+
   const [isCancelling, toggleCancelling] = useToggle(false);
   const {
     value: dataFile,

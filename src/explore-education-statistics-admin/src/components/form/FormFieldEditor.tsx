@@ -1,4 +1,3 @@
-import { Element } from '@admin/types/ckeditor';
 import FormEditor, {
   EditorElementsHandler,
   FormEditorProps,
@@ -9,6 +8,7 @@ import { OmitStrict } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { Field, FieldProps } from 'formik';
 import React, { useRef } from 'react';
+import { Element } from '@admin/types/ckeditor';
 
 export const elementsFieldName = (name: string) => `__${name}`;
 

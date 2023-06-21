@@ -158,6 +158,7 @@ function FormSelectWrapper({
   return inline ? (
     <div className="dfe-flex dfe-align-items--center">{children}</div>
   ) : (
+    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>{children}</>
   );
 }

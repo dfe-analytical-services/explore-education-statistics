@@ -8,9 +8,9 @@ import _preReleaseService, {
 } from '@admin/services/preReleaseService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { addHours, subHours } from 'date-fns';
-import React from 'react';
 import { generatePath, MemoryRouter } from 'react-router';
 import { Route } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/permissionService');
 jest.mock('@admin/services/preReleaseService');

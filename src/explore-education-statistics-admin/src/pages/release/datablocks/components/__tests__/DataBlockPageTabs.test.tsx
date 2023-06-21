@@ -276,13 +276,13 @@ describe('DataBlockPageTabs', () => {
       const sourceInput = screen.getByLabelText('Source');
 
       userEvent.clear(nameInput);
-      await userEvent.type(nameInput, 'Updated test data block');
+      userEvent.type(nameInput, 'Updated test data block');
 
       userEvent.clear(titleInput);
-      await userEvent.type(titleInput, 'Updated test title');
+      userEvent.type(titleInput, 'Updated test title');
 
       userEvent.clear(sourceInput);
-      await userEvent.type(sourceInput, 'Updated test source');
+      userEvent.type(sourceInput, 'Updated test source');
 
       expect(dataBlockService.updateDataBlock).not.toBeCalled();
 

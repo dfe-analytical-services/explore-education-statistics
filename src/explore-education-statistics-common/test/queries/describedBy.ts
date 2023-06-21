@@ -86,8 +86,8 @@ export function getDescribedBy(
 }
 
 export function queryDescribedBy(
-  container: HTMLElement = document.body,
   element: HTMLElement,
+  container: HTMLElement = document.body,
 ): HTMLElement | null {
   const ids = getDescribedByIds(element);
 

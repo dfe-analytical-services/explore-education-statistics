@@ -1,7 +1,9 @@
+import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import React from 'react';
+import { NextPage } from 'next';
 
-function PrivacyNoticePage() {
+const PrivacyNoticePage: NextPage = () => {
   return (
     <Page title="Privacy notice">
       <div className="govuk-grid-row">
@@ -79,9 +81,9 @@ function PrivacyNoticePage() {
             <p>
               For the purpose of this service we need to share your personal
               data with{' '}
-              <a href="https://www.notifications.service.gov.uk/">
+              <Link to="https://www.notifications.service.gov.uk/">
                 GOV.UK Notify
-              </a>{' '}
+              </Link>{' '}
               (a service provided by the Government Digital Service which is
               part of the Cabinet Office) so we can send you email notifications
               about this service.
@@ -91,9 +93,9 @@ function PrivacyNoticePage() {
             <h2 className="govuk-heading-m">Where your data is stored</h2>
             <p>
               We store your data on secure servers in the{' '}
-              <a href="https://www.gov.uk/eu-eea">
+              <Link to="https://www.gov.uk/eu-eea">
                 European Economic Area (EEA)
-              </a>
+              </Link>
               . By submitting your personal data, you agree to this.
             </p>
           </section>
@@ -145,17 +147,17 @@ function PrivacyNoticePage() {
             <p>
               If you need to contact us regarding any of the above use the
               details on DfE's{' '}
-              <a href="https://www.gov.uk/contact-dfe">
+              <Link to="https://www.gov.uk/contact-dfe">
                 Contact the Department for Education (DfE)
-              </a>{' '}
+              </Link>{' '}
               page.
             </p>
             <p>
               Further information about your data protection rights can be found
               on the{' '}
-              <a href="https://ico.org.uk/for-organisations/guide-to-data-protection/">
+              <Link to="https://ico.org.uk/for-organisations/guide-to-data-protection/">
                 Information Commissioner’s Office (ICO)
-              </a>{' '}
+              </Link>{' '}
               website.
             </p>
           </section>
@@ -171,16 +173,16 @@ function PrivacyNoticePage() {
               If you change your mind, or you are unhappy with our use of your
               personal data, let us know by contacting the explore education
               statistics service at{' '}
-              <a href="mailto:explore.statistics@education.gov.uk">
+              <Link to="mailto:explore.statistics@education.gov.uk">
                 explore.statistics@education.gov.uk
-              </a>
+              </Link>
               .
             </p>
             <p>
               You have the right to raise any concerns via the{' '}
-              <a href="https://ico.org.uk/make-a-complaint/">
+              <Link to="https://ico.org.uk/make-a-complaint/">
                 Information Commissioner’s Office (ICO)
-              </a>{' '}
+              </Link>{' '}
               website.
             </p>
           </section>
@@ -197,13 +199,13 @@ function PrivacyNoticePage() {
             <p>
               If you have any questions about how your personal information will
               be used contact the Explore education statistics service at
-              <a href="mailto:explore.statistics@education.gov.uk">
+              <Link to="mailto:explore.statistics@education.gov.uk">
                 explore.statistics@education.gov.uk
-              </a>{' '}
+              </Link>{' '}
               or contact DfE's Data Protection Officer (DPO) via our{' '}
-              <a href="https://www.gov.uk/contact-dfe">
+              <Link to="https://www.gov.uk/contact-dfe">
                 Contact the Department for Education (DfE)
-              </a>{' '}
+              </Link>{' '}
               page.
             </p>
           </section>
@@ -211,6 +213,6 @@ function PrivacyNoticePage() {
       </div>
     </Page>
   );
-}
+};
 
 export default PrivacyNoticePage;

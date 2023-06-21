@@ -1,22 +1,23 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
       "@common/*": [
-        "../../explore-education-statistics-common/src/*"
+        "../explore-education-statistics-common/src/*"
       ],
       "@common-test/*": [
-        "../../explore-education-statistics-common/test/*"
+        "../explore-education-statistics-common/test/*"
       ],
       "@frontend/*": [
-        "./*"
+        "./src/*"
       ],
       "@frontend-test/*": [
-        "../test/*"
+        "./test/*"
       ]
-    }
+    },
+    "incremental": true
   },
   "exclude": [
     "node_modules"

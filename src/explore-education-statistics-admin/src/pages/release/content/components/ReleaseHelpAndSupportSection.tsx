@@ -6,10 +6,10 @@ import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import OfficialStatisticsSection from '@common/modules/find-statistics/components/OfficialStatisticsSection';
-import React from 'react';
 import AdHocOfficialStatisticsSection from '@common/modules/find-statistics/components/AdHocOfficialStatisticsSection';
 import ExperimentalStatisticsSection from '@common/modules/find-statistics/components/ExperimentalStatisticsSection';
 import ManagementInformationSection from '@common/modules/find-statistics/components/ManageInformationSection';
+import React from 'react';
 
 interface MethodologyLink {
   key: string;

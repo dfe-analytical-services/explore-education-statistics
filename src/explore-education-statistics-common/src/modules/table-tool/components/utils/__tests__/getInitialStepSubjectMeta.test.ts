@@ -22,9 +22,9 @@ describe('getInitialStepSubjectMeta', () => {
       locationIds: [],
     };
 
-    expect(await getInitialStepSubjectMeta(query)).toEqual<
-      InitialStepSubjectMeta
-    >({
+    expect(
+      await getInitialStepSubjectMeta(query),
+    ).toEqual<InitialStepSubjectMeta>({
       initialStep: 1,
     });
   });
@@ -38,9 +38,9 @@ describe('getInitialStepSubjectMeta', () => {
       locationIds: [],
     };
 
-    expect(await getInitialStepSubjectMeta(query)).toEqual<
-      InitialStepSubjectMeta
-    >({
+    expect(
+      await getInitialStepSubjectMeta(query),
+    ).toEqual<InitialStepSubjectMeta>({
       initialStep: 2,
     });
   });
@@ -78,9 +78,9 @@ describe('getInitialStepSubjectMeta', () => {
       filters: [],
     };
 
-    expect(await getInitialStepSubjectMeta(query)).toEqual<
-      InitialStepSubjectMeta
-    >({
+    expect(
+      await getInitialStepSubjectMeta(query),
+    ).toEqual<InitialStepSubjectMeta>({
       initialStep: 3,
       subjectMeta,
     });
@@ -113,9 +113,9 @@ describe('getInitialStepSubjectMeta', () => {
       filters: [],
     };
 
-    expect(await getInitialStepSubjectMeta(query)).toEqual<
-      InitialStepSubjectMeta
-    >({
+    expect(
+      await getInitialStepSubjectMeta(query),
+    ).toEqual<InitialStepSubjectMeta>({
       initialStep: 3,
       subjectMeta,
     });
@@ -174,9 +174,9 @@ describe('getInitialStepSubjectMeta', () => {
       },
     };
 
-    expect(await getInitialStepSubjectMeta(query, tableData)).toEqual<
-      InitialStepSubjectMeta
-    >({
+    expect(
+      await getInitialStepSubjectMeta(query, tableData),
+    ).toEqual<InitialStepSubjectMeta>({
       initialStep: 3,
       subjectMeta,
     });
@@ -313,9 +313,9 @@ describe('getInitialStepSubjectMeta', () => {
       },
     };
 
-    expect(await getInitialStepSubjectMeta(query, tableData)).toEqual<
-      InitialStepSubjectMeta
-    >({
+    expect(
+      await getInitialStepSubjectMeta(query, tableData),
+    ).toEqual<InitialStepSubjectMeta>({
       initialStep: 6,
       subjectMeta,
     });

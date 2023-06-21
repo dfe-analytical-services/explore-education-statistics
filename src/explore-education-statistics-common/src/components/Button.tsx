@@ -5,9 +5,8 @@ import React, { forwardRef, Ref } from 'react';
 
 function Button(props: ButtonOptions, ref: Ref<HTMLButtonElement>) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { className, isDisabled, underline, variant, ...button } = useButton(
-    props,
-  );
+  const { className, isDisabled, underline, variant, ...button } =
+    useButton(props);
 
   return (
     // eslint-disable-next-line react/button-has-type

@@ -135,6 +135,7 @@ export function AuthContextTestProvider({
   user,
 }: AuthContextTestProviderProps): ReactElement {
   return (
+    // eslint-disable-next-line react/jsx-no-constructed-context-values
     <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
   );
 }

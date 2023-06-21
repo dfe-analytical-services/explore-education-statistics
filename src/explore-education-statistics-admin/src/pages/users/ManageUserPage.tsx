@@ -13,7 +13,7 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import React, { useCallback, useEffect, useState } from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router';
 import RoleForm, {
   UpdateRoleFormValues,
 } from '@admin/pages/users/components/RoleForm';
@@ -56,12 +56,12 @@ interface Model {
   user: User;
 }
 
-const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
+const ManageUserPage = () => {
   const [model, setModel] = useState<Model>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [, setErrorStatus] = useState<number>();
 
-  const { userId } = match.params;
+  const { userId } = useParams<{ userId: string }>();
 
   const getUser = useCallback(() => {
     setIsLoading(true);

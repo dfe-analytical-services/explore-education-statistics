@@ -7,19 +7,16 @@ import {
 import publicationService from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
 import { generatePath, useHistory } from 'react-router';
+import React from 'react';
 
 const PublicationAdoptMethodologyPage = () => {
   const history = useHistory();
 
   const { publicationId } = usePublicationContext();
 
-  const {
-    value: adoptableMethodologies,
-    isLoading,
-  } = useAsyncHandledRetry(async () =>
-    publicationService.getAdoptableMethodologies(publicationId),
+  const { value: adoptableMethodologies, isLoading } = useAsyncHandledRetry(
+    async () => publicationService.getAdoptableMethodologies(publicationId),
   );
 
   const returnRoute = generatePath<PublicationRouteParams>(

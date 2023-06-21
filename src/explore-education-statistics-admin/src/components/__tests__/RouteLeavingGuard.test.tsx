@@ -1,8 +1,8 @@
+import React from 'react';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
-import React from 'react';
 import { Route, Router } from 'react-router';
 import { Link } from 'react-router-dom';
 

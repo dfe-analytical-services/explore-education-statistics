@@ -63,7 +63,7 @@ export default function RHFForm<TFormValues extends FieldValues>({
 
   const values = useWatch();
   const previousValues = useRef(values);
-  const previousSubmitCount = useRef(submitCount);
+  const previousSubmitCount = useRef<number>(submitCount);
 
   const { getAllErrors } = createRHFErrorHelper({
     errors,
@@ -109,8 +109,9 @@ export default function RHFForm<TFormValues extends FieldValues>({
   }, [allErrors, isMounted, submitCount, toggleSummaryFocus]);
 
   const handleSubmit = useCallback(
-    async (event: FormEvent) => {
+    async (event: FormEvent<HTMLFormElement>) => {
       event.preventDefault();
+
       toggleSummaryFocus.off();
 
       await submit(async () => {
@@ -156,7 +157,6 @@ export default function RHFForm<TFormValues extends FieldValues>({
             onFocus={toggleSummaryFocus.off}
           />
         )}
-
         {children}
       </form>
     </FormIdContextProvider>

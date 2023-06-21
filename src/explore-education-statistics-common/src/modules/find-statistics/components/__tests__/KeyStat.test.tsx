@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import KeyStat from '@common/modules/find-statistics/components/KeyStat';
+import React from 'react';
 
 describe('KeyStat', () => {
   test('renders correctly with all props provided', async () => {

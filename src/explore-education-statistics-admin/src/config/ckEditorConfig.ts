@@ -1,9 +1,9 @@
+import { Dictionary } from '@admin/types';
 import {
   AlignmentConfig,
   HeadingOption,
   ResizeOption,
 } from '@admin/types/ckeditor';
-import { Dictionary } from '@admin/types';
 
 export const toolbarConfigs: Dictionary<string[]> = {
   full: [

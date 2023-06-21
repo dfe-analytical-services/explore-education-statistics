@@ -1,8 +1,8 @@
 import styles from '@admin/pages/release/pre-release/components/PreReleaseInvitePlanModal.module.scss';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
-import React from 'react';
 import { PreReleaseInvitePlan } from '@admin/services/preReleaseUserService';
+import React from 'react';
 
 interface Props {
   invitePlan: PreReleaseInvitePlan;

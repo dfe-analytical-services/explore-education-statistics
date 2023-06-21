@@ -18,7 +18,7 @@ import ReleasePreviewTableTool from '@admin/pages/release/content/components/Rel
 import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
 import classNames from 'classnames';
 import React from 'react';
-import { RouteComponentProps } from 'react-router';
+import { useParams } from 'react-router';
 
 const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, release } = useReleaseContentState();
@@ -106,29 +106,24 @@ const ReleaseContentPageLoaded = () => {
   );
 };
 
-const ReleaseContentPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { releaseId } = match.params;
+const ReleaseContentPage = () => {
+  const { releaseId } = useParams<ReleaseRouteParams>();
 
-  const { value, isLoading } = useAsyncRetry<
-    ReleaseContentContextState
-  >(async () => {
-    const {
-      release,
-      unattachedDataBlocks,
-    } = await releaseContentService.getContent(releaseId);
+  const { value, isLoading } =
+    useAsyncRetry<ReleaseContentContextState>(async () => {
+      const { release, unattachedDataBlocks } =
+        await releaseContentService.getContent(releaseId);
 
-    const canUpdateRelease = await permissionService.canUpdateRelease(
-      releaseId,
-    );
+      const canUpdateRelease = await permissionService.canUpdateRelease(
+        releaseId,
+      );
 
-    return {
-      release,
-      unattachedDataBlocks,
-      canUpdateRelease,
-    };
-  }, [releaseId]);
+      return {
+        release,
+        unattachedDataBlocks,
+        canUpdateRelease,
+      };
+    }, [releaseId]);
 
   return (
     <LoadingSpinner loading={isLoading}>

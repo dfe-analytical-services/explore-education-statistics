@@ -1,3 +1,4 @@
+import React from 'react';
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
 import _releaseService, {
   ReleaseWithPermissions,
@@ -6,7 +7,6 @@ import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
 import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/releaseService');

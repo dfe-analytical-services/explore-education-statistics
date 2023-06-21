@@ -20,25 +20,24 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import classNames from 'classnames';
 import React, { useCallback, useState } from 'react';
-import { generatePath, RouteComponentProps } from 'react-router';
+import { generatePath, useParams } from 'react-router';
 
 interface Model {
   dataBlocks: ReleaseDataBlockSummary[];
   canUpdateRelease: boolean;
 }
 
-const ReleaseDataBlocksPage = ({
-  match,
-}: RouteComponentProps<ReleaseRouteParams>) => {
-  const { publicationId, releaseId } = match.params;
+const ReleaseDataBlocksPage = () => {
+  const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
-  const [deleteDataBlock, setDeleteDataBlock] = useState<
-    ReleaseDataBlockSummary
-  >();
+  const [deleteDataBlock, setDeleteDataBlock] =
+    useState<ReleaseDataBlockSummary>();
 
-  const { value: model, isLoading, setState: setModel } = useAsyncHandledRetry<
-    Model
-  >(async () => {
+  const {
+    value: model,
+    isLoading,
+    setState: setModel,
+  } = useAsyncHandledRetry<Model>(async () => {
     const [dataBlocks, canUpdateRelease] = await Promise.all([
       dataBlocksService.listDataBlocks(releaseId),
       permissionService.canUpdateRelease(releaseId),

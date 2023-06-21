@@ -138,13 +138,11 @@ const LoggedInLinks = ({ user }: LoggedInLinksProps) => (
 );
 
 const NotLoggedInLinks = () => (
-  <>
-    <li className="govuk-header__navigation-item">
-      <a className="govuk-header__link" href={loginService.getSignInLink()}>
-        Sign in
-      </a>
-    </li>
-  </>
+  <li className="govuk-header__navigation-item">
+    <a className="govuk-header__link" href={loginService.getSignInLink()}>
+      Sign in
+    </a>
+  </li>
 );
 
 export default PageHeader;

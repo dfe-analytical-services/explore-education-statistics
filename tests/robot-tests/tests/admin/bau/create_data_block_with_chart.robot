@@ -417,6 +417,8 @@ Configure line chart data sets
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
 
+    user clicks element    id:chartBuilderPreview
+
 Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview
 
@@ -430,6 +432,7 @@ Validate basic line chart preview
     user checks chart x axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
 
     user mouses over line chart point    id:chartBuilderPreview    1    1
+
     user checks chart tooltip label contains    id:chartBuilderPreview    2005
     user checks chart tooltip item contains    id:chartBuilderPreview    1
     ...    Admission Numbers (Nailsea Youngwood): 3,612

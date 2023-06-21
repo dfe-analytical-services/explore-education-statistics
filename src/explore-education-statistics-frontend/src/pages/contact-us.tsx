@@ -1,7 +1,9 @@
-import Page from '@frontend/components/Page';
 import React from 'react';
+import Link from '@frontend/components/Link';
+import Page from '@frontend/components/Page';
+import { NextPage } from 'next';
 
-function ContactPage() {
+const ContactPage: NextPage = () => {
   return (
     <Page
       title="Contact Explore education statistics"
@@ -67,9 +69,9 @@ function ContactPage() {
             <p>
               If you want access to data or statistics which are not available
               within this service submit a{' '}
-              <a href="https://form.education.gov.uk/en/AchieveForms/?form_uri=sandbox-publish://AF-Process-f1453496-7d8a-463f-9f33-1da2ac47ed76/AF-Stage-1e64d4cc-25fb-499a-a8d7-74e98203ac00/definition.json&redirectlink=%2Fen&cancelRedirectLink=%2Fen">
+              <Link to="https://form.education.gov.uk/en/AchieveForms/?form_uri=sandbox-publish://AF-Process-f1453496-7d8a-463f-9f33-1da2ac47ed76/AF-Stage-1e64d4cc-25fb-499a-a8d7-74e98203ac00/definition.json&redirectlink=%2Fen&cancelRedirectLink=%2Fen">
                 freedom of information (FOI) request
-              </a>
+              </Link>
               .
             </p>
           </section>
@@ -77,6 +79,6 @@ function ContactPage() {
       </div>
     </Page>
   );
-}
+};
 
 export default ContactPage;

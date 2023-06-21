@@ -11,9 +11,9 @@ import _methodologyContentService, {
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import React from 'react';
 
 jest.mock('@admin/services/methodologyContentService');
 const methodologyContentService = _methodologyContentService as jest.Mocked<
@@ -174,9 +174,8 @@ describe('PreReleaseMethodologyPage', () => {
     });
 
     const contentAccordion = screen.getAllByTestId('accordion')[0];
-    const contentAccordionSections = within(contentAccordion).getAllByTestId(
-      'accordionSection',
-    );
+    const contentAccordionSections =
+      within(contentAccordion).getAllByTestId('accordionSection');
 
     expect(contentAccordionSections).toHaveLength(2);
 
@@ -216,9 +215,8 @@ describe('PreReleaseMethodologyPage', () => {
     });
 
     const annexAccordion = screen.getAllByTestId('accordion')[1];
-    const annexAccordionSections = within(annexAccordion).getAllByTestId(
-      'accordionSection',
-    );
+    const annexAccordionSections =
+      within(annexAccordion).getAllByTestId('accordionSection');
 
     expect(
       screen.getByRole('heading', { name: 'Annexes' }),

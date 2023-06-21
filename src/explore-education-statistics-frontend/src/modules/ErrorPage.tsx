@@ -45,7 +45,6 @@ const ErrorPage = ({ statusCode, error }: Props) => {
       );
   }
 };
-
 ErrorPage.getInitialProps = ({ res, err: error }: NextPageContext): Props => {
   let statusCode = res?.statusCode;
 

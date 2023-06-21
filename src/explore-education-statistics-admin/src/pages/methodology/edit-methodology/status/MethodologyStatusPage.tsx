@@ -14,8 +14,8 @@ import { useMethodologyContext } from '@admin/pages/methodology/contexts/Methodo
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import MethodologyStatusEditPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusEditPage';
-import React from 'react';
 import UrlContainer from '@common/components/UrlContainer';
+import React from 'react';
 
 interface FormValues {
   status: MethodologyStatus;
@@ -88,91 +88,90 @@ const MethodologyStatusPage = () => {
   const isEditable = permissions?.canApprove || permissions?.canMarkAsDraft;
 
   return (
-    <>
-      <LoadingSpinner loading={isLoading}>
-        {currentMethodology ? (
-          <>
-            {!isEditing ? (
-              <>
-                <h2>Sign off</h2>
+    <LoadingSpinner loading={isLoading}>
+      {currentMethodology ? (
+        // eslint-disable-next-line react/jsx-no-useless-fragment
+        <>
+          {!isEditing ? (
+            <>
+              <h2>Sign off</h2>
 
-                <p>
-                  The <strong>public methodology</strong> will be accessible at:
-                </p>
+              <p>
+                The <strong>public methodology</strong> will be accessible at:
+              </p>
 
-                <p>
-                  <UrlContainer
-                    data-testid="public-methodology-url"
-                    url={`${PublicAppUrl}/methodology/${currentMethodology.slug}`}
-                  />
-                </p>
+              <p>
+                <UrlContainer
+                  data-testid="public-methodology-url"
+                  url={`${PublicAppUrl}/methodology/${currentMethodology.slug}`}
+                />
+              </p>
 
-                <SummaryList>
-                  <SummaryListItem term="Status">
-                    <StatusBlock text={statusMap[currentMethodology.status]} />
-                  </SummaryListItem>
-                  {currentMethodology.status === 'Approved' && (
-                    <>
-                      <SummaryListItem term="Internal note">
-                        {currentMethodology.internalReleaseNote}
-                      </SummaryListItem>
-                      <SummaryListItem term="When to publish">
-                        {currentMethodology.publishingStrategy === 'WithRelease'
-                          ? 'With a specific release'
-                          : currentMethodology.publishingStrategy}
-                      </SummaryListItem>
-                      {currentMethodology.publishingStrategy ===
-                        'WithRelease' && (
-                        <SummaryListItem term="Publish with release">
-                          {currentMethodology.scheduledWithRelease?.title}
-                        </SummaryListItem>
-                      )}
-                    </>
-                  )}
-                  <SummaryListItem term="Owning publication">
-                    {currentMethodology.owningPublication.title}
-                  </SummaryListItem>
-                  {currentMethodology.otherPublications &&
-                    currentMethodology.otherPublications.length > 0 && (
-                      <SummaryListItem term="Other publications">
-                        <ul className="govuk-!-margin-top-0">
-                          {currentMethodology.otherPublications?.map(
-                            publication => (
-                              <li
-                                key={publication.id}
-                                data-testid="other-publication-item"
-                              >
-                                {publication.title}
-                              </li>
-                            ),
-                          )}
-                        </ul>
+              <SummaryList>
+                <SummaryListItem term="Status">
+                  <StatusBlock text={statusMap[currentMethodology.status]} />
+                </SummaryListItem>
+                {currentMethodology.status === 'Approved' && (
+                  <>
+                    <SummaryListItem term="Internal note">
+                      {currentMethodology.internalReleaseNote}
+                    </SummaryListItem>
+                    <SummaryListItem term="When to publish">
+                      {currentMethodology.publishingStrategy === 'WithRelease'
+                        ? 'With a specific release'
+                        : currentMethodology.publishingStrategy}
+                    </SummaryListItem>
+                    {currentMethodology.publishingStrategy ===
+                      'WithRelease' && (
+                      <SummaryListItem term="Publish with release">
+                        {currentMethodology.scheduledWithRelease?.title}
                       </SummaryListItem>
                     )}
-                </SummaryList>
-
-                {isEditable && (
-                  <Button
-                    className="govuk-!-margin-top-2"
-                    onClick={toggleForm.on}
-                  >
-                    Edit status
-                  </Button>
+                  </>
                 )}
-              </>
-            ) : (
-              <MethodologyStatusEditPage
-                methodology={currentMethodology}
-                onCancel={toggleForm.off}
-                onSubmit={handleSubmit}
-              />
-            )}
-          </>
-        ) : (
-          <WarningMessage>Could not load methodology status</WarningMessage>
-        )}
-      </LoadingSpinner>
-    </>
+                <SummaryListItem term="Owning publication">
+                  {currentMethodology.owningPublication.title}
+                </SummaryListItem>
+                {currentMethodology.otherPublications &&
+                  currentMethodology.otherPublications.length > 0 && (
+                    <SummaryListItem term="Other publications">
+                      <ul className="govuk-!-margin-top-0">
+                        {currentMethodology.otherPublications?.map(
+                          publication => (
+                            <li
+                              key={publication.id}
+                              data-testid="other-publication-item"
+                            >
+                              {publication.title}
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    </SummaryListItem>
+                  )}
+              </SummaryList>
+
+              {isEditable && (
+                <Button
+                  className="govuk-!-margin-top-2"
+                  onClick={toggleForm.on}
+                >
+                  Edit status
+                </Button>
+              )}
+            </>
+          ) : (
+            <MethodologyStatusEditPage
+              methodology={currentMethodology}
+              onCancel={toggleForm.off}
+              onSubmit={handleSubmit}
+            />
+          )}
+        </>
+      ) : (
+        <WarningMessage>Could not load methodology status</WarningMessage>
+      )}
+    </LoadingSpinner>
   );
 };
 

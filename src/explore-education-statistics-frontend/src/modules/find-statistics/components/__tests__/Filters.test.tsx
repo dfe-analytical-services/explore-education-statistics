@@ -1,8 +1,8 @@
 import Filters from '@frontend/modules/find-statistics/components/Filters';
 import { testThemeSummaries } from '@frontend/modules/find-statistics/__tests__/__data__/testThemeData';
 import { render, screen, within } from '@testing-library/react';
-import React from 'react';
 import noop from 'lodash/noop';
+import React from 'react';
 
 let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-html-link-for-pages */
 import Link from '@admin/components/Link';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import Accordion from '@common/components/Accordion';
@@ -23,8 +24,7 @@ const PrototypeRelease = () => {
         breadcrumbs={[
           {
             name: 'Childrens social care',
-            link:
-              'https://explore-education-statistics.service.gov.uk/find-statistics#themes-1',
+            link: 'https://explore-education-statistics.service.gov.uk/find-statistics#themes-1',
           },
           {
             name: 'Children looked after in England including adoptions',

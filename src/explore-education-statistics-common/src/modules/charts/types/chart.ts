@@ -135,13 +135,15 @@ export interface ChartCapabilities {
   stackable: boolean;
 }
 
+export type TitleType = 'default' | 'alternative';
+
 export interface ChartDefinitionOptions {
   stacked?: boolean;
   height: number;
   width?: number;
   barThickness?: number;
   title?: string;
-  titleType: 'default' | 'alternative';
+  titleType: TitleType;
   alt: string;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;

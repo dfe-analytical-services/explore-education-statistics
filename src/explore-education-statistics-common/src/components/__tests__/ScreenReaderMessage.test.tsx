@@ -8,6 +8,7 @@ describe('ScreenReaderMessage', () => {
   });
   afterEach(() => {
     jest.useRealTimers();
+    jest.runOnlyPendingTimers();
   });
 
   test('sets the message after a timeout', () => {

@@ -5,9 +5,9 @@ import _legacyReleaseService from '@admin/services/legacyReleaseService';
 import { PublicationWithPermissions } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
+import React from 'react';
 
 jest.mock('@admin/services/legacyReleaseService');
 const legacyReleaseService = _legacyReleaseService as jest.Mocked<

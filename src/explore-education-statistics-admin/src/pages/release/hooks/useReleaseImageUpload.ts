@@ -1,11 +1,11 @@
 import releaseImageService from '@admin/services/releaseImageService';
-import { ImageUploadResult } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import { CancellablePromise } from '@common/types/promise';
 import { useCallback, useRef } from 'react';
+import { ImageUploadResult } from '@admin/types/ckeditor';
 
 interface UseImageUploadReturn {
   handleImageUpload: ImageUploadHandler;

@@ -1,7 +1,7 @@
 import StatusBlock, { StatusBlockColors } from '@admin/components/StatusBlock';
 import { ReleaseStageStatuses } from '@admin/services/releaseService';
-import React from 'react';
 import Tag from '@common/components/Tag';
+import React from 'react';
 
 const approvedStatuses = ['Complete', 'Scheduled'];
 

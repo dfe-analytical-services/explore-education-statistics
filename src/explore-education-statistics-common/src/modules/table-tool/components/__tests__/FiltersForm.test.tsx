@@ -7,7 +7,7 @@ import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import produce from 'immer';
+import { produce } from 'immer';
 import noop from 'lodash/noop';
 import React from 'react';
 
