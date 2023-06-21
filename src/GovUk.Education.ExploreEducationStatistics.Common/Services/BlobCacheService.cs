@@ -13,12 +13,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     {
         private readonly IBlobStorageService _blobStorageService;
         private readonly ILogger<BlobCacheService> _logger;
+        private readonly StaleCacheWorkflow<BlobCacheKeyAndType, BlobCacheService> _staleWorkflow;
 
         public BlobCacheService(IBlobStorageService blobStorageService,
             ILogger<BlobCacheService> logger)
         {
             _blobStorageService = blobStorageService;
             _logger = logger;
+            _staleWorkflow = new(
+                cacheKey => GetItemAsync(cacheKey.CacheKey, cacheKey.Type),
+                cacheKey => GetCacheItemMeta(cacheKey.CacheKey),
+                (cacheKey, item) => SetItemAsync(cacheKey.CacheKey, item),
+                _logger
+            );
         }
 
         public object? GetItem(IBlobCacheKey cacheKey, Type targetType)
@@ -58,6 +65,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return default;
         }
 
+        public async Task<object?> GetOrCreateItemAsync(
+            IBlobCacheKey cacheKey, 
+            Type targetType,
+            Func<Task<object>> createItemFn)
+        {
+            return _staleWorkflow.GetOrCreateItemAsync(new BlobCacheKeyAndType(cacheKey, targetType), createItemFn);
+        }
+
+        public async Task<CacheItemMeta> GetCacheItemMeta(IBlobCacheKey cacheKey)
+        {
+            throw new NotImplementedException();
+        }
+
         public void SetItem<TItem>(
             IBlobCacheKey cacheKey,
             TItem item)
@@ -90,3 +110,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
     }
 }
+
+record BlobCacheKeyAndType(IBlobCacheKey CacheKey, Type Type);

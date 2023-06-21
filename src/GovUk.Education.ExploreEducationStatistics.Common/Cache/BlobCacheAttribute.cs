@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
@@ -21,8 +22,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         public string? ServiceName { get; set; }
 
+        private StaleCacheWorkflow<BlobCacheKeyAndType, BlobCacheAttribute> _staleCacheWorkflow;
+
         public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
         {
+            _staleCacheWorkflow = new(
+                cacheKey => GetAsync(cacheKey.CacheKey, cacheKey.Type),
+                cacheKey => GetCacheItemMeta(cacheKey.CacheKey),
+                (cacheKey, item) => SetAsync(cacheKey.CacheKey, item));
         }
 
         public static void AddService(string name, IBlobCacheService service)
@@ -92,6 +99,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
+        public override async Task<object?> GetBlobMetaAsync(ICacheKey cacheKey, Type returnType)
+        {
+            if (cacheKey is IBlobCacheKey key)
+            {
+                var service = GetService();
+
+                if (service is null)
+                {
+                    return null;
+                }
+
+                return await service.GetBlobMetaAsync(key, returnType);
+            }
+
+            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+        }
+
         public override async Task SetAsync(ICacheKey cacheKey, object value)
         {
             if (cacheKey is IBlobCacheKey key)
@@ -111,6 +135,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
+        protected override T GetOrGenerateAndSet<T>(ICacheKey cacheKey, Func<object[], T> target, object[] args)
+        {
+            throw new NotImplementedException();
+        }
+
         private IBlobCacheService? GetService()
         {
             if (ServiceName is not null)
@@ -121,4 +150,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             return Services.Count > 0 ? Services.First().Value : null;
         }
     }
+
+    record BlobCacheKeyAndType(IBlobCacheKey CacheKey, Type Type);
 }

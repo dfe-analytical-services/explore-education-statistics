@@ -54,6 +54,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// When an attribute with this flag set is invoked, it will retrieve a fresh
         /// value rather than a cached item and then set or update it in the cache,
         /// therefore always caching and then supplying a freshly retrieved value.
+        ///
+        /// TODO DW - this can come out as part of the stale workflow work, when all content is marked as stale rather
+        /// than updated 
+        /// 
         /// </summary>
         public bool ForceUpdate { get; }
 
@@ -79,39 +83,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         protected override T WrapSync<T>(Func<object[], T> target, object[] args, AspectEventArgs eventArgs)
         {
-            var unboxedResultType = typeof(T).GetUnboxedResultTypePath().Last();
-
             var cacheKey = GetCacheKey(Key, args, eventArgs.Method);
 
-            object? cachedResult = null;
-            if (!ForceUpdate)
+            if (ForceUpdate)
             {
-                cachedResult = Get(cacheKey, unboxedResultType);
-            }
-
-            if (cachedResult?.TryBoxToResult(typeof(T), out cachedResult) == true)
-            {
-                return (T)cachedResult;
-            }
-
-            try
-            {
-                var result = target(args);
-
-                if (!result.TryUnboxResult(out cachedResult) || cachedResult is null)
+                try
                 {
+                    var result = target(args);
+
+                    if (!result.TryUnboxResult(out var cachedResult) || cachedResult is null)
+                    {
+                        return result;
+                    }
+
+                    Set(cacheKey, cachedResult);
+
                     return result;
                 }
-
-                Set(cacheKey, cachedResult);
-
-                return result;
+                catch (Exception exception)
+                {
+                    return OnException<T>(eventArgs, exception);
+                }
             }
-            catch (Exception exception)
-            {
-                return OnException<T>(eventArgs, exception);
-            }
+
+            return GetOrGenerateAndSet(cacheKey, target, args);
         }
+
+        protected abstract T GetOrGenerateAndSet<T>(ICacheKey cacheKey, Func<object[], T> target, object[] args);
 
         protected override async Task<T> WrapAsync<T>(Func<object[], Task<T>> target, object[] args, AspectEventArgs eventArgs)
         {
