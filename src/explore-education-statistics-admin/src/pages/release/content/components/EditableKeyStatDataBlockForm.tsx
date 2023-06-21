@@ -10,8 +10,8 @@ import styles from '@common/modules/find-statistics/components/KeyStat.module.sc
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import { KeyStatisticDataBlock } from '@common/services/publicationService';
 import { Formik } from 'formik';
-import Yup from '@common/validation/yup';
 import React from 'react';
+import Yup from '@common/validation/yup';
 
 export interface KeyStatDataBlockFormValues {
   trend: string;

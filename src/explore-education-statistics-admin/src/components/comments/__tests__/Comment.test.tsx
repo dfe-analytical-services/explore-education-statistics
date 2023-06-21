@@ -1,4 +1,3 @@
-import React from 'react';
 import Comment from '@admin/components/comments/Comment';
 import {
   testComments,
@@ -8,6 +7,7 @@ import {
 import { AuthContext, User } from '@admin/contexts/AuthContext';
 import { GlobalPermissions } from '@admin/services/permissionService';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 
 describe('Comment', () => {
   const testUser1: User = {

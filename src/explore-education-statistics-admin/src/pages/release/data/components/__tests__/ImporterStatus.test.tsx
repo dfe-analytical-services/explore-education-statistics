@@ -1,9 +1,9 @@
 import { render, screen, waitFor, within } from '@testing-library/react';
 import ImporterStatus from '@admin/pages/release/data/components/ImporterStatus';
-import React from 'react';
 import _releaseDataFileService, {
   DataFile,
 } from '@admin/services/releaseDataFileService';
+import React from 'react';
 
 jest.mock('@admin/services/releaseDataFileService');
 

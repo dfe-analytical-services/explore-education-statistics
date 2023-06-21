@@ -3,8 +3,8 @@ import InsetText from '@common/components/InsetText';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { ContentBlock } from '@common/services/types/blocks';
-import useMethodologyImageAttributeTransformer from '@common/modules/methodology/hooks/useMethodologyImageAttributeTransformer';
 import React from 'react';
+import useMethodologyImageAttributeTransformer from '@common/modules/methodology/hooks/useMethodologyImageAttributeTransformer';
 
 interface Props {
   blocks: ContentBlock[];

@@ -1,7 +1,7 @@
-import React from 'react';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import { NextPage } from 'next';
+import React from 'react';
 
 const ContactPage: NextPage = () => {
   return (

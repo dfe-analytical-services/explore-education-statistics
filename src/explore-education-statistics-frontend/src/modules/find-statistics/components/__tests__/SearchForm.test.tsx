@@ -1,5 +1,6 @@
 import SearchForm from '@frontend/modules/find-statistics/components/SearchForm';
 import { render, screen } from '@testing-library/react';
+import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
 

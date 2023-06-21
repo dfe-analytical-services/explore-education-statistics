@@ -8,8 +8,8 @@ import {
 import legacyReleaseService from '@admin/services/legacyReleaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { generatePath, useHistory, useParams } from 'react-router';
 import React from 'react';
+import { generatePath, useHistory, useParams } from 'react-router';
 
 const PublicationLegacyReleaseEditPage = () => {
   const { legacyReleaseId } =

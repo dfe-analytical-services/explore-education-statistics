@@ -11,8 +11,8 @@ import _permissionService from '@admin/services/permissionService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
-import { generatePath, Route, Router } from 'react-router-dom';
 import React from 'react';
+import { generatePath, Route, Router } from 'react-router-dom';
 
 jest.mock('@admin/services/footnoteService');
 const footnoteService = _footnoteService as jest.Mocked<
@@ -179,10 +179,13 @@ describe('ReleaseFootnotesPage', () => {
       });
       userEvent.click(screen.getByRole('button', { name: 'Save order' }));
 
-      expect(footnoteService.updateFootnotesOrder).toHaveBeenCalledWith(
-        'release-1',
-        ['footnote-1', 'footnote-2', 'footnote-3'],
-      );
+      expect(
+        footnoteService.updateFootnotesOrder,
+      ).toHaveBeenCalledWith('release-1', [
+        'footnote-1',
+        'footnote-2',
+        'footnote-3',
+      ]);
     });
   });
 

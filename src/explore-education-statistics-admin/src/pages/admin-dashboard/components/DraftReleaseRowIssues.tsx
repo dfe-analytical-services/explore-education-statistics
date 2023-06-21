@@ -1,9 +1,9 @@
-import React from 'react';
 import releaseService from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import React from 'react';
 import TagGroup from '@common/components/TagGroup';
 
 interface Props {

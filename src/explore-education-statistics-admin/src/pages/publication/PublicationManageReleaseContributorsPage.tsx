@@ -7,8 +7,8 @@ import releasePermissionService, {
 import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { useParams } from 'react-router';
 import React from 'react';
+import { useParams } from 'react-router';
 
 interface Model {
   release: Release;

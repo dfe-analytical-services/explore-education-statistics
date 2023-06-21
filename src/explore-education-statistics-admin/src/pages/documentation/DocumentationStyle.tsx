@@ -1,7 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
-import Page from '@admin/components/Page';
 import React from 'react';
+import Page from '@admin/components/Page';
 
 const DocumentationGlossary = () => {
   return (

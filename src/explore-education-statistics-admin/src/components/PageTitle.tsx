@@ -1,6 +1,6 @@
 import classNames from 'classnames';
-import { Helmet } from 'react-helmet';
 import React from 'react';
+import { Helmet } from 'react-helmet';
 
 interface Props {
   caption?: string;

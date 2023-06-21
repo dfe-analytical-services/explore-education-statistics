@@ -12,8 +12,8 @@ import ButtonText from '@common/components/ButtonText';
 import WarningMessage from '@common/components/WarningMessage';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { Formik } from 'formik';
-import { generatePath, useHistory } from 'react-router-dom';
 import React from 'react';
+import { generatePath, useHistory } from 'react-router-dom';
 
 interface AddExistingUsersFormValues {
   userIds: string[];

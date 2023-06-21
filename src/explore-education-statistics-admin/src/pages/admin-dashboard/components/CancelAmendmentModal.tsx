@@ -1,5 +1,5 @@
-import React from 'react';
 import ModalConfirm from '@common/components/ModalConfirm';
+import React from 'react';
 import { IdTitlePair } from '@admin/services/types/common';
 
 interface Props {

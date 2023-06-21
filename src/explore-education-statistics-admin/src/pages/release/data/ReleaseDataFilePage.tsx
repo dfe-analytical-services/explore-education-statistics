@@ -8,13 +8,13 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Link from '@admin/components/Link';
+import React from 'react';
 import { generatePath, useHistory, useParams } from 'react-router';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import { Form, FormFieldTextInput } from '@common/components/form';
 import Button from '@common/components/Button';
-import React from 'react';
 
 interface FormValues {
   title: string;

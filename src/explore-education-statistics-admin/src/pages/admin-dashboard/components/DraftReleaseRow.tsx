@@ -9,8 +9,8 @@ import {
 import ButtonText from '@common/components/ButtonText';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import { generatePath } from 'react-router';
 import React from 'react';
+import { generatePath } from 'react-router';
 
 interface Props {
   isBauUser: boolean;

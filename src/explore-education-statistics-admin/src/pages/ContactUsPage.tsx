@@ -1,5 +1,5 @@
-import React from 'react';
 import Page from '@admin/components/Page';
+import React from 'react';
 
 const ContactUsPage = () => {
   return (

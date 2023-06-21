@@ -1,8 +1,8 @@
 import DataFileUploadForm from '@admin/pages/release/data/components/DataFileUploadForm';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 import React from 'react';
+import noop from 'lodash/noop';
 
 describe('DataFileUploadForm', () => {
   test('shows validation message when no data file selected', async () => {

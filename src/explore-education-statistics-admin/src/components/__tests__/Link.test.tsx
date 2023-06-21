@@ -1,6 +1,6 @@
 import { render } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 import Link from '../Link';
 
 describe('Link', () => {

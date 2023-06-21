@@ -1,8 +1,8 @@
 import ReleaseStatusChecklist from '@admin/pages/release/components/ReleaseStatusChecklist';
 import { testRelease } from '@admin/pages/release/__data__/testRelease';
 import { render, screen } from '@testing-library/react';
-import { MemoryRouter } from 'react-router';
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 
 describe('ReleaseStatusChecklist', () => {
   test('renders correctly with errors', () => {

@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   CategoryFilter,
   Indicator,
@@ -6,7 +7,6 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { render, screen } from '@testing-library/react';
-import React from 'react';
 import DataTableCaption from '../DataTableCaption';
 
 describe('DataTableCaption', () => {

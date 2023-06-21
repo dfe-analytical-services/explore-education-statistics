@@ -1,7 +1,7 @@
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import { render } from '@testing-library/react';
-import noop from 'lodash/noop';
 import React from 'react';
+import noop from 'lodash/noop';
 
 describe('FormNumberInput', () => {
   test('renders correctly with minimal props', () => {

@@ -5,6 +5,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
+import React from 'react';
 import { GetServerSideProps, NextPage } from 'next';
 import sanitizeHtml, {
   defaultSanitizeOptions,
@@ -12,7 +13,6 @@ import sanitizeHtml, {
 } from '@common/utils/sanitizeHtml';
 import { GlossaryCategory } from '@common/services/types/glossary';
 import glossaryService from '@frontend/services/glossaryService';
-import React from 'react';
 
 export interface Props {
   categories: GlossaryCategory[];

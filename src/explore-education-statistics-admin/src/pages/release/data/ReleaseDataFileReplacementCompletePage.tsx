@@ -11,8 +11,8 @@ import dataReplacementService from '@admin/services/dataReplacementService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { generatePath, useParams } from 'react-router';
 import React from 'react';
+import { generatePath, useParams } from 'react-router';
 
 const ReleaseDataFileReplacementCompletePage = () => {
   const { fileId, publicationId, releaseId } =

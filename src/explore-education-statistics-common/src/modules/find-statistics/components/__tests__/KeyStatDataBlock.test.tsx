@@ -2,8 +2,8 @@ import _tableBuilderService, {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 import { render, screen, waitFor } from '@testing-library/react';
-import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 import React from 'react';
+import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStatDataBlock';
 
 jest.mock('@common/services/tableBuilderService');
 

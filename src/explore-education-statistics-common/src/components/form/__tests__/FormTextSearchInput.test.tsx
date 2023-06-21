@@ -1,5 +1,5 @@
-import { fireEvent, render } from '@testing-library/react';
 import React from 'react';
+import { fireEvent, render } from '@testing-library/react';
 import FormTextSearchInput from '../FormTextSearchInput';
 
 jest.mock('lodash/debounce');
@@ -93,8 +93,9 @@ describe('FormTextSearchInput', () => {
       />,
     );
 
-    const ariaDescribedBy =
-      getByLabelText('Test input').getAttribute('aria-describedby');
+    const ariaDescribedBy = getByLabelText('Test input').getAttribute(
+      'aria-describedby',
+    );
 
     expect(ariaDescribedBy).toContain('test-input-error');
     expect(ariaDescribedBy).toContain('test-input-hint');

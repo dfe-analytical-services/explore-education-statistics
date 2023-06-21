@@ -1,4 +1,3 @@
-import React from 'react';
 import PublicationsTab from '@admin/pages/admin-dashboard/components/PublicationsTab';
 import _permissionService from '@admin/services/permissionService';
 import _publicationService, {
@@ -10,6 +9,7 @@ import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
+import React from 'react';
 import { MemoryRouter, Router } from 'react-router';
 
 jest.mock('@admin/services/permissionService');

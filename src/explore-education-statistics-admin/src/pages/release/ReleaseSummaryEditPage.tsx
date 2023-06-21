@@ -12,8 +12,8 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { generatePath, useHistory, useLocation } from 'react-router';
 import React from 'react';
+import { generatePath, useHistory, useLocation } from 'react-router';
 
 const errorMappings = [
   mapFieldErrors<ReleaseSummaryFormValues>({

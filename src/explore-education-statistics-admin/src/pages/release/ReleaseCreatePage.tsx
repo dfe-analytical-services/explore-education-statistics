@@ -14,8 +14,8 @@ import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
-import { generatePath, useHistory, useParams, withRouter } from 'react-router';
 import React from 'react';
+import { generatePath, useHistory, useParams, withRouter } from 'react-router';
 import { ReleaseType } from '@common/services/types/releaseType';
 import Yup from '@common/validation/yup';
 

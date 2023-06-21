@@ -31,10 +31,10 @@ import glossaryService from '@frontend/services/glossaryService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
+import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import WarningMessage from '@common/components/WarningMessage';
-import React from 'react';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
@@ -193,7 +193,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             </SummaryListItem>
           </SummaryList>
           <VisuallyHidden as="h2">
-            {/** 
+            {/**
               Visually hidden h2 as currently the release intro editor only starts from h3
               meaning that this breaks sequential heading order.
               @see {@link https://dfedigital.atlassian.net/browse/EES-3541}
@@ -577,8 +577,10 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
-    const { publication: publicationSlug, release: releaseSlug } =
-      query as Dictionary<string>;
+    const {
+      publication: publicationSlug,
+      release: releaseSlug,
+    } = query as Dictionary<string>;
 
     const release = await (releaseSlug
       ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)

@@ -5,8 +5,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import { dashboardRoute } from '@admin/routes/routes';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import AdoptMethodologyForm from '@admin/pages/methodology/adopt-methodology/components/AdoptMethodologyForm';
-import { useHistory, useParams } from 'react-router';
 import React from 'react';
+import { useHistory, useParams } from 'react-router';
 
 const AdoptMethodologyPage = () => {
   const { publicationId } = useParams<{ publicationId: string }>();

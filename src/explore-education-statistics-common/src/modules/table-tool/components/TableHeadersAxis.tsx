@@ -11,8 +11,8 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import classNames from 'classnames';
 import { useField } from 'formik';
-import { Droppable } from 'react-beautiful-dnd';
 import React from 'react';
+import { Droppable } from 'react-beautiful-dnd';
 
 interface Props {
   id: string;

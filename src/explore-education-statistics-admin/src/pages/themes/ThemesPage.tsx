@@ -17,8 +17,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { generatePath } from 'react-router';
 import React from 'react';
+import { generatePath } from 'react-router';
 
 const ThemesPage = () => {
   const { themeId } = useQueryParams<ThemeParams>();
