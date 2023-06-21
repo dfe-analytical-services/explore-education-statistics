@@ -234,7 +234,10 @@ describe('PublicationForm', () => {
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    userEvent.type(screen.getByLabelText('Search publications'), 'find me');
+    await userEvent.type(
+      screen.getByLabelText('Search publications'),
+      'find me',
+    );
 
     jest.runOnlyPendingTimers();
 
@@ -267,7 +270,10 @@ describe('PublicationForm', () => {
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    userEvent.type(screen.getByLabelText('Search publications'), 'find me');
+    await userEvent.type(
+      screen.getByLabelText('Search publications'),
+      'find me',
+    );
 
     jest.runOnlyPendingTimers();
 
@@ -300,7 +306,10 @@ describe('PublicationForm', () => {
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    userEvent.type(screen.getByLabelText('Search publications'), 'FiND Me');
+    await userEvent.type(
+      screen.getByLabelText('Search publications'),
+      'FiND Me',
+    );
 
     jest.runOnlyPendingTimers();
 
@@ -332,7 +341,7 @@ describe('PublicationForm', () => {
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    userEvent.type(screen.getByLabelText('Search publications'), 'Nope');
+    await userEvent.type(screen.getByLabelText('Search publications'), 'Nope');
 
     jest.runOnlyPendingTimers();
 
@@ -355,7 +364,7 @@ describe('PublicationForm', () => {
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
-    userEvent.type(screen.getByLabelText('Search publications'), '[');
+    await userEvent.type(screen.getByLabelText('Search publications'), '[');
 
     expect(() => {
       jest.runOnlyPendingTimers();

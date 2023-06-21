@@ -56,7 +56,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'To');
+    await userEvent.type(screen.getByLabelText(labelText), 'To');
 
     jest.runOnlyPendingTimers();
 
@@ -101,7 +101,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -146,7 +146,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'TEST');
+    await userEvent.type(screen.getByLabelText(labelText), 'TEST');
 
     jest.runOnlyPendingTimers();
 
@@ -195,7 +195,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'TE');
+    await userEvent.type(screen.getByLabelText(labelText), 'TE');
 
     jest.runOnlyPendingTimers();
 
@@ -244,7 +244,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -302,7 +302,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -340,7 +340,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -377,7 +377,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -418,7 +418,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -451,7 +451,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -473,7 +473,7 @@ describe('PageSearchForm', () => {
       </div>,
     );
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -505,7 +505,7 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -537,7 +537,7 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -571,7 +571,7 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 
@@ -615,7 +615,7 @@ describe('PageSearchForm', () => {
       expect(screen.getByLabelText(labelText)).toBeInTheDocument();
     });
 
-    userEvent.type(screen.getByLabelText(labelText), 'Test');
+    await userEvent.type(screen.getByLabelText(labelText), 'Test');
 
     jest.runOnlyPendingTimers();
 

@@ -62,7 +62,7 @@ describe('CommentAddForm', () => {
       </CommentsContextProvider>,
     );
 
-    userEvent.type(
+    await userEvent.type(
       screen.getByRole('textbox', {
         name: 'Comment',
       }),

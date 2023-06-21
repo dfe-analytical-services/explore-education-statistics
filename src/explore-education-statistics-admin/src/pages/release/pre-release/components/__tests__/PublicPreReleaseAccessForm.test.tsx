@@ -2,8 +2,8 @@ import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import PublicPreReleaseAccessForm from '@admin/pages/release/pre-release/components/PublicPreReleaseAccessForm';
 import { render, screen, waitFor } from '@testing-library/react';
 import noop from 'lodash/noop';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
+import userEvent from '@testing-library/user-event';
 
 describe('PublicPreReleaseAccessForm', () => {
   const testAccessList = `
@@ -143,7 +143,7 @@ describe('PublicPreReleaseAccessForm', () => {
     );
 
     userEvent.clear(screen.getByLabelText('Public access list'));
-    userEvent.type(
+    await userEvent.type(
       screen.getByLabelText('Public access list'),
       'Test updated access list',
     );

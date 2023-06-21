@@ -654,14 +654,14 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     userEvent.clear(legendItem1.getByLabelText('Label'));
-    userEvent.type(
+    await userEvent.type(
       legendItem1.getByLabelText('Label'),
       'Updated legend item 1',
     );
 
     userEvent.selectOptions(legendItem1.getByLabelText('Position'), 'below');
 
-    expect(handleChange).toHaveBeenCalledWith<LegendConfiguration[]>({
+    expect(handleChange).toHaveBeenCalledWith<[LegendConfiguration]>({
       position: 'inline',
       items: [
         {
@@ -923,7 +923,7 @@ describe('ChartLegendConfiguration', () => {
     const legendItem1 = within(legendItems[0]);
 
     userEvent.clear(legendItem1.getByLabelText('Label'));
-    userEvent.type(
+    await userEvent.type(
       legendItem1.getByLabelText('Label'),
       'Updated legend item 1',
     );

@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   testComments,
   testCommentUser1,
@@ -10,6 +9,7 @@ import { GlobalPermissions } from '@admin/services/permissionService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
+import React from 'react';
 
 describe('EditableContentForm', () => {
   const testUser1: User = {
@@ -186,7 +186,7 @@ describe('EditableContentForm', () => {
 
       jest.advanceTimersByTime(500);
 
-      userEvent.type(textbox, 'Test');
+      await userEvent.type(textbox, 'Test');
       expect(handleAction).toHaveBeenCalledTimes(1);
 
       jest.advanceTimersByTime(500);
@@ -374,7 +374,10 @@ describe('EditableContentForm', () => {
 
       userEvent.click(comment.getByRole('button', { name: 'Edit' }));
       userEvent.clear(comment.getByRole('textbox'));
-      userEvent.type(comment.getByRole('textbox'), 'Test updated content');
+      await userEvent.type(
+        comment.getByRole('textbox'),
+        'Test updated content',
+      );
 
       userEvent.click(comment.getByRole('button', { name: 'Update' }));
 

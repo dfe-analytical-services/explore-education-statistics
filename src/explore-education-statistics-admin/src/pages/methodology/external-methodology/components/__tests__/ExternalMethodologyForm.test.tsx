@@ -1,8 +1,8 @@
 import ExternalMethodologyForm from '@admin/pages/methodology/external-methodology/components/ExternalMethodologyForm';
 import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 describe('ExternalMethodologyForm', () => {
   test('can submit with valid values', async () => {
@@ -10,9 +10,9 @@ describe('ExternalMethodologyForm', () => {
 
     render(<ExternalMethodologyForm onSubmit={handleSubmit} onCancel={noop} />);
 
-    userEvent.type(screen.getByLabelText('Link title'), 'Test title');
+    await userEvent.type(screen.getByLabelText('Link title'), 'Test title');
 
-    userEvent.type(screen.getByLabelText('URL'), 'hive.co.uk');
+    await userEvent.type(screen.getByLabelText('URL'), 'hive.co.uk');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -44,7 +44,7 @@ describe('ExternalMethodologyForm', () => {
   test('show validation error when no external methodology URL', async () => {
     render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
-    userEvent.clear(screen.getByLabelText('URL'));
+    await userEvent.clear(screen.getByLabelText('URL'));
     userEvent.tab();
 
     await waitFor(() => {
@@ -59,7 +59,7 @@ describe('ExternalMethodologyForm', () => {
   test('show validation error when invalid external methodology URL', async () => {
     render(<ExternalMethodologyForm onSubmit={noop} onCancel={noop} />);
 
-    userEvent.type(screen.getByLabelText('URL'), 'not a valid url');
+    await userEvent.type(screen.getByLabelText('URL'), 'not a valid url');
     userEvent.tab();
 
     await waitFor(() => {

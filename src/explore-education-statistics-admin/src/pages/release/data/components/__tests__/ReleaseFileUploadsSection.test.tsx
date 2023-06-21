@@ -5,8 +5,8 @@ import _releaseAncillaryFileService, {
 import render from '@common-test/render';
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { MemoryRouter } from 'react-router';
 import React from 'react';
+import { MemoryRouter } from 'react-router';
 import flushPromises from '@common-test/flushPromises';
 
 jest.mock('@admin/services/releaseAncillaryFileService');
@@ -328,8 +328,8 @@ describe('ReleaseFileUploadsSection', () => {
 
       const file = new File(['test'], 'test-file.txt');
 
-      userEvent.type(screen.getByLabelText('Title'), 'Test title');
-      userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
+      await userEvent.type(screen.getByLabelText('Title'), 'Test title');
+      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary');
 
       userEvent.upload(screen.getByLabelText('Upload file'), file);
       userEvent.click(
@@ -368,8 +368,8 @@ describe('ReleaseFileUploadsSection', () => {
 
       const file = new File(['test'], 'test-file.docx');
 
-      userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
-      userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
+      await userEvent.type(screen.getByLabelText('Title'), 'Test file 3');
+      await userEvent.type(screen.getByLabelText('Summary'), 'Test summary 3');
       userEvent.upload(screen.getByLabelText('Upload file'), file);
 
       userEvent.click(
@@ -392,7 +392,7 @@ describe('ReleaseFileUploadsSection', () => {
           file,
         });
       });
-      await flushPromises();
+
       const sections = screen.getAllByTestId('accordionSection');
 
       expect(sections).toHaveLength(3);

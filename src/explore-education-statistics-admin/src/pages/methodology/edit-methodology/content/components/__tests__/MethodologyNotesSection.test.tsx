@@ -210,7 +210,10 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.type(screen.getByLabelText('New methodology note'), 'New note');
+      await userEvent.type(
+        screen.getByLabelText('New methodology note'),
+        'New note',
+      );
       userEvent.click(screen.getByRole('button', { name: 'Save note' }));
 
       await waitFor(() => {
@@ -316,13 +319,16 @@ describe('MethodologyNotesSection', () => {
         ).toBeInTheDocument();
       });
 
-      userEvent.type(screen.getByLabelText('Edit methodology note'), ' edited');
+      await userEvent.type(
+        screen.getByLabelText('Edit methodology note'),
+        ' edited',
+      );
       userEvent.clear(screen.getByLabelText('Day'));
-      userEvent.type(screen.getByLabelText('Day'), '31');
+      await userEvent.type(screen.getByLabelText('Day'), '31');
       userEvent.clear(screen.getByLabelText('Month'));
-      userEvent.type(screen.getByLabelText('Month'), '12');
+      await userEvent.type(screen.getByLabelText('Month'), '12');
       userEvent.clear(screen.getByLabelText('Year'));
-      userEvent.type(screen.getByLabelText('Year'), '2022');
+      await userEvent.type(screen.getByLabelText('Year'), '2022');
 
       userEvent.click(screen.getByRole('button', { name: 'Update note' }));
       await waitFor(() => {

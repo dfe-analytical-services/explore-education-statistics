@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import FormRadioSearchGroup from '@common/components/form//FormRadioSearchGroup';
 import React from 'react';
+import FormRadioSearchGroup from '@common/components/form//FormRadioSearchGroup';
 
 jest.mock('lodash/debounce');
 
@@ -49,7 +49,7 @@ describe('FormRadioSearchGroup', () => {
 
     const searchInput = screen.getByLabelText('Search options');
 
-    userEvent.type(searchInput, '2');
+    await userEvent.type(searchInput, '2');
 
     jest.runAllTimers();
 
@@ -78,7 +78,7 @@ describe('FormRadioSearchGroup', () => {
 
     const searchInput = screen.getByLabelText('Search options');
 
-    userEvent.type(searchInput, '[');
+    await userEvent.type(searchInput, '[');
 
     expect(() => {
       jest.runAllTimers();
@@ -114,7 +114,7 @@ describe('FormRadioSearchGroup', () => {
 
     const searchInput = screen.getByLabelText('Search options');
 
-    userEvent.type(searchInput, '2');
+    await userEvent.type(searchInput, '2');
 
     jest.runAllTimers();
 
@@ -144,7 +144,7 @@ describe('FormRadioSearchGroup', () => {
 
     const searchInput = screen.getByLabelText('Search options');
 
-    userEvent.type(searchInput, 'Not there');
+    await userEvent.type(searchInput, 'Not there');
 
     jest.runAllTimers();
 

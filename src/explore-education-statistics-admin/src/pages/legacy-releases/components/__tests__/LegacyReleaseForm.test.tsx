@@ -1,8 +1,8 @@
 import LegacyReleaseForm from '@admin/pages/legacy-releases/components/LegacyReleaseForm';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 import React from 'react';
+import noop from 'lodash/noop';
 
 describe('LegacyReleaseForm', () => {
   test('shows validation error for empty `description`', async () => {
@@ -46,7 +46,7 @@ describe('LegacyReleaseForm', () => {
 
     expect(screen.queryByText('Enter a valid URL')).not.toBeInTheDocument();
 
-    userEvent.type(screen.getByLabelText('URL'), 'not a url');
+    await userEvent.type(screen.getByLabelText('URL'), 'not a url');
     userEvent.tab();
 
     await waitFor(() => {
@@ -88,7 +88,10 @@ describe('LegacyReleaseForm', () => {
 
       render(<LegacyReleaseForm onSubmit={handleSubmit} />);
 
-      userEvent.type(screen.getByLabelText('Description'), 'Test description');
+      await userEvent.type(
+        screen.getByLabelText('Description'),
+        'Test description',
+      );
 
       userEvent.click(
         screen.getByRole('button', {
@@ -106,8 +109,11 @@ describe('LegacyReleaseForm', () => {
 
       render(<LegacyReleaseForm onSubmit={handleSubmit} />);
 
-      userEvent.type(screen.getByLabelText('Description'), 'Test description');
-      userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
+      await userEvent.type(
+        screen.getByLabelText('Description'),
+        'Test description',
+      );
+      await userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
 
       userEvent.click(
         screen.getByRole('button', {
@@ -209,9 +215,9 @@ describe('LegacyReleaseForm', () => {
         />,
       );
 
-      userEvent.type(screen.getByLabelText('Description'), ' 2');
-      userEvent.type(screen.getByLabelText('URL'), '/updated');
-      userEvent.type(screen.getByLabelText('Order'), '0');
+      await userEvent.type(screen.getByLabelText('Description'), ' 2');
+      await userEvent.type(screen.getByLabelText('URL'), '/updated');
+      await userEvent.type(screen.getByLabelText('Order'), '0');
 
       userEvent.click(
         screen.getByRole('button', {

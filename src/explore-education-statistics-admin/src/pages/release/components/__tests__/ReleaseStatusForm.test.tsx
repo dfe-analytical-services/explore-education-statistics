@@ -4,12 +4,12 @@ import { ReleaseChecklistErrorCode } from '@admin/services/releaseService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { format } from 'date-fns';
+import React from 'react';
 import ReleaseStatusForm, {
   ReleaseStatusFormValues,
 } from '@admin/pages/release/components/ReleaseStatusForm';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
-import React from 'react';
 
 describe('ReleaseStatusForm', () => {
   const testStatusPermissions: ReleaseStatusPermissions = {
@@ -230,7 +230,7 @@ describe('ReleaseStatusForm', () => {
           'Ready for higher review (this will notify approvers)',
         ),
       );
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
       );
@@ -239,8 +239,8 @@ describe('ReleaseStatusForm', () => {
         screen.getByRole('group', { name: 'Next release expected (optional)' }),
       );
 
-      userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
-      userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
+      await userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
+      await userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -331,7 +331,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       userEvent.click(screen.getByLabelText('In draft'));
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
       );
@@ -340,8 +340,8 @@ describe('ReleaseStatusForm', () => {
         screen.getByRole('group', { name: 'Next release expected (optional)' }),
       );
 
-      userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
-      userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
+      await userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
+      await userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -684,7 +684,7 @@ describe('ReleaseStatusForm', () => {
       );
 
       userEvent.click(screen.getByLabelText('In draft'));
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
       );
@@ -693,8 +693,8 @@ describe('ReleaseStatusForm', () => {
         screen.getByRole('group', { name: 'Next release expected (optional)' }),
       );
 
-      userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
-      userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
+      await userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
+      await userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -727,7 +727,7 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
       );
@@ -740,9 +740,12 @@ describe('ReleaseStatusForm', () => {
 
       const nextYear = new Date().getFullYear() + 1;
 
-      userEvent.type(publishDate.getByLabelText('Day'), '10');
-      userEvent.type(publishDate.getByLabelText('Month'), '10');
-      userEvent.type(publishDate.getByLabelText('Year'), nextYear.toString());
+      await userEvent.type(publishDate.getByLabelText('Day'), '10');
+      await userEvent.type(publishDate.getByLabelText('Month'), '10');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
@@ -779,9 +782,12 @@ describe('ReleaseStatusForm', () => {
 
       const nextYear = new Date().getFullYear() + 1;
 
-      userEvent.type(publishDate.getByLabelText('Day'), '10');
-      userEvent.type(publishDate.getByLabelText('Month'), '10');
-      userEvent.type(publishDate.getByLabelText('Year'), nextYear.toString());
+      await userEvent.type(publishDate.getByLabelText('Day'), '10');
+      await userEvent.type(publishDate.getByLabelText('Month'), '10');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
 
@@ -811,7 +817,7 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
       );
@@ -824,9 +830,12 @@ describe('ReleaseStatusForm', () => {
 
       const nextYear = new Date().getFullYear() + 1;
 
-      userEvent.type(publishDate.getByLabelText('Day'), '10');
-      userEvent.type(publishDate.getByLabelText('Month'), '10');
-      userEvent.type(publishDate.getByLabelText('Year'), nextYear.toString());
+      await userEvent.type(publishDate.getByLabelText('Day'), '10');
+      await userEvent.type(publishDate.getByLabelText('Month'), '10');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
 
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
@@ -871,7 +880,7 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
       );
@@ -884,16 +893,19 @@ describe('ReleaseStatusForm', () => {
 
       const nextYear = new Date().getFullYear() + 1;
 
-      userEvent.type(publishDate.getByLabelText('Day'), '10');
-      userEvent.type(publishDate.getByLabelText('Month'), '10');
-      userEvent.type(publishDate.getByLabelText('Year'), nextYear.toString());
+      await userEvent.type(publishDate.getByLabelText('Day'), '10');
+      await userEvent.type(publishDate.getByLabelText('Month'), '10');
+      await userEvent.type(
+        publishDate.getByLabelText('Year'),
+        nextYear.toString(),
+      );
 
       const nextReleaseDate = within(
         screen.getByRole('group', { name: 'Next release expected (optional)' }),
       );
 
-      userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
-      userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
+      await userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
+      await userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -941,7 +953,7 @@ describe('ReleaseStatusForm', () => {
         />,
       );
 
-      userEvent.type(
+      await userEvent.type(
         screen.getByLabelText('Internal note'),
         'Test release note',
       );
@@ -952,8 +964,8 @@ describe('ReleaseStatusForm', () => {
         screen.getByRole('group', { name: 'Next release expected (optional)' }),
       );
 
-      userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
-      userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
+      await userEvent.type(nextReleaseDate.getByLabelText('Month'), '5');
+      await userEvent.type(nextReleaseDate.getByLabelText('Year'), '2021');
 
       expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -1103,7 +1115,7 @@ describe('ReleaseStatusForm', () => {
           />,
         );
 
-        userEvent.type(
+        await userEvent.type(
           screen.getByLabelText('Internal note'),
           'Test release note',
         );

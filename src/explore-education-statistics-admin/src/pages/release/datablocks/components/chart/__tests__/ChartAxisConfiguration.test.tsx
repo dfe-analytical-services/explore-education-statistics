@@ -224,7 +224,7 @@ describe('ChartAxisConfiguration', () => {
     userEvent.clear(sizeInput);
     userEvent.type(sizeInput, '20');
 
-    expect(handleChange).toHaveBeenCalledWith<AxisConfiguration[]>({
+    expect(handleChange).toHaveBeenCalledWith<[AxisConfiguration]>({
       ...testMajorAxisConfiguration,
       size: 20,
     });
@@ -247,7 +247,7 @@ describe('ChartAxisConfiguration', () => {
     );
 
     userEvent.click(screen.getByLabelText('Custom'));
-    userEvent.type(screen.getByLabelText('Every nth value'), 'x');
+    await userEvent.type(screen.getByLabelText('Every nth value'), 'x');
     userEvent.tab();
 
     await waitFor(() => {
@@ -258,7 +258,7 @@ describe('ChartAxisConfiguration', () => {
       screen.getByRole('link', { name: 'Enter tick spacing' }),
     ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
 
-    userEvent.type(screen.getByLabelText('Every nth value'), '-1');
+    await userEvent.type(screen.getByLabelText('Every nth value'), '-1');
     userEvent.tab();
 
     await waitFor(() => {
@@ -286,7 +286,7 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
+    await userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
     userEvent.tab();
 
     await waitFor(() => {
@@ -314,7 +314,7 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '-1');
+    await userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '-1');
     userEvent.tab();
 
     await waitFor(() => {
@@ -344,7 +344,7 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
+    await userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -374,7 +374,7 @@ describe('ChartAxisConfiguration', () => {
     );
 
     userEvent.clear(screen.getByLabelText('Size of axis (pixels)'));
-    userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '100');
+    await userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '100');
 
     userEvent.click(screen.getByRole('checkbox', { name: 'Sort ascending' }));
 
@@ -534,7 +534,10 @@ describe('ChartAxisConfiguration', () => {
         '2014_AY',
       ]);
 
-      userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+      await userEvent.type(
+        referenceLines.getByLabelText('Label'),
+        'Test label',
+      );
 
       userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
@@ -581,9 +584,12 @@ describe('ChartAxisConfiguration', () => {
       );
       expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-      userEvent.type(referenceLines.getByLabelText('Position'), '3000');
+      await userEvent.type(referenceLines.getByLabelText('Position'), '3000');
 
-      userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+      await userEvent.type(
+        referenceLines.getByLabelText('Label'),
+        'Test label',
+      );
 
       userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
@@ -627,7 +633,7 @@ describe('ChartAxisConfiguration', () => {
         ['2014_AY'],
       );
 
-      userEvent.type(
+      await userEvent.type(
         referenceLinesSection.getByLabelText('Label'),
         'I am label',
       );

@@ -4,9 +4,9 @@ import MethodologyStatusForm, {
 import { IdTitlePair } from '@admin/services/types/common';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import noop from 'lodash/noop';
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import React from 'react';
 
 describe('MethodologyStatusForm', () => {
   const testUnpublishedReleases: IdTitlePair[] = [
@@ -236,9 +236,12 @@ describe('MethodologyStatusForm', () => {
       />,
     );
 
-    userEvent.type(screen.getByLabelText('Internal note'), 'Test release note');
+    await userEvent.type(
+      screen.getByLabelText('Internal note'),
+      'Test release note',
+    );
 
-    userEvent.selectOptions(screen.getByLabelText('Select release'), [
+    await userEvent.selectOptions(screen.getByLabelText('Select release'), [
       'test-release-1',
     ]);
 

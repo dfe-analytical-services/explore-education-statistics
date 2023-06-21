@@ -7,11 +7,11 @@ import _releaseDataFileService, {
 } from '@admin/services/releaseDataFileService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 import { MemoryRouter } from 'react-router';
 import _permissionService, {
   DataFilePermissions,
 } from '@admin/services/permissionService';
-import React from 'react';
 
 jest.mock('@admin/services/releaseDataFileService');
 jest.mock('@admin/services/permissionService');
@@ -577,7 +577,10 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      userEvent.type(screen.getByLabelText('Subject title'), 'Test data 1');
+      await userEvent.type(
+        screen.getByLabelText('Subject title'),
+        'Test data 1',
+      );
 
       userEvent.click(
         screen.getByRole('button', {
@@ -710,7 +713,10 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      userEvent.type(screen.getByLabelText('Subject title'), 'Test title');
+      await userEvent.type(
+        screen.getByLabelText('Subject title'),
+        'Test title',
+      );
 
       userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
       userEvent.upload(
@@ -807,7 +813,10 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      userEvent.type(screen.getByLabelText('Subject title'), 'Test zip title');
+      await userEvent.type(
+        screen.getByLabelText('Subject title'),
+        'Test zip title',
+      );
 
       userEvent.click(screen.getByLabelText('ZIP file'));
 
@@ -905,7 +914,10 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'text/csv',
       });
 
-      userEvent.type(screen.getByLabelText('Subject title'), 'Test title');
+      await userEvent.type(
+        screen.getByLabelText('Subject title'),
+        'Test title',
+      );
 
       userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
       userEvent.upload(
@@ -969,7 +981,10 @@ describe('ReleaseDataUploadsSection', () => {
         type: 'application/zip',
       });
 
-      userEvent.type(screen.getByLabelText('Subject title'), 'Test title');
+      await userEvent.type(
+        screen.getByLabelText('Subject title'),
+        'Test title',
+      );
 
       userEvent.click(screen.getByLabelText('ZIP file'));
 

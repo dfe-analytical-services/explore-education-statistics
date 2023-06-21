@@ -97,7 +97,7 @@ describe('DataBlockDetailsForm', () => {
 
     expect(screen.getByLabelText('Featured table name')).toBeInTheDocument();
 
-    userEvent.type(screen.getByLabelText('Featured table name'), '     ');
+    await userEvent.type(screen.getByLabelText('Featured table name'), '     ');
 
     userEvent.click(screen.getByRole('button', { name: 'Save data block' }));
 
@@ -193,19 +193,19 @@ describe('DataBlockDetailsForm', () => {
 
     render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
 
-    userEvent.type(screen.getByLabelText('Name'), 'Test name');
-    userEvent.type(screen.getByLabelText('Table title'), 'Test title');
-    userEvent.type(screen.getByLabelText('Source'), 'Test source');
+    await userEvent.type(screen.getByLabelText('Name'), 'Test name');
+    await userEvent.type(screen.getByLabelText('Table title'), 'Test title');
+    await userEvent.type(screen.getByLabelText('Source'), 'Test source');
 
     userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
-    userEvent.type(
+    await userEvent.type(
       screen.getByLabelText('Featured table name'),
       'Test highlight name',
     );
-    userEvent.type(
+    await userEvent.type(
       screen.getByLabelText('Featured table description'),
       'Test highlight description',
     );
@@ -232,19 +232,19 @@ describe('DataBlockDetailsForm', () => {
 
     render(<DataBlockDetailsForm onSubmit={handleSubmit} />);
 
-    userEvent.type(screen.getByLabelText('Name'), 'Test name');
-    userEvent.type(screen.getByLabelText('Table title'), 'Test title');
-    userEvent.type(screen.getByLabelText('Source'), 'Test source');
+    await userEvent.type(screen.getByLabelText('Name'), 'Test name');
+    await userEvent.type(screen.getByLabelText('Table title'), 'Test title');
+    await userEvent.type(screen.getByLabelText('Source'), 'Test source');
 
     userEvent.click(
       screen.getByLabelText('Set as a featured table for this publication'),
     );
 
-    userEvent.type(
+    await userEvent.type(
       screen.getByLabelText('Featured table name'),
       '   Test highlight name   ',
     );
-    userEvent.type(
+    await userEvent.type(
       screen.getByLabelText('Featured table description'),
       '    Test highlight description    ',
     );

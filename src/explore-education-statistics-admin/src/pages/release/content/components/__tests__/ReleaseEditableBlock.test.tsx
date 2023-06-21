@@ -305,7 +305,7 @@ describe('ReleaseEditableBlock', () => {
 
     expect(screen.getByText('Save & close')).toBeInTheDocument();
 
-    userEvent.type(screen.getByRole('textbox'), 'test');
+    await userEvent.type(screen.getByRole('textbox'), 'test');
 
     userEvent.click(screen.getByRole('button', { name: 'Save & close' }));
 
@@ -698,7 +698,7 @@ describe('ReleaseEditableBlock', () => {
     expect(connectionMock.invoke).not.toHaveBeenCalled();
 
     // Interact with textbox
-    userEvent.type(screen.getByRole('textbox'), 'Test text');
+    await userEvent.type(screen.getByRole('textbox'), 'Test text');
 
     jest.advanceTimersByTime(60_000);
 
