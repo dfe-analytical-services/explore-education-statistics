@@ -97,8 +97,9 @@ const ReleaseStatusForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const [showConfirmScheduleModal, toggleConfirmScheduleModal] =
-    useToggle(false);
+  const [showConfirmScheduleModal, toggleConfirmScheduleModal] = useToggle(
+    false,
+  );
   const [showScheduleErrorModal, toggleScheduleErrorModal] = useToggle(false);
 
   const handleSubmit = useFormSubmit<ReleaseStatusFormValues>(

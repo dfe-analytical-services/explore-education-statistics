@@ -11,8 +11,10 @@ interface Props {
 }
 
 const DraftReleaseRowIssues = ({ releaseId }: Props) => {
-  const { value: checklist, isLoading: isLoadingChecklist } =
-    useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
+  const {
+    value: checklist,
+    isLoading: isLoadingChecklist,
+  } = useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
 
   const totalIssues = checklist
     ? // eslint-disable-next-line no-unsafe-optional-chaining

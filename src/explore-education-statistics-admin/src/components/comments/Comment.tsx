@@ -16,8 +16,15 @@ interface Props {
 }
 
 const Comment = ({ comment }: Props) => {
-  const { content, created, createdBy, id, resolved, resolvedBy, updated } =
-    comment;
+  const {
+    content,
+    created,
+    createdBy,
+    id,
+    resolved,
+    resolvedBy,
+    updated,
+  } = comment;
   const {
     selectedComment,
     removeComment,

@@ -35,8 +35,9 @@ const EditableEmbedForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const [previewValues, setPreviewValues] =
-    useState<EditableEmbedFormValues>(initialValues);
+  const [previewValues, setPreviewValues] = useState<EditableEmbedFormValues>(
+    initialValues,
+  );
 
   const { PermittedEmbedUrlDomains } = useConfig();
 

@@ -17,10 +17,9 @@ const PublicationExternalMethodologyPage = () => {
   const { publicationId, publication, onReload } = usePublicationContext();
   const { value: externalMethodology, isLoading } = useAsyncHandledRetry<
     ExternalMethodology | undefined
-  >(
-    async () => publicationService.getExternalMethodology(publicationId),
-    [publicationId],
-  );
+  >(async () => publicationService.getExternalMethodology(publicationId), [
+    publicationId,
+  ]);
 
   const returnRoute = generatePath<PublicationRouteParams>(
     publicationMethodologiesRoute.path,

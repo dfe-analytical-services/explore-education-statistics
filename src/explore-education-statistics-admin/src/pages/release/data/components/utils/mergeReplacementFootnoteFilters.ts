@@ -28,8 +28,13 @@ export default function mergeReplacementFootnoteFilters(
   let mergedFilters: Dictionary<MergedFootnoteFilterReplacement> = {};
 
   footnoteReplacementPlan.filterItems.forEach(filterItem => {
-    const { filterId, filterLabel, filterGroupId, filterGroupLabel, ...item } =
-      filterItem;
+    const {
+      filterId,
+      filterLabel,
+      filterGroupId,
+      filterGroupLabel,
+      ...item
+    } = filterItem;
 
     mergedFilters = deepmerge(mergedFilters, {
       [filterId]: {

@@ -265,9 +265,9 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<
-  TableToolPageProps
-> = async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async ({
+  query,
+}) => {
   const {
     publicationSlug = '',
     releaseSlug = '',
@@ -292,10 +292,9 @@ export const getServerSideProps: GetServerSideProps<
     };
   }
 
-  const latestRelease =
-    await publicationService.getLatestPublicationReleaseSummary(
-      publicationSlug,
-    );
+  const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
+    publicationSlug,
+  );
 
   const selectedRelease =
     !releaseSlug || latestRelease.slug === releaseSlug

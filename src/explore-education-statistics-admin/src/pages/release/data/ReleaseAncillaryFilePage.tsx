@@ -17,8 +17,9 @@ import { generatePath, useHistory, useParams } from 'react-router';
 
 export default function ReleaseAncillaryFilePage() {
   const history = useHistory();
-  const { publicationId, releaseId, fileId } =
-    useParams<ReleaseAncillaryFileRouteParams>();
+  const { publicationId, releaseId, fileId } = useParams<
+    ReleaseAncillaryFileRouteParams
+  >();
 
   const { data: file, isLoading: isLoadingFile } = useQuery(
     releaseAncillaryFileQueries.get(releaseId, fileId),

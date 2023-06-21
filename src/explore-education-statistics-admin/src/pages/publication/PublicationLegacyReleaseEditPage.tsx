@@ -12,8 +12,9 @@ import React from 'react';
 import { generatePath, useHistory, useParams } from 'react-router';
 
 const PublicationLegacyReleaseEditPage = () => {
-  const { legacyReleaseId } =
-    useParams<PublicationEditLegacyReleaseRouteParams>();
+  const { legacyReleaseId } = useParams<
+    PublicationEditLegacyReleaseRouteParams
+  >();
 
   const { publicationId } = usePublicationContext();
   const history = useHistory();

@@ -11,8 +11,12 @@ const PublicationInviteUsersPage = () => {
   const { publicationId, publication } = usePublicationContext();
   const { releaseId } = useParams<PublicationManageTeamRouteParams>();
 
-  const { value: allReleases = { results: [] }, isLoading } =
-    useAsyncHandledRetry(() => publicationService.listReleases(publicationId));
+  const {
+    value: allReleases = { results: [] },
+    isLoading,
+  } = useAsyncHandledRetry(() =>
+    publicationService.listReleases(publicationId),
+  );
 
   const { results: releases } = allReleases;
 

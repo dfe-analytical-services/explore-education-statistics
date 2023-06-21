@@ -54,10 +54,9 @@ const PreReleaseUserAccessForm = ({
     isLoading,
     error,
     setState: setUsers,
-  } = useAsyncRetry(
-    () => preReleaseUserService.getUsers(releaseId),
-    [releaseId],
-  );
+  } = useAsyncRetry(() => preReleaseUserService.getUsers(releaseId), [
+    releaseId,
+  ]);
 
   const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
 

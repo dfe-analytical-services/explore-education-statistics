@@ -70,8 +70,11 @@ const ChartAxisConfiguration = ({
 }: Props) => {
   const { capabilities } = definition;
 
-  const { hasSubmitted, updateForm, submitForms } =
-    useChartBuilderFormsContext();
+  const {
+    hasSubmitted,
+    updateForm,
+    submitForms,
+  } = useChartBuilderFormsContext();
 
   const axisDefinition = definition.axes[type];
   const axisConfiguration = axesConfiguration[type];

@@ -62,8 +62,11 @@ export const tableQueryFailureCount = new Counter(
 const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
-const { adminUrl, dataApiUrl, supportsRefreshTokens } =
-  environmentAndUsers.environment;
+const {
+  adminUrl,
+  dataApiUrl,
+  supportsRefreshTokens,
+} = environmentAndUsers.environment;
 
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
@@ -156,8 +159,12 @@ function getOrCreateReleaseWithSubject() {
 export function setup(): SetupData {
   const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
-  const { themeId, topicId, releaseId, subjectId } =
-    getOrCreateReleaseWithSubject();
+  const {
+    themeId,
+    topicId,
+    releaseId,
+    subjectId,
+  } = getOrCreateReleaseWithSubject();
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
 

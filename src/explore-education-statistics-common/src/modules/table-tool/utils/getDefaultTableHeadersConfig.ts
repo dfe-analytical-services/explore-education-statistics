@@ -85,8 +85,12 @@ function getFixedTimePeriodAndIndicatorTableHeadersConfig(
 export default function getDefaultTableHeaderConfig(
   fullTable: FullTable,
 ): TableHeadersConfig {
-  const { indicators, filters, locations, timePeriodRange } =
-    fullTable.subjectMeta;
+  const {
+    indicators,
+    filters,
+    locations,
+    timePeriodRange,
+  } = fullTable.subjectMeta;
   const { results } = fullTable;
 
   // When terms are selected the time period range can include ones not displayed in the table,

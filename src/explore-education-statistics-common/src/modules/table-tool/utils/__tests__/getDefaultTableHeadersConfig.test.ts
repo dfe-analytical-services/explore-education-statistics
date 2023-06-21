@@ -126,8 +126,12 @@ describe('getDefaultTableHeadersConfig', () => {
   test('returns correct config using a variety of options for every filter type', () => {
     const testSubjectMeta = mapFullTable(testTableData);
 
-    const { rows, rowGroups, columns, columnGroups } =
-      getDefaultTableHeaderConfig(testSubjectMeta);
+    const {
+      rows,
+      rowGroups,
+      columns,
+      columnGroups,
+    } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
@@ -232,8 +236,12 @@ describe('getDefaultTableHeadersConfig', () => {
 
     const testSubjectMeta = mapFullTable(testTableDataTimePeriods);
 
-    const { rows, rowGroups, columns, columnGroups } =
-      getDefaultTableHeaderConfig(testSubjectMeta);
+    const {
+      rows,
+      rowGroups,
+      columns,
+      columnGroups,
+    } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
@@ -312,8 +320,12 @@ describe('getDefaultTableHeadersConfig', () => {
 
     const testSubjectMeta = mapFullTable(testTableDataTwoOptions);
 
-    const { rows, rowGroups, columns, columnGroups } =
-      getDefaultTableHeaderConfig(testSubjectMeta);
+    const {
+      rows,
+      rowGroups,
+      columns,
+      columnGroups,
+    } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     expect(columnGroups).toHaveLength(1);
     expect(columnGroups[0]).toHaveLength(2);
@@ -406,8 +418,12 @@ describe('getDefaultTableHeadersConfig', () => {
 
     const testSubjectMeta = mapFullTable(testTableDataSiblingless);
 
-    const { rows, rowGroups, columns, columnGroups } =
-      getDefaultTableHeaderConfig(testSubjectMeta);
+    const {
+      rows,
+      rowGroups,
+      columns,
+      columnGroups,
+    } = getDefaultTableHeaderConfig(testSubjectMeta);
 
     // Should only have indicators and time periods
     // when all other filter types are siblingless

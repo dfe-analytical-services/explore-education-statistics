@@ -19,8 +19,12 @@ const WizardStep = ({
   // Hide injected props from public API
   const injectedWizardProps = restProps as InjectedWizardProps;
 
-  const { stepNumber, currentStep, shouldScroll, isActive } =
-    injectedWizardProps;
+  const {
+    stepNumber,
+    currentStep,
+    shouldScroll,
+    isActive,
+  } = injectedWizardProps;
 
   const ref = useRef<HTMLLIElement>(null);
 

@@ -106,20 +106,21 @@ export const MethodologyContentPageInternal = () => {
 const MethodologyContentPage = () => {
   const { methodologyId } = useParams<MethodologyRouteParams>();
 
-  const { value, isLoading } =
-    useAsyncHandledRetry<MethodologyContextState>(async () => {
-      const methodology = await methodologyContentService.getMethodologyContent(
-        methodologyId,
-      );
-      const canUpdateMethodology = await permissionService.canUpdateMethodology(
-        methodologyId,
-      );
+  const { value, isLoading } = useAsyncHandledRetry<
+    MethodologyContextState
+  >(async () => {
+    const methodology = await methodologyContentService.getMethodologyContent(
+      methodologyId,
+    );
+    const canUpdateMethodology = await permissionService.canUpdateMethodology(
+      methodologyId,
+    );
 
-      return {
-        methodology,
-        canUpdateMethodology,
-      };
-    }, [methodologyId]);
+    return {
+      methodology,
+      canUpdateMethodology,
+    };
+  }, [methodologyId]);
 
   return (
     <LoadingSpinner loading={isLoading}>

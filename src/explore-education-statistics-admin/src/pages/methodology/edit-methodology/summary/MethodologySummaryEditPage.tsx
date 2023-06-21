@@ -11,8 +11,11 @@ import React from 'react';
 import { generatePath, useHistory } from 'react-router';
 
 const MethodologySummaryEditPage = () => {
-  const { methodologyId, methodology, onMethodologyChange } =
-    useMethodologyContext();
+  const {
+    methodologyId,
+    methodology,
+    onMethodologyChange,
+  } = useMethodologyContext();
 
   const history = useHistory<MethodologyRouteParams>();
 

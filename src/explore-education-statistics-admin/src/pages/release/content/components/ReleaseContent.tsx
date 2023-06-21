@@ -39,8 +39,11 @@ interface MethodologyLink {
 const ReleaseContent = () => {
   const config = useConfig();
   const location = useLocation();
-  const { editingMode, unsavedBlocks, unsavedCommentDeletions } =
-    useEditingContext();
+  const {
+    editingMode,
+    unsavedBlocks,
+    unsavedCommentDeletions,
+  } = useEditingContext();
   const { release } = useReleaseContentState();
   const { addContentSectionBlock } = useReleaseContentActions();
 

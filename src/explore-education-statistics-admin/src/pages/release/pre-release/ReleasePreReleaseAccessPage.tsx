@@ -26,10 +26,9 @@ const ReleasePreReleaseAccessPage = () => {
     value: release,
     isLoading,
     setState: setRelease,
-  } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
-    [releaseId],
-  );
+  } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
+    releaseId,
+  ]);
 
   const { value: canUpdateRelease = false } = useAsyncHandledRetry(
     () => permissionService.canUpdateRelease(releaseId),
@@ -76,15 +75,12 @@ const ReleasePreReleaseAccessPage = () => {
                 <p>
                   <UrlContainer
                     data-testid="prerelease-url"
-                    url={`${
-                      window.location.origin
-                    }${generatePath<ReleaseRouteParams>(
-                      preReleaseContentRoute.path,
-                      {
-                        publicationId: release.publicationId,
-                        releaseId: release.id,
-                      },
-                    )}`}
+                    url={`${window.location.origin}${generatePath<
+                      ReleaseRouteParams
+                    >(preReleaseContentRoute.path, {
+                      publicationId: release.publicationId,
+                      releaseId: release.id,
+                    })}`}
                   />
                 </p>
               </>

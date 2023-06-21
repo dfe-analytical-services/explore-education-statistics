@@ -16,20 +16,17 @@ export default function PublicationUnpublishedReleases({
   publicationId,
   onAmendmentDelete,
 }: Props) {
-  const {
-    data: releases,
-    isLoading,
-    isSuccess,
-    refetch,
-  } = useQuery(['publicationUnpublishedReleases', publicationId], () =>
-    publicationService.listReleases<ReleaseSummaryWithPermissions>(
-      publicationId,
-      {
-        live: false,
-        pageSize: 100,
-        includePermissions: true,
-      },
-    ),
+  const { data: releases, isLoading, isSuccess, refetch } = useQuery(
+    ['publicationUnpublishedReleases', publicationId],
+    () =>
+      publicationService.listReleases<ReleaseSummaryWithPermissions>(
+        publicationId,
+        {
+          live: false,
+          pageSize: 100,
+          includePermissions: true,
+        },
+      ),
   );
 
   const draftReleases = useMemo(() => {

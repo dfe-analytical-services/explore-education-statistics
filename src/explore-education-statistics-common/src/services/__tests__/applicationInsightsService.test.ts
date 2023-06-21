@@ -108,7 +108,8 @@ describe('filterSensitiveData', () => {
         baseType,
         name: '',
         baseData: {
-          name: 'GET /test?password=my-password&code=my-code&token=my-token&email=my-email',
+          name:
+            'GET /test?password=my-password&code=my-code&token=my-token&email=my-email',
           target:
             'https://localhost/test?password=my-password&code=my-code&token=my-token&email=my-email',
           type: 'Ajax',
@@ -120,7 +121,8 @@ describe('filterSensitiveData', () => {
         baseType,
         name: '',
         baseData: {
-          name: 'GET /test?password=__redacted__&code=__redacted__&token=__redacted__&email=__redacted__',
+          name:
+            'GET /test?password=__redacted__&code=__redacted__&token=__redacted__&email=__redacted__',
           target:
             'https://localhost/test?password=__redacted__&code=__redacted__&token=__redacted__&email=__redacted__',
           type: 'Ajax',
@@ -444,7 +446,8 @@ describe('filterSensitiveData', () => {
         baseData: {
           refUri:
             'https://localhost/test?password=my-password&code=my-code&token=my-token&email=my-email',
-          uri: 'https://localhost/test?password=my-password&code=my-code&token=my-token&email=my-email',
+          uri:
+            'https://localhost/test?password=my-password&code=my-code&token=my-token&email=my-email',
         },
       };
 
@@ -455,7 +458,8 @@ describe('filterSensitiveData', () => {
         baseData: {
           refUri:
             'https://localhost/test?password=__redacted__&code=__redacted__&token=__redacted__&email=__redacted__',
-          uri: 'https://localhost/test?password=__redacted__&code=__redacted__&token=__redacted__&email=__redacted__',
+          uri:
+            'https://localhost/test?password=__redacted__&code=__redacted__&token=__redacted__&email=__redacted__',
         },
       });
     });
@@ -607,7 +611,8 @@ describe('filterSensitiveData', () => {
         baseType,
         name: '',
         baseData: {
-          uri: 'https://localhost/test?password=my-password&code=my-code&token=my-token&email=my-email',
+          uri:
+            'https://localhost/test?password=my-password&code=my-code&token=my-token&email=my-email',
         },
       };
 
@@ -616,7 +621,8 @@ describe('filterSensitiveData', () => {
         baseType,
         name: '',
         baseData: {
-          uri: 'https://localhost/test?password=__redacted__&code=__redacted__&token=__redacted__&email=__redacted__',
+          uri:
+            'https://localhost/test?password=__redacted__&code=__redacted__&token=__redacted__&email=__redacted__',
         },
       });
     });

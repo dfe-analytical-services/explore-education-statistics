@@ -22,10 +22,12 @@ interface Props {
 }
 
 const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
-  const { value: checklist, isLoading: isLoadingChecklist } =
-    useAsyncHandledRetry(async () => {
-      return releaseService.getReleaseChecklist(release.id);
-    });
+  const {
+    value: checklist,
+    isLoading: isLoadingChecklist,
+  } = useAsyncHandledRetry(async () => {
+    return releaseService.getReleaseChecklist(release.id);
+  });
 
   return (
     <tr>

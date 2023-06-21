@@ -281,14 +281,13 @@ const ReleaseDataUploadsSection = ({
                               </Link>
                               <Link
                                 className="govuk-!-margin-right-4"
-                                to={generatePath<ReleaseDataFileReplaceRouteParams>(
-                                  releaseDataFileReplaceRoute.path,
-                                  {
-                                    publicationId,
-                                    releaseId,
-                                    fileId: dataFile.id,
-                                  },
-                                )}
+                                to={generatePath<
+                                  ReleaseDataFileReplaceRouteParams
+                                >(releaseDataFileReplaceRoute.path, {
+                                  publicationId,
+                                  releaseId,
+                                  fileId: dataFile.id,
+                                })}
                               >
                                 Replace data
                               </Link>
@@ -297,11 +296,10 @@ const ReleaseDataUploadsSection = ({
 
                           <ButtonText
                             onClick={async () => {
-                              const plan =
-                                await releaseDataFileService.getDeleteDataFilePlan(
-                                  releaseId,
-                                  dataFile,
-                                );
+                              const plan = await releaseDataFileService.getDeleteDataFilePlan(
+                                releaseId,
+                                dataFile,
+                              );
 
                               setDeleteDataFile({
                                 plan,

@@ -78,10 +78,9 @@ const ReleasePageContainer = () => {
     value: release,
     setState: setRelease,
     isLoading: loadingRelease,
-  } = useAsyncHandledRetry(
-    () => releaseService.getRelease(releaseId),
-    [releaseId],
-  );
+  } = useAsyncHandledRetry(() => releaseService.getRelease(releaseId), [
+    releaseId,
+  ]);
 
   const currentRouteIndex =
     navRoutes.findIndex(

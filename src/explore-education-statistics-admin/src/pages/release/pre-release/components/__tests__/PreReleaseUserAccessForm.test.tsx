@@ -317,10 +317,13 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
 
       await waitFor(() => {
-        expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
-          'release-1',
-          ['test1@test.com', 'test2@test.com', 'test3@test.com'],
-        );
+        expect(
+          preReleaseUserService.getInvitePlan,
+        ).toHaveBeenCalledWith('release-1', [
+          'test1@test.com',
+          'test2@test.com',
+          'test3@test.com',
+        ]);
       });
     });
 
@@ -348,16 +351,15 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
 
       await waitFor(() => {
-        expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
-          'release-1',
-          [
-            "special_'%+-.characters@test.com",
-            'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com',
-            'test@test.co.uk',
-            'test@test.uk',
-            'test@education.gov.uk',
-          ],
-        );
+        expect(
+          preReleaseUserService.getInvitePlan,
+        ).toHaveBeenCalledWith('release-1', [
+          "special_'%+-.characters@test.com",
+          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com',
+          'test@test.co.uk',
+          'test@test.uk',
+          'test@education.gov.uk',
+        ]);
       });
     });
 
@@ -392,10 +394,13 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
 
       await waitFor(() => {
-        expect(preReleaseUserService.getInvitePlan).toHaveBeenCalledWith(
-          'release-1',
-          ['test1@test.com', 'test2@test.com', 'test3@test.com'],
-        );
+        expect(
+          preReleaseUserService.getInvitePlan,
+        ).toHaveBeenCalledWith('release-1', [
+          'test1@test.com',
+          'test2@test.com',
+          'test3@test.com',
+        ]);
       });
 
       await waitFor(() => {
@@ -574,10 +579,13 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
-        expect(preReleaseUserService.inviteUsers).toHaveBeenCalledWith(
-          'release-1',
-          ['test3@test.com', 'test4@test.com', 'test5@test.com'],
-        );
+        expect(
+          preReleaseUserService.inviteUsers,
+        ).toHaveBeenCalledWith('release-1', [
+          'test3@test.com',
+          'test4@test.com',
+          'test5@test.com',
+        ]);
       });
 
       expect(

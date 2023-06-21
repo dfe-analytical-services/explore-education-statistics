@@ -22,10 +22,14 @@ interface FormValues {
 
 const ReleaseDataFilePage = () => {
   const history = useHistory();
-  const { fileId, publicationId, releaseId } =
-    useParams<ReleaseDataFileRouteParams>();
+  const { fileId, publicationId, releaseId } = useParams<
+    ReleaseDataFileRouteParams
+  >();
 
-  const { value: dataFile, isLoading: dataFileLoading } = useAsyncHandledRetry(
+  const {
+    value: dataFile,
+    isLoading: dataFileLoading,
+  } = useAsyncHandledRetry(
     () => releaseDataFileService.getDataFile(releaseId, fileId),
     [releaseId, fileId],
   );

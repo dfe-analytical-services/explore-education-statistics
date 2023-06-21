@@ -60,12 +60,18 @@ const PublicationMethodologiesPage = () => {
     amendment: boolean;
   }>();
   const [dropMethodologyId, setDropMethodologyId] = useState<string>();
-  const [removingExternalMethodology, toggleRemovingExternalMethodology] =
-    useToggle(false);
-  const [showMethodologyTypeGuidance, toggleMethodologyTypeGuidance] =
-    useToggle(false);
-  const [showMethodologyStatusGuidance, toggleMethodologyStatusGuidance] =
-    useToggle(false);
+  const [
+    removingExternalMethodology,
+    toggleRemovingExternalMethodology,
+  ] = useToggle(false);
+  const [
+    showMethodologyTypeGuidance,
+    toggleMethodologyTypeGuidance,
+  ] = useToggle(false);
+  const [
+    showMethodologyStatusGuidance,
+    toggleMethodologyStatusGuidance,
+  ] = useToggle(false);
 
   const handleRemoveExternalMethodology = async () => {
     if (!publication) {
@@ -98,8 +104,9 @@ const PublicationMethodologiesPage = () => {
             <Button
               className="govuk-!-margin-bottom-0"
               onClick={async () => {
-                const { id: methodologyId } =
-                  await methodologyService.createMethodology(publication.id);
+                const {
+                  id: methodologyId,
+                } = await methodologyService.createMethodology(publication.id);
 
                 history.push(
                   generatePath<MethodologyRouteParams>(
@@ -386,10 +393,9 @@ const PublicationMethodologiesPage = () => {
           open
           title="Confirm you want to amend this published methodology"
           onConfirm={async () => {
-            const amendment =
-              await methodologyService.createMethodologyAmendment(
-                amendMethodologyId,
-              );
+            const amendment = await methodologyService.createMethodologyAmendment(
+              amendMethodologyId,
+            );
             history.push(
               generatePath<MethodologyRouteParams>(
                 methodologySummaryRoute.path,

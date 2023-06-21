@@ -22,11 +22,10 @@ export default function KeyStatDataBlock({
   guidanceText,
   testId = 'keyStat',
 }: KeyStatDataBlockProps) {
-  const {
-    value: dataBlock,
-    isLoading,
-    error,
-  } = useKeyStatQuery(releaseId, dataBlockId);
+  const { value: dataBlock, isLoading, error } = useKeyStatQuery(
+    releaseId,
+    dataBlockId,
+  );
 
   const title = dataBlock?.title;
   const statistic = dataBlock?.value;

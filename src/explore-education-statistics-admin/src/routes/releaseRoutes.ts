@@ -90,7 +90,8 @@ export const releaseDataFileReplaceRoute: ReleaseRouteProps = {
 };
 
 export const releaseDataFileReplacementCompleteRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data/:fileId/replacement-complete',
+  path:
+    '/publication/:publicationId/release/:releaseId/data/:fileId/replacement-complete',
   title: 'Replacement complete',
   component: ReleaseDataFileReplacementCompletePage,
 };
@@ -132,7 +133,8 @@ export const releaseDataBlockCreateRoute: ReleaseRouteProps = {
 };
 
 export const releaseDataBlockEditRoute: ReleaseRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/data-blocks/:dataBlockId',
+  path:
+    '/publication/:publicationId/release/:releaseId/data-blocks/:dataBlockId',
   title: 'Edit data block',
   component: ReleaseDataBlockEditPage,
 };

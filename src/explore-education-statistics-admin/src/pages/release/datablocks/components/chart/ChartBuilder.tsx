@@ -134,8 +134,9 @@ const ChartBuilder = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
-  const [submitError, setSubmitError] =
-    useState<ServerValidationErrorResponse>();
+  const [submitError, setSubmitError] = useState<
+    ServerValidationErrorResponse
+  >();
 
   const dataSetsUnits = useMemo(
     () =>

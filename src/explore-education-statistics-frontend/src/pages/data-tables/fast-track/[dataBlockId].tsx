@@ -9,8 +9,8 @@ import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 
 export default TableToolPage;
 
-export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
-  withAxiosHandler(async ({ query }) => {
+export const getServerSideProps: GetServerSideProps<TableToolPageProps> = withAxiosHandler(
+  async ({ query }) => {
     const { dataBlockId } = query as Dictionary<string>;
 
     const [fastTrack, themeMeta] = await Promise.all([
@@ -75,4 +75,5 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
         themeMeta,
       },
     };
-  });
+  },
+);

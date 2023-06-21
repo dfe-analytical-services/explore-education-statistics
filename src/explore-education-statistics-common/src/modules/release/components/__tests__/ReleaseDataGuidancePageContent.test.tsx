@@ -129,10 +129,9 @@ describe('ReleaseDataGuidancePageContent', () => {
       '2018 to 2019',
     );
     expect(
-      within(subject1.getByTestId('Content')).getByText(
-        'Test subject 1 content',
-        { selector: 'p' },
-      ),
+      within(
+        subject1.getByTestId('Content'),
+      ).getByText('Test subject 1 content', { selector: 'p' }),
     ).toBeInTheDocument();
 
     userEvent.click(
@@ -179,10 +178,9 @@ describe('ReleaseDataGuidancePageContent', () => {
       '2020 to 2021',
     );
     expect(
-      within(subject2.getByTestId('Content')).getByText(
-        'Test subject 2 content',
-        { selector: 'p' },
-      ),
+      within(
+        subject2.getByTestId('Content'),
+      ).getByText('Test subject 2 content', { selector: 'p' }),
     ).toBeInTheDocument();
 
     userEvent.click(

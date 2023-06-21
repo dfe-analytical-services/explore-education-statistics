@@ -24,11 +24,13 @@ interface Props {
 }
 
 const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
-  const { value: subjects, isLoading: isLoadingSubjects } =
-    useAsyncHandledRetry(
-      async () => tableBuilderService.listReleaseSubjects(releaseId),
-      [releaseId],
-    );
+  const {
+    value: subjects,
+    isLoading: isLoadingSubjects,
+  } = useAsyncHandledRetry(
+    async () => tableBuilderService.listReleaseSubjects(releaseId),
+    [releaseId],
+  );
   const [reorderingFilters, setReorderingFilters] = useState<Subject>();
   const [reorderingIndicators, setReorderingIndicators] = useState<Subject>();
 

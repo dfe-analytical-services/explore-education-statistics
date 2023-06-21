@@ -22,8 +22,9 @@ import { generatePath } from 'react-router-dom';
 import React from 'react';
 
 const PreReleaseTableToolPage = () => {
-  const { publicationId, releaseId, dataBlockId } =
-    useParams<PreReleaseTableToolRouteParams>();
+  const { publicationId, releaseId, dataBlockId } = useParams<
+    PreReleaseTableToolRouteParams
+  >();
 
   const { value: publication } = useAsyncHandledRetry(
     () => publicationService.getPublication(publicationId),

@@ -169,8 +169,9 @@ export default function ChartReferenceLinesConfiguration({
                   } axis min/max range`,
                   test: value => {
                     return type === 'minor' && minorAxisDomain
-                      ? (value as unknown as number) >= minorAxisDomain?.min &&
-                          (value as unknown as number) <= minorAxisDomain.max
+                      ? ((value as unknown) as number) >=
+                          minorAxisDomain?.min &&
+                          ((value as unknown) as number) <= minorAxisDomain.max
                       : true;
                   },
                 }),

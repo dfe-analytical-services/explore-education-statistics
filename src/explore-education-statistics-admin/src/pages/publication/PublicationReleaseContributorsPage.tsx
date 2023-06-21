@@ -24,13 +24,17 @@ const PublicationReleaseContributorsPage = () => {
   const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [publication, release, publicationContributors, releaseRoles] =
-      await Promise.all([
-        publicationService.getPublication(publicationId),
-        releaseService.getRelease(releaseId),
-        releasePermissionService.listPublicationContributors(publicationId),
-        releasePermissionService.listRoles(releaseId),
-      ]);
+    const [
+      publication,
+      release,
+      publicationContributors,
+      releaseRoles,
+    ] = await Promise.all([
+      publicationService.getPublication(publicationId),
+      releaseService.getRelease(releaseId),
+      releasePermissionService.listPublicationContributors(publicationId),
+      releasePermissionService.listRoles(releaseId),
+    ]);
     return {
       publication,
       release,
@@ -45,8 +49,12 @@ const PublicationReleaseContributorsPage = () => {
     return <LoadingSpinner />;
   }
 
-  const { publication, release, publicationContributors, releaseContributors } =
-    model;
+  const {
+    publication,
+    release,
+    publicationContributors,
+    releaseContributors,
+  } = model;
 
   return (
     <LoadingSpinner

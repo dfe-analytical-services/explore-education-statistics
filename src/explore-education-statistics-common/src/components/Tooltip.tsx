@@ -174,8 +174,10 @@ export default function Tooltip({
     const handleMouseMove = ({ x, y }: MouseEvent) => {
       toggleVisible.on();
 
-      virtualElRef.current.getBoundingClientRect =
-        generateGetBoundingClientRect(x, y);
+      virtualElRef.current.getBoundingClientRect = generateGetBoundingClientRect(
+        x,
+        y,
+      );
 
       popper.current?.update();
     };

@@ -30,14 +30,13 @@ interface Model {
 const ReleaseDataBlocksPage = () => {
   const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
-  const [deleteDataBlock, setDeleteDataBlock] =
-    useState<ReleaseDataBlockSummary>();
+  const [deleteDataBlock, setDeleteDataBlock] = useState<
+    ReleaseDataBlockSummary
+  >();
 
-  const {
-    value: model,
-    isLoading,
-    setState: setModel,
-  } = useAsyncHandledRetry<Model>(async () => {
+  const { value: model, isLoading, setState: setModel } = useAsyncHandledRetry<
+    Model
+  >(async () => {
     const [dataBlocks, canUpdateRelease] = await Promise.all([
       dataBlocksService.listDataBlocks(releaseId),
       permissionService.canUpdateRelease(releaseId),

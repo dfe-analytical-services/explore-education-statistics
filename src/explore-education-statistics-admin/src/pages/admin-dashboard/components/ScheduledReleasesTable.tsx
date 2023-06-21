@@ -40,10 +40,14 @@ interface ScheduledReleasesTableProps {
 }
 
 const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
-  const [showScheduledStatusGuidance, toggleScheduledStatusGuidance] =
-    useToggle(false);
-  const [showScheduledStagesGuidance, toggleScheduledStagesGuidance] =
-    useToggle(false);
+  const [
+    showScheduledStatusGuidance,
+    toggleScheduledStatusGuidance,
+  ] = useToggle(false);
+  const [
+    showScheduledStagesGuidance,
+    toggleScheduledStagesGuidance,
+  ] = useToggle(false);
 
   const releasesByPublication: Dictionary<Release[]> = useMemo(() => {
     return releases.reduce<Dictionary<Release[]>>((acc, release) => {

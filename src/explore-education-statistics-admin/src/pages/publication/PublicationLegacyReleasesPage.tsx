@@ -12,10 +12,9 @@ const PublicationLegacyReleasesPage = () => {
 
   const { value: legacyReleases = [], isLoading } = useAsyncHandledRetry<
     LegacyRelease[]
-  >(
-    async () => legacyReleaseService.listLegacyReleases(publicationId),
-    [publicationId],
-  );
+  >(async () => legacyReleaseService.listLegacyReleases(publicationId), [
+    publicationId,
+  ]);
 
   return (
     <LoadingSpinner loading={isLoading}>

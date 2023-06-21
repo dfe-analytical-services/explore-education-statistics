@@ -32,8 +32,11 @@ const ReleaseContentAccordionSection = ({
 }: ReleaseContentAccordionSectionProps) => {
   const { id: sectionId, caption, content: sectionContent = [] } = section;
 
-  const { editingMode, unsavedCommentDeletions, unsavedBlocks } =
-    useEditingContext();
+  const {
+    editingMode,
+    unsavedCommentDeletions,
+    unsavedBlocks,
+  } = useEditingContext();
 
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();

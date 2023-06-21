@@ -21,8 +21,10 @@ const MethodologyAccordion = ({
   title,
 }: MethodologyAccordionProps) => {
   const { editingMode } = useEditingContext();
-  const { addContentSection, updateContentSectionsOrder } =
-    useMethodologyContentActions();
+  const {
+    addContentSection,
+    updateContentSectionsOrder,
+  } = useMethodologyContentActions();
 
   const onAddSection = useCallback(
     () =>

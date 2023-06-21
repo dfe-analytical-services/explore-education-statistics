@@ -66,16 +66,17 @@ const UserInvitePage = () => {
 
   const history = useHistory<ErrorControlState>();
 
-  const { value: model, isLoading } =
-    useAsyncHandledRetry<InviteUserModel>(async () => {
-      const [roles, resourceRoles, releases, publications] = await Promise.all([
-        userService.getRoles(),
-        userService.getResourceRoles(),
-        userService.getReleases(),
-        publicationService.getPublicationSummaries(),
-      ]);
-      return { roles, resourceRoles, releases, publications };
-    }, []);
+  const { value: model, isLoading } = useAsyncHandledRetry<
+    InviteUserModel
+  >(async () => {
+    const [roles, resourceRoles, releases, publications] = await Promise.all([
+      userService.getRoles(),
+      userService.getResourceRoles(),
+      userService.getReleases(),
+      publicationService.getPublicationSummaries(),
+    ]);
+    return { roles, resourceRoles, releases, publications };
+  }, []);
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
     const userReleaseRoles = values.userReleaseRoles.map(userReleaseRole => {

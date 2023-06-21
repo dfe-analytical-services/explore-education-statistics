@@ -73,11 +73,12 @@ describe('PublicationInviteNewUsersForm', () => {
 
     await waitFor(() => {
       expect(userService.inviteContributor).toHaveBeenCalledTimes(1);
-      expect(userService.inviteContributor).toHaveBeenCalledWith(
-        'test@test.com',
-        'publication-id',
-        ['release-1', 'release-3'],
-      );
+      expect(
+        userService.inviteContributor,
+      ).toHaveBeenCalledWith('test@test.com', 'publication-id', [
+        'release-1',
+        'release-3',
+      ]);
     });
   });
 

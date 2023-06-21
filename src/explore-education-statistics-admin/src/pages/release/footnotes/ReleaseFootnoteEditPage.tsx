@@ -12,22 +12,26 @@ import { generatePath, useHistory, useParams } from 'react-router';
 import React from 'react';
 
 const ReleaseFootnoteEditPage = () => {
-  const { footnoteId, publicationId, releaseId } =
-    useParams<ReleaseFootnoteRouteParams>();
+  const { footnoteId, publicationId, releaseId } = useParams<
+    ReleaseFootnoteRouteParams
+  >();
 
   const history = useHistory();
 
-  const { value: footnoteMeta, isLoading: isFootnoteMetaLoading } =
-    useAsyncHandledRetry(
-      () => footnoteService.getFootnoteMeta(releaseId),
-      [releaseId],
-    );
+  const {
+    value: footnoteMeta,
+    isLoading: isFootnoteMetaLoading,
+  } = useAsyncHandledRetry(() => footnoteService.getFootnoteMeta(releaseId), [
+    releaseId,
+  ]);
 
-  const { value: footnote, isLoading: isFootnoteLoading } =
-    useAsyncHandledRetry(
-      () => footnoteService.getFootnote(releaseId, footnoteId),
-      [releaseId, footnoteId],
-    );
+  const {
+    value: footnote,
+    isLoading: isFootnoteLoading,
+  } = useAsyncHandledRetry(
+    () => footnoteService.getFootnote(releaseId, footnoteId),
+    [releaseId, footnoteId],
+  );
 
   const footnotesPath = generatePath<ReleaseRouteParams>(
     releaseFootnotesRoute.path,

@@ -22,11 +22,7 @@ const InfographicBlock = ({
   width,
   height,
 }: InfographicChartProps) => {
-  const {
-    value: file,
-    error,
-    isLoading,
-  } = useAsyncRetry(async () => {
+  const { value: file, error, isLoading } = useAsyncRetry(async () => {
     if (fileId && getInfographic) {
       const infographic = await getInfographic(fileId);
       const dataUrl = await toDataUrl(infographic);

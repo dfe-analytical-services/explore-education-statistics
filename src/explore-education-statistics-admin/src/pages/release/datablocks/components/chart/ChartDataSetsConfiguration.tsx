@@ -57,10 +57,9 @@ const ChartDataSetsConfiguration = ({
   const [isReordering, toggleIsReordering] = useToggle(false);
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
 
-  const indicatorOptions = useMemo(
-    () => Object.values(meta.indicators),
-    [meta.indicators],
-  );
+  const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
+    meta.indicators,
+  ]);
   const locationOptions = useMemo(
     () =>
       meta.locations.map(location => ({

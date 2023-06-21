@@ -67,8 +67,7 @@ describe('mapTableToJson', () => {
 
   test('returns the correct JSON for a table with two levels of row headers and one level of col headers', () => {
     const result = mapTableToJson({
-      tableHeadersConfig:
-        testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig,
+      tableHeadersConfig: testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig,
       subjectMeta: testTableWithOneLevelOfRowAndColHeaders.subjectMeta,
       results: testTableWithOneLevelOfRowAndColHeaders.results,
     }).tableJson;
@@ -123,8 +122,7 @@ describe('mapTableToJson', () => {
 
   test('returns the correct JSON for  a table with two levels of col headers and one level of row headers', () => {
     const result = mapTableToJson({
-      tableHeadersConfig:
-        testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig,
+      tableHeadersConfig: testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig,
       subjectMeta: testTableWithOneLevelOfRowAndColHeaders.subjectMeta,
       results: testTableWithOneLevelOfRowAndColHeaders.results,
     }).tableJson;
@@ -519,8 +517,7 @@ describe('mapTableToJson', () => {
 
   test('correctly adds groups across three levels of column headers with same labels', () => {
     const result = mapTableToJson({
-      tableHeadersConfig:
-        testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabelsConfig,
+      tableHeadersConfig: testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabelsConfig,
       subjectMeta:
         testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabels.subjectMeta,
       results:

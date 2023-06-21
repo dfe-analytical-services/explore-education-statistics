@@ -41,7 +41,9 @@ export default function createPublicationListRequest(
   );
 }
 
-function getSortParams(sortBy: PublicationSortOption): {
+function getSortParams(
+  sortBy: PublicationSortOption,
+): {
   order?: PublicationOrderParam;
   sort?: PublicationSortParam;
 } {

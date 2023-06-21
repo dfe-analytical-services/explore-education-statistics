@@ -27,8 +27,9 @@ import { generatePath, useHistory, useParams } from 'react-router';
 
 const ReleaseDataFileReplacePage = () => {
   const history = useHistory();
-  const { fileId, publicationId, releaseId } =
-    useParams<ReleaseDataFileReplaceRouteParams>();
+  const { fileId, publicationId, releaseId } = useParams<
+    ReleaseDataFileReplaceRouteParams
+  >();
 
   const [isCancelling, toggleCancelling] = useToggle(false);
   const {

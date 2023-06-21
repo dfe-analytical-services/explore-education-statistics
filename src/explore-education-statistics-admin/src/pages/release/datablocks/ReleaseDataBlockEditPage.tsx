@@ -29,8 +29,9 @@ interface Model {
 }
 
 const ReleaseDataBlockEditPage = () => {
-  const { dataBlockId, publicationId, releaseId } =
-    useParams<ReleaseDataBlockRouteParams>();
+  const { dataBlockId, publicationId, releaseId } = useParams<
+    ReleaseDataBlockRouteParams
+  >();
   const history = useHistory();
 
   const config = useConfig();
@@ -38,11 +39,9 @@ const ReleaseDataBlockEditPage = () => {
 
   const [isDeleting, toggleDeleting] = useToggle(false);
 
-  const {
-    value: model,
-    isLoading,
-    setState: setModel,
-  } = useAsyncHandledRetry<Model>(async () => {
+  const { value: model, isLoading, setState: setModel } = useAsyncHandledRetry<
+    Model
+  >(async () => {
     const [dataBlock, canUpdateRelease] = await Promise.all([
       dataBlocksService.getDataBlock(dataBlockId),
       permissionService.canUpdateRelease(releaseId),

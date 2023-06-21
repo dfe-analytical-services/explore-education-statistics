@@ -47,8 +47,9 @@ export default async function createPermalinkTable(
     // TO DO - EES-4259
     // For old permalinks with duplicate locations.
     // Can be removed once the permalinks migration is done.
-    const dedupedUnmappedFullTable =
-      deduplicatePermalinkLocations(unmappedFullTable);
+    const dedupedUnmappedFullTable = deduplicatePermalinkLocations(
+      unmappedFullTable,
+    );
     const fullTable = mapFullTable(dedupedUnmappedFullTable);
     const tableHeadersConfig = mapTableHeadersConfig(
       configuration.tableHeaders,

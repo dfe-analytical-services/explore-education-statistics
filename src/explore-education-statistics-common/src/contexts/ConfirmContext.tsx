@@ -26,8 +26,9 @@ interface Props {
 export const ConfirmContextProvider = ({ children }: Props) => {
   const [isConfirming, toggleConfirming] = useToggle(false);
 
-  const resolver: MutableRefObject<((confirmed: boolean) => void) | null> =
-    useRef(null);
+  const resolver: MutableRefObject<
+    ((confirmed: boolean) => void) | null
+  > = useRef(null);
 
   const value = useMemo<ConfirmContextValue>(() => {
     return {

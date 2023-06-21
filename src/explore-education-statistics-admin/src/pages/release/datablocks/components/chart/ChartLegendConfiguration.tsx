@@ -101,8 +101,11 @@ const ChartLegendConfiguration = ({
 }: Props) => {
   const { capabilities } = definition;
 
-  const { hasSubmitted, updateForm, submitForms } =
-    useChartBuilderFormsContext();
+  const {
+    hasSubmitted,
+    updateForm,
+    submitForms,
+  } = useChartBuilderFormsContext();
 
   // Prevent legend items from being a dependency of
   // `initialValues` by accessing it as a ref.

@@ -320,8 +320,7 @@ export const lineChartBlockDefinition: ChartDefinition = {
 export default memo(LineChartBlock);
 
 // eslint-disable-next-line react/display-name
-const getDot =
-  (symbol: ChartSymbol | 'none' = 'circle') =>
+const getDot = (symbol: ChartSymbol | 'none' = 'circle') =>
   // eslint-disable-next-line react/display-name
   ({ ref, ...props }: SymbolsProps) => {
     if (symbol === 'none') {

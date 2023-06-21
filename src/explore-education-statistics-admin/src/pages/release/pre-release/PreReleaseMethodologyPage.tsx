@@ -17,21 +17,23 @@ import { generatePath, useParams } from 'react-router';
 import React from 'react';
 
 const PreReleaseMethodologyPage = () => {
-  const { methodologyId, publicationId, releaseId } =
-    useParams<PreReleaseMethodologyRouteParams>();
+  const { methodologyId, publicationId, releaseId } = useParams<
+    PreReleaseMethodologyRouteParams
+  >();
 
-  const { value, isLoading } =
-    useAsyncHandledRetry<MethodologyContextState>(async () => {
-      const methodology = await methodologyContentService.getMethodologyContent(
-        methodologyId,
-      );
+  const { value, isLoading } = useAsyncHandledRetry<
+    MethodologyContextState
+  >(async () => {
+    const methodology = await methodologyContentService.getMethodologyContent(
+      methodologyId,
+    );
 
-      return {
-        methodology,
-        canUpdateMethodology: false,
-        isPreRelease: true,
-      };
-    }, [methodologyId]);
+    return {
+      methodology,
+      canUpdateMethodology: false,
+      isPreRelease: true,
+    };
+  }, [methodologyId]);
 
   return (
     <div className="govuk-width-container">

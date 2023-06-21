@@ -71,8 +71,9 @@ const ReleaseEditableBlock = ({
 
   const getChartFile = useGetChartFile(releaseId);
 
-  const { handleImageUpload, handleImageUploadCancel } =
-    useReleaseImageUpload(releaseId);
+  const { handleImageUpload, handleImageUploadCancel } = useReleaseImageUpload(
+    releaseId,
+  );
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
     releaseId,

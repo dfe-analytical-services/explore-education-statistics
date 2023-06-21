@@ -17,8 +17,10 @@ const ReleaseContentAccordion = ({
   id = 'releaseMainContent',
   sectionName,
 }: ReleaseContentAccordionProps) => {
-  const { addContentSection, updateContentSectionsOrder } =
-    useReleaseContentActions();
+  const {
+    addContentSection,
+    updateContentSectionsOrder,
+  } = useReleaseContentActions();
 
   const addAccordionSection = useCallback(async () => {
     await addContentSection({

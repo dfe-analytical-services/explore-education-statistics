@@ -15,8 +15,9 @@ import React from 'react';
 import { generatePath, useParams } from 'react-router';
 
 const ReleaseDataFileReplacementCompletePage = () => {
-  const { fileId, publicationId, releaseId } =
-    useParams<ReleaseDataFileReplaceRouteParams>();
+  const { fileId, publicationId, releaseId } = useParams<
+    ReleaseDataFileReplaceRouteParams
+  >();
 
   // Run the replacement plan against itself so we can just get the
   // data blocks and footnotes in a convenient way.
