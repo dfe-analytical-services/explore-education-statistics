@@ -1,0 +1,19 @@
+FROM node:16.14.2-alpine AS builder
+
+WORKDIR /app
+
+COPY package.json ./
+COPY pnpm-lock.yaml ./
+
+RUN npm i -g pnpm
+
+RUN pnpm i
+
+COPY index.js ./
+
+ENV NODE_ENV=production
+EXPOSE 8000
+
+USER node
+
+CMD ["node", "index.js"]
