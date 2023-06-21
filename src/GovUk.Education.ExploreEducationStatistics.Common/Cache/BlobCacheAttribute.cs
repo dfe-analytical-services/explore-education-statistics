@@ -22,13 +22,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         public string? ServiceName { get; set; }
 
-        private StaleCacheWorkflow<BlobCacheKeyAndType, BlobCacheAttribute> _staleCacheWorkflow;
+        private ICacheWorkflow _workflow;
 
-        public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
+        public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(
+            key, 
+            forceUpdate)
         {
-            _staleCacheWorkflow = new(
+            _workflow = new StaleCacheWorkflow<BlobCacheKeyAndType, BlobCacheAttribute>(
                 cacheKey => GetAsync(cacheKey.CacheKey, cacheKey.Type),
-                cacheKey => GetCacheItemMeta(cacheKey.CacheKey),
+                cacheKey => GetItemMetaAsync(cacheKey.CacheKey),
                 (cacheKey, item) => SetAsync(cacheKey.CacheKey, item));
         }
 
@@ -99,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
-        public override async Task<object?> GetBlobMetaAsync(ICacheKey cacheKey, Type returnType)
+        public async Task<CacheItemMeta?> GetItemMetaAsync(ICacheKey cacheKey)
         {
             if (cacheKey is IBlobCacheKey key)
             {
@@ -110,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                     return null;
                 }
 
-                return await service.GetBlobMetaAsync(key, returnType);
+                return await service.GetItemMetaAsync(key);
             }
 
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
@@ -135,9 +137,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
-        protected override T GetOrGenerateAndSet<T>(ICacheKey cacheKey, Func<object[], T> target, object[] args)
+        protected override ICacheWorkflow GetWorkflow()
         {
-            throw new NotImplementedException();
+            return _workflow;
         }
 
         private IBlobCacheService? GetService()

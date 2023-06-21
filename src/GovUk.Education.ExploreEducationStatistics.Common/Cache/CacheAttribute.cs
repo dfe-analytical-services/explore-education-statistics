@@ -9,6 +9,7 @@ using Aspects.Universal.Attributes;
 using Aspects.Universal.Events;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
@@ -61,7 +62,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         public bool ForceUpdate { get; }
 
-        protected CacheAttribute(Type key, bool forceUpdate)
+        protected CacheAttribute(
+            Type key, 
+            bool forceUpdate)
         {
             Key = key;
             ForceUpdate = forceUpdate;
@@ -85,6 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         {
             var cacheKey = GetCacheKey(Key, args, eventArgs.Method);
 
+            // TODO DW - remove when changing cache updates to marking caches as stale
             if (ForceUpdate)
             {
                 try
@@ -106,10 +110,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                 }
             }
 
-            return GetOrGenerateAndSet(cacheKey, target, args);
-        }
+            // TODO DW - rename to "result" where ForceUpdate removed
+            var workflowResult = GetWorkflow().GetOrCreateItemAsync(
+                cacheKey, 
+                () => Task.FromResult(target.Invoke(args)).ContinueWith(result => (object) result.Result)
+            ).Result;
 
-        protected abstract T GetOrGenerateAndSet<T>(ICacheKey cacheKey, Func<object[], T> target, object[] args);
+            return (T) workflowResult;
+        }
 
         protected override async Task<T> WrapAsync<T>(Func<object[], Task<T>> target, object[] args, AspectEventArgs eventArgs)
         {
@@ -117,35 +125,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
             var cacheKey = GetCacheKey(Key, args, eventArgs.Method);
 
-            object? cachedResult = null;
-            if (!ForceUpdate)
+            // TODO DW - remove when changing cache updates to marking caches as stale
+            if (ForceUpdate)
             {
-                cachedResult = await GetAsync(cacheKey, unboxedResultType);
-            }
-
-            if (cachedResult?.TryBoxToResult(typeof(T), out cachedResult) == true)
-            {
-                return (T)cachedResult;
-            }
-
-            try
-            {
-                var result = await target(args);
-
-                if (!result.TryUnboxResult(out cachedResult) || cachedResult is null)
+                object? cachedResult = await GetAsync(cacheKey, unboxedResultType);
+                
+                if (cachedResult?.TryBoxToResult(typeof(T), out cachedResult) == true)
                 {
-                    return result;
+                    return (T) cachedResult!;
                 }
 
-                await SetAsync(cacheKey, cachedResult);
+                try
+                {
+                    var result = await target(args);
 
-                return result;
+                    if (!result.TryUnboxResult(out cachedResult) || cachedResult is null)
+                    {
+                        return result;
+                    }
+
+                    await SetAsync(cacheKey, cachedResult);
+
+                    return result;
+                }
+                catch (Exception exception)
+                {
+                    return OnException<T>(eventArgs, exception);
+                }
             }
-            catch (Exception exception)
-            {
-                return OnException<T>(eventArgs, exception);
-            }
+
+            // TODO DW - rename to "result" where ForceUpdate removed
+            var workflowResult = await GetWorkflow().GetOrCreateItemAsync(
+                cacheKey, 
+                () => target.Invoke(args).ContinueWith(result => (object) result.Result)
+                );
+
+            return (T) workflowResult;
         }
+
+        protected abstract ICacheWorkflow GetWorkflow();
 
         public abstract object? Get(ICacheKey cacheKey, Type returnType);
 

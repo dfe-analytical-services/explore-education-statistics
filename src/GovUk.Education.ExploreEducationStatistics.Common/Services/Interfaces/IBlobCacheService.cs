@@ -9,5 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         Task DeleteItemAsync(IBlobCacheKey cacheKey);
         
         Task DeleteCacheFolderAsync(IBlobCacheKey cacheFolderKey);
+        
+        Task<CacheItemMeta> GetItemMetaAsync(IBlobCacheKey key);
     }
 }

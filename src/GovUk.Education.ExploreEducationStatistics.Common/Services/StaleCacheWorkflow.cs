@@ -1,20 +1,21 @@
-# nullable enable
+#nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 public record StaleCacheWorkflow<TCacheKey, TLogger>(
-    Func<TCacheKey, Task<object>> GetCachedItemFn,
-    Func<TCacheKey, Task<CacheItemMeta>> GetCacheItemMetaFn,
+    Func<TCacheKey, Task<object?>> GetCachedItemFn,
+    Func<TCacheKey, Task<CacheItemMeta?>> GetCacheItemMetaFn,
     Func<TCacheKey, object, Task> CacheItemFn,
-    ILogger<TLogger>? Logger = null)
+    ILogger<TLogger>? Logger = null) : ICacheWorkflow
 {
     private readonly CacheLocks<TCacheKey> _locks = new();
     
     public async Task<object?> GetOrCreateItemAsync(
-        TCacheKey cacheKey,
+        object cacheKey,
         Func<Task<object>> createItemFn)
     {
         // *Is other request currently generating cached content?
@@ -53,13 +54,23 @@ public record StaleCacheWorkflow<TCacheKey, TLogger>(
         //              Regenerate it and cache it
         //              Release lock
         //              Return it
+
+        if (cacheKey is not TCacheKey typedCacheKey)
+        {
+            throw new ArgumentException($"Cache Key should be of type {typeof(TCacheKey)} but was {cacheKey.GetType()}");
+        }
         
         // See if there is any existing cached content.
-        var meta = await GetCacheItemMetaFn.Invoke(cacheKey);
+        var meta = await GetCacheItemMetaFn.Invoke(typedCacheKey);
 
         // Check to see if another thread is currently generating cached results for this
         // Blob Container / Cache Key combination.
-        var existingLock = _locks.GetCurrentCacheLock(cacheKey);
+        var existingLock = _locks.GetCurrentCacheLock(typedCacheKey);
+
+        if (meta == null)
+        {
+            throw new ArgumentException($"Should have received non-null meta for cache key {cacheKey}");
+        }
 
         // No other thread is currently generating cached content for this container / key combination.
         if (existingLock == null)
@@ -67,17 +78,17 @@ public record StaleCacheWorkflow<TCacheKey, TLogger>(
             // If not, acquire the lock so that this thread can generate the content to be cached.
             if (!meta.Exists)
             {
-                return await AcquireLockAndGenerateContent(cacheKey, createItemFn);
+                return await AcquireLockAndGenerateContent(typedCacheKey, createItemFn);
             }
             
             // Is the existing content stale?
             if (!meta.Stale)
             {
                 // Return the fresh cached content.
-                return GetCachedItemFn.Invoke(cacheKey);
+                return GetCachedItemFn.Invoke(typedCacheKey);
             }
             
-            return await AcquireLockAndGenerateContent(cacheKey, createItemFn);
+            return await AcquireLockAndGenerateContent(typedCacheKey, createItemFn);
         }
         
         //
@@ -88,24 +99,24 @@ public record StaleCacheWorkflow<TCacheKey, TLogger>(
         if (meta.Exists)
         {
             // Return existing (stale) content.
-            return GetCachedItemFn.Invoke(cacheKey);
+            return GetCachedItemFn.Invoke(typedCacheKey);
         }
         
         // No cached content exists whilst the other thread is generating new cached content, so wait
         // for the other thread to generate the content and then return it.
         try
         {
-            await _locks.Await(cacheKey);
+            await _locks.Await(typedCacheKey);
             
             // TODO is it worth handling scenario where this is null? e.g. the other thread failed to generate the content
-            return GetCachedItemFn.Invoke(cacheKey);
+            return GetCachedItemFn.Invoke(typedCacheKey);
         }
         // Have we timed out waiting for the other thread to generate the content?
         catch (TimeoutException e)
         {
-            Logger.LogError("Timed out waiting for other thread to generate cached content for key {CacheKey}", 
+            Logger?.LogError(e, "Timed out waiting for other thread to generate cached content for key {CacheKey}", 
                 cacheKey);
-            throw e;
+            throw;
         }
     }
 
@@ -134,6 +145,7 @@ public record StaleCacheWorkflow<TCacheKey, TLogger>(
     }
 }
 
+// TODO DW - visibility levels
 public record CacheItemMeta(bool Exists, bool Stale);
 
 record CacheLocks<TCacheKey>
@@ -164,6 +176,7 @@ record CacheLocks<TCacheKey>
     }
 }
 
+// TODO DW - visibility levels
 record CacheLock<TCacheKey>(TCacheKey CacheKey) {
         
     Task AwaitCachedContent()
