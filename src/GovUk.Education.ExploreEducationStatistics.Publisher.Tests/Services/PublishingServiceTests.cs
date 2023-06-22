@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -35,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var logger = new Mock<ILogger<PublishingService>>();
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
-            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var privateBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.Get(methodologyVersion.Id))
                 .ReturnsAsync(methodologyVersion);
@@ -51,15 +52,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .Returns(Task.CompletedTask);
 
             privateBlobStorageService.Setup(mock => mock.CopyDirectory(
-                PrivateMethodologyFiles,
-                $"{methodologyVersion.Id}/",
-                PublicMethodologyFiles,
-                $"{methodologyVersion.Id}/",
-                It.Is<IBlobStorageService.CopyDirectoryOptions>(options =>
-                    options.DestinationConnectionString == PublicStorageConnectionString)))
+                    PrivateMethodologyFiles,
+                    $"{methodologyVersion.Id}/",
+                    PublicMethodologyFiles,
+                    $"{methodologyVersion.Id}/",
+                    It.Is<IBlobStorageService.CopyDirectoryOptions>(options =>
+                        options.DestinationConnectionString == PublicStorageConnectionString)))
                 .ReturnsAsync(new List<BlobInfo>());
 
-            var service = BuildPublishingService(publicStorageConnectionString: PublicStorageConnectionString,
+            var service = BuildPublishingService(
                 methodologyService: methodologyService.Object,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 privateBlobStorageService: privateBlobStorageService.Object,
@@ -76,8 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseId = Guid.NewGuid();
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
-            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var privateBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
@@ -118,8 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             };
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
-            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var privateBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
@@ -167,8 +168,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             };
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
-            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var privateBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
@@ -201,7 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             releaseService.Setup(mock => mock.Get(release.Id))
                 .ReturnsAsync(release);
 
-            var service = BuildPublishingService(publicStorageConnectionString: PublicStorageConnectionString,
+            var service = BuildPublishingService(
                 methodologyService: methodologyService.Object,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 privateBlobStorageService: privateBlobStorageService.Object,
@@ -235,8 +236,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             };
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
-            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var privateBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
@@ -284,8 +285,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             };
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
-            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var privateBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
@@ -319,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             releaseService.Setup(mock => mock.Get(release.Id))
                 .ReturnsAsync(release);
 
-            var service = BuildPublishingService(publicStorageConnectionString: PublicStorageConnectionString,
+            var service = BuildPublishingService(
                 methodologyService: methodologyService.Object,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 privateBlobStorageService: privateBlobStorageService.Object,
@@ -353,8 +354,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             };
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
-            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var privateBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
@@ -370,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             // No invocations on the storage services expected because the publication already has published releases.
             // Files for this methodology will be published independently of this release
 
-            var service = BuildPublishingService(publicStorageConnectionString: PublicStorageConnectionString,
+            var service = BuildPublishingService(
                 methodologyService: methodologyService.Object,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 privateBlobStorageService: privateBlobStorageService.Object,
@@ -389,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task PublishStagedReleaseContent()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             publicBlobStorageService.Setup(mock => mock.MoveDirectory(PublicContent,
                     PublicContentStagingPath(),
@@ -407,23 +408,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         private static PublishingService BuildPublishingService(
-            string? publicStorageConnectionString = null,
-            IBlobStorageService? privateBlobStorageService = null,
-            IBlobStorageService? publicBlobStorageService = null,
+            IPrivateBlobStorageService? privateBlobStorageService = null,
+            IPublicBlobStorageService? publicBlobStorageService = null,
             IMethodologyService? methodologyService = null,
             IPublicationRepository? publicationRepository = null,
             IReleaseService? releaseService = null,
-            ILogger<PublishingService>? logger = null)
+            ILogger<PublishingService>? logger = null,
+            IConfiguration? configuration = null)
         {
             return new PublishingService(
-                publicStorageConnectionString ?? "",
-                privateBlobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
-                publicBlobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
+                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(MockBehavior.Strict),
+                publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(MockBehavior.Strict),
                 publicationRepository ?? Mock.Of<IPublicationRepository>(MockBehavior.Strict),
                 releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
-                logger ?? Mock.Of<ILogger<PublishingService>>()
+                logger ?? Mock.Of<ILogger<PublishingService>>(),
+                configuration ?? DefaultConfigurationMock().Object
             );
         }
+
+        private static Mock<IConfiguration> DefaultConfigurationMock()
+        {
+            return MockUtils.CreateMockConfiguration(
+                TupleOf("PublicStorage", PublicStorageConnectionString));
+        }
+
     }
 }

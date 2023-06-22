@@ -16,36 +16,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Services;
 
 public class PublicReleaseFileBlobService : IReleaseFileBlobService
 {
-    private readonly IBlobStorageService _blobStorageService;
+    private readonly IPublicBlobStorageService _publicBlobStorageService;
 
-    public PublicReleaseFileBlobService(IBlobStorageService blobStorageService)
+    public PublicReleaseFileBlobService(IPublicBlobStorageService publicBlobStorageService)
     {
-        _blobStorageService = blobStorageService;
+        _publicBlobStorageService = publicBlobStorageService;
     }
 
     public Task<bool> CheckBlobExists(ReleaseFile releaseFile)
     {
-        return _blobStorageService.CheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath());
+        return _publicBlobStorageService.CheckBlobExists(PublicReleaseFiles, releaseFile.PublicPath());
     }
 
     public Task<BlobInfo> GetBlob(ReleaseFile releaseFile)
     {
-        return _blobStorageService.GetBlob(PublicReleaseFiles, releaseFile.PublicPath());
+        return _publicBlobStorageService.GetBlob(PublicReleaseFiles, releaseFile.PublicPath());
     }
 
     public Task<BlobInfo?> FindBlob(ReleaseFile releaseFile)
     {
-        return _blobStorageService.FindBlob(PublicReleaseFiles, releaseFile.PublicPath());
+        return _publicBlobStorageService.FindBlob(PublicReleaseFiles, releaseFile.PublicPath());
     }
 
     public Task DeleteFile(ReleaseFile releaseFile)
     {
-        return _blobStorageService.DeleteBlob(PublicReleaseFiles, releaseFile.PublicPath());
+        return _publicBlobStorageService.DeleteBlob(PublicReleaseFiles, releaseFile.PublicPath());
     }
 
     public Task<bool> MoveBlob(ReleaseFile releaseFile, string destinationPath)
     {
-        return _blobStorageService.MoveBlob(
+        return _publicBlobStorageService.MoveBlob(
             containerName: PublicReleaseFiles,
             sourcePath: releaseFile.PublicPath(),
             destinationPath: destinationPath);
@@ -56,7 +56,7 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
         int? bufferSize = null,
         CancellationToken cancellationToken = default)
     {
-        return _blobStorageService.StreamBlob(
+        return _publicBlobStorageService.StreamBlob(
             containerName: PublicReleaseFiles,
             path: releaseFile.PublicPath(),
             cancellationToken: cancellationToken
@@ -67,7 +67,7 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
         ReleaseFile releaseFile,
         CancellationToken cancellationToken = default)
     {
-        return _blobStorageService.DownloadBlobText(
+        return _publicBlobStorageService.DownloadBlobText(
             containerName: PublicReleaseFiles,
             path: releaseFile.PublicPath(),
             cancellationToken: cancellationToken
@@ -79,7 +79,7 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
         Stream stream,
         CancellationToken cancellationToken = default)
     {
-        return _blobStorageService.DownloadToStream(
+        return _publicBlobStorageService.DownloadToStream(
             containerName: PublicReleaseFiles,
             path: releaseFile.PublicPath(),
             stream: stream,
@@ -89,7 +89,7 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
 
     public Task<Either<ActionResult, object?>> GetDeserializedJson(ReleaseFile releaseFile, Type type)
     {
-        return _blobStorageService.GetDeserializedJson(
+        return _publicBlobStorageService.GetDeserializedJson(
             containerName: PublicReleaseFiles,
             path: releaseFile.PublicPath(),
             type: type);
@@ -97,12 +97,12 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
 
     public Task<Either<ActionResult, T?>> GetDeserializedJson<T>(ReleaseFile releaseFile) where T : class
     {
-        return _blobStorageService.GetDeserializedJson<T>(PublicReleaseFiles, releaseFile.PublicPath());
+        return _publicBlobStorageService.GetDeserializedJson<T>(PublicReleaseFiles, releaseFile.PublicPath());
     }
 
     public Task UploadFile(ReleaseFile releaseFile, IFormFile file)
     {
-        return _blobStorageService.UploadFile(
+        return _publicBlobStorageService.UploadFile(
             containerName: PublicReleaseFiles,
             path: releaseFile.PublicPath(),
             file: file);
@@ -110,7 +110,7 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
 
     public Task UploadStream(ReleaseFile releaseFile, Stream stream, string contentType)
     {
-        return _blobStorageService.UploadStream(
+        return _publicBlobStorageService.UploadStream(
             containerName: PublicReleaseFiles,
             path: releaseFile.PublicPath(),
             stream: stream,
@@ -119,7 +119,7 @@ public class PublicReleaseFileBlobService : IReleaseFileBlobService
 
     public Task UploadAsJson<T>(ReleaseFile releaseFile, T content, JsonSerializerSettings? settings = null)
     {
-        return _blobStorageService.UploadAsJson(
+        return _publicBlobStorageService.UploadAsJson(
             containerName: PublicReleaseFiles,
             path: releaseFile.PublicPath(),
             content: content,

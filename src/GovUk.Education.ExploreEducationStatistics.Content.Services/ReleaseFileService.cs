@@ -37,20 +37,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPublicBlobStorageService _publicBlobStorageService;
         private readonly IDataGuidanceFileWriter _dataGuidanceFileWriter;
         private readonly IUserService _userService;
 
         public ReleaseFileService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IBlobStorageService blobStorageService,
+            IPublicBlobStorageService publicBlobStorageService,
             IDataGuidanceFileWriter dataGuidanceFileWriter,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
-            _blobStorageService = blobStorageService;
+            _publicBlobStorageService = publicBlobStorageService;
             _dataGuidanceFileWriter = dataGuidanceFileWriter;
             _userService = userService;
         }
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 )
                 .OnSuccessDo(rf => _userService.CheckCanViewRelease(rf.Release))
                 .OnSuccessCombineWith(rf =>
-                    _blobStorageService.DownloadToStream(PublicReleaseFiles, rf.PublicPath(), new MemoryStream()))
+                    _publicBlobStorageService.DownloadToStream(PublicReleaseFiles, rf.PublicPath(), new MemoryStream()))
                 .OnSuccess(methodologyFileAndStream =>
                 {
                     var (releaseFile, stream) = methodologyFileAndStream;
@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             CancellationToken cancellationToken)
         {
             var path = release.AllFilesZipPath();
-            var allFilesZip = await _blobStorageService.FindBlob(PublicReleaseFiles, path);
+            var allFilesZip = await _publicBlobStorageService.FindBlob(PublicReleaseFiles, path);
 
             // Ideally, we would have some way to do this caching via annotations,
             // but this a chunk of work to get working properly as piping
@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             if (allFilesZip?.Updated is not null
                 && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
             {
-                var result = await _blobStorageService.DownloadToStream(
+                var result = await _publicBlobStorageService.DownloadToStream(
                     containerName: PublicReleaseFiles,
                     path: path,
                     stream: outputStream,
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             // so that we can quickly fetch it again.
             fileStream.Position = 0;
 
-            await _blobStorageService.UploadStream(
+            await _publicBlobStorageService.UploadStream(
                 containerName: PublicReleaseFiles,
                 path: release.AllFilesZipPath(),
                 stream: fileStream,
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     return;
                 }
 
-                var blobExists = await _blobStorageService.CheckBlobExists(
+                var blobExists = await _publicBlobStorageService.CheckBlobExists(
                     PublicReleaseFiles,
                     releaseFile.PublicPath()
                 );
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
                 await using var entryStream = entry.Open();
 
-                await _blobStorageService.DownloadToStream(
+                await _publicBlobStorageService.DownloadToStream(
                     containerName: PublicReleaseFiles,
                     path: releaseFile.PublicPath(),
                     stream: entryStream,

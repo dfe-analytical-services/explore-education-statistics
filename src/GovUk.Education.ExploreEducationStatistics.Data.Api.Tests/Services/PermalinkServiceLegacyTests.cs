@@ -131,7 +131,7 @@ public class PermalinkServiceLegacyTests
             }
         };
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
         var releaseRepository = new Mock<IReleaseRepository>(Strict);
         var subjectRepository = new Mock<ISubjectRepository>(Strict);
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
@@ -141,7 +141,7 @@ public class PermalinkServiceLegacyTests
         Guid? expectedPermalinkId = null;
         var blobPathCapture = new CaptureMatch<string>(callback => expectedPermalinkId = Guid.Parse(callback));
 
-        blobStorageService.Setup(s => s.UploadStream(
+        publicBlobStorageService.Setup(s => s.UploadStream(
                 Permalinks,
                 Capture.With(blobPathCapture),
                 It.IsAny<Stream>(),
@@ -199,7 +199,7 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object,
+                publicBlobStorageService: publicBlobStorageService.Object,
                 releaseRepository: releaseRepository.Object,
                 subjectRepository: subjectRepository.Object,
                 tableBuilderService: tableBuilderService.Object);
@@ -207,7 +207,7 @@ public class PermalinkServiceLegacyTests
             var result = (await service.CreateLegacy(request)).AssertRight();
 
             MockUtils.VerifyAllMocks(
-                blobStorageService,
+                publicBlobStorageService,
                 releaseRepository,
                 subjectRepository,
                 tableBuilderService);
@@ -255,7 +255,7 @@ public class PermalinkServiceLegacyTests
             LatestPublishedRelease = release
         };
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
         // Permalink id is assigned on creation and used as the blob path
@@ -263,7 +263,7 @@ public class PermalinkServiceLegacyTests
         Guid? expectedPermalinkId = null;
         var blobPathCapture = new CaptureMatch<string>(callback => expectedPermalinkId = Guid.Parse(callback));
 
-        blobStorageService.Setup(s => s.UploadStream(
+        publicBlobStorageService.Setup(s => s.UploadStream(
                 Permalinks,
                 Capture.With(blobPathCapture),
                 It.IsAny<Stream>(),
@@ -313,13 +313,13 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object,
+                publicBlobStorageService: publicBlobStorageService.Object,
                 tableBuilderService: tableBuilderService.Object);
 
             var result = (await service.CreateLegacy(release.Id, request)).AssertRight();
 
             MockUtils.VerifyAllMocks(
-                blobStorageService,
+                publicBlobStorageService,
                 tableBuilderService);
 
             Assert.Equal(expectedPermalinkId, result.Id);
@@ -476,7 +476,7 @@ public class PermalinkServiceLegacyTests
             }
         };
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
         var releaseRepository = new Mock<IReleaseRepository>(Strict);
         var subjectRepository = new Mock<ISubjectRepository>(Strict);
         var tableBuilderService = new Mock<ITableBuilderService>(Strict);
@@ -486,7 +486,7 @@ public class PermalinkServiceLegacyTests
         Guid? expectedPermalinkId = null;
         var blobPathCapture = new CaptureMatch<string>(callback => expectedPermalinkId = Guid.Parse(callback));
 
-        blobStorageService.Setup(s => s.UploadStream(
+        publicBlobStorageService.Setup(s => s.UploadStream(
                 Permalinks,
                 Capture.With(blobPathCapture),
                 It.IsAny<Stream>(),
@@ -544,7 +544,7 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object,
+                publicBlobStorageService: publicBlobStorageService.Object,
                 releaseRepository: releaseRepository.Object,
                 subjectRepository: subjectRepository.Object,
                 tableBuilderService: tableBuilderService.Object);
@@ -553,7 +553,7 @@ public class PermalinkServiceLegacyTests
             result.AssertRight();
 
             MockUtils.VerifyAllMocks(
-                blobStorageService,
+                publicBlobStorageService,
                 releaseRepository,
                 subjectRepository,
                 tableBuilderService);
@@ -624,9 +624,9 @@ public class PermalinkServiceLegacyTests
                 SubjectId = subjectId
             });
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -656,11 +656,11 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Equal(permalink.Id, result.Id);
             Assert.Equal(permalink.Created, result.Created);
@@ -695,9 +695,9 @@ public class PermalinkServiceLegacyTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
+        publicBlobStorageService.SetupGetDeserializedJsonNotFound<IPublicBlobStorageService, LegacyPermalink>(
             container: Permalinks,
             path: permalink.Id.ToString(),
             settings: PermalinkService.LegacyPermalinkSerializerSettings);
@@ -705,11 +705,11 @@ public class PermalinkServiceLegacyTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = BuildService(contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await service.GetLegacy(permalink.Id);
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             result.AssertNotFound();
         }
@@ -738,9 +738,9 @@ public class PermalinkServiceLegacyTests
                 SubjectId = Guid.NewGuid()
             });
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -757,11 +757,11 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Equal(permalink.Id, result.Id);
             Assert.Equal(PermalinkStatus.SubjectRemoved, result.Status);
@@ -819,9 +819,9 @@ public class PermalinkServiceLegacyTests
                 SubjectId = subjectId
             });
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -860,11 +860,11 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Equal(permalink.Id, result.Id);
             Assert.Equal(PermalinkStatus.Current, result.Status);
@@ -920,9 +920,9 @@ public class PermalinkServiceLegacyTests
                 SubjectId = subjectId
             });
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -952,11 +952,11 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Equal(permalink.Id, result.Id);
             Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
@@ -1012,9 +1012,9 @@ public class PermalinkServiceLegacyTests
                 SubjectId = subjectId
             });
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -1044,11 +1044,11 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Equal(permalink.Id, result.Id);
             Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
@@ -1106,9 +1106,9 @@ public class PermalinkServiceLegacyTests
                 SubjectId = subjectId
             });
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -1138,11 +1138,11 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Equal(permalink.Id, result.Id);
             Assert.Equal(PermalinkStatus.SubjectReplacedOrRemoved, result.Status);
@@ -1193,9 +1193,9 @@ public class PermalinkServiceLegacyTests
                 SubjectId = subjectId
             });
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -1225,11 +1225,11 @@ public class PermalinkServiceLegacyTests
         {
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = (await service.GetLegacy(permalink.Id)).AssertRight();
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Equal(permalink.Id, result.Id);
             Assert.Equal(PermalinkStatus.PublicationSuperseded, result.Status);
@@ -1345,9 +1345,9 @@ public class PermalinkServiceLegacyTests
             }
         };
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -1376,13 +1376,13 @@ public class PermalinkServiceLegacyTests
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object,
+                publicBlobStorageService: publicBlobStorageService.Object,
                 permalinkCsvMetaService: permalinkCsvMetaService.Object
             );
 
             var result = await service.LegacyDownloadCsvToStream(permalink.Id, stream);
 
-            MockUtils.VerifyAllMocks(blobStorageService, permalinkCsvMetaService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService, permalinkCsvMetaService);
 
             result.AssertRight();
 
@@ -1512,9 +1512,9 @@ public class PermalinkServiceLegacyTests
             // instead
         };
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJson(
+        publicBlobStorageService.SetupGetDeserializedJson(
             container: Permalinks,
             path: permalink.Id.ToString(),
             value: permalinkForSerialization,
@@ -1543,13 +1543,13 @@ public class PermalinkServiceLegacyTests
 
             var service = BuildService(
                 contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object,
+                publicBlobStorageService: publicBlobStorageService.Object,
                 permalinkCsvMetaService: permalinkCsvMetaService.Object
             );
 
             var result = await service.LegacyDownloadCsvToStream(permalink.Id, stream);
 
-            MockUtils.VerifyAllMocks(blobStorageService, permalinkCsvMetaService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService, permalinkCsvMetaService);
 
             result.AssertRight();
 
@@ -1587,9 +1587,9 @@ public class PermalinkServiceLegacyTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
-        blobStorageService.SetupGetDeserializedJsonNotFound<LegacyPermalink>(
+        publicBlobStorageService.SetupGetDeserializedJsonNotFound<IPublicBlobStorageService, LegacyPermalink>(
             container: Permalinks,
             path: permalink.Id.ToString(),
             settings: PermalinkService.LegacyPermalinkSerializerSettings);
@@ -1597,11 +1597,11 @@ public class PermalinkServiceLegacyTests
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {
             var service = BuildService(contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object);
+                publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await service.LegacyDownloadCsvToStream(permalink.Id, new MemoryStream());
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+            MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             result.AssertNotFound();
         }
@@ -1611,7 +1611,7 @@ public class PermalinkServiceLegacyTests
         ContentDbContext? contentDbContext = null,
         ITableBuilderService? tableBuilderService = null,
         IPermalinkCsvMetaService? permalinkCsvMetaService = null,
-        IBlobStorageService? blobStorageService = null,
+        IPublicBlobStorageService? publicBlobStorageService = null,
         IFrontendService? frontendService = null,
         IReleaseRepository? releaseRepository = null,
         ISubjectRepository? subjectRepository = null,
@@ -1623,7 +1623,7 @@ public class PermalinkServiceLegacyTests
             contentDbContext,
             tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict),
             permalinkCsvMetaService ?? Mock.Of<IPermalinkCsvMetaService>(Strict),
-            blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+            publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
             frontendService ?? Mock.Of<IFrontendService>(Strict),
             subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
             publicationRepository ?? new PublicationRepository(contentDbContext),

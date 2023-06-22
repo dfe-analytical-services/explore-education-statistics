@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // test that the deletion of the main data and metadata files completed, as well as any zip files that
             // were uploaded
-            blobStorageService.Setup(mock =>
+            privateBlobStorageService.Setup(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(
                         releaseDataFile.Path(), releaseMetaFile.Path(), zipFile.Path())))
                 .Returns(Task.CompletedTask);
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     releaseFileService: releaseFileService.Object);
 
@@ -164,16 +164,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, releaseDataFile.Path()), Times.Once());
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, releaseMetaFile.Path()), Times.Once());
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, zipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(releaseDataFile.File.Id), Times.Once());
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataImportService,
                     releaseFileService);
             }
@@ -306,14 +306,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             dataImportService.Setup(mock => mock.DeleteImport(replacementDataFile.Id))
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
+            privateBlobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
                     It.IsIn(replacementDataFile.Path(), replacementMetaFile.Path(), replacementZipFile.Path())))
                 .Returns(Task.CompletedTask);
 
@@ -326,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     releaseFileService: releaseFileService.Object);
 
@@ -334,17 +334,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, replacementDataFile.Path()), Times.Once());
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                         mock.DeleteBlob(PrivateReleaseFiles, replacementMetaFile.Path()),
                     Times.Once());
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, replacementZipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(replacementDataFile.Id), Times.Once());
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataImportService,
                     releaseFileService);
             }
@@ -451,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
@@ -464,7 +464,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     releaseFileService: releaseFileService.Object);
 
@@ -472,7 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataImportService,
                     releaseFileService);
             }
@@ -567,14 +567,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
             dataImportService.Setup(mock => mock.DeleteImport(dataReleaseFile.File.Id))
                 .Returns(Task.CompletedTask);
 
-            blobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
+            privateBlobStorageService.Setup(mock => mock.DeleteBlob(PrivateReleaseFiles,
                     It.IsIn(dataReleaseFile.Path(), metaReleaseFile.Path(), zipFile.Path())))
                 .Returns(Task.CompletedTask);
 
@@ -587,7 +587,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     releaseFileService: releaseFileService.Object);
 
@@ -595,16 +595,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, dataReleaseFile.Path()), Times.Once());
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, metaReleaseFile.Path()), Times.Once());
-                blobStorageService.Verify(mock =>
+                privateBlobStorageService.Verify(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, zipFile.Path()), Times.Once());
 
                 dataImportService.Verify(mock => mock.DeleteImport(dataReleaseFile.File.Id), Times.Once());
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataImportService,
                     releaseFileService);
             }
@@ -708,7 +708,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
 
@@ -721,7 +721,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     releaseFileService: releaseFileService.Object);
 
@@ -729,7 +729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataImportService,
                     releaseFileService);
             }
@@ -756,19 +756,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteAll_ReleaseNotFound()
         {
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             await using var contentDbContext = InMemoryApplicationDbContext();
             var service = SetupReleaseDataFileService(contentDbContext: contentDbContext,
-                blobStorageService: blobStorageService.Object,
+                privateBlobStorageService: privateBlobStorageService.Object,
                 dataImportService: dataImportService.Object);
 
             var result = await service.DeleteAll(Guid.NewGuid());
 
             result.AssertNotFound();
 
-            MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
+            MockUtils.VerifyAllMocks(privateBlobStorageService, dataImportService);
         }
 
         [Fact]
@@ -784,20 +784,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupReleaseDataFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object);
 
                 var result = await service.DeleteAll(release.Id);
 
                 Assert.True(result.IsRight);
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, dataImportService);
             }
         }
 
@@ -1667,7 +1667,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFormFile = CreateFormFileMock(dataFileName).Object;
             var metaFormFile = CreateFormFileMock(metaFileName).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
 
@@ -1696,14 +1696,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Status = QUEUED
                     });
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile
                     )).Returns(Task.CompletedTask);
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, FileType.Data))),
@@ -1713,7 +1713,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
@@ -1726,7 +1726,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, dataImportService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal(subjectName, result.Right.Name);
@@ -1837,7 +1837,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFormFile = CreateFormFileMock(dataFileName).Object;
             var metaFormFile = CreateFormFileMock(metaFileName).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
 
@@ -1862,14 +1862,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Status = QUEUED
                     });
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile
                     )).Returns(Task.CompletedTask);
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, FileType.Data))),
@@ -1879,7 +1879,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
@@ -1892,7 +1892,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataFileInfo = result.AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, dataImportService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService);
 
                 Assert.True(dataFileInfo.Id.HasValue);
                 Assert.Equal(originalDataReleaseFile.Name, dataFileInfo.Name);
@@ -2042,7 +2042,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataFormFile = CreateFormFileMock(dataFileName).Object;
             var metaFormFile = CreateFormFileMock(metaFileName).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
@@ -2068,14 +2068,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
                     .ReturnsAsync(new DataImport());
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, FileType.Data))),
                         dataFormFile
                     )).Returns(Task.CompletedTask);
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, FileType.Data))),
@@ -2085,7 +2085,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
                 );
@@ -2098,7 +2098,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataFileInfo = result.AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, dataImportService);
+                MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService, dataImportService);
 
                 Assert.True(dataFileInfo.Id.HasValue);
                 Assert.Equal(dataFileName, dataFileInfo.FileName);
@@ -2174,7 +2174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
             var archiveFile = CreateDataArchiveFileMock(dataFileName, metaFileName).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
@@ -2205,7 +2205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Status = QUEUED
                     });
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, DataZip))),
@@ -2215,7 +2215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     dataArchiveValidationService: dataArchiveValidationService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
@@ -2226,7 +2226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     zipFormFile: zipFormFile,
                     subjectName: subjectName)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataArchiveValidationService,
                     fileUploadsValidatorService,
                     dataImportService);
@@ -2351,7 +2351,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFormFile = CreateFormFileMock(zipFileName).Object;
             var archiveFile = CreateDataArchiveFileMock(dataFileName, metaFileName).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(MockBehavior.Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
@@ -2379,7 +2379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         It.Is<File>(file => file.Type == DataZip && file.Filename == zipFileName)))
                     .ReturnsAsync(new DataImport());
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, DataZip))),
@@ -2389,7 +2389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     dataArchiveValidationService: dataArchiveValidationService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
@@ -2402,7 +2402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataFileInfo = result.AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataArchiveValidationService,
                     fileUploadsValidatorService,
                     dataImportService);
@@ -2511,7 +2511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var zipFormFile = CreateFormFileMock(zipFileName, "application/zip").Object;
             var archiveFile = CreateDataArchiveFileMock(dataFileName, metaFileName).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
             var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
@@ -2540,7 +2540,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Status = QUEUED
                     });
 
-                blobStorageService.Setup(mock =>
+                privateBlobStorageService.Setup(mock =>
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, DataZip))),
@@ -2550,7 +2550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseDataFileService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    privateBlobStorageService: privateBlobStorageService.Object,
                     dataImportService: dataImportService.Object,
                     dataArchiveValidationService: dataArchiveValidationService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object
@@ -2561,7 +2561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     zipFormFile,
                     replacingFileId: originalDataReleaseFile.File.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(blobStorageService,
+                MockUtils.VerifyAllMocks(privateBlobStorageService,
                     dataArchiveValidationService,
                     fileUploadsValidatorService,
                     dataImportService);
@@ -2650,7 +2650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext,
             StatisticsDbContext? statisticsDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IBlobStorageService? blobStorageService = null,
+            IPrivateBlobStorageService? privateBlobStorageService = null,
             IDataArchiveValidationService? dataArchiveValidationService = null,
             IFileUploadsValidatorService? fileUploadsValidatorService = null,
             IFileRepository? fileRepository = null,
@@ -2667,7 +2667,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseDataFileService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
                 dataArchiveValidationService ?? Mock.Of<IDataArchiveValidationService>(Strict),
                 fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict),
                 fileRepository ?? new FileRepository(contentDbContext),

@@ -31,30 +31,18 @@ public class BlobCacheConfigProvider : IExtensionConfigProvider
 
         using var scope = _scopeFactory.CreateScope();
 
-        var publicBlobCacheService = GetBlobCacheService(scope.ServiceProvider, "PublicStorage");
+        var publicBlobCacheService = GetPublicBlobCacheService(scope.ServiceProvider);
         BlobCacheAttribute.AddService("public", publicBlobCacheService);
     }
 
-    private static IBlobCacheService GetBlobCacheService(IServiceProvider provider, string connectionStringKey)
+    private static IBlobCacheService GetPublicBlobCacheService(IServiceProvider provider)
     {
-        return new BlobCacheService(
-            blobStorageService: GetBlobStorageService(provider, connectionStringKey),
-            logger: provider.GetRequiredService<ILogger<BlobCacheService>>());
-    }
-
-    private static IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
-    {
-        var connectionString = GetConfigurationValue(provider, connectionStringKey);
-        return new BlobStorageService(
-            connectionString,
-            new BlobServiceClient(connectionString),
+        var publicBlobStorageService = new PublicBlobStorageService(
             provider.GetRequiredService<ILogger<BlobStorageService>>(),
-            new StorageInstanceCreationUtil());
-    }
+            provider.GetRequiredService<IConfiguration>());
 
-    private static string GetConfigurationValue(IServiceProvider provider, string key)
-    {
-        var configuration = provider.GetService<IConfiguration>();
-        return configuration.GetValue<string>(key);
+        return new BlobCacheService(
+            publicBlobStorageService,
+            provider.GetRequiredService<ILogger<BlobCacheService>>());
     }
 }

@@ -12,6 +12,7 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient.Object);
 
             Assert.True(await service.CheckBlobExists(PublicReleaseFiles, path));
         }
@@ -60,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             Assert.False(await service.CheckBlobExists(PublicReleaseFiles, path));
         }
@@ -83,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             var result = await service.DownloadBlobText(
                 containerName: PublicReleaseFiles,
@@ -110,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             var result = await service.DownloadBlobText(
                 containerName: PublicReleaseFiles,
@@ -137,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             await using var targetStream = new MemoryStream();
             await service.DownloadToStream(
@@ -166,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             var result = await service.DownloadToStream(
                 containerName: PublicReleaseFiles,
@@ -193,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             var result = await service.GetBlob(PublicReleaseFiles, path);
 
@@ -223,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             var result = await service.GetDeserializedJson<TestClass>(PublicReleaseFiles, path);
 
@@ -248,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             var result = await service.GetDeserializedJson(PublicReleaseFiles, path, typeof(TestClass));
 
@@ -273,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             var result = await service.GetDeserializedJson<object>(PublicReleaseFiles, path);
 
@@ -298,7 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name, blobClient);
             var blobServiceClient = MockBlobServiceClient(blobContainerClient);
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             var exception = await Assert.ThrowsAsync<JsonException>(
                 () =>
@@ -342,7 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 )
                 .ReturnsAsync(Response.FromValue(true, null!));
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             await service.DeleteBlobs(PublicReleaseFiles, "directory");
 
@@ -386,7 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 )
                 .ReturnsAsync(Response.FromValue(true, null!));
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             await service.DeleteBlobs(PublicReleaseFiles);
 
@@ -429,7 +430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 )
                 .ReturnsAsync(Response.FromValue(true, null!));
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             await service.DeleteBlobs(
                 PublicReleaseFiles,
@@ -476,7 +477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 )
                 .ReturnsAsync(Response.FromValue(true, null!));
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             await service.DeleteBlobs(
                 PublicReleaseFiles,
@@ -523,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 )
                 .ReturnsAsync(Response.FromValue(true, null!));
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             await service.DeleteBlobs(
                 PublicReleaseFiles,
@@ -569,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 )
                 .ReturnsAsync(Response.FromValue(true, null!));
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             await service.DeleteBlobs(
                 PublicReleaseFiles,
@@ -615,7 +616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 )
                 .ReturnsAsync(Response.FromValue(true, null!));
 
-            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+            var service = SetupTestBlobStorageService(blobServiceClient: blobServiceClient.Object);
 
             await service.DeleteBlobs(
                 PublicReleaseFiles,
@@ -699,15 +700,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             return blobClient;
         }
 
-        private static BlobStorageService SetupBlobStorageService(
+        private static TestBlobStorageService SetupTestBlobStorageService(
             BlobServiceClient? blobServiceClient = null)
         {
-            return new BlobStorageService(
+            return new TestBlobStorageService(
                 connectionString: "",
                 blobServiceClient ?? new Mock<BlobServiceClient>().Object,
                 Mock.Of<ILogger<BlobStorageService>>(),
                 Mock.Of<IStorageInstanceCreationUtil>()
             );
+        }
+
+        private class TestBlobStorageService : BlobStorageService
+        {
+            public TestBlobStorageService(
+                string connectionString,
+                BlobServiceClient client,
+                ILogger<IBlobStorageService> logger,
+                IStorageInstanceCreationUtil storageInstanceCreationUtil)
+                : base(connectionString, client, logger, storageInstanceCreationUtil)
+            {}
         }
 
         private IEnumerable<Page<T>> CreatePages<T>(params List<T>[] pages)

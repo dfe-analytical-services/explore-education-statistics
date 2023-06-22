@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
@@ -9,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -88,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                             providerOptions
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .EnableCustomRetryOnFailure()
-                            )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -99,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
-                            )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -120,19 +118,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             });
 
             services.AddCors();
-            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
-                {
-                    var connectionString = Configuration.GetValue<string>("PublicStorage");
-
-                    return new BlobStorageService(
-                        connectionString,
-                        new BlobServiceClient(connectionString),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                        new StorageInstanceCreationUtil()
-                    );
-                }
-            );
-            services.AddTransient<IBlobCacheService, BlobCacheService>();
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+            services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
+                provider.GetRequiredService<IPublicBlobStorageService>(),
+                provider.GetRequiredService<ILogger<BlobCacheService>>()));
             services.AddSingleton<IMemoryCacheService>(provider =>
             {
                 var memoryCacheConfig = Configuration.GetSection("MemoryCache");
