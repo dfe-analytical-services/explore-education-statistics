@@ -1,4 +1,4 @@
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cancellation
+namespace GovUk.Education.ExploreEducationStatistics.Common.Cancellation
 {
     public static class RequestTimeoutConfigurationKeys
     {

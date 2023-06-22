@@ -46,13 +46,17 @@ async function startServer(port = process.env.PORT || 3000) {
     process.env.CONTENT_API_BASE_URL.replace('/api', ''),
     process.env.DATA_API_BASE_URL.replace('/api', ''),
     process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
-    'https://www.google-analytics.com',
+    'https://*.googletagmanager.com',
+    'https://*.google-analytics.com',
+    'https://*.analytics.google.com',
     'https://dc.services.visualstudio.com/v2/track',
   ];
 
   const cspScriptSrc = [
     "'self'",
-    'https://www.google-analytics.com/',
+    'https://*.googletagmanager.com',
+    'https://*.google-analytics.com/',
+    'https://*.analytics.google.com',
     "'unsafe-inline'",
     "'unsafe-eval'",
   ];
@@ -72,7 +76,9 @@ async function startServer(port = process.env.PORT || 3000) {
             "'self'",
             process.env.CONTENT_API_BASE_URL.replace('/api', ''),
             'data:',
-            'https://www.google-analytics.com/',
+            'https://*.googletagmanager.com',
+            'https://*.google-analytics.com/',
+            'https://*.analytics.google.com',
           ],
           fontSrc: ["'self'"],
           connectSrc:

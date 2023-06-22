@@ -1,14 +1,13 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -19,11 +18,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/data/[controller]")]
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class TableBuilderController : ControllerBase
@@ -31,38 +30,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserService _userService;
-        private readonly ILogger _logger;
 
         public TableBuilderController(
             ITableBuilderService tableBuilderService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IUserService userService,
-            ILogger<TableBuilderController> logger)
+            IUserService userService)
         {
             _tableBuilderService = tableBuilderService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
-            _logger = logger;
         }
 
-        [HttpPost("release/{releaseId:guid}")]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query(
-            Guid releaseId, 
+        [HttpPost("data/tablebuilder/release/{releaseId:guid}")]
+        [Produces("application/json", "text/csv")]
+        [CancellationTokenTimeout(TableBuilderQuery)]
+        public async Task Query(
+            Guid releaseId,
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
-            var stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
+            if (Request.AcceptsCsv(exact: true))
+            {
+                Response.ContentDispositionAttachment(
+                    contentType: ContentTypes.Csv,
+                    filename: $"{releaseId}.csv");
 
-            var tableBuilderResultViewModel = _tableBuilderService.Query(releaseId, query, cancellationToken);
+                await _tableBuilderService.QueryToCsvStream(
+                    releaseId,
+                    query,
+                    Response.BodyWriter.AsStream(),
+                    cancellationToken
+                );
 
-            stopwatch.Stop();
-            _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);
+                return;
+            }
 
-            return tableBuilderResultViewModel.HandleFailuresOrOk();
+            var result = await _tableBuilderService
+                .Query(releaseId, query, cancellationToken)
+                .HandleFailuresOr(Ok);
+
+            await result.ExecuteResultAsync(ControllerContext);
         }
 
-        [HttpGet("release/{releaseId:guid}/data-block/{dataBlockId:guid}")]
+        [HttpGet("data/tablebuilder/release/{releaseId:guid}/data-block/{dataBlockId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId,

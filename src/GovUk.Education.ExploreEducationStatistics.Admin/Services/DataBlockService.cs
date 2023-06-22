@@ -120,10 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(CheckIsDataBlock)
                 .OnSuccess(async dataBlock =>
                 {
-                    // Remove as part of EES-4273 - we fetch these from the FeaturedTables table now
-                    dataBlock.HighlightName = null;
-                    dataBlock.HighlightDescription = null;
-
                     var viewModel = _mapper.Map<DataBlockViewModel>(dataBlock);
 
                     var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(

@@ -289,6 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Name = "Test highlight name 1",
                 Description = "Test highlight description 1",
                 DataBlock = dataBlock1,
+                Release = release,
             };
 
             var dataBlock2 = new DataBlock
@@ -330,6 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Name = "Test highlight name 2",
                 Description = "Test highlight description 2",
                 DataBlock = dataBlock2,
+                Release = release,
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -364,8 +366,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.Heading, listResult[0].Heading);
                 Assert.Equal(dataBlock1.Name, listResult[0].Name);
                 Assert.Equal(dataBlock1.Created, listResult[0].Created);
-                Assert.Equal(dataBlock1.HighlightName, listResult[0].HighlightName);
-                Assert.Equal(dataBlock1.HighlightDescription, listResult[0].HighlightDescription);
+                Assert.Equal(featuredTable1.Name, listResult[0].HighlightName);
+                Assert.Equal(featuredTable1.Description, listResult[0].HighlightDescription);
                 Assert.Equal(dataBlock1.Source, listResult[0].Source);
                 Assert.Equal(1, listResult[0].ChartsCount);
                 Assert.True(listResult[0].InContent);
@@ -373,8 +375,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock2.Heading, listResult[1].Heading);
                 Assert.Equal(dataBlock2.Name, listResult[1].Name);
                 Assert.Equal(dataBlock2.Created, listResult[1].Created);
-                Assert.Equal(dataBlock2.HighlightName, listResult[1].HighlightName);
-                Assert.Equal(dataBlock2.HighlightDescription, listResult[1].HighlightDescription);
+                Assert.Equal(featuredTable2.Name, listResult[1].HighlightName);
+                Assert.Equal(featuredTable2.Description, listResult[1].HighlightDescription);
                 Assert.Equal(dataBlock2.Source, listResult[1].Source);
                 Assert.Equal(0, listResult[1].ChartsCount);
                 Assert.False(listResult[1].InContent);
@@ -479,6 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Name = "Test highlight name 1",
                 Description = "Test highlight description 1",
                 DataBlock = dataBlock1,
+                Release = release,
             };
 
             var dataBlock2 = new DataBlock
@@ -516,8 +519,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.Heading, viewModel.Heading);
                 Assert.Equal(dataBlock1.Name, viewModel.Name);
                 Assert.Equal(dataBlock1.Created, viewModel.Created);
-                Assert.Equal(dataBlock1.HighlightName, viewModel.HighlightName);
-                Assert.Equal(dataBlock1.HighlightDescription, viewModel.HighlightDescription);
+                Assert.Equal(featuredTable1.Name, viewModel.HighlightName);
+                Assert.Equal(featuredTable1.Description, viewModel.HighlightDescription);
                 Assert.Equal(dataBlock1.Source, viewModel.Source);
                 Assert.Equal(1, viewModel.ChartsCount);
                 Assert.True(viewModel.InContent);
@@ -1125,8 +1128,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Heading = "Old heading",
                 Name = "Old name",
-                HighlightName = "Old highlight name",
-                HighlightDescription = "Old highlight description",
                 Source = "Old source",
                 Order = 5,
                 Query = new ObservationQueryContext

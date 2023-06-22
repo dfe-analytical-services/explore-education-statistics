@@ -12,9 +12,12 @@ function AcccessibilityStatementPage() {
         <div className="govuk-grid-column-three-quarters">
           <section>
             <p className="govuk-body">
-              This website is run by{' '}
-              <a href="https://www.gov.uk/government/organisations/department-for-education">
-                the Department for Education (DfE)
+              This website is run by the{' '}
+              <a
+                rel="external"
+                href="https://www.gov.uk/government/organisations/department-for-education"
+              >
+                Department for Education (DfE)
               </a>
               . We want as many people as possible to be able to use this
               website. For example, that means you should be able to:
@@ -34,39 +37,35 @@ function AcccessibilityStatementPage() {
                 the most recent versions of JAWS, NVDA and VoiceOver)
               </li>
             </ul>
+            <p>
+              We’ve also made the website text as simple as possible to
+              understand.
+            </p>
+            <p>
+              <a rel="external" href="https://mcmw.abilitynet.org.uk/">
+                AbilityNet
+              </a>{' '}
+              has advice on making your device easier to use if you have a
+              disability.
+            </p>
           </section>
 
           <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-l">How accessible this website is</h2>
+            <h2 className="govuk-heading-m">How accessible this website is</h2>
             <p className="govuk-body">
               We know some parts of this website are not fully accessible:
             </p>
             <ul className="govuk-list--bullet">
-              <li>
-                the 'in page' search feature does not function as expected using
-                screen reader and keyboard
-              </li>
-              <li>
-                the drag and drop feature for table reordering is difficult to
-                use for screen reader, voice activation or keyboard only users
-              </li>
-              <li>
-                the focus order of hidden links in the charts tab when using
-                keyboard leads to unexpected selections
-              </li>
-              <li>
-                when opening some collapsible sections unexpected elements can
-                be read out to screen reader users
-              </li>
-              <li>some tables are missing title captions</li>
+              <li>some buttons have the same titles, but different actions</li>
               <li>
                 some buttons, links, and headings are not descriptive enough
               </li>
+              <li>some tables are missing title captions</li>
             </ul>
           </section>
 
           <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-l">
+            <h2 className="govuk-heading-m">
               What to do if you cannot access parts of this website
             </h2>
             <p className="govuk-body">
@@ -76,7 +75,7 @@ function AcccessibilityStatementPage() {
             </p>
             <ul className="govuk-list--bullet">
               <li>
-                email:{' '}
+                email{' '}
                 <a href="mailto:explore.statistics@education.gov.uk">
                   explore.statistics@education.gov.uk
                 </a>
@@ -85,7 +84,7 @@ function AcccessibilityStatementPage() {
           </section>
 
           <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-l">
+            <h2 className="govuk-heading-m">
               Reporting accessibility problems with this website
             </h2>
             <p className="govuk-body">
@@ -95,7 +94,7 @@ function AcccessibilityStatementPage() {
             </p>
             <ul className="govuk-list--bullet">
               <li>
-                email:{' '}
+                email{' '}
                 <a href="mailto:explore.statistics@education.gov.uk">
                   explore.statistics@education.gov.uk
                 </a>
@@ -104,7 +103,7 @@ function AcccessibilityStatementPage() {
           </section>
 
           <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-l">Enforcement procedure</h2>
+            <h2 className="govuk-heading-m">Enforcement procedure</h2>
             <p className="govuk-body">
               The Equality and Human Rights Commission (EHRC) is responsible for
               enforcing the Public Sector Bodies (Websites and Mobile
@@ -119,7 +118,7 @@ function AcccessibilityStatementPage() {
           </section>
 
           <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-l">
+            <h2 className="govuk-heading-m">
               Technical information about this website’s accessibility
             </h2>
             <p className="govuk-body">
@@ -137,7 +136,7 @@ function AcccessibilityStatementPage() {
             </p>
           </section>
           <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-l">Non accessible content</h2>
+            <h2 className="govuk-heading-m">Non accessible content</h2>
             <p className="govuk-body">
               The content listed below is non-accessible for the following
               reasons. We will address these issues during our public beta phase
@@ -145,69 +144,36 @@ function AcccessibilityStatementPage() {
             </p>
             <ol>
               <li>
-                The 'in page' search results are not appropriately announced.
-                This means when keyboard focus is on an actual result the text
-                is not announced to screen reader users. This doesn’t meet WCAG
-                2.1 success criterion 1.3.1 (info and relationships).
-              </li>
-              <li>
-                The drag and drop feature for reordering tables has nested
-                active form elements. This means a user could tab to an element,
-                but the screen reader will not announce its name, role or state.
-                This doesn’t meet WCAG 2.1 success criterion 3.3.2
-                (Understanding labels or instructions) and 4.1.2 (Understanding
-                name, role, value)
-              </li>
-              <li>
-                Nested fieldsets used in the table tool. This means screen
-                reader users can find it difficult to traverse through the form
-                elements, and select radio buttons using the keyboard. This
-                doesn’t meet WCAG 2.1 success criterion 2.4.3 (Understanding
-                focus order)
-              </li>
-              <li>
-                Some collapsible sections can trigger an unexpected
-                announcement. This means when a screen reader user opens a
-                collapsible section they will sometimes hear an unexpected
-                announcement that could cause confusion (occurs whenever there
-                is an element inside the section using aria-live='assertive').
-                This doesn’t meet WCAG 2.1 success criterion 4.1.3
-                (understanding status messages).
-              </li>
-              <li>
-                Some tables are missing a summary or caption. This means
-                assistive technology users will find it difficult to determine a
-                table’s contents without traversing it. This doesn’t meet WCAG
-                2.1 success criterion 1.3.1 (info and relationships).
-              </li>
-              <li>
-                There are hidden links in content on the charts tab. This means
-                a keyboard user can focus on an unexpected element on the page
-                thus causing confusion. This doesn’t meet WCAG 2.1 success
-                criterion 2.4.3 (Understanding focus order)
-              </li>
-              <li>
-                Some pages have multiple buttons with the same title. This means
-                a screen reader user is unable to differentiate between these
-                buttons out of context to make an informed selection. This
+                The table tool has multiple buttons with the same title. This
+                means a screen reader user is unable to differentiate between
+                these buttons out of context to make an informed selection. This
                 doesn’t meet WCAG 2.1 success criterion 2.4.6 (understanding
                 headings and labels).
               </li>
               <li>
-                Some pages have multiple headings with the same title. This
-                means it is difficult for screen reader users to distinguish out
-                of context what the headings are relating to. This doesn’t meet
-                WCAG 2.1 success criterion 2.4.6 (understanding headings and
-                labels).
+                Some publication pages have multiple help buttons with the same
+                title. This means it is difficult for screen reader users to
+                distinguish out of context what the headings are relating to.
+                This doesn’t meet WCAG 2.1 success criterion 2.4.6
+                (understanding headings and labels).
+              </li>
+              <li>
+                Some publication pages have tables that are missing a summary or
+                caption. This means assistive technology users will find it
+                difficult to determine a table’s contents without traversing it.
+                This doesn’t meet WCAG 2.1 success criterion 1.3.1 (info and
+                relationships).
               </li>
             </ol>
-            <h3 className="govuk-heading-m">Disproportionate burden</h3>
+          </section>
+          <section className="govuk-section-break--xl">
+            <h2 className="govuk-heading-m">Disproportionate burden</h2>
             <p className="govuk-body">Not applicable</p>
           </section>
           <section className="govuk-section-break--xl">
-            <h2 className="govuk-heading-l">How we tested this website</h2>
+            <h2 className="govuk-heading-m">How we tested this website</h2>
             <p className="govuk-body">
-              This website was last tested on 15 November 2021 against{' '}
+              This website was last tested on 27 September 2022 against{' '}
               <a href="https://www.w3.org/TR/WCAG21/" rel="external">
                 Accessibility Guidelines WCAG2.1
               </a>
@@ -262,7 +228,7 @@ function AcccessibilityStatementPage() {
             </ul>
           </section>
           <section className="govuk-section-break govuk-section-break--xl">
-            <h2 className="govuk-heading-l">
+            <h2 className="govuk-heading-m">
               What we’re doing to improve accessibility
             </h2>
             <p className="govuk-body">
@@ -271,12 +237,12 @@ function AcccessibilityStatementPage() {
             </p>
           </section>
           <section className="govuk-section-break govuk-section-break--xl">
-            <h2 className="govuk-heading-l">
+            <h2 className="govuk-heading-m">
               Preparation of this accessibility statement
             </h2>
             <p className="govuk-body">
               This statement was prepared on 4 December 2019. It was last
-              reviewed on 6 January 2022.
+              reviewed on 13 June 2023.
             </p>
           </section>
         </div>
