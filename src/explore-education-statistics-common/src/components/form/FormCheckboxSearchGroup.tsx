@@ -9,6 +9,7 @@ import FormCheckboxGroup, {
   FormCheckboxGroupProps,
 } from './FormCheckboxGroup';
 import styles from './FormCheckboxSearchGroup.module.scss';
+import VisuallyHidden from '../VisuallyHidden';
 
 export interface FormCheckboxSearchGroupProps extends FormCheckboxGroupProps {
   maxSearchResults?: number;
@@ -18,7 +19,7 @@ export interface FormCheckboxSearchGroupProps extends FormCheckboxGroupProps {
 }
 
 const FormCheckboxSearchGroup = ({
-  searchLabel = 'Search options',
+  searchLabel,
   ...props
 }: FormCheckboxSearchGroupProps) => {
   const { isMounted } = useMounted();
@@ -30,20 +31,21 @@ const FormCheckboxSearchGroup = ({
   }
 
   const {
+    error,
+    hint,
+    groupLabel,
     id,
     legend,
-    hint,
     legendHidden,
     legendSize,
-    error,
     maxSearchResults = 500,
     name,
-    onFieldsetFocus,
-    onFieldsetBlur,
     options = [],
     searchHelpText,
     searchOnly = false,
     value = [],
+    onFieldsetFocus,
+    onFieldsetBlur,
     ...groupProps
   } = props;
 
@@ -115,7 +117,16 @@ const FormCheckboxSearchGroup = ({
       <FormTextSearchInput
         id={`${id}-search`}
         name={`${name}-search`}
-        label={searchLabel}
+        label={
+          searchLabel || (
+            <>
+              Search options
+              {groupLabel && (
+                <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
+              )}
+            </>
+          )
+        }
         width={20}
         onChange={event => {
           if (
@@ -150,6 +161,7 @@ const FormCheckboxSearchGroup = ({
             id={`${id}-options`}
             value={value}
             name={name}
+            groupLabel={groupLabel}
             options={filteredOptions}
             small
           />
