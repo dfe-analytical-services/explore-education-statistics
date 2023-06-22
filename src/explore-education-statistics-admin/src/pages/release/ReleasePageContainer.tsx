@@ -70,7 +70,7 @@ interface MatchProps {
   releaseId: string;
 }
 
-const ReleasePageContainer = () => {
+export default function ReleasePageContainer() {
   const { publicationId, releaseId } = useParams<MatchProps>();
   const location = useLocation();
 
@@ -198,6 +198,4 @@ const ReleasePageContainer = () => {
       )}
     </LoadingSpinner>
   );
-};
-
-export default ReleasePageContainer;
+}

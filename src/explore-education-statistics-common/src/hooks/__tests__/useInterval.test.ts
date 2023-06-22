@@ -7,8 +7,8 @@ describe('useInterval', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
     jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
   test('calls callback at regular intervals', () => {

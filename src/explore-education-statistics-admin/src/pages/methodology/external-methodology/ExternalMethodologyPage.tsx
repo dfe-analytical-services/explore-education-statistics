@@ -9,14 +9,14 @@ import publicationService, {
   Publication,
 } from '@admin/services/publicationService';
 import React from 'react';
-import { useHistory, useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router-dom';
 
 interface Model {
   publication: Publication;
   externalMethodology?: ExternalMethodology;
 }
 
-const ExternalMethodologyPage = () => {
+export default function ExternalMethodologyPage() {
   const { publicationId } = useParams<{ publicationId: string }>();
   const history = useHistory();
 
@@ -82,6 +82,4 @@ const ExternalMethodologyPage = () => {
       </div>
     </Page>
   );
-};
-
-export default ExternalMethodologyPage;
+}

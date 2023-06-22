@@ -134,7 +134,7 @@ const LocationFiltersForm = ({
       enableReinitialize
       initialValues={initialFormValues}
       validateOnBlur={false}
-      validationSchema={Yup.object<LocationFormValues>().shape({
+      validationSchema={Yup.object<LocationFormValues>({
         locations: Yup.object().test(
           'required',
           'Select at least one location',

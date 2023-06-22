@@ -22,6 +22,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  jest.runOnlyPendingTimers();
   jest.useRealTimers();
 });
 
@@ -391,6 +392,8 @@ describe('ReleaseFileUploadsSection', () => {
           summary: 'Test summary 3',
           file,
         });
+
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(3);
       });
 
       const sections = screen.getAllByTestId('accordionSection');

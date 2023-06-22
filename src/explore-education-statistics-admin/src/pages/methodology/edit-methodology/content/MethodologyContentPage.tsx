@@ -21,7 +21,7 @@ import {
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 export const MethodologyContentPageInternal = () => {
   const {
@@ -103,7 +103,7 @@ export const MethodologyContentPageInternal = () => {
   );
 };
 
-const MethodologyContentPage = () => {
+export default function MethodologyContentPage() {
   const { methodologyId } = useParams<MethodologyRouteParams>();
 
   const { value, isLoading } = useAsyncHandledRetry<
@@ -133,6 +133,4 @@ const MethodologyContentPage = () => {
       )}
     </LoadingSpinner>
   );
-};
-
-export default MethodologyContentPage;
+}

@@ -19,7 +19,7 @@ export default class FileSchema extends Yup.MixedSchema<File> {
     return super.required(message) as this;
   }
 
-  minSize(minBytes: number, message?: string) {
+  minSize(minBytes: number, message?: string): FileSchema {
     return this.test({
       name: 'minSize',
       message: message || 'File must be larger than 0 bytes',

@@ -8,7 +8,7 @@ import {
 import methodologyService from '@admin/services/methodologyService';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useHistory } from 'react-router-dom';
 
 const MethodologySummaryEditPage = () => {
   const {

@@ -8,7 +8,7 @@ import releaseService, { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 interface Model {
   release: Release;
@@ -16,7 +16,7 @@ interface Model {
   releaseContributors: UserReleaseRole[];
 }
 
-const PublicationManageReleaseContributorsPage = () => {
+export default function PublicationManageReleaseContributorsPage() {
   const { publicationId } = usePublicationContext();
 
   const { releaseId } = useParams<PublicationManageTeamRouteParams>();
@@ -51,6 +51,4 @@ const PublicationManageReleaseContributorsPage = () => {
       />
     </LoadingSpinner>
   );
-};
-
-export default PublicationManageReleaseContributorsPage;
+}

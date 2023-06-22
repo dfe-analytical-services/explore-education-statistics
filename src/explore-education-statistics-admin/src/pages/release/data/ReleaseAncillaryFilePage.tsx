@@ -13,7 +13,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import { useQuery } from '@tanstack/react-query';
 import React, { useCallback } from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 
 export default function ReleaseAncillaryFilePage() {
   const history = useHistory();

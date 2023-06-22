@@ -6,10 +6,10 @@ import themeService from '@admin/services/themeService';
 import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { useHistory, useParams } from 'react-router';
 import React from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 
-const ThemeEditPage = () => {
+export default function ThemeEditPage() {
   const { themeId } = useParams<ThemeParams>();
   const history = useHistory();
 
@@ -51,6 +51,4 @@ const ThemeEditPage = () => {
       </LoadingSpinner>
     </Page>
   );
-};
-
-export default ThemeEditPage;
+}

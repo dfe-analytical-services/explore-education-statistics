@@ -13,10 +13,10 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { generatePath, useParams } from 'react-router';
 import React from 'react';
+import { generatePath, useParams } from 'react-router-dom';
 
-const PreReleaseMethodologyPage = () => {
+export default function PreReleaseMethodologyPage() {
   const { methodologyId, publicationId, releaseId } = useParams<
     PreReleaseMethodologyRouteParams
   >();
@@ -61,6 +61,4 @@ const PreReleaseMethodologyPage = () => {
       </LoadingSpinner>
     </div>
   );
-};
-
-export default PreReleaseMethodologyPage;
+}

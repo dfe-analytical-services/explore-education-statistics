@@ -8,7 +8,7 @@ import publicationService from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useHistory } from 'react-router-dom';
 
 const PublicationAdoptMethodologyPage = () => {
   const history = useHistory();

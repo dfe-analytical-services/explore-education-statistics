@@ -12,9 +12,9 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useCallback } from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 
-const ReleaseDataBlockCreatePage = () => {
+export default function ReleaseDataBlockCreatePage() {
   const history = useHistory();
   const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
@@ -70,6 +70,4 @@ const ReleaseDataBlockCreatePage = () => {
       </LoadingSpinner>
     </>
   );
-};
-
-export default ReleaseDataBlockCreatePage;
+}

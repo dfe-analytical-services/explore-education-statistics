@@ -25,7 +25,7 @@ const frameScriptSrc = [
   'https://dfe-analytical-services.github.io/',
 ];
 
-const ContentSecurityPolicy = `
+const contentSecurityPolicy = `
   default-src 'self';
   script-src ${cspScriptSrc.join(' ')};
   style-src 'self' 'unsafe-inline';
@@ -44,7 +44,7 @@ const securityHeaders = [
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
   {
     key: 'Content-Security-Policy',
-    value: ContentSecurityPolicy.replace(/\n/g, ''),
+    value: contentSecurityPolicy.replace(/\n/g, ''),
   },
   // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
   {

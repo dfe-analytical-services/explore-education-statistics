@@ -17,11 +17,10 @@ import WizardStepHeading from '@common/modules/table-tool/components/WizardStepH
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import tableBuilderService from '@common/services/tableBuilderService';
-import { useParams } from 'react-router';
-import { generatePath } from 'react-router-dom';
 import React from 'react';
+import { generatePath, useParams } from 'react-router-dom';
 
-const PreReleaseTableToolPage = () => {
+export default function PreReleaseTableToolPage() {
   const { publicationId, releaseId, dataBlockId } = useParams<
     PreReleaseTableToolRouteParams
   >();
@@ -147,6 +146,4 @@ const PreReleaseTableToolPage = () => {
       </LoadingSpinner>
     </>
   );
-};
-
-export default PreReleaseTableToolPage;
+}

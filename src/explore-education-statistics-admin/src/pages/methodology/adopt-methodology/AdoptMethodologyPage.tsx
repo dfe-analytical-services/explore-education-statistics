@@ -6,9 +6,9 @@ import { dashboardRoute } from '@admin/routes/routes';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import AdoptMethodologyForm from '@admin/pages/methodology/adopt-methodology/components/AdoptMethodologyForm';
 import React from 'react';
-import { useHistory, useParams } from 'react-router';
+import { useHistory, useParams } from 'react-router-dom';
 
-const AdoptMethodologyPage = () => {
+export default function AdoptMethodologyPage() {
   const { publicationId } = useParams<{ publicationId: string }>();
   const history = useHistory();
 
@@ -52,6 +52,4 @@ const AdoptMethodologyPage = () => {
       </div>
     </Page>
   );
-};
-
-export default AdoptMethodologyPage;
+}

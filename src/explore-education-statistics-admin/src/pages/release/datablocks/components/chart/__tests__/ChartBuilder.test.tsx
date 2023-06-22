@@ -124,11 +124,7 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(
-        screen.getByText('Line', {
-          selector: 'button',
-        }),
-      );
+      userEvent.click(screen.getByRole('button', { name: 'Line' }));
 
       await waitFor(() => {
         expect(
@@ -140,7 +136,7 @@ describe('ChartBuilder', () => {
 
       userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
 
-      expect(screen.getByText('Add data set')).toBeInTheDocument();
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       userEvent.selectOptions(
         screen.getByLabelText('Characteristic'),
@@ -160,9 +156,7 @@ describe('ChartBuilder', () => {
       );
       userEvent.selectOptions(screen.getByLabelText('Time period'), '2014_AY');
 
-      expect(screen.getByText('Add data set')).toBeInTheDocument();
-
-      userEvent.click(screen.getByText('Add data set'));
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       await waitFor(() => {
         expect(screen.getByText('Remove all')).toBeInTheDocument();
@@ -292,11 +286,7 @@ describe('ChartBuilder', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      userEvent.click(
-        screen.getByText('Line', {
-          selector: 'button',
-        }),
-      );
+      userEvent.click(screen.getByRole('button', { name: 'Line' }));
 
       await waitFor(() => {
         expect(

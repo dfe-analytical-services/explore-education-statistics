@@ -9,7 +9,7 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
 import Link from '@admin/components/Link';
 import React from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -20,7 +20,7 @@ interface FormValues {
   title: string;
 }
 
-const ReleaseDataFilePage = () => {
+export default function ReleaseDataFilePage() {
   const history = useHistory();
   const { fileId, publicationId, releaseId } = useParams<
     ReleaseDataFileRouteParams
@@ -89,6 +89,4 @@ const ReleaseDataFilePage = () => {
       </LoadingSpinner>
     </>
   );
-};
-
-export default ReleaseDataFilePage;
+}

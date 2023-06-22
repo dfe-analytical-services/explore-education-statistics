@@ -1,5 +1,5 @@
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
-import { IAxiosError } from '@common-test/createAxiosErrorMock';
+import createAxiosErrorMock from '@common-test/createAxiosErrorMock';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import React, { useEffect } from 'react';
@@ -38,22 +38,11 @@ describe('PageErrorBoundary', () => {
   });
 
   test('calling `handleError` with 401 error renders Forbidden page', async () => {
-    const error: IAxiosError = {
-      name: 'Error',
-      message: 'Forbidden',
-      isAxiosError: true,
-      request: {},
-      toJSON: () => ({}),
-      config: {},
-      response: {
-        config: {},
-        data: {},
-        headers: {},
-        status: 401,
-        statusText: 'Forbidden',
-        request: {},
-      },
-    };
+    const error = createAxiosErrorMock({
+      status: 401,
+      statusText: 'Forbidden',
+      data: {},
+    });
 
     const TestComponent = () => {
       const { handleError } = useErrorControl();
@@ -84,22 +73,11 @@ describe('PageErrorBoundary', () => {
   });
 
   test('calling `handleError` with 404 error renders Not Found page', async () => {
-    const error: IAxiosError = {
-      name: 'Error',
-      message: 'Not Found',
-      isAxiosError: true,
-      request: {},
-      toJSON: () => ({}),
-      config: {},
-      response: {
-        config: {},
-        data: {},
-        headers: {},
-        status: 404,
-        statusText: 'Not Found',
-        request: {},
-      },
-    };
+    const error = createAxiosErrorMock({
+      status: 404,
+      statusText: 'Not Found',
+      data: {},
+    });
 
     const TestComponent = () => {
       const { handleError } = useErrorControl();

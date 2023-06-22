@@ -14,7 +14,7 @@ const PageNotFoundPage = () => {
       <p>
         If the web address is correct or you clicked a link or button and ended
         up on this page,{' '}
-        <Link className="govuk-link" to="/contact-us">
+        <Link to="/contact-us">
           contact our Explore education statistics team
         </Link>{' '}
         if you need any help or support.

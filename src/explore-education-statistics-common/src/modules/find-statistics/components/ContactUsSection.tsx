@@ -6,7 +6,10 @@ interface Props {
   publicationTitle: string;
 }
 
-const ContactUsSection = ({ publicationContact, publicationTitle }: Props) => {
+export default function ContactUsSection({
+  publicationContact,
+  publicationTitle,
+}: Props) {
   return (
     <>
       <p>
@@ -49,6 +52,4 @@ const ContactUsSection = ({ publicationContact, publicationTitle }: Props) => {
       </p>
     </>
   );
-};
-
-export default ContactUsSection;
+}

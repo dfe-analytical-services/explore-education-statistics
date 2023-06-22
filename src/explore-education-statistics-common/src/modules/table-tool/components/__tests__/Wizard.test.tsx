@@ -743,6 +743,7 @@ describe('Wizard', () => {
     userEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
     await flushPromises();
+
     await waitFor(() => {
       expect(step1).toBeVisible();
       expect(step2).toBeVisible();

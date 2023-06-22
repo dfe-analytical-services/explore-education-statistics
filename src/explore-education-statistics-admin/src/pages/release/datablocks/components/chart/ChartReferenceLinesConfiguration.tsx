@@ -160,33 +160,22 @@ export default function ChartReferenceLinesConfiguration({
                     : true;
                 },
               }),
-              position: Yup.string()
+              position: Yup.mixed<string | number>()
                 .required('Enter position')
                 .test({
-                  name: 'axiosPosition',
+                  name: 'axisPosition',
                   message: `Enter a position within the ${
                     axis === 'x' ? 'X' : 'Y'
                   } axis min/max range`,
                   test: value => {
-                    return type === 'minor' && minorAxisDomain
-                      ? ((value as unknown) as number) >=
-                          minorAxisDomain?.min &&
-                          ((value as unknown) as number) <= minorAxisDomain.max
+                    return typeof value === 'number' &&
+                      type === 'minor' &&
+                      minorAxisDomain
+                      ? value >= minorAxisDomain?.min &&
+                          value <= minorAxisDomain.max
                       : true;
                   },
                 }),
-              // .test({
-              //   name: 'axisPosition',
-              //   message: `Enter a position within the ${
-              //     axis === 'x' ? 'X' : 'Y'
-              //   } axis min/max range`,
-              //   test: (value: number) => {
-              //     return type === 'minor' && minorAxisDomain
-              //       ? value >= minorAxisDomain?.min &&
-              //           value <= minorAxisDomain.max
-              //       : true;
-              //   },
-              // }),
               style: Yup.string()
                 .required('Enter style')
                 .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),

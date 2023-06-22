@@ -15,7 +15,7 @@ const methodologyImageService = {
 
     return client.post(`/methodologies/${methodologyId}/images`, data, {
       onUploadProgress(event: AxiosProgressEvent) {
-        onProgress?.(event.loaded, event.total as number);
+        onProgress?.(event.loaded, event.total ?? 0);
       },
     });
   },

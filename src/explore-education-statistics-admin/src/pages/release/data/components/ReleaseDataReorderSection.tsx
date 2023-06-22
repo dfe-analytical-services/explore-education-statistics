@@ -28,7 +28,7 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
     value: subjects,
     isLoading: isLoadingSubjects,
   } = useAsyncHandledRetry(
-    async () => tableBuilderService.listReleaseSubjects(releaseId),
+    () => tableBuilderService.listReleaseSubjects(releaseId),
     [releaseId],
   );
   const [reorderingFilters, setReorderingFilters] = useState<Subject>();

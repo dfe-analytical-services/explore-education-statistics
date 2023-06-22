@@ -5,10 +5,10 @@ import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releaseContentService from '@admin/services/releaseContentService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { useParams } from 'react-router';
 import React from 'react';
+import { useParams } from 'react-router-dom';
 
-const PreReleaseContentPage = () => {
+export default function PreReleaseContentPage() {
   const { releaseId } = useParams<ReleaseRouteParams>();
 
   const { value: content, isLoading } = useAsyncHandledRetry(
@@ -37,6 +37,4 @@ const PreReleaseContentPage = () => {
       </LoadingSpinner>
     </div>
   );
-};
-
-export default PreReleaseContentPage;
+}

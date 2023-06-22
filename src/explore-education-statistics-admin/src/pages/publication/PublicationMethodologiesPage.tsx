@@ -30,7 +30,7 @@ import VisuallyHidden from '@common/components/VisuallyHidden';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useState } from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useHistory } from 'react-router-dom';
 
 interface Model {
   externalMethodology?: ExternalMethodology;

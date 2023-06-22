@@ -7,8 +7,8 @@ describe('useDebouncedEffect', () => {
   });
 
   afterEach(() => {
-    jest.useRealTimers();
     jest.runOnlyPendingTimers();
+    jest.useRealTimers();
   });
 
   test('calls effect after specified timeout', () => {

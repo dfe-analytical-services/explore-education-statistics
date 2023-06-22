@@ -13,7 +13,7 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath, useHistory, useLocation } from 'react-router';
+import { generatePath, useHistory, useLocation } from 'react-router-dom';
 
 const errorMappings = [
   mapFieldErrors<ReleaseSummaryFormValues>({

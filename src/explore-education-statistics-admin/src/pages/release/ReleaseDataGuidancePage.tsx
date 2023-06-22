@@ -11,7 +11,7 @@ import ReleaseDataGuidancePageContent from '@common/modules/release/components/R
 import { useConfig } from '@admin/contexts/ConfigContext';
 import Link from '@admin/components/Link';
 import React from 'react';
-import { useLocation, useParams } from 'react-router';
+import { useLocation, useParams } from 'react-router-dom';
 
 interface LocationState {
   backLink: string;
@@ -22,7 +22,7 @@ interface Model {
   release: Release;
 }
 
-const ReleaseDataGuidancePage = () => {
+export default function ReleaseDataGuidancePage() {
   const { releaseId } = useParams<ReleaseRouteParams>();
 
   const location = useLocation<LocationState>();
@@ -77,6 +77,4 @@ const ReleaseDataGuidancePage = () => {
       </LoadingSpinner>
     </Page>
   );
-};
-
-export default ReleaseDataGuidancePage;
+}

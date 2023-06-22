@@ -18,9 +18,8 @@ import NotificationBanner from '@common/components/NotificationBanner';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { format } from 'date-fns';
-import { generatePath, useParams } from 'react-router';
-import { Route, Switch } from 'react-router-dom';
 import React from 'react';
+import { generatePath, Route, Switch, useParams } from 'react-router-dom';
 
 interface Model {
   preReleaseWindowStatus: PreReleaseWindowStatus;
@@ -78,100 +77,98 @@ const PreReleasePageContainer = () => {
       },
     } = model;
 
-    switch (access) {
-      case 'After': {
-        return (
-          <>
-            <h1>Pre-release access has ended</h1>
-            <>
-              <p>
-                The <strong>{releaseTitle}</strong> release of{' '}
-                <strong>{publicationTitle}</strong> has now been published on
-                the Explore Education Statistics service.
-              </p>
+    if (access === 'After') {
+      return (
+        <>
+          <h1>Pre-release access has ended</h1>
 
-              <a
-                href={`${config.PublicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
-                rel="noopener noreferrer"
-                data-testid="release-url"
-              >
-                View this release
-              </a>
-            </>
-          </>
-        );
-      }
-
-      case 'Before': {
-        return (
           <>
-            <h1>Pre-release access is not yet available</h1>
             <p>
-              Pre-release access for the <strong>{releaseTitle}</strong> release
-              of <strong>{publicationTitle}</strong> is not yet available.
+              The <strong>{releaseTitle}</strong> release of{' '}
+              <strong>{publicationTitle}</strong> has now been published on the
+              Explore Education Statistics service.
             </p>
 
-            <p>
-              {`Pre-release access will be available from ${format(
-                start,
-                'd MMMM yyyy',
-              )} at ${format(start, 'HH:mm')} until ${format(
-                end,
-                'd MMMM yyyy',
-              )} at ${format(end, 'HH:mm')}.`}
-            </p>
-
-            <p>
-              If you believe that this release should be available and you are
-              having problems accessing please contact the{' '}
-              <a href={`mailto:${contactEmail}`}>production team</a>.
-            </p>
-          </>
-        );
-      }
-
-      case 'Within': {
-        return (
-          <>
-            <NotificationBanner
-              heading="If you have an enquiry about this release contact:"
-              title="Contact"
+            <a
+              href={`${config.PublicAppUrl}/find-statistics/${publicationSlug}/${releaseSlug}`}
+              rel="noopener noreferrer"
+              data-testid="release-url"
             >
-              <p>
-                {`${contactTeam}: `}
-                <a
-                  className='class="govuk-notification-banner__link"'
-                  href={`mailto:${contactEmail}`}
-                >
-                  {contactEmail}
-                </a>
-              </p>
-            </NotificationBanner>
-            <NavBar
-              className="govuk-!-margin-top-0"
-              routes={preReleaseNavRoutes.map(route => ({
-                title: route.title,
-                to: generatePath<ReleaseRouteParams>(route.path, {
-                  publicationId,
-                  releaseId,
-                }),
-              }))}
-              label="Pre-release"
-            />
-
-            <Switch>
-              {preReleaseRoutes.map(route => (
-                <Route key={route.path} {...route} />
-              ))}
-            </Switch>
+              View this release
+            </a>
           </>
-        );
-      }
-
-      default: {
-        return null;
-      }
+        </>
+      );
     }
+
+    if (access === 'Before') {
+      return (
+        <>
+          <h1>Pre-release access is not yet available</h1>
+
+          <p>
+            Pre-release access for the <strong>{releaseTitle}</strong> release
+            of <strong>{publicationTitle}</strong> is not yet available.
+          </p>
+
+          <p>
+            {`Pre-release access will be available from ${format(
+              start,
+              'd MMMM yyyy',
+            )} at ${format(start, 'HH:mm')} until ${format(
+              end,
+              'd MMMM yyyy',
+            )} at ${format(end, 'HH:mm')}.`}
+          </p>
+
+          <p>
+            If you believe that this release should be available and you are
+            having problems accessing please contact the{' '}
+            <a href={`mailto:${contactEmail}`}>production team</a>.
+          </p>
+        </>
+      );
+    }
+
+    if (access === 'Within') {
+      return (
+        <>
+          <NotificationBanner
+            heading="If you have an enquiry about this release contact:"
+            title="Contact"
+          >
+            <p>
+              {`${contactTeam}: `}
+              <a
+                className='class="govuk-notification-banner__link"'
+                href={`mailto:${contactEmail}`}
+              >
+                {contactEmail}
+              </a>
+            </p>
+          </NotificationBanner>
+          <NavBar
+            className="govuk-!-margin-top-0"
+            routes={preReleaseNavRoutes.map(route => ({
+              title: route.title,
+              to: generatePath<ReleaseRouteParams>(route.path, {
+                publicationId,
+                releaseId,
+              }),
+            }))}
+            label="Pre-release"
+          />
+
+          <Switch>
+            {preReleaseRoutes.map(route => (
+              <Route key={route.path} {...route} />
+            ))}
+          </Switch>
+        </>
+      );
+    }
+
+    return null;
   };
 
   return (

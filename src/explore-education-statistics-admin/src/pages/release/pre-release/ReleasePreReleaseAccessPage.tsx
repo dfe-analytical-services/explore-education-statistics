@@ -11,8 +11,8 @@ import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { generatePath } from 'react-router';
 import React from 'react';
+import { generatePath } from 'react-router-dom';
 
 export const releasePreReleaseAccessPageTabs = {
   users: 'preReleaseAccess-users',

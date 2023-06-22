@@ -20,14 +20,14 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import classNames from 'classnames';
 import React, { useCallback, useState } from 'react';
-import { generatePath, useParams } from 'react-router';
+import { generatePath, useParams } from 'react-router-dom';
 
 interface Model {
   dataBlocks: ReleaseDataBlockSummary[];
   canUpdateRelease: boolean;
 }
 
-const ReleaseDataBlocksPage = () => {
+export default function ReleaseDataBlocksPage() {
   const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
   const [deleteDataBlock, setDeleteDataBlock] = useState<
@@ -205,6 +205,4 @@ const ReleaseDataBlocksPage = () => {
       )}
     </>
   );
-};
-
-export default ReleaseDataBlocksPage;
+}

@@ -18,7 +18,7 @@ import ReleasePreviewTableTool from '@admin/pages/release/content/components/Rel
 import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
 import classNames from 'classnames';
 import React from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
 const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, release } = useReleaseContentState();
@@ -106,7 +106,7 @@ const ReleaseContentPageLoaded = () => {
   );
 };
 
-const ReleaseContentPage = () => {
+export default function ReleaseContentPage() {
   const { releaseId } = useParams<ReleaseRouteParams>();
 
   const { value, isLoading } = useAsyncRetry<
@@ -139,6 +139,4 @@ const ReleaseContentPage = () => {
       )}
     </LoadingSpinner>
   );
-};
-
-export default ReleaseContentPage;
+}

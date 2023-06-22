@@ -6,7 +6,7 @@ import { PublicationRouteParams } from '@admin/routes/publicationRoutes';
 import { releaseCreateRoute } from '@admin/routes/routes';
 import noop from 'lodash/noop';
 import React, { useRef } from 'react';
-import { generatePath } from 'react-router';
+import { generatePath } from 'react-router-dom';
 
 const PublicationReleasesPage = () => {
   const { publicationId, publication } = usePublicationContext();

@@ -24,7 +24,7 @@ import publicationService from '@admin/services/publicationService';
 import { PublicationSummary } from '@common/services/publicationService';
 import InviteUserPublicationRoleForm from '@admin/pages/users/components/InviteUserPublicationRoleForm';
 import React from 'react';
-import { useHistory } from 'react-router';
+import { useHistory } from 'react-router-dom';
 
 export interface InviteUserReleaseRole {
   releaseId: string;

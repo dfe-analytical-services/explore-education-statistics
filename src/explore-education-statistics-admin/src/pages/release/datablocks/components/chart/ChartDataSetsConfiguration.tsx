@@ -1,4 +1,3 @@
-/* eslint-disable react/no-array-index-key */
 import DroppableArea from '@admin/components/DroppableArea';
 import DraggableItem, { DragHandle } from '@admin/components/DraggableItem';
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
@@ -277,6 +276,7 @@ const ChartDataSetsConfiguration = ({
                       id={`${key}-${index}`}
                       index={index}
                       isReordering={isReordering}
+                      // eslint-disable-next-line react/no-array-index-key
                       key={`${key}-${index}`}
                       tag="tr"
                     >

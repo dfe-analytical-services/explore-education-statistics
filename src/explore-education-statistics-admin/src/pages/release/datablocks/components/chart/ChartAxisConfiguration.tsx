@@ -218,14 +218,11 @@ const ChartAxisConfiguration = ({
       ),
       tickSpacing: Yup.number().when('tickConfig', {
         is: 'custom',
-        then(s) {
-          return s
+        then: s =>
+          s
             .required('Enter tick spacing')
-            .positive('Tick spacing must be positive');
-        },
-        otherwise(s) {
-          return s.notRequired();
-        },
+            .positive('Tick spacing must be positive'),
+        otherwise: s => s.notRequired(),
       }),
       max: Yup.number(),
       min: Yup.number(),

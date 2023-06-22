@@ -15,10 +15,10 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
-import { generatePath, useParams } from 'react-router';
+import { generatePath, useParams } from 'react-router-dom';
 import React from 'react';
 
-const ReleaseFootnotesPage = () => {
+export default function ReleaseFootnotesPage() {
   const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
   const [isReordering, toggleIsReordering] = useToggle(false);
@@ -161,6 +161,4 @@ const ReleaseFootnotesPage = () => {
       </LoadingSpinner>
     </LoadingSpinner>
   );
-};
-
-export default ReleaseFootnotesPage;
+}

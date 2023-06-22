@@ -167,26 +167,23 @@ const FiltersForm = ({
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    const schema: ObjectSchema<FormValues> = Yup.object({
-      indicators: Yup.array<FormValues['indicators']>()
+    return Yup.object({
+      indicators: Yup.array()
         .required('Select at least one option from indicators')
+        .of(Yup.string().defined())
         .min(1, 'Select at least one option from indicators'),
-      filters: Yup.object<FormValues['filters']>(
-        mapValues(subjectMeta.filters, filter =>
-          Yup.array()
-            .typeError(
-              `Select at least one option from ${filter.legend.toLowerCase()}`,
-            )
-            .of(Yup.string())
-            .min(
-              1,
-              `Select at least one option from ${filter.legend.toLowerCase()}`,
-            ),
-        ),
+      filters: Yup.object(
+        mapValues(subjectMeta.filters, filter => {
+          const label = filter.legend.toLowerCase();
+
+          return Yup.array()
+            .required(`Select at least one option from ${label}`)
+            .typeError(`Select at least one option from ${label}`)
+            .of(Yup.string().defined())
+            .min(1, `Select at least one option from ${label}`);
+        }),
       ),
     });
-
-    return schema;
   }, [subjectMeta.filters]);
 
   const filtersIncludeTotal = Object.values(subjectMeta.filters).some(

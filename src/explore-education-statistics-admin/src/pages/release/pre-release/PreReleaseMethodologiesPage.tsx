@@ -16,15 +16,15 @@ import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { generatePath, useParams } from 'react-router';
 import React from 'react';
+import { generatePath, useParams } from 'react-router-dom';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
   methodologyVersions: MethodologyVersionSummary[];
 }
 
-const PreReleaseMethodologiesPage = () => {
+export default function PreReleaseMethodologiesPage() {
   const { publicationId, releaseId } = useParams<ReleaseRouteParams>();
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
@@ -103,6 +103,4 @@ const PreReleaseMethodologiesPage = () => {
       </LoadingSpinner>
     </div>
   );
-};
-
-export default PreReleaseMethodologiesPage;
+}

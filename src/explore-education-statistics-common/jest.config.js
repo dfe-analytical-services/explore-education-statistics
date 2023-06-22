@@ -1,7 +1,7 @@
 /** @type {import('jest').Config} */
-
 const config = {
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
+  verbose: true,
   setupFilesAfterEnv: ['<rootDir>/test/setupTests.js'],
   testMatch: [
     '<rootDir>/src/**/*.(spec|test).{js,jsx,ts,tsx}',

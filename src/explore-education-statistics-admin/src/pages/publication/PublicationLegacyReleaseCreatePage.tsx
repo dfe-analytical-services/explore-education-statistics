@@ -4,7 +4,7 @@ import usePublicationContext from '@admin/pages/publication/contexts/Publication
 import { publicationLegacyReleasesRoute } from '@admin/routes/publicationRoutes';
 import legacyReleaseService from '@admin/services/legacyReleaseService';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useHistory } from 'react-router-dom';
 
 const PublicationLegacyReleaseCreatePage = () => {
   const { publicationId } = usePublicationContext();

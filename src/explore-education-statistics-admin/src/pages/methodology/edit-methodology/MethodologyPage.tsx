@@ -23,7 +23,7 @@ import {
   Switch,
   useHistory,
   useParams,
-} from 'react-router';
+} from 'react-router-dom';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
@@ -36,7 +36,7 @@ const routes: MethodologyRouteProps[] = [
   methodologySummaryEditRoute,
 ];
 
-const MethodologyPage = () => {
+export default function MethodologyPage() {
   const { methodologyId } = useParams<MethodologyRouteParams>();
 
   const history = useHistory();
@@ -159,6 +159,4 @@ const MethodologyPage = () => {
       </LoadingSpinner>
     </Page>
   );
-};
-
-export default MethodologyPage;
+}

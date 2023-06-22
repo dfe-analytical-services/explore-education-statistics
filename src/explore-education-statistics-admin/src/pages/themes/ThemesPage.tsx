@@ -18,7 +18,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath } from 'react-router';
+import { generatePath } from 'react-router-dom';
 
 const ThemesPage = () => {
   const { themeId } = useQueryParams<ThemeParams>();

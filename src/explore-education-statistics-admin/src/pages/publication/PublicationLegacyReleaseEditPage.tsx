@@ -9,9 +9,9 @@ import legacyReleaseService from '@admin/services/legacyReleaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 
-const PublicationLegacyReleaseEditPage = () => {
+export default function PublicationLegacyReleaseEditPage() {
   const { legacyReleaseId } = useParams<
     PublicationEditLegacyReleaseRouteParams
   >();
@@ -58,6 +58,4 @@ const PublicationLegacyReleaseEditPage = () => {
       )}
     </LoadingSpinner>
   );
-};
-
-export default PublicationLegacyReleaseEditPage;
+}

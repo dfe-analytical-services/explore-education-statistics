@@ -12,9 +12,9 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
-import { generatePath, useParams } from 'react-router';
+import { generatePath, useParams } from 'react-router-dom';
 
-const ReleaseDataFileReplacementCompletePage = () => {
+export default function ReleaseDataFileReplacementCompletePage() {
   const { fileId, publicationId, releaseId } = useParams<
     ReleaseDataFileReplaceRouteParams
   >();
@@ -120,6 +120,4 @@ const ReleaseDataFileReplacementCompletePage = () => {
       </Link>
     </>
   );
-};
-
-export default ReleaseDataFileReplacementCompletePage;
+}

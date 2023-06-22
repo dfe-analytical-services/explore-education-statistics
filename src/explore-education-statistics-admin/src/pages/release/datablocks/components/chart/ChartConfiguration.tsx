@@ -104,12 +104,8 @@ const ChartConfiguration = ({
         .required('Choose a title type'),
       title: Yup.string().when('titleType', {
         is: 'alternative',
-        then(s) {
-          return s.required('Enter chart title');
-        },
-        otherwise(s) {
-          return s.notRequired();
-        },
+        then: s => s.required('Enter chart title'),
+        otherwise: s => s.notRequired(),
       }),
       alt: Yup.string()
         .required('Enter chart alt text')

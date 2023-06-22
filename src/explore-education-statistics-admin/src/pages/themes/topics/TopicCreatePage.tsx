@@ -7,10 +7,10 @@ import topicService from '@admin/services/topicService';
 import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { useHistory, useParams } from 'react-router';
 import React from 'react';
+import { useHistory, useParams } from 'react-router-dom';
 
-const TopicCreatePage = () => {
+export default function TopicCreatePage() {
   const { themeId } = useParams<ThemeParams>();
   const history = useHistory();
 
@@ -59,6 +59,4 @@ const TopicCreatePage = () => {
       </LoadingSpinner>
     </Page>
   );
-};
-
-export default TopicCreatePage;
+}

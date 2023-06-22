@@ -5,9 +5,9 @@ import publicationService from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { useParams } from 'react-router';
+import { useParams } from 'react-router-dom';
 
-const PublicationInviteUsersPage = () => {
+export default function PublicationInviteUsersPage() {
   const { publicationId, publication } = usePublicationContext();
   const { releaseId } = useParams<PublicationManageTeamRouteParams>();
 
@@ -29,6 +29,4 @@ const PublicationInviteUsersPage = () => {
       />
     </LoadingSpinner>
   );
-};
-
-export default PublicationInviteUsersPage;
+}

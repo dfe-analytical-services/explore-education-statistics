@@ -32,4 +32,5 @@ const methodologyService = {
     return contentApi.get(`/methodologies/${methodologySlug}`);
   },
 };
+
 export default methodologyService;

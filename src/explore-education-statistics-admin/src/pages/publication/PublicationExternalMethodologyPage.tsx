@@ -8,7 +8,7 @@ import publicationService, {
   ExternalMethodology,
 } from '@admin/services/publicationService';
 import React from 'react';
-import { generatePath, useHistory } from 'react-router';
+import { generatePath, useHistory } from 'react-router-dom';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 

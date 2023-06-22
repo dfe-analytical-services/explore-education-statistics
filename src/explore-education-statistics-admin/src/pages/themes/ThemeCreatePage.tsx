@@ -4,8 +4,8 @@ import ThemeForm from '@admin/pages/themes/components/ThemeForm';
 import { ThemeParams, themesRoute } from '@admin/routes/routes';
 import themeService from '@admin/services/themeService';
 import appendQuery from '@common/utils/url/appendQuery';
-import { useHistory } from 'react-router';
 import React from 'react';
+import { useHistory } from 'react-router-dom';
 
 const ThemeCreatePage = () => {
   const history = useHistory<ThemeParams>();

@@ -7,14 +7,14 @@ import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ContentHtml from '@common/components/ContentHtml';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { useLocation, useParams } from 'react-router';
 import React from 'react';
+import { useLocation, useParams } from 'react-router-dom';
 
 interface LocationState {
   backLink: string;
 }
 
-const PreReleaseAccessListPage = () => {
+export default function PreReleaseAccessListPage() {
   const { releaseId } = useParams<ReleaseRouteParams>();
   const location = useLocation<LocationState>();
 
@@ -52,6 +52,4 @@ const PreReleaseAccessListPage = () => {
       </LoadingSpinner>
     </Page>
   );
-};
-
-export default PreReleaseAccessListPage;
+}

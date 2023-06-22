@@ -23,9 +23,9 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 
-const ReleaseDataFileReplacePage = () => {
+export default function ReleaseDataFileReplacePage() {
   const history = useHistory();
   const { fileId, publicationId, releaseId } = useParams<
     ReleaseDataFileReplaceRouteParams
@@ -264,6 +264,4 @@ const ReleaseDataFileReplacePage = () => {
       </ModalConfirm>
     </>
   );
-};
-
-export default ReleaseDataFileReplacePage;
+}

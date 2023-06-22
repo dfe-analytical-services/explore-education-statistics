@@ -91,12 +91,12 @@ interface Props {
   onSubmit: (values: ReleaseStatusFormValues) => Promise<void> | void;
 }
 
-const ReleaseStatusForm = ({
+export default function ReleaseStatusForm({
   release,
   statusPermissions,
   onCancel,
   onSubmit,
-}: Props) => {
+}: Props) {
   const [showConfirmScheduleModal, toggleConfirmScheduleModal] = useToggle(
     false,
   );
@@ -434,6 +434,4 @@ const ReleaseStatusForm = ({
       )}
     </Formik>
   );
-};
-
-export default ReleaseStatusForm;
+}

@@ -1,5 +1,4 @@
 /** @type {import('jest').Config} */
-
 const config = {
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
   setupFilesAfterEnv: ['<rootDir>/test/setupTests.js'],

@@ -8,10 +8,10 @@ import {
 import footnoteService from '@admin/services/footnoteService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 import React from 'react';
 
-const ReleaseFootnoteEditPage = () => {
+export default function ReleaseFootnoteEditPage() {
   const { footnoteId, publicationId, releaseId } = useParams<
     ReleaseFootnoteRouteParams
   >();
@@ -73,6 +73,4 @@ const ReleaseFootnoteEditPage = () => {
       </LoadingSpinner>
     </>
   );
-};
-
-export default ReleaseFootnoteEditPage;
+}

@@ -17,8 +17,7 @@ const DraftReleaseRowIssues = ({ releaseId }: Props) => {
   } = useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
 
   const totalIssues = checklist
-    ? // eslint-disable-next-line no-unsafe-optional-chaining
-      checklist?.errors?.length + checklist?.warnings.length
+    ? checklist.errors.length + checklist.warnings.length
     : 0;
 
   return (

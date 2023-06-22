@@ -13,8 +13,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React, { useState } from 'react';
-import { useParams } from 'react-router';
-import { generatePath, useHistory } from 'react-router-dom';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 import { UserPublicationRole } from '@admin/services/userService';
 import orderBy from 'lodash/orderBy';
 import ButtonLink from '@admin/components/ButtonLink';
@@ -28,7 +27,7 @@ interface Model {
   permissions: PublicationPermissions;
 }
 
-const PublicationTeamAccessPage = () => {
+export default function PublicationTeamAccessPage() {
   const history = useHistory();
   const { releaseId } = useParams<PublicationTeamRouteParams>();
 
@@ -218,6 +217,4 @@ const PublicationTeamAccessPage = () => {
       )}
     </>
   );
-};
-
-export default PublicationTeamAccessPage;
+}

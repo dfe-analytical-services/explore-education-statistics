@@ -3,7 +3,7 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldSelect, FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
-import { IdTitlePair } from 'src/services/types/common';
+import { IdTitlePair } from '@admin/services/types/common';
 import { Formik, FormikHelpers } from 'formik';
 import orderBy from 'lodash/orderBy';
 import React from 'react';

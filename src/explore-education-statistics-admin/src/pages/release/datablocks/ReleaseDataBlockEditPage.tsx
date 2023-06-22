@@ -21,14 +21,14 @@ import UrlContainer from '@common/components/UrlContainer';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useCallback, useRef } from 'react';
-import { generatePath, useHistory, useParams } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 
 interface Model {
   dataBlock: ReleaseDataBlock;
   canUpdateRelease: boolean;
 }
 
-const ReleaseDataBlockEditPage = () => {
+export default function ReleaseDataBlockEditPage() {
   const { dataBlockId, publicationId, releaseId } = useParams<
     ReleaseDataBlockRouteParams
   >();
@@ -177,6 +177,4 @@ const ReleaseDataBlockEditPage = () => {
       </LoadingSpinner>
     </div>
   );
-};
-
-export default ReleaseDataBlockEditPage;
+}

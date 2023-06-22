@@ -9,7 +9,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
 import React from 'react';
-import { generatePath } from 'react-router';
+import { generatePath } from 'react-router-dom';
 import {
   publicationReleasesRoute,
   PublicationRouteParams,

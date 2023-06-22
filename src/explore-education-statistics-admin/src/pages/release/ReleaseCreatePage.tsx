@@ -15,7 +15,7 @@ import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import React from 'react';
-import { generatePath, useHistory, useParams, withRouter } from 'react-router';
+import { generatePath, useHistory, useParams } from 'react-router-dom';
 import { ReleaseType } from '@common/services/types/releaseType';
 import Yup from '@common/validation/yup';
 
@@ -42,7 +42,7 @@ interface Model {
   publication: Publication;
 }
 
-const ReleaseCreatePage = () => {
+export default function ReleaseCreatePage() {
   const { publicationId } = useParams<MatchProps>();
   const history = useHistory();
 
@@ -158,6 +158,4 @@ const ReleaseCreatePage = () => {
       />
     </Page>
   );
-};
-
-export default withRouter(ReleaseCreatePage);
+}

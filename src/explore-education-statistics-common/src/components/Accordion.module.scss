@@ -5,13 +5,13 @@
   }
 }
 
-/* stylelint-disable rule-empty-line-before */
 :global(.js-enabled) {
   .accordion :global(.govuk-accordion__controls) {
     @media print {
       display: none !important;
     }
   }
+
   .accordion :global(.govuk-accordion__section-content) {
     @media print {
       display: block !important;

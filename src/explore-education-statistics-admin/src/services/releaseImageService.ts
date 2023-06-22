@@ -1,8 +1,8 @@
 import client from '@admin/services/utils/service';
+import { ImageUploadResult } from '@admin/types/ckeditor';
 import { ImageProgressHandler } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import { CancellablePromise } from '@common/types/promise';
 import { AxiosProgressEvent } from 'axios';
-import { ImageUploadResult } from '@admin/types/ckeditor';
 
 const releaseImageService = {
   upload(

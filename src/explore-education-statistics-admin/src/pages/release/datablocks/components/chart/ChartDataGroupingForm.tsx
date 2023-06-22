@@ -190,9 +190,6 @@ export default function ChartDataGroupingForm({
                 id={`${formId}-customDataGroups`}
                 unit={unit}
                 onAddGroup={group => {
-                  if (!group) {
-                    return;
-                  }
                   form.setFieldValue(
                     'customGroups',
                     orderBy([...form.values.customGroups, group], g => g.min),

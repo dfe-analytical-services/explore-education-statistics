@@ -44,10 +44,10 @@ function FormFieldDateInput<FormValues>({
     if (field.value instanceof Date) {
       return {
         day: field.value?.getDate(),
-        month: field.value?.getMonth()
-          ? // eslint-disable-next-line no-unsafe-optional-chaining
-            field && field.value?.getMonth() + 1
-          : undefined,
+        month:
+          typeof field.value?.getMonth() === 'number'
+            ? field.value.getMonth() + 1
+            : undefined,
         year: field.value?.getFullYear(),
       };
     }

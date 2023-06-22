@@ -1,7 +1,7 @@
 import Page from '@admin/components/Page';
 import React from 'react';
 
-const ContactUsPage = () => {
+function ContactUsPage() {
   return (
     <Page
       title="Contact Explore education statistics"
@@ -71,6 +71,6 @@ const ContactUsPage = () => {
       </div>
     </Page>
   );
-};
+}
 
 export default ContactUsPage;

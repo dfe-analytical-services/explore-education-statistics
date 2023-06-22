@@ -74,7 +74,7 @@ const ReleaseDataUploadsSection = ({
     setState: setDataFilesState,
     isLoading,
   } = useAsyncHandledRetry(
-    async () => releaseDataFileService.getDataFiles(releaseId),
+    () => releaseDataFileService.getDataFiles(releaseId),
     [releaseId],
   );
 

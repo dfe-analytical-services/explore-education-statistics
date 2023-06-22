@@ -64,4 +64,5 @@ const permalinkService = {
     });
   },
 };
+
 export default permalinkService;

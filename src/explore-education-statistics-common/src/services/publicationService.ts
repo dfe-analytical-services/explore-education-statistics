@@ -295,4 +295,5 @@ const publicationService = {
     });
   },
 };
+
 export default publicationService;

@@ -24,7 +24,7 @@ import {
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
 import React from 'react';
-import { useLocation } from 'react-router';
+import { useLocation } from 'react-router-dom';
 import Link from '@admin/components/Link';
 
 const statusMap: Dictionary<string> = {
