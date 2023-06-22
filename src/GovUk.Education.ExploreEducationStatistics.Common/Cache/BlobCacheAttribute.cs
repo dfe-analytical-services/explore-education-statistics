@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
@@ -22,16 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         public string? ServiceName { get; set; }
 
-        private ICacheWorkflow _workflow;
-
-        public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(
-            key, 
-            forceUpdate)
+        public BlobCacheAttribute(Type key, bool forceUpdate = false) : base(key, forceUpdate)
         {
-            _workflow = new StaleCacheWorkflow<BlobCacheKeyAndType, BlobCacheAttribute>(
-                cacheKey => GetAsync(cacheKey.CacheKey, cacheKey.Type),
-                cacheKey => GetItemMetaAsync(cacheKey.CacheKey),
-                (cacheKey, item) => SetAsync(cacheKey.CacheKey, item));
         }
 
         public static void AddService(string name, IBlobCacheService service)
@@ -65,81 +57,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
-        public override async Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
+        public override Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)
         {
-            if (cacheKey is IBlobCacheKey key)
-            {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return null;
-                }
-
-                return await service.GetItemAsync(key, returnType);
-            }
-
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            return WithCacheKeyAndService(cacheKey, (key, service) => service.GetItemAsync(key, returnType));
         }
 
         public override void Set(ICacheKey cacheKey, object value)
         {
-            if (cacheKey is IBlobCacheKey key)
-            {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return;
-                }
-
-                service.SetItem(key, value);
-
-                return;
-            }
-
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            WithCacheKeyAndService(cacheKey, (key, service) => service.SetItem(key, value));
         }
 
-        public async Task<CacheItemMeta?> GetItemMetaAsync(ICacheKey cacheKey)
+        public override Task SetAsync(ICacheKey cacheKey, object value)
         {
-            if (cacheKey is IBlobCacheKey key)
-            {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return null;
-                }
-
-                return await service.GetItemMetaAsync(key);
-            }
-
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
+            return WithCacheKeyAndService(cacheKey, (key, service) => service.SetItemAsync(key, value));
         }
 
-        public override async Task SetAsync(ICacheKey cacheKey, object value)
+        protected override Task<object> GetOrCreateAndCacheItemAsync(object cacheKey, Type returnType, Func<Task<object?>> createItemFn)
         {
-            if (cacheKey is IBlobCacheKey key)
+            return WithCacheKeyAndService(cacheKey, (key, service) => 
+                service.GetOrCreateAndCacheItemAsync(key, returnType, createItemFn)); 
+        }
+        
+        private Task<T?> WithCacheKeyAndService<T>(object cacheKey, Func<IBlobCacheKey, IBlobCacheService, Task<T?>> func) where T : class
+        {
+            if (!(cacheKey is IBlobCacheKey key))
             {
-                var service = GetService();
-
-                if (service is null)
-                {
-                    return;
-                }
-
-                await service.SetItemAsync(key, value);
-
-                return;
+                throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}"); 
             }
 
-            throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
-        }
+            var service = GetService();
 
-        protected override ICacheWorkflow GetWorkflow()
+            if (service is null)
+            {
+                return null;
+            }
+
+            return func.Invoke(key, service);
+        }
+        
+        private async Task WithCacheKeyAndService(object cacheKey, Func<IBlobCacheKey, IBlobCacheService, Task> func)
         {
-            return _workflow;
+            await WithCacheKeyAndService(cacheKey, async (key, service) =>
+            {
+                await func.Invoke(key, service);
+                return Unit.Instance;
+            });
+        }
+        
+        private void WithCacheKeyAndService(object cacheKey, Action<IBlobCacheKey, IBlobCacheService> action)
+        {
+            WithCacheKeyAndService(cacheKey, async (key, service) =>
+            {
+                action.Invoke(key, service);
+                return Unit.Instance;
+            });
         }
 
         private IBlobCacheService? GetService()
@@ -152,6 +123,4 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             return Services.Count > 0 ? Services.First().Value : null;
         }
     }
-
-    record BlobCacheKeyAndType(IBlobCacheKey CacheKey, Type Type);
 }

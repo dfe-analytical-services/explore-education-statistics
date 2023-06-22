@@ -2,6 +2,7 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -20,14 +21,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             _blobStorageService = blobStorageService;
             _logger = logger;
-            _staleWorkflow = new(
+            _staleWorkflow = new StaleCacheWorkflow<BlobCacheKeyAndType, BlobCacheService>(
                 cacheKey => GetItemAsync(cacheKey.CacheKey, cacheKey.Type),
-                cacheKey => GetCacheItemMeta(cacheKey.CacheKey),
+                cacheKey => GetItemMetaAsync(cacheKey.CacheKey),
                 (cacheKey, item) => SetItemAsync(cacheKey.CacheKey, item),
                 _logger
             );
         }
 
+        // TODO DW - remove???
         public object? GetItem(IBlobCacheKey cacheKey, Type targetType)
         {
             throw new NotImplementedException();
@@ -65,17 +67,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return default;
         }
 
-        public async Task<object?> GetOrCreateItemAsync(
-            IBlobCacheKey cacheKey, 
-            Type targetType,
-            Func<Task<object>> createItemFn)
+        public Task<object?> GetOrCreateAndCacheItemAsync(IBlobCacheKey cacheKey, Type targetType, Func<Task<object?>> createItemFunc)
         {
-            return _staleWorkflow.GetOrCreateItemAsync(new BlobCacheKeyAndType(cacheKey, targetType), createItemFn);
+            return _staleWorkflow.GetOrCreateAndCacheItemAsync(cacheKey, createItemFunc);
         }
 
-        public async Task<CacheItemMeta> GetCacheItemMeta(IBlobCacheKey cacheKey)
+        public async Task<CacheItemMeta?> GetItemMetaAsync(IBlobCacheKey cacheKey)
         {
-            throw new NotImplementedException();
+            var blobContainer = cacheKey.Container;
+            var key = cacheKey.Key;
+
+            // Attempt to read blob from the storage container
+            try
+            {
+                var result = await _blobStorageService.FindBlob(blobContainer, key);
+
+                if (result == null)
+                {
+                    return new CacheItemMeta(Exists: false);
+                }
+
+                var stale = !result.Meta["StaleDateTime"].IsNullOrWhitespace();
+                return new CacheItemMeta(Exists: true, Stale: stale);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Caught error fetching cache metadata from: {BlobContainer}/{Key}", blobContainer, key);
+                return null;
+            }
         }
 
         public void SetItem<TItem>(

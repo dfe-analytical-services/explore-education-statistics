@@ -38,8 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         public string? ServiceName { get; set; }
 
-        private ICacheWorkflow _workflow;
-
         public MemoryCacheAttribute(
             Type key, 
             int durationInSeconds, 
@@ -49,7 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         {
             DurationInSeconds = durationInSeconds;
             ExpirySchedule = expiryScheduleCron != null ? CrontabSchedule.Parse(expiryScheduleCron) : null;
-            _workflow = new 
         }
 
         public static void AddService(string name, IMemoryCacheService service)
@@ -84,6 +81,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             var service = GetService();
 
             return service?.GetItem(key, returnType);
+        }
+
+        protected override Task<object> GetOrCreateAndCacheItemAsync(object cacheKey, Type returnType, Func<Task<object?>> createItemFn)
+        {
+            throw new NotImplementedException();
         }
 
         public override Task<object?> GetAsync(ICacheKey cacheKey, Type returnType)

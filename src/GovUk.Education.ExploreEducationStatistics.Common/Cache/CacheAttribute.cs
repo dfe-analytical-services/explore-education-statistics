@@ -89,6 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             var cacheKey = GetCacheKey(Key, args, eventArgs.Method);
 
             // TODO DW - remove when changing cache updates to marking caches as stale
+            // TODO DW - is this logic the wrong way round?
             if (ForceUpdate)
             {
                 try
@@ -111,9 +112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             }
 
             // TODO DW - rename to "result" where ForceUpdate removed
-            var workflowResult = GetWorkflow().GetOrCreateItemAsync(
-                cacheKey, 
-                () => Task.FromResult(target.Invoke(args)).ContinueWith(result => (object) result.Result)
+            var workflowResult = GetOrCreateAndCacheItemAsync(
+                cacheKey,
+                typeof(T),
+                () => Task.FromResult(target.Invoke(args)).ContinueWith(result => (object?) result.Result)
             ).Result;
 
             return (T) workflowResult;
@@ -126,6 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             var cacheKey = GetCacheKey(Key, args, eventArgs.Method);
 
             // TODO DW - remove when changing cache updates to marking caches as stale
+            // TODO DW - is this logic the wrong way round?
             if (ForceUpdate)
             {
                 object? cachedResult = await GetAsync(cacheKey, unboxedResultType);
@@ -155,17 +158,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             }
 
             // TODO DW - rename to "result" where ForceUpdate removed
-            var workflowResult = await GetWorkflow().GetOrCreateItemAsync(
-                cacheKey, 
-                () => target.Invoke(args).ContinueWith(result => (object) result.Result)
+            var workflowResult = await GetOrCreateAndCacheItemAsync(
+                cacheKey,
+                unboxedResultType,
+                () => target.Invoke(args).ContinueWith(result => (object?) result.Result)
                 );
 
             return (T) workflowResult;
         }
-
-        protected abstract ICacheWorkflow GetWorkflow();
-
-        public abstract object? Get(ICacheKey cacheKey, Type returnType);
+        
+        protected abstract Task<object> GetOrCreateAndCacheItemAsync(object cacheKey, Type returnType, Func<Task<object?>> createItemFn);
 
         public abstract void Set(ICacheKey cacheKey, object value);
 

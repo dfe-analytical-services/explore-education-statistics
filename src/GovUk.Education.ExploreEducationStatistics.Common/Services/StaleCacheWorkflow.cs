@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
@@ -14,9 +15,9 @@ public record StaleCacheWorkflow<TCacheKey, TLogger>(
 {
     private readonly CacheLocks<TCacheKey> _locks = new();
     
-    public async Task<object?> GetOrCreateItemAsync(
+    public async Task<object?> GetOrCreateAndCacheItemAsync(
         object cacheKey,
-        Func<Task<object>> createItemFn)
+        Func<Task<object?>> createItemFn)
     {
         // *Is other request currently generating cached content?
         // *No
@@ -120,9 +121,9 @@ public record StaleCacheWorkflow<TCacheKey, TLogger>(
         }
     }
 
-    private async Task<object> AcquireLockAndGenerateContent(
+    private async Task<object?> AcquireLockAndGenerateContent(
         TCacheKey cacheKey, 
-        Func<Task<object>> createItemFn)
+        Func<Task<object?>> createItemFn)
     {
         try
         {
@@ -130,12 +131,17 @@ public record StaleCacheWorkflow<TCacheKey, TLogger>(
 
             // Then generate the content to be cached.
             var content = await createItemFn.Invoke();
+            
+            if (!content.TryUnboxResult(out var cachedResult) || cachedResult is null)
+            {
+                return content;
+            }
 
             // Cache it.
-            await CacheItemFn(cacheKey, content);
+            await CacheItemFn(cacheKey, cachedResult);
 
             // return the newly cached content.
-            return content;
+            return cachedResult;
         }
         finally
         {
@@ -146,7 +152,7 @@ public record StaleCacheWorkflow<TCacheKey, TLogger>(
 }
 
 // TODO DW - visibility levels
-public record CacheItemMeta(bool Exists, bool Stale);
+public record CacheItemMeta(bool Exists, bool Stale = false);
 
 record CacheLocks<TCacheKey>
 {
