@@ -72,14 +72,19 @@ const TimePeriodForm = ({
   const formInitialValues = useMemo(() => {
     const { startYear, startCode, endYear, endCode } = initialValues;
 
-    const start = startYear && startCode ? `${startYear}_${startCode}` : '';
-    const end = endYear && endCode ? `${endYear}_${endCode}` : '';
+    const defaultTimePeriod =
+      options.length === 1 ? `${options[0].year}_${options[0].code}` : '';
+
+    const start =
+      startYear && startCode ? `${startYear}_${startCode}` : defaultTimePeriod;
+    const end =
+      endYear && endCode ? `${endYear}_${endCode}` : defaultTimePeriod;
 
     return {
       start,
       end,
     };
-  }, [initialValues]);
+  }, [initialValues, options]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
@@ -157,7 +162,11 @@ const TimePeriodForm = ({
       {form => {
         return isActive ? (
           <Form id={formId} showSubmitError>
-            <FormFieldset id="timePeriod" legend={stepHeading}>
+            <FormFieldset
+              id="timePeriod"
+              hint={options.length === 1 && 'Only one time period available.'}
+              legend={stepHeading}
+            >
               <FormFieldSelect
                 name="start"
                 label="Start date"
