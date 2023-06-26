@@ -1,5 +1,5 @@
 import Header from '@common/modules/table-tool/utils/Header';
-import { ExpandedHeader } from '@common/modules/table-tool/utils/mapTableToJson';
+import { TableCellJson } from '@common/modules/table-tool/utils/mapTableToJson';
 
 /**
  * Create the column headers for the table.
@@ -10,8 +10,13 @@ import { ExpandedHeader } from '@common/modules/table-tool/utils/mapTableToJson'
  */
 export default function createExpandedColumnHeaders(
   columnHeaders: Header[],
-): ExpandedHeader[][] {
-  const acc: ExpandedHeader[][] = [];
+): TableCellJson[][] {
+  const maxDepth = columnHeaders.reduce((acc, header) => {
+    const { maxCrossSpan } = header;
+    return maxCrossSpan > acc ? maxCrossSpan : acc;
+  }, 0);
+
+  const acc: TableCellJson[][] = [];
 
   // To construct these headers, we use a breadth-first
   // search algorithm, consequently, we need a 'queue' to
@@ -20,7 +25,7 @@ export default function createExpandedColumnHeaders(
   const queue = [...columnHeaders];
 
   let currentDepth = 0;
-  let row: ExpandedHeader[] = [];
+  let row: TableCellJson[] = [];
 
   while (queue.length > 0) {
     const current = queue.shift();
@@ -32,13 +37,15 @@ export default function createExpandedColumnHeaders(
     // We're moving to the next level of the tree, so
     // we are now finished on the last row and should push it.
     if (currentDepth !== current.depth) {
-      acc.push(row);
+      if (row.length) {
+        acc.push(adjustRow(row));
+      }
 
       row = [];
       currentDepth = current.depth;
     }
 
-    const { parent } = current;
+    const { crossSpan, parent } = current;
 
     // If the current header's parent appears identical to it,
     // the parent will have a cross span higher than 1.
@@ -47,11 +54,11 @@ export default function createExpandedColumnHeaders(
     // and is supposed to be merged with the current header.
     if (!parent || parent?.crossSpan === 1) {
       row.push({
-        id: current.id,
+        colSpan: current.span,
+        rowSpan: current.crossSpan,
+        scope: maxDepth > currentDepth + crossSpan ? 'colgroup' : 'col',
         text: current.text,
-        span: current.span,
-        isGroup: current.hasChildren(),
-        crossSpan: current.crossSpan,
+        tag: 'th',
       });
     }
 
@@ -62,10 +69,19 @@ export default function createExpandedColumnHeaders(
     // There are no more children to iterate
     // through so push the final row.
     if (queue.length === 0 && row.length) {
-      acc.push(row);
+      acc.push(adjustRow(row));
       row = [];
     }
   }
 
   return acc;
+}
+
+// Adjust the rowSpan for cells in rows where all cells are merged.
+function adjustRow(row: TableCellJson[]): TableCellJson[] {
+  const allMerged = row.every(cell => cell.rowSpan === 2);
+  return row.map(cell => ({
+    ...cell,
+    rowSpan: allMerged ? 1 : cell.rowSpan,
+  }));
 }

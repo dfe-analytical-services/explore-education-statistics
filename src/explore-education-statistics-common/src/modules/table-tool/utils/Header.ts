@@ -50,6 +50,16 @@ export default class Header {
     return crossSpan;
   }
 
+  public get maxCrossSpan(): number {
+    let crossSpan = 1;
+    let child = this.getFirstChild();
+    while (child) {
+      crossSpan += 1;
+      child = child.getFirstChild();
+    }
+    return crossSpan;
+  }
+
   public addChild(child: Header): this {
     const lastChild = this.getLastChild();
 
@@ -101,8 +111,16 @@ export default class Header {
     return last(this.children);
   }
 
+  public hasSingleMatchingChild(): boolean {
+    return this.children.length === 1 && this.children[0].text === this.text;
+  }
+
   public hasSiblings(): boolean {
     return !!this.parent && this.parent.children.length > 1;
+  }
+
+  public getAllAtCurrentLevel(): Header[] | undefined {
+    return this.parent?.children;
   }
 
   public getPrevSibling(): Header | undefined {
