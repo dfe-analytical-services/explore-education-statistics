@@ -36,7 +36,10 @@
       "value": false
     },
     "devopsSPN": {
-      "value": "702e692e-8bdf-4283-9799-9630cb781e33"
+      "value": "2d5a7bf2-a6b1-4474-b202-ab17dd87c375",
+      "metadata": {
+         "comments": "ObjectId for s101prep-datahub-spn-ees-dfe-gov-uk"
+      }
     },
     "domain": {
       "value": "pre-production.explore-education-statistics.service.gov.uk"
