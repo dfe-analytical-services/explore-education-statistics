@@ -48,17 +48,21 @@ public class MetaDataFileReader
             DecimalPlaces = !indicatorDp.IsNullOrEmpty() ? int.Parse(indicatorDp!) : null
         };
     }
-    
-    public List<(Filter Filter, string Column, string FilterGroupingColumn)> ReadFiltersFromCsv(
-        IEnumerable<MetaRow> metaRows, 
+
+    public List<(Filter Filter, string Column)> ReadFiltersFromCsv(
+        IEnumerable<MetaRow> metaRows,
         Subject subject)
     {
         return metaRows
             .Where(row => row.ColumnType == ColumnType.Filter)
             .Select(filter => (
-                filter: new Filter(filter.FilterHint, filter.Label, filter.ColumnName, subject.Id),
-                column: filter.ColumnName,
-                filterGroupingColumn: filter.FilterGroupingColumn))
+                filter: new Filter(
+                    hint: filter.FilterHint,
+                    label: filter.Label,
+                    name: filter.ColumnName,
+                    groupCsvColumn: filter.FilterGroupingColumn,
+                    subjectId: subject.Id),
+                column: filter.ColumnName))
             .ToList();
     }
 
@@ -79,14 +83,14 @@ public class MetaDataFileReader
         var indicatorGroups = indicatorRows
             .GroupBy(row => row.IndicatorGrouping)
             .ToDictionary(
-                rows => rows.Key, 
+                rows => rows.Key,
                 rows => new IndicatorGroup(rows.Key, subject.Id));
 
         return indicatorRows
             .Select(row =>
             {
                 var indicatorGroup = indicatorGroups.GetValueOrDefault(row.IndicatorGrouping)!;
-                
+
                 return (
                     indicator:
                     new Indicator
@@ -106,7 +110,7 @@ public class MetaDataFileReader
     private string? ReadMetaColumnValue(MetaColumns column, IReadOnlyList<string> rowValues)
     {
         var columnIndex = _metaColumnIndexes[column];
-        
+
         if (columnIndex == -1)
         {
             return null;

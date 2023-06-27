@@ -304,6 +304,19 @@ public class ProcessorStage2Tests
 
             Assert.Equal(expectedFilterNames, filterNames);
 
+            var filterGroupCsvColumns = filters
+                .Select(f => f.GroupCsvColumn)
+                .OrderBy(groupCsvColumn => groupCsvColumn)
+                .JoinToString(",");
+
+            var expectedFilterGroupCsvColumns = scenario
+                .GetExpectedFilters()
+                .Select(f => f.GroupCsvColumn)
+                .OrderBy(groupCsvColumn => groupCsvColumn)
+                .JoinToString(",");
+
+            Assert.Equal(expectedFilterGroupCsvColumns, filterGroupCsvColumns);
+
             filters.ForEach(filter => Assert.Equal(subject.Id, filter.SubjectId));
 
             scenario.GetExpectedFilters().ForEach(expectedFilter =>

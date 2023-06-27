@@ -10,6 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? Hint { get; set; } 
         public string Label { get; set; } = string.Empty;
         public string Name { get; set; } = string.Empty;
+        public string? GroupCsvColumn { get; set; }
         public Subject Subject { get; set; } = null!;
         public Guid SubjectId { get; set; }
         public List<FilterGroup> FilterGroups { get; set; } = new();
@@ -21,12 +22,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         {
         }
 
-        public Filter(string? hint, string label, string name, Guid subjectId)
+        public Filter(string? hint,
+            string label,
+            string name,
+            string groupCsvColumn,
+            Guid subjectId)
         {
             Id = Guid.NewGuid();
             Hint = hint;
             Label = label;
             Name = name;
+            GroupCsvColumn = groupCsvColumn;
             SubjectId = subjectId;
             FilterGroups = new List<FilterGroup>();
         }
