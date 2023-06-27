@@ -7,11 +7,17 @@ interface Props {
   children: ReactNode;
   wide?: boolean;
   onClose?: () => void;
+  testId?: string;
 }
 
-export default function Banner({ children, wide = false, onClose }: Props) {
+export default function Banner({
+  children,
+  wide = false,
+  onClose,
+  testId,
+}: Props) {
   return (
-    <div className={styles.container}>
+    <div className={styles.container} data-testid={testId}>
       <div
         className={classNames('govuk-width-container', {
           'dfe-width-container--wide': wide,

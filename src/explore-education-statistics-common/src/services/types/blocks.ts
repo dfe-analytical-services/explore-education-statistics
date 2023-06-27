@@ -65,6 +65,8 @@ export type ContentBlock = MarkdownBlock | HtmlBlock;
 export interface DataBlock extends BaseBlock {
   type: 'DataBlock';
   name: string;
+  dataSetName?: string;
+  dataSetId: string;
   highlightName?: string;
   highlightDescription?: string;
   heading: string;

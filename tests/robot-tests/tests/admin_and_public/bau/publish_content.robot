@@ -59,6 +59,8 @@ Check glossary info icon appears on release preview
     user waits until page contains button    Absence
 
 Click glossary info icon and validate glossary entry
+    user closes admin feedback banner if needed
+
     user clicks button    Absence
     ${modal}=    user waits until modal is visible    Absence
     user checks page contains    When a pupil misses (or is absent from) at least 1 possible school session.
