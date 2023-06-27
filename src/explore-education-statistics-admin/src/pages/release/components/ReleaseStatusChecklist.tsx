@@ -98,6 +98,15 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseRouteParams,
             ),
           };
+        case 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock':
+          return {
+            message:
+              'Release must contain a key statistic or a non-empty headline text block',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
         default:
           // Show error code, even if there is no mapping,
           // as this is better than having invisible errors.
