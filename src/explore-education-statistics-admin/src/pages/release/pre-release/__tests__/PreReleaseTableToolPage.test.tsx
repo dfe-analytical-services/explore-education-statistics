@@ -227,6 +227,8 @@ describe('PreReleaseTableToolPage', () => {
 
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',
+    dataSetId: 'data-set-1',
+    dataSetName: 'Test data set',
     name: 'Test block',
     highlightName: 'Test highlight name',
     source: '',

@@ -29,6 +29,8 @@ const emptyTable: Table = {
 
 const basicDataBlock: DataBlock = {
   id: 'datablock-0',
+  dataSetId: 'dataSetId',
+  dataSetName: 'Test data set',
   order: 1,
   type: 'DataBlock',
   name: 'Test data block',
@@ -304,6 +306,8 @@ describe('ReleaseContentContext', () => {
         charts: [],
         table: emptyTable,
         type: 'DataBlock',
+        dataSetId: 'cpih01',
+        dataSetName: 'CPIH01',
         id: '69a9522d-501d-441a-9ee5-260ede5cd85c',
         order: 0,
         comments: [],

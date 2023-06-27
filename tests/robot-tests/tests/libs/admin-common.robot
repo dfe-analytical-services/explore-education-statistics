@@ -855,3 +855,6 @@ user removes key stat
     [Arguments]    ${tile_num}
     user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
     user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Remove")]
+
+user closes admin feedback banner if needed
+    user clicks element if exists    //*[@data-testid="admin-survey-banner"]//button[text()="Close"]

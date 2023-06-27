@@ -200,11 +200,15 @@ User navigates to Data blocks page to edit block
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
 Edit data block
-    #just updating the table title and source
     user waits until table is visible
+
     user clicks link    Edit block    css:tbody > tr:first-child
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until h2 is visible    Data block details
+
+    user checks page contains element    //*[@data-testid="Data set name-key" and contains(text(), "Data set name")]
+    user checks page contains element
+    ...    //*[@data-testid="Data set name-value" and contains(text(), "Dates test subject")]
 
     user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
     user enters text into element    id:dataBlockDetailsForm-heading    Updated dates table title

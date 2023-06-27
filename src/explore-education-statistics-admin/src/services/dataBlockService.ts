@@ -1,10 +1,7 @@
 import client from '@admin/services/utils/service';
 import { DataBlock } from '@common/services/types/blocks';
 import { OmitStrict } from '@common/types';
-import {
-  FeaturedTableBasic,
-  FeaturedTableCreateRequest,
-} from '@admin/services/featuredTableService';
+import { FeaturedTableBasic } from '@admin/services/featuredTableService';
 
 export type ReleaseDataBlock = OmitStrict<DataBlock, 'order' | 'type'>;
 
