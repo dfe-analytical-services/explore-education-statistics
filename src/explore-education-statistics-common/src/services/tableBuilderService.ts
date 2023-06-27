@@ -94,6 +94,7 @@ export interface FeaturedTable {
   description?: string;
   subjectId: string;
   dataBlockId: string;
+  order: number;
 }
 
 export interface SubjectMeta {

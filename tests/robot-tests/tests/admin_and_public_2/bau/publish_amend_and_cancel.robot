@@ -296,7 +296,6 @@ Edit data block for amendment
     user checks table cell contains    1    1    ${DATABLOCK_NAME}
     user checks table cell contains    1    2    Yes
     user checks table cell contains    1    3    Yes
-    user checks table cell contains    1    4    None
 
     user clicks link    Edit block    css:tbody > tr:first-child
 

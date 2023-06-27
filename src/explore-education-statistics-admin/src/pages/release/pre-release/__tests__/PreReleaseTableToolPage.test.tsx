@@ -200,6 +200,7 @@ describe('PreReleaseTableToolPage', () => {
       name: 'Test highlight',
       description: 'Test highlight description',
       subjectId: 'subject-1',
+      order: 0,
     },
   ];
   const testSubjects: Subject[] = [

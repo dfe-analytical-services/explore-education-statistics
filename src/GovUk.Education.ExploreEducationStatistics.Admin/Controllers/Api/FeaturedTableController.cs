@@ -72,7 +72,7 @@ public class FeaturedTableController : ControllerBase
             .HandleFailuresOrNoContent();
     }
 
-    [HttpPut("releases/{releaesId:guid}/featured-tables/order")]
+    [HttpPut("releases/{releaseId:guid}/featured-tables/order")]
     public async Task<ActionResult<List<FeaturedTableViewModel>>> Reorder(
         Guid releaseId,
         List<Guid> newOrder)
