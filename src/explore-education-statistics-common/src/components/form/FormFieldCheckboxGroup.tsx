@@ -12,7 +12,7 @@ type Props<FormValues> = OmitStrict<
 >;
 
 function FormFieldCheckboxGroup<FormValues>(props: Props<FormValues>) {
-  const { options } = props;
+  const { options, onChange, onAllChange } = props;
 
   return (
     <FormField<string[]> {...props} formGroup={false}>
@@ -22,9 +22,7 @@ function FormFieldCheckboxGroup<FormValues>(props: Props<FormValues>) {
           {...field}
           id={id}
           onAllChange={(event, checked) => {
-            if (props.onAllChange) {
-              props.onAllChange(event, checked, options);
-            }
+            onAllChange?.(event, checked, options);
 
             if (event.isDefaultPrevented()) {
               return;
@@ -38,9 +36,7 @@ function FormFieldCheckboxGroup<FormValues>(props: Props<FormValues>) {
             });
           }}
           onChange={(event, option) => {
-            if (props.onChange) {
-              props.onChange(event, option);
-            }
+            onChange?.(event, option);
 
             if (event.isDefaultPrevented()) {
               return;

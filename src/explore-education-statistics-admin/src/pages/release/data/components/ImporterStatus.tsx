@@ -167,6 +167,7 @@ const ImporterStatus = ({
             >
               <ul className="govuk-!-margin-top-0">
                 {currentStatus.errors.map((error, index) => (
+                  // eslint-disable-next-line react/no-array-index-key
                   <li key={index.toString()}>{error}</li>
                 ))}
               </ul>

@@ -45,6 +45,7 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
     );
   }
 
+  // eslint-disable-next-line react/sort-comp
   private unregisterCallback?: () => void;
 
   private errorPages = {
