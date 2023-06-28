@@ -57,7 +57,6 @@ const VerticalBarBlock = ({
   legend,
   includeNonNumericData,
   showDataLabels,
-  dataLabelPosition,
 }: VerticalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
   if (
@@ -179,8 +178,7 @@ const VerticalBarBlock = ({
                   ? {
                       fontSize: 14,
                       offset: 5,
-                      position:
-                        dataLabelPosition === 'inside' ? 'insideTop' : 'top',
+                      position: 'top',
                       formatter: (value: string | number) =>
                         formatPretty(
                           value.toString(),
