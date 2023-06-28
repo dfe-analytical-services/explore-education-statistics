@@ -2,7 +2,6 @@ import EditableAccordionSection from '@admin/components/editable/EditableAccordi
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
 import MethodologyEditableBlock from '@admin/pages/methodology/edit-methodology/content/components/MethodologyEditableBlock';
 import { EditableContentBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
@@ -18,17 +17,18 @@ interface MethodologyAccordionSectionProps {
   section: ContentSection<EditableContentBlock>;
   sectionKey: ContentSectionKeys;
   methodologyId: string;
+  methodologySlug: string;
 }
 
 const MethodologyAccordionSection = ({
   sectionKey,
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   methodologyId,
+  methodologySlug,
   ...props
 }: MethodologyAccordionSectionProps) => {
   const { editingMode } = useEditingContext();
   const { PublicAppUrl } = useConfig();
-  const { methodology: currentMethodology } = useMethodologyContext();
 
   const {
     addContentSectionBlock,
@@ -130,7 +130,7 @@ const MethodologyAccordionSection = ({
       anchorLinkIdPrefix={sectionKey}
       anchorLinkUrl={
         editingMode === 'preview'
-          ? id => `${PublicAppUrl}/methodology/${currentMethodology.slug}#${id}`
+          ? id => `${PublicAppUrl}/methodology/${methodologySlug}#${id}`
           : undefined
       }
       heading={heading}
