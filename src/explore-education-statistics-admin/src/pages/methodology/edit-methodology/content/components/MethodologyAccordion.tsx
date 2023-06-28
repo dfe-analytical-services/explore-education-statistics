@@ -73,6 +73,7 @@ const MethodologyAccordion = ({
           key={section.id}
           id={`${id}-${section.id}`}
           methodologyId={methodology.id}
+          methodologySlug={methodology.slug}
           section={section}
           sectionKey={sectionKey}
         />
