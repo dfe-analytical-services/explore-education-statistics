@@ -212,11 +212,14 @@ const VerticalBarBlock = ({
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
               axis: 'y',
+              axisDomain: minorDomainTicks.domain,
               axisType: 'minor',
               chartData,
               label: referenceLine.label,
               otherAxisDomain: majorDomainTicks.domain,
+              otherAxisEnd: referenceLine.otherAxisEnd,
               otherAxisPosition: referenceLine.otherAxisPosition,
+              otherAxisStart: referenceLine.otherAxisStart,
               position: referenceLine.position,
               style: referenceLine.style,
               y: referenceLine.position,

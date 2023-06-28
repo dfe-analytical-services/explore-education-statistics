@@ -1,11 +1,14 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration.module.scss';
 import Button from '@common/components/Button';
+import { FormFieldset } from '@common/components/form';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import Tooltip from '@common/components/Tooltip';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import {
+  AxisType,
   ChartDefinitionAxis,
   ReferenceLine,
   ReferenceLineStyle,
@@ -15,13 +18,24 @@ import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
+import produce from 'immer';
 import upperFirst from 'lodash/upperFirst';
 import React, { useMemo } from 'react';
 
+const otherAxisPositionTypes = {
+  default: 'default',
+  betweenDataPoints: 'between-data-points',
+  custom: 'custom',
+} as const;
+type OtherAxisPositionType = keyof typeof otherAxisPositionTypes;
+
 interface AddFormValues {
+  otherAxisEnd?: string;
   label: string;
   otherAxisPosition?: number;
+  otherAxisPositionType?: typeof otherAxisPositionTypes[OtherAxisPositionType];
   position: string | number;
+  otherAxisStart?: string;
   style: ReferenceLineStyle;
 }
 
@@ -44,11 +58,7 @@ export default function ChartReferenceLinesConfiguration({
 }: ChartReferenceLinesConfigurationProps) {
   const { axis, referenceLineDefaults, type } = axisDefinition || {};
 
-  const options = useMemo<SelectOption[]>(() => {
-    if (type === 'minor') {
-      return [];
-    }
-
+  const majorAxisOptions = useMemo<SelectOption[]>(() => {
     return dataSetCategories.map(({ filter }) => ({
       label: filter.label,
       value:
@@ -56,33 +66,109 @@ export default function ChartReferenceLinesConfiguration({
           ? LocationFilter.createId(filter)
           : filter.value,
     }));
-  }, [type, dataSetCategories]);
+  }, [dataSetCategories]);
 
   const filteredOptions = useMemo<SelectOption[]>(() => {
-    return options.filter(option =>
+    return majorAxisOptions.filter(option =>
       lines?.every(line => line.position !== option.value),
     );
-  }, [lines, options]);
+  }, [lines, majorAxisOptions]);
 
   const referenceLines = useMemo(() => {
     if (type === 'major') {
       return (
         lines?.filter(line =>
-          options.some(option => option.value === line.position),
+          majorAxisOptions.some(option => option.value === line.position),
         ) ?? []
       );
     }
 
     return lines ?? [];
-  }, [type, lines, options]);
+  }, [type, lines, majorAxisOptions]);
 
-  const getPositionLabel = (position: string | number) => {
-    if (type === 'major') {
-      return options.find(option => option.value === position)?.label;
+  const validationSchema = useMemo(() => {
+    const schema = Yup.object<AddFormValues>({
+      label: Yup.string().required('Enter label'),
+      position: Yup.string()
+        .required('Enter position')
+        .test({
+          name: 'axisPosition',
+          message: `Enter a position within the ${
+            axis === 'x' ? 'X' : 'Y'
+          } axis min/max range`,
+          test: (value: number) => {
+            return type === 'minor' && minorAxisDomain
+              ? value >= minorAxisDomain?.min && value <= minorAxisDomain.max
+              : true;
+          },
+        }),
+      style: Yup.string()
+        .required('Enter style')
+        .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
+    });
+
+    if (type === 'minor') {
+      return schema.shape({
+        otherAxisEnd: Yup.string()
+          .when('otherAxisPositionType', {
+            is: otherAxisPositionTypes.betweenDataPoints,
+            then: Yup.string().required('Enter end point'),
+            otherwise: Yup.string(),
+          })
+          .test(
+            'otherAxisEnd',
+            'End point cannot match start point',
+            function checkotherAxisEnd(value: number) {
+              /* eslint-disable react/no-this-in-sfc */
+              if (this.parent.otherAxisStart) {
+                return value !== this.parent.otherAxisStart;
+              }
+              return true;
+              /* eslint-enable react/no-this-in-sfc */
+            },
+          ),
+        otherAxisStart: Yup.string().when('otherAxisPositionType', {
+          is: otherAxisPositionTypes.betweenDataPoints,
+          then: Yup.string().required('Enter start point'),
+          otherwise: Yup.string(),
+        }),
+        otherAxisPosition: Yup.number().when('otherAxisPositionType', {
+          is: otherAxisPositionTypes.custom,
+          then: Yup.number()
+            .required('Enter a percentage between 0 and 100%')
+            .test({
+              name: 'otherAxisPosition',
+              message: 'Enter a percentage between 0 and 100%',
+              test: (value: number) => {
+                if (typeof value !== 'number') {
+                  return true;
+                }
+                return value >= 0 && value <= 100;
+              },
+            }),
+          otherwise: Yup.number(),
+        }),
+      });
     }
 
-    return position;
-  };
+    return schema.shape({
+      otherAxisPosition: Yup.number().test({
+        name: 'otherAxisPosition',
+        message: `Enter a position within the ${
+          axis === 'x' ? 'Y' : 'X'
+        } axis min/max range`,
+        test: (value: number) => {
+          if (typeof value !== 'number') {
+            return true;
+          }
+
+          return minorAxisDomain
+            ? value >= minorAxisDomain?.min && value <= minorAxisDomain.max
+            : true;
+        },
+      }),
+    });
+  }, [axis, minorAxisDomain, type]);
 
   return (
     <table className="govuk-table">
@@ -90,7 +176,7 @@ export default function ChartReferenceLinesConfiguration({
       <thead>
         <tr>
           <th>Position</th>
-          <th>
+          <th className="govuk-!-width-one-quarter">
             {axis === 'x' ? 'Y axis position' : 'X axis position'}
             {type === 'minor' && (
               <>
@@ -109,10 +195,21 @@ export default function ChartReferenceLinesConfiguration({
       <tbody>
         {referenceLines.map(line => (
           <tr key={`${line.label}_${line.position}`}>
-            <td>{getPositionLabel(line.position)}</td>
             <td>
-              {line.otherAxisPosition &&
-                `${line.otherAxisPosition}${type === 'minor' ? '%' : ''}`}
+              {type === 'major'
+                ? majorAxisOptions.find(
+                    option => option.value === line.position,
+                  )?.label
+                : line.position}
+            </td>
+            <td>
+              {getOtherAxisPositionLabel({
+                majorAxisOptions,
+                otherAxisEnd: line.otherAxisEnd,
+                otherAxisStart: line.otherAxisStart,
+                otherAxisPosition: line.otherAxisPosition,
+                type,
+              })}
             </td>
             <td className="govuk-!-width-one-third">{line.label}</td>
             <td>{upperFirst(line.style)}</td>
@@ -133,53 +230,37 @@ export default function ChartReferenceLinesConfiguration({
           <Formik<AddFormValues>
             initialValues={{
               label: '',
+              otherAxisPositionType:
+                type === 'minor' ? otherAxisPositionTypes.default : undefined,
               position: '',
               style: 'dashed',
               ...(referenceLineDefaults ?? {}),
             }}
-            validationSchema={Yup.object<AddFormValues>({
-              label: Yup.string().required('Enter label'),
-              otherAxisPosition: Yup.number().test({
-                name: 'otherAxisPosition',
-                message:
-                  type === 'minor'
-                    ? 'Enter a percentage between 0 and 100%'
-                    : `Enter a position within the ${
-                        axis === 'x' ? 'Y' : 'X'
-                      } axis min/max range`,
-                test: (value: number) => {
-                  if (typeof value !== 'number') {
-                    return true;
-                  }
-                  if (type === 'minor') {
-                    return value >= 0 && value <= 100;
-                  }
-                  return minorAxisDomain
-                    ? value >= minorAxisDomain?.min &&
-                        value <= minorAxisDomain.max
-                    : true;
-                },
-              }),
-              position: Yup.string()
-                .required('Enter position')
-                .test({
-                  name: 'axisPosition',
-                  message: `Enter a position within the ${
-                    axis === 'x' ? 'X' : 'Y'
-                  } axis min/max range`,
-                  test: (value: number) => {
-                    return type === 'minor' && minorAxisDomain
-                      ? value >= minorAxisDomain?.min &&
-                          value <= minorAxisDomain.max
-                      : true;
-                  },
-                }),
-              style: Yup.string()
-                .required('Enter style')
-                .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
-            })}
+            validationSchema={validationSchema}
             onSubmit={(values, helpers) => {
-              onAddLine(values);
+              const updatedValues = produce(values, draft => {
+                switch (draft.otherAxisPositionType) {
+                  case otherAxisPositionTypes.custom:
+                    delete draft.otherAxisStart;
+                    delete draft.otherAxisEnd;
+                    break;
+
+                  case otherAxisPositionTypes.betweenDataPoints:
+                    delete draft.otherAxisPosition;
+                    break;
+
+                  case otherAxisPositionTypes.default:
+                    delete draft.otherAxisEnd;
+                    delete draft.otherAxisPosition;
+                    delete draft.otherAxisStart;
+                    break;
+                  default:
+                    break;
+                }
+
+                delete draft.otherAxisPositionType;
+              });
+              onAddLine(updatedValues);
               helpers.resetForm();
             }}
           >
@@ -208,18 +289,95 @@ export default function ChartReferenceLinesConfiguration({
                   )}
                 </td>
                 <td className="dfe-vertical-align--bottom">
-                  <FormFieldNumberInput
-                    name="otherAxisPosition"
-                    id="referenceLines-otherAxisPosition"
-                    label={axis === 'x' ? 'Y axis position' : 'X axis position'}
-                    formGroup={false}
-                    hideLabel
-                    hint={
-                      type === 'major'
-                        ? 'Value (leave blank for default)'
-                        : 'Percent (leave blank for default)'
-                    }
-                  />
+                  {type === 'minor' ? (
+                    <>
+                      <FormFieldSelect
+                        name="otherAxisPositionType"
+                        id="referenceLines-otherAxisPositionType"
+                        label={`${axis === 'x' ? 'Y' : 'X'} axis position`}
+                        formGroup={false}
+                        hideLabel
+                        order={FormSelect.unordered}
+                        options={[
+                          {
+                            label: 'Default',
+                            value: otherAxisPositionTypes.default,
+                          },
+                          {
+                            label: 'Custom',
+                            value: otherAxisPositionTypes.custom,
+                          },
+                          {
+                            label: 'Between data points',
+                            value: otherAxisPositionTypes.betweenDataPoints,
+                          },
+                        ]}
+                      />
+
+                      {addForm.values.otherAxisPositionType !==
+                        otherAxisPositionTypes.default && (
+                        <>
+                          {addForm.values.otherAxisPositionType ===
+                          otherAxisPositionTypes.custom ? (
+                            <div className="govuk-!-margin-top-2">
+                              <FormFieldNumberInput
+                                name="otherAxisPosition"
+                                id="referenceLines-otherAxisPosition"
+                                label={`Percent along ${
+                                  axis === 'x' ? 'Y' : 'X'
+                                } axis`}
+                                formGroup={false}
+                              />
+                            </div>
+                          ) : (
+                            <FormFieldset
+                              className="dfe-flex dfe-align-items-end govuk-!-margin-top-2"
+                              id="referenceLines-betweenPosition"
+                              legend="Select start and end points of line"
+                              legendSize="s"
+                              legendWeight="regular"
+                            >
+                              <div className="govuk-!-margin-right-2">
+                                <FormFieldSelect
+                                  name="otherAxisStart"
+                                  id="referenceLines-otherAxisStart"
+                                  label="Start point"
+                                  formGroup={false}
+                                  hideLabel
+                                  placeholder="Start point"
+                                  order={FormSelect.unordered}
+                                  options={majorAxisOptions}
+                                />
+                              </div>
+                              <div>
+                                <FormFieldSelect
+                                  name="otherAxisEnd"
+                                  id="referenceLines-otherAxisEnd"
+                                  label="End point"
+                                  formGroup={false}
+                                  hideLabel
+                                  placeholder="End point"
+                                  order={FormSelect.unordered}
+                                  options={majorAxisOptions}
+                                />
+                              </div>
+                            </FormFieldset>
+                          )}
+                        </>
+                      )}
+                    </>
+                  ) : (
+                    <FormFieldNumberInput
+                      name="otherAxisPosition"
+                      id="referenceLines-otherAxisPosition"
+                      label={
+                        axis === 'x' ? 'Y axis position' : 'X axis position'
+                      }
+                      formGroup={false}
+                      hideLabel
+                      hint="Value (leave blank for default)"
+                    />
+                  )}
                 </td>
                 <td className="govuk-!-width-one-third dfe-vertical-align--bottom">
                   <FormFieldTextInput
@@ -275,4 +433,32 @@ export default function ChartReferenceLinesConfiguration({
       </tbody>
     </table>
   );
+}
+
+function getOtherAxisPositionLabel({
+  majorAxisOptions,
+  otherAxisEnd,
+  otherAxisStart,
+  otherAxisPosition,
+  type,
+}: {
+  majorAxisOptions: SelectOption[];
+  otherAxisEnd?: string;
+  otherAxisStart?: string;
+  otherAxisPosition?: number;
+  type?: AxisType;
+}) {
+  if (otherAxisPosition) {
+    return `${otherAxisPosition}${type === 'minor' ? '%' : ''}`;
+  }
+
+  if (otherAxisEnd && otherAxisStart) {
+    return `${
+      majorAxisOptions.find(option => option.value === otherAxisStart)?.label
+    } - ${
+      majorAxisOptions.find(option => option.value === otherAxisEnd)?.label
+    }`;
+  }
+
+  return null;
 }
