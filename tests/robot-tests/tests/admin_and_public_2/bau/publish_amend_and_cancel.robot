@@ -103,9 +103,14 @@ Navigate to 'Content' page
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
-Add three accordion sections to release
     user waits for page to finish loading
     user waits until page does not contain loading spinner
+
+Add headline text block
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Add three accordion sections to release
     user clicks button    Add new section
     user changes accordion section title    1    Dates data block
     user clicks button    Add new section

@@ -15,8 +15,10 @@ Force Tags          Admin    Local    Dev    AltersData
 *** Variables ***
 ${PUBLICATION_NAME}=                UI tests - prerelease and amend %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=                    Calendar year 2000
-${SCHEDULED_PRERELEASE_WARNING}=    Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
-${IMMEDIATE_PRERELEASE_WARNING}=    Pre-release users will not have access to a preview of the release if it is published immediately.
+${SCHEDULED_PRERELEASE_WARNING}=
+...                                 Pre-release users will have access to a preview of the release 24 hours before the scheduled publish date.
+${IMMEDIATE_PRERELEASE_WARNING}=
+...                                 Pre-release users will not have access to a preview of the release if it is published immediately.
 
 
 *** Test Cases ***
@@ -53,6 +55,11 @@ Add metadata guidance
     user enters text into element    id:dataGuidanceForm-subjects-0-content    Test file guidance content
 
     user clicks button    Save guidance
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Test headlines summary text for ${PUBLICATION_NAME}
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -131,10 +138,10 @@ user creates amendment for release
     user checks page contains tag    Amendment
 
 Add basic release content
-    user clicks link    Content
-    user waits until h1 is visible    ${PUBLICATION_NAME}
-    user waits until h2 is visible    ${PUBLICATION_NAME}
-    user adds basic release content    ${PUBLICATION_NAME}
+    user navigates to content page    ${PUBLICATION_NAME}
+
+    # FALSE to not add headline block, as we needed to add that to publish the original release
+    user adds basic release content    ${PUBLICATION_NAME}    ${FALSE}
 
 Add release note to amendment
     user clicks button    Add note

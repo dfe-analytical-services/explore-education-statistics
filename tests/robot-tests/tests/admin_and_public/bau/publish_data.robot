@@ -2,6 +2,7 @@
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -36,6 +37,11 @@ Create new publication and release via API
 Navigate to release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_1_NAME}
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -423,6 +429,11 @@ Check footnotes were reordered on data block
     user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Add public prerelease access list for release
     user clicks link    Pre-release access
