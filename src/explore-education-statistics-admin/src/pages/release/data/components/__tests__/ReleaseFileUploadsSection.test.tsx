@@ -7,24 +7,12 @@ import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
-import flushPromises from '@common-test/flushPromises';
 
 jest.mock('@admin/services/releaseAncillaryFileService');
 
 const releaseAncillaryFileService = _releaseAncillaryFileService as jest.Mocked<
   typeof _releaseAncillaryFileService
 >;
-
-beforeEach(() => {
-  jest.useFakeTimers({
-    legacyFakeTimers: true,
-  });
-});
-
-afterEach(() => {
-  jest.runOnlyPendingTimers();
-  jest.useRealTimers();
-});
 
 describe('ReleaseFileUploadsSection', () => {
   const testFiles: AncillaryFile[] = [
@@ -53,6 +41,10 @@ describe('ReleaseFileUploadsSection', () => {
       created: '2021-05-27T00:00:00',
     },
   ];
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
 
   function renderPage() {
     return render(
@@ -213,12 +205,11 @@ describe('ReleaseFileUploadsSection', () => {
         expect(releaseAncillaryFileService.deleteFile).toHaveBeenCalledWith<
           Parameters<typeof releaseAncillaryFileService.deleteFile>
         >('release-1', 'file-2');
+
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
       });
-      await flushPromises();
 
       const updatedSections = screen.getAllByTestId('accordionSection');
-
-      expect(updatedSections).toHaveLength(1);
 
       expect(
         within(updatedSections[0]).getByRole('button', {
@@ -243,8 +234,6 @@ describe('ReleaseFileUploadsSection', () => {
         },
       });
       userEvent.tab();
-
-      await flushPromises();
 
       await waitFor(
         () => {

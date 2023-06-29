@@ -9,12 +9,6 @@ import React, { FC } from 'react';
 describe('useBlockLock', () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    MockDate.reset();
-  });
-
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
   });
 
   const testUser1: UserDetails = {

@@ -21,6 +21,10 @@ describe('ModalConfirm', () => {
     process.env.APP_ROOT_ID = originalAppRootId;
   });
 
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   describe('confirming', () => {
     test('clicking Confirm button disables all buttons', () => {
       const handleExit = jest.fn();
@@ -92,8 +96,6 @@ describe('ModalConfirm', () => {
     });
 
     test('re-enables buttons once `onConfirm` has completed', async () => {
-      jest.useFakeTimers();
-
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
       const handleConfirm = jest.fn(async () => {
@@ -126,8 +128,6 @@ describe('ModalConfirm', () => {
     });
 
     test('re-enables exiting once `onConfirm` has completed', async () => {
-      jest.useFakeTimers();
-
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
       const handleConfirm = jest.fn(async () => {
@@ -239,8 +239,6 @@ describe('ModalConfirm', () => {
     });
 
     test('re-enables buttons once `onCancel` has completed', async () => {
-      jest.useFakeTimers();
-
       const handleExit = jest.fn();
       const handleCancel = jest.fn(async () => {
         await delay(500);
@@ -273,8 +271,6 @@ describe('ModalConfirm', () => {
     });
 
     test('re-enables exiting once `onCancel` has completed', async () => {
-      jest.useFakeTimers();
-
       const handleExit = jest.fn();
       const handleCancel = jest.fn(async () => {
         await delay(500);

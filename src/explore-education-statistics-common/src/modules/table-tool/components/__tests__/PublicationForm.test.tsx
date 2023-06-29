@@ -184,6 +184,10 @@ describe('PublicationForm', () => {
     goToPreviousStep: task => task?.(),
   };
 
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   test('renders the form with the search form, themes list and empty publications list', () => {
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
@@ -226,10 +230,6 @@ describe('PublicationForm', () => {
   });
 
   test('renders publication options filtered by title when using search field', async () => {
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
-
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
@@ -262,10 +262,6 @@ describe('PublicationForm', () => {
   });
 
   test('renders the theme as a hint on the publication options when using search field', async () => {
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
-
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
@@ -298,10 +294,6 @@ describe('PublicationForm', () => {
   });
 
   test('renders publication options filtered by case-insensitive title', async () => {
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
-
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
@@ -333,10 +325,6 @@ describe('PublicationForm', () => {
   });
 
   test('renders the `no publications found` message when there are no search results', async () => {
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
-
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
@@ -356,10 +344,6 @@ describe('PublicationForm', () => {
   });
 
   test('does not throw error if regex sensitive search term is used', async () => {
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
-
     render(
       <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );

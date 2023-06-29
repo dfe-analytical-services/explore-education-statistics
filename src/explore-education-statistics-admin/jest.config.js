@@ -50,9 +50,6 @@ const config = {
     'jest-watch-typeahead/filename',
     'jest-watch-typeahead/testname',
   ],
-  fakeTimers: {
-    legacyFakeTimers: true,
-  },
 };
 
 module.exports = config;

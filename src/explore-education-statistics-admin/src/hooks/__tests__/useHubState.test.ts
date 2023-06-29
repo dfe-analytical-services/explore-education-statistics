@@ -4,20 +4,12 @@ import { HubConnectionState } from '@microsoft/signalr';
 import { waitFor } from '@testing-library/react';
 import { renderHook } from '@testing-library/react-hooks';
 import { mock } from 'jest-mock-extended';
-import flushPromises from '@common-test/flushPromises';
 
 describe('useHubState', () => {
   const mockHub = mock<Hub>();
 
   beforeEach(() => {
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
-  });
-
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
+    jest.useFakeTimers();
   });
 
   test('calls `start` on hub when mounted', () => {
@@ -74,7 +66,6 @@ describe('useHubState', () => {
     expect(mockHub.stop).toHaveBeenCalledTimes(1);
 
     jest.runOnlyPendingTimers();
-    await flushPromises();
 
     await waitFor(() => {
       expect(mockHub.stop).toHaveBeenCalledTimes(2);

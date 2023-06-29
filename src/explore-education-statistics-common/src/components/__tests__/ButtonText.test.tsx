@@ -5,6 +5,10 @@ import React from 'react';
 import ButtonText from '../ButtonText';
 
 describe('ButtonText', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   test('renders correctly with required props', () => {
     const { container } = render(<ButtonText>Test button</ButtonText>);
 
@@ -48,10 +52,6 @@ describe('ButtonText', () => {
   });
 
   test('disabled if current `onClick` handler is processing', async () => {
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
-
     const handleClick = jest.fn(
       () => new Promise(resolve => setTimeout(resolve, 2000)),
     );
@@ -73,14 +73,9 @@ describe('ButtonText', () => {
       // Button is still disabled
       expect(button).toBeDisabled();
     });
-
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
   });
 
   test('enabled if current `onClick` handler is processing and `disableDoubleClick` is false', async () => {
-    jest.useFakeTimers();
-
     const handleClick = jest.fn(
       () => new Promise(resolve => setTimeout(resolve, 2000)),
     );
@@ -106,14 +101,9 @@ describe('ButtonText', () => {
 
     // Button is still enabled
     expect(button).toBeEnabled();
-
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
   });
 
   test('enabled once the current `onClick` handler has finished', async () => {
-    jest.useFakeTimers();
-
     const handleClick = jest.fn(
       () => new Promise(resolve => setTimeout(resolve, 2000)),
     );
@@ -133,8 +123,5 @@ describe('ButtonText', () => {
 
     // Task has completed, so button is now enabled
     expect(button).toBeEnabled();
-
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
   });
 });

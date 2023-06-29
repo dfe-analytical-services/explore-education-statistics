@@ -1,3 +1,5 @@
+import { setImmediate } from 'timers';
+
 /**
  * Flush all pending promises.
  *
@@ -9,10 +11,6 @@
  * be flushed before we can observe them being resolved correctly.
  * @see https://stackoverflow.com/questions/52177631/jest-timer-and-promise-dont-work-well-settimeout-and-async-function
  */
-export default async function flushPromises() {
-  do {
-    jest.runAllTimers();
-    // eslint-disable-next-line no-await-in-loop
-    await new Promise(jest.requireActual('timers').setImmediate);
-  } while (jest.getTimerCount() > 0);
+export default async function flushPromises(): Promise<void> {
+  await new Promise(setImmediate);
 }

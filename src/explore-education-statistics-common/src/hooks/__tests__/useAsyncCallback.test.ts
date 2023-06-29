@@ -235,8 +235,6 @@ describe('useAsyncCallback', () => {
     expect(state.isLoading).toBe(false);
     expect(state.value).toBe('second value');
     expect(state.error).toBeUndefined();
-
-    jest.useRealTimers();
   });
 
   test('setting `keepStaleValue = true` keeps the last value when re-running', async () => {
@@ -288,7 +286,5 @@ describe('useAsyncCallback', () => {
     expect(state.isLoading).toBe(false);
     expect(state.value).toBe('second value');
     expect(state.error).toBeUndefined();
-
-    jest.useRealTimers();
   });
 });

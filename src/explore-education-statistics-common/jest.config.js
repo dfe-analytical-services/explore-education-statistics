@@ -41,9 +41,6 @@ const config = {
   ],
   resetMocks: true,
   snapshotSerializers: ['jest-serializer-html'],
-  fakeTimers: {
-    legacyFakeTimers: true,
-  },
 };
 
 module.exports = config;

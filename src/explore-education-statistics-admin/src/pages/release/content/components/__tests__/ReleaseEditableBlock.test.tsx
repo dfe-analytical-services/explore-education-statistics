@@ -320,9 +320,7 @@ describe('ReleaseEditableBlock', () => {
       screen.getByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
 
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
+    jest.useFakeTimers();
 
     // After editing the block, another timeout triggers to refresh
     // the lock, but we shouldn't action this if the user has already
@@ -340,8 +338,6 @@ describe('ReleaseEditableBlock', () => {
     expect(
       screen.getByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
-
-    jest.useRealTimers();
   });
 
   test('renders locked state when already locked by other user', () => {
@@ -480,7 +476,7 @@ describe('ReleaseEditableBlock', () => {
     mockDate.set('2022-02-16T12:00:00Z');
 
     jest.useFakeTimers({
-      legacyFakeTimers: true,
+      doNotFake: ['Date'],
     });
     jest
       .spyOn(connectionMock, 'state', 'get')
@@ -550,8 +546,6 @@ describe('ReleaseEditableBlock', () => {
     expect(
       screen.queryByRole('button', { name: 'Save & close' }),
     ).not.toBeInTheDocument();
-
-    jest.useRealTimers();
   });
 
   test('re-renders locked state when other user renews their lock', async () => {
@@ -643,8 +637,9 @@ describe('ReleaseEditableBlock', () => {
     mockDate.set('2022-02-16T12:09:00Z');
 
     jest.useFakeTimers({
-      legacyFakeTimers: true,
+      doNotFake: ['Date'],
     });
+
     jest
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
@@ -724,8 +719,6 @@ describe('ReleaseEditableBlock', () => {
     expect(
       screen.getByRole('button', { name: 'Save & close' }),
     ).toBeInTheDocument();
-
-    jest.useRealTimers();
   });
 
   test('renders locked state when other user starts editing', async () => {

@@ -6,11 +6,6 @@ describe('useThrottledCallback', () => {
     jest.useFakeTimers();
   });
 
-  afterEach(() => {
-    jest.runOnlyPendingTimers();
-    jest.useRealTimers();
-  });
-
   test('does not run callback until specified timeout', () => {
     const callback = jest.fn();
 

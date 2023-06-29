@@ -1,3 +1,4 @@
+import flushTasks from '@common-test/flushTasks';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
@@ -6,20 +7,13 @@ import TabsSection from '@common/components/TabsSection';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import flushPromises from '@common-test/flushPromises';
 import PageSearchForm from '../PageSearchForm';
 
 const labelText = 'Find on this page';
 
 describe('PageSearchForm', () => {
   beforeEach(() => {
-    jest.useFakeTimers({
-      legacyFakeTimers: true,
-    });
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
+    jest.useFakeTimers();
   });
 
   test('does not render results if input is less than default 3 characters', async () => {
@@ -456,7 +450,9 @@ describe('PageSearchForm', () => {
     jest.runOnlyPendingTimers();
 
     userEvent.click(container.querySelector('[role="option"]') as HTMLElement);
-    await flushPromises();
+
+    await flushTasks();
+
     const target = container.querySelector('#target');
 
     expect(target).toHaveFocus();
@@ -481,7 +477,8 @@ describe('PageSearchForm', () => {
 
     fireEvent.keyDown(listBox, { key: 'ArrowDown' });
     fireEvent.keyDown(listBox, { key: 'Enter' });
-    await flushPromises();
+
+    await flushTasks();
 
     const target = container.querySelector('#target');
     expect(target).toHaveFocus();
@@ -546,7 +543,8 @@ describe('PageSearchForm', () => {
     expect(summary).toHaveAttribute('aria-expanded', 'false');
 
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
-    await flushPromises();
+
+    await flushTasks();
 
     expect(summary).toHaveAttribute('aria-expanded', 'true');
   });
@@ -584,7 +582,9 @@ describe('PageSearchForm', () => {
     expect(tabs[1]).toHaveAttribute('aria-selected', 'false');
 
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
-    await flushPromises();
+
+    await flushTasks();
+
     expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
     expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
   });
@@ -628,7 +628,8 @@ describe('PageSearchForm', () => {
     expect(accordionSection).toHaveAttribute('aria-expanded', 'false');
 
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
-    await flushPromises();
+
+    await flushTasks();
 
     expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
 

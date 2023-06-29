@@ -6,9 +6,6 @@ describe('ScreenReaderMessage', () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
-  afterEach(() => {
-    jest.useRealTimers();
-  });
 
   test('sets the message after a timeout', () => {
     const { rerender } = render(<ScreenReaderMessage message="" />);
