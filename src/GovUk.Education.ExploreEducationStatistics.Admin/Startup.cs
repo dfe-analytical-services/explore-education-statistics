@@ -5,7 +5,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
@@ -538,6 +537,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
             services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
             services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
+            services.AddTransient<IFilterMigrationService, FilterMigrationService>();
 
             services.AddTransient<INotificationClient>(s =>
             {
