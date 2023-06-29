@@ -44,8 +44,8 @@ public class FilterAndIndicatorValuesReader
             .Filters
             .ToDictionary(
                 filterMeta => filterMeta.Filter.Id,
-                filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.FilterGroupingColumn)));
-        
+                filterMeta => csvHeaders.FindIndex(h => h.Equals(filterMeta.Filter.GroupCsvColumn)));
+
         _filterItemCache = subjectMeta
             .Filters
             .Select(meta => meta.Filter)

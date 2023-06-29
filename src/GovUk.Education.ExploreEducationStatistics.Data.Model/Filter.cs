@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Filter(string? hint,
             string label,
             string name,
-            string groupCsvColumn,
+            string? groupCsvColumn,
             Guid subjectId)
         {
             Id = Guid.NewGuid();
