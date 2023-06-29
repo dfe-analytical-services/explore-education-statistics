@@ -284,7 +284,12 @@ def admin_request(method, endpoint, body=None):
 
         assert response.status_code not in {401, 403}, "Failed to reauthenticate."
 
+
+    if response.status_code == 400 and "SlugNotUnique" in response.json().get("errors", {}).get("", []):
+        raise Exception(f"SlugNotUnique for {body}")
+
     assert response.status_code < 300, f"Admin request responded with {response.status_code} and {response.text}"
+
     return response
 
 
