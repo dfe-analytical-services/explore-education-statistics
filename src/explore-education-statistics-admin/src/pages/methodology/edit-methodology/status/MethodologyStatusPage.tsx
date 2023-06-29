@@ -90,7 +90,6 @@ const MethodologyStatusPage = () => {
   return (
     <LoadingSpinner loading={isLoading}>
       {currentMethodology ? (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {!isEditing ? (
             <>

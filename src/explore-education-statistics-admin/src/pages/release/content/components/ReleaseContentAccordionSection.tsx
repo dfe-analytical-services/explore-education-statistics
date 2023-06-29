@@ -236,7 +236,6 @@ const ReleaseContentAccordionSection = ({
                   </Button>
                 )}
                 {user?.permissions.isBauUser && (
-                  // eslint-disable-next-line react/jsx-no-useless-fragment
                   <>
                     {!showEmbedDashboardForm && (
                       <Button

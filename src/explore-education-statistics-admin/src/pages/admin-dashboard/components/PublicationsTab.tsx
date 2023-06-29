@@ -118,32 +118,27 @@ const PublicationsTab = ({ isBauUser }: Props) => {
         <li>view and sign-off releases and methodologies</li>
       </ul>
 
-      {isBauUser && (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
-        <>
-          {themes && themes.length > 0 && (
-            <FormThemeTopicSelect
-              id="publicationsReleases-themeTopic"
-              legend="Choose a theme and topic to view publications for"
-              legendHidden
-              themes={themes}
-              topicId={topicId}
-              onChange={(nextTopicId, nextThemeId) => {
-                setSavedThemeTopic({
-                  themeId: nextThemeId,
-                  topicId: nextTopicId,
-                });
+      {isBauUser && themes && themes.length > 0 && (
+        <FormThemeTopicSelect
+          id="publicationsReleases-themeTopic"
+          legend="Choose a theme and topic to view publications for"
+          legendHidden
+          themes={themes}
+          topicId={topicId}
+          onChange={(nextTopicId, nextThemeId) => {
+            setSavedThemeTopic({
+              themeId: nextThemeId,
+              topicId: nextTopicId,
+            });
 
-                history.replace(
-                  appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-                    themeId: nextThemeId,
-                    topicId: nextTopicId,
-                  }),
-                );
-              }}
-            />
-          )}
-        </>
+            history.replace(
+              appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                themeId: nextThemeId,
+                topicId: nextTopicId,
+              }),
+            );
+          }}
+        />
       )}
 
       <hr className="govuk-!-margin-bottom-0" />
@@ -167,7 +162,6 @@ const PublicationsTab = ({ isBauUser }: Props) => {
           </p>
         </>
       ) : (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {selectedTheme && selectedTopic ? (
             <TopicPublications
@@ -176,7 +170,6 @@ const PublicationsTab = ({ isBauUser }: Props) => {
               topic={selectedTopic}
             />
           ) : (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
             <>
               {themes?.map(theme => {
                 return theme.topics.map(topic => (

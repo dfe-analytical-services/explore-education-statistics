@@ -28,9 +28,9 @@ const PrototypeSelectedRole = ({
       )}
     >
       {/* <label htmlFor={`role-${roleId}`} className="govuk-!-margin-right-3">{release}</label>
-      <select 
-        className="govuk-select" 
-        name="role" 
+      <select
+        className="govuk-select"
+        name="role"
         id={`role-${roleId}`}
         onBlur={event => {
           role = event.target.value;
@@ -44,14 +44,14 @@ const PrototypeSelectedRole = ({
             </option>
           ))}
         </>
-          </select>*/}
+          </select> */}
 
       {/* <div className="govuk-checkboxes">
         <div className="govuk-checkboxes__item">
           <input type="checkbox" className="govuk-checkboxes__input" name='role' id={`role-${roleId}`} checked={selectedRole} />
           <label htmlFor={`role-${roleId}`} className="govuk-label govuk-checkboxes__label">Grant access</label>
         </div>
-        </div>*/}
+        </div> */}
 
       <p
         className={classNames(
@@ -97,21 +97,21 @@ const PrototypeSelectedRole = ({
           onClick={() => {
             toggleRoleModal(true);
           }}
-          type="button" 
+          type="button"
           className={
             classNames(
-              'govuk-button', 
-              'govuk-button--secondary', 
+              'govuk-button',
+              'govuk-button--secondary',
               'govuk-!-margin-left-2',
               {
-                'govuk-!-margin-bottom-9': lastItem, 
+                'govuk-!-margin-bottom-9': lastItem,
                 'govuk-!-margin-bottom-2': !lastItem
               })
           }
         >
           Set role
         </button>
-        )}*/}
+        )} */}
       <ModalConfirm
         open={showRoleModal}
         title={`Change access for ${name}`}

@@ -160,4 +160,4 @@ export class Logout extends Component {
     return window.location.replace(returnUrl);
   }
 }
-/* eslint-enable*/
+/* eslint-enable */

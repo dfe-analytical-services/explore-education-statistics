@@ -163,7 +163,6 @@ const TableToolFinalStep = ({
         contactDetails={publication?.contact}
         methodologyLinks={getMethodologyLinks()}
         releaseLink={
-          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {selectedPublication.selectedRelease.latestData ? (
               <Link to={`/find-statistics/${selectedPublication.slug}`}>

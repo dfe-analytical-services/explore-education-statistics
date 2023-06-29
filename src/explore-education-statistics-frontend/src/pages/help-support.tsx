@@ -80,7 +80,7 @@ const HelpSupportPage: NextPage = () => {
             <p>
               You can also download full data files of those statistics
               currently published via the service through our{' '}
-              <a href="/data-catalogue">Data catalogue</a>.
+              <Link to="/data-catalogue">Data catalogue</Link>.
             </p>
             <p>
               These files are currently only available in CSV format but other

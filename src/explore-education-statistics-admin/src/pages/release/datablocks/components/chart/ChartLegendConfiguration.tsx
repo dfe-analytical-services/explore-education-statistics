@@ -335,7 +335,6 @@ const ChartLegendConfiguration = ({
           <h4>Legend items</h4>
           <div className="dfe-overflow-x--auto govuk-!-margin-bottom-6">
             {form.values.items?.length > 0 ? (
-              // eslint-disable-next-line react/jsx-no-useless-fragment
               <>
                 {form.values.items?.map((dataSet, index) => {
                   const itemId = `items-${index}`;

@@ -179,11 +179,11 @@ const PrototypeManageUsers = () => {
                             <>
                               <div className={`dfe-flex dfe-align-items--center ${index2 < (item.releases.length-1) ? 'dfe-flex-underline' : ''}`} key={index2.toString()}>
                                 <div className="dfe-flex-basis--60 dfe-align--right govuk-!-padding-2">
-                                  <PrototypeChangeUserRole 
-                                    selectedRole={item2.role} 
-                                    name={`${item.name} ${item.surname}`} 
+                                  <PrototypeChangeUserRole
+                                    selectedRole={item2.role}
+                                    name={`${item.name} ${item.surname}`}
                                     release={item2.release}
-                                    roleId={`${index}-${index2}`} 
+                                    roleId={`${index}-${index2}`}
                                   />
                                 </div>
                                 <div className="dfe-flex-basis--40 dfe-align--right">
@@ -202,7 +202,7 @@ const PrototypeManageUsers = () => {
                             </>
                           ))}
                         </Details>
-                      </div>*/}
+                      </div> */}
                       <ModalConfirm
                         open={showDeleteUserModal}
                         title="Confirm user removal"

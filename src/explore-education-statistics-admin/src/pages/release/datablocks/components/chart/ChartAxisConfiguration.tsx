@@ -428,12 +428,12 @@ const ChartAxisConfiguration = ({
             <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
               {validationSchema.fields.sortAsc && (
                 <FormFieldset id="sort" legend="Sorting" legendSize="s">
-                  {/* <FormFieldSelect<AxisConfiguration>*/}
-                  {/*  id={`${id}-sortBy`}*/}
-                  {/*  name="sortBy"*/}
-                  {/*  label="Sort data by"*/}
-                  {/*  options={sortOptions}*/}
-                  {/* />*/}
+                  {/* <FormFieldSelect<AxisConfiguration> */}
+                  {/*  id={`${id}-sortBy`} */}
+                  {/*  name="sortBy" */}
+                  {/*  label="Sort data by" */}
+                  {/*  options={sortOptions} */}
+                  {/* /> */}
                   <FormFieldCheckbox<AxisConfiguration>
                     name="sortAsc"
                     label="Sort ascending"

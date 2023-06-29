@@ -105,7 +105,6 @@ const Pagination = ({
                   ...queryParams,
                   page: pageNumber,
                 }),
-                // eslint-disable-next-line react/jsx-no-useless-fragment
                 children: <>{pageNumber}</>,
               })}
             </li>

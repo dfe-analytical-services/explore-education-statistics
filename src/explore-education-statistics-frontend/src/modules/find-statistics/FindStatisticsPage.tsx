@@ -300,7 +300,6 @@ const FindStatisticsPage: NextPage = () => {
                 Cannot load publications, please try again later.
               </WarningMessage>
             ) : (
-              // eslint-disable-next-line react/jsx-no-useless-fragment
               <>
                 {publications.length === 0 ? (
                   <div className="govuk-!-margin-top-5" id="searchResults">

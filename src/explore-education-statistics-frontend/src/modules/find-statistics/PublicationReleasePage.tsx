@@ -1,4 +1,3 @@
-/* eslint-disable no-unreachable */
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
@@ -104,7 +103,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               )}
               <TagGroup>
                 {!release.publication.isSuperseded && (
-                  // eslint-disable-next-line react/jsx-no-useless-fragment
                   <>
                     {release.latestRelease ? (
                       <Tag>This is the latest data</Tag>

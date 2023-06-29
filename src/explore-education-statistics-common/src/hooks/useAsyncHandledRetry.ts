@@ -33,7 +33,6 @@ export interface UseAsyncHandledRetryOptions<T> {
  */
 export default function useAsyncHandledRetry<T>(
   task: () => Promise<T>,
-  // eslint-disable-next-line default-param-last
   deps: DependencyList = [],
   options?: UseAsyncHandledRetryOptions<T>,
 ): AsyncHandledRetryState<T> {

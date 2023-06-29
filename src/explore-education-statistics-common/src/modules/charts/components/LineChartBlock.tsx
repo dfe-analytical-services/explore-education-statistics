@@ -192,7 +192,6 @@ const LineChartBlock = ({
               dot={getDot(config.symbol)}
               strokeWidth="2"
               strokeDasharray={lineStyles[config.lineStyle ?? 'solid']}
-              // eslint-disable-next-line react/no-unstable-nested-components
               label={(props: LabelProps & { index: number }) => (
                 <LineChartLabel
                   colour={config.colour}

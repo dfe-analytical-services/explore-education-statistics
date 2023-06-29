@@ -65,7 +65,6 @@ const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
       {releases.length === 0 ? (
         <p>There are currently no scheduled releases</p>
       ) : (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {releasesByPublication &&
             Object.keys(releasesByPublication).length > 0 && (

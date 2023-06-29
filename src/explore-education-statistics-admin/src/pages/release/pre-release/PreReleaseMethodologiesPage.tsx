@@ -46,7 +46,6 @@ export default function PreReleaseMethodologiesPage() {
       <PageTitle title="Methodologies" />
       <LoadingSpinner loading={isLoading}>
         {model && (
-          // eslint-disable-next-line react/jsx-no-useless-fragment
           <>
             {model.methodologyVersions?.length === 0 &&
             !model.externalMethodology ? (

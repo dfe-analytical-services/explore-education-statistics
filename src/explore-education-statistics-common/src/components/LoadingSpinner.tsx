@@ -26,7 +26,6 @@ const LoadingSpinner = ({
   text,
 }: Props) => {
   return (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
     <>
       {loading ? (
         <div

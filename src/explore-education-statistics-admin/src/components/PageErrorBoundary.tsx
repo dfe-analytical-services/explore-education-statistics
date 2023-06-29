@@ -29,10 +29,6 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
     },
   };
 
-  public constructor(props: RouteComponentProps) {
-    super(props);
-  }
-
   public componentDidMount() {
     const { history } = this.props;
 
@@ -43,6 +39,14 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
     });
 
     window.addEventListener('unhandledrejection', this.handlePromiseRejections);
+  }
+
+  public componentDidCatch(error: Error) {
+    logger.error(error);
+
+    this.setState({
+      errorCode: 500,
+    });
   }
 
   public componentWillUnmount() {
@@ -67,14 +71,6 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
       errorCode: isAxiosError(error) ? error.response?.status : 500,
     });
   };
-
-  public componentDidCatch(error: Error) {
-    logger.error(error);
-
-    this.setState({
-      errorCode: 500,
-    });
-  }
 
   public render() {
     const { handleError, errorPages } = this;

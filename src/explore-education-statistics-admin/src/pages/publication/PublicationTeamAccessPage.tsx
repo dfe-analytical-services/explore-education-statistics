@@ -159,7 +159,6 @@ export default function PublicationTeamAccessPage() {
         )}
 
       {model.permissions.canViewReleaseTeamAccess && (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {model?.releases.length ? (
             <>

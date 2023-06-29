@@ -454,7 +454,7 @@ const DocumentationManageDataBlock = ({ location: _ }: RouteChildrenProps) => {
                   explore.statistics@education.gov.uk
                 </a>
               </p>
-            </StepNavItem>*/}
+            </StepNavItem> */}
             <StepNavItem
               stepNumber={5}
               stepHeading="Delete tables and charts"

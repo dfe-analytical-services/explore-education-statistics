@@ -64,7 +64,6 @@ export default function AllFeaturedTables({
           </VisuallyHidden>
 
           {!isMobileMedia && (
-            // eslint-disable-next-line react/jsx-no-useless-fragment
             <>
               {listView ? (
                 <p>

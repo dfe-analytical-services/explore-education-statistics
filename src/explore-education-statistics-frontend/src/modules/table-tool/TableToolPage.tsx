@@ -147,7 +147,6 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           </Link>
         )}
         currentStep={currentStep}
-        // eslint-disable-next-line react/no-unstable-nested-components
         finalStep={({
           query,
           selectedPublication: selectedPublicationDetails,

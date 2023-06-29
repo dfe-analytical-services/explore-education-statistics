@@ -47,7 +47,6 @@ export default function DataSetStepContent({
       </VisuallyHidden>
 
       {selectedSubjectId ? (
-        // eslint-disable-next-line react/jsx-no-useless-fragment
         <>
           {selectedSubject ? (
             <DataSetDetails
