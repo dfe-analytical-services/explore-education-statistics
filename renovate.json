@@ -1,0 +1,63 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "dependencyDashboard": true,
+  "extends": ["config:base"],
+  "timezone": "Europe/London",
+  "azure-pipelines": {
+    "enabled": true
+  },
+  "vulnerabilityAlerts": {
+    "groupName": "renovate",
+    "dependencyDashboardApproval": false,
+    "minimumReleaseAge": "0d",
+    "rangeStrategy": "update-lockfile",
+    "commitMessageSuffix": "[SECURITY]",
+    "branchTopic": "{{{datasource}}}-{{{depName}}}-vulnerability",
+    "prCreation": "immediate"
+  },
+  "packageRules": [
+    {
+      "matchDatasources": ["npm"],
+      "groupName": "Minor frontend dependencies",
+      "matchUpdateTypes": ["minor", "patch"],
+      "schedule": ["every month"],
+      "enabled": false
+    },
+    {
+      "matchDatasources": ["npm"],
+      "groupName": "Major frontend dependencies",
+      "matchUpdateTypes": ["major"],
+      "schedule": ["every 3 months"],
+      "enabled": false
+    },
+    {
+      "matchDatasources": ["nuget"],
+      "groupName": "Minor backend dependencies",
+      "matchUpdateTypes": ["minor", "patch"],
+      "schedule": ["every month"]
+    },
+    {
+      "matchDatasources": ["nuget"],
+      "groupName": "Major backend dependencies",
+      "matchUpdateTypes": ["major"],
+      "schedule": ["every month"]
+    },
+    {
+      "matchDatasources": ["pypi"],
+      "groupName": "python dependencies"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "docker image updates"
+    },
+    {
+      "matchDatasources": ["azure-pipelines-tasks"],
+      "groupName": "azure-pipelines-tasks updates",
+      "extractVersion": "^(?<version>\\d+)"
+    },
+    {
+      "matchPackagePatterns": ["^@ckeditor/", "Mime", "Mime-Detective"],
+      "enabled": false
+    }
+  ]
+}
