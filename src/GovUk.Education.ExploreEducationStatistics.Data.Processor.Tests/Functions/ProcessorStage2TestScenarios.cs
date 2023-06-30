@@ -1,7 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
@@ -33,6 +33,7 @@ public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
             {
                 Label = "Filter one",
                 Name = "filter_one",
+                GroupCsvColumn = null,
                 FilterGroups = ListOf(
                     new FilterGroup
                     {
@@ -49,6 +50,7 @@ public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
             {
                 Label = "Filter two",
                 Name = "filter_two",
+                GroupCsvColumn = "filter_two_group",
                 FilterGroups = ListOf(
                     new FilterGroup
                     {
@@ -75,6 +77,7 @@ public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
             {
                 Label = "Filter three",
                 Name = "filter_three",
+                GroupCsvColumn = null,
                 FilterGroups = ListOf(
                     new FilterGroup
                     {
@@ -92,6 +95,7 @@ public class OrderingCsvStage2Scenario : IProcessorStage2TestScenario
             {
                 Label = "Filter four",
                 Name = "filter_four",
+                GroupCsvColumn = "filter_four_group",
                 FilterGroups = ListOf(
                     new FilterGroup
                     {
@@ -195,6 +199,7 @@ public class AdditionalFiltersAndIndicatorsScenario : IProcessorStage2TestScenar
             {
                 Label = "Filter one",
                 Name = "filter_one",
+                GroupCsvColumn = null,
                 FilterGroups = ListOf(
                     new FilterGroup
                     {
@@ -301,6 +306,7 @@ public class SpecialFilterItemsScenario : IProcessorStage2TestScenario
             {
                 Label = "Filter one",
                 Name = "filter_one",
+                GroupCsvColumn = null,
                 FilterGroups = ListOf(
                     new FilterGroup
                     {
