@@ -58,7 +58,7 @@ jobs:
           arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
           zipAfterPublish: True
 
-      - task: 'PublishPipelineArtifact@0'
+      - task: 'PublishPipelineArtifact@1'
         displayName: 'Publish Public APIs Artifacts'
         inputs:
           artifactName: 'public-api'
@@ -72,7 +72,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
           zipAfterPublish: True
-      - task: 'PublishPipelineArtifact@0'
+      - task: 'PublishPipelineArtifact@1'
         displayName: 'Publish Notifier Artifacts'
         inputs:
           artifactName: 'notifier'
@@ -86,7 +86,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
           zipAfterPublish: True
-      - task: 'PublishPipelineArtifact@0'
+      - task: 'PublishPipelineArtifact@1'
         displayName: 'Publish Publisher Artifacts'
         inputs:
           artifactName: 'publisher'
@@ -100,7 +100,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
           zipAfterPublish: True
-      - task: 'PublishPipelineArtifact@0'
+      - task: 'PublishPipelineArtifact@1'
         displayName: 'Publish Processor Artifacts'
         inputs:
           artifactName: 'processor'
@@ -179,7 +179,7 @@ jobs:
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
-      - task: 'PublishPipelineArtifact@0'
+      - task: 'PublishPipelineArtifact@1'
         displayName: 'Publish Admin Artifact'
         inputs:
           artifactName: 'Admin'
@@ -213,7 +213,7 @@ jobs:
         displayName: 'Run npm audit'
         continueOnError: true
         enabled: false
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: 'Publish Pipeline Artifact audit_results'
         inputs:
           artifactName: 'audit_results'
@@ -281,7 +281,7 @@ jobs:
           rootFolderOrFile: './src/explore-education-statistics-frontend'
           includeRootFolder: false
           archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
-      - task: 'PublishPipelineArtifact@0'
+      - task: 'PublishPipelineArtifact@1'
         displayName: 'Publish Pipeline Artifact'
         inputs:
           artifactName: 'public-frontend'
@@ -298,7 +298,7 @@ jobs:
             Pipfile
             Pipfile.lock
           TargetFolder: 'tests'
-      - task: PublishPipelineArtifact@0
+      - task: PublishPipelineArtifact@1
         displayName: 'Publish test files'
         inputs:
           artifactName: 'tests'
