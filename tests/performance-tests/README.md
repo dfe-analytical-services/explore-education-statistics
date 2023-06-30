@@ -172,7 +172,7 @@ convention of `big-file1.zip`, `big-file2.zip` etc, and place them in the
 [imports assets folder](src/tests/admin/import/assets). With this naming convention, they will
 be ignored by Git.
 
-### Profiles
+### Common load profiles
 
 Tests which use the [common configuration generators](src/configuration) can have their configuration
 fine-tuned using the following parameters.
@@ -236,6 +236,18 @@ Full sets of options per test are available below as examples:
 `npm run test dist/import.test.js --environment=dev --users=bau1 -- 
 -e PUBLICATION_TITLE="Import publication" -e DATA_FILE="big-file1.zip"`
 
+#### getReleasePage.test.js
+
+##### Profiles
+
+This test supports various different performance testing scenarios.
+
+* PROFILE - supported values are "load", "stress", "spike", "sequential".
+
+Each of these profiles has a default set of configuration out-of-the-box. They can however be
+fine-tuned further using the common override parameters defined in 
+[Common load profiles](#common-load-profiles).
+
 #### publicTableBuilderQuery.test.js
 
 * PUBLICATION_TITLE - default value is "publicTableBuilderQuery.test.ts".
@@ -263,7 +275,8 @@ This test supports various different performance testing scenarios.
 * PROFILE - supported values are "load", "stress", "spike", "sequential".
 
 Each of these profiles has a default set of configuration out-of-the-box. They can however be
-fine-tuned further using the common override parameters defined in .
+fine-tuned further using the common override parameters defined in 
+[Common load profiles](#common-load-profiles).
 
 ##### Query generation
 

@@ -1,6 +1,6 @@
 import { Options } from 'k6/options';
 import merge from 'lodash/merge';
-import { parseIntOptional } from '../utils/utils';
+import { parseFloatOptional, parseIntOptional } from '../utils/utils';
 
 interface Config {
   // Duration of normal traffic period prior to spike.
@@ -16,9 +16,11 @@ interface Config {
 }
 
 const overrides: Partial<Config> = {
-  preSpikeStageDurationMinutes: parseIntOptional(__ENV.PRE_SPIKE_DURATION_MINS),
-  spikeStageDurationMinutes: parseIntOptional(__ENV.SPIKE_DURATION_MINS),
-  postSpikeStageDurationMinutes: parseIntOptional(
+  preSpikeStageDurationMinutes: parseFloatOptional(
+    __ENV.PRE_SPIKE_DURATION_MINS,
+  ),
+  spikeStageDurationMinutes: parseFloatOptional(__ENV.SPIKE_DURATION_MINS),
+  postSpikeStageDurationMinutes: parseFloatOptional(
     __ENV.POST_SPIKE_DURATION_MINS,
   ),
   normalTrafficRequestRatePerSecond: parseIntOptional(__ENV.RPS_NORMAL),
@@ -42,8 +44,8 @@ export default function spikeProfile({
       [scenario]: {
         executor: 'ramping-arrival-rate',
         timeUnit: '1m',
-        preAllocatedVUs: 10,
-        maxVUs: 10,
+        preAllocatedVUs: spikeRequestRatePerSecond * 2,
+        maxVUs: spikeRequestRatePerSecond * 2,
         gracefulStop: `${postSpikeStageDurationMinutes}m`,
         stages: [
           // Immediately start with a steady rate of requests.
@@ -53,7 +55,7 @@ export default function spikeProfile({
           },
           // Run with a steady rate of requests for a period.
           {
-            duration: `${preSpikeStageDurationMinutes}s`,
+            duration: `${preSpikeStageDurationMinutes}m`,
             target: normalTrafficRequestRatePerSecond * 60,
           },
           // Very quickly ramp up traffic to a spike of traffic.
@@ -73,7 +75,7 @@ export default function spikeProfile({
           },
           // Very quickly drop down to a normal level of traffic.
           {
-            duration: `${postSpikeStageDurationMinutes}s`,
+            duration: `${postSpikeStageDurationMinutes}m`,
             target: normalTrafficRequestRatePerSecond * 60,
           },
         ],
