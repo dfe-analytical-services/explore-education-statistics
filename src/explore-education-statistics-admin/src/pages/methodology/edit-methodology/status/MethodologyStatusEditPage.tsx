@@ -1,6 +1,6 @@
 import methodologyService, {
   MethodologyVersion,
-  MethodologyStatus,
+  MethodologyApprovalStatus,
 } from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -9,7 +9,7 @@ import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/sta
 import React from 'react';
 
 interface FormValues {
-  status: MethodologyStatus;
+  status: MethodologyApprovalStatus;
   latestInternalReleaseNote: string;
   publishingStrategy?: 'WithRelease' | 'Immediately';
   withReleaseId?: string;

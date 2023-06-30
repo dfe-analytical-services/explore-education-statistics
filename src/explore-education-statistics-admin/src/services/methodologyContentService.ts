@@ -1,5 +1,5 @@
 import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
-import { MethodologyStatus } from '@admin/services/methodologyService';
+import { MethodologyApprovalStatus } from '@admin/services/methodologyService';
 import { MethodologyNote } from '@admin/services/methodologyNoteService';
 import {
   ContentBlockPostModel,
@@ -16,7 +16,7 @@ export interface MethodologyContent {
   id: string;
   title: string;
   slug: string;
-  status: MethodologyStatus;
+  status: MethodologyApprovalStatus;
   published?: string;
   content: ContentSection<EditableContentBlock>[];
   annexes: ContentSection<EditableContentBlock>[];

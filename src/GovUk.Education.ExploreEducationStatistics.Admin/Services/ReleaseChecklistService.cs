@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var methodologiesNotApproved = methodologies
-                .Where(m => m.Status != MethodologyStatus.Approved)
+                .Where(m => m.Status != MethodologyApprovalStatus.Approved)
                 .ToList();
 
             if (methodologiesNotApproved.Any())

@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Status)
-                .HasConversion(new EnumToStringConverter<MethodologyStatus>());
+                .HasConversion(new EnumToStringConverter<MethodologyApprovalStatus>());
 
             modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.PublishingStrategy)
