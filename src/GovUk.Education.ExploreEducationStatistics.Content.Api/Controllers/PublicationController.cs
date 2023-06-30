@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
@@ -19,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class PublicationController : ControllerBase
     {
+        private const string HalfHourlyExpirySchedule = "*/30 * * * *";
+        
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IPublicationService _publicationService;
 
@@ -45,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
+        [MemoryCache(typeof(GetPublicationListCacheKey), durationInSeconds: 15, expiryScheduleCron: HalfHourlyExpirySchedule)]
         [HttpGet("publications")]
         public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
             [FromQuery] PublicationsListRequest request)
