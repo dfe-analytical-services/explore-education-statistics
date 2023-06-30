@@ -42,15 +42,18 @@ export default function ReleaseAncillaryFilePage({
 
   const handleSubmit = useCallback(
     async ({ title, summary, file: newFile }: AncillaryFileFormValues) => {
-      await Promise.all([
-        releaseAncillaryFileService.updateFile(releaseId, fileId, {
-          title,
-          summary,
-        }),
-        newFile
-          ? releaseAncillaryFileService.replaceFile(releaseId, fileId, newFile)
-          : undefined,
-      ]);
+      // NOTE: Need to guarantee the order these are called as `replaceFile` will change the fileId
+      await releaseAncillaryFileService.updateFile(releaseId, fileId, {
+        title,
+        summary,
+      });
+      if (newFile) {
+        await releaseAncillaryFileService.replaceFile(
+          releaseId,
+          fileId,
+          newFile,
+        );
+      }
 
       navigateBack();
     },
