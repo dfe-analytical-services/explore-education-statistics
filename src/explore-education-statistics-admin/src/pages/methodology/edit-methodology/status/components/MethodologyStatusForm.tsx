@@ -1,7 +1,7 @@
 import {
   MethodologyVersion,
   MethodologyPublishingStrategy,
-  MethodologyStatus,
+  MethodologyApprovalStatus,
 } from '@admin/services/methodologyService';
 import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
@@ -17,7 +17,7 @@ import React from 'react';
 import { StringSchema } from 'yup';
 
 export interface FormValues {
-  status: MethodologyStatus;
+  status: MethodologyApprovalStatus;
   latestInternalReleaseNote: string;
   publishingStrategy?: MethodologyPublishingStrategy;
   withReleaseId?: string;
@@ -68,7 +68,7 @@ const MethodologyStatusForm = ({
           <Form id="methodologyStatusForm">
             <h2>Edit methodology status</h2>
 
-            <FormFieldRadioGroup<FormValues, MethodologyStatus>
+            <FormFieldRadioGroup<FormValues, MethodologyApprovalStatus>
               legend="Status"
               hint={
                 isPublished &&

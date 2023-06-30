@@ -3,12 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public enum MethodologyStatus
+    public enum MethodologyApprovalStatus
     {
         Draft,
         Approved
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Slug => Methodology.Slug;
 
-        public MethodologyStatus Status { get; set; }
+        public MethodologyApprovalStatus Status { get; set; }
 
         public DateTime? Published { get; set; }
 
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? ScheduledWithReleaseId { get; set; }
 
-        public bool Approved => Status == MethodologyStatus.Approved;
+        public bool Approved => Status == MethodologyApprovalStatus.Approved;
 
         public bool ScheduledForPublishingWithRelease => PublishingStrategy == WithRelease;
 

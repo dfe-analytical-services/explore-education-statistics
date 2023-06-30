@@ -1,7 +1,7 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import methodologyService, {
-  MethodologyStatus,
+  MethodologyApprovalStatus,
 } from '@admin/services/methodologyService';
 import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';
@@ -18,7 +18,7 @@ import React from 'react';
 import UrlContainer from '@common/components/UrlContainer';
 
 interface FormValues {
-  status: MethodologyStatus;
+  status: MethodologyApprovalStatus;
   latestInternalReleaseNote: string;
   publishingStrategy?: 'WithRelease' | 'Immediately';
   withReleaseId?: string;

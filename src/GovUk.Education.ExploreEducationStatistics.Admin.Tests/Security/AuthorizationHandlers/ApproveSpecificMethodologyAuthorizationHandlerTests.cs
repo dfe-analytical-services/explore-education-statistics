@@ -14,7 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static Moq.MockBehavior;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;

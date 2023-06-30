@@ -19,7 +19,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         private Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateStatus(
             MethodologyVersion methodologyVersion,
-            MethodologyStatus requestedStatus)
+            MethodologyApprovalStatus requestedStatus)
         {
             return requestedStatus switch
             {

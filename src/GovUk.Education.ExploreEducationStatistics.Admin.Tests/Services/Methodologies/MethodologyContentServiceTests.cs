@@ -18,7 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
