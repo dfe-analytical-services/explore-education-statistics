@@ -47,6 +47,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             return $"{FilesPath(file.RootPath, file.Type)}{file.Id}";
         }
 
+        public static string Path(Guid rootPath, FileType type, Guid fileId)
+        {
+            return $"{FilesPath(rootPath, type)}{fileId}";
+        }
+
         public static string PublicPath(this File file, Guid releaseId)
         {
             if (!PublicFileTypes.Contains(file.Type))

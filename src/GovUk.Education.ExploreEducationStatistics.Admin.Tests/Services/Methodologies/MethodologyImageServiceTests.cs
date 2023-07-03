@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
@@ -15,6 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
