@@ -7,6 +7,9 @@
   "azure-pipelines": {
     "enabled": false
   },
+  "python": {
+    "enabled": false
+  },
   "vulnerabilityAlerts": {
     "groupName": "renovate",
     "dependencyDashboardApproval": false,
@@ -59,10 +62,6 @@
     },
     {
       "matchPackagePatterns": ["^@ckeditor/", "Mime", "Mime-Detective"],
-      "enabled": false
-    },
-    {
-      "fileMatch": ["(^|/)\\.python-version$"],
       "enabled": false
     }
   ]
