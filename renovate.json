@@ -3,8 +3,9 @@
   "dependencyDashboard": true,
   "extends": ["config:base"],
   "timezone": "Europe/London",
+  "recreateWhen": "never",
   "azure-pipelines": {
-    "enabled": true
+    "enabled": false
   },
   "vulnerabilityAlerts": {
     "groupName": "renovate",
@@ -40,23 +41,28 @@
       "matchDatasources": ["nuget"],
       "groupName": "Major backend dependencies",
       "matchUpdateTypes": ["major"],
-      "schedule": ["every month"]
+      "schedule": ["every 3 months"]
     },
     {
       "matchDatasources": ["pypi"],
-      "groupName": "python dependencies"
+      "groupName": "python dependencies",
+      "enabled": false
     },
     {
       "matchDatasources": ["docker"],
-      "groupName": "docker image updates"
+      "groupName": "docker image updates",
+      "enabled": false
     },
     {
-      "matchDatasources": ["azure-pipelines-tasks"],
-      "groupName": "azure-pipelines-tasks updates",
-      "extractVersion": "^(?<version>\\d+)"
+      "packageNames": ["node"],
+      "enabled": false
     },
     {
       "matchPackagePatterns": ["^@ckeditor/", "Mime", "Mime-Detective"],
+      "enabled": false
+    },
+    {
+      "fileMatch": ["(^|/)\\.python-version$"],
       "enabled": false
     }
   ]
