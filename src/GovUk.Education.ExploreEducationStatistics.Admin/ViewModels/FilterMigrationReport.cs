@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.FilterMigrationReportErrorItem;
 using static GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.FilterMigrationReportInfoItem;
 
@@ -54,7 +56,8 @@ public record FilterMigrationReport
     }
 }
 
-public record FilterMigrationReportInfoItem(FilterMigrationReportInfo Value,
+public record FilterMigrationReportInfoItem(
+    [property:JsonConverter(typeof(StringEnumConverter))] FilterMigrationReportInfo Value,
     Guid SubjectId,
     Guid? FilterId = null,
     string? FilterName = null,
@@ -122,7 +125,8 @@ public record FilterMigrationReportInfoItem(FilterMigrationReportInfo Value,
     }
 }
 
-public record FilterMigrationReportErrorItem(FilterMigrationReportError Value,
+public record FilterMigrationReportErrorItem(
+    [property:JsonConverter(typeof(StringEnumConverter))] FilterMigrationReportError Value,
     Guid SubjectId,
     Guid? FilterId = null,
     string? FilterName = null,
@@ -130,7 +134,8 @@ public record FilterMigrationReportErrorItem(FilterMigrationReportError Value,
     string? FilePath = null,
     string? Exception = null)
 {
-    public FilterMigrationReportErrorItem(FilterMigrationReportError value,
+    public FilterMigrationReportErrorItem(
+        FilterMigrationReportError value,
         Guid subjectId,
         Filter? filter = null,
         File? file = null,
