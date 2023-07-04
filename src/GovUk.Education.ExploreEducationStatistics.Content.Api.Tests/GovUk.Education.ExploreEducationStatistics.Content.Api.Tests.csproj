@@ -9,8 +9,8 @@
     <ItemGroup>
         <PackageReference Include="AspectInjector" Version="2.7.3" />
         <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.8" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.8" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
         <PackageReference Include="Moq" Version="4.13.1" />
         <PackageReference Include="xunit" Version="2.4.2" />

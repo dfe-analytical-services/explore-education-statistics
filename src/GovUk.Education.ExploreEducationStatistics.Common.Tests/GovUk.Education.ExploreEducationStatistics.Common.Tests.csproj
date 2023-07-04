@@ -10,9 +10,9 @@
         <PackageReference Include="AspectInjector" Version="2.7.3" />
         <PackageReference Include="Bogus" Version="34.0.2" />
         <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.1" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.8" PrivateAssets="all" />
         <PackageReference Include="CompareNETObjects" Version="4.74.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="7.0.8" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.0.0" />
         <PackageReference Include="Moq" Version="4.13.1" />
         <PackageReference Include="Snapshooter.Xunit" Version="0.6.2" />
