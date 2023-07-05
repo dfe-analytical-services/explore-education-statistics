@@ -1,6 +1,7 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
 
 Force Tags          Admin    Local    Dev    AltersData
@@ -178,6 +179,11 @@ Add data guidance for all subjects
     ...    Four guidance content
 
     user clicks button    Save guidance
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Publish release
     user approves original release for immediate publication

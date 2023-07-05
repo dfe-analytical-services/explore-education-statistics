@@ -97,6 +97,11 @@ Add second footnote to subject
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
 Add public prerelease access list
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list

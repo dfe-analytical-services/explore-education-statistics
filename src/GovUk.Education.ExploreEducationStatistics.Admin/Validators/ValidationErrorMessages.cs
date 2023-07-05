@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Content
         EmptyContentSectionExists,
         GenericSectionsContainEmptyHtmlBlock,
+        ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
         ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,

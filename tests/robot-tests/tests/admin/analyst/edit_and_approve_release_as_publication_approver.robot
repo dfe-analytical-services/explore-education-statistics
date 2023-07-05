@@ -103,6 +103,9 @@ Create some release content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
     user clicks button    Add new section
     user changes accordion section title    1    Dates data block
 

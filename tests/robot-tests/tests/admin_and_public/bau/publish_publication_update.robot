@@ -2,6 +2,7 @@
 Library             ../../libs/admin_api.py
 Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -20,9 +21,15 @@ Create Publication as bau1
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    AY    2046
 
-Publish release
+Navigate to release and add headline text block
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic year 2046/47
+
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Publish release
     user approves release for immediate publication
 
 Update publication details

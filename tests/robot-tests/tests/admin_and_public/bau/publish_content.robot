@@ -27,6 +27,10 @@ Navigate to release content
     user waits until page contains button    Add dashboards section
     user waits until page contains button    Add new section
 
+Add headline text block to release content
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
 Add Related dashboards section to release content
     user clicks button    Add dashboards section
     user waits until page contains accordion section    View related dashboard(s)
