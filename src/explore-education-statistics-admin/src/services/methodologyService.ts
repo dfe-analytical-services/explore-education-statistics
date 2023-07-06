@@ -48,6 +48,15 @@ export interface MethodologyVersionSummary extends BaseMethodologyVersion {
   };
 }
 
+export interface MethodologyStatus {
+  methodologyStatusId: string;
+  internalReleaseNote: string;
+  approvalStatus: MethodologyApprovalStatus;
+  created: string;
+  createdByEmail?: string;
+  methodologyVersion: number;
+}
+
 const methodologyService = {
   createMethodology(publicationId: string): Promise<MethodologyVersion> {
     return client.post(`/publication/${publicationId}/methodology`);
@@ -84,6 +93,11 @@ const methodologyService = {
 
   deleteMethodology(methodologyId: string): Promise<void> {
     return client.delete(`/methodology/${methodologyId}`);
+  },
+  getMethodologyStatuses(
+    methodologyVersionId: string,
+  ): Promise<MethodologyStatus[]> {
+    return client.get(`/methodology/${methodologyVersionId}/status`);
   },
 };
 
