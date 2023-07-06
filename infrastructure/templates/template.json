@@ -2002,7 +2002,7 @@
     {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
-      "kind": "app,linux,container",
+      "kind": "app,container",
       "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
       "identity": {
@@ -2084,7 +2084,7 @@
         "Name": "[first(split(parameters('skuPublic'), ' '))]"
       },
       "name": "[variables('publicPlanName')]",
-      "kind": "app,linux,container",
+      "kind": "app,container",
       "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
