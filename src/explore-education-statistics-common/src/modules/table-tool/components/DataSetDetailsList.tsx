@@ -35,6 +35,7 @@ export default function DataSetDetailsList({ subject }: Props) {
             testId="indicators"
           >
             {indicators.map((indicator, index) => (
+              // eslint-disable-next-line react/no-array-index-key
               <li key={index.toString()}>{indicator}</li>
             ))}
           </CollapsibleList>
@@ -50,6 +51,7 @@ export default function DataSetDetailsList({ subject }: Props) {
             testId="filters"
           >
             {filters.map((filter, index) => (
+              // eslint-disable-next-line react/no-array-index-key
               <li key={index.toString()}>{filter}</li>
             ))}
           </CollapsibleList>

@@ -1,6 +1,8 @@
 variables:
   BuildConfiguration: 'Release'
   CI: true
+  NODE_VERSION: 16.14.2
+  DOTNET_VERSION: 6.0.x
 
 trigger:
   branches:
@@ -20,8 +22,9 @@ jobs:
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'
         inputs:
-          version: 6.0.x
+          version: $(DOTNET_VERSION)
           performMultiLevelLookup: true
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Restore'
         inputs:
@@ -29,11 +32,13 @@ jobs:
           projects: '**/GovUk.*/*csproj'
           feedsToUse: config
           nugetConfigPath: src/nuget.config
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
           projects: '**/GovUk.*/*csproj'
           arguments: '--configuration $(BuildConfiguration)'
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Test'
         inputs:
@@ -49,6 +54,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Api.csproj'
           arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/public-api'
           zipAfterPublish: True
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Publish Content API'
         inputs:
@@ -72,6 +78,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Notifier.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/notifier'
           zipAfterPublish: True
+
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Notifier Artifacts'
         inputs:
@@ -86,6 +93,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Publisher.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/publisher'
           zipAfterPublish: True
+
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Publisher Artifacts'
         inputs:
@@ -100,6 +108,7 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Data.Processor.csproj'
           arguments: '--configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)/processor'
           zipAfterPublish: True
+
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Processor Artifacts'
         inputs:
@@ -113,14 +122,23 @@ jobs:
         - azureps
     steps:
       - task: NodeTool@0
-        displayName: 'Install Node.js 16.14.2'
+        displayName: 'Install Node.js $(NODE_VERSION)'
         inputs:
-          versionSpec: '16.14.2'
+          versionSpec: $(NODE_VERSION)
+
+      - task: 'Bash@3'
+        displayName: 'corepack enable'
+        inputs:
+          workingDir: '.'
+          targetType: 'inline'
+          script: 'corepack enable'
+
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'
         inputs:
-          version: 6.0.x
+          version: $(DOTNET_VERSION)
           performMultiLevelLookup: true
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Restore'
         inputs:
@@ -128,11 +146,13 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           feedsToUse: config
           nugetConfigPath: src/nuget.config
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Build'
         inputs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: '--configuration $(BuildConfiguration)'
+
       - task: 'DotNetCoreCLI@2'
         displayName: 'Test'
         inputs:
@@ -140,31 +160,23 @@ jobs:
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.Tests.csproj'
           arguments: '--configuration $(BuildConfiguration) --collect "Code coverage"'
 
-      - task: Npm@1
-        displayName: 'npm run ci'
+      - task: 'Bash@3'
+        displayName: 'pnpm i'
         inputs:
-          command: custom
-          verbose: false
-          customCommand: ci
-      - task: Npm@1
-        displayName: 'npm run bootstrap'
+          targetType: 'inline'
+          script: 'pnpm i'
+
+      - task: 'Bash@3'
+        displayName: 'pnpm format'
         inputs:
-          command: custom
-          verbose: false
-          customCommand: 'run bootstrap'
-      - task: Npm@1
-        displayName: 'npm run format'
+          targetType: 'inline'
+          script: 'pnpm format'
+
+      - task: 'Bash@3'
+        displayName: 'pnpm run build'
         inputs:
-          command: custom
-          verbose: false
-          customCommand: 'run format'
-      - task: Npm@1
-        displayName: 'npm run build'
-        inputs:
-          command: custom
-          workingDir: 'src/explore-education-statistics-admin'
-          verbose: false
-          customCommand: 'run build'
+          targetType: 'inline'
+          script: 'pnpm --filter=explore-education-statistics-admin run build'
 
       - task: CopyFiles@2
         displayName: 'Copy files to wwwroot'
@@ -179,6 +191,7 @@ jobs:
           publishWebProjects: false
           projects: '**/GovUk.Education.ExploreEducationStatistics.Admin.csproj'
           arguments: '--self-contained true -r win-x64 --configuration $(BuildConfiguration) --output $(build.artifactstagingdirectory)'
+
       - task: 'PublishPipelineArtifact@0'
         displayName: 'Publish Admin Artifact'
         inputs:
@@ -191,63 +204,52 @@ jobs:
       demands: azureps
     steps:
       - task: NodeTool@0
-        displayName: 'Install Node.js 16.14.2'
+        displayName: 'Install Node.js $(NODE_VERSION)'
         inputs:
-          versionSpec: '16.14.2'
-      - task: 'Npm@1'
-        displayName: 'npm run ci'
+          versionSpec: $(NODE_VERSION)
+
+      - task: 'Bash@3'
+        displayName: 'corepack enable'
         inputs:
-          command: 'custom'
           workingDir: '.'
-          verbose: false
-          customCommand: 'ci'
-      - task: 'Npm@1'
-        displayName: 'npm run bootstrap'
+          targetType: 'inline'
+          script: 'corepack enable'
+
+      - task: 'Bash@3'
+        displayName: 'pnpm i'
         inputs:
-          command: 'custom'
           workingDir: '.'
-          verbose: false
-          customCommand: 'run bootstrap'
-      - script: 'npm audit --json >> audit.json'
-        workingDirectory: 'src/explore-education-statistics-frontend'
-        displayName: 'Run npm audit'
-        continueOnError: true
-        enabled: false
-      - task: PublishPipelineArtifact@0
-        displayName: 'Publish Pipeline Artifact audit_results'
+          targetType: 'inline'
+          script: 'pnpm i'
+
+      - task: 'Bash@3'
+        displayName: 'pnpm tsc'
         inputs:
-          artifactName: 'audit_results'
-          targetPath: 'src/explore-education-statistics-frontend/audit.json'
-        continueOnError: true
-        enabled: false
-      - task: 'Npm@1'
-        displayName: 'npm run tsc'
-        inputs:
-          command: 'custom'
           workingDir: '.'
-          verbose: false
-          customCommand: 'run tsc'
-      - task: 'Npm@1'
-        displayName: 'npm run lint'
+          targetType: 'inline'
+          script: 'pnpm tsc'
+
+      - task: 'Bash@3'
+        displayName: 'pnpm lint'
         inputs:
-          command: 'custom'
           workingDir: '.'
-          verbose: false
-          customCommand: 'run lint'
-      - task: 'Npm@1'
-        displayName: 'npm run format:check'
+          targetType: 'inline'
+          script: 'pnpm lint'
+
+      - task: 'Bash@3'
+        displayName: 'pnpm format:check'
         inputs:
-          command: 'custom'
           workingDir: '.'
-          verbose: false
-          customCommand: 'run format:check'
-      - task: 'Npm@1'
-        displayName: 'npm run test:ci'
+          targetType: 'inline'
+          script: 'pnpm format:check'
+
+      - task: 'Bash@3'
+        displayName: 'pnpm test:ci'
         inputs:
-          command: 'custom'
           workingDir: '.'
-          verbose: false
-          customCommand: 'run test:ci'
+          targetType: 'inline'
+          script: 'pnpm test:ci'
+
       - task: 'PublishTestResults@2'
         displayName: 'Publish frontend test results'
         inputs:
@@ -256,36 +258,23 @@ jobs:
           searchFolder: './src'
           testRunTitle: 'Release Jest tests'
           mergeTestResults: true
-      - task: 'Npm@1'
-        displayName: 'Build frontend'
-        inputs:
-          command: 'custom'
-          workingDir: './src/explore-education-statistics-frontend'
-          verbose: false
-          customCommand: 'run build'
+
       - task: 'Bash@3'
-        displayName: 'Remove dev dependencies'
+        displayName: 'pnpm run build'
         inputs:
           targetType: 'inline'
-          script: 'rm -rf ./src/**/node_modules'
-      - task: 'Npm@1'
-        displayName: 'Install prod dependencies'
+          script: 'pnpm --filter=explore-education-statistics-frontend run build'
+
+      - task: Docker@2
+        displayName: 'Build and push public frontend Docker image'
+        condition: ne(variables['Build.Reason'], 'PullRequest')
         inputs:
-          command: 'custom'
-          workingDir: '.'
-          verbose: false
-          customCommand: 'run bootstrap:prod'
-      - task: 'ArchiveFiles@2'
-        displayName: 'Archive frontend'
-        inputs:
-          rootFolderOrFile: './src/explore-education-statistics-frontend'
-          includeRootFolder: false
-          archiveFile: '$(Build.ArtifactStagingDirectory)/public-frontend.zip'
-      - task: 'PublishPipelineArtifact@0'
-        displayName: 'Publish Pipeline Artifact'
-        inputs:
-          artifactName: 'public-frontend'
-          targetPath: '$(Build.ArtifactStagingDirectory)'
+          containerRegistry: 's101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection'
+          repository: 'ees-public-frontend'
+          command: 'buildAndPush'
+          Dockerfile: 'docker/Dockerfile.public-frontend'
+          buildContext: '$(System.DefaultWorkingDirectory)'
+          tags: $(Build.BuildNumber)
 
   - job: 'MiscellaneousArtifacts'
     pool:
@@ -298,6 +287,7 @@ jobs:
             Pipfile
             Pipfile.lock
           TargetFolder: 'tests'
+
       - task: PublishPipelineArtifact@0
         displayName: 'Publish test files'
         inputs:

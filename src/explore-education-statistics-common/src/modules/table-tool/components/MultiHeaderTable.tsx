@@ -26,6 +26,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
                 createElement(
                   cell.tag,
                   {
+                    // eslint-disable-next-line react/no-array-index-key
                     key: `cell-${rowIndex}-${i}`,
                     colSpan: cell.colSpan,
                     rowSpan: cell.rowSpan,
@@ -47,6 +48,7 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
                   createElement(
                     cell.tag,
                     {
+                      // eslint-disable-next-line react/no-array-index-key
                       key: `cell-${rowIndex}-${i}`,
                       colSpan: cell.colSpan,
                       rowSpan: cell.rowSpan,

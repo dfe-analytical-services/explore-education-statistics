@@ -12,6 +12,8 @@ type Props<FormValues, Value extends string> = FormFieldComponentProps<
 function FormFieldRadioGroup<FormValues, Value extends string = string>(
   props: Props<FormValues, Value>,
 ) {
+  const { onChange } = props;
+
   return (
     <FormField<Value> {...props}>
       {({ id, field }) => (
@@ -20,9 +22,7 @@ function FormFieldRadioGroup<FormValues, Value extends string = string>(
           {...field}
           id={id}
           onChange={(event, option) => {
-            if (props.onChange) {
-              props.onChange(event, option);
-            }
+            onChange?.(event, option);
 
             if (!event.isDefaultPrevented()) {
               field.onChange(event);

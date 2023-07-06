@@ -82,9 +82,7 @@ const FormRadio = ({
           name={name}
           onBlur={onBlur}
           onChange={event => {
-            if (onChange) {
-              onChange(event, { label });
-            }
+            onChange?.(event, { label });
           }}
           ref={inputRef}
           type="radio"

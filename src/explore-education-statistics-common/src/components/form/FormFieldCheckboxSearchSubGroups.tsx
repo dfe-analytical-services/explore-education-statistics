@@ -16,6 +16,8 @@ export type FormFieldCheckboxSearchSubGroupsProps<FormValues> = OmitStrict<
 function FormFieldCheckboxSearchSubGroups<FormValues>(
   props: FormFieldCheckboxSearchSubGroupsProps<FormValues>,
 ) {
+  const { onSubGroupAllChange, onChange } = props;
+
   return (
     <FormField<string[]> {...props}>
       {({ id, field, helpers, meta }) => {
@@ -38,9 +40,7 @@ function FormFieldCheckboxSearchSubGroups<FormValues>(
               });
             }}
             onSubGroupAllChange={(event, checked, groupOptions) => {
-              if (props.onSubGroupAllChange) {
-                props.onSubGroupAllChange(event, checked, groupOptions);
-              }
+              onSubGroupAllChange?.(event, checked, groupOptions);
 
               if (event.isDefaultPrevented()) {
                 return;
@@ -54,9 +54,7 @@ function FormFieldCheckboxSearchSubGroups<FormValues>(
               });
             }}
             onChange={(event, option) => {
-              if (props.onChange) {
-                props.onChange(event, option);
-              }
+              onChange?.(event, option);
 
               if (event.isDefaultPrevented()) {
                 return;

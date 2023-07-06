@@ -52,7 +52,7 @@ describe('MapBlockInternal', () => {
 
     await waitFor(() => {
       const paths = container.querySelectorAll<HTMLElement>(
-        '.leaflet-container svg path',
+        '.leaflet-container svg:not(.leaflet-attribution-flag) path',
       );
 
       expect(paths).toHaveLength(4);
@@ -173,9 +173,8 @@ describe('MapBlockInternal', () => {
       );
 
       userEvent.selectOptions(select, select.children[1] as HTMLElement);
-
       const paths = container.querySelectorAll<HTMLElement>(
-        '.leaflet-container svg path',
+        '.leaflet-container svg:not(.leaflet-attribution-flag) path',
       );
 
       expect(paths).toHaveLength(4);
@@ -222,9 +221,8 @@ describe('MapBlockInternal', () => {
     expect(group1Options[0]).toHaveTextContent('Leeds');
 
     userEvent.selectOptions(select, group1Options[0]);
-
     const paths = container.querySelectorAll<HTMLElement>(
-      '.leaflet-container svg path',
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path',
     );
 
     expect(paths).toHaveLength(4);
@@ -343,7 +341,7 @@ describe('MapBlockInternal', () => {
     userEvent.selectOptions(select, group1Options[0]);
 
     const paths = container.querySelectorAll<HTMLElement>(
-      '.leaflet-container svg path',
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path',
     );
 
     expect(paths[3]).toHaveClass('selected');
@@ -381,7 +379,7 @@ describe('MapBlockInternal', () => {
     });
 
     const paths = container.querySelectorAll<HTMLElement>(
-      '.leaflet-container svg path',
+      '.leaflet-container svg:not(.leaflet-attribution-flag) path',
     );
 
     expect(paths).toHaveLength(4);
