@@ -2027,6 +2027,7 @@
         "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
+        "reserved": true,
         "siteConfig": {
           "acrUseManagedIdentityCreds": false,
           "http20Enabled": true,
@@ -2103,7 +2104,8 @@
         "name": "[variables('publicPlanName')]",
         "workerSizeId": "0",
         "numberOfWorkers": "1",
-        "hostingEnvironment": ""
+        "hostingEnvironment": "",
+        "reserved": true
       }
     },
     {
