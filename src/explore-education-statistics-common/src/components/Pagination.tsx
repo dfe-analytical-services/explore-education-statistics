@@ -80,6 +80,7 @@ const Pagination = ({
           if (pageNumber === null) {
             return (
               <li
+                // eslint-disable-next-line react/no-array-index-key
                 key={index.toString()}
                 className="govuk-pagination__item govuk-pagination__item--ellipses"
                 data-testid="pagination-ellipsis"
@@ -90,6 +91,7 @@ const Pagination = ({
           }
           return (
             <li
+              // eslint-disable-next-line react/no-array-index-key
               key={index.toString()}
               className={classNames('govuk-pagination__item', {
                 'govuk-pagination__item--current': pageNumber === currentPage,

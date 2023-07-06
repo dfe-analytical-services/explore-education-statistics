@@ -129,9 +129,7 @@ const FormCheckboxSearchSubGroups = ({
 
   const handleAllGroupsChange: MouseEventHandler<HTMLButtonElement> = useCallback(
     event => {
-      if (onAllChange) {
-        onAllChange(event, isAllChecked, filteredOptions);
-      }
+      onAllChange?.(event, isAllChecked, filteredOptions);
     },
     [isAllChecked, onAllChange, filteredOptions],
   );
@@ -211,9 +209,7 @@ const FormCheckboxSearchSubGroups = ({
                   </>
                 )}
                 onAllChange={(event, checked) => {
-                  if (onSubGroupAllChange) {
-                    onSubGroupAllChange(event, checked, optionGroup.options);
-                  }
+                  onSubGroupAllChange?.(event, checked, optionGroup.options);
                 }}
               />
             ))}
@@ -232,9 +228,7 @@ const FormCheckboxSearchSubGroups = ({
             value={value}
             selectAll
             onAllChange={(event, checked) => {
-              if (onSubGroupAllChange) {
-                onSubGroupAllChange(event, checked, filteredOptions[0].options);
-              }
+              onSubGroupAllChange?.(event, checked, filteredOptions[0].options);
             }}
           />
         )}
