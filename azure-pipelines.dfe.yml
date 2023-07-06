@@ -269,7 +269,7 @@ jobs:
         displayName: 'Build and push public frontend Docker image'
         condition: ne(variables['Build.Reason'], 'PullRequest')
         inputs:
-          containerRegistry: 's101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection'
+          containerRegistry: 'eesacr-managed-service-connection'
           repository: 'ees-public-frontend'
           command: 'buildAndPush'
           Dockerfile: 'docker/Dockerfile.public-frontend'
