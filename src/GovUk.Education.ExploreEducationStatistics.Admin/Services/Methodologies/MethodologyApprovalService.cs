@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query.Internal;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -94,8 +95,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     methodology.Updated = DateTime.UtcNow;
 
-                    _context.MethodologyVersions.Update(methodology);
-
                     var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodology.Id);
                     
                     if (isPubliclyAccessible)
@@ -106,6 +105,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     }
 
                     _context.MethodologyVersions.Update(methodology);
+
+                    // @MarkFix this gets added even if moving from Draft -> Draft?
+                    var methodologyStatus = new MethodologyStatus
+                    {
+                        MethodologyVersionId = methodology.Id,
+                        InternalReleaseNote = request.LatestInternalReleaseNote,
+                        ApprovalStatus = request.Status,
+                        CreatedById = _userService.GetUserId(),
+                    };
+                    await _context.MethodologyStatus.AddAsync(methodologyStatus);
+
                     await _context.SaveChangesAsync();
 
                     if (isPubliclyAccessible)
