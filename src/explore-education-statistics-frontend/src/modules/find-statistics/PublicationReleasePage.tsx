@@ -590,7 +590,7 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     props: {
       release,
     },
-    revalidate: 30,
+    revalidate: process.env.APP_ENV === 'Development' ? 0 : 30,
   };
 };
 
