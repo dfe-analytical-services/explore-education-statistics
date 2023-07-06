@@ -29,7 +29,12 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import glossaryService from '@frontend/services/glossaryService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
-import { GetServerSideProps, NextPage } from 'next';
+import {
+  GetServerSideProps,
+  GetStaticPaths,
+  GetStaticProps,
+  NextPage,
+} from 'next';
 import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
@@ -571,13 +576,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
+export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
   const {
     publication: publicationSlug,
     release: releaseSlug,
-  } = query as Dictionary<string>;
+  } = params as Dictionary<string>;
 
   const release = await (releaseSlug
     ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
@@ -587,6 +590,14 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
     props: {
       release,
     },
+    revalidate: 30,
+  };
+};
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking',
   };
 };
 
