@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;

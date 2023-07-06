@@ -111,5 +111,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .DeleteMethodologyVersion(methodologyVersionId)
                 .HandleFailuresOrNoContent();
         }
+
+        [HttpGet("methodology/{methodologyVersionId:guid}/status")]
+        public Task<ActionResult<List<MethodologyStatusViewModel>>> GetMethodologyStatuses(Guid methodologyVersionId)
+        {
+            return _methodologyService
+                .GetMethodologyStatuses(methodologyVersionId)
+                .HandleFailuresOrOk();
+        }
     }
 }
