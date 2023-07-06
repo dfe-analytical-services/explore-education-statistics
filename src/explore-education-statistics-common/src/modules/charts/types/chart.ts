@@ -37,8 +37,11 @@ export type LineChartDataLabelPosition = 'above' | 'below';
 export type BarChartDataLabelPosition = 'inside' | 'outside';
 
 export interface ReferenceLine {
+  endPosition?: string;
   label: string;
+  otherAxisEnd?: string;
   otherAxisPosition?: number;
+  otherAxisStart?: string;
   position: number | string;
   style?: ReferenceLineStyle;
 }
