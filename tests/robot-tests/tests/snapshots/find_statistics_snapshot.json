@@ -170,7 +170,7 @@
   {
     "publication_summary": "Statistics on children aged 2 to 4 registered for funded early education and childcare entitlements in England, including on staff and providers delivering them",
     "publication_title": "Education provision: children under 5 years of age",
-    "published": "30 Jun 2022",
+    "published": "6 Jul 2023",
     "release_type": "National statistics",
     "theme": "Early years"
   },
@@ -317,14 +317,14 @@
   {
     "publication_summary": "Earnings and employment for higher education university graduates & postgraduates by subject studied and characteristics. Longitudinal Education Outcomes (LEO).",
     "publication_title": "LEO Graduate and Postgraduate Outcomes",
-    "published": "24 Nov 2022",
+    "published": "6 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Higher education"
   },
   {
     "publication_summary": "Employment and earnings outcomes of graduates by each higher education provider by sex and current region/subject studied/prior attainment.",
     "publication_title": "LEO Graduate outcomes provider level data",
-    "published": "24 Nov 2022",
+    "published": "6 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Higher education"
   },
@@ -429,7 +429,7 @@
   {
     "publication_summary": "LA management information on participation and not in education or training (NEET) age 16 to 17. Includes ethnicity, SEND figures and comparative NEET scorecard",
     "publication_title": "Participation in education, training and NEET age 16 to 17 by local authority",
-    "published": "1 Dec 2022",
+    "published": "6 Jul 2023",
     "release_type": "Management information",
     "theme": "Destination of pupils and students"
   },
@@ -551,6 +551,13 @@
     "published": "15 Jun 2023",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "LA management information on September Guarantee offers of education or training places for young people aged 16 and 17.",
+    "publication_title": "September Guarantee: offers of education and training for young people age 16 and 17",
+    "published": "6 Jul 2023",
+    "release_type": "Management information",
+    "theme": "Destination of pupils and students"
   },
   {
     "publication_summary": "Statistics for England on serious incidents that involve death or serious harm to a child due to abuse or neglect, and any death of a looked after child.",
