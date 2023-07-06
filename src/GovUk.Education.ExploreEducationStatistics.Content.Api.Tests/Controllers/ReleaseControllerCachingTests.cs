@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Moq;
 using NCrontab;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedules;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
@@ -21,8 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 [Collection(CacheServiceTests)]
 public class ReleaseControllerCachingTests : CacheServiceTestFixture
 {
-    private const string HalfHourlyExpirySchedule = "*/30 * * * *";
-
     private const string PublicationSlug = "publication-a";
     private const string ReleaseSlug = "200";
 
