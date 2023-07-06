@@ -333,8 +333,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     var methodologyVersionIds= methodology
                         .Versions
                         .Select(methodologyVersion => new IdAndPreviousVersionIdPair<string>(
-                                methodologyVersion.Id.ToString(),
-                                methodologyVersion.PreviousVersionId?.ToString()))
+                            methodologyVersion.Id.ToString(),
+                            methodologyVersion.PreviousVersionId?.ToString()))
                         .ToList();
 
                     var methodologyVersionIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
@@ -362,6 +362,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     query => query.Include(m => m.Methodology))
                 .OnSuccessDo(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
                 .OnSuccessVoid(DeleteMethodologyIfOrphaned);
+        }
+
+        public Task<Either<ActionResult, List<MethodologyStatusViewModel>>> GetMethodologyStatuses(
+            Guid methodologyVersionId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+                .OnSuccess(_userService.CheckCanViewMethodology)
+                .OnSuccess(async methodologyVersion =>
+                {
+                    var methodologyVersionIds = await _context.MethodologyVersions
+                        .Where(mv => mv.MethodologyId == methodologyVersion.MethodologyId)
+                        .Select(mv => mv.Id)
+                        .ToListAsync();
+
+                    var statuses = await _context.MethodologyStatus
+                        .Include(ms => ms.MethodologyVersion)
+                        .Include(ms => ms.CreatedBy)
+                        .Where(status => methodologyVersionIds.Contains(status.MethodologyVersionId))
+                        .ToListAsync();
+
+                    return statuses
+                        .Select(status =>
+                            new MethodologyStatusViewModel
+                            {
+                                MethodologyStatusId = status.Id,
+                                InternalReleaseNote = status.InternalReleaseNote,
+                                ApprovalStatus = status.ApprovalStatus,
+                                Created = status.Created,
+                                CreatedByEmail = status.CreatedBy?.Email,
+                                MethodologyVersion = status.MethodologyVersion.Version,
+                            }
+                        )
+                        .OrderByDescending(vm => vm.Created)
+                        .ToList();
+                });
         }
 
         private async Task<Either<ActionResult, Unit>> DeleteVersion(MethodologyVersion methodologyVersion,
@@ -407,9 +443,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .SingleAsync();
 
             if (await _context
-                .Methodologies
-                .AsQueryable()
-                .AnyAsync(p => p.Slug == slug && p.Id != methodologyId))
+                    .Methodologies
+                    .AsQueryable()
+                    .AnyAsync(p => p.Slug == slug && p.Id != methodologyId))
             {
                 return ValidationActionResult(SlugNotUnique);
             }
