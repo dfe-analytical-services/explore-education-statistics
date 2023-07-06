@@ -48,7 +48,11 @@ const Page = ({
       <PageHeader wide={wide} />
 
       {showBanner && !isAdminBannerSeen && (
-        <Banner wide={wide} onClose={() => setAdminBannerSeenCookie(true)}>
+        <Banner
+          wide={wide}
+          onClose={() => setAdminBannerSeenCookie(true)}
+          testId="admin-survey-banner"
+        >
           <p className="govuk-!-font-weight-bold">
             Pl-EES-e let us know what you think of EES admin!
           </p>

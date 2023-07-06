@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPrivateCache_SingleValidPath()
         {
-            var privateBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
             DeleteBlobsOptions options = null!;
             var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPrivateCacheReleases_AllValidPaths()
         {
-            var privateBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
             DeleteBlobsOptions options = null!;
             var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPrivateCache_Empty()
         {
-            var privateBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
             var controller = BuildController(privateBlobStorageService: privateBlobStorageService.Object);
 
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPublicCachePublication()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             DeleteBlobsOptions options = null!;
             var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
@@ -170,7 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPublicCachePublications()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             DeleteBlobsOptions options = null!;
             var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
@@ -201,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPublicCachePublicationJson()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             DeleteBlobsOptions options = null!;
             var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
@@ -231,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPublicCacheReleaseJson()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             DeleteBlobsOptions options = null!;
             var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPublicCacheReleases_SingleValidPath()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             DeleteBlobsOptions options = null!;
             var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
@@ -307,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPublicCacheReleases_AllValidPaths()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             DeleteBlobsOptions options = null!;
             var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
@@ -348,7 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ClearPublicCacheReleases_Empty()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
@@ -425,7 +425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task UpdatePublicCacheTrees_Empty()
         {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(Strict);
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
@@ -437,15 +437,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         private static BauCacheController BuildController(
-            IBlobStorageService? privateBlobStorageService = null,
-            IBlobStorageService? publicBlobStorageService = null,
+            IPrivateBlobStorageService? privateBlobStorageService = null,
+            IPublicBlobStorageService? publicBlobStorageService = null,
             IGlossaryCacheService? glossaryCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IPublicationCacheService? publicationCacheService = null)
         {
             return new BauCacheController(
-                privateBlobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
-                publicBlobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
+                publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
                 glossaryCacheService ?? Mock.Of<IGlossaryCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict)

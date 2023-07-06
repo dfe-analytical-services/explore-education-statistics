@@ -197,7 +197,7 @@ public class ProcessorStage2Tests
             await statisticsDbContext.SaveChangesAsync();
         }
 
-        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+        var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(Strict);
 
         var dataFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + scenario.GetFilenameUnderTest());
@@ -205,12 +205,12 @@ public class ProcessorStage2Tests
         var metaFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
             "Resources" + Path.DirectorySeparatorChar + metaFileUnderTest);
 
-        blobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.File.Path(),
             dataFilePath);
 
-        blobStorageService.SetupStreamBlob(
+        privateBlobStorageService.SetupStreamBlob(
             PrivateReleaseFiles,
             import.MetaFile.Path(),
             metaFilePath);
@@ -228,7 +228,7 @@ public class ProcessorStage2Tests
         var guidGenerator = new SequentialGuidGenerator();
 
         var importerMetaService = new ImporterMetaService(guidGenerator, transactionHelper);
-        
+
         var importerService = new ImporterService(
             guidGenerator,
             new ImporterLocationService(
@@ -242,15 +242,14 @@ public class ProcessorStage2Tests
 
         var fileImportService = new FileImportService(
             Mock.Of<ILogger<FileImportService>>(),
-            blobStorageService.Object,
+            privateBlobStorageService.Object,
             dataImportService,
-            importerService,
-            importerMetaService);
-    
+            importerService);
+
         var processorService = BuildProcessorService(
             dbContextSupplier,
             dataImportService: dataImportService,
-            blobStorageService: blobStorageService.Object,
+            privateBlobStorageService: privateBlobStorageService.Object,
             importerService: importerService,
             fileImportService: fileImportService);
 
@@ -268,7 +267,7 @@ public class ProcessorStage2Tests
             new ExecutionContext(),
             importStagesMessageQueue.Object);
 
-        VerifyAllMocks(blobStorageService, importStagesMessageQueue);
+        VerifyAllMocks(privateBlobStorageService, importStagesMessageQueue);
 
         await using (var statisticsDbContext = InMemoryStatisticsDbContext(_statisticsDbContextId))
         {
@@ -304,6 +303,19 @@ public class ProcessorStage2Tests
                 .JoinToString(",");
 
             Assert.Equal(expectedFilterNames, filterNames);
+
+            var filterGroupCsvColumns = filters
+                .Select(f => f.GroupCsvColumn)
+                .OrderBy(groupCsvColumn => groupCsvColumn)
+                .JoinToString(",");
+
+            var expectedFilterGroupCsvColumns = scenario
+                .GetExpectedFilters()
+                .Select(f => f.GroupCsvColumn)
+                .OrderBy(groupCsvColumn => groupCsvColumn)
+                .JoinToString(",");
+
+            Assert.Equal(expectedFilterGroupCsvColumns, filterGroupCsvColumns);
 
             filters.ForEach(filter => Assert.Equal(subject.Id, filter.SubjectId));
 
@@ -415,13 +427,13 @@ public class ProcessorStage2Tests
     private static ProcessorService BuildProcessorService(
         IDbContextSupplier dbContextSupplier,
         IDataImportService? dataImportService = null,
-        IBlobStorageService? blobStorageService = null,
+        IPrivateBlobStorageService? privateBlobStorageService = null,
         IImporterService? importerService = null,
         IFileImportService? fileImportService = null)
     {
         return new ProcessorService(
             Mock.Of<ILogger<ProcessorService>>(),
-            blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+            privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
             fileImportService ?? Mock.Of<IFileImportService>(Strict),
             importerService ?? Mock.Of<IImporterService>(Strict),
             dataImportService ?? Mock.Of<IDataImportService>(Strict),

@@ -105,9 +105,15 @@ Verify that the methodology is still not publicly accessible by URL without publ
     user navigates to public frontend    ${ACCESSIBLE_METHODOLOGY_URL}
     user waits until page contains    Page not found
 
-Approve the release
+Navigate to release content page and add headline text block
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
+
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Approve the release
     user approves original release for immediate publication
 
 Verify that the user cannot edit the status of the methodology

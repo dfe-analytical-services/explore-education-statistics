@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
 
 Force Tags          Admin    Local    Dev    AltersData
@@ -64,6 +65,11 @@ Add data guidance to subject
     user waits until page contains accordion section    UI test subject
     user enters text into data guidance data file content editor    UI test subject    dataguidance content
     user clicks button    Save guidance
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Go to "Sign off" page
     user clicks link    Sign off

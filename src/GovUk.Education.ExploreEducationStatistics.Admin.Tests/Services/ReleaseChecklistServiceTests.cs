@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.False(checklist.Valid);
 
-                Assert.Equal(6, checklist.Errors.Count);
+                Assert.Equal(7, checklist.Errors.Count);
 
                 Assert.Equal(DataFileImportsMustBeCompleted, checklist.Errors[0].Code);
                 Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Errors[1].Code);
@@ -159,6 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ReleaseNoteRequired, checklist.Errors[3].Code);
                 Assert.Equal(EmptyContentSectionExists, checklist.Errors[4].Code);
                 Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Errors[5].Code);
+                Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, checklist.Errors[6].Code);
             }
 
             MockUtils.VerifyAllMocks(dataImportService,
@@ -509,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         new HtmlBlock
                         {
-                            Body = ""
+                            Body = "Not empty"
                         }
                     }
                 }

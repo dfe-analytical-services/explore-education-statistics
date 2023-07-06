@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IPermalinkCsvMetaService _permalinkCsvMetaService;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPublicBlobStorageService _publicBlobStorageService;
         private readonly IFrontendService _frontendService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IPublicationRepository _publicationRepository;
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             ContentDbContext contentDbContext,
             ITableBuilderService tableBuilderService,
             IPermalinkCsvMetaService permalinkCsvMetaService,
-            IBlobStorageService blobStorageService,
+            IPublicBlobStorageService publicBlobStorageService,
             IFrontendService frontendService,
             ISubjectRepository subjectRepository,
             IPublicationRepository publicationRepository,
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _contentDbContext = contentDbContext;
             _tableBuilderService = tableBuilderService;
             _permalinkCsvMetaService = permalinkCsvMetaService;
-            _blobStorageService = blobStorageService;
+            _publicBlobStorageService = publicBlobStorageService;
             _frontendService = frontendService;
             _subjectRepository = subjectRepository;
             _publicationRepository = publicationRepository;
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             CancellationToken cancellationToken = default)
         {
             return await Find(permalinkId, cancellationToken)
-                .OnSuccessVoid(() => _blobStorageService.DownloadToStream(
+                .OnSuccessVoid(() => _publicBlobStorageService.DownloadToStream(
                     containerName: BlobContainers.PermalinkSnapshots,
                     path: $"{permalinkId}.csv.zst",
                     stream: stream,
@@ -476,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
                     permalink.LegacyContentLength = stream.Length;
 
-                    await _blobStorageService.UploadStream(
+                    await _publicBlobStorageService.UploadStream(
                         containerName: BlobContainers.Permalinks,
                         path: permalink.Id.ToString(),
                         stream: stream,
@@ -583,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private async Task<Either<ActionResult, LegacyPermalink>> DownloadLegacyPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            return (await _blobStorageService.GetDeserializedJson<LegacyPermalink>(
+            return (await _publicBlobStorageService.GetDeserializedJson<LegacyPermalink>(
                 containerName: BlobContainers.Permalinks,
                 path: permalinkId.ToString(),
                 settings: LegacyPermalinkSerializerSettings,
@@ -593,7 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private async Task<Either<ActionResult, PermalinkTableViewModel>> DownloadPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
-            return (await _blobStorageService.GetDeserializedJson<PermalinkTableViewModel>(
+            return (await _publicBlobStorageService.GetDeserializedJson<PermalinkTableViewModel>(
                 containerName: BlobContainers.PermalinkSnapshots,
                 path: $"{permalinkId}.json.zst",
                 cancellationToken: cancellationToken))!;
@@ -631,7 +631,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             await WriteCsvRows(csvWriter, observations, csvMeta, cancellationToken);
             await csvWriter.FlushAsync();
 
-            await _blobStorageService.UploadStream(
+            await _publicBlobStorageService.UploadStream(
                 containerName: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.csv.zst",
                 stream: csvStream,
@@ -645,7 +645,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             PermalinkTableViewModel table,
             CancellationToken cancellationToken = default)
         {
-            await _blobStorageService.UploadAsJson(
+            await _publicBlobStorageService.UploadAsJson(
                 containerName: BlobContainers.PermalinkSnapshots,
                 path: $"{permalink.Id}.json.zst",
                 content: table,

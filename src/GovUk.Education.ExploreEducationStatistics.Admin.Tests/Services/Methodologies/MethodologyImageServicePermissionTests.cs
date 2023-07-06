@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private MethodologyImageService SetupMethodologyImageService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IBlobStorageService blobStorageService = null,
+            IPrivateBlobStorageService privateBlobStorageService = null,
             IFileUploadsValidatorService fileUploadsValidatorService = null,
             IFileRepository fileRepository = null,
             IMethodologyFileRepository methodologyFileRepository = null,
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             return new(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
                 fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
                 fileRepository ?? Mock.Of<IFileRepository>(),
                 methodologyFileRepository ?? Mock.Of<IMethodologyFileRepository>(),

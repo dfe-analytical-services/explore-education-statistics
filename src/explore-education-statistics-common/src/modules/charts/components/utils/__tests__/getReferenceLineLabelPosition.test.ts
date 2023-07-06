@@ -41,7 +41,7 @@ describe('getReferenceLineLabelPosition', () => {
     });
   });
 
-  test('returns the default position for an X axis line when otherAxisPosition below the minimum', () => {
+  test('returns the default position for an X axis line when otherAxisPosition is below the minimum', () => {
     const result = getReferenceLineLabelPosition({
       axis: 'x',
       axisType: 'minor',
@@ -62,7 +62,7 @@ describe('getReferenceLineLabelPosition', () => {
     });
   });
 
-  test('returns the default position for an X axis line when otherAxisPosition above the maximum', () => {
+  test('returns the default position for an X axis line when otherAxisPosition is above the maximum', () => {
     const result = getReferenceLineLabelPosition({
       axis: 'x',
       axisType: 'minor',
@@ -83,7 +83,7 @@ describe('getReferenceLineLabelPosition', () => {
     });
   });
 
-  test('returns the default position for a Y axis line when otherAxisPosition below the minimum', () => {
+  test('returns the default position for a Y axis line when otherAxisPosition is below the minimum', () => {
     const result = getReferenceLineLabelPosition({
       axis: 'y',
       axisType: 'major',
@@ -104,7 +104,7 @@ describe('getReferenceLineLabelPosition', () => {
     });
   });
 
-  test('returns the default position for a Y axis line when otherAxisPosition above the maximum', () => {
+  test('returns the default position for a Y axis line when otherAxisPosition is above the maximum', () => {
     const result = getReferenceLineLabelPosition({
       axis: 'y',
       axisType: 'major',

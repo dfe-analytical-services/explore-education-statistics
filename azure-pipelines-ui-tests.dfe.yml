@@ -1,3 +1,5 @@
+variables:
+  SPN_NAME: s101d-datahub-spn-ees-dfe-gov-uk
 schedules:
 - cron: 0 5,7,19 * * 1,2,3,4,5
   branches:
@@ -7,7 +9,6 @@ schedules:
 pr: none
 
 name: $(date:yyyyMMdd)$(rev:.r)
-
 resources:
   repositories:
   - repository: self
@@ -38,7 +39,7 @@ jobs:
   - task: AzureKeyVault@2
     displayName: 'Azure Key Vault: s101d01-kv-ees-01'
     inputs:
-      azureSubscription: 's101-datahub-development-spn-ees'
+      azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
@@ -97,7 +98,7 @@ jobs:
   - task: AzureKeyVault@2
     displayName: 'Azure Key Vault: s101d01-kv-ees-01'
     inputs:
-      azureSubscription: 's101-datahub-development-spn-ees'
+      azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
@@ -157,7 +158,7 @@ jobs:
   - task: AzureKeyVault@2
     displayName: 'Azure Key Vault: s101d01-kv-ees-01'
     inputs:
-      azureSubscription: 's101-datahub-development-spn-ees'
+      azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
@@ -218,7 +219,7 @@ jobs:
   - task: AzureKeyVault@2
     displayName: 'Azure Key Vault: s101d01-kv-ees-01'
     inputs:
-      azureSubscription: 's101-datahub-development-spn-ees'
+      azureSubscription: $(SPN_NAME)
       KeyVaultName: s101d01-kv-ees-01
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true

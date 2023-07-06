@@ -2,6 +2,7 @@
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -43,6 +44,11 @@ Add data guidance to archive-publication subject
 
     user clicks button    Save guidance
     user waits until page contains button    Edit guidance
+
+Add headline text block to archive-publication content
+    user navigates to content page    ${PUBLICATION_NAME_ARCHIVE}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Go to "Sign off" page and approve archive-publication release
     user clicks link    Sign off
@@ -181,6 +187,11 @@ Add data guidance to superseding-publication subject
 
     user clicks button    Save guidance
     user waits until page contains button    Edit guidance
+
+Add headline text block to superseding-publication content
+    user navigates to content page    ${PUBLICATION_NAME_SUPERSEDE}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Go to "Sign off" page and approve superseding-publication release
     user clicks link    Sign off

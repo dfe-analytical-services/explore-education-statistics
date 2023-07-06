@@ -13,8 +13,9 @@ import Yup from '@common/validation/yup';
 import Details from '@common/components/Details';
 import DataSetDetailsList from '@common/modules/table-tool/components/DataSetDetailsList';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
-import React, { ReactNode } from 'react';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import React, { ReactNode } from 'react';
+import orderBy from 'lodash/orderBy';
 
 const formId = 'publicationDataStepForm';
 
@@ -160,7 +161,7 @@ export default function DataSetStep({
                     <div className="govuk-grid-column-two-thirds govuk-grid-column-three-quarters-from-desktop">
                       <DataSetStepContent
                         {...stepProps}
-                        featuredTables={featuredTables}
+                        featuredTables={orderBy(featuredTables, 'order')}
                         isSubmitting={formState.isSubmitting}
                         release={release}
                         renderFeaturedTableLink={renderFeaturedTableLink}

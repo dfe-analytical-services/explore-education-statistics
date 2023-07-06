@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
 
 Force Tags          Admin    Local    Dev    AltersData
@@ -47,6 +48,11 @@ Navigate to admin dashboard to create new release
 Navigate to release in admin
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic year 2020/21
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Approve release
     user clicks link    Sign off

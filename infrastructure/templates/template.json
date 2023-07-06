@@ -3620,7 +3620,7 @@
             }
           },
           {
-            "tenantId": "9c7d9dd3-840c-4b3f-818e-552865082e16",
+            "tenantId": "[subscription().tenantId]",
             "objectId": "[parameters('devopsSPN')]", // Devops SPN
             "permissions": {
               "keys": [

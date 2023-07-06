@@ -4,10 +4,14 @@ import FormCheckboxGroup, {
   CheckboxGroupAllChangeEvent,
   CheckboxOption,
   FormCheckboxGroupProps,
+  getDefaultSelectAllText,
 } from '@common/components/form/FormCheckboxGroup';
 import FormFieldset, {
   FormFieldsetProps,
 } from '@common/components/form/FormFieldset';
+import styles from '@common/components/form/FormCheckboxSearchSubGroups.module.scss';
+import FormTextSearchInput from '@common/components/form//FormTextSearchInput';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import useMounted from '@common/hooks/useMounted';
 import { OmitStrict } from '@common/types';
 import React, {
@@ -18,8 +22,6 @@ import React, {
   useState,
   memo,
 } from 'react';
-import styles from './FormCheckboxSearchSubGroups.module.scss';
-import FormTextSearchInput from './FormTextSearchInput';
 
 export interface OptionGroup {
   id?: string;
@@ -32,7 +34,9 @@ export interface FormCheckboxSearchSubGroupsProps
     FormCheckboxGroupProps,
     'onAllChange' | 'selectAll' | 'selectAllText' | 'options'
   > {
+  groupLabel?: string;
   options: OptionGroup[];
+  searchLabel?: string;
   onAllChange?: (
     event: MouseEvent<HTMLButtonElement>,
     checked: boolean,
@@ -43,22 +47,22 @@ export interface FormCheckboxSearchSubGroupsProps
     checked: boolean,
     options: CheckboxOption[],
   ) => void;
-  searchLabel?: string;
 }
 
 const FormCheckboxSearchSubGroups = ({
-  searchLabel = 'Search options',
+  searchLabel,
   onAllChange,
   onSubGroupAllChange,
   ...props
 }: FormCheckboxSearchSubGroupsProps) => {
   const {
+    error,
+    groupLabel,
+    hint,
     id,
     legend,
-    hint,
     legendHidden,
     legendSize,
-    error,
     name,
     onFieldsetFocus,
     onFieldsetBlur,
@@ -143,9 +147,10 @@ const FormCheckboxSearchSubGroups = ({
               underline={false}
               onClick={handleAllGroupsChange}
             >
-              {`${
-                isAllChecked ? 'Unselect' : 'Select'
-              } all ${totalFilteredOptions} options`}
+              {getDefaultSelectAllText(isAllChecked, totalFilteredOptions)}
+              {groupLabel && (
+                <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
+              )}
             </ButtonText>
           )}
 
@@ -153,7 +158,16 @@ const FormCheckboxSearchSubGroups = ({
             <FormTextSearchInput
               id={`${id}-search`}
               name={`${name}-search`}
-              label={searchLabel}
+              label={
+                searchLabel || (
+                  <>
+                    Search options
+                    {groupLabel && (
+                      <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
+                    )}
+                  </>
+                )
+              }
               width={20}
               onChange={event => setSearchTerm(event.target.value)}
               onKeyPress={event => {
@@ -177,6 +191,7 @@ const FormCheckboxSearchSubGroups = ({
                 {...groupProps}
                 key={optionGroup.legend}
                 name={name}
+                groupLabel={groupLabel}
                 id={
                   optionGroup.id
                     ? `${id}-${optionGroup.id}`
@@ -187,17 +202,19 @@ const FormCheckboxSearchSubGroups = ({
                 options={optionGroup.options}
                 value={value}
                 selectAll
-                selectAllText={(allChecked, opts) =>
-                  `${allChecked ? 'Unselect' : 'Select'} all ${
-                    opts.length
-                  } subgroup options`
-                }
+                selectAllText={(allChecked, opts) => (
+                  <>
+                    {`${allChecked ? 'Unselect' : 'Select'} all ${
+                      opts.length
+                    } subgroup options`}
+                    <VisuallyHidden>{` for ${optionGroup.legend}`}</VisuallyHidden>
+                  </>
+                )}
                 onAllChange={(event, checked) => {
                   if (onSubGroupAllChange) {
                     onSubGroupAllChange(event, checked, optionGroup.options);
                   }
                 }}
-                hiddenText={`for ${optionGroup.legend}`}
               />
             ))}
           </>
@@ -206,6 +223,7 @@ const FormCheckboxSearchSubGroups = ({
             {...groupProps}
             name={name}
             id={options[0].id ? options[0].id : `${id}-1`}
+            groupLabel={groupLabel}
             options={
               filteredOptions.length
                 ? filteredOptions[0].options

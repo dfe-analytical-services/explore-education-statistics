@@ -22,8 +22,8 @@ export default function getReferenceLineLabelPosition({
   viewBox?: CartesianViewBox;
 }): LabelPosition {
   const { height = 0, width = 0, x = 0, y = 0 } = viewBox ?? {};
-  const defaultXPosition = axis === 'x' ? x : width / 2 + x;
-  const defaultYPosition = axis === 'y' ? y : height / 2 + y;
+  const defaultXPosition = axis === 'y' ? width / 2 + x : x;
+  const defaultYPosition = axis === 'x' ? height / 2 + y : y;
 
   // No custom other axis position or domain so default to middle
   if (
@@ -41,6 +41,7 @@ export default function getReferenceLineLabelPosition({
 
   // Amount to offset from the top on horizontal bar charts so the label is visible when positioned at 100%
   const yOffset = 15;
+
   const yPosition =
     y +
     height * ((otherAxisDomainMax - otherAxisPosition) / otherAxisDomainMax);

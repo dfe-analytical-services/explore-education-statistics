@@ -16,13 +16,24 @@ ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}=      id:methodologyAccordion-annexes
 
 
 *** Keywords ***
+user navigates to content page
+    [Arguments]    ${PUBLICATION_NAME}
+    user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
+    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+
+    user waits for page to finish loading
+    user waits until page does not contain loading spinner
+
 user adds basic release content
-    [Arguments]    ${publication}
+    [Arguments]    ${publication}    ${add_headlines_block}=${TRUE}
     user adds summary text block
     user adds content to summary text block    Test summary text for ${publication}
 
-    user adds headlines text block
-    user adds content to headlines text block    Test headlines summary text for ${publication}
+    IF    ${add_headlines_block}
+        user adds headlines text block
+        user adds content to headlines text block    Test headlines summary text for ${publication}
+    END
 
     user waits until button is enabled    Add new section
     user clicks button    Add new section

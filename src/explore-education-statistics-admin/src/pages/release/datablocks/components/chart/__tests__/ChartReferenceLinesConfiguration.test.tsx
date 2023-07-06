@@ -300,6 +300,36 @@ describe('ChartReferenceLinesConfiguration', () => {
     expect(within(rows[2]).getByText('Test label 2')).toBeInTheDocument();
   });
 
+  test('renders correctly with existing lines between two data points on minor axis', () => {
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMinorAxisDefinition}
+        lines={[
+          {
+            otherAxisEnd: '2015_AY',
+            label: 'Test label 1',
+            position: '50',
+            otherAxisStart: '2014_AY',
+          },
+        ]}
+        minorAxisDomain={testMinorAxisDomain}
+        onAddLine={noop}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+
+    const rows = referenceLines.getAllByRole('row');
+    expect(rows).toHaveLength(3);
+    expect(within(rows[1]).getByText('50')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('2014/15 - 2015/16')).toBeInTheDocument();
+    expect(within(rows[1]).getByText('Test label 1')).toBeInTheDocument();
+  });
+
   test('shows validation error when `Position` is empty', async () => {
     render(
       <ChartReferenceLinesConfiguration
@@ -416,7 +446,11 @@ describe('ChartReferenceLinesConfiguration', () => {
       referenceLines.queryByText('Enter a percentage between 0 and 100%'),
     ).not.toBeInTheDocument();
 
-    userEvent.type(referenceLines.getByLabelText('X axis position'), '101');
+    userEvent.selectOptions(referenceLines.getByLabelText('X axis position'), [
+      'custom',
+    ]);
+
+    userEvent.type(referenceLines.getByLabelText(/Percent/), '101');
     userEvent.tab();
 
     await waitFor(() => {
@@ -449,6 +483,94 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     await waitFor(() => {
       expect(referenceLines.getByText('Enter label')).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation error when adding a reference line between two data points and start and end point are empty', async () => {
+    const handleAddLine = jest.fn();
+
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMinorAxisDefinition}
+        lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
+        onAddLine={handleAddLine}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+    expect(referenceLines.getAllByRole('row')).toHaveLength(2);
+
+    userEvent.selectOptions(referenceLines.getByLabelText('X axis position'), [
+      'between-data-points',
+    ]);
+
+    expect(
+      referenceLines.queryByText('Enter start point'),
+    ).not.toBeInTheDocument();
+    expect(
+      referenceLines.queryByText('Enter end point'),
+    ).not.toBeInTheDocument();
+
+    userEvent.click(referenceLines.getByLabelText('Start point'));
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(referenceLines.getByText('Enter start point')).toBeInTheDocument();
+    });
+
+    userEvent.click(referenceLines.getByLabelText('End point'));
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(referenceLines.getByText('Enter end point')).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation error when adding a reference line between two data points and start and end point are the same', async () => {
+    const handleAddLine = jest.fn();
+
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMinorAxisDefinition}
+        lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
+        onAddLine={handleAddLine}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+    expect(referenceLines.getAllByRole('row')).toHaveLength(2);
+
+    userEvent.selectOptions(referenceLines.getByLabelText('X axis position'), [
+      'between-data-points',
+    ]);
+
+    expect(
+      referenceLines.queryByText('End point cannot match start point'),
+    ).not.toBeInTheDocument();
+
+    userEvent.selectOptions(referenceLines.getByLabelText('Start point'), [
+      '2014_AY',
+    ]);
+
+    userEvent.selectOptions(referenceLines.getByLabelText('End point'), [
+      '2014_AY',
+    ]);
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        referenceLines.getByText('End point cannot match start point'),
+      ).toBeInTheDocument();
     });
   });
 
@@ -790,6 +912,59 @@ describe('ChartReferenceLinesConfiguration', () => {
     });
   });
 
+  test('adding a reference line between two data points', async () => {
+    const handleAddLine = jest.fn();
+
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMinorAxisDefinition}
+        lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
+        onAddLine={handleAddLine}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+    expect(referenceLines.getAllByRole('row')).toHaveLength(2);
+
+    userEvent.type(referenceLines.getByLabelText('Position'), '3000');
+
+    userEvent.selectOptions(referenceLines.getByLabelText('X axis position'), [
+      'between-data-points',
+    ]);
+
+    userEvent.selectOptions(referenceLines.getByLabelText('Start point'), [
+      '2014_AY',
+    ]);
+
+    userEvent.selectOptions(referenceLines.getByLabelText('End point'), [
+      '2015_AY',
+    ]);
+
+    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+
+    expect(handleAddLine).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+
+    await waitFor(() => {
+      expect(handleAddLine).toHaveBeenCalledTimes(1);
+      expect(handleAddLine).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
+      >({
+        label: 'Test label',
+        otherAxisEnd: '2015_AY',
+        otherAxisStart: '2014_AY',
+        position: 3000,
+        style: 'dashed',
+      });
+    });
+  });
+
   test('cannot add reference line when no more options', async () => {
     const handleAddLine = jest.fn();
 
@@ -1067,7 +1242,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     });
   });
 
-  test('setting the other axis position on a minor axis reference line', async () => {
+  test('setting a custom other axis position on a minor axis reference line', async () => {
     const handleAddLine = jest.fn();
 
     render(
@@ -1083,7 +1258,12 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     userEvent.type(screen.getByLabelText('Position'), '40000');
     userEvent.type(screen.getByLabelText('Label'), 'Test label');
-    userEvent.type(screen.getByLabelText('X axis position'), '75');
+
+    userEvent.selectOptions(screen.getByLabelText('X axis position'), [
+      'custom',
+    ]);
+
+    userEvent.type(screen.getByLabelText(/Percent/), '75');
 
     expect(handleAddLine).not.toHaveBeenCalled();
 

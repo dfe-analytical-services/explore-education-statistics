@@ -103,9 +103,14 @@ Navigate to 'Content' page
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
-Add three accordion sections to release
     user waits for page to finish loading
     user waits until page does not contain loading spinner
+
+Add headline text block
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Add three accordion sections to release
     user clicks button    Add new section
     user changes accordion section title    1    Dates data block
     user clicks button    Add new section
@@ -235,7 +240,7 @@ Confirm data replacement
     user clicks button    Confirm data replacement
     user waits until h2 is visible    Data replacement complete
 
-Edit Ancillary file and replace data
+Edit ancillary file and replace data
     [Documentation]    EES-4315
     user clicks link    Data and files
     user clicks link    Ancillary file uploads
@@ -243,13 +248,16 @@ Edit Ancillary file and replace data
 
     user waits until page contains accordion section    Test ancillary file 1
     user opens accordion section    Test ancillary file 1    id:file-uploads
+
     ${section_1}=    user gets accordion section content element    Test ancillary file 1    id:file-uploads
     user clicks link    Edit file    ${section_1}
     user waits until h2 is visible    Edit ancillary file
     user enters text into element    label:Title    Replacement ancillary file
     user enters text into element    label:Summary    Replacement ancillary file summary updated
+
     user chooses file    label:Upload new file    ${FILES_DIR}test-file-2.txt
     user clicks button    Save file
+
     user waits until page contains accordion section    Replacement ancillary file
     user opens accordion section    Replacement ancillary file    id:file-uploads
 
@@ -293,12 +301,15 @@ Edit data block for amendment
     user checks table cell contains    1    1    ${DATABLOCK_NAME}
     user checks table cell contains    1    2    Yes
     user checks table cell contains    1    3    Yes
-    user checks table cell contains    1    4    None
 
     user clicks link    Edit block    css:tbody > tr:first-child
 
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until h2 is visible    Data block details
+
+    user checks page contains element    //*[@data-testid="Data set name-key" and contains(text(), "Data set name")]
+    user checks page contains element
+    ...    //*[@data-testid="Data set name-value" and contains(text(), "Dates test subject")]
 
     user clicks element    testid:wizardStep-4-goToButton
 

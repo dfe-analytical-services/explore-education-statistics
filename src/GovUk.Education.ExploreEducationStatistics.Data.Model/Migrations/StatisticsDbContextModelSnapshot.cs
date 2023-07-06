@@ -54,6 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("GroupCsvColumn")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Hint")
                         .HasColumnType("nvarchar(max)");
 

@@ -221,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private ReleaseFileService SetupReleaseFileService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IBlobStorageService? blobStorageService = null,
+            IPrivateBlobStorageService? privateBlobStorageService = null,
             IFileRepository? fileRepository = null,
             IFileUploadsValidatorService? fileUploadsValidatorService = null,
             IReleaseFileRepository? releaseFileRepository = null,
@@ -231,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseFileService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
                 fileRepository ?? new FileRepository(contentDbContext),
                 fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),

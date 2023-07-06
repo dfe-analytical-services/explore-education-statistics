@@ -1,6 +1,7 @@
 *** Settings ***
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -23,6 +24,29 @@ Go to release sign off page and verify initial release checklist
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Financial year 3000-01
 
+Validate checklist errors and warnings
+    user edits release status
+
+    user checks checklist warnings contains
+    ...    4 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
+    user checks checklist warnings contains link    No next expected release date has been added
+    user checks checklist warnings contains link    No data files uploaded
+    user checks checklist warnings contains link    A public pre-release access list has not been created
+
+    user checks checklist errors contains
+    ...    1 issue that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    Release must contain a key statistic or a non-empty headline text block
+
+    user checks page does not contain testid    releaseChecklist-success
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+Validate checklist errors and warnings after adding headline text block
     user edits release status
 
     user checks checklist warnings contains
@@ -176,3 +200,13 @@ user checks checklist warnings does not contain link
     [Arguments]    ${text}
     user waits until page contains testid    releaseChecklist-warnings
     user waits until parent does not contain element    testid:releaseChecklist-warnings    link:${text}
+
+user checks checklist errors contains
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-errors
+    user waits until element contains    testid:releaseChecklist-errors    ${text}
+
+user checks checklist errors contains link
+    [Arguments]    ${text}
+    user waits until page contains testid    releaseChecklist-errors
+    user waits until parent contains element    testid:releaseChecklist-errors    link:${text}

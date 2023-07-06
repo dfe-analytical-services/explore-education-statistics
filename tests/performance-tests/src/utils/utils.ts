@@ -28,3 +28,7 @@ export function stringifyWithoutNulls(obj: object) {
 export function parseIntOptional(int: string) {
   return parseInt(int, 10) || undefined;
 }
+
+export function parseFloatOptional(float: string) {
+  return parseFloat(float) || undefined;
+}

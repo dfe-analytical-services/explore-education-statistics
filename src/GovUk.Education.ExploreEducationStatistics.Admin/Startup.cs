@@ -8,7 +8,6 @@ using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
-using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -595,7 +594,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
-            services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
+
+            services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+
             services.AddTransient<ITableStorageService, TableStorageService>(_ =>
                 new TableStorageService(
                     coreStorageConnectionString,
@@ -631,19 +633,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
-            services.AddTransient<IBlobCacheService, BlobCacheService>();
+            services.AddTransient<IBlobCacheService, BlobCacheService>(provider =>
+                new BlobCacheService(
+                    provider.GetRequiredService<IPrivateBlobStorageService>(),
+                    provider.GetRequiredService<ILogger<BlobCacheService>>()
+                ));
             services.AddTransient<ICacheKeyService, CacheKeyService>();
-
-            // Register any controllers that need specific dependencies
-            services.AddTransient(
-                provider => new BauCacheController(
-                    privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
-                    publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                    glossaryCacheService: provider.GetRequiredService<IGlossaryCacheService>(),
-                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
-                )
-            );
 
             /*
              * Swagger
@@ -681,10 +676,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
-            var privateBlobCacheService = GetBlobCacheService(provider, "CoreStorage");
-            var publicBlobCacheService = GetBlobCacheService(provider, "PublicStorage");
-            BlobCacheAttribute.AddService("default", privateBlobCacheService);
-            BlobCacheAttribute.AddService("public", publicBlobCacheService);
+            var privateCacheService = new BlobCacheService(
+                new PrivateBlobStorageService(
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                    Configuration),
+                provider.GetRequiredService<ILogger<BlobCacheService>>()
+            );
+            var publicCacheService = new BlobCacheService(
+                new PublicBlobStorageService(
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                    Configuration),
+                provider.GetRequiredService<ILogger<BlobCacheService>>()
+            );
+            BlobCacheAttribute.AddService("default", privateCacheService);
+            BlobCacheAttribute.AddService("public", publicCacheService);
 
             UpdateDatabase(app, env);
 
@@ -829,23 +834,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .GetRequiredService<BootstrapUsersService>()
                     .AddBootstrapUsers();
             }
-        }
-
-        private IBlobCacheService GetBlobCacheService(IServiceProvider provider, string connectionStringKey)
-        {
-            return new BlobCacheService(
-                blobStorageService: GetBlobStorageService(provider, connectionStringKey),
-                logger: provider.GetRequiredService<ILogger<BlobCacheService>>());
-        }
-
-        private IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
-        {
-            var connectionString = Configuration.GetValue<string>(connectionStringKey);
-            return new BlobStorageService(
-                connectionString,
-                new BlobServiceClient(connectionString),
-                provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                new StorageInstanceCreationUtil());
         }
 
         private static void ApplyCustomMigrations(params ICustomMigration[] migrations)

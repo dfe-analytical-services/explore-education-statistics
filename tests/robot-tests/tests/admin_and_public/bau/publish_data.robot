@@ -2,6 +2,7 @@
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -36,6 +37,11 @@ Create new publication and release via API
 Navigate to release
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_1_NAME}
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -360,17 +366,78 @@ Check created table has footnotes
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Save data block as a featured table
-    user enters text into element    id:dataBlockDetailsForm-name    UI Test data block name
-    user enters text into element    id:dataBlockDetailsForm-heading    UI Test table title
-    user enters text into element    id:dataBlockDetailsForm-source    UI Test source
+    user enters text into element    label:Name    UI Test data block name 1
+    user enters text into element    label:Table title    UI Test table title 1
+    user enters text into element    label:Source    UI Test source 1
 
     user clicks checkbox    Set as a featured table for this publication
-    user waits until page contains element    id:dataBlockDetailsForm-highlightName
-    user enters text into element    id:dataBlockDetailsForm-highlightName    Test highlight name
-    user enters text into element    id:dataBlockDetailsForm-highlightDescription    Test highlight description
+    user waits until page contains element    label:Featured table name
+    user enters text into element    label:Featured table name    Test highlight name 1
+    user enters text into element    label:Featured table description    Test highlight description 1
 
     user clicks button    Save data block
     user waits until page contains    Delete this data block
+
+Create another new data block
+    user clicks link    Create another data block
+    user waits until h2 is visible    Create data block
+    user waits until table tool wizard step is available    1    Select a data set
+
+Select subject "${SUBJECT_2_NAME}"
+    user waits until page contains    ${SUBJECT_2_NAME}
+    user clicks radio    ${SUBJECT_2_NAME}
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Select locations
+    user waits until table tool wizard step is available    2    Choose locations
+    user opens details dropdown    Opportunity area
+    user clicks checkbox    Bolton 001
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Select time period
+    user waits until table tool wizard step is available    3    Choose time period
+    user chooses select option    id:timePeriodForm-start    2009
+    user chooses select option    id:timePeriodForm-end    2017
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+
+Create table
+    user waits until button is enabled    Create table
+    user clicks button    Create table
+
+Save data block as a featured table
+    user enters text into element    label:Name    UI Test data block name 2
+    user enters text into element    label:Table title    UI Test table title 2
+    user enters text into element    label:Source    UI Test source 2
+
+    user clicks checkbox    Set as a featured table for this publication
+    user waits until page contains element    label:Featured table name
+    user enters text into element    label:Featured table name    Test highlight name 2
+    user enters text into element    label:Featured table description    Test highlight description 2
+
+    user clicks button    Save data block
+    user waits until page contains    Delete this data block
+
+Check data blocks are shown in the featured tables table
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_MEDIUM}
+
+    user checks table cell contains    1    1    UI Test data block name 1    testid:featuredTables
+    user checks table cell contains    2    1    UI Test data block name 2    testid:featuredTables
+
+Reorder featured tables
+    user clicks button    Reorder featured tables
+    user sets focus to element    css:tbody tr:first-child
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}
+    user clicks button    Save order
+
+Check featured tables were reordered
+    user checks table cell contains    1    1    UI Test data block name 2    testid:featuredTables
+    user checks table cell contains    2    1    UI Test data block name 1    testid:featuredTables
 
 Edit footnote
     user clicks link    Footnotes
@@ -423,6 +490,11 @@ Check footnotes were reordered on data block
     user checks list has x items    testid:footnotes    2
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Add public prerelease access list for release
     user clicks link    Pre-release access
@@ -532,7 +604,7 @@ Validate table has footnotes
     user checks list has x items    testid:footnotes    3
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
-Select featured table from subjects step
+Validate featured tables are reordered
     user clicks element    testid:wizardStep-2-goToButton
     user waits until h2 is visible    Go back to previous step
     user clicks button    Confirm
@@ -542,12 +614,18 @@ Select featured table from subjects step
 
     user clicks radio    ${SUBJECT_2_NAME}
 
-    user checks element count is x    css:[data-testid="featuredTables"] li    1
-    user checks element should contain    css:[data-testid="featuredTables"] li:first-child a    Test highlight name
-    user checks element should contain    css:[data-testid="featuredTables"] li:first-child p
-    ...    Test highlight description
+    user checks element count is x    css:[data-testid="featuredTables"] li    2
 
-    user clicks link    Test highlight name
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child a    Test highlight name 2
+    user checks element should contain    css:[data-testid="featuredTables"] li:first-child p
+    ...    Test highlight description 2
+
+    user checks element should contain    css:[data-testid="featuredTables"] li:nth-child(2) a    Test highlight name 1
+    user checks element should contain    css:[data-testid="featuredTables"] li:nth-child(2) p
+    ...    Test highlight description 1
+
+Select featured table from subjects step
+    user clicks link    Test highlight name 1
     user waits until results table appears    %{WAIT_LONG}
     user waits until page contains element
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2017"]

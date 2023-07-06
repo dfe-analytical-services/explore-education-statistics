@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
@@ -94,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             };
         }
 
-        private async Task<IEnumerable<(Filter Filter, string Column, string FilterGroupingColumn)>> GetFilters(
+        private async Task<IEnumerable<(Filter Filter, string Column)>> GetFilters(
             IEnumerable<MetaRow> metaRows, Subject subject, StatisticsDbContext context)
         {
             var filters = await context
@@ -104,13 +105,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 .ThenInclude(group => group.FilterItems)
                 .Where(filter => filter.SubjectId == subject.Id)
                 .ToListAsync();
-            
+
             return metaRows
                 .Where(row => row.ColumnType == ColumnType.Filter)
                 .Select(filter => (
                     filter: filters.Single(f => f.Name == filter.ColumnName),
-                    column: filter.ColumnName,
-                    filterGroupingColumn: filter.FilterGroupingColumn))
+                    column: filter.ColumnName))
                 .ToList();
         }
 

@@ -275,19 +275,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
         }
         
         private static FileImportService BuildFileImportService(
-            IBlobStorageService blobStorageService = null,
+            IPrivateBlobStorageService privateBlobStorageService = null,
             IImporterService importerService = null,
             ILogger<FileImportService> logger = null,
-            IDataImportService dataImportService = null,
-            IImporterMetaService importerMetaService = null
-            )
+            IDataImportService dataImportService = null)
         {
             return new FileImportService(
                 logger ?? Mock.Of<ILogger<FileImportService>>(),
-                blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(Strict),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
-                importerService ?? Mock.Of<IImporterService>(Strict),
-                importerMetaService ?? Mock.Of<IImporterMetaService>(Strict));
+                importerService ?? Mock.Of<IImporterService>(Strict));
         }
     }
 }

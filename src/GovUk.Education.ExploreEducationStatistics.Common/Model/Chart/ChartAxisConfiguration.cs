@@ -73,6 +73,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public AxisReferenceLineStyle? Style;
 
         public int? OtherAxisPosition;
+
+        public string? OtherAxisStart;
+
+        public string? OtherAxisEnd;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]

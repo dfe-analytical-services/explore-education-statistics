@@ -113,7 +113,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
             }
 
+            if (!await ReleaseHasKeyStatistic(release.Id) && !await ReleaseHasNonEmptyHeadlineBlock(release.Id))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock));
+            }
+
             return errors;
+        }
+
+        private async Task<bool> ReleaseHasKeyStatistic(Guid releaseId)
+        {
+            return await _contentDbContext.KeyStatistics
+                .AnyAsync(ks => ks.ReleaseId == releaseId);
+        }
+
+        private async Task<bool> ReleaseHasNonEmptyHeadlineBlock(Guid releaseId)
+        {
+            var headlineBlockList = await _contentDbContext.ReleaseContentSections
+                .Include(rcs => rcs.ContentSection.Content)
+                .Where(rcs =>
+                    rcs.ReleaseId == releaseId
+                    && rcs.ContentSection.Type == ContentSectionType.Headlines)
+                .SelectMany(rcs => rcs.ContentSection.Content)
+                .ToListAsync();
+
+            return headlineBlockList.Any(block => block is not HtmlBlock htmlBlock || !htmlBlock.Body.IsNullOrEmpty());
         }
 
         private async Task<bool> ReleaseHasEmptyGenericContentSection(Guid releaseId)
@@ -139,14 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
 
             return releaseGenericContentBlocks
-                .Any(block =>
-                {
-                    if (block is HtmlBlock htmlBlock)
-                    {
-                        return htmlBlock.Body.IsNullOrEmpty();
-                    }
-                    return false;
-                });
+                .Any(block => block is HtmlBlock htmlBlock && htmlBlock.Body.IsNullOrEmpty());
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)

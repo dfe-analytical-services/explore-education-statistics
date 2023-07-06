@@ -72,13 +72,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
             
             services.AddMvc(options =>
-            {
-                options.Filters.Add(new OperationCancelledExceptionFilter());
-                options.RespectBrowserAcceptHeader = true;
-                options.ReturnHttpNotAcceptable = true;
-                options.EnableEndpointRouting = false;
+                {
+                    options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.RespectBrowserAcceptHeader = true;
+                    options.ReturnHttpNotAcceptable = true;
+                    options.EnableEndpointRouting = false;
 
-            })
+                })
                 .AddNewtonsoftJson(options => {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                                 .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
                                 .AddBulkOperationSupport()
                                 .EnableCustomRetryOnFailure()
-                        )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                             providerOptions
                                 .MigrationsAssembly(typeof(Startup).Assembly.FullName)
                                 .EnableCustomRetryOnFailure()
-                            )
+                    )
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -129,12 +129,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Services
             //
 
-            var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
-
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
-            services.AddTransient<IBlobCacheService, BlobCacheService>();
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
+            services.AddTransient<IBlobCacheService, BlobCacheService>(provider => new BlobCacheService(
+                provider.GetRequiredService<IPublicBlobStorageService>(),
+                provider.GetRequiredService<ILogger<BlobCacheService>>()
+            ));
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
@@ -143,12 +145,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<ISubjectResultMetaService, SubjectResultMetaService>();
             services.AddTransient<ISubjectCsvMetaService, SubjectCsvMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
-            services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
-                new BlobStorageService(
-                        publicStorageConnectionString,
-                        new BlobServiceClient(publicStorageConnectionString),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                        new StorageInstanceCreationUtil()));
             services.AddTransient<IReleaseFileBlobService, PublicReleaseFileBlobService>();
             services.AddTransient<IFilterItemRepository, FilterItemRepository>();
             services.AddTransient<IFilterRepository, FilterRepository>();

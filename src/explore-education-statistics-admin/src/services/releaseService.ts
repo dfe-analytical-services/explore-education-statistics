@@ -139,6 +139,7 @@ export const ReleaseChecklistErrorCode = [
   'ReleaseNoteRequired',
   'EmptyContentSectionExists',
   'GenericSectionsContainEmptyHtmlBlock',
+  'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock',
 ] as const;
 
 export type ReleaseChecklistError = {
