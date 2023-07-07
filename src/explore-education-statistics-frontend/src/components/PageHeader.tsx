@@ -17,7 +17,7 @@ const PageHeader = () => (
             >
               <span className="govuk-header__logotype">
                 <img
-                  alt="GOV.UK"
+                  alt=""
                   src={logo.src}
                   className="govuk-header__logotype-crown-fallback-image"
                 />
