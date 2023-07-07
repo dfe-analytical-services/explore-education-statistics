@@ -1,4 +1,5 @@
 *** Settings ***
+Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
@@ -88,7 +89,6 @@ Update legacy release
     user enters text into element    id:legacyReleaseForm-description    ${UPDATED_DESCRIPTION}
     user enters text into element    id:legacyReleaseForm-url    http://test2.com
     user clicks button    Save legacy release
-    sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
 
 Validate updated legacy release
     user waits until h2 is visible    Legacy releases
@@ -98,7 +98,13 @@ Validate updated legacy release
     user checks table cell contains    1    3    http://test2.com
 
 Validate public frontend shows changes made to legacy release after saving publication
+    user waits for caches to expire
+
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+
+    user reloads the stale cached page
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
     user opens details dropdown    View releases (1)
 

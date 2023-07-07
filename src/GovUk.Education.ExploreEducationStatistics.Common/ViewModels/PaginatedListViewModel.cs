@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
@@ -17,6 +18,13 @@ public record PaginatedListViewModel<T>
     {
         Results = results;
         Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults);
+    }
+
+    [JsonConstructor]
+    public PaginatedListViewModel(List<T> results, PagingViewModel paging)
+    {
+        Results = results;
+        Paging = paging;
     }
 
     /// <summary>
