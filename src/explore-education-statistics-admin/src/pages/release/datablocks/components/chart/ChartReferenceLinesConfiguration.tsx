@@ -6,7 +6,6 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
 import Tooltip from '@common/components/Tooltip';
-import VisuallyHidden from '@common/components/VisuallyHidden';
 import {
   AxisType,
   ChartDefinitionAxis,

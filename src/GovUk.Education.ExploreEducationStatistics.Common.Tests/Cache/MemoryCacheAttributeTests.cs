@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using Moq;
 using NCrontab;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedules;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
@@ -18,9 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache;
 [Collection(CacheTestFixture.CollectionName)]
 public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposable
 {
-    private const string HourlyExpirySchedule = "0 * * * *";
-    private const string HalfHourlyExpirySchedule = "*/30 * * * *";
-    
     private readonly Mock<IMemoryCacheService> _memoryCacheService = new(MockBehavior.Strict);
 
     public MemoryCacheAttributeTests()

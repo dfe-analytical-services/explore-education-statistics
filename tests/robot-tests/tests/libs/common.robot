@@ -982,3 +982,6 @@ user takes html snapshot of element
     ${element}=    lookup or return webelement    ${selector_or_webelement}
     ${filepath}=    take html snapshot of element    ${element}    ${filename}
     [Return]    ${filepath}
+
+user waits for caches to expire
+    sleep    %{WAIT_CACHE_EXPIRY}

@@ -730,11 +730,16 @@ Approve amendment for scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify amendment is on Find Statistics page again
+    user waits for caches to expire
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Navigate to amendment release page
     user clicks link    ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+
+    user reloads the stale cached page
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+
     user waits until page contains title caption    ${RELEASE_NAME}
 
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
@@ -948,8 +953,12 @@ Verify published date on publication page has been updated
     user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
 Navigate to amended public release
+    user waits for caches to expire
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+
+    user reloads the stale cached page
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Verify public published date has been updated
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}
