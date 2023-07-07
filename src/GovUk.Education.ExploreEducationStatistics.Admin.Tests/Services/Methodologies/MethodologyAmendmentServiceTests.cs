@@ -80,18 +80,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var methodologyService = new Mock<IMethodologyService>(Strict);
                 var service = BuildService(context, methodologyService: methodologyService.Object);
 
-                var amendmentIdCapture = new List<Guid>();
+                var amendmentCapture = new List<MethodologyVersion>();
                 var viewModel = new MethodologyVersionViewModel();
 
                 methodologyService
-                    .Setup(s => s.GetMethodology(Capture.In(amendmentIdCapture)))
+                    .Setup(s => s.BuildMethodologyVersionViewModel(Capture.In(amendmentCapture)))
                     .ReturnsAsync(viewModel);
 
                 var result = await service.CreateMethodologyAmendment(originalVersion.Id);
                 VerifyAllMocks(methodologyService);
 
                 result.AssertRight(viewModel);
-                amendmentId = Assert.Single(amendmentIdCapture);
+                var amendment = Assert.Single(amendmentCapture);
+                amendmentId = amendment.Id;
             }
 
             // Check that the amendment was successfully saved.  More detailed field-by-field testing is available in
@@ -178,18 +179,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var methodologyService = new Mock<IMethodologyService>(Strict);
                 var service = BuildService(context, methodologyService: methodologyService.Object);
 
-                var amendmentIdCapture = new List<Guid>();
+                var amendmentCapture = new List<MethodologyVersion>();
                 var viewModel = new MethodologyVersionViewModel();
 
                 methodologyService
-                    .Setup(s => s.GetMethodology(Capture.In(amendmentIdCapture)))
+                    .Setup(s => s.BuildMethodologyVersionViewModel(Capture.In(amendmentCapture)))
                     .ReturnsAsync(viewModel);
 
                 var result = await service.CreateMethodologyAmendment(originalVersion.Id);
                 VerifyAllMocks(methodologyService);
 
                 result.AssertRight(viewModel);
-                amendmentId = Assert.Single(amendmentIdCapture);
+                var amendment = Assert.Single(amendmentCapture);
+                amendmentId = amendment.Id;
             }
 
             // Check that the Methodology Files were successfully linked to the Amendment.
