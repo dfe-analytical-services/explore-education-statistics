@@ -213,10 +213,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     q.Include(m => m.Methodology))
                 .OnSuccess(methodology => UpdateStatus(methodology, request))
                 .OnSuccess(methodology => UpdateDetails(methodology, request))
-                .OnSuccess(_ => GetMethodology(id));
+                .OnSuccess(BuildMethodologyVersionViewModel);
         }
 
-        private async Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
+        public async Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
             MethodologyVersion methodologyVersion)
         {
             var loadedMethodology = _context.AssertEntityLoaded(methodologyVersion);
