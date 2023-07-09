@@ -5,9 +5,9 @@ const path = require('path');
 
 const cspConnectSrc = [
   "'self'",
-  process.env.CONTENT_API_BASE_URL.replace('/api', ''),
-  process.env.DATA_API_BASE_URL.replace('/api', ''),
-  process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
+  process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace('/api', ''),
+  process.env.NEXT_PUBLIC_DATA_API_BASE_URL.replace('/api', ''),
+  process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL.replace('/api', ''),
   'https://www.google-analytics.com',
   'https://dc.services.visualstudio.com/v2/track',
 ];
@@ -88,7 +88,10 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        hostname: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+        hostname: process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace(
+          '/api',
+          '',
+        ),
       },
     ],
     formats: ['image/avif', 'image/webp'],
