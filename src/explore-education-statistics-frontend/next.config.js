@@ -153,7 +153,7 @@ const nextConfig = {
       config.plugins.push(
         new ForkTsCheckerPlugin({
           typescript: {
-            configFile: path.resolve(__dirname, 'src/tsconfig.json'),
+            configFile: path.resolve(__dirname, 'tsconfig.json'),
           },
         }),
       );

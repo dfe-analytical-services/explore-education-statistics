@@ -1,7 +1,6 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
 import '../styles/_all.scss';
-
 import {
   ApplicationInsightsContextProvider,
   useApplicationInsights,
@@ -10,20 +9,16 @@ import useMounted from '@common/hooks/useMounted';
 import { contentApi, dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
-import loadEnv from '@frontend/loadEnv';
 import notificationApi from '@frontend/services/clients/notificationApi';
-import NextApp, { AppContext, AppProps } from 'next/app';
+import { AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { parseCookies } from 'nookies';
 import React, { useEffect, useState } from 'react';
 import {
   Hydrate,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-
-loadEnv();
 
 const ApplicationInsightsTracking = () => {
   const appInsights = useApplicationInsights();
@@ -54,8 +49,6 @@ const App = ({ Component, pageProps, cookies }: Props) => {
   const router = useRouter();
   const { getCookie } = useCookies(cookies);
   const [queryClient] = useState(() => new QueryClient());
-
-  loadEnv();
 
   contentApi.axios.defaults.baseURL =
     process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL;
@@ -96,17 +89,6 @@ const App = ({ Component, pageProps, cookies }: Props) => {
       </QueryClientProvider>
     </ApplicationInsightsContextProvider>
   );
-};
-
-App.getInitialProps = async (appContext: AppContext) => {
-  const appProps = await NextApp.getInitialProps(appContext);
-
-  loadEnv();
-
-  return {
-    ...appProps,
-    cookies: parseCookies(appContext.ctx),
-  };
 };
 
 export default App;
