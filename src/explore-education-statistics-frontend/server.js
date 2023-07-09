@@ -19,11 +19,9 @@ if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
 
 const basicAuth = require('express-basic-auth');
 const express = require('express');
-const helmet = require('helmet');
 const nextApp = require('next');
 const { loadEnvConfig } = require('@next/env');
 const path = require('path');
-const referrerPolicy = require('referrer-policy');
 
 loadEnvConfig(__dirname);
 
@@ -42,60 +40,7 @@ async function startServer(port = process.env.PORT || 3000) {
     process.exit(1);
   }
 
-  const cspConnectSrc = [
-    "'self'",
-    process.env.CONTENT_API_BASE_URL.replace('/api', ''),
-    process.env.DATA_API_BASE_URL.replace('/api', ''),
-    process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
-    'https://*.googletagmanager.com',
-    'https://*.google-analytics.com',
-    'https://*.analytics.google.com',
-    'https://dc.services.visualstudio.com/v2/track',
-  ];
-
-  const cspScriptSrc = [
-    "'self'",
-    'https://*.googletagmanager.com',
-    'https://*.google-analytics.com/',
-    'https://*.analytics.google.com',
-    "'unsafe-inline'",
-    "'unsafe-eval'",
-  ];
-
   const server = express();
-
-  // Use Helmet for configuration of headers and disable express powered by header
-  server.disable('x-powered-by');
-  server.use(
-    helmet({
-      contentSecurityPolicy: {
-        directives: {
-          defaultSrc: ["'self'"],
-          scriptSrc: cspScriptSrc,
-          styleSrc: ["'self'", "'unsafe-inline'"],
-          imgSrc: [
-            "'self'",
-            process.env.CONTENT_API_BASE_URL.replace('/api', ''),
-            'data:',
-            'https://*.googletagmanager.com',
-            'https://*.google-analytics.com/',
-            'https://*.analytics.google.com',
-          ],
-          fontSrc: ["'self'"],
-          connectSrc:
-            process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
-          frameSrc: [
-            "'self'",
-            'https://department-for-education.shinyapps.io/',
-            'https://dfe-analytical-services.github.io/',
-          ],
-          frameAncestors: ["'self'"],
-          childSrc: ["'self'"],
-        },
-      },
-    }),
-  );
-  server.use(referrerPolicy({ policy: 'no-referrer-when-downgrade' }));
 
   if (process.env.BASIC_AUTH === 'true') {
     server.use(
