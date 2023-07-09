@@ -1,12 +1,12 @@
 import Client from '@common/services/api/Client';
-import { commaSeparated } from '@common/services/util/paramSerializers';
 import axios from 'axios';
+import qs from 'qs';
 
 export const baseURL = '/api/';
 
 const axiosInstance = axios.create({
   baseURL,
-  paramsSerializer: commaSeparated,
+  paramsSerializer: params => qs.stringify(params, { arrayFormat: 'comma' }),
 });
 
 const client = new Client(axiosInstance);
