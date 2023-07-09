@@ -27,6 +27,7 @@
   overflow: auto;
   padding-left: 0;
   padding-top: 0;
+
   &:focus {
     border: $govuk-focus-width solid #000;
     outline: $govuk-focus-colour solid $govuk-focus-width;

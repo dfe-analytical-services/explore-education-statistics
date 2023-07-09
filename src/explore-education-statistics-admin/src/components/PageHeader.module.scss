@@ -38,10 +38,12 @@ $envs: (
     :global(.govuk-header__container) {
       border-color: $colour;
     }
+
     :global(.govuk-header__logotype) {
       align-items: center;
       display: inline-flex;
     }
+
     :global(.govuk-header__logotype::after) {
       background-color: $colour;
       color: $text-colour;
@@ -52,6 +54,7 @@ $envs: (
       padding: 0.25rem 0.4rem;
       text-transform: uppercase;
     }
+
     :global(.govuk-header__logotype-text) {
       margin-left: 0.5rem;
     }
