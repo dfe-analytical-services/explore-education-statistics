@@ -1,10 +1,6 @@
-import { mixed } from 'yup';
+import * as Yup from 'yup';
 
-const MixedSchema = mixed;
-
-class FileSchema extends MixedSchema {
-  private isNullable = true;
-
+export default class FileSchema extends Yup.MixedSchema<File> {
   constructor() {
     super({ type: 'file' });
 
@@ -19,31 +15,17 @@ class FileSchema extends MixedSchema {
     });
   }
 
-  // eslint-disable-next-line no-underscore-dangle,class-methods-use-this
-  private _typeCheck(value: unknown): boolean {
-    if (this.isNullable && value === null) {
-      return true;
-    }
-
-    return value instanceof File;
-  }
-
-  public nullable(isNullable = true): FileSchema {
-    const clone = this.clone();
-    clone.isNullable = isNullable;
-    return clone;
-  }
-
-  public required(message: string): FileSchema {
+  required(message: string): FileSchema {
     return super.required(message) as this;
   }
 
-  public minSize(minBytes: number, message: string): FileSchema {
+  minSize(minBytes: number, message?: string): FileSchema {
     return this.test({
       name: 'minSize',
-      message,
+      message: message || 'File must be larger than 0 bytes',
       exclusive: true,
-      test(value?: File) {
+
+      test(value) {
         if (!value) {
           return true;
         }
@@ -53,5 +35,3 @@ class FileSchema extends MixedSchema {
     });
   }
 }
-
-export default FileSchema;

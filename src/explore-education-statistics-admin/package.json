@@ -93,7 +93,7 @@
     "webpack-manifest-plugin": "^4.0.2",
     "whatwg-fetch": "^3.4.1",
     "workbox-webpack-plugin": "^6.4.1",
-    "yup": "^0.29.3"
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^7.24.4",
@@ -122,7 +122,6 @@
     "@types/testing-library__react-hooks": "^3.4.1",
     "@types/testing-library__user-event": "^4.2.0",
     "@types/turndown": "^5.0.0",
-    "@types/yup": "^0.28.3",
     "@typescript-eslint/eslint-plugin": "^5.59.11",
     "@typescript-eslint/parser": "^5.59.11",
     "babel-jest": "^26.5.2",

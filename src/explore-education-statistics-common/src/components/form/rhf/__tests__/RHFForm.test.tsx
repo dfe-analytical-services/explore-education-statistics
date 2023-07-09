@@ -147,7 +147,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
       >
         <RHFForm id="test-form" onSubmit={handleSubmitForm}>
@@ -171,7 +171,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
       >
         <RHFForm
@@ -293,7 +293,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
@@ -339,7 +339,7 @@ describe('Form', () => {
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
@@ -371,7 +371,7 @@ describe('Form', () => {
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (

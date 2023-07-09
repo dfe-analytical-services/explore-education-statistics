@@ -34,7 +34,7 @@
     "referrer-policy": "^1.2.0",
     "use-immer": "^0.6.0",
     "webpack": "^5.57.1",
-    "yup": "^0.29.3"
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.11.6",
@@ -61,7 +61,6 @@
     "@types/testing-library__react-hooks": "^3.4.1",
     "@types/testing-library__user-event": "^4.2.0",
     "@types/whatwg-fetch": "0.0.33",
-    "@types/yup": "^0.28.3",
     "@webcomponents/shadydom": "^1.8.0",
     "babel-core": "7.0.0-bridge.0",
     "babel-jest": "^26.5.2",
@@ -101,7 +100,7 @@
     "test:coverage": "jest --coverage",
     "test:watch": "jest --watch",
     "test:snapshot": "jest --updateSnapshot",
-    "tsc": "tsc --noEmit -p src/tsconfig.json"
+    "tsc": "tsc --noEmit"
   },
   "browserslist": [
     ">0.2%",

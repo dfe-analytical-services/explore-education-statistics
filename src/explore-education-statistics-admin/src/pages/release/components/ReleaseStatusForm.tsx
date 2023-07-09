@@ -36,7 +36,6 @@ import { endOfDay, format, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
 import { keyBy, mapValues } from 'lodash';
 import React, { useMemo } from 'react';
-import { StringSchema } from 'yup';
 
 export interface ReleaseStatusFormValues {
   publishMethod?: 'Scheduled' | 'Immediate';
@@ -144,22 +143,20 @@ const ReleaseStatusForm = ({
 
   const validationSchema = useMemo(() => {
     const schema = Yup.object<ReleaseStatusFormValues>({
-      approvalStatus: Yup.string().required('Choose a status') as StringSchema<
-        ReleaseStatusFormValues['approvalStatus']
-      >,
+      approvalStatus: Yup.string().required('Choose a status'),
       internalReleaseNote: Yup.string().when('approvalStatus', {
-        is: value => ['Approved', 'HigherLevelReview'].includes(value),
-        then: Yup.string().required('Enter an internal note'),
+        is: (value: string) =>
+          ['Approved', 'HigherLevelReview'].includes(value),
+        then: s => s.required('Enter an internal note'),
       }),
       publishMethod: Yup.string().when('approvalStatus', {
         is: 'Approved',
-        then: Yup.string().required('Choose when to publish'),
-      }) as StringSchema<ReleaseStatusFormValues['publishMethod']>,
+        then: s => s.required('Choose when to publish'),
+      }),
       publishScheduled: Yup.date().when('publishMethod', {
         is: 'Scheduled',
-        then: Yup.date()
-          .required('Enter a valid publish date')
-          .test({
+        then: s =>
+          s.required('Enter a valid publish date').test({
             name: 'validDateIfAfterToday',
             message: `Publish date cannot be before ${format(
               new Date(),
@@ -170,25 +167,26 @@ const ReleaseStatusForm = ({
             },
           }),
       }),
-      nextReleaseDate: Yup.object<PartialDate>({
-        day: Yup.number().notRequired(),
-        month: Yup.number(),
-        year: Yup.number(),
-      })
+      nextReleaseDate: Yup.object<PartialDate>()
+        .shape({
+          day: Yup.number().notRequired(),
+          month: Yup.number(),
+          year: Yup.number(),
+        })
         .notRequired()
         .test({
           name: 'validDate',
           message: 'Enter a valid next release date',
-          test(value: PartialDate) {
-            if (isPartialDateEmpty(value)) {
+          test: value => {
+            if (isPartialDateEmpty(value as PartialDate)) {
               return true;
             }
 
-            if (!isValidPartialDate(value)) {
+            if (!isValidPartialDate(value as PartialDate)) {
               return false;
             }
 
-            return isValid(parsePartialDateToLocalDate(value));
+            return isValid(parsePartialDateToLocalDate(value as PartialDate));
           },
         }),
     });
@@ -196,12 +194,12 @@ const ReleaseStatusForm = ({
     if (release.amendment) {
       return schema.shape({
         notifySubscribers: Yup.boolean().when('approvalStatus', {
-          is: value => value === 'Approved',
-          then: Yup.boolean().required(),
+          is: (value: string) => value === 'Approved',
+          then: s => s.required(),
         }),
         updatePublishedDate: Yup.boolean().when('approvalStatus', {
-          is: value => value === 'Approved',
-          then: Yup.boolean().required(),
+          is: (value: string) => value === 'Approved',
+          then: s => s.required(),
         }),
       });
     }

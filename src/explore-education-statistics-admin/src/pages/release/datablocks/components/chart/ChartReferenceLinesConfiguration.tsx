@@ -89,15 +89,17 @@ export default function ChartReferenceLinesConfiguration({
     const schema = Yup.object<AddFormValues>({
       label: Yup.string().required('Enter label'),
       position: Yup.string()
+
         .required('Enter position')
         .test({
           name: 'axisPosition',
           message: `Enter a position within the ${
             axis === 'x' ? 'X' : 'Y'
           } axis min/max range`,
-          test: (value: number) => {
+          test: value => {
             return type === 'minor' && minorAxisDomain
-              ? value >= minorAxisDomain?.min && value <= minorAxisDomain.max
+              ? parseInt(value, 10) >= minorAxisDomain?.min &&
+                  parseInt(value, 10) <= minorAxisDomain.max
               : true;
           },
         }),
@@ -111,13 +113,13 @@ export default function ChartReferenceLinesConfiguration({
         otherAxisEnd: Yup.string()
           .when('otherAxisPositionType', {
             is: otherAxisPositionTypes.betweenDataPoints,
-            then: Yup.string().required('Enter end point'),
-            otherwise: Yup.string(),
+            then: s => s.required('Enter end point').min(1),
+            otherwise: s => s.notRequired(), // before it was .string(). Dobule check tests luke
           })
           .test(
             'otherAxisEnd',
             'End point cannot match start point',
-            function checkotherAxisEnd(value: number) {
+            function checkotherAxisEnd(value) {
               /* eslint-disable react/no-this-in-sfc */
               if (this.parent.otherAxisStart) {
                 return value !== this.parent.otherAxisStart;
@@ -128,24 +130,42 @@ export default function ChartReferenceLinesConfiguration({
           ),
         otherAxisStart: Yup.string().when('otherAxisPositionType', {
           is: otherAxisPositionTypes.betweenDataPoints,
-          then: Yup.string().required('Enter start point'),
-          otherwise: Yup.string(),
+          then: s => s.required('Enter start point').min(1),
+          otherwise: s => s.notRequired(), // before it was .string(). Dobule check tests luke
         }),
-        otherAxisPosition: Yup.number().when('otherAxisPositionType', {
+        // otherAxisPosition: Yup.number().when('otherAxisPositionType', {
+        //   is: otherAxisPositionTypes.custom,
+        //   then: Yup.number()
+        //     .required('Enter a percentage between 0 and 100%')
+        //     .test({
+        //       name: 'otherAxisPosition',
+        //       message: 'Enter a percentage between 0 and 100%',
+        //       test: (value: number) => {
+        //         if (typeof value !== 'number') {
+        //           return true;
+        //         }
+        //         return value >= 0 && value <= 100;
+        //       },
+        //     }),
+        //   otherwise: Yup.number(),
+        // }),
+        otherAxiosPosition: Yup.number().when('otherAxisPositionType', {
           is: otherAxisPositionTypes.custom,
-          then: Yup.number()
-            .required('Enter a percentage between 0 and 100%')
-            .test({
-              name: 'otherAxisPosition',
-              message: 'Enter a percentage between 0 and 100%',
-              test: (value: number) => {
-                if (typeof value !== 'number') {
-                  return true;
-                }
-                return value >= 0 && value <= 100;
-              },
-            }),
-          otherwise: Yup.number(),
+          then: s =>
+            s
+              .required('Enter a percentage between 0 and 100%')
+              .min(0)
+              .test({
+                name: 'otherAxisPosition',
+                message: 'Enter a percentage between 0 and 100%',
+                test: (value: number) => {
+                  if (typeof value !== 'number') {
+                    return true;
+                  }
+                  return value >= 0 && value <= 100;
+                },
+              }),
+          otherwise: s => s.notRequired(),
         }),
       });
     }
@@ -156,7 +176,7 @@ export default function ChartReferenceLinesConfiguration({
         message: `Enter a position within the ${
           axis === 'x' ? 'Y' : 'X'
         } axis min/max range`,
-        test: (value: number) => {
+        test: value => {
           if (typeof value !== 'number') {
             return true;
           }

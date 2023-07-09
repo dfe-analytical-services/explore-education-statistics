@@ -62,13 +62,12 @@ const MethodologySummaryForm = ({
         } as MethodologySummaryFormValues)
       }
       validationSchema={Yup.object<MethodologySummaryFormValues>({
-        titleType: Yup.mixed<MethodologySummaryFormValues['titleType']>()
-          .oneOf(['default', 'alternative'])
-          .required('Choose a title type'),
+        titleType: Yup.string()
+          .required('Choose a title type')
+          .oneOf(['default', 'alternative']),
         title: Yup.string().when('titleType', {
           is: 'alternative',
-          then: Yup.string().required('Enter a methodology title'),
-          otherwise: Yup.string(),
+          then: s => s.required('Enter a methodology title'),
         }),
       })}
       onSubmit={handleSubmit}

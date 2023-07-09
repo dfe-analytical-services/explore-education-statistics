@@ -47,7 +47,7 @@
     "use-immer": "^0.6.0",
     "uuid": "^8.3.1",
     "xlsx": "^0.17.4",
-    "yup": "^0.29.3"
+    "yup": "^1.2.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^7.24.4",
@@ -77,7 +77,6 @@
     "@types/testing-library__react-hooks": "^3.4.1",
     "@types/testing-library__user-event": "^4.2.0",
     "@types/uuid": "^8.3.0",
-    "@types/yup": "^0.28.3",
     "babel-jest": "^26.5.2",
     "eslint": "^8.43.0",
     "jest": "^26.5.2",

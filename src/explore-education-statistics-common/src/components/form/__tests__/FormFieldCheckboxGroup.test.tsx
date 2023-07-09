@@ -406,7 +406,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -435,7 +435,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {props => (
@@ -476,7 +476,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -512,7 +512,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -557,7 +557,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -599,7 +599,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (

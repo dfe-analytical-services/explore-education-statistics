@@ -136,27 +136,33 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
       }}
       onSubmit={handleSubmit}
       validationSchema={() => {
-        const baseSchema = Yup.object<DataFileUploadFormValues>({
-          uploadType: Yup.mixed<
-            DataFileUploadFormValues['uploadType']
-          >().oneOf(['csv', 'zip']),
+        const baseSchema: ObjectSchema<DataFileUploadFormValues> = Yup.object({
+          uploadType: Yup.mixed<DataFileUploadFormValues['uploadType']>()
+            .oneOf(['csv', 'zip'])
+            .defined(),
           dataFile: Yup.file().when('uploadType', {
             is: 'csv',
-            then: Yup.file()
-              .required('Choose a data file')
-              .minSize(0, 'Choose a data file that is not empty'),
+            then: s =>
+              s
+                .required('Choose a data file')
+                .minSize(0, 'Choose a data file that is not empty'),
+            otherwise: s => s.nullable(),
           }),
           metadataFile: Yup.file().when('uploadType', {
             is: 'csv',
-            then: Yup.file()
-              .required('Choose a metadata file')
-              .minSize(0, 'Choose a metadata file that is not empty'),
+            then: s =>
+              s
+                .required('Choose a metadata file')
+                .minSize(0, 'Choose a metadata file that is not empty'),
+            otherwise: s => s.nullable(),
           }),
           zipFile: Yup.file().when('uploadType', {
             is: 'zip',
-            then: Yup.file()
-              .required('Choose a zip file')
-              .minSize(0, 'Choose a ZIP file that is not empty'),
+            then: s =>
+              s
+                .required('Choose a zip file')
+                .minSize(0, 'Choose a ZIP file that is not empty'),
+            otherwise: s => s.nullable(),
           }),
         });
 
