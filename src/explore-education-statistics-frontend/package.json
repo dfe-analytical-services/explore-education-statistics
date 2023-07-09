@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@next/env": "^11.1.3",
+    "@next/env": "^12.3.4",
     "@tanstack/react-query": "^4.2.1",
     "axios": "^1.4.0",
     "applicationinsights": "^1.8.7",
@@ -21,8 +21,8 @@
     "leaflet": "^1.7.1",
     "lodash": "^4.17.21",
     "memoizee": "^0.4.14",
-    "next": "^11.1.3",
-    "next-transpile-modules": "^8.0.0",
+    "next": "^12.3.4",
+    "next-transpile-modules": "^9.1.0",
     "nookies": "^2.4.0",
     "react": "17.0.2",
     "react-beautiful-dnd": "^13.0.0",
@@ -91,7 +91,7 @@
   },
   "scripts": {
     "start": "cross-env NODE_ENV=production NEXT_CONFIG_MODE=server node server.js",
-    "start:local": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 node server.js",
+    "dev": "cross-env NODE_TLS_REJECT_UNAUTHORIZED=0 node server.js",
     "build": "next build ./src",
     "lint": "pnpm lint:js && pnpm lint:style",
     "lint:js": "eslint src/**/*.{ts,tsx}",

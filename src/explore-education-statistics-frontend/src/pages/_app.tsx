@@ -46,9 +46,9 @@ const ApplicationInsightsTracking = () => {
   return null;
 };
 
-interface Props extends AppProps {
+type Props = AppProps<{ dehydratedState: unknown }> & {
   cookies: Dictionary<string>;
-}
+};
 
 const App = ({ Component, pageProps, cookies }: Props) => {
   const router = useRouter();
