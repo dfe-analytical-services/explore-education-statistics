@@ -34,6 +34,7 @@ import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import WarningMessage from '@common/components/WarningMessage';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -571,23 +572,23 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const {
-    publication: publicationSlug,
-    release: releaseSlug,
-  } = query as Dictionary<string>;
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const {
+      publication: publicationSlug,
+      release: releaseSlug,
+    } = query as Dictionary<string>;
 
-  const release = await (releaseSlug
-    ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
-    : publicationService.getLatestPublicationRelease(publicationSlug));
+    const release = await (releaseSlug
+      ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
+      : publicationService.getLatestPublicationRelease(publicationSlug));
 
-  return {
-    props: {
-      release,
-    },
-  };
-};
+    return {
+      props: {
+        release,
+      },
+    };
+  },
+);
 
 export default PublicationReleasePage;
