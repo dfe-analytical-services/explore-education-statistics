@@ -73,44 +73,44 @@ const PrototypeBauGlossary = () => {
       </div>
 
       {edit && (
-        <>
-          <form id="createMetaForm" className="govuk-!-marin-bottom-9">
-            <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
-              <h2 className="govuk-heading-m">
-                {newEntry ? 'Add new glossary item' : 'Update glossary item'}
-              </h2>
-            </legend>
-            <FormGroup>
-              <FormTextInput
-                id="name"
-                name="name"
-                label="Glossary item"
-                value={glossaryName}
-                className="govuk-!-width-one-half"
-                onChange={event => {
-                  glossaryName = event.target.value;
-                }}
-              />
-            </FormGroup>
-            <FormEditor
-              id="description"
-              label="Item description"
-              value={glossaryDescription || ''}
-              onChange={() => {
-                setEdit(true);
+        <form id="createMetaForm" className="govuk-!-marin-bottom-9">
+          <legend className="govuk-fieldset__legend govuk-fieldset__legend--l">
+            <h2 className="govuk-heading-m">
+              {newEntry ? 'Add new glossary item' : 'Update glossary item'}
+            </h2>
+          </legend>
+          <FormGroup>
+            <FormTextInput
+              id="name"
+              name="name"
+              label="Glossary item"
+              value={glossaryName}
+              className="govuk-!-width-one-half"
+              onChange={event => {
+                glossaryName = event.target.value;
               }}
             />
-            <div className="govuk-!-margin-top-9 govuk-grid-row">
-              <div className="govuk-grid-column-one-half">
-                <Button
-                  className="govuk-!-margin-right-3"
-                  onClick={() => {
-                    setEdit(false);
-                  }}
-                >
-                  Save
-                </Button>
+          </FormGroup>
+          <FormEditor
+            id="description"
+            label="Item description"
+            value={glossaryDescription || ''}
+            onChange={() => {
+              setEdit(true);
+            }}
+          />
+          <div className="govuk-!-margin-top-9 govuk-grid-row">
+            <div className="govuk-grid-column-one-half">
+              <Button
+                className="govuk-!-margin-right-3"
+                onClick={() => {
+                  setEdit(false);
+                }}
+              >
+                Save
+              </Button>
 
+<<<<<<< HEAD
                 <Button
                   variant="secondary"
                   onClick={() => {
@@ -143,9 +143,42 @@ const PrototypeBauGlossary = () => {
                   </>
                 )}
               </div>
+=======
+              <Button
+                variant="secondary"
+                onClick={() => {
+                  setEdit(false);
+                }}
+              >
+                Cancel
+              </Button>
+>>>>>>> 50a2dd93e (EES-3409 - fix eslint errors and warnings after upgrade)
             </div>
-          </form>
-        </>
+            <div className="govuk-grid-column-one-half dfe-align--right">
+              {!newEntry && (
+                <>
+                  <Button
+                    variant="warning"
+                    onClick={() => {
+                      toggleDeleteModal(true);
+                    }}
+                  >
+                    Delete this item
+                  </Button>
+                  <ModalConfirm
+                    open={showDeleteModal}
+                    title="Confirm delete"
+                    onExit={() => toggleDeleteModal(false)}
+                    onConfirm={() => toggleDeleteModal(false)}
+                    onCancel={() => toggleDeleteModal(false)}
+                  >
+                    <p>Are you sure you want to delete this item?</p>
+                  </ModalConfirm>
+                </>
+              )}
+            </div>
+          </div>
+        </form>
       )}
       {!edit && (
         <>

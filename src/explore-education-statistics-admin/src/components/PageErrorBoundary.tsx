@@ -19,12 +19,19 @@ interface State {
 class PageErrorBoundary extends Component<RouteComponentProps, State> {
   public state: State = {};
 
-  public constructor(props: RouteComponentProps) {
-    super(props);
-  }
+  private unregisterCallback?: () => void;
+
+  private errorPages = {
+    forbidden: () => {
+      this.setState({
+        errorCode: 403,
+      });
+    },
+  };
 
   public componentDidMount() {
     const { history } = this.props;
+
     this.unregisterCallback = history.listen(() => {
       this.setState({
         errorCode: undefined,
@@ -32,6 +39,14 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
     });
 
     window.addEventListener('unhandledrejection', this.handlePromiseRejections);
+  }
+
+  public componentDidCatch(error: Error) {
+    logger.error(error);
+
+    this.setState({
+      errorCode: 500,
+    });
   }
 
   public componentWillUnmount() {
@@ -45,17 +60,6 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
     );
   }
 
-  // eslint-disable-next-line react/sort-comp
-  private unregisterCallback?: () => void;
-
-  private errorPages = {
-    forbidden: () => {
-      this.setState({
-        errorCode: 403,
-      });
-    },
-  };
-
   private handlePromiseRejections = (event: PromiseRejectionEvent) => {
     this.handleError(event.reason);
   };
@@ -67,14 +71,6 @@ class PageErrorBoundary extends Component<RouteComponentProps, State> {
       errorCode: isAxiosError(error) ? error.response?.status : 500,
     });
   };
-
-  public componentDidCatch(error: Error) {
-    logger.error(error);
-
-    this.setState({
-      errorCode: 500,
-    });
-  }
 
   public render() {
     const { handleError, errorPages } = this;

@@ -5,7 +5,7 @@ import { RefObject } from 'react';
 
 /**
  * Checks element position relative to its container and adds fixed positioning if needed to make it visible.
- **/
+ */
 const usePinElementToContainer = (
   elementRef: RefObject<HTMLElement>,
   containerRef: RefObject<HTMLElement>,

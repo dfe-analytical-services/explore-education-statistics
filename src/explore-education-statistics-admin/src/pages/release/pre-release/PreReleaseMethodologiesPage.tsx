@@ -56,39 +56,37 @@ const PreReleaseMethodologiesPage = ({
               <ul className="govuk-list">
                 {model.methodologyVersions.map(methodology => (
                   <li key={methodology.id}>
-                    <>
-                      <Link
-                        to={generatePath<PreReleaseMethodologyRouteParams>(
-                          preReleaseMethodologyRoute.path,
-                          {
-                            publicationId,
-                            releaseId,
-                            methodologyId:
-                              methodology.status === 'Draft' &&
-                              methodology.previousVersionId
-                                ? methodology.previousVersionId
-                                : methodology.id,
-                          },
+                    <Link
+                      to={generatePath<PreReleaseMethodologyRouteParams>(
+                        preReleaseMethodologyRoute.path,
+                        {
+                          publicationId,
+                          releaseId,
+                          methodologyId:
+                            methodology.status === 'Draft' &&
+                            methodology.previousVersionId
+                              ? methodology.previousVersionId
+                              : methodology.id,
+                        },
+                      )}
+                    >
+                      {`${methodology.title} ${
+                        methodology.owned ? '(Owned)' : '(Adopted)'
+                      }`}
+                    </Link>
+                    <TagGroup className="govuk-!-margin-left-2">
+                      {methodology.status === 'Approved' &&
+                        !methodology.published && <Tag>Approved</Tag>}
+
+                      {((methodology.amendment &&
+                        methodology.status === 'Draft') ||
+                        methodology.published) && <Tag>Published</Tag>}
+
+                      {methodology.amendment &&
+                        methodology.status === 'Approved' && (
+                          <Tag>Amendment</Tag>
                         )}
-                      >
-                        {`${methodology.title} ${
-                          methodology.owned ? '(Owned)' : '(Adopted)'
-                        }`}
-                      </Link>
-                      <TagGroup className="govuk-!-margin-left-2">
-                        {methodology.status === 'Approved' &&
-                          !methodology.published && <Tag>Approved</Tag>}
-
-                        {((methodology.amendment &&
-                          methodology.status === 'Draft') ||
-                          methodology.published) && <Tag>Published</Tag>}
-
-                        {methodology.amendment &&
-                          methodology.status === 'Approved' && (
-                            <Tag>Amendment</Tag>
-                          )}
-                      </TagGroup>
-                    </>
+                    </TagGroup>
                   </li>
                 ))}
 

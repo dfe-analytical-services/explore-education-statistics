@@ -379,14 +379,12 @@ const ChartAxisConfiguration = ({
                     name="visible"
                     label="Show axis"
                     conditional={
-                      <>
-                        <FormFieldTextInput<AxisConfiguration>
-                          label="Displayed unit"
-                          name="unit"
-                          hint="Leave blank to set default from metadata"
-                          width={10}
-                        />
-                      </>
+                      <FormFieldTextInput<AxisConfiguration>
+                        label="Displayed unit"
+                        name="unit"
+                        hint="Leave blank to set default from metadata"
+                        width={10}
+                      />
                     }
                   />
                 )}
@@ -429,12 +427,12 @@ const ChartAxisConfiguration = ({
             <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
               {validationSchema.fields.sortAsc && (
                 <FormFieldset id="sort" legend="Sorting" legendSize="s">
-                  {/* <FormFieldSelect<AxisConfiguration>*/}
-                  {/*  id={`${id}-sortBy`}*/}
-                  {/*  name="sortBy"*/}
-                  {/*  label="Sort data by"*/}
-                  {/*  options={sortOptions}*/}
-                  {/* />*/}
+                  {/* <FormFieldSelect<AxisConfiguration> */}
+                  {/*  id={`${id}-sortBy`} */}
+                  {/*  name="sortBy" */}
+                  {/*  label="Sort data by" */}
+                  {/*  options={sortOptions} */}
+                  {/* /> */}
                   <FormFieldCheckbox<AxisConfiguration>
                     name="sortAsc"
                     label="Sort ascending"

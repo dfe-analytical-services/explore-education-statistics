@@ -310,25 +310,21 @@ const ChartLegendConfiguration = ({
           />
 
           {validationSchema.fields.position && (
-            <>
-              <FormFieldSelect<FormValues>
-                name="position"
-                hint={
-                  capabilities.canPositionLegendInline && showDataLabels
-                    ? 'The legend cannot be positioned inline when data labels are used.'
-                    : undefined
-                }
-                label="Legend position"
-                options={
-                  capabilities.canPositionLegendInline
-                    ? positionOptions
-                    : positionOptions.filter(
-                        option => option.value !== 'inline',
-                      )
-                }
-                order={FormSelect.unordered}
-              />
-            </>
+            <FormFieldSelect<FormValues>
+              name="position"
+              hint={
+                capabilities.canPositionLegendInline && showDataLabels
+                  ? 'The legend cannot be positioned inline when data labels are used.'
+                  : undefined
+              }
+              label="Legend position"
+              options={
+                capabilities.canPositionLegendInline
+                  ? positionOptions
+                  : positionOptions.filter(option => option.value !== 'inline')
+              }
+              order={FormSelect.unordered}
+            />
           )}
 
           <h4>Legend items</h4>

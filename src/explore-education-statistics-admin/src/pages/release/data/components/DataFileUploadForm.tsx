@@ -164,71 +164,69 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
       }}
     >
       {form => (
-        <>
-          <Form id={id}>
-            <div style={{ position: 'relative' }}>
-              {form.isSubmitting && (
-                <LoadingSpinner text="Uploading files" overlay />
-              )}
+        <Form id={id}>
+          <div style={{ position: 'relative' }}>
+            {form.isSubmitting && (
+              <LoadingSpinner text="Uploading files" overlay />
+            )}
 
-              {beforeFields}
+            {beforeFields}
 
-              <FormFieldRadioGroup<DataFileUploadFormValues>
-                name="uploadType"
-                legend="Choose upload method"
-                options={[
-                  {
-                    label: 'CSV files',
-                    value: 'csv',
-                    conditional: (
-                      <>
-                        <FormFieldFileInput<DataFileUploadFormValues>
-                          name="dataFile"
-                          label="Upload data file"
-                          accept=".csv"
-                        />
-
-                        <FormFieldFileInput<DataFileUploadFormValues>
-                          name="metadataFile"
-                          label="Upload metadata file"
-                          accept=".csv"
-                        />
-                      </>
-                    ),
-                  },
-                  {
-                    label: 'ZIP file',
-                    hint: 'Recommended for larger data files',
-                    value: 'zip',
-                    conditional: (
+            <FormFieldRadioGroup<DataFileUploadFormValues>
+              name="uploadType"
+              legend="Choose upload method"
+              options={[
+                {
+                  label: 'CSV files',
+                  value: 'csv',
+                  conditional: (
+                    <>
                       <FormFieldFileInput<DataFileUploadFormValues>
-                        hint="Must contain both the data and metadata CSV files"
-                        name="zipFile"
-                        label="Upload ZIP file"
-                        accept=".zip"
+                        name="dataFile"
+                        label="Upload data file"
+                        accept=".csv"
                       />
-                    ),
-                  },
-                ]}
-              />
 
-              <ButtonGroup>
-                <Button type="submit" disabled={form.isSubmitting}>
-                  {submitText}
-                </Button>
+                      <FormFieldFileInput<DataFileUploadFormValues>
+                        name="metadataFile"
+                        label="Upload metadata file"
+                        accept=".csv"
+                      />
+                    </>
+                  ),
+                },
+                {
+                  label: 'ZIP file',
+                  hint: 'Recommended for larger data files',
+                  value: 'zip',
+                  conditional: (
+                    <FormFieldFileInput<DataFileUploadFormValues>
+                      hint="Must contain both the data and metadata CSV files"
+                      name="zipFile"
+                      label="Upload ZIP file"
+                      accept=".zip"
+                    />
+                  ),
+                },
+              ]}
+            />
 
-                <ButtonText
-                  disabled={form.isSubmitting}
-                  onClick={() => {
-                    form.resetForm();
-                  }}
-                >
-                  Cancel
-                </ButtonText>
-              </ButtonGroup>
-            </div>
-          </Form>
-        </>
+            <ButtonGroup>
+              <Button type="submit" disabled={form.isSubmitting}>
+                {submitText}
+              </Button>
+
+              <ButtonText
+                disabled={form.isSubmitting}
+                onClick={() => {
+                  form.resetForm();
+                }}
+              >
+                Cancel
+              </ButtonText>
+            </ButtonGroup>
+          </div>
+        </Form>
       )}
     </Formik>
   );
