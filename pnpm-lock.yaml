@@ -306,8 +306,8 @@ importers:
         specifier: ^17.0.2
         version: 17.0.2(react@17.0.2)
       recharts:
-        specifier: ^2.1.16
-        version: 2.4.1(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2)
+        specifier: ^2.7.2
+        version: 2.7.2(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2)
       resolve:
         specifier: ^1.22.2
         version: 1.22.2
@@ -706,8 +706,8 @@ importers:
         specifier: ^3.12.1
         version: 3.16.1(react-dom@17.0.2)(react@17.0.2)
       recharts:
-        specifier: ^2.1.16
-        version: 2.4.1(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2)
+        specifier: ^2.7.2
+        version: 2.7.2(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2)
       regenerator-runtime:
         specifier: 0.13.9
         version: 0.13.9
@@ -934,8 +934,8 @@ importers:
         specifier: ^4.3.1
         version: 4.3.1(react@17.0.2)
       recharts:
-        specifier: ^2.1.16
-        version: 2.4.1(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2)
+        specifier: ^2.7.2
+        version: 2.7.2(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2)
       referrer-policy:
         specifier: ^1.2.0
         version: 1.2.0
@@ -10738,8 +10738,9 @@ packages:
     resolution: {integrity: sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==}
     dev: true
 
-  /fast-equals@2.0.4:
-    resolution: {integrity: sha512-caj/ZmjHljPrZtbzJ3kfH5ia/k4mTJe/qSiXAGzxZWRZgsgDV0cvNaQULqUX8t0/JVlzzEdYOwCN5DmzTxoD4w==}
+  /fast-equals@5.0.1:
+    resolution: {integrity: sha512-WF1Wi8PwwSY7/6Kx0vKXtw8RwuSGoM1bvDaJbu7MxDlR1vovZjIAKrnzyrThgAjm6JDTu0fVgWXDlMGspodfoQ==}
+    engines: {node: '>=6.0.0'}
     dev: false
 
   /fast-glob@2.2.7:
@@ -16053,8 +16054,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /react-resize-detector@7.1.2(react-dom@17.0.2)(react@17.0.2):
-    resolution: {integrity: sha512-zXnPJ2m8+6oq9Nn8zsep/orts9vQv3elrpA+R8XTcW7DVVUJ9vwDwMXaBtykAYjMnkCIaOoK9vObyR7ZgFNlOw==}
+  /react-resize-detector@8.1.0(react-dom@17.0.2)(react@17.0.2):
+    resolution: {integrity: sha512-S7szxlaIuiy5UqLhLL1KY3aoyGHbZzsTpYal9eYMwCyKqoqoVLCmIgAgNyIM1FhnP2KyBygASJxdhejrzjMb+w==}
     peerDependencies:
       react: ^16.0.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.0.0 || ^17.0.0 || ^18.0.0
@@ -16113,14 +16114,14 @@ packages:
       react: 17.0.2
     dev: false
 
-  /react-smooth@2.0.1(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2):
-    resolution: {integrity: sha512-Own9TA0GPPf3as4vSwFhDouVfXP15ie/wIHklhyKBH5AN6NFtdk0UpHBnonV11BtqDkAWlt40MOUc+5srmW7NA==}
+  /react-smooth@2.0.3(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2):
+    resolution: {integrity: sha512-yl4y3XiMorss7ayF5QnBiSprig0+qFHui8uh7Hgg46QX5O+aRMRKlfGGNGLHno35JkQSvSYY8eCWkBfHfrSHfg==}
     peerDependencies:
       prop-types: ^15.6.0
       react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
       react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      fast-equals: 2.0.4
+      fast-equals: 5.0.1
       prop-types: 15.8.1
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
@@ -16215,8 +16216,8 @@ packages:
       decimal.js-light: 2.5.1
     dev: false
 
-  /recharts@2.4.1(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2):
-    resolution: {integrity: sha512-mX/R6wUFquFKbvqfa2VUFfrtqydzNp6f2b74NKVmk3Zt3m/uPD6hQYST2/1j/YXv0ZbNWE4xAyVp98tMBVxOsA==}
+  /recharts@2.7.2(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2):
+    resolution: {integrity: sha512-HMKRBkGoOXHW+7JcRa6+MukPSifNtJlqbc+JreGVNA407VLE/vOP+8n3YYjprDVVIF9E2ZgwWnL3D7K/LUFzBg==}
     engines: {node: '>=12'}
     peerDependencies:
       prop-types: ^15.6.0
@@ -16230,8 +16231,8 @@ packages:
       react: 17.0.2
       react-dom: 17.0.2(react@17.0.2)
       react-is: 16.13.1
-      react-resize-detector: 7.1.2(react-dom@17.0.2)(react@17.0.2)
-      react-smooth: 2.0.1(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2)
+      react-resize-detector: 8.1.0(react-dom@17.0.2)(react@17.0.2)
+      react-smooth: 2.0.3(prop-types@15.8.1)(react-dom@17.0.2)(react@17.0.2)
       recharts-scale: 0.4.5
       reduce-css-calc: 2.1.8
       victory-vendor: 36.6.8

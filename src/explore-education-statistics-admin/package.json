@@ -75,7 +75,7 @@
     "react-router": "^5.3.4",
     "react-router-dom": "^5.3.4",
     "react-test-renderer": "^17.0.2",
-    "recharts": "^2.1.16",
+    "recharts": "^2.7.2",
     "resolve": "^1.22.2",
     "resolve-url-loader": "^5.0.0",
     "sass": "1.32.13",

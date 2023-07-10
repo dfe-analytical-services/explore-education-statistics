@@ -30,7 +30,7 @@
     "react-ga4": "^2.1.0",
     "react-leaflet": "^2.7.0",
     "react-markdown": "^4.3.1",
-    "recharts": "^2.1.16",
+    "recharts": "^2.7.2",
     "referrer-policy": "^1.2.0",
     "use-immer": "^0.6.0",
     "webpack": "^5.57.1",
