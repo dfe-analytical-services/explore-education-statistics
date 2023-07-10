@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [MemoryCache(typeof(GetThemesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
+        [MemoryCache(typeof(ListThemesCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
         [HttpGet("themes")]
         public async Task<IList<ThemeViewModel>> ListThemes()
         {
