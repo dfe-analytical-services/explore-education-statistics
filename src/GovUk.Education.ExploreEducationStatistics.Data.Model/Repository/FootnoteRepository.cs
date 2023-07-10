@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 }).ToList()
             };
 
-            // TODO EES-2971 We could link Footnote with ReleaseSubject to simplify getting all foonotes for a subject.
+            // TODO EES-2971 We could link Footnote with ReleaseSubject to simplify getting all footnotes for a subject.
             // Currently this involves getting all footnotes with criteria matching the subject directly or indirectly.
             // This would also prevent removing a subject from a release until all of its footnote links are removed.
             // Currently a footnote could remain linked to a release and a subject (either directly or indirectly via

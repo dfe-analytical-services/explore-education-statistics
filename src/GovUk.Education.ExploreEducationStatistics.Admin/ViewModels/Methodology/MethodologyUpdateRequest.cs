@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public string Slug => SlugFromTitle(Title);
 
-        public bool IsDetailUpdateForMethodology(MethodologyVersion methodologyVersion)
+        public bool IsDetailUpdateRequired(MethodologyVersion methodologyVersion)
         {
             return methodologyVersion.Title != Title;
         }
