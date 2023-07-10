@@ -34,7 +34,8 @@ import {
 import Yup from '@common/validation/yup';
 import { endOfDay, format, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
-import { keyBy, mapValues } from 'lodash';
+import keyBy from 'lodash/keyBy';
+import mapValues from 'lodash/mapValues';
 import React, { useMemo } from 'react';
 
 export interface ReleaseStatusFormValues {
