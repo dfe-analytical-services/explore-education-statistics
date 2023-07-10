@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyImageService: imageService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion, request)).AssertRight();
 
                 imageService.Verify(mock =>
                     mock.Delete(methodologyVersion.Id, new List<Guid>
@@ -306,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request))
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion, request))
                     .AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
@@ -398,7 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     publishingService: publishingService.Object,
                     methodologyCacheService: methodologyCacheService.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion, request)).AssertRight();
 
                 VerifyAllMocks(
                     contentService, 
@@ -492,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -580,7 +580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -656,7 +656,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupService(contentDbContext: context);
 
-                var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
+                var result = await service.UpdateApprovalStatus(methodologyVersion, request);
                 result.AssertNotFound();
             }
         }
@@ -707,7 +707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupService(contentDbContext: context);
 
 
-                var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
+                var result = await service.UpdateApprovalStatus(methodologyVersion, request);
                 result.AssertNotFound();
             }
         }
@@ -767,7 +767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupService(contentDbContext: context);
 
-                var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
+                var result = await service.UpdateApprovalStatus(methodologyVersion, request);
                 result.AssertBadRequest(MethodologyCannotDependOnPublishedRelease);
             }
         }
@@ -820,7 +820,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupService(contentDbContext: context);
 
-                var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
+                var result = await service.UpdateApprovalStatus(methodologyVersion, request);
                 result.AssertBadRequest(MethodologyCannotDependOnRelease);
             }
         }
@@ -879,7 +879,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 // Un-approving is allowed for users that can approve the methodology providing it's not publicly accessible
                 // Test that un-approving alters the status
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 

@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
 
             return await _methodologyApprovalService
-                .UpdateApprovalStatus(methodologyVersionToUpdate.Id, request)
+                .UpdateApprovalStatus(methodologyVersionToUpdate, request)
                 .OnSuccess(_ => _context
                     .MethodologyVersions
                     .Include(mv => mv.Methodology)

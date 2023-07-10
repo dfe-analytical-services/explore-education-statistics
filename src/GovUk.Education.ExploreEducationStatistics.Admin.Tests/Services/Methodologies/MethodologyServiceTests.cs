@@ -1672,9 +1672,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var methodologyApprovalService = new Mock<IMethodologyApprovalService>();
-
                 methodologyApprovalService
-                    .Setup(s => s.UpdateApprovalStatus(methodologyVersion.Id, request))
+                    .Setup(s => s.UpdateApprovalStatus(
+                            It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id),
+                            request))
                     .ReturnsAsync(methodologyVersion);
 
                 var service = SetupMethodologyService(

@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     userService =>
                     {
                         var service = SetupService(userService: userService.Object);
-                        return service.UpdateApprovalStatus(_methodologyVersion.Id, new MethodologyApprovalUpdateRequest
+                        return service.UpdateApprovalStatus(_methodologyVersion, new MethodologyApprovalUpdateRequest
                         {
                             Status = Approved
                         });
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     userService =>
                     {
                         var service = SetupService(userService: userService.Object);
-                        return service.UpdateApprovalStatus(_approvedMethodologyVersion.Id, new MethodologyApprovalUpdateRequest
+                        return service.UpdateApprovalStatus(_approvedMethodologyVersion, new MethodologyApprovalUpdateRequest
                         {
                             Status = Draft
                         });

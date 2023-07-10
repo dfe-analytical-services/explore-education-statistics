@@ -1,5 +1,4 @@
 ﻿#nullable enable
-using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
     public interface IMethodologyApprovalService
     {
         Task<Either<ActionResult, MethodologyVersion>> UpdateApprovalStatus(
-            Guid methodologyVersionId,
+            MethodologyVersion methodologyVersionToUpdate,
             MethodologyApprovalUpdateRequest request);
     }
 }
