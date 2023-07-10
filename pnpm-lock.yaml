@@ -189,8 +189,8 @@ importers:
         specifier: ^6.2.0
         version: 6.2.0(webpack@5.88.1)
       formik:
-        specifier: ^2.1.7
-        version: 2.2.9(react@17.0.2)
+        specifier: ^2.4.2
+        version: 2.4.2(react@17.0.2)
       fs-extra:
         specifier: ^9.1.0
         version: 9.1.0
@@ -634,8 +634,8 @@ importers:
         specifier: ^4.2.2
         version: 4.3.1
       formik:
-        specifier: ^2.1.7
-        version: 2.2.9(react@17.0.2)
+        specifier: ^2.4.2
+        version: 2.4.2(react@17.0.2)
       geojson:
         specifier: ^0.5.0
         version: 0.5.0
@@ -886,8 +886,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.1
       formik:
-        specifier: ^2.1.7
-        version: 2.2.9(react@17.0.2)
+        specifier: ^2.4.2
+        version: 2.4.2(react@17.0.2)
       govuk-frontend:
         specifier: ^4.7.0
         version: 4.7.0
@@ -11012,8 +11012,8 @@ packages:
       combined-stream: 1.0.8
       mime-types: 2.1.35
 
-  /formik@2.2.9(react@17.0.2):
-    resolution: {integrity: sha512-LQLcISMmf1r5at4/gyJigGn0gOwFbeEAlji+N9InZF6LIMXnFNkO42sCI8Jt84YZggpD4cPWObAZaxpEFtSzNA==}
+  /formik@2.4.2(react@17.0.2):
+    resolution: {integrity: sha512-C6nx0hifW2uENP3M6HpPmnAE6HFWCcd8/sqBZEOHZY6lpHJ5qehsfAy43ktpFLEmkBmhiZDei726utcUB9leqg==}
     peerDependencies:
       react: '>=16.8.0'
     dependencies:
@@ -11024,7 +11024,7 @@ packages:
       react: 17.0.2
       react-fast-compare: 2.0.4
       tiny-warning: 1.0.3
-      tslib: 1.14.1
+      tslib: 2.6.0
     dev: false
 
   /forwarded@0.2.0:
@@ -17952,6 +17952,7 @@ packages:
 
   /tslib@1.14.1:
     resolution: {integrity: sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==}
+    dev: true
 
   /tslib@2.5.0:
     resolution: {integrity: sha512-336iVw3rtn2BUK7ORdIAHTyxHGRIHVReokCR3XjbckJMK7ms8FysBfhLR8IXnAgy7T0PTPNBWKiH514FOW/WSg==}
