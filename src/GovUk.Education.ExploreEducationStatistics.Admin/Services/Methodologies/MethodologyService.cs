@@ -211,8 +211,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(id, q =>
                     q.Include(m => m.Methodology))
-                .OnSuccess(methodology => UpdateStatus(methodology, request))
-                .OnSuccess(methodology => UpdateDetails(methodology, request))
+                .OnSuccess(methodologyVersion => UpdateStatus(methodologyVersion, request))
+                .OnSuccess(methodologyVersion => UpdateDetails(methodologyVersion, request))
                 .OnSuccess(BuildMethodologyVersionViewModel);
         }
 
@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
-            if (!request.IsDetailUpdateRequired(methodologyVersionToUpdate))
+            if (request.Title == methodologyVersionToUpdate.Title)
             {
                 // Details unchanged
                 return methodologyVersionToUpdate;
@@ -300,21 +300,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;
 
-                    if (request.Title != methodologyVersion.Title)
-                    {
-                        methodologyVersion.AlternativeTitle =
-                            request.Title != methodologyVersion.Methodology.OwningPublicationTitle
-                                ? request.Title
-                                : null;
+                    methodologyVersion.AlternativeTitle =
+                        request.Title != methodologyVersion.Methodology.OwningPublicationTitle
+                            ? request.Title
+                            : null;
 
-                        // If we're updating a Methodology that is not an Amendment, it's not yet publicly
-                        // visible and so its Slug can be updated.  At the point that a Methodology is publicly
-                        // visible and the only means of updating it is via Amendments, we will no longer allow its
-                        // Slug to change even though its AlternativeTitle can.
-                        if (!methodologyVersion.Amendment)
-                        {
-                            methodologyVersion.Methodology.Slug = request.Slug;
-                        }
+                    // If we're updating a Methodology that is not an Amendment, it's not yet publicly
+                    // visible and so its Slug can be updated.  At the point that a Methodology is publicly
+                    // visible and the only means of updating it is via Amendments, we will no longer allow its
+                    // Slug to change even though its AlternativeTitle can.
+                    if (!methodologyVersion.Amendment)
+                    {
+                        methodologyVersion.Methodology.Slug = request.Slug;
                     }
 
                     await _context.SaveChangesAsync();
