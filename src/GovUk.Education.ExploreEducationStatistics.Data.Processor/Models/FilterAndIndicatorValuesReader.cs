@@ -18,7 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 /// </summary>
 public class FilterAndIndicatorValuesReader
 {
-    private const string DefaultFilterGroupLabel = "Default";
     private const string DefaultFilterItemLabel = "Not specified";
 
     private readonly Dictionary<Guid, int> _indicatorColumnIndexes;
@@ -52,7 +51,7 @@ public class FilterAndIndicatorValuesReader
             .SelectMany(f => f.FilterGroups)
             .SelectMany(fg => fg.FilterItems)
             .ToDictionary(
-                fi => $"{fi.FilterGroup.Filter.Label}_{fi.FilterGroup.Label}_{fi.Label}".ToLower(), 
+                fi => $"{fi.FilterGroup.Filter.Label}_{fi.FilterGroup.Label}_{fi.Label}".ToLower(),
                 fi => fi);
     }
 
@@ -69,12 +68,12 @@ public class FilterAndIndicatorValuesReader
         Guid filterId)
     {
         var columnIndex = _filterColumnIndexes[filterId];
-        
+
         if (columnIndex == -1)
         {
             return DefaultFilterItemLabel;
         }
-        
+
         return rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? DefaultFilterItemLabel;
     }
 
@@ -83,22 +82,22 @@ public class FilterAndIndicatorValuesReader
         Guid filterId)
     {
         var columnIndex = _filterGroupColumnIndexes[filterId];
-        
+
         if (columnIndex == -1)
         {
-            return DefaultFilterGroupLabel;
+            return FilterGroup.DefaultFilterGroupLabel;
         }
 
-        return rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? DefaultFilterGroupLabel;
+        return rowValues[columnIndex].Trim().NullIfWhiteSpace() ?? FilterGroup.DefaultFilterGroupLabel;
     }
-    
+
     public FilterItem GetFilterItem(IReadOnlyList<string> rowValues, Filter filter)
     {
         var filterItemLabel = GetFilterItemLabel(rowValues, filter.Id);
         var filterGroupLabel = GetFilterGroupLabel(rowValues, filter.Id);
         return LookupCachedFilterItem(filterItemLabel, filterGroupLabel, filter.Label);
     }
-    
+
     private FilterItem LookupCachedFilterItem(string filterItemLabel, string filterGroupLabel, string filterLabel)
     {
         return _filterItemCache[$"{filterLabel}_{filterGroupLabel}_{filterItemLabel}".ToLower()];

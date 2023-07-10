@@ -7,27 +7,29 @@ using System.Linq;
 using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Utils;
 
 public static class CsvUtils
 {
-    public static Task<List<string>> GetCsvHeaders(Stream stream)
-        => GetCsvHeaders(() => Task.FromResult(stream));
+    public static Task<List<string>> GetCsvHeaders(Stream stream,
+        bool leaveOpen = false)
+        => GetCsvHeaders(() => Task.FromResult(stream), leaveOpen);
 
-    public static Task<List<string>> GetCsvHeaders(Task<Stream> stream)
-        => GetCsvHeaders(() => stream);
+    public static Task<List<string>> GetCsvHeaders(Task<Stream> stream,
+        bool leaveOpen = false)
+        => GetCsvHeaders(() => stream, leaveOpen);
 
     /// <summary>
     /// Gets the header values of the first line of the provided CSV.
     /// </summary>
     /// <remarks>
-    /// This method uses and closes the provided Stream.
+    /// This method uses and closes the provided stream, unless leaveOpen is true.
     /// </remarks>
-    public static async Task<List<string>> GetCsvHeaders(Func<Task<Stream>> streamProvider)
+    public static async Task<List<string>> GetCsvHeaders(Func<Task<Stream>> streamProvider,
+        bool leaveOpen = false)
     {
-        using var dataFileReader = new StreamReader(await streamProvider.Invoke());
+        using var dataFileReader = new StreamReader(await streamProvider.Invoke(), leaveOpen: leaveOpen);
         using var csvReader = new CsvReader(dataFileReader, CultureInfo.InvariantCulture);
         await csvReader.ReadAsync();
         csvReader.ReadHeader();
@@ -116,7 +118,7 @@ public static class CsvUtils
                 lastLine = !await csvReader.ReadAsync();
                 continue;
             }
-            
+
             var cellCount = csvDataReader.FieldCount;
 
             var cells = Enumerable
@@ -124,9 +126,9 @@ public static class CsvUtils
                 .Select(csvReader.GetField<string>)
                 .OfType<string>()
                 .ToList();
-            
+
             lastLine = !await csvReader.ReadAsync();
-            
+
             var result = await func.Invoke(cells, currentRowIndex, lastLine);
 
             if (!result)
@@ -135,7 +137,7 @@ public static class CsvUtils
             }
         }
     }
-    
+
     /// <summary>
     /// Execute a given function against batches of rows from the provided CSV. The batch
     /// of rows (a list of lists of cells) and the index of the current batch being processed are
@@ -165,7 +167,7 @@ public static class CsvUtils
         var linesInBatch = new List<List<string>>();
         var batchIndex = 0;
         var rowsProcessed = 0;
-        
+
         await ForEachRow(
             streamProvider,
             async (cells, _, lastLine) =>

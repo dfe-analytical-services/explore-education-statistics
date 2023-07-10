@@ -35,6 +35,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 .ReturnsAsync(() => File.OpenRead(filePathToStream));
         }
 
+        public static IReturnsResult<T> SetupStreamBlobNotFound<T>(
+            this Mock<T> service,
+            IBlobContainer container,
+            string expectedBlobPath) where T : class, IBlobStorageService
+        {
+            return service.Setup(s => s.StreamBlob(container, expectedBlobPath, null, default))
+                .ThrowsAsync(new FileNotFoundException($"Could not find file at {container.Name}/{expectedBlobPath}"));
+        }
+
+        public static IReturnsResult<T> SetupStreamBlobThrows<T>(
+            this Mock<T> service,
+            IBlobContainer container,
+            string expectedBlobPath,
+            Exception exception) where T : class, IBlobStorageService
+        {
+            return service.Setup(s => s.StreamBlob(container, expectedBlobPath, null, default))
+                .ThrowsAsync(exception);
+        }
+
         public static IReturnsResult<T> SetupCheckBlobExists<T>(
             this Mock<T> service,
             IBlobContainer container,
@@ -132,8 +151,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             T2 value,
             JsonSerializerSettings? settings = null,
             CancellationToken cancellationToken = default)
-        where T1 : class, IBlobStorageService
-        where T2 : class
+            where T1 : class, IBlobStorageService
+            where T2 : class
         {
             return service.Setup(s =>
                     s.GetDeserializedJson<T2>(container, path, settings, cancellationToken))
@@ -159,8 +178,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             string path,
             JsonSerializerSettings? settings = null,
             CancellationToken cancellationToken = default)
-        where T1 : class, IBlobStorageService
-        where T2 : class
+            where T1 : class, IBlobStorageService
+            where T2 : class
         {
             return service.Setup(s =>
                     s.GetDeserializedJson<T2>(container, path, settings, cancellationToken))

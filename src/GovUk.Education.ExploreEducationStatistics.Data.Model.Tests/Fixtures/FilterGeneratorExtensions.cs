@@ -30,6 +30,9 @@ public static class FilterGeneratorExtensions
     public static Generator<Filter> WithLabel(this Generator<Filter> generator, string label)
         => generator.ForInstance(s => s.SetLabel(label));
 
+    public static Generator<Filter> WithGroupCsvColumn(this Generator<Filter> generator, string groupCsvColumn)
+        => generator.ForInstance(s => s.SetGroupCsvColumn(groupCsvColumn));
+
     public static Generator<Filter> WithFilterGroups(
         this Generator<Filter> generator,
         IEnumerable<FilterGroup> filterGroups)
@@ -59,6 +62,12 @@ public static class FilterGeneratorExtensions
         => setters
             .Set(f => f.Label, label)
             .Set(f => f.Name, label.SnakeCase());
+
+    public static InstanceSetters<Filter> SetGroupCsvColumn(
+        this InstanceSetters<Filter> setters,
+        string groupCsvColumn)
+        => setters
+            .Set(f => f.GroupCsvColumn, groupCsvColumn);
 
     public static InstanceSetters<Filter> SetSubject(
         this InstanceSetters<Filter> setters,
