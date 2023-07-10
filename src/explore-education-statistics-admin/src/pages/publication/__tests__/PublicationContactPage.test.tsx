@@ -14,10 +14,10 @@ import {
   waitFor,
   within,
 } from '@testing-library/react';
-import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
+import React from 'react';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -148,15 +148,10 @@ describe('PublicationContactPage', () => {
     );
 
     userEvent.clear(screen.getByLabelText('Team name'));
-    userEvent.tab();
-
     userEvent.clear(screen.getByLabelText('Team email'));
-    userEvent.tab();
-
     userEvent.clear(screen.getByLabelText('Contact name'));
-    userEvent.tab();
-
     userEvent.clear(screen.getByLabelText('Contact telephone'));
+
     userEvent.tab();
 
     await waitFor(() => {

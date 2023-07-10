@@ -10,7 +10,7 @@ import {
 import React from 'react';
 import noop from 'lodash/noop';
 import userEvent from '@testing-library/user-event';
-import { IdTitlePair } from 'src/services/types/common';
+import { IdTitlePair } from '@admin/services/types/common';
 
 describe('PublicationAccessForm', () => {
   const testUser: User = {

@@ -1,3 +1,4 @@
+import flushPromises from '@common-test/flushPromises';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import ImporterStatus from '@admin/pages/release/data/components/ImporterStatus';
 import _releaseDataFileService, {
@@ -185,6 +186,8 @@ describe('ImporterStatus', () => {
 
     expect(screen.getByText('Queued')).toBeInTheDocument();
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
+
+    await flushPromises();
 
     await waitFor(() => {
       expect(screen.getByText('Failed')).toBeInTheDocument();

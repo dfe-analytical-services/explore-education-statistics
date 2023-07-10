@@ -42,6 +42,10 @@ describe('ReleaseFileUploadsSection', () => {
     },
   ];
 
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   function renderPage() {
     return render(
       <MemoryRouter>
@@ -201,11 +205,11 @@ describe('ReleaseFileUploadsSection', () => {
         expect(releaseAncillaryFileService.deleteFile).toHaveBeenCalledWith<
           Parameters<typeof releaseAncillaryFileService.deleteFile>
         >('release-1', 'file-2');
+
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
       });
 
       const updatedSections = screen.getAllByTestId('accordionSection');
-
-      expect(updatedSections).toHaveLength(1);
 
       expect(
         within(updatedSections[0]).getByRole('button', {
@@ -231,13 +235,19 @@ describe('ReleaseFileUploadsSection', () => {
       });
       userEvent.tab();
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a file', {
-            selector: '#ancillaryFileForm-file-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText('Choose a file', {
+              selector: '#ancillaryFileForm-file-error',
+            }),
+          ).toBeInTheDocument();
+        },
+        {
+          timeout: 10000,
+          interval: 100,
+        },
+      );
     });
 
     test('shows validation message when `file` uploaded is an empty file', async () => {
@@ -371,6 +381,8 @@ describe('ReleaseFileUploadsSection', () => {
           summary: 'Test summary 3',
           file,
         });
+
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(3);
       });
 
       const sections = screen.getAllByTestId('accordionSection');

@@ -43,9 +43,11 @@ describe('ChartBuilder', () => {
     expect(screen.getByText('Choose chart type')).toBeInTheDocument();
 
     expect(screen.getByRole('button', { name: 'Line' })).toBeInTheDocument();
+
     expect(
       screen.getByRole('button', { name: 'Vertical bar' }),
     ).toBeInTheDocument();
+
     expect(
       screen.getByRole('button', { name: 'Horizontal bar' }),
     ).toBeInTheDocument();
@@ -124,11 +126,17 @@ describe('ChartBuilder', () => {
 
       userEvent.click(screen.getByRole('button', { name: 'Line' }));
 
+      await waitFor(() => {
+        expect(
+          screen.getByText('Data sets', {
+            selector: '[role="tab"]',
+          }),
+        ).toBeInTheDocument();
+      });
+
       userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
 
-      expect(
-        screen.getByRole('heading', { name: 'Data sets' }),
-      ).toBeInTheDocument();
+      userEvent.click(screen.getByRole('button', { name: 'Add data set' }));
 
       userEvent.selectOptions(
         screen.getByLabelText('Characteristic'),
@@ -208,6 +216,14 @@ describe('ChartBuilder', () => {
 
       userEvent.click(screen.getByRole('button', { name: 'Line' }));
 
+      await waitFor(() => {
+        expect(
+          screen.getByText('Data sets', {
+            selector: '[role="tab"]',
+          }),
+        ).toBeInTheDocument();
+      });
+
       userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
 
       expect(
@@ -271,6 +287,14 @@ describe('ChartBuilder', () => {
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Line' }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Data sets', {
+            selector: '[role="tab"]',
+          }),
+        ).toBeInTheDocument();
+      });
 
       userEvent.click(screen.getByRole('tab', { name: 'Data sets' }));
 

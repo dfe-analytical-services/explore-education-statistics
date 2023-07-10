@@ -70,14 +70,6 @@ describe('PublicationDraftReleases', () => {
 
   const testReleases = [testRelease1, testRelease2, testRelease3];
 
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
   beforeEach(() => {
     releaseService.getReleaseChecklist.mockResolvedValue({
       errors: [
