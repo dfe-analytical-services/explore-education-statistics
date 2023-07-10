@@ -13,6 +13,7 @@ if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
     .setAutoCollectDependencies(true)
     .setAutoCollectConsole(true)
     .setUseDiskRetryCaching(true)
+    .setSendLiveMetrics(true)
     .start();
 }
 

@@ -209,8 +209,14 @@ Check public superseding-publication release page displays correctly
     user waits until page contains    This is the latest data
 
 Check public archive-publication release page displays correctly
+    user waits for caches to expire
+
     user navigates to public frontend    ${PUBLICATION_ARCHIVE_URL}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
+
+    user reloads the stale cached page
+    user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
+
     user checks page does not contain    This is the latest data
 
 Check public archive-publication release page displays superseded warning
@@ -386,7 +392,7 @@ Set archive-publication to be no longer be superseded
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Confirm publication changes
 
-    sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
+    user waits for caches to expire
 
 Check can create a release for archive-publication which is no longer archived
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269

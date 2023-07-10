@@ -505,6 +505,8 @@ Approve release
     user approves original release for immediate publication
 
 Verify newly published release is on Find Statistics page
+    user waits for caches to expire
+
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Navigate to published release page
