@@ -29,7 +29,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import glossaryService from '@frontend/services/glossaryService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
-import { GetStaticPaths, GetStaticProps, NextPage } from 'next';
+import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
@@ -189,7 +189,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             </SummaryListItem>
           </SummaryList>
           <VisuallyHidden as="h2">
-            {/** 
+            {/**
               Visually hidden h2 as currently the release intro editor only starts from h3
               meaning that this breaks sequential heading order.
               @see {@link https://dfedigital.atlassian.net/browse/EES-3541}
@@ -571,7 +571,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   );
 };
 
-export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  params,
+}) => {
   const {
     publication: publicationSlug,
     release: releaseSlug,
@@ -585,14 +587,6 @@ export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
     props: {
       release,
     },
-    revalidate: process.env.APP_ENV === 'Local' ? 2 : 10,
-  };
-};
-
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: [],
-    fallback: 'blocking',
   };
 };
 
