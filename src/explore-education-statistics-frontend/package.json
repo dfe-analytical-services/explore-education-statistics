@@ -32,6 +32,7 @@
     "react-markdown": "^4.3.1",
     "recharts": "^2.1.16",
     "referrer-policy": "^1.2.0",
+    "route-cache": "^0.5.0",
     "use-immer": "^0.6.0",
     "webpack": "^5.57.1",
     "yup": "^0.29.3"

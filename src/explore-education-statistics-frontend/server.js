@@ -23,6 +23,7 @@ const helmet = require('helmet');
 const nextApp = require('next');
 const { loadEnvConfig } = require('@next/env');
 const path = require('path');
+const routeCache = require('route-cache');
 const referrerPolicy = require('referrer-policy');
 
 loadEnvConfig(__dirname);
@@ -111,6 +112,19 @@ async function startServer(port = process.env.PORT || 3000) {
       }),
     );
   }
+
+  const cacheTtl = process.env.APP_ENV === 'Local' ? 2 : 10;
+
+  server.get(
+    '/find-statistics',
+    routeCache.cacheSeconds(cacheTtl),
+    (req, res) => handleRequest(req, res),
+  );
+  server.get(
+    '/find-statistics/:publication/:release?',
+    routeCache.cacheSeconds(cacheTtl),
+    (req, res) => handleRequest(req, res),
+  );
 
   server.get('*', (req, res) => handleRequest(req, res));
   server.post('*', (req, res) => handleRequest(req, res));
