@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
             MethodologyUpdateRequest request);
 
         Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
-            MethodologyVersion methodologyVersion);
+            Guid methodologyVersionId);
 
         Task<Either<ActionResult, List<MethodologyStatusViewModel>>> GetMethodologyStatuses(Guid methodologyVersionId);
     }

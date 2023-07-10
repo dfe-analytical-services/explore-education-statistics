@@ -280,11 +280,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Title = "Test publication"
             };
 
+            var methodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                Methodology = new Methodology
+                {
+                    Id = Guid.NewGuid(),
+                    Slug = "test-publication",
+                    OwningPublicationTitle = publication.Title,
+                    Publications = new List<PublicationMethodology>
+                    {
+                        new()
+                        {
+                            Owner = true,
+                            Publication = publication,
+                        }
+                    }
+                },
+                Status = Draft
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Publications.AddAsync(publication);
+                await context.MethodologyVersions.AddAsync(methodologyVersion);
                 await context.SaveChangesAsync();
             }
 
@@ -296,40 +316,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     contentDbContext: context,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var createdMethodology = new MethodologyVersion
-                {
-                    Id = Guid.NewGuid(),
-                    Methodology = new Methodology
-                    {
-                        Id = Guid.NewGuid(),
-                        Slug = "test-publication",
-                        OwningPublicationTitle = publication.Title,
-                        Publications = new List<PublicationMethodology>
-                        {
-                            new()
-                            {
-                                Owner = true,
-                                Publication = publication
-                            }
-                        }
-                    },
-                    Status = Draft
-                };
-
                 methodologyVersionRepository
                     .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
-                    .ReturnsAsync(createdMethodology);
-
-                context.Attach(createdMethodology);
+                    .ReturnsAsync(methodologyVersion);
 
                 var viewModel = (await service.CreateMethodology(publication.Id)).AssertRight();
                 VerifyAllMocks(methodologyVersionRepository);
 
-                Assert.Equal(createdMethodology.Id, viewModel.Id);
+                Assert.Equal(methodologyVersion.Id, viewModel.Id);
                 Assert.Equal("test-publication", viewModel.Slug);
                 Assert.False(viewModel.Amendment);
                 Assert.Null(viewModel.InternalReleaseNote);
-                Assert.Equal(createdMethodology.Methodology.Id, viewModel.MethodologyId);
+                Assert.Equal(methodologyVersion.Methodology.Id, viewModel.MethodologyId);
                 Assert.Null(viewModel.Published);
                 Assert.Equal(Immediately, viewModel.PublishingStrategy);
                 Assert.Equal(Draft, viewModel.Status);
@@ -1674,8 +1672,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var methodologyApprovalService = new Mock<IMethodologyApprovalService>();
                 methodologyApprovalService
                     .Setup(s => s.UpdateApprovalStatus(
-                            It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id),
-                            request))
+                        It.Is<MethodologyVersion>(mv => mv.Id == methodologyVersion.Id),
+                        request))
                     .ReturnsAsync(methodologyVersion);
 
                 var service = SetupMethodologyService(
