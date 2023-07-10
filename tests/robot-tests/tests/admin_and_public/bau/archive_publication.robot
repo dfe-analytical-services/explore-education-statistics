@@ -214,9 +214,6 @@ Check public archive-publication release page displays correctly
     user navigates to public frontend    ${PUBLICATION_ARCHIVE_URL}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
 
-    user reloads the stale cached page
-    user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
-
     user checks page does not contain    This is the latest data
 
 Check public archive-publication release page displays superseded warning
