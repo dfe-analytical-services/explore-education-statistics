@@ -24,7 +24,7 @@ public static class CsvUtils
     /// Gets the header values of the first line of the provided CSV.
     /// </summary>
     /// <remarks>
-    /// This method uses and closes the provided Stream.
+    /// This method uses and closes the provided stream, unless leaveOpen is true.
     /// </remarks>
     public static async Task<List<string>> GetCsvHeaders(Func<Task<Stream>> streamProvider,
         bool leaveOpen = false)
