@@ -601,8 +601,8 @@ importers:
         specifier: ^3.2.2
         version: 3.2.2(react@17.0.2)
       '@hookform/resolvers':
-        specifier: 2.9.10
-        version: 2.9.10(react-hook-form@7.42.1)
+        specifier: ^3.1.1
+        version: 3.1.1(react-hook-form@7.43.9)
       '@microsoft/applicationinsights-web':
         specifier: ^2.5.9
         version: 2.8.10(tslib@2.6.0)
@@ -697,8 +697,8 @@ importers:
         specifier: ^0.16.0
         version: 0.16.0(react@17.0.2)
       react-hook-form:
-        specifier: 7.42.1
-        version: 7.42.1(react@17.0.2)
+        specifier: ^7.43.9
+        version: 7.43.9(react@17.0.2)
       react-lazyload:
         specifier: ^3.0.0
         version: 3.2.0(react-dom@17.0.2)(react@17.0.2)
@@ -1050,8 +1050,8 @@ importers:
         specifier: workspace:*
         version: link:../explore-education-statistics-common
       fork-ts-checker-webpack-plugin:
-        specifier: ^6.3.3
-        version: 6.5.2(eslint@8.43.0)(typescript@5.1.6)(webpack@5.75.0)
+        specifier: ^8.0.0
+        version: 8.0.0(typescript@5.1.6)(webpack@5.75.0)
       identity-obj-proxy:
         specifier: 3.0.0
         version: 3.0.0
@@ -3869,12 +3869,12 @@ packages:
       tinycolor2: 1.6.0
     dev: false
 
-  /@hookform/resolvers@2.9.10(react-hook-form@7.42.1):
-    resolution: {integrity: sha512-JIL1DgJIlH9yuxcNGtyhsWX/PgNltz+5Gr6+8SX9fhXc/hPbEIk6wPI82nhgvp3uUb6ZfAM5mqg/x7KR7NAb+A==}
+  /@hookform/resolvers@3.1.1(react-hook-form@7.43.9):
+    resolution: {integrity: sha512-tS16bAUkqjITNSvbJuO1x7MXbn7Oe8ZziDTJdA9mMvsoYthnOOiznOTGBYwbdlYBgU+tgpI/BtTU3paRbCuSlg==}
     peerDependencies:
       react-hook-form: ^7.0.0
     dependencies:
-      react-hook-form: 7.42.1(react@17.0.2)
+      react-hook-form: 7.43.9(react@17.0.2)
     dev: false
 
   /@humanwhocodes/config-array@0.11.10:
@@ -6403,6 +6403,7 @@ packages:
   /at-least-node@1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
+    dev: false
 
   /atob@2.1.2:
     resolution: {integrity: sha512-Wm6ukoaOGJi/73p/cl2GvLjTI5JM1k/O14isD73YML8StrH/7/lRFgmg8nICZgD3bZZvjwCGxtMOD3wWNAu8cg==}
@@ -7563,6 +7564,7 @@ packages:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
+    dev: false
 
   /cosmiconfig@7.1.0:
     resolution: {integrity: sha512-AdmX6xUzdNASswsFtmwSt7Vj8po9IuqXm0UXz7QKPuEUmPB4XyjGfaAr2PSuELMwkRMVH1EpIkX5bTZGRB3eCA==}
@@ -9773,6 +9775,30 @@ packages:
       tapable: 1.1.3
       typescript: 5.1.6
       webpack: 5.75.0
+    dev: false
+
+  /fork-ts-checker-webpack-plugin@8.0.0(typescript@5.1.6)(webpack@5.75.0):
+    resolution: {integrity: sha512-mX3qW3idpueT2klaQXBzrIM/pHw+T0B/V9KHEvNrqijTq9NFnMZU6oreVxDYcf33P8a5cW+67PjodNHthGnNVg==}
+    engines: {node: '>=12.13.0', yarn: '>=1.0.0'}
+    peerDependencies:
+      typescript: '>3.6.0'
+      webpack: ^5.11.0
+    dependencies:
+      '@babel/code-frame': 7.18.6
+      chalk: 4.1.2
+      chokidar: 3.5.3
+      cosmiconfig: 7.1.0
+      deepmerge: 4.3.0
+      fs-extra: 10.1.0
+      memfs: 3.4.13
+      minimatch: 3.1.2
+      node-abort-controller: 3.1.1
+      schema-utils: 3.1.1
+      semver: 7.3.8
+      tapable: 2.2.1
+      typescript: 5.1.6
+      webpack: 5.75.0
+    dev: true
 
   /form-data@3.0.1:
     resolution: {integrity: sha512-RHkBKtLWUVwd7SqRIvCZMEvAMoGUp0XU+seQiZejj0COz3RI3hWP4sCv3gZWWLjJTd7rGwcsF5eKZGii0r/hbg==}
@@ -9837,6 +9863,15 @@ packages:
       readable-stream: 2.3.7
     dev: true
 
+  /fs-extra@10.1.0:
+    resolution: {integrity: sha512-oRXApq54ETRj4eMiFzGnHWGy+zo5raudjuxN0b8H7s/RU2oW0Wvsx9O0ACRN/kRq9E8Vu/ReskGB5o3ji+FzHQ==}
+    engines: {node: '>=12'}
+    dependencies:
+      graceful-fs: 4.2.10
+      jsonfile: 6.1.0
+      universalify: 2.0.0
+    dev: true
+
   /fs-extra@8.1.0:
     resolution: {integrity: sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==}
     engines: {node: '>=6 <7 || >=8'}
@@ -9854,6 +9889,7 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
+    dev: false
 
   /fs-minipass@2.1.0:
     resolution: {integrity: sha512-V/JgOLFCS+R6Vcq0slCuaeWEdNC3ouDlJMNIsacH2VtALiu9mV4LPrHc5cDl8k5aw6J8jwgWWpiTo5RYhmIzvg==}
@@ -12682,6 +12718,10 @@ packages:
       tslib: 2.6.0
     dev: false
 
+  /node-abort-controller@3.1.1:
+    resolution: {integrity: sha512-AGK2yQKIjRuqnc6VkX2Xj5d+QW8xZ87pa1UK6yA6ouUyuxfHuMP6umE5QK7UmTeOAymo+Zx1Fxiuw9rVx8taHQ==}
+    dev: true
+
   /node-fetch@2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
     engines: {node: 4.x || >=6.0.0}
@@ -14871,8 +14911,8 @@ packages:
       react: 17.0.2
     dev: false
 
-  /react-hook-form@7.42.1(react@17.0.2):
-    resolution: {integrity: sha512-2UIGqwMZksd5HS55crTT1ATLTr0rAI4jS7yVuqTaoRVDhY2Qc4IyjskCmpnmdYqUNOYFy04vW253tb2JRVh+IQ==}
+  /react-hook-form@7.43.9(react@17.0.2):
+    resolution: {integrity: sha512-AUDN3Pz2NSeoxQ7Hs6OhQhDr6gtF9YRuutGDwPQqhSUAHJSgGl2VeY3qN19MG0SucpjgDiuMJ4iC5T5uB+eaNQ==}
     engines: {node: '>=12.22.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18
@@ -15665,6 +15705,7 @@ packages:
       '@types/json-schema': 7.0.11
       ajv: 6.12.6
       ajv-keywords: 3.5.2(ajv@6.12.6)
+    dev: false
 
   /schema-utils@2.7.1:
     resolution: {integrity: sha512-SHiNtMOUGWBQJwzISiVYKu82GiV4QYGePp3odlY1tuKO7gPtphAT5R/py0fA6xtbgLL/RvtJZnU9b8s0F1q0Xg==}

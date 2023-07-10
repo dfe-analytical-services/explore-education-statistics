@@ -89,7 +89,6 @@ export default function ChartReferenceLinesConfiguration({
     const schema = Yup.object<AddFormValues>({
       label: Yup.string().required('Enter label'),
       position: Yup.string()
-
         .required('Enter position')
         .test({
           name: 'axisPosition',
@@ -98,8 +97,8 @@ export default function ChartReferenceLinesConfiguration({
           } axis min/max range`,
           test: value => {
             return type === 'minor' && minorAxisDomain
-              ? parseInt(value, 10) >= minorAxisDomain?.min &&
-                  parseInt(value, 10) <= minorAxisDomain.max
+              ? ((value as unknown) as number) >= minorAxisDomain?.min &&
+                  ((value as unknown) as number) <= minorAxisDomain.max
               : true;
           },
         }),
@@ -113,7 +112,7 @@ export default function ChartReferenceLinesConfiguration({
         otherAxisEnd: Yup.string()
           .when('otherAxisPositionType', {
             is: otherAxisPositionTypes.betweenDataPoints,
-            then: s => s.required('Enter end point').min(1),
+            then: s => s.required('Enter end point').min(1, 'Enter end point'),
             otherwise: s => s.notRequired(), // before it was .string(). Dobule check tests luke
           })
           .test(
@@ -130,8 +129,9 @@ export default function ChartReferenceLinesConfiguration({
           ),
         otherAxisStart: Yup.string().when('otherAxisPositionType', {
           is: otherAxisPositionTypes.betweenDataPoints,
-          then: s => s.required('Enter start point').min(1),
-          otherwise: s => s.notRequired(), // before it was .string(). Dobule check tests luke
+          then: s =>
+            s.required('Enter start point').min(1, 'Enter start point'),
+          otherwise: s => s.notRequired(),
         }),
         // otherAxisPosition: Yup.number().when('otherAxisPositionType', {
         //   is: otherAxisPositionTypes.custom,
@@ -149,22 +149,19 @@ export default function ChartReferenceLinesConfiguration({
         //     }),
         //   otherwise: Yup.number(),
         // }),
-        otherAxiosPosition: Yup.number().when('otherAxisPositionType', {
+        otherAxisPosition: Yup.number().when('otherAxisPositionType', {
           is: otherAxisPositionTypes.custom,
           then: s =>
-            s
-              .required('Enter a percentage between 0 and 100%')
-              .min(0)
-              .test({
-                name: 'otherAxisPosition',
-                message: 'Enter a percentage between 0 and 100%',
-                test: (value: number) => {
-                  if (typeof value !== 'number') {
-                    return true;
-                  }
-                  return value >= 0 && value <= 100;
-                },
-              }),
+            s.required('Enter a percentage between 0 and 100%').test({
+              name: 'otherAxisPosition',
+              message: 'Enter a percentage between 0 and 100%',
+              test: value => {
+                if (typeof value !== 'number') {
+                  return true;
+                }
+                return value >= 0 && value <= 100;
+              },
+            }),
           otherwise: s => s.notRequired(),
         }),
       });

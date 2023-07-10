@@ -1224,6 +1224,7 @@ describe('ChartReferenceLinesConfiguration', () => {
     userEvent.selectOptions(screen.getByLabelText('Position'), '2015_AY');
     userEvent.type(screen.getByLabelText('Label'), 'Test label');
     userEvent.type(screen.getByLabelText('Y axis position'), '20000');
+    userEvent.selectOptions(screen.getByLabelText('Style'), 'dashed');
 
     expect(handleAddLine).not.toHaveBeenCalled();
 
@@ -1255,10 +1256,8 @@ describe('ChartReferenceLinesConfiguration', () => {
         onRemoveLine={noop}
       />,
     );
-
     userEvent.type(screen.getByLabelText('Position'), '40000');
     userEvent.type(screen.getByLabelText('Label'), 'Test label');
-
     userEvent.selectOptions(screen.getByLabelText('X axis position'), [
       'custom',
     ]);

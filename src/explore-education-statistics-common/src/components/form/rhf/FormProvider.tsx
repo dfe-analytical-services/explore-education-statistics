@@ -27,6 +27,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
     defaultValues: initialValues,
     mode: 'onBlur',
     resolver: validationSchema ? yupResolver(validationSchema) : undefined,
+    shouldFocusError: false,
   });
 
   const previousInitialValues = useRef(initialValues);
