@@ -113,7 +113,7 @@ export default function ChartReferenceLinesConfiguration({
           .when('otherAxisPositionType', {
             is: otherAxisPositionTypes.betweenDataPoints,
             then: s => s.required('Enter end point').min(1, 'Enter end point'),
-            otherwise: s => s.notRequired(), // before it was .string(). Dobule check tests luke
+            otherwise: s => s.notRequired(),
           })
           .test(
             'otherAxisEnd',
@@ -133,22 +133,6 @@ export default function ChartReferenceLinesConfiguration({
             s.required('Enter start point').min(1, 'Enter start point'),
           otherwise: s => s.notRequired(),
         }),
-        // otherAxisPosition: Yup.number().when('otherAxisPositionType', {
-        //   is: otherAxisPositionTypes.custom,
-        //   then: Yup.number()
-        //     .required('Enter a percentage between 0 and 100%')
-        //     .test({
-        //       name: 'otherAxisPosition',
-        //       message: 'Enter a percentage between 0 and 100%',
-        //       test: (value: number) => {
-        //         if (typeof value !== 'number') {
-        //           return true;
-        //         }
-        //         return value >= 0 && value <= 100;
-        //       },
-        //     }),
-        //   otherwise: Yup.number(),
-        // }),
         otherAxisPosition: Yup.number().when('otherAxisPositionType', {
           is: otherAxisPositionTypes.custom,
           then: s =>
