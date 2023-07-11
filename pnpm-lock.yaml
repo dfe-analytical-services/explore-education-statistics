@@ -688,8 +688,8 @@ importers:
         specifier: ^6.1.0
         version: 6.1.0(react@17.0.2)
       react-highlight-words:
-        specifier: ^0.16.0
-        version: 0.16.0(react@17.0.2)
+        specifier: ^0.20.0
+        version: 0.20.0(react@17.0.2)
       react-hook-form:
         specifier: ^7.43.9
         version: 7.43.9(react@17.0.2)
@@ -782,7 +782,7 @@ importers:
         specifier: ^6.1.0
         version: 6.1.6
       '@types/react-highlight-words':
-        specifier: ^0.16.1
+        specifier: ^0.16.4
         version: 0.16.4
       '@types/react-lazyload':
         specifier: ^3.0.0
@@ -16020,10 +16020,10 @@ packages:
       react-side-effect: 2.1.2(react@17.0.2)
     dev: false
 
-  /react-highlight-words@0.16.0(react@17.0.2):
-    resolution: {integrity: sha512-q34TwCSJOL+5pVDv6LUj3amaoyXdNDwd7zRqVAvceOrO9g1haWLAglK6WkGLMNUa3PFN8EgGedLg/k8Gpndxqg==}
+  /react-highlight-words@0.20.0(react@17.0.2):
+    resolution: {integrity: sha512-asCxy+jCehDVhusNmCBoxDf2mm1AJ//D+EzDx1m5K7EqsMBIHdZ5G4LdwbSEXqZq1Ros0G0UySWmAtntSph7XA==}
     peerDependencies:
-      react: ^0.14.0 || ^15.0.0 || ^16.0.0-0
+      react: ^0.14.0 || ^15.0.0 || ^16.0.0-0 || ^17.0.0-0 || ^18.0.0-0
     dependencies:
       highlight-words-core: 1.2.2
       memoize-one: 4.0.3
