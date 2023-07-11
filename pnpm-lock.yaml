@@ -115,7 +115,7 @@ importers:
         version: 7.0.7
       '@pmmmwh/react-refresh-webpack-plugin':
         specifier: ^0.5.10
-        version: 0.5.10(react-refresh@0.10.0)(webpack-dev-server@4.15.1)(webpack@5.88.1)
+        version: 0.5.10(react-refresh@0.14.0)(webpack-dev-server@4.15.1)(webpack@5.88.1)
       '@svgr/webpack':
         specifier: ^6.5.1
         version: 6.5.1
@@ -294,8 +294,8 @@ importers:
         specifier: ^4.3.1
         version: 4.3.1(react@17.0.2)
       react-refresh:
-        specifier: ^0.10.0
-        version: 0.10.0
+        specifier: ^0.14.0
+        version: 0.14.0
       react-router:
         specifier: ^5.3.4
         version: 5.3.4(react@17.0.2)
@@ -5972,7 +5972,7 @@ packages:
       tslib: 2.6.0
     dev: true
 
-  /@pmmmwh/react-refresh-webpack-plugin@0.5.10(react-refresh@0.10.0)(webpack-dev-server@4.15.1)(webpack@5.88.1):
+  /@pmmmwh/react-refresh-webpack-plugin@0.5.10(react-refresh@0.14.0)(webpack-dev-server@4.15.1)(webpack@5.88.1):
     resolution: {integrity: sha512-j0Ya0hCFZPd4x40qLzbhGsh9TMtdb+CJQiso+WxLOPNasohq9cc5SNUcwsZaRH6++Xh91Xkm/xHCkuIiIu0LUA==}
     engines: {node: '>= 10.13'}
     peerDependencies:
@@ -6005,7 +6005,7 @@ packages:
       find-up: 5.0.0
       html-entities: 2.3.3
       loader-utils: 2.0.4
-      react-refresh: 0.10.0
+      react-refresh: 0.14.0
       schema-utils: 3.1.1
       source-map: 0.7.4
       webpack: 5.88.1
@@ -16254,8 +16254,8 @@ packages:
       react-is: 17.0.2
     dev: false
 
-  /react-refresh@0.10.0:
-    resolution: {integrity: sha512-PgidR3wST3dDYKr6b4pJoqQFpPGNKDSCDx4cZoshjXipw3LzO7mG1My2pwEzz2JVkF+inx3xRpDeQLFQGH/hsQ==}
+  /react-refresh@0.14.0:
+    resolution: {integrity: sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==}
     engines: {node: '>=0.10.0'}
     dev: false
 
