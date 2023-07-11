@@ -197,7 +197,7 @@ const releaseDataFileService = {
     fileId: string,
     data: DataFileUpdateRequest,
   ): Promise<void> {
-    return client.patch(`/release/${releaseId}/file/${fileId}`, data);
+    return client.patch(`/release/${releaseId}/data/${fileId}`, data);
   },
   cancelImport(releaseId: string, fileId: string): Promise<void> {
     return client.post(`/release/${releaseId}/data/${fileId}/import/cancel`);

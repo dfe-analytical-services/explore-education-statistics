@@ -6,9 +6,9 @@ using System.IO.Compression;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -2290,7 +2290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Update()
+        public async Task UpdateDataFileDetails()
         {
             var release = new Release
             {
@@ -2300,12 +2300,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFile = new ReleaseFile
             {
                 Release = release,
-                Name = "Test PDF File",
+                Name = "Test CSV File",
                 File = new File
                 {
                     RootPath = release.Id,
-                    Filename = "test.pdf",
-                    Type = Ancillary,
+                    Filename = "test.csv",
+                    Type = FileType.Data,
                     Created = new DateTime(),
                     CreatedBy = new User
                     {
@@ -2326,10 +2326,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-                var result = await service.Update(
+                var result = await service.UpdateDataFileDetails(
                     releaseFile.ReleaseId,
                     releaseFile.FileId,
-                    new ReleaseFileUpdateViewModel
+                    new ReleaseDataFileUpdateRequest
                     {
                         Title = "New file title",
                         Summary = "New file summary"
@@ -2354,7 +2354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Update_OnlyName()
+        public async Task UpdateDataFileDetails_OnlyName()
         {
             var release = new Release
             {
@@ -2369,7 +2369,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     RootPath = release.Id,
-                    Filename = "test.pdf"
+                    Type = FileType.Data,
+                    Filename = "test.csv",
                 }
             };
 
@@ -2385,10 +2386,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-                var result = await service.Update(
+                var result = await service.UpdateDataFileDetails(
                     releaseFile.ReleaseId,
                     releaseFile.FileId,
-                    new ReleaseFileUpdateViewModel
+                    new ReleaseDataFileUpdateRequest
                     {
                         Title = "New file title",
                     }
@@ -2412,7 +2413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Update_OnlySummary()
+        public async Task UpdateDataFileDetails_OnlySummary()
         {
             var release = new Release
             {
@@ -2427,7 +2428,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = new File
                 {
                     RootPath = release.Id,
-                    Filename = "test.pdf",
+                    Type = FileType.Data,
+                    Filename = "test.csv",
                 }
             };
 
@@ -2443,10 +2445,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-                var result = await service.Update(
+                var result = await service.UpdateDataFileDetails(
                     releaseFile.ReleaseId,
                     releaseFile.FileId,
-                    new ReleaseFileUpdateViewModel
+                    new ReleaseDataFileUpdateRequest
                     {
                         Summary = "New file summary",
                     }
@@ -2470,15 +2472,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Update_NoRelease()
+        public async Task UpdateDataFileDetails_NoRelease()
         {
             await using var contentDbContext = InMemoryContentDbContext();
             var service = SetupReleaseFileService(contentDbContext);
 
-            var result = await service.Update(
+            var result = await service.UpdateDataFileDetails(
                 Guid.NewGuid(),
                 Guid.NewGuid(),
-                new ReleaseFileUpdateViewModel
+                new ReleaseDataFileUpdateRequest
                 {
                     Title = "New file title",
                 }
@@ -2488,7 +2490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Update_NoReleaseFile()
+        public async Task UpdateDataFileDetails_NoReleaseFile()
         {
             var release = new Release();
 
@@ -2504,10 +2506,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleaseFileService(contentDbContext);
 
-                var result = await service.Update(
+                var result = await service.UpdateDataFileDetails(
                     Guid.NewGuid(),
                     Guid.NewGuid(),
-                    new ReleaseFileUpdateViewModel
+                    new ReleaseDataFileUpdateRequest
                     {
                         Title = "New file title",
                     }
@@ -2555,7 +2557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.UploadAncillary(
                     release.Id,
-                    new ReleaseAncillaryFileUploadViewModel
+                    new ReleaseAncillaryFileUploadRequest
                     {
                         Title = "Test name",
                         Summary = "Test summary",
@@ -2609,7 +2611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ReplaceAncillary()
+        public async Task UpdateAncillary()
         {
             var release = new Release
             {
@@ -2667,11 +2669,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     privateBlobStorageService: privateBlobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
-                var result = await service.ReplaceAncillary(
+                var result = await service.UpdateAncillary(
                     release.Id,
                     releaseFile.FileId,
-                    newFile: newFormFile
-                );
+                    request: new ReleaseAncillaryFileUpdateRequest
+                    {
+                        File = newFormFile,
+                        Title = "New ancillary name",
+                        Summary = "New ancillary summary",
+                    });
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
 
@@ -2690,8 +2696,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(fileInfo.Id.HasValue);
                 Assert.Equal("pdf", fileInfo.Extension);
                 Assert.Equal("newAncillary.pdf", fileInfo.FileName);
-                Assert.Equal("Ancillary name", fileInfo.Name);
-                Assert.Equal("Ancillary summary", fileInfo.Summary);
+                Assert.Equal("New ancillary name", fileInfo.Name);
+                Assert.Equal("New ancillary summary", fileInfo.Summary);
                 Assert.Equal("10 Kb", fileInfo.Size);
                 Assert.Equal(Ancillary, fileInfo.Type);
                 Assert.Equal("test@test.com", fileInfo.UserName);
@@ -2716,8 +2722,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         && rf.File.Type == Ancillary)
                     .ToListAsync());
 
-                Assert.Equal(releaseFile.Name, dbNewReleaseFile.Name);
-                Assert.Equal(releaseFile.Summary, dbNewReleaseFile.Summary);
+                Assert.Equal("New ancillary name", dbNewReleaseFile.Name);
+                Assert.Equal("New ancillary summary", dbNewReleaseFile.Summary);
 
                 var newFile = dbNewReleaseFile.File;
 
@@ -2729,7 +2735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ReplaceAncillary_DoNotRemoveFileAttachedToOtherRelease()
+        public async Task UpdateAncillary_DoNotRemoveFileAttachedToOtherRelease()
         {
             var release = new Release
             {
@@ -2787,11 +2793,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     privateBlobStorageService: privateBlobStorageService.Object,
                     fileUploadsValidatorService: fileUploadsValidatorService.Object);
 
-                var result = await service.ReplaceAncillary(
+                var result = await service.UpdateAncillary(
                     release.Id,
                     releaseFile.FileId,
-                    newFile: newFormFile
-                );
+                    request: new ReleaseAncillaryFileUpdateRequest
+                    {
+                        File = newFormFile,
+                        Title = "New ancillary name",
+                        Summary = "New ancillary summary",
+                    });
 
                 MockUtils.VerifyAllMocks(privateBlobStorageService, fileUploadsValidatorService);
 
@@ -2808,7 +2818,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ), Times.Once);
 
                 Assert.True(fileInfo.Id.HasValue);
-                Assert.Equal("Ancillary name", fileInfo.Name);
+                Assert.Equal("New ancillary name", fileInfo.Name);
+                Assert.Equal("New ancillary summary", fileInfo.Summary);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -2833,7 +2844,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         && rf.File.Filename == "newAncillary.pdf"
                         && rf.File.Type == Ancillary)
                     .ToListAsync());
-                Assert.Equal(releaseFile.Name, dbNewReleaseFile.Name);
+                Assert.Equal("New ancillary name", dbNewReleaseFile.Name);
+                Assert.Equal("New ancillary summary", dbNewReleaseFile.Summary);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateAncillary_NoFile()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Filename = "oldAncillary.csv",
+                    Type = Ancillary,
+                    RootPath = release.Id,
+                    ContentType = "text/csv",
+                    ContentLength = 1024,
+                    Created = DateTime.UtcNow.AddDays(-1),
+                },
+                Name = "Ancillary name",
+                Summary = "Ancillary summary",
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
+
+                var result = await service.UpdateAncillary(
+                    release.Id,
+                    releaseFile.FileId,
+                    request: new ReleaseAncillaryFileUpdateRequest
+                    {
+                        Title = "New ancillary name",
+                        Summary = "New ancillary summary",
+                    });
+
+                var fileInfo = result.AssertRight();
+
+                Assert.True(fileInfo.Id.HasValue);
+                Assert.Equal("New ancillary name", fileInfo.Name);
+                Assert.Equal("New ancillary summary", fileInfo.Summary);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                Assert.NotNull(await contentDbContext.Files
+                    .FirstOrDefaultAsync(f => f.Id == releaseFile.FileId));
+
+                var dbReleaseFile = Assert.Single(await contentDbContext.ReleaseFiles.ToListAsync());
+                Assert.Equal(release.Id, dbReleaseFile.ReleaseId);
+                Assert.Equal(releaseFile.FileId, dbReleaseFile.FileId);
+                Assert.Equal("New ancillary name", dbReleaseFile.Name);
+                Assert.Equal("New ancillary summary", dbReleaseFile.Summary);
             }
         }
 
