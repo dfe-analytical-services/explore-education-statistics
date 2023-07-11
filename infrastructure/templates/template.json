@@ -686,32 +686,32 @@
       "type": "int",
       "defaultValue": 1
     },
-    "eesacrName": {
+    "containerRegistryName": {
       "type": "string",
       "defaultValue": "eesacr",
       "metadata": {
-        "description": "The name of the Azure Container Registry."
+        "description": "The name of the Container registry"
       }
     },
     "dockerRegistryServerUrl": {
       "type": "string",
-      "defaultValue": "https://[parameters('eesacrName')].azurecr.io",
+      "defaultValue": "https://[parameters('containerRegistryName')].azurecr.io",
       "metadata": {
-        "description": "The URL of the Docker registry."
+        "description": "The URL of the Container registry"
       }
     },
     "dockerRegistryServerUsername": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "The username to log in to the Docker registry."
+        "description": "The username to log in to the Container registry"
       }
     },
     "dockerRegistryServerPassword": {
       "type": "securestring",
       "defaultValue": "",
       "metadata": {
-        "description": "The password to log in to the Docker registry."
+        "description": "The password to log in to the Container registry"
       }
     }
   },
@@ -1939,9 +1939,10 @@
       }
     },
     {
+      "condition": "[equals(parameters('environmentName'), 'Development')]",
       "type": "Microsoft.ContainerRegistry/registries",
       "apiVersion": "2022-02-01-preview",
-      "name": "[parameters('eesacrName')]",
+      "name": "[parameters('containerRegistryName')]",
       "location": "[resourceGroup().location]",
       "sku": {
         "name": "Standard",
