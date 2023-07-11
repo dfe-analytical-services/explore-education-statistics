@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -253,6 +254,136 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateApprovalStatus_ApprovingMethodologyAddsMethodologyStatus()
+        {
+            var methodologyVersion = new MethodologyVersion
+            {
+                Status = Draft,
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Publication title",
+                    Publications = ListOf(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication()
+                    })
+                }
+            };
+
+            var request = new MethodologyApprovalUpdateRequest
+            {
+                LatestInternalReleaseNote = "Test approval",
+                PublishingStrategy = Immediately,
+                Status = Approved,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyVersionRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
+
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyVersionRepository);
+
+                Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
+                Assert.Equal("Test approval", updatedMethodologyVersion.InternalReleaseNote);
+                Assert.Null(updatedMethodologyVersion.Published);
+                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Equal(request.Status, updatedMethodologyVersion.Status);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyStatus = await context
+                    .MethodologyStatus
+                    .SingleAsync(ms => ms.MethodologyVersionId == methodologyVersion.Id);
+
+                Assert.Equal("Test approval", methodologyStatus.InternalReleaseNote);
+                Assert.Equal(Approved, methodologyStatus.ApprovalStatus);
+                Assert.NotNull(methodologyStatus.Created);
+                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created.Value).Milliseconds, 0, 1500);
+                Assert.Equal(UserId, methodologyStatus.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateApprovalStatus_NoStatusUpdateRequiredNoMethodologyStatusAdded()
+        {
+            var methodologyVersion = new MethodologyVersion
+            {
+                Status = Draft,
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Publication title",
+                    Publications = ListOf(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication()
+                    })
+                }
+            };
+
+            var request = new MethodologyApprovalUpdateRequest
+            {
+                Status = Draft,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(contentDbContext: context);
+
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+
+                Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
+                Assert.Null(updatedMethodologyVersion.InternalReleaseNote);
+                Assert.Null(updatedMethodologyVersion.Published);
+                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy); // Immediately is the default
+                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Equal(request.Status, updatedMethodologyVersion.Status);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyStatuses = await context
+                    .MethodologyStatus
+                    .Where(ms => ms.MethodologyVersionId == methodologyVersion.Id)
+                    .ToListAsync();
+
+                Assert.Empty(methodologyStatuses);
             }
         }
 

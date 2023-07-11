@@ -228,6 +228,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 );
         }
 
+        [Fact]
+        public async Task GetMethodologyStatuses()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodologyVersion, CanViewSpecificMethodology)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupMethodologyService(userService: userService.Object);
+                        return service.GetMethodologyStatuses(_methodologyVersion.Id);
+                    }
+                );
+        }
+
         private MethodologyService SetupMethodologyService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
@@ -247,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(),
                 methodologyApprovalService ?? Mock.Of<IMethodologyApprovalService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-            userService ?? Mock.Of<IUserService>()
+                userService ?? Mock.Of<IUserService>()
             );
         }
 
