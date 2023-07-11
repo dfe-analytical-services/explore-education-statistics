@@ -16,7 +16,14 @@ export default function createExpandedRowHeaders(
     const { maxCrossSpan } = header;
     return maxCrossSpan > acc ? maxCrossSpan : acc;
   }, 0);
-  const headers = rowHeaders.reduce<TableCellJson[][]>((acc, header) => {
+
+  // Check to see if all headers at the current level have only
+  // a single matching child, so we can collapse this level.
+  let isCollapsibleLevel = rowHeaders.every(rowHeader =>
+    rowHeader.hasSingleMatchingChild(),
+  );
+
+  return rowHeaders.reduce<TableCellJson[][]>((acc, header) => {
     // To construct these headers, we use a depth-first
     // search algorithm. This requires a 'stack' data-structure to
     // track the correct order of header nodes as we process
@@ -24,12 +31,21 @@ export default function createExpandedRowHeaders(
     const stack = [header];
 
     let row: TableCellJson[] = [];
+    let prevDepth = 0;
 
     while (stack.length > 0) {
       const current = stack.shift();
 
       if (!current) {
         break;
+      }
+
+      if (current.depth > prevDepth) {
+        prevDepth = current.depth;
+
+        isCollapsibleLevel = current.parent.children.every(rowHeader =>
+          rowHeader.hasSingleMatchingChild(),
+        );
       }
 
       const prev = last(row);
@@ -46,21 +62,12 @@ export default function createExpandedRowHeaders(
         !matchesPreviousHeader ||
         (matchesPreviousHeader && current.hasSiblings())
       ) {
-        // Check to see if all headers at the current level have only
-        // a single matching child so will be merged.
-        const headersAtCurrentLevel = current.parent
-          ? current.parent.children
-          : rowHeaders;
-        const allHeadersAtCurrentLevelWillBeMerged = headersAtCurrentLevel.every(
-          rowHeader => rowHeader.hasSingleMatchingChild(),
-        );
-
         row.push({
           text: current.text,
           rowSpan: current.span,
           scope:
             maxDepth > current.depth + current.crossSpan ? 'rowgroup' : 'row',
-          colSpan: allHeadersAtCurrentLevelWillBeMerged ? 1 : current.crossSpan,
+          colSpan: isCollapsibleLevel ? 1 : current.crossSpan,
           tag: 'th',
         });
       } else if (
@@ -92,11 +99,10 @@ export default function createExpandedRowHeaders(
 
         acc[index] = row;
         row = [];
+        prevDepth = 0;
       }
     }
 
     return acc;
   }, []);
-
-  return headers;
 }

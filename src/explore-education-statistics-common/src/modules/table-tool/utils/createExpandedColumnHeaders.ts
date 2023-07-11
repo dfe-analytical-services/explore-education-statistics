@@ -27,6 +27,9 @@ export default function createExpandedColumnHeaders(
   let currentDepth = 0;
   let row: TableCellJson[] = [];
 
+  let isCollapsibleRow = true;
+  let prevCrossSpan = 0;
+
   while (queue.length > 0) {
     const current = queue.shift();
 
@@ -38,14 +41,17 @@ export default function createExpandedColumnHeaders(
     // we are now finished on the last row and should push it.
     if (currentDepth !== current.depth) {
       if (row.length) {
-        acc.push(adjustRow(row));
+        acc.push(adjustRow(row, isCollapsibleRow));
       }
 
       row = [];
+      isCollapsibleRow = true;
+      prevCrossSpan = 0;
+
       currentDepth = current.depth;
     }
 
-    const { crossSpan, parent } = current;
+    const { parent } = current;
 
     // If the current header's parent appears identical to it,
     // the parent will have a cross span higher than 1.
@@ -53,9 +59,17 @@ export default function createExpandedColumnHeaders(
     // as the parent will have already been added to the row above
     // and is supposed to be merged with the current header.
     if (!parent || parent?.crossSpan === 1) {
+      const { crossSpan } = current;
+
+      if (prevCrossSpan > 0 && crossSpan !== prevCrossSpan) {
+        isCollapsibleRow = false;
+      }
+
+      prevCrossSpan = crossSpan;
+
       row.push({
         colSpan: current.span,
-        rowSpan: current.crossSpan,
+        rowSpan: crossSpan,
         scope: maxDepth > currentDepth + crossSpan ? 'colgroup' : 'col',
         text: current.text,
         tag: 'th',
@@ -69,8 +83,11 @@ export default function createExpandedColumnHeaders(
     // There are no more children to iterate
     // through so push the final row.
     if (queue.length === 0 && row.length) {
-      acc.push(adjustRow(row));
+      acc.push(adjustRow(row, isCollapsibleRow));
+
       row = [];
+      isCollapsibleRow = true;
+      prevCrossSpan = 0;
     }
   }
 
@@ -78,10 +95,12 @@ export default function createExpandedColumnHeaders(
 }
 
 // Adjust the rowSpan for cells in rows where all cells are merged.
-function adjustRow(row: TableCellJson[]): TableCellJson[] {
-  const allMerged = row.every(cell => cell.rowSpan === 2);
+function adjustRow(
+  row: TableCellJson[],
+  isCollapsibleRow: boolean,
+): TableCellJson[] {
   return row.map(cell => ({
     ...cell,
-    rowSpan: allMerged ? 1 : cell.rowSpan,
+    rowSpan: isCollapsibleRow ? 1 : cell.rowSpan,
   }));
 }
