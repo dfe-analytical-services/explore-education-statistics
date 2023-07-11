@@ -10,6 +10,7 @@ import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
+import isAxiosError from '@common/utils/error/isAxiosError';
 
 export interface Contact {
   contactName: string;
@@ -96,17 +97,14 @@ const publicationService = {
       params: { topicId },
     });
   },
-
   getPublicationSummaries(): Promise<PublicationSummary[]> {
     return client.get('/publication-summaries');
   },
-
   createPublication(
     publication: PublicationCreateRequest,
   ): Promise<Publication> {
     return client.post('/publications', publication);
   },
-
   updatePublication(
     publicationId: string,
     publication: PublicationSaveRequest,
@@ -131,7 +129,7 @@ const publicationService = {
         `/publication/${publicationId}/external-methodology`,
       )
       .catch(err => {
-        if (err.response.status !== 404) {
+        if (isAxiosError(err) && err?.response?.status !== 404) {
           throw err;
         }
         return undefined;
