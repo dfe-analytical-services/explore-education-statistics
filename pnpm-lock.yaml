@@ -111,8 +111,8 @@ importers:
         specifier: ^1.2.0
         version: 1.2.0(@tanstack/query-core@4.24.6)
       '@microsoft/signalr':
-        specifier: ^6.0.1
-        version: 6.0.13
+        specifier: ^7.0.7
+        version: 7.0.7
       '@pmmmwh/react-refresh-webpack-plugin':
         specifier: ^0.5.10
         version: 0.5.10(react-refresh@0.10.0)(webpack-dev-server@4.15.1)(webpack@5.88.1)
@@ -5701,13 +5701,13 @@ packages:
       - typescript
     dev: false
 
-  /@microsoft/signalr@6.0.13:
-    resolution: {integrity: sha512-kwDb8ULOxKGo79JWHydyXAdtsWg0Oq2/zwCg+EozawEaosbl5nC6z/JGcV7+6Gy7BIMofbZOx78bvDh1yjWMYw==}
+  /@microsoft/signalr@7.0.7:
+    resolution: {integrity: sha512-RMWZLTxnjWPSaS9PYZxXAttql2JDM/+IsSJk0nACFhpLjnSw8UWfvUxOv/QjZSqLxhuksXxzBJ/91xUP6Y7Nvg==}
     dependencies:
       abort-controller: 3.0.0
-      eventsource: 1.1.2
-      fetch-cookie: 0.11.0
-      node-fetch: 2.6.9
+      eventsource: 2.0.2
+      fetch-cookie: 2.1.0
+      node-fetch: 2.6.12
       ws: 7.5.9
     transitivePeerDependencies:
       - bufferutil
@@ -10779,11 +10779,6 @@ packages:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
 
-  /eventsource@1.1.2:
-    resolution: {integrity: sha512-xAH3zWhgO2/3KIniEKYPr8plNSzlGINOUqYj0m0u7AB81iRw8b/3E73W6AuU+6klLbaSFmZnaETQ2lXPfAydrA==}
-    engines: {node: '>=0.12.0'}
-    dev: false
-
   /eventsource@2.0.2:
     resolution: {integrity: sha512-IzUmBGPR3+oUG9dUeXynyNmf91/3zUSJg1lCktzKw47OXuhco54U3r9B7O4XX+Rb1Itm9OZ2b0RkTs10bICOxA==}
     engines: {node: '>=12.0.0'}
@@ -11008,10 +11003,10 @@ packages:
       bser: 2.1.1
     dev: true
 
-  /fetch-cookie@0.11.0:
-    resolution: {integrity: sha512-BQm7iZLFhMWFy5CZ/162sAGjBfdNWb7a8LEqqnzsHFhxT/X/SVj/z2t2nu3aJvjlbQkrAlTUApplPRjWyH4mhA==}
-    engines: {node: '>=8'}
+  /fetch-cookie@2.1.0:
+    resolution: {integrity: sha512-39+cZRbWfbibmj22R2Jy6dmTbAWC+oqun1f1FzQaNurkPDUP4C38jpeZbiXCR88RKRVDp8UcDrbFXkNhN+NjYg==}
     dependencies:
+      set-cookie-parser: 2.5.1
       tough-cookie: 4.1.2
     dev: false
 
@@ -13244,7 +13239,7 @@ packages:
       whatwg-encoding: 2.0.0
       whatwg-mimetype: 3.0.0
       whatwg-url: 11.0.0
-      ws: 8.12.0
+      ws: 8.13.0
       xml-name-validator: 4.0.0
     transitivePeerDependencies:
       - bufferutil
@@ -14091,18 +14086,6 @@ packages:
 
   /node-fetch@2.6.7:
     resolution: {integrity: sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==}
-    engines: {node: 4.x || >=6.0.0}
-    peerDependencies:
-      encoding: ^0.1.0
-    peerDependenciesMeta:
-      encoding:
-        optional: true
-    dependencies:
-      whatwg-url: 5.0.0
-    dev: false
-
-  /node-fetch@2.6.9:
-    resolution: {integrity: sha512-DJm/CJkZkRjKKj4Zi4BsKVZh3ValV5IR5s7LVZnW+6YMh0W1BfNA8XSs6DLMGYlId5F3KnA70uu2qepcR08Qqg==}
     engines: {node: 4.x || >=6.0.0}
     peerDependencies:
       encoding: ^0.1.0
@@ -19385,7 +19368,6 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
-    dev: false
 
   /x-is-string@0.1.0:
     resolution: {integrity: sha512-GojqklwG8gpzOVEVki5KudKNoq7MbbjYZCbyWzEz7tyPA7eleiE0+ePwOWQQRb5fm86rD3S8Tc0tSFf3AOv50w==}
