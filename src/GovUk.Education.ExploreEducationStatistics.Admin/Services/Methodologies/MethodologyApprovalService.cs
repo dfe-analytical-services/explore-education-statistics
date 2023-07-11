@@ -104,7 +104,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             await _publishingService.PublishMethodologyFiles(methodologyVersion.Id);
                         }
 
-                        // @MarkFix this gets added even if moving from Draft -> Draft?
                         var methodologyStatus = new MethodologyStatus
                         {
                             MethodologyVersionId = methodologyVersion.Id,
