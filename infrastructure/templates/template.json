@@ -686,46 +686,32 @@
       "type": "int",
       "defaultValue": 1
     },
-    "containerRegistrySubscriptionId": {
-      "type": "string",
-      "defaultValue": "",
-      "metadata": {
-        "description": "Subscription id of the Container registry"
-      }
-    },
-    "containerRegistryResourceGroup": {
-      "type": "string",
-      "defaultValue": "s101d01-rg-ees",
-      "metadata": {
-        "description": "Resource group name of the Container registry"
-      }
-    },
-    "containerRegistryName": {
+    "eesacrName": {
       "type": "string",
       "defaultValue": "eesacr",
       "metadata": {
-        "description": "The name of the Container registry"
+        "description": "The name of the Azure Container Registry."
       }
     },
     "dockerRegistryServerUrl": {
       "type": "string",
-      "defaultValue": "https://[parameters('containerRegistryName')].azurecr.io",
+      "defaultValue": "https://[parameters('eesacrName')].azurecr.io",
       "metadata": {
-        "description": "The URL of the Container registry"
+        "description": "The URL of the Docker registry."
       }
     },
     "dockerRegistryServerUsername": {
       "type": "string",
       "defaultValue": "",
       "metadata": {
-        "description": "The username to log in to the Container registry"
+        "description": "The username to log in to the Docker registry."
       }
     },
     "dockerRegistryServerPassword": {
       "type": "securestring",
       "defaultValue": "",
       "metadata": {
-        "description": "The password to log in to the Container registry"
+        "description": "The password to log in to the Docker registry."
       }
     }
   },
@@ -1953,6 +1939,63 @@
       }
     },
     {
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2022-02-01-preview",
+      "name": "[parameters('eesacrName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Container Registry",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "adminUserEnabled": false,
+        "policies": {
+          "quarantinePolicy": {
+            "status": "disabled"
+          },
+          "trustPolicy": {
+            "type": "Notary",
+            "status": "disabled"
+          },
+          "retentionPolicy": {
+            "days": 7,
+            "status": "disabled"
+          },
+          "exportPolicy": {
+            "status": "enabled"
+          },
+          "azureADAuthenticationAsArmPolicy": {
+            "status": "enabled"
+          },
+          "softDeletePolicy": {
+            "retentionDays": 7,
+            "status": "enabled"
+          }
+        },
+        "encryption": {
+          "status": "disabled"
+        },
+        "dataEndpointEnabled": false,
+        "publicNetworkAccess": "Enabled",
+        "networkRuleBypassOptions": "AzureServices",
+        "zoneRedundancy": "Disabled",
+        "anonymousPullEnabled": false
+      }
+    },
+    {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
       "kind": "app,linux,container",
@@ -2003,8 +2046,7 @@
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
-        "[resourceId('microsoft.insights/components/', variables('publicAppInsights'))]",
-        "[resourceId('Microsoft.ContainerRegistry/registries/', parameters('containerRegistryName'))]"
+        "[resourceId('microsoft.insights/components/', variables('publicAppInsights'))]"
       ]
     },
     {
@@ -3435,80 +3477,6 @@
             }
           }
         ]
-      }
-    },
-    {
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2021-04-01",
-      "name": "containerRegistryDeployment",
-      "resourceGroup": "[parameters('containerRegistryResourceGroup')]",
-      "subscriptionId": "[parameters('containerRegistrySubscriptionId')]",
-      "properties": {
-        "mode": "Incremental",
-        "template": {
-          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-          "contentVersion": "1.0.0.0",
-          "parameters": {},
-          "variables": {},
-          "resources": [
-            {
-              "type": "Microsoft.ContainerRegistry/registries",
-              "apiVersion": "2022-02-01-preview",
-              "name": "[parameters('containerRegistryName')]",
-              "location": "[resourceGroup().location]",
-              "sku": {
-                "name": "Standard",
-                "tier": "Standard"
-              },
-              "tags": {
-                "Department": "[parameters('departmentName')]",
-                "Solution": "[parameters('solutionName')]",
-                "ServiceType": "Container Registry",
-                "CostCentre": "[parameters('costCentre')]",
-                "ServiceOwner": "[parameters('serviceOwnerName')]",
-                "DateProvisioned": "[parameters('dateProvisioned')]",
-                "CreatedBy": "[parameters('createdBy')]",
-                "DeploymentRepo": "[parameters('deploymentRepo')]",
-                "DeploymentScript": "[parameters('deploymentScript')]"
-              },
-              "properties": {
-                "adminUserEnabled": false,
-                "policies": {
-                  "quarantinePolicy": {
-                    "status": "disabled"
-                  },
-                  "trustPolicy": {
-                    "type": "Notary",
-                    "status": "disabled"
-                  },
-                  "retentionPolicy": {
-                    "days": 7,
-                    "status": "disabled"
-                  },
-                  "exportPolicy": {
-                    "status": "enabled"
-                  },
-                  "azureADAuthenticationAsArmPolicy": {
-                    "status": "enabled"
-                  },
-                  "softDeletePolicy": {
-                    "retentionDays": 7,
-                    "status": "enabled"
-                  }
-                },
-                "encryption": {
-                  "status": "disabled"
-                },
-                "dataEndpointEnabled": false,
-                "publicNetworkAccess": "Enabled",
-                "networkRuleBypassOptions": "AzureServices",
-                "zoneRedundancy": "Disabled",
-                "anonymousPullEnabled": false
-              }
-            }
-          ]
-        },
-        "parameters": {}
       }
     },
     {
