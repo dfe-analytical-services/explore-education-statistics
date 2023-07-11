@@ -60,9 +60,3 @@ user checks methodology note
     [Arguments]    ${number}    ${displayDate}    ${content}
     user waits until element contains    css:#methodologyNotes li:nth-of-type(${number}) time    ${displayDate}
     user waits until element contains    css:#methodologyNotes li:nth-of-type(${number}) p    ${content}
-
-user reloads the stale cached page
-    # Next.js will have returned a stale cached page for the last request and will have created a new cached page in
-    # the background in the meantime using Incremental Static Regeneration, so request the page again.
-    sleep    %{WAIT_NEXT_ISR}
-    user reloads page
