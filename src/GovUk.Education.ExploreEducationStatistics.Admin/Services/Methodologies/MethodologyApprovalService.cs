@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyApprovalUpdateRequest request)
         {
-            if (!request.IsStatusUpdateForMethodology(methodologyVersionToUpdate))
+            if (!request.IsStatusUpdateRequired(methodologyVersionToUpdate))
             {
                 // Status unchanged
                 return methodologyVersionToUpdate;

@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyApprovalUpdateRequest request)
         {
-            if (!request.IsStatusUpdateForMethodology(methodologyVersionToUpdate))
+            if (!request.IsStatusUpdateRequired(methodologyVersionToUpdate))
             {
                 return methodologyVersionToUpdate;
             }
@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
-            if (!request.IsDetailUpdateForMethodology(methodologyVersionToUpdate))
+            if (methodologyVersionToUpdate.Title == request.Title)
             {
                 // Details unchanged
                 return methodologyVersionToUpdate;
