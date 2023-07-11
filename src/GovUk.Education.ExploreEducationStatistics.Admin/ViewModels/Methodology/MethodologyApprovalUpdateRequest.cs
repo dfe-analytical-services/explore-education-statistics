@@ -22,8 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         {
             return methodologyVersion.Status != Status
                    || methodologyVersion.PublishingStrategy != PublishingStrategy
-                   || methodologyVersion.ScheduledWithReleaseId != WithReleaseId
-                   || methodologyVersion.InternalReleaseNote != LatestInternalReleaseNote;
+                   || methodologyVersion.ScheduledWithReleaseId != WithReleaseId;
+                   //|| methodologyVersion.InternalReleaseNote != LatestInternalReleaseNote; // @MarkFix why internal release note check?
         }
     }
 }
