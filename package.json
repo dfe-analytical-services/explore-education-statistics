@@ -34,7 +34,9 @@
   },
   "scripts": {
     "prepare": "husky install",
+    "preinstall": "pnpm check:node",
     "clean": "pnpm -r --parallel exec rm -rf node_modules && rm -rf node_modules",
+    "check:node": "check-node-version --node 16.14.2 --pnpm 8.6.6",
     "fix": "pnpm fix:js && pnpm fix:style",
     "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx src tests/performance-tests/src useful-scripts",
     "fix:style": "stylelint --fix src/**/*.{scss,css}",
