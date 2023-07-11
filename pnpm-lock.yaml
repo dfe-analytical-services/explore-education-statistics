@@ -150,8 +150,8 @@ importers:
         specifier: ^2.3.2
         version: 2.3.2
       core-js:
-        specifier: ^3.18.2
-        version: 3.27.2
+        specifier: ^3.31.1
+        version: 3.31.1
       cross-env:
         specifier: ^7.0.3
         version: 7.0.3
@@ -622,8 +622,8 @@ importers:
         specifier: ^2.0.0
         version: 2.0.2
       core-js:
-        specifier: ^3.6.5
-        version: 3.27.2
+        specifier: ^3.31.1
+        version: 3.31.1
       cross-fetch:
         specifier: ^3.0.6
         version: 3.1.5
@@ -868,8 +868,8 @@ importers:
         specifier: ^2.3.2
         version: 2.3.2
       core-js:
-        specifier: ^3.6.5
-        version: 3.27.2
+        specifier: ^3.31.1
+        version: 3.31.1
       cross-env:
         specifier: ^7.0.2
         version: 7.0.3
@@ -9059,8 +9059,8 @@ packages:
     deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
     requiresBuild: true
 
-  /core-js@3.27.2:
-    resolution: {integrity: sha512-9ashVQskuh5AZEZ1JdQWp1GqSoC1e1G87MzRqg2gIfVAQ7Qn9K+uFj8EcniUFA4P2NLZfV+TOlX1SzoKfo+s7w==}
+  /core-js@3.31.1:
+    resolution: {integrity: sha512-2sKLtfq1eFST7l7v62zaqXacPc7uG8ZAya8ogijLhTtaKNcpzpB4TMoTw2Si+8GYKRwFPMMtUT0263QFWFfqyQ==}
     requiresBuild: true
     dev: false
 
@@ -14309,7 +14309,7 @@ packages:
     dependencies:
       acorn: 7.4.1
       base64-js: 1.5.1
-      core-js: 3.27.2
+      core-js: 3.31.1
       crypto-js: 4.1.1
       serialize-javascript: 4.0.0
     dev: false
@@ -16003,7 +16003,7 @@ packages:
     resolution: {integrity: sha512-sZ41cxiU5llIB003yxxQBYrARBqe0repqPTTYBTmMqTz9szeBbE37BehCE891NZsmdZqqP+xWKdT3eo3vOzN8w==}
     engines: {node: '>=14'}
     dependencies:
-      core-js: 3.27.2
+      core-js: 3.31.1
       object-assign: 4.1.1
       promise: 8.3.0
       raf: 3.4.1

@@ -8,7 +8,7 @@
     "applicationinsights": "^2.7.0",
     "axios": "^1.4.0",
     "classnames": "^2.3.2",
-    "core-js": "^3.6.5",
+    "core-js": "^3.31.1",
     "cross-env": "^7.0.2",
     "cross-fetch": "^3.0.6",
     "date-fns": "^2.16.1",
