@@ -211,8 +211,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(id, q =>
                     q.Include(m => m.Methodology))
-                .OnSuccess(methodology => UpdateStatus(methodology, request))
-                .OnSuccess(methodology => UpdateDetails(methodology, request))
+                .OnSuccess(methodologyVersion => UpdateStatus(methodologyVersion, request))
+                .OnSuccess(methodologyVersion => UpdateDetails(methodologyVersion, request))
                 .OnSuccess(BuildMethodologyVersionViewModel);
         }
 
@@ -295,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
                 // unlikely scenario, it's entirely possible.
                 .OnSuccessDo(methodologyVersion =>
-                    ValidateMethodologySlugUniqueForUpdate(methodologyVersion.Id, request.Slug))
+                    ValidateMethodologySlugUniqueForUpdate(methodologyVersion, request.Slug))
                 .OnSuccess(async methodologyVersion =>
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;
@@ -433,19 +433,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(
-            Guid methodologyVersionId, string slug)
+            MethodologyVersion methodologyVersion, string slug)
         {
-            var methodologyId = await _context
-                .MethodologyVersions
-                .AsQueryable()
-                .Where(m => m.Id == methodologyVersionId)
-                .Select(m => m.MethodologyId)
-                .SingleAsync();
-
             if (await _context
                     .Methodologies
                     .AsQueryable()
-                    .AnyAsync(p => p.Slug == slug && p.Id != methodologyId))
+                    .AnyAsync(p => p.Slug == slug && p.Id != methodologyVersion.MethodologyId))
             {
                 return ValidationActionResult(SlugNotUnique);
             }

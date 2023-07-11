@@ -73,58 +73,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             if (!request.IsStatusUpdateRequired(methodologyVersionToUpdate))
             {
-                // Status unchanged
                 return methodologyVersionToUpdate;
             }
 
             return await 
                 CheckCanUpdateStatus(methodologyVersionToUpdate, request.Status)
-                .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
-                .OnSuccessDo(RemoveUnusedImages)
-                .OnSuccess(async methodology =>
-                {
-                    methodology.Status = request.Status;
-                    methodology.PublishingStrategy = request.PublishingStrategy;
-                    methodology.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
-                        ? request.WithReleaseId
-                        : null;
-                    methodology.InternalReleaseNote = Approved == request.Status
-                        ? request.LatestInternalReleaseNote
-                        : null;
-
-                    methodology.Updated = DateTime.UtcNow;
-
-                    var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodology.Id);
-                    
-                    if (isPubliclyAccessible)
+                    .OnSuccessDo(methodologyVersion => CheckMethodologyCanDependOnRelease(methodologyVersion, request))
+                    .OnSuccessDo(RemoveUnusedImages)
+                    .OnSuccess(async methodologyVersion =>
                     {
-                        methodology.Published = DateTime.UtcNow;
+                        _context.MethodologyVersions.Update(methodologyVersion);
 
-                        await _publishingService.PublishMethodologyFiles(methodology.Id);
-                    }
+                        methodologyVersion.Status = request.Status;
+                        methodologyVersion.PublishingStrategy = request.PublishingStrategy;
+                        methodologyVersion.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
+                            ? request.WithReleaseId
+                            : null;
+                        methodologyVersion.InternalReleaseNote = Approved == request.Status
+                            ? request.LatestInternalReleaseNote
+                            : null;
 
-                    _context.MethodologyVersions.Update(methodology);
+                        methodologyVersion.Updated = DateTime.UtcNow;
 
-                    // @MarkFix this gets added even if moving from Draft -> Draft?
-                    var methodologyStatus = new MethodologyStatus
-                    {
-                        MethodologyVersionId = methodology.Id,
-                        InternalReleaseNote = request.LatestInternalReleaseNote,
-                        ApprovalStatus = request.Status,
-                        CreatedById = _userService.GetUserId(),
-                    };
-                    await _context.MethodologyStatus.AddAsync(methodologyStatus);
+                        var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id);
 
-                    await _context.SaveChangesAsync();
+                        if (isPubliclyAccessible)
+                        {
+                            methodologyVersion.Published = DateTime.UtcNow;
 
-                    if (isPubliclyAccessible)
-                    {
-                        // Update the 'All Methodologies' cache item
-                        await _methodologyCacheService.UpdateSummariesTree();
-                    }
+                            await _publishingService.PublishMethodologyFiles(methodologyVersion.Id);
+                        }
 
-                    return methodology;
-                });
+                        // @MarkFix this gets added even if moving from Draft -> Draft?
+                        var methodologyStatus = new MethodologyStatus
+                        {
+                            MethodologyVersionId = methodologyVersion.Id,
+                            InternalReleaseNote = request.LatestInternalReleaseNote,
+                            ApprovalStatus = request.Status,
+                            CreatedById = _userService.GetUserId(),
+                        };
+                        await _context.MethodologyStatus.AddAsync(methodologyStatus);
+
+                        await _context.SaveChangesAsync();
+
+                        if (isPubliclyAccessible)
+                        {
+                            // Update the 'All Methodologies' cache item
+                            await _methodologyCacheService.UpdateSummariesTree();
+                        }
+
+                        return methodologyVersion;
+                    });
         }
 
         private async Task<Either<ActionResult, Unit>> CheckMethodologyCanDependOnRelease(
