@@ -2004,7 +2004,7 @@
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
         "[resourceId('microsoft.insights/components/', variables('publicAppInsights'))]",
-        "[resourceId('Microsoft.Resources/deployments', 'containerRegistryDeployment')]"
+        "[resourceId(parameters('containerRegistrySubscriptionId'), parameters('containerRegistryResourceGroup'), 'Microsoft.ContainerRegistry/registries', parameters('containerRegistryName'))]"
       ]
     },
     {
