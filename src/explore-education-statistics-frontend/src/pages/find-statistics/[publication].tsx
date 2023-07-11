@@ -1,5 +1,4 @@
 export {
   default,
-  getStaticProps,
-  getStaticPaths,
+  getServerSideProps,
 } from '@frontend/modules/find-statistics/PublicationReleasePage';
