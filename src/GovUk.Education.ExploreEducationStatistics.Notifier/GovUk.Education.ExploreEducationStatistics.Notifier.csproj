@@ -7,7 +7,7 @@
   <ItemGroup>
     <PackageReference Include="GovukNotify" Version="6.0.0" />
     <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
-    <PackageReference Include="JWT" Version="7.3.1" />
+    <PackageReference Include="JWT" Version="10.0.2" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.0.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.0.1" />
