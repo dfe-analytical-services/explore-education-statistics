@@ -275,6 +275,7 @@ jobs:
           Dockerfile: 'docker/Dockerfile.public-frontend'
           buildContext: '$(System.DefaultWorkingDirectory)'
           tags: $(Build.BuildNumber)
+          arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
 
   - job: 'MiscellaneousArtifacts'
     pool:
