@@ -1,10 +1,10 @@
 {
   "name": "explore-education-statistics",
   "private": true,
-  "packageManager": "pnpm@8.6.6",
+  "packageManager": "pnpm@8.6.7",
   "engines": {
     "node": "16.14.2",
-    "pnpm": "8.6.6"
+    "pnpm": "8.6.7"
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",
@@ -36,7 +36,7 @@
     "prepare": "husky install",
     "preinstall": "pnpm check:node",
     "clean": "pnpm -r --parallel exec rm -rf node_modules && rm -rf node_modules",
-    "check:node": "check-node-version --node 16.14.2 --pnpm 8.6.6",
+    "check:node": "check-node-version --package",
     "fix": "pnpm fix:js && pnpm fix:style",
     "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx src tests/performance-tests/src useful-scripts",
     "fix:style": "stylelint --fix src/**/*.{scss,css}",
@@ -53,9 +53,9 @@
     "start:azure": "cd \"C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\" && c:AzureStorageEmulator.exe start -inprocess",
     "test": "pnpm -r --no-bail test",
     "test:snapshot": "pnpm -r --no-bail test:snapshot",
-    "test:ci": "pnpm -r --no-bail --aggregate-output --append-only=reporter test:ci",
+    "test:ci": "pnpm -r --no-bail --aggregate-output --reporter=append-only test:ci",
     "test:coverage": "pnpm -r --no-bail test:coverage",
-    "tsc": "pnpm -r --aggregate-output --append-only=reporter --no-bail tsc",
+    "tsc": "pnpm -r --aggregate-output --reporter=append-only --no-bail tsc",
     "install:azure-tools": "pnpm install -g azure-functions-core-tools@4 --unsafe-perm true"
   },
   "lint-staged": {
