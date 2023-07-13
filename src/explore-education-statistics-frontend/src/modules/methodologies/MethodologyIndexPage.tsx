@@ -12,6 +12,8 @@ import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWith
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import { MethodologySummary } from '@common/services/types/methodology';
+import { uniqWith } from 'lodash';
 
 interface Props {
   themes: MethodologyTheme[];
@@ -111,7 +113,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async () => {
 export default MethodologyIndexPage;
 
 function getMethodologiesForTopics(topics: MethodologyTopic[]) {
-  return topics.flatMap(topic =>
+  const methodologies = topics.flatMap(topic =>
     topic.publications.flatMap(pub => pub.methodologies),
+  );
+  return uniqWith(
+    methodologies,
+    (methodology1: MethodologySummary, methodology2: MethodologySummary) =>
+      methodology1.id === methodology2.id,
   );
 }
