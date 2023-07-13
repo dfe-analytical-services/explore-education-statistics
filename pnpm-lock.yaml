@@ -703,7 +703,7 @@ importers:
         specifier: ^4.3.1
         version: 4.3.1(react@17.0.2)
       react-modal:
-        specifier: ^3.12.1
+        specifier: ^3.16.1
         version: 3.16.1(react-dom@17.0.2)(react@17.0.2)
       recharts:
         specifier: ^2.7.2
@@ -791,8 +791,8 @@ importers:
         specifier: ^2.5.2
         version: 2.8.3
       '@types/react-modal':
-        specifier: ^3.12.0
-        version: 3.13.1
+        specifier: ^3.16.0
+        version: 3.16.0
       '@types/sanitize-html':
         specifier: ^1.27.0
         version: 1.27.2
@@ -6979,8 +6979,8 @@ packages:
       '@types/react': 17.0.27
     dev: true
 
-  /@types/react-modal@3.13.1:
-    resolution: {integrity: sha512-iY/gPvTDIy6Z+37l+ibmrY+GTV4KQTHcCyR5FIytm182RQS69G5ps4PH2FxtC7bAQ2QRHXMevsBgck7IQruHNg==}
+  /@types/react-modal@3.16.0:
+    resolution: {integrity: sha512-iphdqXAyUfByLbxJn5j6d+yh93dbMgshqGP0IuBeaKbZXx0aO+OXsvEkt6QctRdxjeM9/bR+Gp3h9F9djVWTQQ==}
     dependencies:
       '@types/react': 17.0.27
     dev: true
