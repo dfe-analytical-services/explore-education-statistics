@@ -311,10 +311,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
-                Assert.Equal("Test approval", updatedMethodologyVersion.InternalReleaseNote);
-                Assert.Null(updatedMethodologyVersion.Published);
-                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
             }
 
@@ -369,10 +365,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
-                Assert.Null(updatedMethodologyVersion.InternalReleaseNote);
-                Assert.Null(updatedMethodologyVersion.Published);
-                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy); // Immediately is the default
-                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
             }
 

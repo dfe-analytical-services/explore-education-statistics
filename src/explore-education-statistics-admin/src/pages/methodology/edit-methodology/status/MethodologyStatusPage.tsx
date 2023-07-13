@@ -17,8 +17,9 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import MethodologyStatusEditPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusEditPage';
 import React from 'react';
 import UrlContainer from '@common/components/UrlContainer';
-import releaseService, { ReleaseStatus } from '@admin/services/releaseService';
 import FormattedDate from '@common/components/FormattedDate';
+import { useQuery } from '@tanstack/react-query';
+import methodologyQueries from '@admin/queries/methodologyQueries';
 
 interface FormValues {
   status: MethodologyApprovalStatus;
@@ -43,9 +44,8 @@ const MethodologyStatusPage = () => {
 
   const [isEditing, toggleForm] = useToggle(false);
 
-  const { value: methodologyStatuses } = useAsyncRetry<MethodologyStatus[]>(
-    () => methodologyService.getMethodologyStatuses(currentMethodology.id),
-    [currentMethodology],
+  const { data: methodologyStatuses } = useQuery(
+    methodologyQueries.getMethodologyStatuses(currentMethodology.id),
   );
 
   const {
@@ -185,36 +185,34 @@ const MethodologyStatusPage = () => {
                             <th scope="col">By user</th>
                           </tr>
                         </thead>
-                        {methodologyStatuses && (
-                          <tbody>
-                            {methodologyStatuses.map(status => (
-                              <tr key={status.methodologyStatusId}>
-                                <td>
-                                  {status.created ? (
-                                    <FormattedDate format="d MMMM yyyy HH:mm">
-                                      {status.created}
-                                    </FormattedDate>
-                                  ) : (
-                                    'Not available'
-                                  )}
-                                </td>
-                                <td>{status.approvalStatus}</td>
-                                <td>{status.internalReleaseNote}</td>
-                                <td>{`${status.methodologyVersion + 1}`}</td>{' '}
-                                {/* +1 because version starts from 0 in DB */}
-                                <td>
-                                  {status.createdByEmail ? (
-                                    <a href={`mailto:${status.createdByEmail}`}>
-                                      {status.createdByEmail}
-                                    </a>
-                                  ) : (
-                                    'Not available'
-                                  )}
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        )}
+                        <tbody>
+                          {methodologyStatuses.map(status => (
+                            <tr key={status.methodologyStatusId}>
+                              <td>
+                                {status.created ? (
+                                  <FormattedDate format="d MMMM yyyy HH:mm">
+                                    {status.created}
+                                  </FormattedDate>
+                                ) : (
+                                  'Not available'
+                                )}
+                              </td>
+                              <td>{status.approvalStatus}</td>
+                              <td>{status.internalReleaseNote}</td>
+                              <td>{`${status.methodologyVersion + 1}`}</td>{' '}
+                              {/* +1 because version starts from 0 in DB */}
+                              <td>
+                                {status.createdByEmail ? (
+                                  <a href={`mailto:${status.createdByEmail}`}>
+                                    {status.createdByEmail}
+                                  </a>
+                                ) : (
+                                  'Not available'
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
                       </table>
                     </LoadingSpinner>
                   </>

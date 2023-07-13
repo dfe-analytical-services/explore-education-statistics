@@ -3,24 +3,23 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+public class MethodologyStatus : ICreatedTimestamp<DateTime?>
 {
-    public class MethodologyStatus : ICreatedTimestamp<DateTime?>
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public Guid MethodologyVersionId { get; set; }
+    public Guid MethodologyVersionId { get; set; }
 
-        public MethodologyVersion MethodologyVersion { get; set; } = null!;
+    public MethodologyVersion MethodologyVersion { get; set; } = null!;
 
-        public string? InternalReleaseNote { get; set; }
+    public string? InternalReleaseNote { get; set; }
 
-        public MethodologyApprovalStatus ApprovalStatus { get; set; }
+    public MethodologyApprovalStatus ApprovalStatus { get; set; }
 
-        public DateTime? Created { get; set; }
+    public DateTime? Created { get; set; }
 
-        public Guid? CreatedById { get; set; }
+    public Guid? CreatedById { get; set; }
 
-        public User? CreatedBy { get; set; }
-    }
+    public User? CreatedBy { get; set; }
 }

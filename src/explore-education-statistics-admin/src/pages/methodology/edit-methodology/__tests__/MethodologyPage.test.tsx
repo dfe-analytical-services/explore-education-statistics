@@ -12,11 +12,12 @@ import _methodologyContentService, {
 } from '@admin/services/methodologyContentService';
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Route } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
+import render from '@common-test/render';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');

@@ -7,5 +7,6 @@ SELECT NEWID() AS Id,
        MV.Published AS Created,
        NULL AS CreatedById
 FROM [dbo].[MethodologyVersions] MV
-WHERE MV.Published IS NOT NULL;
+WHERE MV.InternalReleaseNote IS NOT NULL
+AND MV.Status = 'Approved';
 
