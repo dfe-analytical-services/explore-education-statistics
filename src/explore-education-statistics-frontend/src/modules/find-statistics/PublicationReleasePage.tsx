@@ -442,7 +442,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               onClick={() => {
                 logEvent({
                   category: 'Downloads',
-                  action: `Release page all files, Release: ${release.title}, File: All files`,
+                  action: `Release page all files downloads.title}, Release: ${release.title}, File: All files`,
                 });
               }}
             >
