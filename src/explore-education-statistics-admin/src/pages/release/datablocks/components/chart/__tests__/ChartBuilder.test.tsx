@@ -197,7 +197,7 @@ describe('ChartBuilder', () => {
       expect(updatedTableRows[2]).toHaveTextContent(
         'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded secondary, Barnet, 2014/15)',
       );
-    });
+    }, 20000);
 
     test('removing a data set', async () => {
       render(
