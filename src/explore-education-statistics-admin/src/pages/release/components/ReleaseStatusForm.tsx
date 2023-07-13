@@ -182,11 +182,11 @@ const ReleaseStatusForm = ({
               return true;
             }
 
-            if (!isValidPartialDate(value as PartialDate)) {
+            if (!isValidPartialDate(value)) {
               return false;
             }
 
-            return isValid(parsePartialDateToLocalDate(value as PartialDate));
+            return isValid(parsePartialDateToLocalDate(value));
           },
         }),
     });
