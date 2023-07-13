@@ -10,7 +10,7 @@ import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
 import { PaginatedList } from '@common/services/types/pagination';
 import { UserPublicationRole } from '@admin/services/userService';
-import isAxiosError from '@common/utils/error/isAxiosError';
+import { isAxiosError } from 'axios';
 
 export interface Contact {
   contactName: string;

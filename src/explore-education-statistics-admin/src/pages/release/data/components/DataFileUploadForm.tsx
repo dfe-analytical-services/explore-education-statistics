@@ -137,9 +137,7 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
       onSubmit={handleSubmit}
       validationSchema={() => {
         const baseSchema: ObjectSchema<DataFileUploadFormValues> = Yup.object({
-          uploadType: Yup.mixed<DataFileUploadFormValues['uploadType']>()
-            .oneOf(['csv', 'zip'])
-            .defined(),
+          uploadType: Yup.string().oneOf(['csv', 'zip']).defined(),
           dataFile: Yup.file().when('uploadType', {
             is: 'csv',
             then: s =>

@@ -3,87 +3,11 @@ const flowRight = require('lodash/fp/flowRight');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
-const cspConnectSrc = [
-  "'self'",
-  process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace('/api', ''),
-  process.env.NEXT_PUBLIC_DATA_API_BASE_URL.replace('/api', ''),
-  process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL.replace('/api', ''),
-  'https://www.google-analytics.com',
-  'https://dc.services.visualstudio.com/v2/track',
-];
-
-const cspScriptSrc = [
-  "'self'",
-  'https://www.google-analytics.com/',
-  "'unsafe-inline'",
-  "'unsafe-eval'",
-];
-
-const frameScriptSrc = [
-  "'self'",
-  'https://department-for-education.shinyapps.io/',
-  'https://dfe-analytical-services.github.io/',
-];
-
-const contentSecurityPolicy = `
-  default-src 'self';
-  script-src ${cspScriptSrc.join(' ')};
-  style-src 'self' 'unsafe-inline';
-  img-src * blob: data: https://www.google-analytics.com/;
-  media-src 'self' blob: data:;
-  font-src 'self';
-  connect-src ${
-    process.env.NODE_ENV !== 'production' ? '*' : cspConnectSrc.join(' ')
-  };
-  frame-src ${frameScriptSrc.join(' ')};
-  frame-ancestors 'self';
-  child-src 'self';
-`;
-
-const securityHeaders = [
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
-  {
-    key: 'Content-Security-Policy',
-    value: contentSecurityPolicy.replace(/\n/g, ''),
-  },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
-  {
-    key: 'Referrer-Policy',
-    value: 'origin-when-cross-origin',
-  },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
-  {
-    key: 'X-Frame-Options',
-    value: 'DENY',
-  },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
-  {
-    key: 'X-Content-Type-Options',
-    value: 'nosniff',
-  },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-DNS-Prefetch-Control
-  {
-    key: 'X-DNS-Prefetch-Control',
-    value: 'on',
-  },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
-  {
-    key: 'Strict-Transport-Security',
-    value: 'max-age=31536000; includeSubDomains; preload',
-  },
-  // https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Feature-Policy
-  {
-    key: 'Permissions-Policy',
-    value: 'camera=(), microphone=(), geolocation=()',
-  },
-];
-
 /**
  * @type {import('next').NextConfig}
  */
 const nextConfig = {
   reactStrictMode: true,
-  poweredByHeader: false,
   swcMinify: false,
   eslint: {
     ignoreDuringBuilds: true,
@@ -123,10 +47,6 @@ const nextConfig = {
   },
   async headers() {
     return [
-      {
-        source: '/(.*)',
-        headers: securityHeaders,
-      },
       {
         source: '/fonts/(.*)',
         headers: [

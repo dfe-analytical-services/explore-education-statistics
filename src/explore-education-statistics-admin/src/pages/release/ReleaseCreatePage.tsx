@@ -127,7 +127,7 @@ const ReleaseCreatePage = ({
                 .value ?? '',
             timePeriodCoverageStartYear: '',
             templateReleaseId: '',
-            releaseType: (undefined as unknown) as ReleaseType,
+            releaseType: undefined,
           } as FormValues)
         }
         validationSchema={baseSchema => {

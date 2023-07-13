@@ -17,7 +17,6 @@ import {
   ChartDefinition,
   BarChartDataLabelPosition,
   LineChartDataLabelPosition,
-  TitleType,
 } from '@common/modules/charts/types/chart';
 import { LegendPosition } from '@common/modules/charts/types/legend';
 import {
@@ -99,7 +98,7 @@ const ChartConfiguration = ({
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
-      titleType: Yup.mixed<TitleType>()
+      titleType: Yup.mixed()
         .oneOf(['default', 'alternative'])
         .required('Choose a title type'),
       title: Yup.string().when('titleType', {

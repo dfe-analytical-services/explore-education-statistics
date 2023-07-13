@@ -12,7 +12,7 @@ import TimePeriodDataTable from '@common/modules/table-tool/components/TimePerio
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
 import { DataBlock } from '@common/services/types/blocks';
-import isAxiosError from '@common/utils/error/isAxiosError';
+import { isAxiosError } from 'axios';
 import React, { ReactNode } from 'react';
 
 const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;

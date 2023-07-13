@@ -37,7 +37,7 @@ const PageMeta = ({
       {imgUrl && (
         <meta
           property="og:image"
-          content={process.env.NEXT_PUBLIC_PUBLIC_URL + imgUrl}
+          content={process.env.NEXT_PUBLIC_URL + imgUrl}
         />
       )}
 
@@ -48,7 +48,7 @@ const PageMeta = ({
       {imgUrl && (
         <meta
           property="twitter:image"
-          content={process.env.NEXT_PUBLIC_PUBLIC_URL + imgUrl}
+          content={process.env.NEXT_PUBLIC_URL + imgUrl}
         />
       )}
     </Head>

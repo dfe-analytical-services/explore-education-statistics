@@ -6,6 +6,8 @@ const path = require('path');
 const appInsights = require('applicationinsights');
 const express = require('express');
 const basicAuth = require('express-basic-auth');
+const helmet = require('helmet');
+const referrerPolicy = require('referrer-policy');
 
 if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
   appInsights
@@ -24,8 +26,27 @@ if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
 const port = process.env.PORT || 3000;
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
-
 const handleRequest = app.getRequestHandler();
+
+const cspConnectSrc = [
+  "'self'",
+  process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+  process.env.DATA_API_BASE_URL.replace('/api', ''),
+  process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
+  'https://*.googletagmanager.com',
+  'https://*.google-analytics.com',
+  'https://*.analytics.google.com',
+  'https://dc.services.visualstudio.com/v2/track',
+];
+
+const cspScriptSrc = [
+  "'self'",
+  'https://*.googletagmanager.com',
+  'https://*.google-analytics.com/',
+  'https://*.analytics.google.com',
+  "'unsafe-inline'",
+  "'unsafe-eval'",
+];
 
 async function startServer() {
   try {
@@ -37,6 +58,37 @@ async function startServer() {
   }
 
   const server = express();
+
+  server.use(
+    helmet({
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: cspScriptSrc,
+          styleSrc: ["'self'", "'unsafe-inline'"],
+          imgSrc: [
+            "'self'",
+            process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+            'data:',
+            'https://*.googletagmanager.com',
+            'https://*.google-analytics.com/',
+            'https://*.analytics.google.com',
+          ],
+          fontSrc: ["'self'"],
+          connectSrc:
+            process.env.NODE_ENV !== 'production' ? ['*'] : cspConnectSrc,
+          frameSrc: [
+            "'self'",
+            'https://department-for-education.shinyapps.io/',
+            'https://dfe-analytical-services.github.io/',
+          ],
+          frameAncestors: ["'self'"],
+          childSrc: ["'self'"],
+        },
+      },
+    }),
+  );
+  server.use(referrerPolicy({ policy: 'no-referrer-when-downgrade' }));
 
   if (process.env.BASIC_AUTH === 'true') {
     server.use(

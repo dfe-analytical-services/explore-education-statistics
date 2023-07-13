@@ -3,7 +3,7 @@ import ResourceNotFoundPage from '@admin/pages/errors/ResourceNotFoundPage';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import { ErrorControlContextProvider } from '@common/contexts/ErrorControlContext';
 import logger from '@common/services/logger';
-import isAxiosError from '@common/utils/error/isAxiosError';
+import { isAxiosError } from 'axios';
 import React, { Component } from 'react';
 import { RouteComponentProps, withRouter } from 'react-router';
 

@@ -88,7 +88,7 @@ export default function ChartReferenceLinesConfiguration({
   const validationSchema = useMemo(() => {
     const schema = Yup.object<AddFormValues>({
       label: Yup.string().required('Enter label'),
-      position: Yup.string()
+      position: Yup.mixed<AddFormValues['position']>()
         .required('Enter position')
         .test({
           name: 'axisPosition',
@@ -96,9 +96,12 @@ export default function ChartReferenceLinesConfiguration({
             axis === 'x' ? 'X' : 'Y'
           } axis min/max range`,
           test: value => {
+            if (typeof value !== 'number') {
+              return true;
+            }
+
             return type === 'minor' && minorAxisDomain
-              ? ((value as unknown) as number) >= minorAxisDomain?.min &&
-                  ((value as unknown) as number) <= minorAxisDomain.max
+              ? value >= minorAxisDomain?.min && value <= minorAxisDomain.max
               : true;
           },
         }),

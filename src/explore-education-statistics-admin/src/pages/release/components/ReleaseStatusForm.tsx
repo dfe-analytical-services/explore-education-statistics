@@ -168,18 +168,17 @@ const ReleaseStatusForm = ({
             },
           }),
       }),
-      nextReleaseDate: Yup.object<PartialDate>()
-        .shape({
-          day: Yup.number().notRequired(),
-          month: Yup.number(),
-          year: Yup.number(),
-        })
+      nextReleaseDate: Yup.object({
+        day: Yup.number(),
+        month: Yup.number(),
+        year: Yup.number(),
+      })
         .notRequired()
         .test({
           name: 'validDate',
           message: 'Enter a valid next release date',
           test: value => {
-            if (isPartialDateEmpty(value as PartialDate)) {
+            if (!value || isPartialDateEmpty(value as PartialDate)) {
               return true;
             }
 
@@ -199,7 +198,7 @@ const ReleaseStatusForm = ({
           then: s => s.required(),
         }),
         updatePublishedDate: Yup.boolean().when('approvalStatus', {
-          is: (value: string) => value === 'Approved',
+          is: (value: ReleaseApprovalStatus) => value === 'Approved',
           then: s => s.required(),
         }),
       });
