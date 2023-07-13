@@ -12,17 +12,6 @@ const nextConfig = {
   eslint: {
     ignoreDuringBuilds: true,
   },
-  images: {
-    remotePatterns: [
-      {
-        hostname: process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace(
-          '/api',
-          '',
-        ),
-      },
-    ],
-    formats: ['image/avif', 'image/webp'],
-  },
   env: {
     BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
   },
