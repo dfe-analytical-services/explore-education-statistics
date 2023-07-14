@@ -776,11 +776,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
-                .GenerateList(2);
+            var filters = _fixture.DefaultFilter()
+                .ForIndex(0, s =>
+                    s.SetGroupCsvColumn("filter_0_grouping")
+                        .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                            .ForInstance(s => s.Set(
+                                fg => fg.Label,
+                                (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                            .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetGroupCsvColumn("filter_1_grouping")
+                        .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                            .ForInstance(s => s.Set(
+                                fg => fg.Label,
+                                (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                            .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
+                        .Generate(1)))
+                .GenerateList();
 
-            var filterItems = filters
-                .SelectMany(f => f.FilterGroups)
+            var filter0Items = filters[0].FilterGroups
+                .SelectMany(fg => fg.FilterItems)
+                .ToList();
+
+            var filter1Items = filters[1].FilterGroups
+                .SelectMany(fg => fg.FilterItems)
+                .ToList();
+
+            var filter2Items = filters[2].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
                 .ToList();
 
@@ -809,19 +833,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var observations = _fixture.DefaultObservation()
                 .WithMeasures(indicators)
                 .ForRange(..2, o => o
-                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
                     .SetLocation(locations[0])
                     .SetTimePeriod(2022, AcademicYear))
                 .ForRange(2..4, o => o
-                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
                     .SetLocation(locations[1])
                     .SetTimePeriod(2022, AcademicYear))
                 .ForRange(4..6, o => o
-                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
                     .SetLocation(locations[2])
                     .SetTimePeriod(2023, AcademicYear))
                 .ForRange(6..8, o => o
-                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
                     .SetLocation(locations[3])
                     .SetTimePeriod(2023, AcademicYear))
                 .GenerateList();
@@ -880,7 +904,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var subjectCsvMeta = new SubjectCsvMetaViewModel
                 {
-                    Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+                    Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(
+                        filter0Items.Concat(filter1Items).Concat(filter2Items)),
                     Indicators = indicators
                         .Select(i => new IndicatorCsvMetaViewModel(i))
                         .ToDictionary(i => i.Name),
@@ -897,8 +922,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         "new_la_code",
                         "old_la_code",
                         "la_name",
+                        "filter_0_grouping",
+                        "filter_1_grouping",
                         filters[0].Name,
                         filters[1].Name,
+                        filters[2].Name,
                         indicators[0].Name,
                         indicators[1].Name,
                         indicators[2].Name
@@ -1114,11 +1142,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task QueryToCsvStream_ReleaseId()
         {
-            var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
-                .GenerateList(2);
+            var filters = _fixture.DefaultFilter()
+                .ForIndex(0, s =>
+                    s.SetGroupCsvColumn("filter_0_grouping")
+                        .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                            .ForInstance(s => s.Set(
+                                fg => fg.Label,
+                                (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                            .Generate(2)))
+                .ForIndex(1, s =>
+                    s.SetGroupCsvColumn("filter_1_grouping")
+                        .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                            .ForInstance(s => s.Set(
+                                fg => fg.Label,
+                                (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                            .Generate(2)))
+                .ForIndex(2, s =>
+                    s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
+                        .Generate(1)))
+                .GenerateList();
 
-            var filterItems = filters
-                .SelectMany(f => f.FilterGroups)
+            var filter0Items = filters[0].FilterGroups
+                .SelectMany(fg => fg.FilterItems)
+                .ToList();
+
+            var filter1Items = filters[1].FilterGroups
+                .SelectMany(fg => fg.FilterItems)
+                .ToList();
+
+            var filter2Items = filters[2].FilterGroups
                 .SelectMany(fg => fg.FilterItems)
                 .ToList();
 
@@ -1143,11 +1195,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var observations = _fixture.DefaultObservation()
                 .WithMeasures(indicators)
                 .ForRange(..2, o => o
-                    .SetFilterItems(filterItems[0], filterItems[2])
+                    .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
                     .SetLocation(locations[0])
                     .SetTimePeriod(2022, AcademicYear))
                 .ForRange(2..4, o => o
-                    .SetFilterItems(filterItems[1], filterItems[3])
+                    .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
                     .SetLocation(locations[1])
                     .SetTimePeriod(2023, AcademicYear))
                 .GenerateList();
@@ -1160,7 +1212,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .WithIndicatorGroups(indicatorGroups)
                     .WithObservations(observations)
             };
-
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -1199,7 +1250,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var subjectCsvMeta = new SubjectCsvMetaViewModel
                 {
-                    Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+                    Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(
+                        filter0Items.Concat(filter1Items).Concat(filter2Items)),
                     Indicators = indicators
                         .Select(i => new IndicatorCsvMetaViewModel(i))
                         .ToDictionary(i => i.Name),
@@ -1213,8 +1265,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         "country_name",
                         "region_code",
                         "region_name",
+                        "filter_0_grouping",
+                        "filter_1_grouping",
                         filters[0].Name,
                         filters[1].Name,
+                        filters[2].Name,
                         indicators[0].Name,
                         indicators[1].Name,
                         indicators[2].Name

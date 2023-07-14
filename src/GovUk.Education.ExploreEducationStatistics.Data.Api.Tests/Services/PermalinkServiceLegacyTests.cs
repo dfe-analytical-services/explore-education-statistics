@@ -1241,18 +1241,37 @@ public class PermalinkServiceLegacyTests
     {
         var subject = _fixture.DefaultSubject().Generate();
 
-        var filters = _fixture.DefaultFilter().GenerateList(2);
+        var filters = _fixture.DefaultFilter()
+            .ForIndex(0, s =>
+                s.SetGroupCsvColumn("filter_0_grouping")
+                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                        .ForInstance(s => s.Set(
+                            fg => fg.Label,
+                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                        .Generate(2)))
+            .ForIndex(1, s =>
+                s.SetGroupCsvColumn("filter_1_grouping")
+                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                        .ForInstance(s => s.Set(
+                            fg => fg.Label,
+                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                        .Generate(2)))
+            .ForIndex(2, s =>
+                s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
+                    .Generate(1)))
+            .GenerateList();
 
-        var filterItems = _fixture.DefaultFilterItem()
-            .ForRange(..2, fi => fi
-                .SetFilterGroup(_fixture.DefaultFilterGroup()
-                    .WithFilter(filters[0])
-                    .Generate()))
-            .ForRange(2..4, fi => fi
-                .SetFilterGroup(_fixture.DefaultFilterGroup()
-                    .WithFilter(filters[1])
-                    .Generate()))
-            .GenerateArray(4);
+        var filter0Items = filters[0].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter1Items = filters[1].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter2Items = filters[2].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
 
         var indicators = _fixture.DefaultIndicator()
             .ForRange(..1, i => i
@@ -1278,19 +1297,19 @@ public class PermalinkServiceLegacyTests
             .WithSubject(subject)
             .WithMeasures(indicators)
             .ForRange(..2, o => o
-                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
                 .SetLocation(locations[0])
                 .SetTimePeriod(2022, AcademicYear))
             .ForRange(2..4, o => o
-                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
                 .SetLocation(locations[1])
                 .SetTimePeriod(2022, AcademicYear))
             .ForRange(4..6, o => o
-                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
                 .SetLocation(locations[2])
                 .SetTimePeriod(2023, AcademicYear))
             .ForRange(6..8, o => o
-                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
                 .SetLocation(locations[3])
                 .SetTimePeriod(2023, AcademicYear))
             .GenerateList(8);
@@ -1320,7 +1339,8 @@ public class PermalinkServiceLegacyTests
 
         var csvMeta = new PermalinkCsvMetaViewModel
         {
-            Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+            Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(
+                filter0Items.Concat(filter1Items).Concat(filter2Items)),
             Indicators = indicators
                 .Select(i => new IndicatorCsvMetaViewModel(i))
                 .ToDictionary(i => i.Name),
@@ -1337,8 +1357,11 @@ public class PermalinkServiceLegacyTests
                 "new_la_code",
                 "old_la_code",
                 "la_name",
+                "filter_0_grouping",
+                "filter_1_grouping",
                 filters[0].Name,
                 filters[1].Name,
+                filters[2].Name,
                 indicators[0].Name,
                 indicators[1].Name,
                 indicators[2].Name
@@ -1405,18 +1428,16 @@ public class PermalinkServiceLegacyTests
 
         var subject = _fixture.DefaultSubject().Generate();
 
-        var filters = _fixture.DefaultFilter().GenerateList(2);
+        var filters = _fixture.DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
+            .GenerateList(2);
 
-        var filterItems = _fixture.DefaultFilterItem()
-            .ForRange(..2, fi => fi
-                .SetFilterGroup(_fixture.DefaultFilterGroup()
-                    .WithFilter(filters[0])
-                    .Generate()))
-            .ForRange(2..4, fi => fi
-                .SetFilterGroup(_fixture.DefaultFilterGroup()
-                    .WithFilter(filters[1])
-                    .Generate()))
-            .GenerateArray(4);
+        var filter0Items = filters[0].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter1Items = filters[1].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
 
         var indicators = _fixture.DefaultIndicator()
             .ForRange(..1, i => i
@@ -1442,19 +1463,19 @@ public class PermalinkServiceLegacyTests
             .WithSubject(subject)
             .WithMeasures(indicators)
             .ForRange(..2, o => o
-                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetFilterItems(filter0Items[0], filter1Items[0])
                 .SetLocation(locations[0])
                 .SetTimePeriod(2022, AcademicYear))
             .ForRange(2..4, o => o
-                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetFilterItems(filter0Items[0], filter1Items[0])
                 .SetLocation(locations[1])
                 .SetTimePeriod(2022, AcademicYear))
             .ForRange(4..6, o => o
-                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetFilterItems(filter0Items[1], filter1Items[1])
                 .SetLocation(locations[2])
                 .SetTimePeriod(2023, AcademicYear))
             .ForRange(6..8, o => o
-                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetFilterItems(filter0Items[1], filter1Items[1])
                 .SetLocation(locations[3])
                 .SetTimePeriod(2023, AcademicYear))
             .GenerateList(8);
@@ -1478,16 +1499,18 @@ public class PermalinkServiceLegacyTests
                 // Build the observations WITHOUT location id's here and include locations instead
                 Results = observations
                     .Select(observation =>
-                        ObservationViewModelBuilderTestUtils.BuildObservationViewModelWithoutLocationId(
+                        ObservationViewModelBuilderTestUtils.BuildObservationViewModel(
                             observation,
-                            indicators))
+                            indicators,
+                            ObservationViewModelTestBuildStrategy.WithLocationObjectOnly))
                     .ToList()
             }
         };
 
         var csvMeta = new PermalinkCsvMetaViewModel
         {
-            Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(filterItems),
+            Filters = FiltersMetaViewModelBuilder.BuildCsvFiltersFromFilterItems(
+                filter0Items.Concat(filter1Items)),
             Indicators = indicators
                 .Select(i => new IndicatorCsvMetaViewModel(i))
                 .ToDictionary(i => i.Name),
@@ -1619,7 +1642,7 @@ public class PermalinkServiceLegacyTests
     {
         contentDbContext ??= InMemoryContentDbContext();
 
-        return new(
+        return new PermalinkService(
             contentDbContext,
             tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict),
             permalinkCsvMetaService ?? Mock.Of<IPermalinkCsvMetaService>(Strict),
