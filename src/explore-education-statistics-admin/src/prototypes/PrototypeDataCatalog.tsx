@@ -163,7 +163,6 @@ const PrototypeDataCatalogue = () => {
                   Search
                 </label>
               </h2>
-
               <input
                 type="search"
                 id="search"
@@ -296,7 +295,7 @@ const PrototypeDataCatalogue = () => {
                   className="govuk-label govuk-label--s"
                   htmlFor="pubilication"
                 >
-                  Release
+                  Related release
                 </label>
               </h2>
 
