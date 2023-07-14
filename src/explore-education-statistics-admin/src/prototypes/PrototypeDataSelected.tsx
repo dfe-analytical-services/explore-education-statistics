@@ -4,14 +4,19 @@ import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import RelatedInformation from '@common/components/RelatedInformation';
+import Tabs from '@common/components/Tabs';
+import TabsSection from '@common/components/TabsSection';
+import UrlContainer from '@common/components/UrlContainer';
 import Link from '../components/Link';
 import styles from './PrototypePublicPage.module.scss';
-import imageDataPreview from './images/dataDownload.png';
 
 const PrototypeHomepage = () => {
+  const params = new URLSearchParams(window.location.search);
+  const urlDataType = params.get('dataType');
   const latestRelease = 'Academic year 2021/22';
   const [fullWidth, setFullWidth] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
+  const [dataType, setDataType] = useState(urlDataType);
   return (
     <div
       className={classNames(
@@ -24,13 +29,13 @@ const PrototypeHomepage = () => {
     >
       <PrototypePage
         wide={fullWidth}
-        backLink="./data-catalog?theme=fe&publication=traineeships"
+        backLink={`./data-catalog?theme=fe&publication=traineeships&dataType=${dataType}`}
         backLinkText=" Back to apprenticeships and traineeships data catalogue"
       >
         <>
           <h1 className="govuk-heading-xl">
             <span className="govuk-caption-xl ">Data catalogue</span>{' '}
-            Apprenticeship Achievement Rates Detailed Series
+            Apprenticeship Achievement Rates Detailed Series {dataType}
           </h1>
 
           <div className="govuk-grid-row">
@@ -44,18 +49,54 @@ const PrototypeHomepage = () => {
                   Not the latest data
                 </span>
               )}
-              {selectedRelease !== latestRelease && (
-                <p className="govuk-!-margin-top-6">
-                  <a
-                    href="#"
-                    onClick={e => {
-                      setSelectedRelease(latestRelease);
-                    }}
-                  >
-                    View the latest data: {latestRelease}
-                  </a>
-                </p>
+              {selectedRelease === 'Academic year 2019/20' && (
+                <>
+                  <div className="govuk-inset-text">
+                    <div className="govuk-warning-text">
+                      <span
+                        className="govuk-warning-text__icon"
+                        aria-hidden="true"
+                      >
+                        !
+                      </span>
+                      <strong className="govuk-warning-text__text">
+                        <span className="govuk-warning-text__assistive">
+                          Warning
+                        </span>
+                        <p>
+                          <strong>
+                            This version of the API data set has been
+                            deprecated.
+                          </strong>
+                        </p>
+                        <p>
+                          <a
+                            href="#"
+                            onClick={e => {
+                              setSelectedRelease(latestRelease);
+                            }}
+                          >
+                            View the latest available data set: {latestRelease}
+                          </a>
+                        </p>
+                      </strong>
+                    </div>
+                  </div>
+                </>
               )}
+              {selectedRelease !== latestRelease &&
+                selectedRelease !== 'Academic year 2019/20' && (
+                  <p className="govuk-!-margin-top-6">
+                    <a
+                      href="#"
+                      onClick={e => {
+                        setSelectedRelease(latestRelease);
+                      }}
+                    >
+                      View the latest data: {latestRelease}
+                    </a>
+                  </p>
+                )}
               <p className="govuk-body-l govuk-!-margin-top-3 govuk-!-margin-bottom-3">
                 Apprenticeship national achievement rate tables
               </p>
@@ -72,13 +113,46 @@ const PrototypeHomepage = () => {
                 */}
               {!fullWidth && (
                 <SummaryList noBorder className="govuk-!-margin-bottom-9">
+                  {dataType === 'api' && (
+                    <SummaryListItem term="API status">
+                      {selectedRelease === latestRelease && (
+                        <>
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 2.0
+                        </>
+                      )}
+                      {selectedRelease !== latestRelease && (
+                        <>
+                          {selectedRelease === 'Academic year 2020/21' && (
+                            <>
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 1.1
+                            </>
+                          )}
+                          {selectedRelease === 'Academic year 2019/20' && (
+                            <>
+                              <span className="govuk-tag govuk-tag--red">
+                                DEPRECATED
+                              </span>{' '}
+                              Version 1.0
+                            </>
+                          )}
+                        </>
+                      )}
+                    </SummaryListItem>
+                  )}
+
                   <SummaryListItem term="Theme">
                     Further education
                   </SummaryListItem>
                   <SummaryListItem term="Publication">
                     Apprenticeships and traineeships
                   </SummaryListItem>
-                  <SummaryListItem term="Release">
+                  <SummaryListItem term="Related release">
                     {selectedRelease}
                   </SummaryListItem>
                   <SummaryListItem term="Published">
@@ -103,29 +177,76 @@ const PrototypeHomepage = () => {
             </div>
             <div className="govuk-grid-column-one-third">
               <RelatedInformation heading="Quick links">
-                <a
-                  href="/prototypes/find-statistics6"
-                  className={classNames(
-                    'govuk-button',
-                    'govuk-link--no-visited-state',
-                    'govuk-!-margin-bottom-3',
-                  )}
-                >
-                  Download file (csv, 2 Mb)
-                </a>
+                {dataType === 'api' && (
+                  <ul className="govuk-list govuk-list--spaced">
+                    <li>
+                      <a
+                        href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                        className={classNames(
+                          'govuk-button',
+                          'govuk-link--no-visited-state',
+                          'govuk-!-margin-bottom-3',
+                        )}
+                      >
+                        API documentatiom
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        onClick={e => {
+                          setDataType('csv');
+                        }}
+                      >
+                        View data downloads
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="./table-highlights-2?source=dataCat&dataset=ratesDetailed"
+                        target="_blank"
+                      >
+                        View or create your own tables
+                      </a>
+                    </li>
+                  </ul>
+                )}
+                {dataType === 'csv' && (
+                  <ul className="govuk-list govuk-list--spaced">
+                    <li>
+                      <a
+                        href="/prototypes/find-statistics6"
+                        className={classNames(
+                          'govuk-button',
+                          'govuk-link--no-visited-state',
+                          'govuk-!-margin-bottom-3',
+                        )}
+                      >
+                        Download file (csv, 2 Mb)
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="#"
+                        onClick={e => {
+                          setDataType('api');
+                        }}
+                      >
+                        API available for this data set
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        href="./table-highlights-2?source=dataCat&dataset=ratesDetailed"
+                        target="_blank"
+                      >
+                        View or create your own tables
+                      </a>
+                    </li>
+                  </ul>
+                )}
                 {!fullWidth && (
                   <>
-                    <ul className="govuk-list govuk-list--spaced">
-                      <li>
-                        <a
-                          href="./table-highlights-2?source=dataCat&dataset=ratesDetailed"
-                          target="_blank"
-                        >
-                          View or create your own tables
-                        </a>
-                      </li>
-                    </ul>
-
                     <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
                       Publication
                     </h3>
@@ -155,7 +276,7 @@ const PrototypeHomepage = () => {
                           className="govuk-label govuk-label--s"
                           htmlFor="pubilication"
                         >
-                          All releases
+                          All related releases
                         </label>
                       </h2>
 
@@ -167,12 +288,14 @@ const PrototypeHomepage = () => {
                         }}
                       >
                         <option value={latestRelease}>Latest release</option>
-                        <option value={latestRelease}>{latestRelease}</option>
+                        <option value={latestRelease}>
+                          v2.0 {latestRelease}
+                        </option>
                         <option value="Academic year 2020/21">
-                          Academic year 2020/21
+                          v1.1 Academic year 2020/21
                         </option>
                         <option value="Academic year 2019/20">
-                          Academic year 2019/20
+                          v1.0 Academic year 2019/20
                         </option>
                       </select>
                     </div>
@@ -259,136 +382,218 @@ const PrototypeHomepage = () => {
             </div>
           </div>
 
-          <h2 className="govuk-heading-l">Data preview</h2>
+          {dataType === 'api' && (
+            <div className="govuk-!-margin-bottom-9">
+              <h2 className="govuk-heading-l">API endpoints</h2>
 
-          <div style={{ maxWidth: '100%', overflow: 'auto' }}>
-            <table className="govuk-table">
-              <caption
-                className="govuk-!-margin-bottom-3"
-                style={{ fontWeight: 'normal' }}
-              >
-                Snapshot showing first 5 rows of XXXXX, taken from CSV file
-              </caption>
-              <thead>
-                <tr>
-                  <th>time_period</th>
-                  <th>time_identifier</th>
-                  <th>geographic_level</th>
-                  <th>country_code</th>
-                  <th>country_name</th>
-                  <th>group</th>
-                  <th>standard</th>
-                  <th>age</th>
-                  <th>apprenticeship level</th>
-                  <th>demographic</th>
-                  <th>sector_subject_area</th>
-                  <th>overall_leavers</th>
-                  <th>overall_achievers</th>
-                  <th>overall_completers</th>
-                  <th>overall_acheievement_rate</th>
-                  <th>overall_retention_rate</th>
-                  <th>overall_pass_rate</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>201819</td>
-                  <td>Academic year</td>
-                  <td>National</td>
-                  <td>E92000001</td>
-                  <td>England</td>
-                  <td>Ethnicity group</td>
-                  <td>Framework</td>
-                  <td>16-18</td>
-                  <td>Advanced</td>
-                  <td>Ethnic minorities (excluding white minorities)</td>
-                  <td>Agriculture, Horticulture and Animal Care</td>
-                  <td>10</td>
-                  <td>~</td>
-                  <td>~</td>
-                  <td>~</td>
-                  <td>~</td>
-                  <td>~</td>
-                </tr>
-                <tr>
-                  <td>201819</td>
-                  <td>Academic year</td>
-                  <td>National</td>
-                  <td>E92000001</td>
-                  <td>England</td>
-                  <td>Ethnicity group</td>
-                  <td>Framework</td>
-                  <td>16-18</td>
-                  <td>Advanced</td>
-                  <td>Ethnic minorities (excluding white minorities)</td>
-                  <td>Arts, Media and Publishing</td>
-                  <td>10</td>
-                  <td>10</td>
-                  <td>10</td>
-                  <td>58.3</td>
-                  <td>75</td>
-                  <td>77.8</td>
-                </tr>
-                <tr>
-                  <td>201819</td>
-                  <td>Academic year</td>
-                  <td>National</td>
-                  <td>E92000001</td>
-                  <td>England</td>
-                  <td>Ethnicity group</td>
-                  <td>Framework</td>
-                  <td>16-18</td>
-                  <td>Advanced</td>
-                  <td>Ethnic minorities (excluding white minorities)</td>
-                  <td>Business, Administration and Law</td>
-                  <td>440</td>
-                  <td>300</td>
-                  <td>300</td>
-                  <td>67.6</td>
-                  <td>68.2</td>
-                  <td>99</td>
-                </tr>
-                <tr>
-                  <td>201819</td>
-                  <td>Academic year</td>
-                  <td>National</td>
-                  <td>E92000001</td>
-                  <td>England</td>
-                  <td>Ethnicity group</td>
-                  <td>Framework</td>
-                  <td>16-18</td>
-                  <td>Advanced</td>
-                  <td>Ethnic minorities (excluding white minorities)</td>
-                  <td>Construction, Planning and the Built Environment</td>
-                  <td>60</td>
-                  <td>40</td>
-                  <td>40</td>
-                  <td>74.5</td>
-                  <td>76.4</td>
-                  <td>97.6</td>
-                </tr>
-                <tr>
-                  <td>201819</td>
-                  <td>Academic year</td>
-                  <td>National</td>
-                  <td>E92000001</td>
-                  <td>England</td>
-                  <td>Ethnicity group</td>
-                  <td>Framework</td>
-                  <td>16-18</td>
-                  <td>Advanced</td>
-                  <td>Ethnic minorities (excluding white minorities)</td>
-                  <td>Education and Training</td>
-                  <td>50</td>
-                  <td>30</td>
-                  <td>30</td>
-                  <td>62.5</td>
-                  <td>70.8</td>
-                  <td>88.2</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+              <h3>Data set summary</h3>
+              <UrlContainer
+                className="govuk-!-margin-bottom-2"
+                url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}"
+              />
+              <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/GetDataSet/">
+                View endpoint summary guidance
+              </a>
+
+              <h3 className="govuk-!-margin-top-9">Query data set</h3>
+
+              <UrlContainer
+                className="govuk-!-margin-bottom-2"
+                url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
+              />
+              <UrlContainer
+                className="govuk-!-margin-bottom-2"
+                url="POST https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
+              />
+              <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/QueryDataSetGet/">
+                View endpoint query guidance
+              </a>
+            </div>
+          )}
+
+          <h2 className="govuk-heading-l">
+            {dataType === 'api' ? 'API preview and history' : 'Data preview'}
+          </h2>
+
+          <Tabs id="api-preview-tabs">
+            <TabsSection title="Data preview">
+              <div style={{ maxWidth: '100%', overflow: 'auto' }}>
+                <table className="govuk-table">
+                  <caption
+                    className="govuk-!-margin-bottom-3"
+                    style={{ fontWeight: 'normal' }}
+                  >
+                    Snapshot showing first 5 rows of XXXXX, taken from CSV file
+                  </caption>
+                  <thead>
+                    <tr>
+                      <th>time_period</th>
+                      <th>time_identifier</th>
+                      <th>geographic_level</th>
+                      <th>country_code</th>
+                      <th>country_name</th>
+                      <th>group</th>
+                      <th>standard</th>
+                      <th>age</th>
+                      <th>apprenticeship level</th>
+                      <th>demographic</th>
+                      <th>sector_subject_area</th>
+                      <th>overall_leavers</th>
+                      <th>overall_achievers</th>
+                      <th>overall_completers</th>
+                      <th>overall_acheievement_rate</th>
+                      <th>overall_retention_rate</th>
+                      <th>overall_pass_rate</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>201819</td>
+                      <td>Academic year</td>
+                      <td>National</td>
+                      <td>E92000001</td>
+                      <td>England</td>
+                      <td>Ethnicity group</td>
+                      <td>Framework</td>
+                      <td>16-18</td>
+                      <td>Advanced</td>
+                      <td>Ethnic minorities (excluding white minorities)</td>
+                      <td>Agriculture, Horticulture and Animal Care</td>
+                      <td>10</td>
+                      <td>~</td>
+                      <td>~</td>
+                      <td>~</td>
+                      <td>~</td>
+                      <td>~</td>
+                    </tr>
+                    <tr>
+                      <td>201819</td>
+                      <td>Academic year</td>
+                      <td>National</td>
+                      <td>E92000001</td>
+                      <td>England</td>
+                      <td>Ethnicity group</td>
+                      <td>Framework</td>
+                      <td>16-18</td>
+                      <td>Advanced</td>
+                      <td>Ethnic minorities (excluding white minorities)</td>
+                      <td>Arts, Media and Publishing</td>
+                      <td>10</td>
+                      <td>10</td>
+                      <td>10</td>
+                      <td>58.3</td>
+                      <td>75</td>
+                      <td>77.8</td>
+                    </tr>
+                    <tr>
+                      <td>201819</td>
+                      <td>Academic year</td>
+                      <td>National</td>
+                      <td>E92000001</td>
+                      <td>England</td>
+                      <td>Ethnicity group</td>
+                      <td>Framework</td>
+                      <td>16-18</td>
+                      <td>Advanced</td>
+                      <td>Ethnic minorities (excluding white minorities)</td>
+                      <td>Business, Administration and Law</td>
+                      <td>440</td>
+                      <td>300</td>
+                      <td>300</td>
+                      <td>67.6</td>
+                      <td>68.2</td>
+                      <td>99</td>
+                    </tr>
+                    <tr>
+                      <td>201819</td>
+                      <td>Academic year</td>
+                      <td>National</td>
+                      <td>E92000001</td>
+                      <td>England</td>
+                      <td>Ethnicity group</td>
+                      <td>Framework</td>
+                      <td>16-18</td>
+                      <td>Advanced</td>
+                      <td>Ethnic minorities (excluding white minorities)</td>
+                      <td>Construction, Planning and the Built Environment</td>
+                      <td>60</td>
+                      <td>40</td>
+                      <td>40</td>
+                      <td>74.5</td>
+                      <td>76.4</td>
+                      <td>97.6</td>
+                    </tr>
+                    <tr>
+                      <td>201819</td>
+                      <td>Academic year</td>
+                      <td>National</td>
+                      <td>E92000001</td>
+                      <td>England</td>
+                      <td>Ethnicity group</td>
+                      <td>Framework</td>
+                      <td>16-18</td>
+                      <td>Advanced</td>
+                      <td>Ethnic minorities (excluding white minorities)</td>
+                      <td>Education and Training</td>
+                      <td>50</td>
+                      <td>30</td>
+                      <td>30</td>
+                      <td>62.5</td>
+                      <td>70.8</td>
+                      <td>88.2</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </TabsSection>
+            {dataType === 'api' && (
+              <TabsSection title="Changelog">
+                <h3>Changelog</h3>
+                <h4>
+                  {selectedRelease === latestRelease && <>Version 2.0</>}
+                  {selectedRelease !== latestRelease && (
+                    <>
+                      {selectedRelease === 'Academic year 2020/21' && (
+                        <>Version 1.1</>
+                      )}
+                      {selectedRelease === 'Academic year 2019/20' && (
+                        <>Version 1.0</>
+                      )}
+                    </>
+                  )}
+                </h4>
+                {selectedRelease === latestRelease && (
+                  <div className="govuk-inset-text">
+                    This version includes some strutural and variable changes,
+                    these are highlighted in the changelog below, this is likely
+                    to cause breaking changes to any existing queries you may
+                    have set up.
+                  </div>
+                )}
+                <h4 className="govuk-!-margin-bottom-0">New locations</h4>
+                <ul className="govuk-!-margin-bottom-6">
+                  <li>Northumberland (new)</li>
+                  <li>Kingston upon Hull, City of (new)</li>
+                  <li>Leeds</li>
+                  <li>Doncaster</li>
+                </ul>
+                <h4 className="govuk-!-margin-bottom-0">Mapped locations</h4>
+                <ul className="govuk-!-margin-bottom-6">
+                  <li>
+                    Darlington <strong>maps to</strong> Darlington
+                  </li>
+                  <li>
+                    Sheffield <strong>maps to</strong> Sheffield
+                  </li>
+                </ul>
+              </TabsSection>
+            )}
+            {dataType === 'api' && (
+              <TabsSection title="Version history">
+                Version history here
+              </TabsSection>
+            )}
+          </Tabs>
 
           <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-9">
             <a

@@ -57,9 +57,9 @@ const PrototypeChangeStatusForm = ({ selectedStatus, onSubmit }: Props) => {
 
                       <FormFieldDateInput
                         name="date"
-                        legend=" Date of deprecation"
+                        legend="Expiry date (expected date of deletion)"
                         legendSize="s"
-                        hint="The date helps give users advance warning of when the data set will be deprecated. If you don't yet know a precise date, just add an estimated month leaving the day blank."
+                        hint="The date helps give users advance warning of when this data set will no longer be available for public usage. If you don't yet know a precise date, just add an estimated month leaving the day blank."
                         type="partialDate"
                       />
                     </>

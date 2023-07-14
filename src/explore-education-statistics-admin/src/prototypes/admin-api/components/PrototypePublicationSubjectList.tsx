@@ -178,9 +178,14 @@ const PrototypePublicationSubjectList = ({
                         </SummaryListItem>
                         <SummaryListItem term="Next API data set version">
                           {nextSubject.version}{' '}
-                          <div className="govuk-tag govuk-tag--yellow govuk-!-margin-right-3 govuk-!-margin-left-1 ">
+                        </SummaryListItem>
+                        <SummaryListItem term="API data set version status">
+                          <div className="govuk-tag govuk-tag--yellow govuk-!-margin-right-3  ">
                             Staging - unpublished
-                          </div>{' '}
+                          </div>
+                        </SummaryListItem>
+                        <SummaryListItem term="Notifications">
+                          0
                         </SummaryListItem>
                       </SummaryList>
                     )}
@@ -203,8 +208,8 @@ const PrototypePublicationSubjectList = ({
                                   }}
                                 >
                                   {!previewInitialDataset
-                                    ? 'Preview staged data set'
-                                    : 'Close preview for staged data set'}{' '}
+                                    ? 'Preview and notifications'
+                                    : 'Close preview and notifications'}{' '}
                                   ({subject.version})
                                 </ButtonText>
                               )}
@@ -229,8 +234,8 @@ const PrototypePublicationSubjectList = ({
                                     }}
                                   >
                                     {!previewDataset
-                                      ? 'Preview staged data set'
-                                      : 'Close preview'}{' '}
+                                      ? 'Preview and notifications'
+                                      : 'Close preview and notifications'}{' '}
                                   </ButtonText>
                                   <ButtonText
                                     onClick={e => {
@@ -296,7 +301,7 @@ const PrototypePublicationSubjectList = ({
                         {previewDataset && (
                           <div className="govuk-!-margin-bottom-9">
                             <h4 className="govuk-heading-m">
-                              Preview version 1.1
+                              Preview and notifications for version 1.1
                             </h4>
                             <PreviewExample />
                             <ButtonText
@@ -379,7 +384,7 @@ const PrototypePublicationSubjectList = ({
                                     toggleStatusModal.on();
                                   }}
                                 >
-                                  Set status
+                                  Edit status
                                 </a>
                               </td>
                             </tr>
@@ -429,7 +434,7 @@ const PrototypePublicationSubjectList = ({
                                     toggleStatusModal.on();
                                   }}
                                 >
-                                  Set status
+                                  Edit status
                                 </a>
                               </td>
                             </tr>
@@ -479,7 +484,7 @@ const PrototypePublicationSubjectList = ({
                                     toggleStatusModal.on();
                                   }}
                                 >
-                                  Set status
+                                  Edit status
                                 </a>
                               </td>
                             </tr>
@@ -519,7 +524,7 @@ const PrototypePublicationSubjectList = ({
                               <>
                                 <p>{version1Status.notes}</p>
                                 <h3 className="govuk-heading-s">
-                                  Deprecation date
+                                  Expiry date for this data set
                                 </h3>
 
                                 {version1Status.date && (

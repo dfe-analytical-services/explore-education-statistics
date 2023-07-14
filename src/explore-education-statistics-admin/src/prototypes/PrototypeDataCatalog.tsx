@@ -17,6 +17,7 @@ const PrototypeDataCatalogue = () => {
   const urlTheme = params.get('theme');
   const urlPublication = params.get('publication');
   const urlSource = params.get('source');
+  const urlDataType = params.get('dataType');
 
   const [fullList, setFullList] = useState(true);
   const [listCompact, setListCompact] = useState(false);
@@ -40,6 +41,9 @@ const PrototypeDataCatalogue = () => {
   );
   const latestRelease = 'Academic year 2021/22';
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
+  const [dataType, setDataType] = useState(
+    urlDataType === 'api' ? 'api' : 'csv',
+  );
 
   const getSelectedTheme = (themeId: string) => {
     return themes.find(theme => theme.id === themeId);
@@ -125,7 +129,8 @@ const PrototypeDataCatalogue = () => {
           <div className="govuk-grid-column-two-thirds">
             <h1 className={classNames('govuk-heading-xl')}>Data catalogue</h1>
             <p className="govuk-body-l">
-              View all of the open data available and choose files to download.
+              View and access data from by downloading CSV data <br />
+              or select available API data sets.
             </p>{' '}
           </div>
           <div className="govuk-grid-column-one-third">
@@ -178,6 +183,7 @@ const PrototypeDataCatalogue = () => {
               <select
                 className="govuk-select"
                 id="theme"
+                /* eslint-disable-next-line */
                 onBlur={e => {
                   params.delete('theme');
                   setSelectedTheme(e.target.value);
@@ -227,6 +233,7 @@ const PrototypeDataCatalogue = () => {
               <select
                 className="govuk-select"
                 id="publication"
+                /* eslint-disable-next-line */
                 onBlur={e => {
                   setSelectedPublication(e.target.value);
                   setTotalResults(32);
@@ -299,6 +306,7 @@ const PrototypeDataCatalogue = () => {
                 /* eslint-disable-next-line react/jsx-props-no-spreading */
                 {...(selectedPublication !==
                   'Apprenticeships and traineeships' && { disabled: true })}
+                // eslint-disable-next-line jsx-a11y/no-onchange
                 onBlur={e => {
                   setSelectedRelease(e.target.value);
                 }}
@@ -324,20 +332,25 @@ const PrototypeDataCatalogue = () => {
             <div className="govuk-radios govuk-radios--small">
               <fieldset className="govuk-fieldset govuk-!-margin-top-6">
                 <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
-                  File types
+                  Type of data
                 </legend>
                 <div className="govuk-radios__item">
                   <input
                     type="radio"
                     className="govuk-radios__input"
                     name="filetype"
-                    id="filetype-1"
+                    id="filetype-2"
+                    value="csv"
+                    checked={dataType === 'csv'}
+                    onChange={e => {
+                      setDataType(e.target.value);
+                    }}
                   />
                   <label
                     className="govuk-label govuk-radios__label"
-                    htmlFor="filetype-1"
+                    htmlFor="filetype-2"
                   >
-                    All files
+                    Data downloads (csv)
                   </label>
                 </div>
                 <div className="govuk-radios__item">
@@ -345,13 +358,18 @@ const PrototypeDataCatalogue = () => {
                     type="radio"
                     className="govuk-radios__input"
                     name="filetype"
-                    id="filetype-2"
+                    id="filetype-1"
+                    value="api"
+                    checked={dataType === 'api'}
+                    onChange={e => {
+                      setDataType(e.target.value);
+                    }}
                   />
                   <label
                     className="govuk-label govuk-radios__label"
-                    htmlFor="filetype-2"
+                    htmlFor="filetype-1"
                   >
-                    Open data only (csv)
+                    API data sets
                   </label>
                 </div>
               </fieldset>
@@ -379,7 +397,11 @@ const PrototypeDataCatalogue = () => {
                   selectedTheme === 'All themes' && (
                     <>
                       <h2 className="govuk-!-margin-bottom-0">All themes </h2>
-                      <h3 className="govuk-!-margin-bottom-0">XXXX datasets</h3>
+                      <h3 className="govuk-!-margin-bottom-0">
+                        {dataType === 'csv'
+                          ? '500 Open data (csv) data sets'
+                          : '120 API data sets'}
+                      </h3>
                     </>
                   )}
 
@@ -389,7 +411,11 @@ const PrototypeDataCatalogue = () => {
                       <h2 className="govuk-!-margin-bottom-0">
                         {selectedTheme}
                       </h2>
-                      <h3 className="govuk-!-margin-bottom-0">XX datasets</h3>
+                      <h3 className="govuk-!-margin-bottom-0">
+                        {dataType === 'csv'
+                          ? '90 Open data (csv) data sets'
+                          : '30 API data sets'}
+                      </h3>
                     </>
                   )}
 
@@ -438,7 +464,9 @@ const PrototypeDataCatalogue = () => {
                 </h2>
                 <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                   <h3 className="govuk-heading-m govuk-!-margin-bottom-3">
-                    32 datasets{' '}
+                    {dataType === 'csv'
+                      ? '32 Open data (csv) data sets'
+                      : '12 API data sets'}
                   </h3>
                 </div>
                 <div className="govuk-!-margin-top-3">
@@ -450,7 +478,7 @@ const PrototypeDataCatalogue = () => {
                       e.preventDefault();
                     }}
                   >
-                    Show all further education datasets
+                    Show all further education data sets
                   </a>
                 </div>
                 <hr />
@@ -489,11 +517,14 @@ const PrototypeDataCatalogue = () => {
                   </SummaryListItem>
                   <SummaryListItem term="Options">
                     <ul className="govuk-list">
-                      <li>
-                        <Button className="govuk-!-margin-bottom-3">
-                          Download all 32 datasets (.zip)
-                        </Button>
-                      </li>
+                      {dataType === 'csv' && (
+                        <li>
+                          <Button className="govuk-!-margin-bottom-3">
+                            Download all 32 datasets (.zip)
+                          </Button>
+                        </li>
+                      )}
+
                       <li>
                         <Link to="./releaseData#exploreData">
                           View this release
@@ -601,6 +632,66 @@ const PrototypeDataCatalogue = () => {
                     )}
                   </div>
                   <ul className="govuk-list">
+                    {dataType === 'api' && (
+                      <li>
+                        <hr />
+                        <h3>
+                          <a href="#">
+                            {' '}
+                            Academy Transfers and Funding 2013-14 to 2021-22
+                          </a>
+                        </h3>
+                        <p>
+                          This API data set contains the number of academies
+                          that have moved trusts from the financial year 2013
+                          -14 2014 to 2021-22 and the total grant funding
+                          provided. It also compares the reason that academies
+                          move trust from the financial year 2016-17 to 2021-22.
+                        </p>
+
+                        {!listCompact && (
+                          <SummaryList noBorder>
+                            {dataType === 'api' && (
+                              <SummaryListItem term="API status">
+                                <span className="govuk-tag govuk-tag--turquoise">
+                                  ACTIVE
+                                </span>{' '}
+                                Version 2.1
+                              </SummaryListItem>
+                            )}
+                            <SummaryListItem term="Theme">
+                              Children's social care
+                            </SummaryListItem>
+                            <SummaryListItem term="Publication">
+                              Characteristics of children in need
+                            </SummaryListItem>
+                            <SummaryListItem term="Indicators">
+                              Number of academies in England as at 31 March,
+                              Number of academies where grant funding was
+                              provided, Number of academies where no grant
+                              funding was provided, Percentage of academies that
+                              moved trust in England, Percentage of academies
+                              where grant funding was provided, Percentage of
+                              academies where no grant funding was provided,
+                              Total grant funding provided{' '}
+                              <strong>+ 20 more</strong>
+                            </SummaryListItem>
+                            <SummaryListItem term="Filters">
+                              No filters
+                            </SummaryListItem>
+                            <SummaryListItem term="Geographic level">
+                              National
+                            </SummaryListItem>
+                            <SummaryListItem term="Time period">
+                              Academic years 2013-14 to 2021-22
+                            </SummaryListItem>
+                            <SummaryListItem term="Published">
+                              22 December 2022
+                            </SummaryListItem>
+                          </SummaryList>
+                        )}
+                      </li>
+                    )}
                     <li>
                       <hr />
                       <h3>
@@ -616,9 +707,19 @@ const PrototypeDataCatalogue = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 17 Kb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 17 Kb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 2.1
+                            </SummaryListItem>
+                          )}
                           <SummaryListItem term="Theme">
                             Children's social care
                           </SummaryListItem>
@@ -652,9 +753,19 @@ const PrototypeDataCatalogue = () => {
                       <p>Time series of headline apprenticeship figures</p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 45 Kb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 45 Kb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 1.4
+                            </SummaryListItem>
+                          )}
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -684,15 +795,31 @@ const PrototypeDataCatalogue = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href="./data-selected">
+                        <a href={`./data-selected?dataType=${dataType}`}>
                           Apprenticeship Achievement Rates Detailed Series
                         </a>
                       </h3>
                       <p>Apprenticeship national achievement rate tables</p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 2 Mb
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 2 Mb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 2.0
+                            </SummaryListItem>
+                          )}
+                          <SummaryListItem term="Theme">
+                            Further education
+                          </SummaryListItem>
+                          <SummaryListItem term="Publication">
+                            Apprenticeships and traineeships
                           </SummaryListItem>
                           <SummaryListItem term="Indicators">
                             Achievement rate, Achievers, Completers, Leavers,
@@ -723,9 +850,19 @@ const PrototypeDataCatalogue = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 1 Mb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 1 Mb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 1.0
+                            </SummaryListItem>
+                          )}
                           <SummaryListItem term="Theme">
                             Destination of pupils and students
                           </SummaryListItem>
@@ -766,9 +903,19 @@ const PrototypeDataCatalogue = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 161 Kb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 161 Kb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 1.4
+                            </SummaryListItem>
+                          )}
                           <SummaryListItem term="Theme">
                             Finance and funding
                           </SummaryListItem>
@@ -807,9 +954,19 @@ const PrototypeDataCatalogue = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 101 Mb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 101 Mb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--red">
+                                DEPRECATED
+                              </span>{' '}
+                              Version 1.1
+                            </SummaryListItem>
+                          )}
                           <SummaryListItem term="Theme">
                             Pupils and schools
                           </SummaryListItem>
@@ -1118,9 +1275,20 @@ const PrototypeDataCatalogue = () => {
                       <p>Time series of headline apprenticeship figures</p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 45 Kb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 45 Kb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 1.4
+                            </SummaryListItem>
+                          )}
+
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1162,9 +1330,20 @@ const PrototypeDataCatalogue = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 84 Mb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 84 Mb
+                            </SummaryListItem>
+                          )}
+
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 1.4
+                            </SummaryListItem>
+                          )}
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1194,16 +1373,27 @@ const PrototypeDataCatalogue = () => {
                     <li>
                       <hr />
                       <h3>
-                        <a href="./data-selected">
+                        <a href={`./data-selected?dataType=${dataType}`}>
                           Apprenticeship Achievement Rates Detailed Series
                         </a>
                       </h3>
                       <p>Apprenticeship national achievement rate tables</p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 2 Mb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 2 Mb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 2.0
+                            </SummaryListItem>
+                          )}
+
                           <SummaryListItem term="Indicators">
                             Achievement rate, Achievers, Completers, Leavers,
                             Pass rate, Retention rate
@@ -1226,7 +1416,7 @@ const PrototypeDataCatalogue = () => {
                       <h3>
                         <a href="#">
                           Employee numbers and median earnings by region,
-                          sector, subsector, level and subject (csv, 32 Mb)
+                          sector, subsector, level and subject
                         </a>
                       </h3>
                       <p>
@@ -1235,9 +1425,20 @@ const PrototypeDataCatalogue = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 32 Mb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 32 Mb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 1.8
+                            </SummaryListItem>
+                          )}
+
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1269,7 +1470,7 @@ const PrototypeDataCatalogue = () => {
                         <a href="#">
                           Destinations by qualification Title, Sector Subject
                           area, prior attainment and free school meal
-                          eligibility (csv, 14 Mb)
+                          eligibility
                         </a>
                       </h3>
                       <p>
@@ -1277,9 +1478,20 @@ const PrototypeDataCatalogue = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 14 Mb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 14 Mb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 1.3
+                            </SummaryListItem>
+                          )}
+
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1320,9 +1532,20 @@ const PrototypeDataCatalogue = () => {
                       </p>
                       {!listCompact && (
                         <SummaryList noBorder>
-                          <SummaryListItem term="Filetype and size">
-                            csv, 474 Kb
-                          </SummaryListItem>
+                          {dataType === 'csv' && (
+                            <SummaryListItem term="Filetype and size">
+                              csv, 474 Kb
+                            </SummaryListItem>
+                          )}
+                          {dataType === 'api' && (
+                            <SummaryListItem term="API status">
+                              <span className="govuk-tag govuk-tag--turquoise">
+                                ACTIVE
+                              </span>{' '}
+                              Version 2.1
+                            </SummaryListItem>
+                          )}
+
                           <SummaryListItem term="Theme">
                             Further education
                           </SummaryListItem>
@@ -1576,9 +1799,20 @@ const PrototypeDataCatalogue = () => {
                     <p>Time series of headline apprenticeship figures</p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 45Kb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 45 Kb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 1.4
+                          </SummaryListItem>
+                        )}
+
                         <SummaryListItem term="Indicators">
                           Starts, Achievements, Learner participation,
                           Percentage Starts, Percentage Achievements, Percentage
@@ -1606,9 +1840,19 @@ const PrototypeDataCatalogue = () => {
                     <p>Apprenticeship national achievement rate tables</p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 28 Kb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 28 Kb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 1.5
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Achievement rate, Achievers, Completers, Leavers, Pass
                           rate, Retention rate
@@ -1629,16 +1873,26 @@ const PrototypeDataCatalogue = () => {
                   <li>
                     <hr />
                     <h3>
-                      <a href="./data-selected">
+                      <a href={`./data-selected?dataType=${dataType}`}>
                         Apprenticeship Achievement Rates Detailed Series
                       </a>
                     </h3>
                     <p>Apprenticeship national achievement rate tables</p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 2 Mb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 2 Mb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 2.0
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Achievement rate, Achievers, Completers, Leavers, Pass
                           rate, Retention rate
@@ -1664,9 +1918,19 @@ const PrototypeDataCatalogue = () => {
                     <p>Apprenticeship national achievement rate tables</p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 9 Kb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 9 Kb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 1.1
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Achievement rate, Leavers, Pass rate, Retention rate
                         </SummaryListItem>
@@ -1694,9 +1958,19 @@ const PrototypeDataCatalogue = () => {
                     </p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 18 kb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 18 kb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 1.0
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Incentive claims
                         </SummaryListItem>
@@ -1726,9 +2000,19 @@ const PrototypeDataCatalogue = () => {
                     </p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 2 kb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 2 kb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 2.0
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Adult Apprenticeship, Adult Community learning, Adult
                           Education & training, Adult FE & skills, Adult FE &
@@ -1761,9 +2045,19 @@ const PrototypeDataCatalogue = () => {
                     </p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 28 kb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 28 kb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 1.2
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Starts, Starts (used in duration calculations),
                           Average expected duration
@@ -1794,9 +2088,19 @@ const PrototypeDataCatalogue = () => {
                     </p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 20 kb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 20 kb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 1.0
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Adverts, Vacancies
                         </SummaryListItem>
@@ -1824,9 +2128,19 @@ const PrototypeDataCatalogue = () => {
                     </p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 62 Mb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 62 Mb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 1.0
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Starts, Achievements
                         </SummaryListItem>
@@ -1854,9 +2168,19 @@ const PrototypeDataCatalogue = () => {
                     <p>Headline regional breakdowns of apprenticeship starts</p>
                     {!listCompact && (
                       <SummaryList noBorder>
-                        <SummaryListItem term="Filetype and size">
-                          csv, 16 kb
-                        </SummaryListItem>
+                        {dataType === 'csv' && (
+                          <SummaryListItem term="Filetype and size">
+                            csv, 16 kb
+                          </SummaryListItem>
+                        )}
+                        {dataType === 'api' && (
+                          <SummaryListItem term="API status">
+                            <span className="govuk-tag govuk-tag--turquoise">
+                              ACTIVE
+                            </span>{' '}
+                            Version 1.0
+                          </SummaryListItem>
+                        )}
                         <SummaryListItem term="Indicators">
                           Starts
                         </SummaryListItem>
