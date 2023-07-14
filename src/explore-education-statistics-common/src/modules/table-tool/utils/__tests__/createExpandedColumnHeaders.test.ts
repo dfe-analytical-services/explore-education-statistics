@@ -1042,6 +1042,166 @@ describe('createExpandedColumnHeaders', () => {
     );
   });
 
+  test('returns correct headers with deeply nested rows and multiple identical headers', () => {
+    const columnHeaders: Header[] = [
+      new Header('A', 'A').addChild(
+        new Header('A', 'A').addChild(
+          new Header('A', 'A').addChild(
+            new Header('A', 'A').addChild(new Header('A', 'A')),
+          ),
+        ),
+      ),
+      new Header('B', 'B').addChild(
+        new Header('B', 'B')
+          .addChild(
+            new Header('B', 'B').addChild(
+              new Header('B', 'B').addChild(new Header('B', 'B')),
+            ),
+          )
+          .addChild(
+            new Header('C', 'C').addChild(
+              new Header('D', 'D').addChild(new Header('D1', 'D1')),
+            ),
+          ),
+      ),
+      new Header('E', 'E').addChild(
+        new Header('F', 'F')
+          .addChild(
+            new Header('F', 'F')
+              .addChild(new Header('F', 'F').addChild(new Header('F', 'F')))
+              .addChild(new Header('G', 'G').addChild(new Header('G1', 'G1'))),
+          )
+          .addChild(
+            new Header('H', 'H')
+              .addChild(new Header('I', 'I').addChild(new Header('I', 'I')))
+              .addChild(new Header('J', 'J').addChild(new Header('J', 'J'))),
+          ),
+      ),
+    ];
+
+    const expandedColumnHeaders: TableCellJson[][] = [
+      [
+        {
+          colSpan: 1,
+          rowSpan: 5,
+          scope: 'col',
+          tag: 'th',
+          text: 'A',
+        },
+        {
+          colSpan: 2,
+          rowSpan: 2,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'B',
+        },
+        {
+          colSpan: 4,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'E',
+        },
+      ],
+      [
+        {
+          colSpan: 4,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'F',
+        },
+      ],
+      [
+        {
+          colSpan: 1,
+          rowSpan: 3,
+          scope: 'col',
+          tag: 'th',
+          text: 'B',
+        },
+        {
+          colSpan: 1,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'C',
+        },
+        {
+          colSpan: 2,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'F',
+        },
+        {
+          colSpan: 2,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'H',
+        },
+      ],
+      [
+        {
+          colSpan: 1,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'D',
+        },
+        {
+          colSpan: 1,
+          rowSpan: 2,
+          scope: 'col',
+          tag: 'th',
+          text: 'F',
+        },
+        {
+          colSpan: 1,
+          rowSpan: 1,
+          scope: 'colgroup',
+          tag: 'th',
+          text: 'G',
+        },
+        {
+          colSpan: 1,
+          rowSpan: 2,
+          scope: 'col',
+          tag: 'th',
+          text: 'I',
+        },
+        {
+          colSpan: 1,
+          rowSpan: 2,
+          scope: 'col',
+          tag: 'th',
+          text: 'J',
+        },
+      ],
+      [
+        {
+          colSpan: 1,
+          rowSpan: 1,
+          scope: 'col',
+          tag: 'th',
+          text: 'D1',
+        },
+        {
+          colSpan: 1,
+          rowSpan: 1,
+          scope: 'col',
+          tag: 'th',
+          text: 'G1',
+        },
+      ],
+    ];
+
+    expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+      expandedColumnHeaders,
+    );
+  });
+
   test('returns correct headers with only headers merged with identical parent in the first row', () => {
     const colHeaders: Header[] = [
       new Header('A', 'A').addChild(
