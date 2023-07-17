@@ -209,21 +209,21 @@ Start creating a featured table
     user clicks link    Create data block
     user waits until table tool wizard step is available    1    Select a data set
 
-Select subject "UI test subject"
+Select subject "UI test subject" again
     user waits until page contains    UI test subject    %{WAIT_SMALL}
     user clicks radio    UI test subject
     user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
     user checks previous table tool step contains    1    Data set    UI test subject
 
-Select locations
+Select locations again
     user opens details dropdown    Opportunity area
     user clicks checkbox    Bolton 001
 
     user clicks element    id:locationFiltersForm-submit
     user waits until table tool wizard step is available    3    Choose time period    90
 
-Select time period
+Select time period again
     user waits until page contains element    id:timePeriodForm-start
     user chooses select option    id:timePeriodForm-start    2009
     user chooses select option    id:timePeriodForm-end    2017
@@ -231,17 +231,17 @@ Select time period
     user waits until table tool wizard step is available    4    Choose your filters
     user checks previous table tool step contains    3    Time period    2009 to 2017    %{WAIT_MEDIUM}
 
-Select indicators
+Select indicators again
     user checks indicator checkbox is checked    Admission Numbers
 
-Create table
+Create table again
     [Documentation]    EES-615
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    testid:dataTableCaption
     ...    Admission Numbers for 'UI test subject' in Bolton 001 between 2009 and 2017
 
-Save data block
+Save data block again
     user enters text into element    label:Name    UI test featured table
     user enters text into element    label:Table title    UI test featured table title
     user enters text into element    label:Source    UI test featured table source
@@ -254,7 +254,7 @@ Save data block
     user clicks button    Save data block
     user waits until page contains    Delete this data block
 
-Validate data block is in list
+Validate data block is in list again
     user clicks link    Back
     user waits until h2 is visible    Data blocks
 

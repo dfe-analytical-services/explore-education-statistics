@@ -843,6 +843,9 @@ importers:
       jest-watch-typeahead:
         specifier: ^0.6.1
         version: 0.6.5(jest@26.6.3)
+      open:
+        specifier: ^8.4.1
+        version: 8.4.1
       react-test-renderer:
         specifier: 16.13.1
         version: 16.13.1(react@17.0.2)
@@ -4549,7 +4552,7 @@ packages:
     dependencies:
       '@babel/core': 7.20.12
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss@8.4.21)
+      postcss-syntax: 0.36.2(postcss@8.2.15)
     transitivePeerDependencies:
       - supports-color
 
@@ -4561,7 +4564,7 @@ packages:
       postcss-syntax: '>=0.36.2'
     dependencies:
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss@8.4.21)
+      postcss-syntax: 0.36.2(postcss@8.2.15)
       remark: 13.0.0
       unist-util-find-all-after: 3.0.2
     transitivePeerDependencies:
@@ -6395,6 +6398,7 @@ packages:
 
   /bindings@1.5.0:
     resolution: {integrity: sha512-p2q/t/mhvuOj/UeLlV6566GD/guowlr0hHxClI0W9m7MWYkL1F0hLo+0Aexs9HSPCtR1SXQ0TD3MMKrXZajbiQ==}
+    requiresBuild: true
     dependencies:
       file-uri-to-path: 1.0.0
     dev: true
@@ -9185,6 +9189,7 @@ packages:
 
   /file-uri-to-path@1.0.0:
     resolution: {integrity: sha512-0Zt+s3L7Vf1biwWZ29aARiVYLx7iMGnEUl9x33fbB/j3jR81u/O2LbqK+Bm1CDSNDKVtJ/YjwY7TUd5SkeLQLw==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -12031,6 +12036,7 @@ packages:
 
   /nan@2.17.0:
     resolution: {integrity: sha512-2ZTgtl0nJsO0KQCjEpxcIr5D+Yv90plTitZt9JBfQvVJDS5seMl3FOvsh3+9CoYWXf/1l5OaZzzF6nDm4cagaQ==}
+    requiresBuild: true
     dev: true
     optional: true
 
@@ -13135,7 +13141,7 @@ packages:
     dependencies:
       htmlparser2: 3.10.1
       postcss: 7.0.39
-      postcss-syntax: 0.36.2(postcss@8.4.21)
+      postcss-syntax: 0.36.2(postcss@8.2.15)
 
   /postcss-image-set-function@4.0.7(postcss@8.4.21):
     resolution: {integrity: sha512-9T2r9rsvYzm5ndsBE8WgtrMlIT7VbtTfE7b3BQnudUqnBcBo7L758oc+o+pdj/dUV0l5wjwSdjeOH2DZtfv8qw==}
@@ -13896,7 +13902,7 @@ packages:
       svgo: 2.8.0
     dev: false
 
-  /postcss-syntax@0.36.2(postcss@8.4.21):
+  /postcss-syntax@0.36.2(postcss@8.2.15):
     resolution: {integrity: sha512-nBRg/i7E3SOHWxF3PpF5WnJM/jQ1YpY9000OaVXlAQj6Zp/kIqJxEDWIZ67tAd7NLuk7zqN4yqe9nc0oNAOs1w==}
     peerDependencies:
       postcss: '>=5.0.0'
@@ -13917,7 +13923,7 @@ packages:
       postcss-scss:
         optional: true
     dependencies:
-      postcss: 8.4.21
+      postcss: 8.2.15
 
   /postcss-unique-selectors@4.0.1:
     resolution: {integrity: sha512-+JanVaryLo9QwZjKrmJgkI4Fn8SBgRO6WXQBJi7KiAVPlmxikB5Jzc4EvXMT2H0/m0RjrVVm9rGNhZddm/8Spg==}
@@ -16014,7 +16020,7 @@ packages:
       postcss-sass: 0.4.4
       postcss-scss: 2.1.1
       postcss-selector-parser: 6.0.11
-      postcss-syntax: 0.36.2(postcss@8.4.21)
+      postcss-syntax: 0.36.2(postcss@8.2.15)
       postcss-value-parser: 4.2.0
       resolve-from: 5.0.0
       slash: 3.0.0
