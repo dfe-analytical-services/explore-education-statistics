@@ -44,6 +44,7 @@ jobs:
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
 
+  # TODO EES-4412 - we need to add the new "rerun_attempts" parameter to the "arguments" list here.
   - task: PythonScript@0
     displayName: Public UI tests
     inputs:
@@ -54,6 +55,7 @@ jobs:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
+  # TODO EES-4412 - this can come out.
   #- task: PythonScript@0
   #  displayName: Public UI tests - rerun failed suites
   #  condition: not(succeeded())
@@ -102,7 +104,8 @@ jobs:
       KeyVaultName: s101d01-kv-ees-01
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
-
+  
+  # TODO EES-4412 - we need to add the new "rerun_attempts" parameter to the "arguments" list here.
   - task: PythonScript@0
     displayName: Publish release and amend UI tests
     condition: succeededOrFailed()
@@ -114,7 +117,8 @@ jobs:
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
-
+    
+  # TODO EES-4412 - this can come out.
   #- task: PythonScript@0
   #  displayName: 'Publish release and amend UI tests - rerun failed suites'
   #  condition: not(succeeded())
@@ -162,7 +166,8 @@ jobs:
       KeyVaultName: s101d01-kv-ees-01
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
-
+    
+  # TODO EES-4412 - we need to add the new "rerun_attempts" parameter to the "arguments" list here.
   - task: PythonScript@0
     displayName: Admin UI tests
     condition: succeededOrFailed()
@@ -173,7 +178,8 @@ jobs:
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
-
+    
+  # TODO EES-4412 - this can come out.
   #- task: PythonScript@0
   #  displayName: Admin UI tests - rerun failed suites
   #  condition: not(succeeded())
@@ -223,7 +229,8 @@ jobs:
       KeyVaultName: s101d01-kv-ees-01
       SecretsFilter: ees-test-ADMIN-PASSWORD,ees-test-ANALYST-PASSWORD,ees-test-expiredinvite-password,ees-test-SLACK-BOT-TOKEN,ees-test-SLACK-TEST-REPORT-WEBHOOK-URL
       RunAsPreJob: true
-
+      
+  # TODO EES-4412 - we need to add the new "rerun_attempts" parameter to the "arguments" list here.
   - task: PythonScript@0
     displayName: Admin public UI tests
     inputs:
@@ -233,7 +240,8 @@ jobs:
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
-
+    
+  # TODO EES-4412 - this can come out.
   #- task: PythonScript@0
   #  displayName: Admin public UI tests - rerun failed suites
   #  condition: not(succeeded())
