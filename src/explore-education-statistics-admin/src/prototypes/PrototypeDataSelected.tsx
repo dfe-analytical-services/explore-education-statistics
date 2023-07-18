@@ -180,8 +180,8 @@ const PrototypeHomepage = () => {
                 {dataType === 'api' && (
                   <ul className="govuk-list govuk-list--spaced">
                     <li>
-                      <a
-                        href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                      <Link
+                        to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
                         className={classNames(
                           'govuk-button',
                           'govuk-link--no-visited-state',
@@ -189,7 +189,7 @@ const PrototypeHomepage = () => {
                         )}
                       >
                         API documentatiom
-                      </a>
+                      </Link>
                     </li>
                     <li>
                       <a
@@ -385,7 +385,20 @@ const PrototypeHomepage = () => {
           {dataType === 'api' && (
             <div className="govuk-!-margin-bottom-9">
               <h2 className="govuk-heading-l">API endpoints</h2>
-
+              <p className="govuk-hint">
+                If you are unfamiliar with using APIs, we suggest you first read
+                our{' '}
+                <Link
+                  to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                  target="blank"
+                >
+                  API guidance documentation
+                </Link>
+              </p>
+              <p className="govuk-hint">
+                The documentation provides full details and examples on how to
+                make the most from our data sets
+              </p>
               <h3>Data set summary</h3>
               <UrlContainer
                 className="govuk-!-margin-bottom-2"
