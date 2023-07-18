@@ -13,7 +13,7 @@ import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import { MethodologySummary } from '@common/services/types/methodology';
-import { uniqWith } from 'lodash';
+import uniqBy from 'lodash/uniqBy';
 
 interface Props {
   themes: MethodologyTheme[];
@@ -116,9 +116,5 @@ function getMethodologiesForTopics(topics: MethodologyTopic[]) {
   const methodologies = topics.flatMap(topic =>
     topic.publications.flatMap(pub => pub.methodologies),
   );
-  return uniqWith(
-    methodologies,
-    (methodology1: MethodologySummary, methodology2: MethodologySummary) =>
-      methodology1.id === methodology2.id,
-  );
+  return uniqBy(methodologies, methodology => methodology.id);
 }
