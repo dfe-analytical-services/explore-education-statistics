@@ -910,6 +910,12 @@ user navigates to data catalogue page on public frontend
     user waits until h1 is visible    Browse our open data
     user waits until page contains    View all of the open data available and choose files to download.
 
+user navigates to methodologies page on public frontend
+    environment variable should be set    PUBLIC_URL
+    user navigates to public frontend    %{PUBLIC_URL}/methodology
+    user waits until h1 is visible    Methodologies
+    user waits until page contains    Browse to find out about the methodology behind specific
+
 check that variable is not empty
     [Arguments]    ${variable_name}    ${variable_value}
     IF    '${variable_value}'=='${EMPTY}'

@@ -29,20 +29,45 @@ Verify release summary
 Upload subject
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
-Go to 'Sign Off' page
+Check release isn't publically visible
     user clicks link    Sign off
     user waits for page to finish loading
     user waits until page contains element    testid:public-release-url
-    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
+    ${PUBLIC_RELEASE_LINK}=    Get Value    testid:public-release-url
     check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
-Go to Public Release Link
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found
     user checks page does not contain    ${RELEASE_NAME}
 
 Return to admin
+    user navigates to admin dashboard    Bau1
+
+Create methodology for release
+    user creates methodology for publication    ${PUBLICATION_NAME}
+
+    user clicks link    Manage content
+    user creates new content section    1    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 1    1
+    ...    Content 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+Set methodology to be published alongside release
+    approve methodology from methodology view    WithRelease    ${PUBLICATION_NAME} - ${RELEASE_NAME}
+
+Check methodology isn't publically visible
+    user waits until page contains element    testid:public-methodology-url
+    ${PUBLIC_METHODOLOGY_LINK}=    Get Value    testid:public-methodology-url
+    check that variable is not empty    PUBLIC_METHODOLOGY_LINK    ${PUBLIC_METHODOLOGY_LINK}
+    Set Suite Variable    ${PUBLIC_METHODOLOGY_LINK}
+
+    user navigates to public frontend    ${PUBLIC_METHODOLOGY_LINK}
+    user waits until page contains    Page not found
+
+Return to admin again
     user navigates to admin dashboard    Bau1
 
 Add public prerelease access list
@@ -98,6 +123,7 @@ Approve release and wait for it to be Scheduled
     user clicks button    Update status
     user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
+
     # the below fails on dev
     user checks summary list contains    Scheduled release    ${day} ${month_word} ${year}
     user checks summary list contains    Next release expected    January 2001
@@ -111,7 +137,17 @@ Check scheduled release isn't visible on public Table Tool
 
 Go to public release URL and check release isn't visible
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user waits until page contains    Page not found
     user waits until page does not contain    ${PUBLICATION_NAME}
+
+Check methodology isn't visible on public Methodologies page
+    user navigates to methodologies page on public frontend
+    user waits until page contains    %{TEST_THEME_NAME}
+    user opens accordion section    %{TEST_THEME_NAME}
+    user checks page does not contain    ${PUBLICATION_NAME}
+
+Check methoodlogy isn't accessible via URL
+    user navigates to public frontend    ${PUBLIC_METHODOLOGY_LINK}
     user waits until page contains    Page not found
 
 Go to admin release summary
@@ -119,19 +155,19 @@ Go to admin release summary
     user navigates to scheduled release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
 
-Approve release for immediate publication but don't wait to finish
-    user clicks link    Sign off
-    user waits until h2 is visible    Sign off
-    user waits until page contains button    Edit release status
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status
-    user clicks radio    Approved for publication
-    user enters text into element    id:releaseStatusForm-internalReleaseNote    Approved by UI tests
-    user clicks radio    Immediately
-    user clicks button    Update status
-    user waits until h2 is visible    Sign off
-    user checks summary list contains    Current status    Approved
+Approve release for immediate publication
+    user approves original release for immediate publication
 
-Go to public release URL again and check release isn't visible
+Check release has been published
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
-    user waits until page contains    Page not found
+    user waits until page contains title caption    Calendar year 2000
+    user waits until h1 is visible    ${PUBLICATION_NAME}
+
+Check methodology has been published
+    user navigates to methodologies page on public frontend
+    user waits until page contains    %{TEST_THEME_NAME}
+    user opens accordion section    %{TEST_THEME_NAME}
+    user clicks link    ${PUBLICATION_NAME}
+
+    user waits until page contains title caption    Methodology
+    user waits until h1 is visible    ${PUBLICATION_NAME}

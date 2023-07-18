@@ -386,11 +386,22 @@ Validate no methodologies
 
 Create and validate methodology
     user creates methodology for publication    ${PUBLICATION_NAME}
+
+    user clicks link    Manage content
+    user creates new content section    1    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 1    1
+    ...    Content 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
     approve methodology from methodology view
+
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/methodologies
     user waits until h1 is visible    Methodologies
     user waits until page contains    ${PUBLICATION_NAME} (Owned)
     user clicks link    ${PUBLICATION_NAME} (Owned)
+
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate prerelease has started for Analyst user
