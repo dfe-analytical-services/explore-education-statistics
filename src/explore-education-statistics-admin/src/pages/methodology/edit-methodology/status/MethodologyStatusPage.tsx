@@ -1,6 +1,7 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import methodologyService, {
+  MethodologyApprovalStatus,
   MethodologyStatus,
 } from '@admin/services/methodologyService';
 import permissionService from '@admin/services/permissionService';
@@ -16,9 +17,12 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import MethodologyStatusEditPage from '@admin/pages/methodology/edit-methodology/status/MethodologyStatusEditPage';
 import React from 'react';
 import UrlContainer from '@common/components/UrlContainer';
+import FormattedDate from '@common/components/FormattedDate';
+import { useQuery } from '@tanstack/react-query';
+import methodologyQueries from '@admin/queries/methodologyQueries';
 
 interface FormValues {
-  status: MethodologyStatus;
+  status: MethodologyApprovalStatus;
   latestInternalReleaseNote: string;
   publishingStrategy?: 'WithRelease' | 'Immediately';
   withReleaseId?: string;
@@ -39,6 +43,10 @@ const MethodologyStatusPage = () => {
   const { PublicAppUrl } = useConfig();
 
   const [isEditing, toggleForm] = useToggle(false);
+
+  const { data: methodologyStatuses } = useQuery(
+    methodologyQueries.getMethodologyStatuses(currentMethodology.id),
+  );
 
   const {
     value: permissions,
@@ -158,6 +166,56 @@ const MethodologyStatusPage = () => {
                   >
                     Edit status
                   </Button>
+                )}
+
+                {methodologyStatuses && methodologyStatuses.length > 0 && (
+                  <>
+                    <h3>Methodology status history</h3>
+                    <LoadingSpinner
+                      loading={!methodologyStatuses}
+                      text="Loading methodology status history"
+                    >
+                      <table data-testid="methodology-status-history">
+                        <thead>
+                          <tr>
+                            <th scope="col">Date</th>
+                            <th scope="col">Status</th>
+                            <th scope="col">Internal note</th>
+                            <th scope="col">Methodology version</th>
+                            <th scope="col">By user</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {methodologyStatuses.map(status => (
+                            <tr key={status.methodologyStatusId}>
+                              <td>
+                                {status.created ? (
+                                  <FormattedDate format="d MMMM yyyy HH:mm">
+                                    {status.created}
+                                  </FormattedDate>
+                                ) : (
+                                  'Not available'
+                                )}
+                              </td>
+                              <td>{status.approvalStatus}</td>
+                              <td>{status.internalReleaseNote}</td>
+                              <td>{`${status.methodologyVersion + 1}`}</td>{' '}
+                              {/* +1 because version starts from 0 in DB */}
+                              <td>
+                                {status.createdByEmail ? (
+                                  <a href={`mailto:${status.createdByEmail}`}>
+                                    {status.createdByEmail}
+                                  </a>
+                                ) : (
+                                  'Not available'
+                                )}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </LoadingSpinner>
+                  </>
                 )}
               </>
             ) : (

@@ -15,7 +15,7 @@ public record MethodologyVersionSummaryViewModel
     public DateTime? Published { get; set; }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public MethodologyStatus Status { get; set; }
+    public MethodologyApprovalStatus Status { get; set; }
 
     public bool Owned { get; set; }
 

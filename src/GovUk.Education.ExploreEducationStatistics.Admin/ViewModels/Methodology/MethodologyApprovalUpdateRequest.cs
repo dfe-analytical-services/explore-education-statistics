@@ -11,19 +11,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         public string? LatestInternalReleaseNote { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public MethodologyStatus Status { get; set; }
+        public MethodologyApprovalStatus Status { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public MethodologyPublishingStrategy PublishingStrategy { get; set; }
 
         public Guid? WithReleaseId { get; set; }
 
-        public bool IsStatusUpdateForMethodology(MethodologyVersion methodologyVersion)
+        public bool IsStatusUpdateRequired(MethodologyVersion methodologyVersion)
         {
             return methodologyVersion.Status != Status
                    || methodologyVersion.PublishingStrategy != PublishingStrategy
-                   || methodologyVersion.ScheduledWithReleaseId != WithReleaseId
-                   || methodologyVersion.InternalReleaseNote != LatestInternalReleaseNote;
+                   || methodologyVersion.ScheduledWithReleaseId != WithReleaseId;
         }
     }
 }

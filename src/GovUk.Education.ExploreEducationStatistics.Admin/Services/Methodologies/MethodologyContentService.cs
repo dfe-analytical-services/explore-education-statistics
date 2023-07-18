@@ -423,7 +423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, MethodologyVersionContent>> CheckCanUpdateMethodologyContent(
             MethodologyVersion methodologyVersion)
         {
-            if (methodologyVersion.Status != MethodologyStatus.Draft)
+            if (methodologyVersion.Status != MethodologyApprovalStatus.Draft)
             {
                 return ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft);
             }
@@ -441,7 +441,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, Tuple<MethodologyVersionContent, ContentSection>>> CheckCanUpdateMethodologyContent(
             Tuple<MethodologyVersion, ContentSection> tuple)
         {
-            if (tuple.Item1.Status != MethodologyStatus.Draft)
+            if (tuple.Item1.Status != MethodologyApprovalStatus.Draft)
             {
                 return ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft);
             }
