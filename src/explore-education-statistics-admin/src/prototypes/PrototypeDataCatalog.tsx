@@ -286,47 +286,50 @@ const PrototypeDataCatalogue = () => {
                 </option>
               </select>
             </div>
-            <div
-              className="govuk-form-group govuk-!-margin-bottom-6"
-              style={{ position: 'relative' }}
-            >
-              <h2 className="govuk-label-wrapper">
-                <label
-                  className="govuk-label govuk-label--s"
-                  htmlFor="pubilication"
-                >
-                  Related release
-                </label>
-              </h2>
 
-              <select
-                className="govuk-select"
-                id="release"
-                /* eslint-disable-next-line react/jsx-props-no-spreading */
-                {...(selectedPublication !==
-                  'Apprenticeships and traineeships' && { disabled: true })}
-                // eslint-disable-next-line jsx-a11y/no-onchange
-                onBlur={e => {
-                  setSelectedRelease(e.target.value);
-                }}
+            {selectedPublication === 'Apprenticeships and traineeships' && (
+              <div
+                className="govuk-form-group govuk-!-margin-bottom-6"
+                style={{ position: 'relative' }}
               >
-                <option
-                  value={selectedRelease}
-                  selected={selectedRelease !== ''}
+                <h2 className="govuk-label-wrapper">
+                  <label
+                    className="govuk-label govuk-label--s"
+                    htmlFor="pubilication"
+                  >
+                    Related release
+                  </label>
+                </h2>
+                <select
+                  className="govuk-select"
+                  id="release"
+                  /* eslint-disable-next-line react/jsx-props-no-spreading */
+                  {...(selectedPublication !==
+                    'Apprenticeships and traineeships' && { disabled: true })}
+                  // eslint-disable-next-line jsx-a11y/no-onchange
+                  onBlur={e => {
+                    setSelectedRelease(e.target.value);
+                  }}
                 >
-                  {selectedRelease}
-                </option>
-                <option value="Academic year 2020/21">
-                  Academic year 2020/21
-                </option>
-                <option value="Academic year 2019/20">
-                  Academic year 2019/20
-                </option>
-                <option value="Academic year 2019/20">
-                  Academic year 2018/19
-                </option>
-              </select>
-            </div>
+                  <option
+                    value={selectedRelease}
+                    selected={selectedRelease !== ''}
+                  >
+                    {selectedRelease}
+                  </option>
+                  <option value="Academic year 2020/21">
+                    Academic year 2020/21
+                  </option>
+                  <option value="Academic year 2019/20">
+                    Academic year 2019/20
+                  </option>
+                  <option value="Academic year 2019/20">
+                    Academic year 2018/19
+                  </option>
+                </select>
+              </div>
+            )}
+
             <hr />
             <div className="govuk-radios govuk-radios--small">
               <fieldset className="govuk-fieldset govuk-!-margin-top-6">

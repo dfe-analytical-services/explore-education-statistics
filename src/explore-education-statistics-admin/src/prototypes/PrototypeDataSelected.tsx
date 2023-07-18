@@ -396,11 +396,12 @@ const PrototypeHomepage = () => {
               </a>
 
               <h3 className="govuk-!-margin-top-9">Query data set</h3>
-
+              <h4>Using GET</h4>
               <UrlContainer
-                className="govuk-!-margin-bottom-2"
+                className="govuk-!-margin-bottom-6"
                 url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
               />
+              <h4>Using POST</h4>
               <UrlContainer
                 className="govuk-!-margin-bottom-2"
                 url="POST https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
@@ -564,10 +565,10 @@ const PrototypeHomepage = () => {
                 </h4>
                 {selectedRelease === latestRelease && (
                   <div className="govuk-inset-text">
-                    This version includes some strutural and variable changes,
-                    these are highlighted in the changelog below, this is likely
-                    to cause breaking changes to any existing queries you may
-                    have set up.
+                    This version includes some structural changes, these are
+                    highlighted in the changelog, this is likely to cause
+                    breaking changes to any existing queries you may have set
+                    up.
                   </div>
                 )}
                 <h4 className="govuk-!-margin-bottom-0">New locations</h4>
@@ -586,11 +587,126 @@ const PrototypeHomepage = () => {
                     Sheffield <strong>maps to</strong> Sheffield
                   </li>
                 </ul>
+                <h4 className="govuk-!-margin-bottom-0">Unmapped locations</h4>
+                <ul className="govuk-!-margin-bottom-6">
+                  <li>Chester</li>
+                  <li>Kingston upon Hull, City of</li>
+                  <li>Northumberland</li>
+                </ul>
+                <h4 className="govuk-!-margin-botttom-0">New filters</h4>
+                <ul className="govuk-!-margin-bottom-6">
+                  <li>Age 10 (new)</li>
+                  <li>Ethnicity Major Asian Total (new)</li>
+                  <li>Age 11</li>
+                  <li>Age 12</li>
+                </ul>
+                <h4 className="govuk-!-margin-botttom-0">Mapped filters</h4>
+                <ul className="govuk-!-margin-bottom-6">
+                  <li>
+                    Ethnicity Major Black Total <strong>maps to</strong>{' '}
+                    Ethnicity Major Black Total
+                  </li>
+                  <li>
+                    Age 4 and under <strong>maps to</strong> Age 4 and under
+                  </li>
+                  <li>Unmapped filters</li>
+                  <li>Ethnicity Major Asian Total</li>
+                  <li>Age 10</li>
+                </ul>
+                <h4 className="govuk-!-margin-botttom-0">New indicators</h4>
+                <ul className="govuk-!-margin-bottom-6">
+                  <li>Number of authorised holiday sessions (new)</li>
+                  <li>Authorised absence rate (new)</li>
+                  <li>Number of authorised other sessions</li>
+                  <li>Number of authorised reasons sessions</li>
+                </ul>
+                <h4 className="govuk-!-margin-botttom-0">Mapped indicators</h4>
+                <ul className="govuk-!-margin-bottom-6">
+                  <li>
+                    Number of excluded sessions <strong>maps to</strong> Number
+                    of excluded sessions
+                  </li>
+                  <li>
+                    Number of extended authorised holiday sessions{' '}
+                    <strong>maps to</strong> Number of extended authorised
+                    holiday sessions
+                  </li>
+                </ul>
+                <h4 className="govuk-!-margin-botttom-0">
+                  Unmapped indicators
+                </h4>
+                <ul className="govuk-!-margin-bottom-6">
+                  <li>
+                    Authorised absence rate Number of authorised holiday
+                    sessions
+                  </li>
+                </ul>
               </TabsSection>
             )}
             {dataType === 'api' && (
               <TabsSection title="Version history">
-                Version history here
+                <table>
+                  <caption>API data set version history</caption>
+                  <thead>
+                    <tr>
+                      <th>Version</th>
+                      <th>Related release</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <a
+                          href="#"
+                          onClick={e => {
+                            setSelectedRelease('Academic year 2021/22');
+                          }}
+                        >
+                          2.0
+                        </a>
+                      </td>
+                      <td>Academic year 2021/22</td>
+                      <td>
+                        <span className="govuk-tag">Active</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a
+                          href="#"
+                          onClick={e => {
+                            setSelectedRelease('Academic year 2020/21');
+                          }}
+                        >
+                          1.1
+                        </a>
+                      </td>
+                      <td>Academic year 2020/21</td>
+                      <td>
+                        <span className="govuk-tag">Active</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>
+                        <a
+                          href="#"
+                          onClick={e => {
+                            setSelectedRelease('Academic year 2019/20');
+                          }}
+                        >
+                          1.0
+                        </a>
+                      </td>
+                      <td>Academic year 2019/20</td>
+                      <td>
+                        <span className="govuk-tag govuk-tag--red">
+                          Deprecated
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </TabsSection>
             )}
           </Tabs>

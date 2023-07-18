@@ -9,8 +9,13 @@
       max-width: 1220px;
 
       ul,
-      p {
+      p,
+      :global(.govuk-inset-text) {
         max-width: 960px !important;
+      }
+
+      :global(ul.govuk-tabs__list) {
+        max-width: 1220px !important;
       }
     }
   }
