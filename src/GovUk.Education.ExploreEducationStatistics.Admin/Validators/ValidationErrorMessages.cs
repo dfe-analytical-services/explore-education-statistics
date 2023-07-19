@@ -10,9 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         PartialDateNotValid,
 
         // Content
-        EmptyContentSectionExists,
-        GenericSectionsContainEmptyHtmlBlock,
-        ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
         ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
@@ -98,6 +95,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         DataFileReplacementsMustBeCompleted,
         ReleaseNoteRequired,
         PublicDataGuidanceRequired,
+        EmptyContentSectionExists,
+        GenericSectionsContainEmptyHtmlBlock,
+        ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
 
         // Release checklist warnings
         NoMethodology,
