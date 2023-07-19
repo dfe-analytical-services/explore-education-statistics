@@ -97,6 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         PublicDataGuidanceRequired,
         EmptyContentSectionExists,
         GenericSectionsContainEmptyHtmlBlock,
+        RelatedDashboardsSectionContainsEmptyHtmlBlock,
         ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
 
         // Release checklist warnings

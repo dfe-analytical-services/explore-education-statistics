@@ -119,6 +119,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ValidationErrorMessages.ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock));
             }
 
+            if (await ReleaseRelatedDashboardsSectionContainsEmptyContentBlock(release.Id))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
+            }
+
             return errors;
         }
 
@@ -143,28 +149,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> ReleaseHasEmptyGenericContentSection(Guid releaseId)
         {
-            return await _contentDbContext.ReleaseContentSections
-                .Include(rcs => rcs.ContentSection)
-                .ThenInclude(cs => cs.Content)
-                .Where(rcs =>
-                    rcs.ReleaseId == releaseId
-                    && rcs.ContentSection.Type == ContentSectionType.Generic)
-                .AnyAsync(rcs => rcs.ContentSection.Content.Count == 0);
+            return await _contentDbContext.ContentSections
+                .Where(cs =>
+                    cs.Type == ContentSectionType.Generic && 
+                    cs.Release.ReleaseId == releaseId)
+                .AnyAsync(cs => cs.Content.Count == 0);
         }
 
         private async Task<bool> ReleaseGenericContentSectionsContainEmptyContentBlock(Guid releaseId)
         {
-            var releaseGenericContentBlocks = await _contentDbContext.ReleaseContentSections
-                .Include(rcs => rcs.ContentSection)
-                .ThenInclude(cs => cs.Content)
-                .Where(rcs =>
-                    rcs.ReleaseId == releaseId
-                    && rcs.ContentSection.Type == ContentSectionType.Generic)
-                .SelectMany(rcs => rcs.ContentSection.Content)
-                .ToListAsync();
+            return await _contentDbContext.ContentBlocks
+                .Where(cb =>
+                    cb.ContentSection!.Type == ContentSectionType.Generic && 
+                    cb.ContentSection.Release.ReleaseId == releaseId)
+                .OfType<HtmlBlock>()
+                .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
+        }
 
-            return releaseGenericContentBlocks
-                .Any(block => block is HtmlBlock htmlBlock && htmlBlock.Body.IsNullOrEmpty());
+        private async Task<bool> ReleaseRelatedDashboardsSectionContainsEmptyContentBlock(Guid releaseId)
+        {
+            return await _contentDbContext.ContentBlocks
+                .Where(cb =>
+                    cb.ContentSection!.Type == ContentSectionType.RelatedDashboards && 
+                    cb.ContentSection.Release.ReleaseId == releaseId)
+                .OfType<HtmlBlock>()
+                .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)

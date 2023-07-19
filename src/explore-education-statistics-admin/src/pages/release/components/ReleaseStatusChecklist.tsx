@@ -98,6 +98,15 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseRouteParams,
             ),
           };
+        case 'RelatedDashboardsSectionContainsEmptyHtmlBlock':
+          return {
+            message:
+              'Release content should not contain an empty related dashboards section',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
         case 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock':
           return {
             message:

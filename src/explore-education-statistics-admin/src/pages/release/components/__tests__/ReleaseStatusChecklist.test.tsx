@@ -19,6 +19,7 @@ describe('ReleaseStatusChecklist', () => {
               { code: 'ReleaseNoteRequired' },
               { code: 'EmptyContentSectionExists' },
               { code: 'GenericSectionsContainEmptyHtmlBlock' },
+              { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
               { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
             ],
           }}
@@ -35,7 +36,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.queryByRole('heading', { name: 'Warnings' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText('7 issues')).toBeInTheDocument();
+    expect(screen.getByText('8 issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -87,6 +88,16 @@ describe('ReleaseStatusChecklist', () => {
     expect(
       screen.getByRole('link', {
         name: 'Release content should not contain empty text blocks',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name:
+          'Release content should not contain an empty related dashboards section',
       }),
     ).toHaveAttribute(
       'href',
