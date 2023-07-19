@@ -1,4 +1,5 @@
 import styles from '@admin/components/editable/EditableAccordionSection.module.scss';
+import DraggableItem from '@admin/components/DraggableItem';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import AccordionSection, {
   accordionSectionClasses,
@@ -18,7 +19,6 @@ import React, {
   useMemo,
   useState,
 } from 'react';
-import { Draggable } from 'react-beautiful-dnd';
 
 export interface DraggableAccordionSectionProps {
   index: number;
@@ -128,96 +128,80 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
   }
 
   return (
-    <Draggable draggableId={id} isDragDisabled={!isReordering} index={index}>
-      {(draggableProvided, snapshot) => (
-        <div
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          {...draggableProvided.draggableProps}
-          // eslint-disable-next-line react/jsx-props-no-spreading
-          {...draggableProvided.dragHandleProps}
-          ref={draggableProvided.innerRef}
-          className={classNames({
-            [styles.dragContainer]: isReordering,
-            [styles.isDragging]: snapshot.isDragging,
-          })}
-          data-testid="editableAccordionSection"
-        >
-          <AccordionSection
-            {...props}
-            id={id}
-            heading={heading}
-            header={header}
-          >
-            {sectionProps => (
-              <>
-                <ButtonGroup>
-                  {isEditingHeading ? (
-                    <Button onClick={saveHeading}>Save section title</Button>
-                  ) : (
-                    <Tooltip
-                      text={disabledHeadingChangeTooltip}
-                      enabled={!!disabledHeadingChangeTooltip}
+    <DraggableItem
+      className={classNames({ [styles.draggableItem]: isReordering })}
+      id={id}
+      index={index}
+      isReordering={isReordering}
+      testId="editableAccordionSection"
+    >
+      <AccordionSection {...props} id={id} heading={heading} header={header}>
+        {sectionProps => (
+          <>
+            <ButtonGroup>
+              {isEditingHeading ? (
+                <Button onClick={saveHeading}>Save section title</Button>
+              ) : (
+                <Tooltip
+                  text={disabledHeadingChangeTooltip}
+                  enabled={!!disabledHeadingChangeTooltip}
+                >
+                  {({ ref }) => (
+                    <Button
+                      ariaDisabled={!!disabledHeadingChangeTooltip}
+                      type="button"
+                      ref={ref}
+                      variant="secondary"
+                      onClick={toggleEditingHeading}
                     >
-                      {({ ref }) => (
-                        <Button
-                          ariaDisabled={!!disabledHeadingChangeTooltip}
-                          type="button"
-                          ref={ref}
-                          variant="secondary"
-                          onClick={toggleEditingHeading}
-                        >
-                          Edit section title
-                        </Button>
-                      )}
-                    </Tooltip>
+                      Edit section title
+                    </Button>
                   )}
+                </Tooltip>
+              )}
 
-                  {headerButtons}
+              {headerButtons}
 
-                  {onRemoveSection && (
-                    <>
-                      <Tooltip
-                        text={disabledRemoveSectionTooltip}
-                        enabled={!!disabledRemoveSectionTooltip}
+              {onRemoveSection && (
+                <>
+                  <Tooltip
+                    text={disabledRemoveSectionTooltip}
+                    enabled={!!disabledRemoveSectionTooltip}
+                  >
+                    {({ ref }) => (
+                      <Button
+                        ariaDisabled={!!disabledRemoveSectionTooltip}
+                        ref={ref}
+                        variant="warning"
+                        onClick={toggleRemoveModal.on}
                       >
-                        {({ ref }) => (
-                          <Button
-                            ariaDisabled={!!disabledRemoveSectionTooltip}
-                            ref={ref}
-                            variant="warning"
-                            onClick={toggleRemoveModal.on}
-                          >
-                            Remove this section
-                          </Button>
-                        )}
-                      </Tooltip>
+                        Remove this section
+                      </Button>
+                    )}
+                  </Tooltip>
 
-                      <ModalConfirm
-                        title="Removing section"
-                        open={showRemoveModal}
-                        onConfirm={onRemoveSection}
-                        onExit={toggleRemoveModal.off}
-                        onCancel={toggleRemoveModal.off}
-                      >
-                        <p>
-                          Are you sure you want to remove the following section?
-                          <br />
-                          <strong>"{heading}"</strong>
-                        </p>
-                      </ModalConfirm>
-                    </>
-                  )}
-                </ButtonGroup>
+                  <ModalConfirm
+                    title="Removing section"
+                    open={showRemoveModal}
+                    onConfirm={onRemoveSection}
+                    onExit={toggleRemoveModal.off}
+                    onCancel={toggleRemoveModal.off}
+                  >
+                    <p>
+                      Are you sure you want to remove the following section?
+                      <br />
+                      <strong>"{heading}"</strong>
+                    </p>
+                  </ModalConfirm>
+                </>
+              )}
+            </ButtonGroup>
 
-                {typeof children === 'function'
-                  ? children(sectionProps)
-                  : children}
-              </>
-            )}
-          </AccordionSection>
-        </div>
-      )}
-    </Draggable>
+            {typeof children === 'function' ? children(sectionProps) : children}
+          </>
+        )}
+      </AccordionSection>
+    </DraggableItem>
   );
 };
 

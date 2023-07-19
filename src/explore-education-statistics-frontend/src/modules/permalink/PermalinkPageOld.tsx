@@ -96,7 +96,7 @@ const PermalinkPage = ({ data }: Props) => {
         />
       </div>
 
-      <div className="dfe-hide-print">
+      <div className="govuk-!-display-none-print">
         {!hasTableError && (
           <DownloadTable
             fullTable={fullTable}

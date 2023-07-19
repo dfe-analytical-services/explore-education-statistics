@@ -16,7 +16,8 @@ Navigate to publication release page
 Click fast track link for 'Pupil absence rates' data block
     user waits until h1 is visible    Pupil absence in schools in England
     user opens accordion section    Pupil absence rates    id:content
-    user scrolls to accordion section content    Pupil absence rates    id:content
+    user scrolls to accordion section    Pupil absence rates    id:content
+    user scrolls to element    testid:Data block - Generic data block - National
     user waits until h3 is visible    Explore and edit this data online
     user clicks link by visible text    Explore data    testid:Data block - Generic data block - National
 

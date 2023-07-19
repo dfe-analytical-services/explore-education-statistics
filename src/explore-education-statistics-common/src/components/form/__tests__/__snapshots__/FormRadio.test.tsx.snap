@@ -70,11 +70,11 @@ exports[`FormRadio renders correctly when \`hint\` is provided 1`] = `
   >
     Test radio
   </label>
-  <span id="test-radio-item-hint"
-        class="govuk-hint govuk-radios__hint"
+  <div id="test-radio-item-hint"
+       class="govuk-hint govuk-radios__hint"
   >
     Click me to proceed
-  </span>
+  </div>
 </div>
 `;
 

@@ -4,10 +4,6 @@
   }
 }
 
-.dfe-print-hidden {
-  @include print-hide();
-}
-
 @mixin print-break-avoid() {
   page-break-inside: avoid;
 }

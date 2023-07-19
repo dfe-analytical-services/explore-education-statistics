@@ -58,7 +58,7 @@ const PrototypeSelectedRole = ({
           'govuk-!-margin-0',
           'govuk-tag',
           'dfe-flex-basis--45',
-          'dfe-align--centre',
+          'govuk-!-text-align-centre',
           roleType ? 'govuk-tag--grey' : 'govuk-tag--red',
         )}
       >

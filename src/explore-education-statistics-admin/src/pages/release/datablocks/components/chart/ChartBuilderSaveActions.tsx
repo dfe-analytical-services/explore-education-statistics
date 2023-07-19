@@ -36,7 +36,6 @@ const ChartBuilderSaveActions = ({
     <>
       <ErrorSummary
         title="Cannot save chart"
-        id={`${formId}-errorSummary`}
         errors={
           showSubmitError
             ? Object.values(forms)

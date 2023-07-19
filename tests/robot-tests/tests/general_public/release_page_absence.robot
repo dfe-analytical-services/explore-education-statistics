@@ -243,14 +243,13 @@ Validate accordion sections order
     user checks accordion is in position    Absence for 4-year-olds    7    id:content
     user checks accordion is in position    Pupil referral unit absence    8    id:content
     user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:content
-
     user checks there are x accordion sections    9    id:content
 
-    user checks accordion is in position    Methodology    1    id:help-and-support-accordion
-    user checks accordion is in position    Official statistics    2    id:help-and-support-accordion
-    user checks accordion is in position    Contact us    3    id:help-and-support-accordion
-
-    user checks there are x accordion sections    3    id:help-and-support-accordion
+Verify help and support section is correct
+    user checks page contains    Help and support
+    user checks page contains    Methodology
+    user checks page contains    Official statistics
+    user checks page contains    Contact us
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
@@ -325,7 +324,7 @@ Validate Regional and local authority (LA) breakdown chart
     [Documentation]    EES-718    Failing due to https://dfedigital.atlassian.net/browse/EES-4269
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
-    user scrolls to accordion section content    Regional and local authority (LA) breakdown    id:content
+    user scrolls to accordion section    Regional and local authority (LA) breakdown    id:content
 
     ${datablock}=    set variable    css:[data-testid="Data block - Generic data block - LA"]
     user waits until element contains map chart    ${datablock}

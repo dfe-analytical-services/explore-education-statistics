@@ -13,8 +13,8 @@ export interface ErrorSummaryMessage {
 }
 
 interface BaseErrorSummaryProps {
-  id: string;
   children: ReactNode;
+  testId?: string;
   title: string;
 }
 
@@ -22,24 +22,22 @@ export const BaseErrorSummary = forwardRef<
   HTMLDivElement,
   BaseErrorSummaryProps
 >((props, ref) => {
-  const { id, children, title } = props;
-  const idTitle = `${id}-title`;
+  const { children, testId = 'errorSummary', title } = props;
 
   return (
     <div
-      aria-labelledby={idTitle}
       className="govuk-error-summary"
       ref={ref}
-      role="alert"
       tabIndex={-1}
+      data-testid={testId}
     >
-      <h2 className="govuk-error-summary__title" id={idTitle}>
-        {title}
-      </h2>
+      <div role="alert">
+        <h2 className="govuk-error-summary__title">{title}</h2>
 
-      <ErrorPrefixPageTitle />
+        <ErrorPrefixPageTitle />
 
-      <div className="govuk-error-summary__body">{children}</div>
+        <div className="govuk-error-summary__body">{children}</div>
+      </div>
     </div>
   );
 });
@@ -47,7 +45,6 @@ BaseErrorSummary.displayName = 'BaseErrorSummary';
 
 interface ErrorSummaryProps {
   errors: ErrorSummaryMessage[];
-  id: string;
   focusOnError?: boolean;
   title?: string;
   onFocus?: () => void;
@@ -55,7 +52,6 @@ interface ErrorSummaryProps {
 }
 
 const ErrorSummary = ({
-  id,
   errors,
   focusOnError = false,
   title = 'There is a problem',
@@ -91,7 +87,7 @@ const ErrorSummary = ({
   }, [errors, focusOnError, onFocus]);
 
   return errors.length > 0 ? (
-    <BaseErrorSummary id={id} title={title} ref={ref}>
+    <BaseErrorSummary title={title} ref={ref}>
       <ul className="govuk-list govuk-error-summary__list">
         {errors.map(error => (
           <li key={error.id}>

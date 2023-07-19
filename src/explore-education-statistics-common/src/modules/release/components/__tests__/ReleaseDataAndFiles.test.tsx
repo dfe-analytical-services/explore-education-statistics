@@ -255,7 +255,7 @@ describe('ReleaseDataAndFiles', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Additional supporting files' }),
+      screen.getByRole('heading', { name: /Additional supporting files/ }),
     ).toBeInTheDocument();
 
     expect(

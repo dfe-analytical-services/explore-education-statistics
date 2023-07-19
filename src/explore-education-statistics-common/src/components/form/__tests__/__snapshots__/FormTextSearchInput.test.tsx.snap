@@ -29,11 +29,11 @@ exports[`FormTextSearchInput renders correctly with hint 1`] = `
 >
   Test input
 </label>
-<span id="test-input-hint"
-      class="govuk-hint"
+<div id="test-input-hint"
+     class="govuk-hint"
 >
   Fill me in
-</span>
+</div>
 <input name="testInput"
        aria-describedby="test-input-hint"
        class="govuk-input searchInput"
@@ -63,11 +63,11 @@ exports[`FormTextSearchInput renders with a specific width class 1`] = `
 >
   Test input
 </label>
-<span id="test-input-hint"
-      class="govuk-hint"
+<div id="test-input-hint"
+     class="govuk-hint"
 >
   Fill me in
-</span>
+</div>
 <input name="testInput"
        aria-describedby="test-input-hint"
        class="govuk-input searchInput govuk-input--width-20"

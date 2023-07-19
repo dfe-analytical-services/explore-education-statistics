@@ -361,7 +361,7 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
   });
 
   test('does not re-focus error summary when changing input', async () => {
@@ -394,7 +394,7 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
 
     const input = screen.getByLabelText('First name');
 
@@ -410,7 +410,7 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).not.toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
   });
 
   test('re-focuses error summary on re-submit', async () => {
@@ -443,10 +443,10 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
 
     screen.getByLabelText('First name').focus();
-    expect(screen.getByRole('alert')).not.toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -454,6 +454,6 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
   });
 });

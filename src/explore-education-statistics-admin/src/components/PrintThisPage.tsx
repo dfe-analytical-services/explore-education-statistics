@@ -8,7 +8,7 @@ const PrintThisPage = () => {
     <div
       className={classNames(
         'govuk-!-margin-top-6',
-        'dfe-print-hidden',
+        'govuk-!-display-none-print',
         styles.mobileHidden,
       )}
     >

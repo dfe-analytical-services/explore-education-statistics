@@ -7,7 +7,7 @@ interface Props {
 
 export default function GoToTopLink({ className }: Props) {
   return (
-    <div className={classNames('dfe-print-hidden', className)}>
+    <div className={classNames('govuk-!-display-none-print', className)}>
       <a
         href="#main-content"
         className="govuk-link govuk-link--no-visited-state"

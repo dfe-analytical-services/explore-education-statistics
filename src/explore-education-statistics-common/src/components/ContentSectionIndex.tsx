@@ -78,6 +78,12 @@ const ContentSectionIndex = ({
       return;
     }
 
+    // update the width on scroll as it's zero initially due
+    // to the element being hidden in accordions.
+    if (initialBounds?.width === 0) {
+      setInitialBounds(outerRef?.current?.getBoundingClientRect());
+    }
+
     const { height: indexHeight } = ref.current.getBoundingClientRect();
     const { top, bottom } = contentRef.current.getBoundingClientRect();
 
@@ -132,7 +138,7 @@ const ContentSectionIndex = ({
     };
   });
 
-  const { height, width } = initialBounds ?? {};
+  const { width } = initialBounds ?? {};
 
   const getContainerStyle = (): CSSProperties => {
     switch (viewportPosition) {
@@ -169,17 +175,15 @@ const ContentSectionIndex = ({
     <div ref={outerRef} className={classNames('dfe-print-hidden', className)}>
       <div
         style={{
+          minHeight: '1px',
           position: 'relative',
-          height,
-          width,
           ...getContainerStyle(),
         }}
       >
         <div
           ref={ref}
           style={{
-            height,
-            width,
+            width: width === 0 ? '100%' : width,
             ...getStyle(),
           }}
         >

@@ -83,14 +83,14 @@ const FormCheckbox = ({
           {label}
         </label>
         {hint && (
-          <span
+          <div
             id={`${id}-item-hint`}
             className={classNames('govuk-hint govuk-checkboxes__hint', {
               'govuk-!-font-size-14 govuk-!-margin-bottom-1': hintSmall,
             })}
           >
             {hint}
-          </span>
+          </div>
         )}
       </div>
       {conditional && (

@@ -6,7 +6,6 @@ describe('ErrorSummary', () => {
   test('renders correctly with some errors', () => {
     const { container, getByText } = render(
       <ErrorSummary
-        id="test-errors"
         errors={[
           { id: 'test-error-1', message: 'Something went wrong 1' },
           { id: 'test-error-2', message: 'Something went wrong 2' },
@@ -23,7 +22,6 @@ describe('ErrorSummary', () => {
   test('does not gain focus or scroll into view when there are errors by default', async () => {
     const { container } = render(
       <ErrorSummary
-        id="test-errors"
         errors={[
           { id: 'test-error-1', message: 'Something went wrong 1' },
           { id: 'test-error-2', message: 'Something went wrong 2' },
@@ -44,7 +42,6 @@ describe('ErrorSummary', () => {
   test('gains focus and scrolls into view when there are errors and `focusOnError` is true', () => {
     const { container } = render(
       <ErrorSummary
-        id="test-errors"
         focusOnError
         errors={[
           { id: 'test-error-1', message: 'Something went wrong 1' },
@@ -64,7 +61,6 @@ describe('ErrorSummary', () => {
   test('re-rendering with new errors does not gain focus or scroll into view', () => {
     const { container, getByText, rerender } = render(
       <ErrorSummary
-        id="test-errors"
         focusOnError
         errors={[
           { id: 'test-error-1', message: 'Something went wrong 1' },
@@ -82,7 +78,6 @@ describe('ErrorSummary', () => {
 
     rerender(
       <ErrorSummary
-        id="test-errors"
         errors={[
           { id: 'test-error-1', message: 'Something went wrong 1' },
           { id: 'test-error-2', message: 'Something went wrong 2' },
@@ -96,32 +91,8 @@ describe('ErrorSummary', () => {
   });
 
   test('does not render when there are no errors', () => {
-    const { container } = render(<ErrorSummary id="test-errors" errors={[]} />);
+    const { container } = render(<ErrorSummary errors={[]} />);
 
     expect(container.innerHTML).toBe('');
-  });
-
-  test('aria-labelledby matches the summary title id', () => {
-    const { container, getByText } = render(
-      <ErrorSummary
-        errors={[
-          {
-            id: 'test-error-1',
-            message: 'Something went wrong',
-          },
-        ]}
-        id="test-errors"
-        title="The world is ending"
-      />,
-    );
-
-    expect(container.querySelector('[aria-labelledby]')).toHaveAttribute(
-      'aria-labelledby',
-      'test-errors-title',
-    );
-    expect(getByText('The world is ending')).toHaveAttribute(
-      'id',
-      'test-errors-title',
-    );
   });
 });

@@ -120,7 +120,7 @@ const PrototypeBauGlossary = () => {
                   Cancel
                 </Button>
               </div>
-              <div className="govuk-grid-column-one-half dfe-align--right">
+              <div className="govuk-grid-column-one-half govuk-!-text-align-right">
                 {!newEntry && (
                   <>
                     <Button

@@ -34,7 +34,7 @@ const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
             </span>
           </Link>
         </div>
-        <div className="govuk-grid-column-one-half dfe-align--right">
+        <div className="govuk-grid-column-one-half govuk-!-text-align-right">
           <Link to={nextSection.linkTo} className={styles.nextPrevious}>
             <span className="govuk-heading-m govuk-!-margin-bottom-0">
               Next step
@@ -65,7 +65,7 @@ const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
 
   if (nextSection) {
     return (
-      <div className="govuk-!-margin-top-9 dfe-align--right">
+      <div className="govuk-!-margin-top-9 govuk-!-text-align-right">
         <Link to={nextSection.linkTo} className={styles.nextPrevious}>
           <span className="govuk-heading-m govuk-!-margin-bottom-0">
             Next step

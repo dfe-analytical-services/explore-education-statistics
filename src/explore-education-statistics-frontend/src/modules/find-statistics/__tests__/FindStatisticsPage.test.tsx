@@ -130,7 +130,7 @@ describe('FindStatisticsPage', () => {
     expect(themeOptions[4]).not.toBeChecked();
 
     expect(
-      screen.getByRole('button', { name: 'Release type' }),
+      screen.getByRole('button', { name: /Release type/ }),
     ).toBeInTheDocument();
 
     const releaseTypeFilterGroup = within(

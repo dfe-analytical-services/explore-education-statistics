@@ -161,7 +161,7 @@ const PrototypeManageUsers = () => {
                         className="dfe-flex-basis--30 govuk-!-margin-top-1 govuk-!-margin-bottom-1"
                       />
 
-                      <div className="dfe-align--right dfe-flex-basis--10">
+                      <div className="govuk-!-text-align-right dfe-flex-basis--10">
                         <a
                           href="#"
                           onClick={() => {
@@ -178,7 +178,7 @@ const PrototypeManageUsers = () => {
                           {item.releases.map((item2, index2) =>(
                             <>
                               <div className={`dfe-flex dfe-align-items--center ${index2 < (item.releases.length-1) ? 'dfe-flex-underline' : ''}`} key={index2.toString()}>
-                                <div className="dfe-flex-basis--60 dfe-align--right govuk-!-padding-2">
+                                <div className="dfe-flex-basis--60 govuk-!-text-align-right govuk-!-padding-2">
                                   <PrototypeChangeUserRole 
                                     selectedRole={item2.role} 
                                     name={`${item.name} ${item.surname}`} 
@@ -186,7 +186,7 @@ const PrototypeManageUsers = () => {
                                     roleId={`${index}-${index2}`} 
                                   />
                                 </div>
-                                <div className="dfe-flex-basis--40 dfe-align--right">
+                                <div className="dfe-flex-basis--40 govuk-!-text-align-right">
                                   <a
                                     href="#"
                                     onClick={() => {
@@ -292,7 +292,7 @@ const PrototypeManageUsers = () => {
                           release={item2.releases[index + 1].release}
                           className="dfe-flex-basis--30 govuk-!-margin-top-1 govuk-!-margin-bottom-1"
                         />
-                        <div className="dfe-align--right dfe-flex-basis--10">
+                        <div className="govuk-!-text-align-right dfe-flex-basis--10">
                           <a
                             href="#"
                             onClick={() => {
@@ -356,7 +356,7 @@ const PrototypeManageUsers = () => {
                         <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">
                           {item}
                         </h2>
-                        <div className="dfe-flex-basis--50 dfe-align--right govuk-!-padding-2">
+                        <div className="dfe-flex-basis--50 govuk-!-text-align-right govuk-!-padding-2">
                           <PrototypeChangeUserRole
                             selectedRole
                             name="Invited user"

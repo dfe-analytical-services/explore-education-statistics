@@ -198,7 +198,8 @@ user changes accordion section title
     ${input}=    get child element    ${section}    css:input[name="heading"]
     user enters text into element    ${input}    ${title}
     user clicks button    Save section title    ${section}
-    user waits until parent contains element    ${section}    xpath:.//h2/button[@aria-expanded and text()="${title}"]
+    user waits until parent contains element    ${section}
+    ...    xpath:.//button[@class='govuk-accordion__section-button'][.//span[text()="${title}"] and @aria-expanded]
 
 user checks accordion section contains x blocks
     [Arguments]

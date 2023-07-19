@@ -38,7 +38,7 @@ const PrototypePublicationReleaseList = () => {
           </p>
         </div>
         {showReleases && (
-          <div className="govuk-grid-column-one-quarter dfe-align--right">
+          <div className="govuk-grid-column-one-quarter govuk-!-text-align-right">
             <Button>Create new release</Button>
           </div>
         )}
@@ -50,7 +50,7 @@ const PrototypePublicationReleaseList = () => {
               No releases created in this publication
             </WarningMessage>
           </div>
-          <div className="govuk-grid-column-one-quarter dfe-align--right govuk-!-margin-top-3">
+          <div className="govuk-grid-column-one-quarter govuk-!-text-align-right govuk-!-margin-top-3">
             <Button>Create new release</Button>
           </div>
         </div>
@@ -357,7 +357,7 @@ const PrototypePublicationReleaseList = () => {
                   <th
                     style={{ width: '120px' }}
                     colSpan={2}
-                    className="dfe-align--centre"
+                    className="govuk-!-text-align-centre"
                   >
                     Actions
                   </th>
@@ -530,7 +530,7 @@ const PrototypePublicationReleaseList = () => {
           </div>
         </>
       )}
-      <div className="dfe-align--right govuk-!-margin-top-9">
+      <div className="govuk-!-text-align-right govuk-!-margin-top-9">
         <ul className="govuk-list">
           <li>
             {showScheduled ? (

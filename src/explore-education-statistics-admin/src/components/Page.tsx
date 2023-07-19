@@ -63,6 +63,7 @@ const Page = ({
           </p>
           <p>
             <Link
+              className="govuk-link--inverse"
               to="https://forms.gle/ZMBcQjBpr9ZZvRwu5"
               target="_blank"
               rel="noopener noreferrer"

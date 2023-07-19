@@ -180,15 +180,17 @@ export default function ChartReferenceLinesConfiguration({
             {type === 'minor' && (
               <>
                 <br />
-                <span className="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-0">
+                <div className="govuk-hint govuk-!-font-size-16 govuk-!-margin-bottom-0">
                   0% = start of axis
-                </span>
+                </div>
               </>
             )}
           </th>
           <th className="govuk-!-width-one-third">Label</th>
           <th>Style</th>
-          <th className={`dfe-align--right ${styles.actions}`}>Actions</th>
+          <th className={`govuk-!-text-align-right ${styles.actions}`}>
+            Actions
+          </th>
         </tr>
       </thead>
       <tbody>

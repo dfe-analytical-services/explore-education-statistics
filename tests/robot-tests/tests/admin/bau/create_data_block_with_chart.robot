@@ -281,7 +281,7 @@ Embed data block into release content
 
 Check footnote is displayed in content Tab
     user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
-    user scrolls to accordion section content    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user scrolls to accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     user waits until page contains element    testid:Data block - ${DATABLOCK_NAME}
     user scrolls to element    testid:Data block - ${DATABLOCK_NAME}

@@ -2,24 +2,23 @@
 
 exports[`Form does not render errors for fields that do not have errors 1`] = `
 <form id="test-form">
-  <div aria-labelledby="test-form-summary-title"
-       class="govuk-error-summary"
-       role="alert"
+  <div class="govuk-error-summary"
        tabindex="-1"
+       data-testid="errorSummary"
   >
-    <h2 class="govuk-error-summary__title"
-        id="test-form-summary-title"
-    >
-      There is a problem
-    </h2>
-    <div class="govuk-error-summary__body">
-      <ul class="govuk-list govuk-error-summary__list">
-        <li>
-          <a href="#test-form-firstName">
-            First name is required
-          </a>
-        </li>
-      </ul>
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">
+        There is a problem
+      </h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li>
+            <a href="#test-form-firstName">
+              First name is required
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
   The form
@@ -31,29 +30,28 @@ exports[`Form does not render errors for fields that do not have errors 1`] = `
 
 exports[`Form renders error summary from form errors when form is submitted 1`] = `
 <form id="test-form">
-  <div aria-labelledby="test-form-summary-title"
-       class="govuk-error-summary"
-       role="alert"
+  <div class="govuk-error-summary"
        tabindex="-1"
+       data-testid="errorSummary"
   >
-    <h2 class="govuk-error-summary__title"
-        id="test-form-summary-title"
-    >
-      There is a problem
-    </h2>
-    <div class="govuk-error-summary__body">
-      <ul class="govuk-list govuk-error-summary__list">
-        <li>
-          <a href="#test-form-firstName">
-            First name is required
-          </a>
-        </li>
-        <li>
-          <a href="#test-form-lastName">
-            Last name is required
-          </a>
-        </li>
-      </ul>
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">
+        There is a problem
+      </h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li>
+            <a href="#test-form-firstName">
+              First name is required
+            </a>
+          </li>
+          <li>
+            <a href="#test-form-lastName">
+              Last name is required
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
   The form
@@ -65,24 +63,23 @@ exports[`Form renders error summary from form errors when form is submitted 1`] 
 
 exports[`Form renders submit error 1`] = `
 <form id="test-form">
-  <div aria-labelledby="test-form-summary-title"
-       class="govuk-error-summary"
-       role="alert"
+  <div class="govuk-error-summary"
        tabindex="-1"
+       data-testid="errorSummary"
   >
-    <h2 class="govuk-error-summary__title"
-        id="test-form-summary-title"
-    >
-      There is a problem
-    </h2>
-    <div class="govuk-error-summary__body">
-      <ul class="govuk-list govuk-error-summary__list">
-        <li>
-          <a href="#test-form-submit">
-            Something went wrong
-          </a>
-        </li>
-      </ul>
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">
+        There is a problem
+      </h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li>
+            <a href="#test-form-submit">
+              Something went wrong
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
   The form

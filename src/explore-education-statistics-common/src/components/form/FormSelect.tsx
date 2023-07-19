@@ -72,9 +72,9 @@ const FormSelect = ({
         {!inline && (
           <>
             {hint && (
-              <span id={`${id}-hint`} className="govuk-hint">
+              <div id={`${id}-hint`} className="govuk-hint">
                 {hint}
-              </span>
+              </div>
             )}
             {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
           </>
@@ -133,9 +133,9 @@ const FormSelect = ({
       {inline && (
         <>
           {hint && (
-            <span id={`${id}-hint`} className="govuk-hint">
+            <div id={`${id}-hint`} className="govuk-hint">
               {hint}
-            </span>
+            </div>
           )}
           {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
         </>
