@@ -15,6 +15,7 @@ const PrototypeHomepage = () => {
   const urlDataType = params.get('dataType');
   const latestRelease = 'Academic year 2021/22';
   const [fullWidth, setFullWidth] = useState(false);
+  const [fullTable, setFullTable] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
   const [dataType, setDataType] = useState(urlDataType || 'api');
   return (
@@ -34,7 +35,7 @@ const PrototypeHomepage = () => {
       >
         <>
           <h1 className="govuk-heading-xl">
-            <span className="govuk-caption-xl ">Data catalogue</span>{' '}
+            <span className="govuk-caption-xl ">Data catalogue v3</span>{' '}
             Apprenticeship Achievement Rates Detailed Series {dataType}
           </h1>
 
@@ -178,38 +179,35 @@ const PrototypeHomepage = () => {
             <div className="govuk-grid-column-one-third">
               <RelatedInformation heading="Quick links">
                 {dataType === 'api' && (
-                  <ul className="govuk-list govuk-list--spaced">
-                    <li>
-                      <Link
-                        to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
-                        className={classNames(
-                          'govuk-button',
-                          'govuk-link--no-visited-state',
-                          'govuk-!-margin-bottom-3',
-                        )}
-                      >
-                        API documentatiom
-                      </Link>
-                    </li>
-                    <li>
-                      <a
-                        href="#"
-                        onClick={e => {
-                          setDataType('csv');
-                        }}
-                      >
-                        View data downloads
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        href="./table-highlights-2?source=dataCat&dataset=ratesDetailed"
-                        target="_blank"
-                      >
-                        View or create your own tables
-                      </a>
-                    </li>
-                  </ul>
+                  <>
+                    <ul className="govuk-list">
+                      <li>
+                        <Link
+                          to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                          className={classNames(
+                            'govuk-button',
+                            'govuk-link--no-visited-state',
+                            'govuk-!-margin-bottom-0',
+                          )}
+                        >
+                          API documentatiom
+                        </Link>
+                      </li>
+                    </ul>
+                    <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+                      On this page
+                    </h3>
+                    <ul className="govuk-list ">
+                      <li>
+                        <a href="#api-preview-tabs-3">Changelog</a>
+                      </li>
+                      <li>
+                        <a href="#api-preview-tabs-2">
+                          API endpoint quick start
+                        </a>
+                      </li>
+                    </ul>
+                  </>
                 )}
                 {dataType === 'csv' && (
                   <ul className="govuk-list govuk-list--spaced">
@@ -382,62 +380,23 @@ const PrototypeHomepage = () => {
             </div>
           </div>
 
-          {dataType === 'api' && (
-            <div className="govuk-!-margin-bottom-9">
-              <h2 className="govuk-heading-l">API endpoints</h2>
-              <p className="govuk-hint">
-                If you are unfamiliar with using APIs, we suggest you first read
-                our{' '}
-                <Link
-                  to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
-                  target="blank"
-                >
-                  API guidance documentation
-                </Link>
-              </p>
-              <p className="govuk-hint">
-                The documentation provides full details and examples on how to
-                make the most from our data sets
-              </p>
-              <h3>Data set summary</h3>
-              <UrlContainer
-                className="govuk-!-margin-bottom-2"
-                url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}"
-              />
-              <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/GetDataSet/">
-                View endpoint summary guidance
-              </a>
-
-              <h3 className="govuk-!-margin-top-9">Query data set</h3>
-              <h4>Using GET</h4>
-              <UrlContainer
-                className="govuk-!-margin-bottom-6"
-                url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
-              />
-              <h4>Using POST</h4>
-              <UrlContainer
-                className="govuk-!-margin-bottom-2"
-                url="POST https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
-              />
-              <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/QueryDataSetGet/">
-                View endpoint query guidance
-              </a>
-            </div>
-          )}
-
           <h2 className="govuk-heading-l">
-            {dataType === 'api' ? 'API preview and history' : 'Data preview'}
+            {dataType === 'api'
+              ? 'API data preview, endpoints and changelog'
+              : 'Data preview'}
           </h2>
 
           <Tabs id="api-preview-tabs">
             <TabsSection title="Data preview">
+              <h3>Data preview</h3>
               <div style={{ maxWidth: '100%', overflow: 'auto' }}>
-                <table className="govuk-table">
+                <table className="govuk-table" style={{ width: '3500px' }}>
                   <caption
                     className="govuk-!-margin-bottom-3"
                     style={{ fontWeight: 'normal' }}
                   >
-                    Snapshot showing first 5 rows of XXXXX, taken from CSV file
+                    Snapshot showing {fullTable ? 'first 5 rows' : 'first row'}{' '}
+                    of XXXXX, taken from underlying data
                   </caption>
                   <thead>
                     <tr>
@@ -480,86 +439,171 @@ const PrototypeHomepage = () => {
                       <td>~</td>
                       <td>~</td>
                     </tr>
-                    <tr>
-                      <td>201819</td>
-                      <td>Academic year</td>
-                      <td>National</td>
-                      <td>E92000001</td>
-                      <td>England</td>
-                      <td>Ethnicity group</td>
-                      <td>Framework</td>
-                      <td>16-18</td>
-                      <td>Advanced</td>
-                      <td>Ethnic minorities (excluding white minorities)</td>
-                      <td>Arts, Media and Publishing</td>
-                      <td>10</td>
-                      <td>10</td>
-                      <td>10</td>
-                      <td>58.3</td>
-                      <td>75</td>
-                      <td>77.8</td>
-                    </tr>
-                    <tr>
-                      <td>201819</td>
-                      <td>Academic year</td>
-                      <td>National</td>
-                      <td>E92000001</td>
-                      <td>England</td>
-                      <td>Ethnicity group</td>
-                      <td>Framework</td>
-                      <td>16-18</td>
-                      <td>Advanced</td>
-                      <td>Ethnic minorities (excluding white minorities)</td>
-                      <td>Business, Administration and Law</td>
-                      <td>440</td>
-                      <td>300</td>
-                      <td>300</td>
-                      <td>67.6</td>
-                      <td>68.2</td>
-                      <td>99</td>
-                    </tr>
-                    <tr>
-                      <td>201819</td>
-                      <td>Academic year</td>
-                      <td>National</td>
-                      <td>E92000001</td>
-                      <td>England</td>
-                      <td>Ethnicity group</td>
-                      <td>Framework</td>
-                      <td>16-18</td>
-                      <td>Advanced</td>
-                      <td>Ethnic minorities (excluding white minorities)</td>
-                      <td>Construction, Planning and the Built Environment</td>
-                      <td>60</td>
-                      <td>40</td>
-                      <td>40</td>
-                      <td>74.5</td>
-                      <td>76.4</td>
-                      <td>97.6</td>
-                    </tr>
-                    <tr>
-                      <td>201819</td>
-                      <td>Academic year</td>
-                      <td>National</td>
-                      <td>E92000001</td>
-                      <td>England</td>
-                      <td>Ethnicity group</td>
-                      <td>Framework</td>
-                      <td>16-18</td>
-                      <td>Advanced</td>
-                      <td>Ethnic minorities (excluding white minorities)</td>
-                      <td>Education and Training</td>
-                      <td>50</td>
-                      <td>30</td>
-                      <td>30</td>
-                      <td>62.5</td>
-                      <td>70.8</td>
-                      <td>88.2</td>
-                    </tr>
+                    {fullTable && (
+                      <>
+                        <tr>
+                          <td>201819</td>
+                          <td>Academic year</td>
+                          <td>National</td>
+                          <td>E92000001</td>
+                          <td>England</td>
+                          <td>Ethnicity group</td>
+                          <td>Framework</td>
+                          <td>16-18</td>
+                          <td>Advanced</td>
+                          <td>
+                            Ethnic minorities (excluding white minorities)
+                          </td>
+                          <td>Arts, Media and Publishing</td>
+                          <td>10</td>
+                          <td>10</td>
+                          <td>10</td>
+                          <td>58.3</td>
+                          <td>75</td>
+                          <td>77.8</td>
+                        </tr>
+                        <tr>
+                          <td>201819</td>
+                          <td>Academic year</td>
+                          <td>National</td>
+                          <td>E92000001</td>
+                          <td>England</td>
+                          <td>Ethnicity group</td>
+                          <td>Framework</td>
+                          <td>16-18</td>
+                          <td>Advanced</td>
+                          <td>
+                            Ethnic minorities (excluding white minorities)
+                          </td>
+                          <td>Business, Administration and Law</td>
+                          <td>440</td>
+                          <td>300</td>
+                          <td>300</td>
+                          <td>67.6</td>
+                          <td>68.2</td>
+                          <td>99</td>
+                        </tr>
+                        <tr>
+                          <td>201819</td>
+                          <td>Academic year</td>
+                          <td>National</td>
+                          <td>E92000001</td>
+                          <td>England</td>
+                          <td>Ethnicity group</td>
+                          <td>Framework</td>
+                          <td>16-18</td>
+                          <td>Advanced</td>
+                          <td>
+                            Ethnic minorities (excluding white minorities)
+                          </td>
+                          <td>
+                            Construction, Planning and the Built Environment
+                          </td>
+                          <td>60</td>
+                          <td>40</td>
+                          <td>40</td>
+                          <td>74.5</td>
+                          <td>76.4</td>
+                          <td>97.6</td>
+                        </tr>
+                        <tr>
+                          <td>201819</td>
+                          <td>Academic year</td>
+                          <td>National</td>
+                          <td>E92000001</td>
+                          <td>England</td>
+                          <td>Ethnicity group</td>
+                          <td>Framework</td>
+                          <td>16-18</td>
+                          <td>Advanced</td>
+                          <td>
+                            Ethnic minorities (excluding white minorities)
+                          </td>
+                          <td>Education and Training</td>
+                          <td>50</td>
+                          <td>30</td>
+                          <td>30</td>
+                          <td>62.5</td>
+                          <td>70.8</td>
+                          <td>88.2</td>
+                        </tr>
+                      </>
+                    )}
                   </tbody>
                 </table>
               </div>
+              <div className="govuk-!-margin-bottom-6 govuk-!-margin-top-6">
+                <a
+                  href="#"
+                  onClick={e => {
+                    e.preventDefault();
+                    setFullTable(!fullTable);
+                  }}
+                >
+                  {fullTable ? 'Show first row only' : 'View more rows'}
+                </a>
+                {` `}
+                <a
+                  href="#"
+                  className="govuk-!-margin-left-6"
+                  onClick={e => {
+                    setFullWidth(!fullWidth);
+                    e.preventDefault();
+                  }}
+                >
+                  {fullWidth
+                    ? 'Back to standard page view'
+                    : 'View preview as full screen'}
+                </a>
+              </div>
             </TabsSection>
+            {dataType === 'api' && (
+              <TabsSection title="API endpoint quick start">
+                <div className="govuk-!-margin-bottom-9">
+                  <h3>API endpoints</h3>
+                  <div className="govuk-inset-text">
+                    <p className="govuk-hint">
+                      If you are unfamiliar using APIs, we suggest you first
+                      read our{' '}
+                      <Link
+                        to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                        target="blank"
+                      >
+                        API guidance documentation
+                      </Link>
+                    </p>
+                    <p className="govuk-hint">
+                      The documentation provides full details and examples on
+                      how to make the most from our data sets
+                    </p>
+                  </div>
+
+                  <h4>Data set summary</h4>
+                  <UrlContainer
+                    className="govuk-!-margin-bottom-2"
+                    url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}"
+                  />
+                  <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/GetDataSet/">
+                    View endpoint summary guidance
+                  </a>
+
+                  <h4 className="govuk-!-margin-top-9">Query data set</h4>
+                  <h5>Using GET</h5>
+                  <UrlContainer
+                    className="govuk-!-margin-bottom-6"
+                    url="GET https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
+                  />
+                  <h5>Using POST</h5>
+                  <UrlContainer
+                    className="govuk-!-margin-bottom-2"
+                    url="POST https://ees-api-mock.ambitiousocean-cb084d07.uksouth.azurecontainerapps.io/api/v1/data-sets/{dataSetId}/query"
+                  />
+                  <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/QueryDataSetGet/">
+                    View endpoint query guidance
+                  </a>
+                </div>
+              </TabsSection>
+            )}
             {dataType === 'api' && (
               <TabsSection title="Changelog">
                 <h3>Changelog</h3>
@@ -607,6 +651,7 @@ const PrototypeHomepage = () => {
                   <li>Northumberland</li>
                 </ul>
                 <h4 className="govuk-!-margin-botttom-0">New filters</h4>
+
                 <ul className="govuk-!-margin-bottom-6">
                   <li>Age 10 (new)</li>
                   <li>Ethnicity Major Asian Total (new)</li>
@@ -723,20 +768,6 @@ const PrototypeHomepage = () => {
               </TabsSection>
             )}
           </Tabs>
-
-          <div className="govuk-!-margin-top-3 govuk-!-margin-bottom-9">
-            <a
-              href="#"
-              onClick={e => {
-                setFullWidth(!fullWidth);
-                e.preventDefault();
-              }}
-            >
-              {fullWidth
-                ? 'Back to standard page view'
-                : 'View preview as full screen'}
-            </a>
-          </div>
 
           <h2 className="govuk-heading-l">Access and view data</h2>
 

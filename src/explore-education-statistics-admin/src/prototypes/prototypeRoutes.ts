@@ -38,6 +38,8 @@ import PrototypeTableHighlightsV2b from './PrototypeTableHighlightsUpdateV2-b';
 import PrototypeTableHighlightsV2c from './PrototypeTableHighlightsUpdateV2-c';
 import PrototypeDataCatalog from './PrototypeDataCatalog';
 import PrototypeDataSelected from './PrototypeDataSelected';
+import PrototypeDataSelected2 from './PrototypeDataSelected2';
+import PrototypeDataSelected3 from './PrototypeDataSelected3';
 import PrototypeMethodology from './PrototypeMethodology';
 import PrototypeDashboard from './PrototypeDashboard';
 import PrototypeDashboard2 from './PrototypeDashboard2';
@@ -214,7 +216,17 @@ const prototypeRoutes: PrototypeRoute[] = [
   {
     name: 'Dataset selected',
     path: '/prototypes/data-selected',
+    component: PrototypeDataSelected2,
+  },
+  {
+    name: 'Dataset selected ORIGINAL',
+    path: '/prototypes/data-selected2',
     component: PrototypeDataSelected,
+  },
+  {
+    name: 'Dataset selected3',
+    path: '/prototypes/data-selected3',
+    component: PrototypeDataSelected3,
   },
   {
     name: 'Methodology',
@@ -316,7 +328,6 @@ const prototypeRoutes: PrototypeRoute[] = [
     path: '/prototypes/admin-dashboard2',
     component: PrototypeAdminDashboard2,
   },
-
 ];
 
 export default prototypeRoutes;

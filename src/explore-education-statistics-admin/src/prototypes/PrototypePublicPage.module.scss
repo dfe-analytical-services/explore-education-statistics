@@ -13,10 +13,6 @@
       :global(.govuk-inset-text) {
         max-width: 960px !important;
       }
-
-      :global(ul.govuk-tabs__list) {
-        max-width: 1220px !important;
-      }
     }
   }
 }
@@ -552,4 +548,8 @@
 .prototypeMastheadLower {
   background: govuk-colour('light-grey');
   padding: 2rem 0;
+}
+
+:global(.govuk-tabs__panel) {
+  scroll-margin-top: 10rem;
 }
