@@ -213,7 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 
                 // does this user have permission to approve a specific Methodology?
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificMethodology.ToString(), policy =>
-                    policy.Requirements.Add(new MethodologyStatusAuthorizationHandlers.ApproveSpecificMethodologyRequirement()));
+                    policy.Requirements.Add(new MethodologyStatusAuthorizationHandlers.MarkMethodologyAsApprovedRequirement()));
 
                 // does this user have permission to create an Amendment of a specific Methodology?
                 options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificMethodology.ToString(), policy =>
@@ -286,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ViewSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.MarkSpecificMethodologyAsDraftAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.ApproveSpecificMethodologyAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.MarkMethodologyAsApprovedAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteSpecificMethodologyAuthorizationHandler>();
         }

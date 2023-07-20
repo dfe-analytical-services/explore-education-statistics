@@ -22,7 +22,7 @@ using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class ApproveSpecificMethodologyAuthorizationHandlerTests
+    public class MarkMethodologyAsApprovedAuthorizationHandlerTests
     {
         private static readonly Guid UserId = Guid.NewGuid();
 
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
-                        CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, MethodologyVersion>
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
@@ -112,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
-                        CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, MethodologyVersion>
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
                             (user, methodologyVersion);
 
                     await handler.HandleAsync(authContext);
@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
-                        CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, MethodologyVersion>
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
                             (user, methodologyVersion);
 
                     await handler.HandleAsync(authContext);
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
         }
         
-        // TODO DW - possibly should allow the Publication Owner to be able to do this too?
+        // TODO DW - possibly should allow the Publication Owner to be able to do this too? @MarkFix
         public class PublicationRoleTests
         {
             [Fact]
@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var user = CreateClaimsPrincipal(UserId);
 
                     var authContext =
-                        CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, MethodologyVersion>(
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
                             user,
                             MethodologyVersion);
 
@@ -292,7 +292,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var user = CreateClaimsPrincipal(UserId);
 
                     var authContext =
-                        CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, MethodologyVersion>(
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
                             user,
                             MethodologyVersion);
 
@@ -347,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
 
                 var authContext =
-                    CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, MethodologyVersion>
+                    CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
@@ -392,7 +392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
 
                 var authContext =
-                    CreateAuthorizationHandlerContext<ApproveSpecificMethodologyRequirement, MethodologyVersion>
+                    CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
@@ -408,7 +408,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static
-            (ApproveSpecificMethodologyAuthorizationHandler,
+            (MarkMethodologyAsApprovedAuthorizationHandler,
             Mock<IMethodologyRepository>,
             Mock<IMethodologyVersionRepository>,
             Mock<IUserReleaseRoleRepository>,
@@ -423,7 +423,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
-            var handler = new ApproveSpecificMethodologyAuthorizationHandler(
+            var handler = new MarkMethodologyAsApprovedAuthorizationHandler(
                 methodologyVersionRepository.Object,
                 methodologyRepository.Object,
                 new AuthorizationHandlerResourceRoleService(

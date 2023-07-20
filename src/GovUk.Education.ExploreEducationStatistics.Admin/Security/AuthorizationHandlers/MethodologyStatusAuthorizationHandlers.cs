@@ -12,18 +12,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     // ReSharper disable once ClassNeverInstantiated.Global
     public class MethodologyStatusAuthorizationHandlers
     {
-        public class ApproveSpecificMethodologyRequirement : IAuthorizationRequirement
+        public class MarkMethodologyAsApprovedRequirement : IAuthorizationRequirement
         {
         }
 
-        public class ApproveSpecificMethodologyAuthorizationHandler :
-            AuthorizationHandler<ApproveSpecificMethodologyRequirement, MethodologyVersion>
+        public class MarkMethodologyAsApprovedAuthorizationHandler :
+            AuthorizationHandler<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
         {
             private readonly IMethodologyVersionRepository _methodologyVersionRepository;
             private readonly IMethodologyRepository _methodologyRepository;
             private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-            public ApproveSpecificMethodologyAuthorizationHandler(
+            public MarkMethodologyAsApprovedAuthorizationHandler(
                 IMethodologyVersionRepository methodologyVersionRepository,
                 IMethodologyRepository methodologyRepository,
                 AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-                ApproveSpecificMethodologyRequirement requirement,
+                MarkMethodologyAsApprovedRequirement requirement,
                 MethodologyVersion methodologyVersion)
             {
                 // If the Methodology is already public, it cannot be approved
