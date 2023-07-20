@@ -17,6 +17,7 @@ describe('ReleaseStatusChecklist', () => {
               { code: 'DataFileReplacementsMustBeCompleted' },
               { code: 'PublicDataGuidanceRequired' },
               { code: 'ReleaseNoteRequired' },
+              { code: 'SummarySectionContainsEmptyHtmlBlock' },
               { code: 'EmptyContentSectionExists' },
               { code: 'GenericSectionsContainEmptyHtmlBlock' },
               { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
@@ -36,7 +37,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.queryByRole('heading', { name: 'Warnings' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText('8 issues')).toBeInTheDocument();
+    expect(screen.getByText('9 issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -70,6 +71,15 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('link', {
         name:
           'A public release note for this amendment is required, add this near the top of the content page',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Release content should not contain an empty summary section',
       }),
     ).toHaveAttribute(
       'href',

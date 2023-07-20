@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -90,6 +91,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 },
+                SummarySection = new ContentSection
+                {
+                    Type = ContentSectionType.ReleaseSummary,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = ""
+                        }
+                    }
+                },
                 Updates = new List<Update>
                 {
                     new()
@@ -159,16 +171,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.False(checklist.Valid);
 
-                Assert.Equal(8, checklist.Errors.Count);
+                var errors = checklist.Errors
+                    .Select(error => error.Code)
+                    .ToList();
 
-                Assert.Equal(DataFileImportsMustBeCompleted, checklist.Errors[0].Code);
-                Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Errors[1].Code);
-                Assert.Equal(PublicDataGuidanceRequired, checklist.Errors[2].Code);
-                Assert.Equal(ReleaseNoteRequired, checklist.Errors[3].Code);
-                Assert.Equal(EmptyContentSectionExists, checklist.Errors[4].Code);
-                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Errors[5].Code);
-                Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, checklist.Errors[6].Code);
-                Assert.Equal(RelatedDashboardsSectionContainsEmptyHtmlBlock, checklist.Errors[7].Code);
+                Assert.Equal(9, errors.Count);
+
+                Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
+                Assert.Equal(DataFileReplacementsMustBeCompleted, errors[1]);
+                Assert.Equal(PublicDataGuidanceRequired, errors[2]);
+                Assert.Equal(ReleaseNoteRequired, errors[3]);
+                Assert.Equal(SummarySectionContainsEmptyHtmlBlock, errors[4]);
+                Assert.Equal(EmptyContentSectionExists, errors[5]);
+                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, errors[6]);
+                Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, errors[7]);
+                Assert.Equal(RelatedDashboardsSectionContainsEmptyHtmlBlock, errors[8]);
             }
         }
 
@@ -494,6 +511,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 RelatedDashboardsSection = new ContentSection
                 {
                     Type = ContentSectionType.RelatedDashboards,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "Not empty"
+                        }
+                    }
+                },
+                SummarySection = new ContentSection
+                {
+                    Type = ContentSectionType.ReleaseSummary,
                     Content = new List<ContentBlock>
                     {
                         new HtmlBlock

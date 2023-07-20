@@ -116,6 +116,15 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseRouteParams,
             ),
           };
+        case 'SummarySectionContainsEmptyHtmlBlock':
+          return {
+            message:
+              'Release content should not contain an empty summary section',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
         default:
           // Show error code, even if there is no mapping,
           // as this is better than having invisible errors.

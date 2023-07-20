@@ -103,14 +103,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
             }
 
-            if (await ReleaseHasEmptyGenericContentSection(release.Id))
+            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.ReleaseSummary))
             {
-                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.EmptyContentSectionExists));
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.SummarySectionContainsEmptyHtmlBlock));
             }
 
-            if (await ReleaseGenericContentSectionsContainEmptyContentBlock(release.Id))
+            if (await ReleaseHasEmptySection(release.Id, ContentSectionType.Generic))
             {
-                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.EmptyContentSectionExists));
+            }
+
+            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.Generic))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
             }
 
             if (!await ReleaseHasKeyStatistic(release.Id) && !await ReleaseHasNonEmptyHeadlineBlock(release.Id))
@@ -119,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ValidationErrorMessages.ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock));
             }
 
-            if (await ReleaseRelatedDashboardsSectionContainsEmptyContentBlock(release.Id))
+            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.RelatedDashboards))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
@@ -147,31 +155,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return headlineBlockList.Any(block => block is not HtmlBlock htmlBlock || !htmlBlock.Body.IsNullOrEmpty());
         }
 
-        private async Task<bool> ReleaseHasEmptyGenericContentSection(Guid releaseId)
+        private async Task<bool> ReleaseHasEmptySection(Guid releaseId, ContentSectionType sectionType)
         {
             return await _contentDbContext.ContentSections
                 .Where(cs =>
-                    cs.Type == ContentSectionType.Generic && 
-                    cs.Release.ReleaseId == releaseId)
+                    cs.Release.ReleaseId == releaseId &&
+                    cs.Type == sectionType)
                 .AnyAsync(cs => cs.Content.Count == 0);
         }
 
-        private async Task<bool> ReleaseGenericContentSectionsContainEmptyContentBlock(Guid releaseId)
+        private async Task<bool> ReleaseSectionHasEmptyHtmlBlock(Guid releaseId, ContentSectionType sectionType)
         {
             return await _contentDbContext.ContentBlocks
                 .Where(cb =>
-                    cb.ContentSection!.Type == ContentSectionType.Generic && 
-                    cb.ContentSection.Release.ReleaseId == releaseId)
-                .OfType<HtmlBlock>()
-                .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
-        }
-
-        private async Task<bool> ReleaseRelatedDashboardsSectionContainsEmptyContentBlock(Guid releaseId)
-        {
-            return await _contentDbContext.ContentBlocks
-                .Where(cb =>
-                    cb.ContentSection!.Type == ContentSectionType.RelatedDashboards && 
-                    cb.ContentSection.Release.ReleaseId == releaseId)
+                    cb.ContentSection!.Release.ReleaseId == releaseId &&
+                    cb.ContentSection.Type == sectionType)
                 .OfType<HtmlBlock>()
                 .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
         }

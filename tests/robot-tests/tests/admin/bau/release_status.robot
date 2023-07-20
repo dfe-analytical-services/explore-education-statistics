@@ -59,15 +59,19 @@ Validate checklist errors and warnings after adding headline text block
     user checks page does not contain testid    releaseChecklist-errors
     user checks page does not contain testid    releaseChecklist-success
 
-Add content section with empty content block to the page
+Add empty Summary section text block to the page
     user navigates to content page    ${PUBLICATION_NAME}
+    user clicks button    Add a summary text block    id:releaseSummary
+    user waits until element contains    id:releaseSummary    This section is empty    %{WAIT_SMALL}
+
+Add content section with empty content block to the page
     user creates new content section    1    Test section one
     user adds text block to editable accordion section    Test section one    id:releaseMainContent
 
 Add empty content section to the page
     user creates new content section    2    Test section two
 
-Add empty Related dashboards section to the page
+Add empty Related dashboards section text block to the page
     user clicks button    Add dashboards section
     user waits until page contains accordion section    View related dashboard(s)
 
@@ -82,7 +86,9 @@ Validate checklist errors and warnings after adding empty content sections
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
     user checks checklist errors contains
-    ...    3 issues that must be resolved before this release can be published.
+    ...    4 issues that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    Release content should not contain an empty summary section
     user checks checklist errors contains link
     ...    Release content should not contain any empty sections
     user checks checklist errors contains link
@@ -90,8 +96,12 @@ Validate checklist errors and warnings after adding empty content sections
     user checks checklist errors contains link
     ...    Release content should not contain an empty related dashboards section
 
-Add content to text block in Test section one
+Add content to text block in Summary section
     user navigates to content page    ${PUBLICATION_NAME}
+    user adds content to summary text block
+    ...    Summary test text
+
+Add content to text block in Test section one
     user opens accordion section    Test section one    id:releaseMainContent
     user adds content to autosaving accordion section text block    Test section one    1
     ...    Test section one text    id:releaseMainContent

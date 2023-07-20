@@ -99,6 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         GenericSectionsContainEmptyHtmlBlock,
         RelatedDashboardsSectionContainsEmptyHtmlBlock,
         ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
+        SummarySectionContainsEmptyHtmlBlock,
 
         // Release checklist warnings
         NoMethodology,
