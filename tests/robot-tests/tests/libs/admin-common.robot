@@ -74,8 +74,8 @@ user selects dashboard theme and topic if possible
     ...    ${theme_name}=%{TEST_THEME_NAME}
     ...    ${topic_name}=%{TEST_TOPIC_NAME}
     user waits until page does not contain loading spinner
-    ${DROPDOWNS_EXIST}=    user checks dashboard theme topic dropdowns exist
-    IF    ${DROPDOWNS_EXIST}
+    ${dropsdowns_exist}=    user checks dashboard theme topic dropdowns exist
+    IF    ${dropsdowns_exist}
         user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme_name}
         user waits until page contains element    id:publicationsReleases-themeTopic-topicId
         user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic_name}

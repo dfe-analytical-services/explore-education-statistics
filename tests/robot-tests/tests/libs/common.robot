@@ -893,23 +893,6 @@ user navigates to public frontend
     enable basic auth headers
     go to    ${URL}
 
-user navigates to find statistics page on public frontend
-    environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
-    user waits until h1 is visible    Find statistics and data
-
-user navigates to data tables page on public frontend
-    environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/data-tables
-    user waits until h1 is visible    Create your own tables
-
-user navigates to data catalogue page on public frontend
-    environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue
-    user waits until page contains title caption    Data catalogue
-    user waits until h1 is visible    Browse our open data
-    user waits until page contains    View all of the open data available and choose files to download.
-
 check that variable is not empty
     [Arguments]    ${variable_name}    ${variable_value}
     IF    '${variable_value}'=='${EMPTY}'

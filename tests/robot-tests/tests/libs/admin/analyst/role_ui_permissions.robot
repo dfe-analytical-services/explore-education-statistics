@@ -18,8 +18,8 @@ user goes to methodologies and checks cannot create methodologies for publicatio
 
 user cannot see the create amendment controls for release
     [Arguments]    ${RELEASE_NAME}
-    ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
-    user checks element does not contain button    ${ROW}    Amend
+    ${row}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
+    user checks element does not contain button    ${row}    Amend
 
 user cannot see edit controls for release content
     [Arguments]    ${publication}

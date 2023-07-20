@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
 
