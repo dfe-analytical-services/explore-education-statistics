@@ -34,7 +34,7 @@ public static class IndicatorGroupGeneratorExtensions
             .SetDefault(ig => ig.Id)
             .Set(
                 ig => ig.Label, 
-                (_, _, ctx) => ctx.Index == 0 ? "Default" : $"Indicator Group {ctx.Index + 1}");
+                (_, _, ctx) => ctx.Index == 0 ? "Default" : $"Indicator group {ctx.Index + 1}");
 
     public static InstanceSetters<IndicatorGroup> SetSubject(
         this InstanceSetters<IndicatorGroup> setters,

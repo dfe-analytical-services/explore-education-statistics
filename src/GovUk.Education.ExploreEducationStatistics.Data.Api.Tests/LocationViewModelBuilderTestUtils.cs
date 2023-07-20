@@ -12,12 +12,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests;
 internal static class LocationViewModelBuilderTestUtils
 {
     public static Dictionary<GeographicLevel, List<LocationAttributeViewModel>>
-        BuildLocationAttributeViewModelsWithoutLocationIds(
+        BuildLocationAttributeViewModels(
             IList<Location> locations,
             Dictionary<GeographicLevel, List<string>>? hierarchies,
-            Dictionary<GeographicLevel, Dictionary<string, GeoJson>>? geoJson = null)
+            Dictionary<GeographicLevel, Dictionary<string, GeoJson>>? geoJson = null,
+            bool includeLocationIds = true)
     {
         var viewModels = LocationViewModelBuilder.BuildLocationAttributeViewModels(locations, hierarchies, geoJson);
+
+        if (includeLocationIds)
+        {
+            return viewModels;
+        }
 
         // Deliberately remove the location id's from options to represent permalink data prior to location id's
         // being added to subject meta data.
