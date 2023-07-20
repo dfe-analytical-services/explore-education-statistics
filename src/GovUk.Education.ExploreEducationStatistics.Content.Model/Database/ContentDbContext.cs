@@ -45,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
         public virtual DbSet<Methodology> Methodologies { get; set; }
         public virtual DbSet<MethodologyVersion> MethodologyVersions { get; set; }
+        public virtual DbSet<MethodologyStatus> MethodologyStatus { get; set; }
         public virtual DbSet<MethodologyVersionContent> MethodologyContent { get; set; }
         public virtual DbSet<PublicationMethodology> PublicationMethodologies { get; set; }
         public virtual DbSet<MethodologyFile> MethodologyFiles { get; set; }
@@ -156,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Status)
-                .HasConversion(new EnumToStringConverter<MethodologyStatus>());
+                .HasConversion(new EnumToStringConverter<MethodologyApprovalStatus>());
 
             modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.PublishingStrategy)
@@ -172,6 +173,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(m => m.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MethodologyStatus>()
+                .Property(rs => rs.Created)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue
+                        ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                        : null);
+
+            modelBuilder.Entity<MethodologyStatus>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<MethodologyStatus>()
+                .Property(rs => rs.ApprovalStatus)
+                .HasConversion(new EnumToStringConverter<MethodologyApprovalStatus>());
 
             modelBuilder.Entity<MethodologyFile>()
                 .HasOne(mf => mf.MethodologyVersion)

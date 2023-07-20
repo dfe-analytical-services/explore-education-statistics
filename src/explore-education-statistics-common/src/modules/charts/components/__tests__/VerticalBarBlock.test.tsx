@@ -23,7 +23,7 @@ describe('VerticalBarBlock', () => {
     legend: testChartConfiguration.legend as LegendConfiguration,
     meta: fullTable.subjectMeta,
     data: fullTable.results,
-    dataLabelPosition: 'inside',
+    dataLabelPosition: 'outside',
   };
 
   const { axes } = props;

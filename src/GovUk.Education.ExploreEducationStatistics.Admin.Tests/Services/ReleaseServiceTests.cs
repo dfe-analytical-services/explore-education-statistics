@@ -1328,7 +1328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(retrievedMethodology.ScheduledForPublishingImmediately);
                 Assert.Null(retrievedMethodology.ScheduledWithReleaseId);
                 Assert.Null(retrievedMethodology.InternalReleaseNote);
-                Assert.Equal(MethodologyStatus.Draft, retrievedMethodology.Status);
+                Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodology.Status);
                 Assert.InRange(DateTime.UtcNow
                     .Subtract(retrievedMethodology.Updated!.Value).Milliseconds, 0, 1500);
 

@@ -170,6 +170,11 @@ const ChartConfiguration = ({
             return !(value && legendPosition === 'inline');
           },
         }),
+      });
+    }
+
+    if (definition.type === 'horizontalbar' || definition.type === 'line') {
+      schema = schema.shape({
         dataLabelPosition:
           definition.type === 'line'
             ? Yup.string().oneOf<LineChartDataLabelPosition>(['above', 'below'])
@@ -362,12 +367,14 @@ const ChartConfiguration = ({
                 label="Show data labels"
                 showError={!!form.errors.showDataLabels}
                 conditional={
-                  <FormFieldSelect<FormValues>
-                    label="Data label position"
-                    name="dataLabelPosition"
-                    order={[]}
-                    options={dataLabelPositionOptions}
-                  />
+                  definition.type !== 'verticalbar' && (
+                    <FormFieldSelect<FormValues>
+                      label="Data label position"
+                      name="dataLabelPosition"
+                      order={[]}
+                      options={dataLabelPositionOptions}
+                    />
+                  )
                 }
               />
             )}

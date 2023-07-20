@@ -42,7 +42,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(HydrateMethodologyVersionForAmendment)
                 .OnSuccess(CreateAndSaveAmendment)
                 .OnSuccessDo(LinkOriginalMethodologyFilesToAmendment)
-                .OnSuccess(amendment => _methodologyService.GetMethodology(amendment.Id));
+                .OnSuccess(amendment =>
+                    _methodologyService.BuildMethodologyVersionViewModel(amendment));
         }
 
         private async Task<Either<ActionResult, MethodologyVersion>> CreateAndSaveAmendment(

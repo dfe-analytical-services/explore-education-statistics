@@ -72,8 +72,28 @@ Add annexe content to methodology
     user adds content to accordion section text block    Methodology annexe section 2    1
     ...    Annexe 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
+Check there is no methodology status history table on Sign off page
+    user clicks link    Sign off
+    user waits until h2 is visible    Sign off
+
+    user checks page does not contain element    testid:methodology-status-history
+
 Approve the methodology for publishing immediately
     user approves methodology for publication    ${PUBLICATION_NAME}
+
+Check methodology status history is correct after approval
+    user waits until h3 is visible    Methodology status history    %{WAIT_SMALL}
+    user checks page contains element    testid:methodology-status-history
+
+    user checks table body has x rows    1    testid:methodology-status-history
+    table cell should contain    testid:methodology-status-history    1    2    Status
+    table cell should contain    testid:methodology-status-history    1    3    Internal note
+    table cell should contain    testid:methodology-status-history    1    4    Methodology version
+    table cell should contain    testid:methodology-status-history    1    5    By user
+    table cell should contain    testid:methodology-status-history    2    2    Approved
+    table cell should contain    testid:methodology-status-history    2    3    Approved by UI tests
+    table cell should contain    testid:methodology-status-history    2    4    1
+    table cell should contain    testid:methodology-status-history    2    5    ees-test.bau1@education.gov.uk
 
 Verify the expected public URL of the methodology on the Sign off tab
     user navigates to methodology    ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
@@ -292,10 +312,36 @@ Add and update another note describing the amendment
     ...    03
     ...    2021
 
+Check methodology status history is correct before approving amendment
+    user clicks link    Sign off
+    user waits until h2 is visible    Sign off
+
+    user waits until h3 is visible    Methodology status history    %{WAIT_SMALL}
+    user checks page contains element    testid:methodology-status-history
+
+    user checks table body has x rows    2    testid:methodology-status-history
+
 Approve the amendment for publishing immediately
     user approves methodology amendment for publication
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - Amended methodology
+
+Check methodology status history is correct after approving amendment
+    user waits until h3 is visible    Methodology status history    %{WAIT_SMALL}
+    user checks page contains element    testid:methodology-status-history
+    user checks table body has x rows    3    testid: methodology-status-history
+    table cell should contain    testid:methodology-status-history    2    2    Approved
+    table cell should contain    testid:methodology-status-history    2    3    Approved by UI tests
+    table cell should contain    testid:methodology-status-history    2    4    2
+    table cell should contain    testid:methodology-status-history    2    5    ees-test.bau1@education.gov.uk
+    table cell should contain    testid:methodology-status-history    3    2    Approved
+    table cell should contain    testid:methodology-status-history    3    3    Approved by UI tests
+    table cell should contain    testid:methodology-status-history    3    4    1
+    table cell should contain    testid:methodology-status-history    3    5    ees-test.bau1@education.gov.uk
+    table cell should contain    testid:methodology-status-history    4    2    Approved
+    table cell should contain    testid:methodology-status-history    4    3    Approved by UI tests
+    table cell should contain    testid:methodology-status-history    4    4    1
+    table cell should contain    testid:methodology-status-history    4    5    ees-test.bau1@education.gov.uk
 
 Verify that the user cannot edit the status of the amended methodology
     user clicks link    Sign off
@@ -380,6 +426,17 @@ Schedule a methodology amendment to be published with a release amendment
     ...    methodology_title=${PUBLICATION_NAME} - Amended methodology
     ...    publishing_strategy=WithRelease
     ...    with_release=${PUBLICATION_NAME} - ${RELEASE_NAME}
+
+Check methodology status history table contains new row after approving amendment
+    user checks table body has x rows    4    testid:methodology-status-history
+    table cell should contain    testid:methodology-status-history    2    2    Approved
+    table cell should contain    testid:methodology-status-history    2    3    Approved by UI tests
+    table cell should contain    testid:methodology-status-history    2    4    3
+    table cell should contain    testid:methodology-status-history    2    5    ees-test.bau1@education.gov.uk
+    table cell should contain    testid:methodology-status-history    3    2    Approved
+    table cell should contain    testid:methodology-status-history    3    3    Approved by UI tests
+    table cell should contain    testid:methodology-status-history    3    4    2
+    table cell should contain    testid:methodology-status-history    3    5    ees-test.bau1@education.gov.uk
 
 Cancel the release amendment and validate that the appropriate warning modal is shown
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}

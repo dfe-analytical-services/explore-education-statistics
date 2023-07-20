@@ -23,6 +23,8 @@ import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import getUnit from '@common/modules/charts/util/getUnit';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
 import parseNumber from '@common/utils/number/parseNumber';
+import formatPretty from '@common/utils/number/formatPretty';
+import getAccessibleTextColour from '@common/utils/colour/getAccessibleTextColour';
 import React, { memo } from 'react';
 import {
   Bar,
@@ -35,7 +37,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import formatPretty from '@common/utils/number/formatPretty';
+
+const defaultLabelTextColour = '#0B0C0C';
 
 export interface HorizontalBarProps extends StackedBarProps {
   legend: LegendConfiguration;
@@ -185,6 +188,13 @@ const HorizontalBarBlock = ({
               label={
                 showDataLabels
                   ? {
+                      fill:
+                        dataLabelPosition === 'outside'
+                          ? defaultLabelTextColour
+                          : getAccessibleTextColour({
+                              backgroundColour: config.colour,
+                              textColour: defaultLabelTextColour,
+                            }),
                       fontSize: 14,
                       position:
                         dataLabelPosition === 'inside'
