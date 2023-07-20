@@ -21,7 +21,7 @@ using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class MarkSpecificMethodologyAsDraftAuthorizationHandlerTests
+    public class MarkMethodologyAsDraftAuthorizationHandlerTests
     {
         private static readonly Guid UserId = Guid.NewGuid();
 
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
-                        CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
-                        CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var user = CreateClaimsPrincipal(UserId);
 
                     var authContext =
-                        CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement,
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement,
                             MethodologyVersion>(user,
                             MethodologyVersion);
 
@@ -224,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var user = CreateClaimsPrincipal(UserId);
 
                     var authContext =
-                        CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement,
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement,
                             MethodologyVersion>(user,
                             MethodologyVersion);
 
@@ -271,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
 
                 var authContext =
-                    CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
+                    CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
@@ -311,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var user = CreateClaimsPrincipal(UserId);
 
                 var authContext =
-                    CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
+                    CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         private static (
-            MarkSpecificMethodologyAsDraftAuthorizationHandler,
+            MarkMethodologyAsDraftAuthorizationHandler,
             Mock<IMethodologyRepository>,
             Mock<IMethodologyVersionRepository>,
             Mock<IUserReleaseRoleRepository>,
@@ -342,7 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
-            var handler = new MarkSpecificMethodologyAsDraftAuthorizationHandler(
+            var handler = new MarkMethodologyAsDraftAuthorizationHandler(
                 methodologyVersionRepository.Object,
                 methodologyRepository.Object,
                 new AuthorizationHandlerResourceRoleService(

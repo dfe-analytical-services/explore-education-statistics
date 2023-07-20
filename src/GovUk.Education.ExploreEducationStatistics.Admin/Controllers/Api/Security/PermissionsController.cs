@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .OnSuccess(release => new ReleaseStatusPermissionsViewModel
                 {
                     CanMarkDraft = _userService.CheckCanMarkReleaseAsDraft(release).Result.IsRight,
-                    CanMarkHigherLevelReview = _userService.CheckCanSubmitReleaseToHigherApproval(release).Result.IsRight,
+                    CanMarkHigherLevelReview = _userService.CheckCanSubmitReleaseForHigherReview(release).Result.IsRight,
                     CanMarkApproved = _userService.CheckCanApproveRelease(release).Result.IsRight,
                 })
                 .OrElse(() => new ReleaseStatusPermissionsViewModel());

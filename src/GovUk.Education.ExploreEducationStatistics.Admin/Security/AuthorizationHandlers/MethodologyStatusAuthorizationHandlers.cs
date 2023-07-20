@@ -5,7 +5,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -59,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnPublicationOrLatestRelease(
                             context.User.GetUserId(),
                             owningPublication.Id,
-                            ListOf(PublicationRole.Approver),
+                            ListOf(Approver),
                             ListOf(ReleaseRole.Approver)))
                 {
                     context.Succeed(requirement);
@@ -67,19 +70,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
         }
 
-        public class MarkSpecificMethodologyAsDraftRequirement : IAuthorizationRequirement
+        public class MarkMethodologyAsDraftRequirement : IAuthorizationRequirement
         {
         }
 
-        public class
-            MarkSpecificMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
-                MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
+        public class MarkMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
+            MarkMethodologyAsDraftRequirement, MethodologyVersion>
         {
             private readonly IMethodologyVersionRepository _methodologyVersionRepository;
             private readonly IMethodologyRepository _methodologyRepository;
             private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-            public MarkSpecificMethodologyAsDraftAuthorizationHandler(
+            public MarkMethodologyAsDraftAuthorizationHandler(
                 IMethodologyVersionRepository methodologyVersionRepository,
                 IMethodologyRepository methodologyRepository,
                 AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
@@ -90,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
-                MarkSpecificMethodologyAsDraftRequirement requirement,
+                MarkMethodologyAsDraftRequirement requirement,
                 MethodologyVersion methodologyVersion)
             {
                 // If the Methodology is already public, it cannot be marked as draft
@@ -105,18 +107,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     return;
                 }
 
+                var allowedPublicationRoles = methodologyVersion.Status == Approved
+                    ? ListOf(Approver)
+                    : ListOf(Owner, Approver);
+
+                var allowedReleaseRoles = methodologyVersion.Status == Approved
+                    ? ListOf(ReleaseRole.Approver)
+                    : ReleaseEditorAndApproverRoles;
+
                 var owningPublication =
                     await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
-                // If the user is a Publication Approve of the Publication that owns this Methodology, they can
-                // mark it as draft.  Additionally, if they're an Approver for Releases on the owning Publication, they
-                // can mark it as draft.
                 if (await _authorizationHandlerResourceRoleService
                         .HasRolesOnPublicationOrLatestRelease(
                             context.User.GetUserId(),
                             owningPublication.Id,
-                            ListOf(PublicationRole.Approver),
-                            ListOf(ReleaseRole.Approver)))
+                            allowedPublicationRoles,
+                            allowedReleaseRoles))
+                {
+                    context.Succeed(requirement);
+                }
+            }
+        }
+
+        public class MarkMethodologyAsHigherLevelReviewRequirement : IAuthorizationRequirement
+        {
+        }
+
+        public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : AuthorizationHandler<
+            MarkMethodologyAsHigherLevelReviewRequirement, MethodologyVersion>
+        {
+            private readonly IMethodologyVersionRepository _methodologyVersionRepository;
+            private readonly IMethodologyRepository _methodologyRepository;
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+
+            public MarkMethodologyAsHigherLevelReviewAuthorizationHandler(
+                IMethodologyVersionRepository methodologyVersionRepository,
+                IMethodologyRepository methodologyRepository,
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            {
+                _methodologyVersionRepository = methodologyVersionRepository;
+                _methodologyRepository = methodologyRepository;
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            }
+
+            protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+                MarkMethodologyAsHigherLevelReviewRequirement requirement,
+                MethodologyVersion methodologyVersion)
+            {
+                // If the Methodology is already public, it cannot be marked as draft
+                if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
+                {
+                    return;
+                }
+
+                if (SecurityUtils.HasClaim(context.User, SubmitAllMethodologiesToHigherReview))
+                {
+                    context.Succeed(requirement);
+                    return;
+                }
+
+                var allowedPublicationRoles = methodologyVersion.Status == Approved
+                    ? ListOf(Approver)
+                    : ListOf(Owner, Approver);
+
+                var allowedReleaseRoles = methodologyVersion.Status == Approved
+                    ? ListOf(ReleaseRole.Approver)
+                    : ReleaseEditorAndApproverRoles;
+
+                var owningPublication =
+                    await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
+
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnPublicationOrLatestRelease(
+                            context.User.GetUserId(),
+                            owningPublication.Id,
+                            allowedPublicationRoles,
+                            allowedReleaseRoles))
                 {
                     context.Succeed(requirement);
                 }
