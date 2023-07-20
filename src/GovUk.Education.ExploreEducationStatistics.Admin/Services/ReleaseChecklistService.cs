@@ -121,7 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
             }
 
-            if (!await ReleaseHasKeyStatistic(release.Id) && !await ReleaseHasNonEmptyHeadlineBlock(release.Id))
+            if (!(await ReleaseHasKeyStatistic(release.Id) ||
+                  await ReleaseSectionHasNonEmptyHtmlBlock(release.Id, ContentSectionType.Headlines)))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock));
@@ -142,19 +143,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(ks => ks.ReleaseId == releaseId);
         }
 
-        private async Task<bool> ReleaseHasNonEmptyHeadlineBlock(Guid releaseId)
-        {
-            var headlineBlockList = await _contentDbContext.ReleaseContentSections
-                .Include(rcs => rcs.ContentSection.Content)
-                .Where(rcs =>
-                    rcs.ReleaseId == releaseId
-                    && rcs.ContentSection.Type == ContentSectionType.Headlines)
-                .SelectMany(rcs => rcs.ContentSection.Content)
-                .ToListAsync();
-
-            return headlineBlockList.Any(block => block is not HtmlBlock htmlBlock || !htmlBlock.Body.IsNullOrEmpty());
-        }
-
         private async Task<bool> ReleaseHasEmptySection(Guid releaseId, ContentSectionType sectionType)
         {
             return await _contentDbContext.ContentSections
@@ -172,6 +160,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     cb.ContentSection.Type == sectionType)
                 .OfType<HtmlBlock>()
                 .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
+        }
+
+        private async Task<bool> ReleaseSectionHasNonEmptyHtmlBlock(Guid releaseId, ContentSectionType sectionType)
+        {
+            return await _contentDbContext.ContentBlocks
+                .Where(cb =>
+                    cb.ContentSection!.Release.ReleaseId == releaseId &&
+                    cb.ContentSection.Type == sectionType)
+                .OfType<HtmlBlock>()
+                .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)
