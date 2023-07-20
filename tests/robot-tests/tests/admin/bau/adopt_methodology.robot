@@ -20,8 +20,8 @@ ${RELEASE_NAME}=                    Calendar year 2000
 Create test data
     user creates test publication via api    ${OWNING_PUBLICATION_NAME}
     user creates methodology for publication    ${OWNING_PUBLICATION_NAME}
-    ${ADOPTING_PUBLICATION_ID}=    user creates test publication via api    ${ADOPTING_PUBLICATION_NAME}
-    user creates test release via api    ${ADOPTING_PUBLICATION_ID}    CY    2000
+    ${adopting_publication_id}=    user creates test publication via api    ${ADOPTING_PUBLICATION_NAME}
+    user creates test release via api    ${adopting_publication_id}    CY    2000
 
     user navigates to draft release page from dashboard    ${ADOPTING_PUBLICATION_NAME}    ${RELEASE_NAME}
     user navigates to content page    ${ADOPTING_PUBLICATION_NAME}
@@ -46,12 +46,12 @@ Adopt a Methodology
     user waits until h2 is visible    Manage methodologies
 
 Validate methodology adopted
-    ${ROW}=    user gets table row    ${OWNING_PUBLICATION_NAME}    testid:methodologies
-    user checks element contains    ${ROW}    Adopted
-    user checks element contains    ${ROW}    Draft
-    user checks element contains    ${ROW}    Not yet published
-    user checks element contains link    ${ROW}    Edit
-    user checks element contains button    ${ROW}    Remove
+    ${row}=    user gets table row    ${OWNING_PUBLICATION_NAME}    testid:methodologies
+    user checks element contains    ${row}    Adopted
+    user checks element contains    ${row}    Draft
+    user checks element contains    ${row}    Not yet published
+    user checks element contains link    ${row}    Edit
+    user checks element contains button    ${row}    Remove
 
 Set methodology to published alongside release
     user navigates to methodology    ${ADOPTING_PUBLICATION_NAME}    ${OWNING_PUBLICATION_NAME}
@@ -118,8 +118,8 @@ Drop adopted Methodology
     user changes to bau1
     user navigates to methodologies on publication page    ${ADOPTING_PUBLICATION_NAME}
 
-    ${ROW}=    user gets table row    ${OWNING_PUBLICATION_NAME}    testid:methodologies
-    user clicks button    Remove    ${ROW}
+    ${row}=    user gets table row    ${OWNING_PUBLICATION_NAME}    testid:methodologies
+    user clicks button    Remove    ${row}
     ${modal}=    user waits until modal is visible    Remove methodology
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Remove methodology

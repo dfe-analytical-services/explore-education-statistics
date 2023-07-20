@@ -22,8 +22,8 @@ ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}=    UI test featured table description
 
 *** Test Cases ***
 Create test publication and release via API
-    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user creates test release via api    ${PUBLICATION_ID}    CY    2000
+    ${publication_id}=    user creates test publication via api    ${PUBLICATION_NAME}
+    user creates test release via api    ${publication_id}    CY    2000
 
 Upload subject
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}

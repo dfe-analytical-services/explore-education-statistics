@@ -12,7 +12,7 @@ Force Tags          GeneralPublic    Prod
 Navigate to Find Statistics page
     [Tags]    Local    Dev
     environment variable should be set    PUBLIC_URL
-    user navigates to find statistics page on public frontend
+    user navigates to public find statistics page
 
 Validate Related information section and links exist
     ${relatedInformation}=    get webelement    css:[aria-labelledby="related-information"]

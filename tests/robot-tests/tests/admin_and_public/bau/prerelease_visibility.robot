@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
 
@@ -63,6 +64,11 @@ Check methodology isn't publically visible
     ${PUBLIC_METHODOLOGY_LINK}=    Get Value    testid:public-methodology-url
     check that variable is not empty    PUBLIC_METHODOLOGY_LINK    ${PUBLIC_METHODOLOGY_LINK}
     Set Suite Variable    ${PUBLIC_METHODOLOGY_LINK}
+
+    user navigates to public methodologies page
+    user waits until page contains    %{TEST_THEME_NAME}
+    user opens accordion section    %{TEST_THEME_NAME}
+    user checks page does not contain    ${PUBLICATION_NAME}
 
     user navigates to public frontend    ${PUBLIC_METHODOLOGY_LINK}
     user waits until page contains    Page not found
@@ -141,12 +147,12 @@ Go to public release URL and check release isn't visible
     user waits until page does not contain    ${PUBLICATION_NAME}
 
 Check methodology isn't visible on public Methodologies page
-    user navigates to methodologies page on public frontend
+    user navigates to public methodologies page
     user waits until page contains    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
     user checks page does not contain    ${PUBLICATION_NAME}
 
-Check methoodlogy isn't accessible via URL
+Check methodology isn't accessible via URL
     user navigates to public frontend    ${PUBLIC_METHODOLOGY_LINK}
     user waits until page contains    Page not found
 
@@ -163,10 +169,13 @@ Check release has been published
     user waits until page contains title caption    Calendar year 2000
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-Check methodology has been published
-    user navigates to methodologies page on public frontend
+Check methodology is visible on public Methodologies page
+    user navigates to public methodologies page
     user waits until page contains    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
+    user waits until page contains    ${PUBLICATION_NAME}
+
+Check methodology has been published
     user clicks link    ${PUBLICATION_NAME}
 
     user waits until page contains title caption    Methodology

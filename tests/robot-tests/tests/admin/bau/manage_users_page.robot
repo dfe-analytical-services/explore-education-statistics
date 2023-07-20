@@ -27,37 +27,37 @@ Navigate to manage users page as bau1
     user checks table column heading contains    1    4    Actions
 
 Check correct test users are present in table
-    ${ROW}=    user gets table row with heading    Analyst1 User1
-    user checks row cell contains text    ${ROW}    1    EES-test.ANALYST1@education.gov.uk
-    user checks row cell contains text    ${ROW}    2    Analyst
-    user checks row cell contains text    ${ROW}    3    Manage
+    ${row}=    user gets table row with heading    Analyst1 User1
+    user checks row cell contains text    ${row}    1    EES-test.ANALYST1@education.gov.uk
+    user checks row cell contains text    ${row}    2    Analyst
+    user checks row cell contains text    ${row}    3    Manage
 
-    ${ROW}=    user gets table row with heading    Analyst2 User2
-    user checks row cell contains text    ${ROW}    1    EES-test.ANALYST2@education.gov.uk
-    user checks row cell contains text    ${ROW}    2    Analyst
-    user checks row cell contains text    ${ROW}    3    Manage
+    ${row}=    user gets table row with heading    Analyst2 User2
+    user checks row cell contains text    ${row}    1    EES-test.ANALYST2@education.gov.uk
+    user checks row cell contains text    ${row}    2    Analyst
+    user checks row cell contains text    ${row}    3    Manage
 
-    ${ROW}=    user gets table row with heading    Bau1 User1
-    user checks row cell contains text    ${ROW}    1    EES-test.BAU1@education.gov.uk
-    user checks row cell contains text    ${ROW}    2    BAU User
-    user checks row cell contains text    ${ROW}    3    Manage
+    ${row}=    user gets table row with heading    Bau1 User1
+    user checks row cell contains text    ${row}    1    EES-test.BAU1@education.gov.uk
+    user checks row cell contains text    ${row}    2    BAU User
+    user checks row cell contains text    ${row}    3    Manage
 
-    ${ROW}=    user gets table row with heading    Bau2 User2
-    user checks row cell contains text    ${ROW}    1    EES-test.BAU2@education.gov.uk
-    user checks row cell contains text    ${ROW}    2    BAU User
-    user checks row cell contains text    ${ROW}    3    Manage
+    ${row}=    user gets table row with heading    Bau2 User2
+    user checks row cell contains text    ${row}    1    EES-test.BAU2@education.gov.uk
+    user checks row cell contains text    ${row}    2    BAU User
+    user checks row cell contains text    ${row}    3    Manage
 
 Assert prerelease users are present in table
     ${list}=    create list    ees-prerelease1@education.gov.uk    ees-prerelease2@education.gov.uk
     user resets user roles via api if required    ${list}
     user reloads page
 
-    ${ROW}=    user gets table row with heading    Prerelease2 User2
+    ${row}=    user gets table row with heading    Prerelease2 User2
 
-    user checks row cell contains text    ${ROW}    1    ees-prerelease2@education.gov.uk
-    user checks row cell contains text    ${ROW}    2    No role
-    user checks row cell contains text    ${ROW}    3    Manage
-    set suite variable    ${PRE_RELEASE_ROW}    ${ROW}
+    user checks row cell contains text    ${row}    1    ees-prerelease2@education.gov.uk
+    user checks row cell contains text    ${row}    2    No role
+    user checks row cell contains text    ${row}    3    Manage
+    set suite variable    ${PRE_RELEASE_ROW}    ${row}
 
 Select a user to manage
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
