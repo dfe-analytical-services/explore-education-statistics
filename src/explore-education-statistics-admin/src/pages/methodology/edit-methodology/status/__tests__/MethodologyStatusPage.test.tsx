@@ -27,6 +27,8 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyStatusPage', () => {
+  // @MarkFix add tests for HigherLevelReview
+  // @MarkFix review existing tests and update if necessary
   const testMethodology: MethodologyVersion = {
     id: 'm1',
     amendment: false,
@@ -53,8 +55,11 @@ describe('MethodologyStatusPage', () => {
   };
 
   test('renders Draft status details', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
 
     renderPage({
       ...testMethodology,
@@ -77,8 +82,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Approved details for publishing immediately', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
 
     renderPage({
       ...testMethodology,
@@ -115,8 +123,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Approved details for publishing with release', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
 
     renderPage({
       ...testMethodology,
@@ -160,8 +171,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can approve methodology', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodology);
 
@@ -175,8 +189,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can mark methodology as draft', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(true);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: true,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
 
     renderPage(testMethodology);
 
@@ -191,8 +208,11 @@ describe('MethodologyStatusPage', () => {
 
   test('renders status form when Edit button is clicked', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodology);
 
@@ -216,8 +236,11 @@ describe('MethodologyStatusPage', () => {
 
   test('renders the owning publication', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodology);
 
@@ -235,8 +258,11 @@ describe('MethodologyStatusPage', () => {
 
   test('renders the other publications', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodologyWithOtherPublications);
 
@@ -257,8 +283,11 @@ describe('MethodologyStatusPage', () => {
 
   test('does not render the other publications section if there are none', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodology);
 

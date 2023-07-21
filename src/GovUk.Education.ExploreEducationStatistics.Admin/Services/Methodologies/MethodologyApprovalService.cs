@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
 
             return await 
-                CheckCanUpdateStatus(methodologyVersionToUpdate, request.Status)
+                _userService.CheckCanUpdateMethodologyVersionStatus(methodologyVersionToUpdate, request.Status)
                     .OnSuccessDo(methodologyVersion => CheckMethodologyCanDependOnRelease(methodologyVersion, request))
                     .OnSuccessDo(RemoveUnusedImages)
                     .OnSuccess(async methodologyVersion =>
@@ -89,9 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         methodologyVersion.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
                             ? request.WithReleaseId
                             : null;
-                        methodologyVersion.InternalReleaseNote = Approved == request.Status
-                            ? request.LatestInternalReleaseNote
-                            : null;
+                        methodologyVersion.InternalReleaseNote = request.LatestInternalReleaseNote;
 
                         methodologyVersion.Updated = DateTime.UtcNow;
 
@@ -168,18 +166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     return Unit.Instance;
                 });
-        }
-
-        private Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateStatus(
-            MethodologyVersion methodologyVersion,
-            MethodologyApprovalStatus requestedStatus)
-        {
-            return requestedStatus switch
-            {
-                Draft => _userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion),
-                Approved => _userService.CheckCanApproveMethodologyVersion(methodologyVersion),
-                _ => throw new ArgumentOutOfRangeException(nameof(requestedStatus), "Unexpected status")
-            };
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(MethodologyVersion methodologyVersion)

@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security
 {
@@ -87,28 +88,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
                 : userService.CheckCanUpdateMethodologyVersion(methodologyVersion);
         }
 
-        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodologyVersionStatus(  // @MarkFix check this permission check is used - if not remove
-            this IUserService userService, MethodologyVersion methodologyVersion, MethodologyApprovalStatus approvalStatus)
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodologyVersionStatus(
+            this IUserService userService, MethodologyVersion methodologyVersion, MethodologyApprovalStatus requestedStatus)
         {
-            switch (approvalStatus)
+            return requestedStatus switch
             {
-                case MethodologyApprovalStatus.Draft:
-                {
-                    return userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion);
-                }
-                case MethodologyApprovalStatus.HigherLevelReview:
-                {
-                    return userService.CheckCanSubmitMethodologyForHigherReview(methodologyVersion);
-                }
-                case MethodologyApprovalStatus.Approved:
-                {
-                    return userService.CheckCanApproveMethodologyVersion(methodologyVersion);
-                }
-                default:
-                {
-                    return Task.FromResult(new Either<ActionResult, MethodologyVersion>(methodologyVersion));
-                }
-            }
+                Draft => userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion),
+                HigherLevelReview => userService.CheckCanSubmitMethodologyForHigherReview(methodologyVersion),
+                Approved => userService.CheckCanApproveMethodologyVersion(methodologyVersion),
+                _ => throw new ArgumentOutOfRangeException(nameof(requestedStatus), "Unexpected status")
+            };
         }
 
         public static Task<Either<ActionResult, MethodologyVersion>> CheckCanMarkMethodologyVersionAsDraft(

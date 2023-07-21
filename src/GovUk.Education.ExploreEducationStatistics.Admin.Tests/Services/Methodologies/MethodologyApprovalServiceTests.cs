@@ -970,7 +970,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyApprovalUpdateRequest
             {
-                LatestInternalReleaseNote = "A release note to be ignored",
+                LatestInternalReleaseNote = "A release note",
                 PublishingStrategy = Immediately,
                 Status = Draft
             };
@@ -1008,8 +1008,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
 
-                // Original release note is cleared if unapproving
-                Assert.Null(updatedMethodologyVersion.InternalReleaseNote);
+                Assert.Equal("A release note", updatedMethodologyVersion.InternalReleaseNote);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
@@ -1026,7 +1025,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(Draft, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.Null(updatedMethodology.InternalReleaseNote);
+                Assert.Equal("A release note", updatedMethodology.InternalReleaseNote);
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }

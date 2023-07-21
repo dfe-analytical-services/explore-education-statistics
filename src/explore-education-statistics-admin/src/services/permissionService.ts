@@ -16,6 +16,11 @@ export interface ReleaseStatusPermissions {
   canMarkHigherLevelReview: boolean;
   canMarkApproved: boolean;
 }
+export interface MethodologyStatusPermissions {
+  canMarkDraft: boolean;
+  canMarkHigherLevelReview: boolean;
+  canMarkApproved: boolean;
+}
 
 export interface DataFilePermissions {
   canCancelImport: boolean;
@@ -53,13 +58,10 @@ const permissionService = {
   canUpdateMethodology(methodologyId: string): Promise<boolean> {
     return client.get(`/permissions/methodology/${methodologyId}/update`);
   },
-  canMarkMethodologyAsDraft(methodologyId: string): Promise<boolean> {
-    return client.get(`/permissions/methodology/${methodologyId}/status/draft`);
-  },
-  canApproveMethodology(methodologyId: string): Promise<boolean> {
-    return client.get(
-      `/permissions/methodology/${methodologyId}/status/approve`,
-    );
+  canUpdateMethodologyApprovalStatus(
+    methodologyId: string,
+  ): Promise<MethodologyStatusPermissions> {
+    return client.get(`/permissions/methodology/${methodologyId}/status`);
   },
   getPreReleaseWindowStatus(
     releaseId: string,

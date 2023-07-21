@@ -8,13 +8,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.MethodologyStatusAuthorizationHandlers;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
@@ -23,6 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class MarkMethodologyAsDraftAuthorizationHandlerTests
     {
+        // @MarkFix need similar tests for HigherLevelReview
+        // @MarkFix review these tests and update if necessary
         private static readonly Guid UserId = Guid.NewGuid();
 
         private static readonly MethodologyVersion MethodologyVersion = new()
@@ -121,13 +124,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class PublicationRoleTests
         {
             [Fact]
-            public async Task ApproversOnOwningPublicationCanMarkMethodologyAsDraft()
+            public async Task ApproversAndOwnersOnOwningPublicationCanMarkMethodologyAsDraft()
             {
                 await ForEachPublicationRoleAsync(async publicationRole =>
                 {
-                    // If the user has the Approver role on the Owning Publication of this
-                    // Methodology they are allowed to mark it as draft.
-                    var expectedToPassByPublicationRole = publicationRole == PublicationRole.Approver;
+                    var expectedToPassByPublicationRole =
+                        publicationRole is Approver or Owner;
 
                     var (
                         handler,
@@ -154,7 +156,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         publicationRepository
                             .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
                             .ReturnsAsync((Release?)null);
-                        
                     }
 
                     var user = CreateClaimsPrincipal(UserId);
@@ -180,13 +181,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ReleaseRoleTests
         {
             [Fact]
-            public async Task ApproversOnOwningPublicationsLatestReleaseCanMarkMethodologyAsDraft()
+            public async Task ReleaseEditorAndApproverRolesOnOwningPublicationsLatestReleaseCanMarkMethodologyAsDraft()
             {
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {
-                    // If the user has the Approver role on the latest Release of the owning Publication of this
-                    // Methodology they are allowed to mark it as draft
-                    var expectedToPassByReleaseRole = releaseRole == Approver;
+                    var expectedToPassByReleaseRole = ReleaseEditorAndApproverRoles.Contains(releaseRole);
 
                     var latestReleaseForPublication = new Release
                     {
