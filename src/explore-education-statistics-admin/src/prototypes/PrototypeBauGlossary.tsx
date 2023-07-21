@@ -168,6 +168,7 @@ const PrototypeBauGlossary = () => {
             </thead>
             <tbody>
               {glossaryList.map((item, index) => (
+                // eslint-disable-next-line react/no-array-index-key
                 <tr key={index.toString()}>
                   <td>
                     <a

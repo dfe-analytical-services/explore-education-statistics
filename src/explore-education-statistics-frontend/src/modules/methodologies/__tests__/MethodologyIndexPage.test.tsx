@@ -101,6 +101,41 @@ const testThemes: MethodologyTheme[] = [
       },
     ],
   },
+  {
+    id: 'theme-3',
+    summary: 'Theme 3 summary',
+    title: 'Theme 3',
+    topics: [
+      {
+        id: 'topic-6',
+        publications: [
+          {
+            id: 'publication-6',
+            methodologies: [
+              {
+                id: 'methodology-6',
+                slug: 'methodology-6-slug',
+                title: 'Methodology 6',
+              },
+            ],
+            title: 'Publication 6',
+          },
+          {
+            id: 'publication-7',
+            methodologies: [
+              {
+                id: 'methodology-6',
+                slug: 'methodology-6-slug',
+                title: 'Methodology 6',
+              },
+            ],
+            title: 'Publication 7',
+          },
+        ],
+        title: 'Topic 6',
+      },
+    ],
+  },
 ];
 
 describe('MethodologyIndexPage', () => {
@@ -116,7 +151,7 @@ describe('MethodologyIndexPage', () => {
     ).toBeInTheDocument();
 
     const themes = screen.getAllByTestId('accordionSection');
-    expect(themes).toHaveLength(2);
+    expect(themes).toHaveLength(3);
 
     const theme1Methodologies = within(themes[0]).getAllByRole('listitem');
 
@@ -149,6 +184,14 @@ describe('MethodologyIndexPage', () => {
         name: 'Methodology 5',
       }),
     ).toHaveAttribute('href', '/methodology/methodology-5-slug');
+
+    const theme3Methodologies = within(themes[2]).getAllByRole('listitem');
+    expect(theme3Methodologies).toHaveLength(1); // Duplicates should be removed
+    expect(
+      within(theme3Methodologies[0]).getByRole('link', {
+        name: 'Methodology 6',
+      }),
+    ).toHaveAttribute('href', '/methodology/methodology-6-slug');
   });
 
   test('renders methodology index page without themes', async () => {

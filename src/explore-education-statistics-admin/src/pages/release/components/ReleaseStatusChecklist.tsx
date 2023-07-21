@@ -98,10 +98,28 @@ const ReleaseStatusChecklist = ({ checklist, release }: Props) => {
               releaseRouteParams,
             ),
           };
+        case 'RelatedDashboardsSectionContainsEmptyHtmlBlock':
+          return {
+            message:
+              'Release content should not contain an empty related dashboards section',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
         case 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock':
           return {
             message:
               'Release must contain a key statistic or a non-empty headline text block',
+            link: generatePath<ReleaseRouteParams>(
+              releaseContentRoute.path,
+              releaseRouteParams,
+            ),
+          };
+        case 'SummarySectionContainsEmptyHtmlBlock':
+          return {
+            message:
+              'Release content should not contain an empty summary section',
             link: generatePath<ReleaseRouteParams>(
               releaseContentRoute.path,
               releaseRouteParams,

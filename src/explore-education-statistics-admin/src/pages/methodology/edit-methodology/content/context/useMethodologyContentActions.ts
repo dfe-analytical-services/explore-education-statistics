@@ -110,7 +110,12 @@ export default function useMethodologyContentActions() {
     sectionKey: ContentSectionKeys;
   }) {
     const sectionContent = await methodologyContentService.updateContentSectionBlocksOrder(
-      { methodologyId, sectionId, order, sectionKey },
+      {
+        methodologyId,
+        sectionId,
+        order,
+        sectionKey,
+      },
     );
     dispatch({
       type: 'UPDATE_SECTION_CONTENT',

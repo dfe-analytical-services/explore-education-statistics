@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public static IEqualityComparer<FilterGroup> IdComparer { get; } = new IdEqualityComparer();
 
+        public const string DefaultFilterGroupLabel = "Default";
+
         public FilterGroup()
         {
         }

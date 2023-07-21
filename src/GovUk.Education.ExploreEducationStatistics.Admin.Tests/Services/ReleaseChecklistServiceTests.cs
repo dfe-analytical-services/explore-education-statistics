@@ -1,5 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -19,7 +21,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -47,49 +49,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
             };
+
             var release = new Release
             {
                 Publication = publication,
                 PreviousVersion = originalRelease,
                 Version = 1,
                 Created = DateTime.UtcNow.AddMonths(-1),
+                GenericContent = new List<ContentSection>
+                {
+                    new()
+                    {
+                        Type = ContentSectionType.Generic,
+                        Content = new List<ContentBlock>()
+                    },
+                    new()
+                    {
+                        Type = ContentSectionType.Generic,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = "<p>Test</p>"
+                            },
+                            new DataBlock(),
+                            new HtmlBlock
+                            {
+                                Body = ""
+                            }
+                        }
+                    }
+                },
+                RelatedDashboardsSection = new ContentSection
+                {
+                    Type = ContentSectionType.RelatedDashboards,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = ""
+                        }
+                    }
+                },
+                SummarySection = new ContentSection
+                {
+                    Type = ContentSectionType.ReleaseSummary,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = ""
+                        }
+                    }
+                },
                 Updates = new List<Update>
                 {
                     new()
                     {
                         Reason = "Original release note",
                         Created = DateTime.UtcNow.AddMonths(-2).AddDays(1),
-                    }
-                },
-            };
-
-            var releaseContentSection1 = new ReleaseContentSection
-            {
-                Release = release,
-                ContentSection = new ContentSection
-                {
-                    Type = ContentSectionType.Generic,
-                    Content = new List<ContentBlock>()
-                }
-            };
-
-            var releaseContentSection2 = new ReleaseContentSection
-            {
-                Release = release,
-                ContentSection = new ContentSection
-                {
-                    Type = ContentSectionType.Generic,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = "<p>Test</p>"
-                        },
-                        new DataBlock(),
-                        new HtmlBlock
-                        {
-                            Body = ""
-                        }
                     }
                 }
             };
@@ -98,10 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(
-                    releaseContentSection1,
-                    releaseContentSection2,
-                    originalRelease);
+                await context.Releases.AddRangeAsync(originalRelease, release);
                 await context.SaveChangesAsync();
             }
 
@@ -125,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new List<File>
                         {
-                            new File()
+                            new()
                         }
                     );
 
@@ -147,25 +162,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetChecklist(release.Id);
 
+                MockUtils.VerifyAllMocks(dataImportService,
+                    dataGuidanceService,
+                    methodologyVersionRepository,
+                    releaseDataFileRepository);
+
                 var checklist = result.AssertRight();
 
                 Assert.False(checklist.Valid);
 
-                Assert.Equal(7, checklist.Errors.Count);
+                var errors = checklist.Errors
+                    .Select(error => error.Code)
+                    .ToList();
 
-                Assert.Equal(DataFileImportsMustBeCompleted, checklist.Errors[0].Code);
-                Assert.Equal(DataFileReplacementsMustBeCompleted, checklist.Errors[1].Code);
-                Assert.Equal(PublicDataGuidanceRequired, checklist.Errors[2].Code);
-                Assert.Equal(ReleaseNoteRequired, checklist.Errors[3].Code);
-                Assert.Equal(EmptyContentSectionExists, checklist.Errors[4].Code);
-                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, checklist.Errors[5].Code);
-                Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, checklist.Errors[6].Code);
+                Assert.Equal(9, errors.Count);
+
+                Assert.Equal(DataFileImportsMustBeCompleted, errors[0]);
+                Assert.Equal(DataFileReplacementsMustBeCompleted, errors[1]);
+                Assert.Equal(PublicDataGuidanceRequired, errors[2]);
+                Assert.Equal(ReleaseNoteRequired, errors[3]);
+                Assert.Equal(SummarySectionContainsEmptyHtmlBlock, errors[4]);
+                Assert.Equal(EmptyContentSectionExists, errors[5]);
+                Assert.Equal(GenericSectionsContainEmptyHtmlBlock, errors[6]);
+                Assert.Equal(ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock, errors[7]);
+                Assert.Equal(RelatedDashboardsSectionContainsEmptyHtmlBlock, errors[8]);
             }
-
-            MockUtils.VerifyAllMocks(dataImportService,
-                dataGuidanceService,
-                methodologyVersionRepository,
-                releaseDataFileRepository);
         }
 
         [Fact]
@@ -215,6 +236,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetChecklist(release.Id);
 
+                MockUtils.VerifyAllMocks(dataGuidanceService,
+                    methodologyVersionRepository,
+                    releaseDataFileRepository);
+
                 var checklist = result.AssertRight();
 
                 Assert.False(checklist.Valid);
@@ -225,10 +250,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
                 Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
             }
-
-            MockUtils.VerifyAllMocks(dataGuidanceService,
-                methodologyVersionRepository,
-                releaseDataFileRepository);
         }
 
         [Fact]
@@ -273,14 +294,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new List<File>
                         {
-                            new File
+                            new()
                             {
                                 Id = Guid.NewGuid(),
                                 Filename = "test-file-1.csv",
                                 Type = FileType.Data,
                                 SubjectId = subject.Id
                             },
-                            new File
+                            new()
                             {
                                 Id = Guid.NewGuid(),
                                 Filename = "test-file-2.csv",
@@ -312,8 +333,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new List<DataBlock>
                         {
-                            new DataBlock(),
-                            new DataBlock(),
+                            new(),
+                            new(),
                         }
                     );
 
@@ -325,7 +346,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     footnoteRepository: footnoteRepository.Object,
                     dataBlockService: dataBlockService.Object
                 );
+
                 var result = await service.GetChecklist(release.Id);
+
+                MockUtils.VerifyAllMocks(dataBlockService,
+                    footnoteRepository,
+                    dataGuidanceService,
+                    methodologyVersionRepository,
+                    releaseDataFileRepository);
 
                 var checklist = result.AssertRight();
 
@@ -342,12 +370,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(NoFeaturedTables, checklist.Warnings[3].Code);
                 Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[4].Code);
             }
-
-            MockUtils.VerifyAllMocks(dataBlockService,
-                footnoteRepository,
-                dataGuidanceService,
-                methodologyVersionRepository,
-                releaseDataFileRepository);
         }
 
         [Fact]
@@ -402,6 +424,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetChecklist(release.Id);
 
+                MockUtils.VerifyAllMocks(dataGuidanceService,
+                    methodologyVersionRepository,
+                    releaseDataFileRepository);
+
                 var checklist = result.AssertRight();
 
                 Assert.False(checklist.Valid);
@@ -417,10 +443,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(NoDataFiles, checklist.Warnings[2].Code);
                 Assert.Equal(NoPublicPreReleaseAccessList, checklist.Warnings[3].Code);
             }
-
-            MockUtils.VerifyAllMocks(dataGuidanceService,
-                methodologyVersionRepository,
-                releaseDataFileRepository);
         }
 
         [Fact]
@@ -439,6 +461,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 0,
                 Created = DateTime.UtcNow.AddMonths(-2),
             };
+
+            var dataBlockId = Guid.NewGuid();
+
             var release = new Release
             {
                 Publication = publication,
@@ -447,6 +472,64 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Created = DateTime.UtcNow.AddMonths(-1),
                 DataGuidance = "Test guidance",
                 PreReleaseAccessList = "Test access list",
+                GenericContent = new List<ContentSection>
+                {
+                    new()
+                    {
+                        Type = ContentSectionType.Generic,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = "<p>test</p>"
+                            }
+                        }
+                    },
+                    new()
+                    {
+                        Type = ContentSectionType.Generic,
+                        Content = new List<ContentBlock>
+                        {
+                            new DataBlock
+                            {
+                                Id = dataBlockId
+                            }
+                        }
+                    }
+                },
+                HeadlinesSection = new ContentSection
+                {
+                    Type = ContentSectionType.Headlines,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "Not empty"
+                        }
+                    }
+                },
+                RelatedDashboardsSection = new ContentSection
+                {
+                    Type = ContentSectionType.RelatedDashboards,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "Not empty"
+                        }
+                    }
+                },
+                SummarySection = new ContentSection
+                {
+                    Type = ContentSectionType.ReleaseSummary,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Body = "Not empty"
+                        }
+                    }
+                },
                 NextReleaseDate = new PartialDate
                 {
                     Month = "12",
@@ -464,67 +547,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
             };
 
-            var releaseContentSection1 = new ReleaseContentSection
-            {
-                Release = release,
-                ContentSection = new ContentSection
-                {
-                    Type = ContentSectionType.Generic,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = "<p>test</p>"
-                        }
-                    }
-                }
-            };
-
-            var dataBlockId = Guid.NewGuid();
-
-            var releaseContentSection2 = new ReleaseContentSection
-            {
-                Release = release,
-                ContentSection = new ContentSection
-                {
-                    Type = ContentSectionType.Generic,
-                    Content = new List<ContentBlock>
-                    {
-                        new DataBlock { Id = dataBlockId },
-                    }
-                }
-            };
-
             var featuredTable = new FeaturedTable
             {
                 DataBlockId = dataBlockId,
-            };
-
-            var releaseContentSection3 = new ReleaseContentSection
-            {
-                Release = release,
-                ContentSection = new ContentSection
-                {
-                    Type = ContentSectionType.Headlines,
-                    Content = new List<ContentBlock>
-                    {
-                        new HtmlBlock
-                        {
-                            Body = "Not empty"
-                        }
-                    }
-                }
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(
-                    releaseContentSection1,
-                    releaseContentSection2,
-                    releaseContentSection3,
-                    originalRelease);
+                await context.Releases.AddRangeAsync(originalRelease, release);
                 await context.FeaturedTables.AddRangeAsync(featuredTable);
                 await context.SaveChangesAsync();
             }
@@ -551,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new List<File>
                         {
-                            new File
+                            new()
                             {
                                 Id = Guid.NewGuid(),
                                 Filename = "test-file-1.csv",
@@ -578,7 +610,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(
                         new List<DataBlock>
                         {
-                            new() { Id = dataBlockId, },
+                            new()
+                            {
+                                Id = dataBlockId
+                            }
                         }
                     );
 
@@ -629,13 +664,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static ReleaseChecklistService BuildReleaseChecklistService(
             ContentDbContext contentDbContext,
-            IDataImportService dataImportService = null,
-            IUserService userService = null,
-            IDataGuidanceService dataGuidanceService = null,
-            IReleaseDataFileRepository releaseDataFileRepository = null,
-            IMethodologyVersionRepository methodologyVersionRepository = null,
-            IFootnoteRepository footnoteRepository = null,
-            IDataBlockService dataBlockService = null)
+            IDataImportService? dataImportService = null,
+            IUserService? userService = null,
+            IDataGuidanceService? dataGuidanceService = null,
+            IReleaseDataFileRepository? releaseDataFileRepository = null,
+            IMethodologyVersionRepository? methodologyVersionRepository = null,
+            IFootnoteRepository? footnoteRepository = null,
+            IDataBlockService? dataBlockService = null)
         {
             return new(
                 contentDbContext,

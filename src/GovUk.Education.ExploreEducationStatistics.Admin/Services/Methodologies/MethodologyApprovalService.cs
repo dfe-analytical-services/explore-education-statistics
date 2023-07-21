@@ -19,7 +19,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -71,51 +71,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyApprovalUpdateRequest request)
         {
-            if (!request.IsStatusUpdateForMethodology(methodologyVersionToUpdate))
+            if (!request.IsStatusUpdateRequired(methodologyVersionToUpdate))
             {
-                // Status unchanged
                 return methodologyVersionToUpdate;
             }
 
             return await 
                 CheckCanUpdateStatus(methodologyVersionToUpdate, request.Status)
-                .OnSuccessDo(methodology => CheckMethodologyCanDependOnRelease(methodology, request))
-                .OnSuccessDo(RemoveUnusedImages)
-                .OnSuccess(async methodology =>
-                {
-                    methodology.Status = request.Status;
-                    methodology.PublishingStrategy = request.PublishingStrategy;
-                    methodology.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
-                        ? request.WithReleaseId
-                        : null;
-                    methodology.InternalReleaseNote = Approved == request.Status
-                        ? request.LatestInternalReleaseNote
-                        : null;
-
-                    methodology.Updated = DateTime.UtcNow;
-
-                    _context.MethodologyVersions.Update(methodology);
-
-                    var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodology.Id);
-                    
-                    if (isPubliclyAccessible)
+                    .OnSuccessDo(methodologyVersion => CheckMethodologyCanDependOnRelease(methodologyVersion, request))
+                    .OnSuccessDo(RemoveUnusedImages)
+                    .OnSuccess(async methodologyVersion =>
                     {
-                        methodology.Published = DateTime.UtcNow;
+                        _context.MethodologyVersions.Update(methodologyVersion);
 
-                        await _publishingService.PublishMethodologyFiles(methodology.Id);
-                    }
+                        methodologyVersion.Status = request.Status;
+                        methodologyVersion.PublishingStrategy = request.PublishingStrategy;
+                        methodologyVersion.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
+                            ? request.WithReleaseId
+                            : null;
+                        methodologyVersion.InternalReleaseNote = Approved == request.Status
+                            ? request.LatestInternalReleaseNote
+                            : null;
 
-                    _context.MethodologyVersions.Update(methodology);
-                    await _context.SaveChangesAsync();
+                        methodologyVersion.Updated = DateTime.UtcNow;
 
-                    if (isPubliclyAccessible)
-                    {
-                        // Update the 'All Methodologies' cache item
-                        await _methodologyCacheService.UpdateSummariesTree();
-                    }
+                        var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id);
 
-                    return methodology;
-                });
+                        if (isPubliclyAccessible)
+                        {
+                            methodologyVersion.Published = DateTime.UtcNow;
+
+                            await _publishingService.PublishMethodologyFiles(methodologyVersion.Id);
+                        }
+
+                        var methodologyStatus = new MethodologyStatus
+                        {
+                            MethodologyVersionId = methodologyVersion.Id,
+                            InternalReleaseNote = request.LatestInternalReleaseNote,
+                            ApprovalStatus = request.Status,
+                            CreatedById = _userService.GetUserId(),
+                        };
+                        await _context.MethodologyStatus.AddAsync(methodologyStatus);
+
+                        await _context.SaveChangesAsync();
+
+                        if (isPubliclyAccessible)
+                        {
+                            // Update the 'All Methodologies' cache item
+                            await _methodologyCacheService.UpdateSummariesTree();
+                        }
+
+                        return methodologyVersion;
+                    });
         }
 
         private async Task<Either<ActionResult, Unit>> CheckMethodologyCanDependOnRelease(
@@ -165,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         private Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateStatus(
             MethodologyVersion methodologyVersion,
-            MethodologyStatus requestedStatus)
+            MethodologyApprovalStatus requestedStatus)
         {
             return requestedStatus switch
             {

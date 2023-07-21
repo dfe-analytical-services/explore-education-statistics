@@ -211,12 +211,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(id, q =>
                     q.Include(m => m.Methodology))
-                .OnSuccess(methodology => UpdateStatus(methodology, request))
-                .OnSuccess(methodology => UpdateDetails(methodology, request))
-                .OnSuccess(_ => GetMethodology(id));
+                .OnSuccess(methodologyVersion => UpdateStatus(methodologyVersion, request))
+                .OnSuccess(methodologyVersion => UpdateDetails(methodologyVersion, request))
+                .OnSuccess(BuildMethodologyVersionViewModel);
         }
 
-        private async Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
+        public async Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
             MethodologyVersion methodologyVersion)
         {
             var loadedMethodology = _context.AssertEntityLoaded(methodologyVersion);
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyApprovalUpdateRequest request)
         {
-            if (!request.IsStatusUpdateForMethodology(methodologyVersionToUpdate))
+            if (!request.IsStatusUpdateRequired(methodologyVersionToUpdate))
             {
                 return methodologyVersionToUpdate;
             }
@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
-            if (!request.IsDetailUpdateForMethodology(methodologyVersionToUpdate))
+            if (methodologyVersionToUpdate.Title == request.Title)
             {
                 // Details unchanged
                 return methodologyVersionToUpdate;
@@ -295,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
                 // unlikely scenario, it's entirely possible.
                 .OnSuccessDo(methodologyVersion =>
-                    ValidateMethodologySlugUniqueForUpdate(methodologyVersion.Id, request.Slug))
+                    ValidateMethodologySlugUniqueForUpdate(methodologyVersion, request.Slug))
                 .OnSuccess(async methodologyVersion =>
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;
@@ -333,8 +333,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     var methodologyVersionIds= methodology
                         .Versions
                         .Select(methodologyVersion => new IdAndPreviousVersionIdPair<string>(
-                                methodologyVersion.Id.ToString(),
-                                methodologyVersion.PreviousVersionId?.ToString()))
+                            methodologyVersion.Id.ToString(),
+                            methodologyVersion.PreviousVersionId?.ToString()))
                         .ToList();
 
                     var methodologyVersionIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
@@ -362,6 +362,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     query => query.Include(m => m.Methodology))
                 .OnSuccessDo(methodologyVersion => DeleteVersion(methodologyVersion, forceDelete))
                 .OnSuccessVoid(DeleteMethodologyIfOrphaned);
+        }
+
+        public Task<Either<ActionResult, List<MethodologyStatusViewModel>>> GetMethodologyStatuses(
+            Guid methodologyVersionId)
+        {
+            return _persistenceHelper
+                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+                .OnSuccess(_userService.CheckCanViewMethodology)
+                .OnSuccess(async methodologyVersion =>
+                {
+                    var methodologyVersionIds = await _context.MethodologyVersions
+                        .Where(mv => mv.MethodologyId == methodologyVersion.MethodologyId)
+                        .Select(mv => mv.Id)
+                        .ToListAsync();
+
+                    var statuses = await _context.MethodologyStatus
+                        .Include(ms => ms.MethodologyVersion)
+                        .Include(ms => ms.CreatedBy)
+                        .Where(status => methodologyVersionIds.Contains(status.MethodologyVersionId))
+                        .ToListAsync();
+
+                    return statuses
+                        .Select(status =>
+                            new MethodologyStatusViewModel
+                            {
+                                MethodologyStatusId = status.Id,
+                                InternalReleaseNote = status.InternalReleaseNote,
+                                ApprovalStatus = status.ApprovalStatus,
+                                Created = status.Created,
+                                CreatedByEmail = status.CreatedBy?.Email,
+                                MethodologyVersion = status.MethodologyVersion.Version,
+                            }
+                        )
+                        .OrderByDescending(vm => vm.Created)
+                        .ToList();
+                });
         }
 
         private async Task<Either<ActionResult, Unit>> DeleteVersion(MethodologyVersion methodologyVersion,
@@ -397,19 +433,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(
-            Guid methodologyVersionId, string slug)
+            MethodologyVersion methodologyVersion, string slug)
         {
-            var methodologyId = await _context
-                .MethodologyVersions
-                .AsQueryable()
-                .Where(m => m.Id == methodologyVersionId)
-                .Select(m => m.MethodologyId)
-                .SingleAsync();
-
             if (await _context
-                .Methodologies
-                .AsQueryable()
-                .AnyAsync(p => p.Slug == slug && p.Id != methodologyId))
+                    .Methodologies
+                    .AsQueryable()
+                    .AnyAsync(p => p.Slug == slug && p.Id != methodologyVersion.MethodologyId))
             {
                 return ValidationActionResult(SlugNotUnique);
             }

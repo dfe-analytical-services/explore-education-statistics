@@ -54,7 +54,7 @@ const FilterGroupDetails = ({
             `${groupPath}.filterGroups[${filterGroupId}].selected`,
           );
           const hideGrouping = filterGroup.label === 'Default';
-          const filterItems =
+          const filterItems: string[] =
             get(
               form.values,
               `${groupPath}.filterGroups[${filterGroupId}].filterItems`,
@@ -81,8 +81,7 @@ const FilterGroupDetails = ({
               >
                 {filterGroup.options.map(filterItem => {
                   const checked =
-                    (filterItems && filterItems.includes(filterItem.value)) ||
-                    false;
+                    filterItems.includes(filterItem.value) || false;
                   return (
                     <FormCheckbox
                       {...filterItem}

@@ -1,0 +1,4 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+name_of_filter_0,Filter,Label of Filter 0,,,,Hint of Filter 0,filter_0_group
+name_of_filter_1,Filter,Label of Filter 1,,,,Hint of Filter 1,filter_1_group
+name_of_filter_2,Filter,Label of Filter 2,,,,Hint of Filter 2,filter_2_group

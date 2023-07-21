@@ -389,6 +389,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 }
             }
 
+            if (meta.FiltersByGroupingColumn.TryGetValue(header, out var filterFoundFromGroupHeader))
+            {
+                var match = observation.Filters
+                    .Where(filterItemId => filterFoundFromGroupHeader.Items.ContainsKey(filterItemId))
+                    .OfType<Guid?>()
+                    .FirstOrDefault(null as Guid?);
+
+                if (match.HasValue)
+                {
+                    return filterFoundFromGroupHeader.Items[match.Value].GroupLabel;
+                }
+            }
+
             if (meta.Filters.TryGetValue(header, out var filter))
             {
                 var match = observation.Filters

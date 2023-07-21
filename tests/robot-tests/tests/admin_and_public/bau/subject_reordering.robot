@@ -235,7 +235,7 @@ Check subject order in data catalogue
     user checks checkbox in position has label    4    Four
 
 Check subject order in data guidance
-    user navigates to find statistics page on public frontend
+    user navigates to public find statistics page
     user clicks link    ${PUBLICATION_NAME}
 
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}

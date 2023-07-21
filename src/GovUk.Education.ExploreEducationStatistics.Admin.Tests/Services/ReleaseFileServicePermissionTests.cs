@@ -2,10 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Update()
+        public async Task UpdateDataFileDetails()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
@@ -55,10 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.Update(
+                        return service.UpdateDataFileDetails(
                             _release.Id,
                             Guid.NewGuid(),
-                            new ReleaseFileUpdateViewModel
+                            new ReleaseDataFileUpdateRequest
                             {
                                 Title = "Test title"
                             }
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseFileService(userService: userService.Object);
                         return service.UploadAncillary(
                             releaseId: _release.Id,
-                            upload: new ReleaseAncillaryFileUploadViewModel
+                            upload: new ReleaseAncillaryFileUploadRequest
                             {
                                 File = Mock.Of<IFormFile>(),
                                 Title = "Title",
@@ -185,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ReplaceAncillary()
+        public async Task UpdateAncillary()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
@@ -193,10 +193,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseFileService(userService: userService.Object);
-                        return service.ReplaceAncillary(
+                        return service.UpdateAncillary(
                             releaseId: _release.Id,
                             fileId: Guid.NewGuid(),
-                            newFile: Mock.Of<IFormFile>()
+                            request: new ReleaseAncillaryFileUpdateRequest
+                            {
+                                File = Mock.Of<IFormFile>()
+                            }
                         );
                     }
                 );

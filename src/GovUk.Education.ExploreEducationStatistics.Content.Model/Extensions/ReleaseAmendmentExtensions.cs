@@ -27,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             amendment.CreatedById = createdByUserId;
             amendment.Version = release.Version + 1;
             amendment.PreviousVersionId = release.Id;
-            amendment.PreReleaseAccessList = null;
 
             var context = new Release.CloneContext(amendment);
 

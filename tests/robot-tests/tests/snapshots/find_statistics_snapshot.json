@@ -16,7 +16,7 @@
   {
     "publication_summary": "Annual release on academy transfers in England, including why academies transferred and any associated grant funding that was provided.",
     "publication_title": "Academy transfers and funding",
-    "published": "21 Jul 2022",
+    "published": "20 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
   },
@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships and traineeships",
-    "published": "8 Jun 2023",
+    "published": "20 Jul 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -86,7 +86,7 @@
   {
     "publication_summary": "Children looked after, care leavers and children adopted in England. Annual statistics including characteristics, placement information and health outcomes.",
     "publication_title": "Children looked after in England including adoptions",
-    "published": "17 Nov 2022",
+    "published": "13 Jul 2023",
     "release_type": "National statistics",
     "theme": "Children's social care"
   },
@@ -170,7 +170,7 @@
   {
     "publication_summary": "Statistics on children aged 2 to 4 registered for funded early education and childcare entitlements in England, including on staff and providers delivering them",
     "publication_title": "Education provision: children under 5 years of age",
-    "published": "30 Jun 2022",
+    "published": "6 Jul 2023",
     "release_type": "National statistics",
     "theme": "Early years"
   },
@@ -219,7 +219,7 @@
   {
     "publication_summary": "Apprenticeship and adult 19+ Further Education and skills learning, including community learning, education and training, and basic skills (English and maths).",
     "publication_title": "Further education and skills",
-    "published": "30 Mar 2023",
+    "published": "20 Jul 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -259,7 +259,7 @@
     "theme": "Teachers and school workforce"
   },
   {
-    "publication_summary": "Annual national and provider level statistics on outcomes of final year teacher trainees in England (qualified teacher status rates and employment rates).",
+    "publication_summary": "Annual national, regional and provider level statistics on outcomes of teacher trainees in England (qualified teacher status rates and employment rates).",
     "publication_title": "Initial teacher training performance profiles",
     "published": "28 Jul 2022",
     "release_type": "Official statistics",
@@ -282,7 +282,7 @@
   {
     "publication_summary": "",
     "publication_title": "Key stage 2 attainment: National headlines",
-    "published": "5 Jul 2022",
+    "published": "11 Jul 2023",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -317,14 +317,14 @@
   {
     "publication_summary": "Earnings and employment for higher education university graduates & postgraduates by subject studied and characteristics. Longitudinal Education Outcomes (LEO).",
     "publication_title": "LEO Graduate and Postgraduate Outcomes",
-    "published": "24 Nov 2022",
+    "published": "6 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Higher education"
   },
   {
     "publication_summary": "Employment and earnings outcomes of graduates by each higher education provider by sex and current region/subject studied/prior attainment.",
     "publication_title": "LEO Graduate outcomes provider level data",
-    "published": "24 Nov 2022",
+    "published": "6 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Higher education"
   },
@@ -345,7 +345,7 @@
   {
     "publication_summary": "Sustained education, apprenticeship or employment destinations 1, 3 and 5 years after GCSEs. Includes disadvantage and gender breakdowns.",
     "publication_title": "Longer term destinations",
-    "published": "7 Jul 2022",
+    "published": "20 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -429,7 +429,7 @@
   {
     "publication_summary": "LA management information on participation and not in education or training (NEET) age 16 to 17. Includes ethnicity, SEND figures and comparative NEET scorecard",
     "publication_title": "Participation in education, training and NEET age 16 to 17 by local authority",
-    "published": "1 Dec 2022",
+    "published": "6 Jul 2023",
     "release_type": "Management information",
     "theme": "Destination of pupils and students"
   },
@@ -443,7 +443,7 @@
   {
     "publication_summary": "Data on permanent exclusions and suspensions, including by reason for exclusion, duration, by pupil characteristics and data on independent review panels.",
     "publication_title": "Permanent exclusions and suspensions in England",
-    "published": "20 Apr 2023",
+    "published": "20 Jul 2023",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
   },
@@ -478,7 +478,7 @@
   {
     "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the full academic year.",
     "publication_title": "Pupil absence in schools in England",
-    "published": "18 May 2023",
+    "published": "20 Jul 2023",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
   },
@@ -499,7 +499,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "4 Jul 2023",
+    "published": "13 Jul 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },
@@ -509,6 +509,13 @@
     "published": "23 Mar 2023",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "An overview of what happened to LA maintained and academy school finances during the Covid-19 pandemic",
+    "publication_title": "School finances during the Covid-19 pandemic",
+    "published": "17 Jul 2023",
+    "release_type": "Ad hoc statistics",
+    "theme": "Finance and funding"
   },
   {
     "publication_summary": "School funding data for England, including trends in funding over time since 2010-11 and funding allocations of individual primary and secondary schools.",
@@ -534,7 +541,7 @@
   {
     "publication_summary": "Annual statistics on teachers and support staff (TAs) in England. Age, gender, ethnicity, pupil teacher ratio (PTR), retention, pay, subject taught and absence.",
     "publication_title": "School workforce in England",
-    "published": "19 Jun 2023",
+    "published": "8 Jun 2023",
     "release_type": "National statistics",
     "theme": "Teachers and school workforce"
   },
@@ -551,6 +558,13 @@
     "published": "15 Jun 2023",
     "release_type": "Official statistics",
     "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "LA management information on September Guarantee offers of education or training places for young people aged 16 and 17.",
+    "publication_title": "September Guarantee: offers of education and training for young people age 16 and 17",
+    "published": "6 Jul 2023",
+    "release_type": "Management information",
+    "theme": "Destination of pupils and students"
   },
   {
     "publication_summary": "Statistics for England on serious incidents that involve death or serious harm to a child due to abuse or neglect, and any death of a looked after child.",
@@ -590,7 +604,7 @@
   {
     "publication_summary": "",
     "publication_title": "Teacher and Leader development: ECF and NPQs",
-    "published": "14 Jul 2022",
+    "published": "19 Jul 2023",
     "release_type": "Experimental statistics",
     "theme": "Teachers and school workforce"
   },
@@ -618,7 +632,7 @@
   {
     "publication_summary": "Annual statistics on young people's participation in higher education, including their background characteristics.",
     "publication_title": "Widening participation in higher education",
-    "published": "28 Jul 2022",
+    "published": "13 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Higher education"
   }

@@ -105,9 +105,9 @@ user checks chart x axis ticks
 user mouses over line chart point
     [Arguments]    ${locator}    ${line}    ${number}
     user waits until parent contains element    ${locator}
-    ...    css:.recharts-line-dots:nth-of-type(${line}) .recharts-symbols:nth-of-type(${number})
+    ...    xpath://*[contains(@class, 'recharts-line-dots')][${line}]/*[contains(@class, 'recharts-symbols')][${number}]
     ${element}=    get child element    ${locator}
-    ...    css:.recharts-line-dots:nth-of-type(${line}) .recharts-symbols:nth-of-type(${number})
+    ...    xpath://*[contains(@class, 'recharts-line-dots')][${line}]/*[contains(@class, 'recharts-symbols')][${number}]
     user waits until element is visible    ${element}
     user mouses over element    ${element}
 

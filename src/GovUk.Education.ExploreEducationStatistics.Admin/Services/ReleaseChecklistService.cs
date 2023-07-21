@@ -103,20 +103,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.ReleaseNoteRequired));
             }
 
-            if (await ReleaseHasEmptyGenericContentSection(release.Id))
+            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.ReleaseSummary))
             {
-                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.EmptyContentSectionExists));
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.SummarySectionContainsEmptyHtmlBlock));
             }
 
-            if (await ReleaseGenericContentSectionsContainEmptyContentBlock(release.Id))
+            if (await ReleaseHasEmptySection(release.Id, ContentSectionType.Generic))
             {
-                errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.EmptyContentSectionExists));
             }
 
-            if (!await ReleaseHasKeyStatistic(release.Id) && !await ReleaseHasNonEmptyHeadlineBlock(release.Id))
+            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.Generic))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.GenericSectionsContainEmptyHtmlBlock));
+            }
+
+            if (!(await ReleaseHasKeyStatistic(release.Id) ||
+                  await ReleaseSectionHasNonEmptyHtmlBlock(release.Id, ContentSectionType.Headlines)))
             {
                 errors.Add(new ReleaseChecklistIssue(
                     ValidationErrorMessages.ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock));
+            }
+
+            if (await ReleaseSectionHasEmptyHtmlBlock(release.Id, ContentSectionType.RelatedDashboards))
+            {
+                errors.Add(new ReleaseChecklistIssue(
+                    ValidationErrorMessages.RelatedDashboardsSectionContainsEmptyHtmlBlock));
             }
 
             return errors;
@@ -128,43 +143,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(ks => ks.ReleaseId == releaseId);
         }
 
-        private async Task<bool> ReleaseHasNonEmptyHeadlineBlock(Guid releaseId)
+        private async Task<bool> ReleaseHasEmptySection(Guid releaseId, ContentSectionType sectionType)
         {
-            var headlineBlockList = await _contentDbContext.ReleaseContentSections
-                .Include(rcs => rcs.ContentSection.Content)
-                .Where(rcs =>
-                    rcs.ReleaseId == releaseId
-                    && rcs.ContentSection.Type == ContentSectionType.Headlines)
-                .SelectMany(rcs => rcs.ContentSection.Content)
-                .ToListAsync();
-
-            return headlineBlockList.Any(block => block is not HtmlBlock htmlBlock || !htmlBlock.Body.IsNullOrEmpty());
+            return await _contentDbContext.ContentSections
+                .Where(cs =>
+                    cs.Release.ReleaseId == releaseId &&
+                    cs.Type == sectionType)
+                .AnyAsync(cs => cs.Content.Count == 0);
         }
 
-        private async Task<bool> ReleaseHasEmptyGenericContentSection(Guid releaseId)
+        private async Task<bool> ReleaseSectionHasEmptyHtmlBlock(Guid releaseId, ContentSectionType sectionType)
         {
-            return await _contentDbContext.ReleaseContentSections
-                .Include(rcs => rcs.ContentSection)
-                .ThenInclude(cs => cs.Content)
-                .Where(rcs =>
-                    rcs.ReleaseId == releaseId
-                    && rcs.ContentSection.Type == ContentSectionType.Generic)
-                .AnyAsync(rcs => rcs.ContentSection.Content.Count == 0);
+            return await _contentDbContext.ContentBlocks
+                .Where(cb =>
+                    cb.ContentSection!.Release.ReleaseId == releaseId &&
+                    cb.ContentSection.Type == sectionType)
+                .OfType<HtmlBlock>()
+                .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
         }
 
-        private async Task<bool> ReleaseGenericContentSectionsContainEmptyContentBlock(Guid releaseId)
+        private async Task<bool> ReleaseSectionHasNonEmptyHtmlBlock(Guid releaseId, ContentSectionType sectionType)
         {
-            var releaseGenericContentBlocks = await _contentDbContext.ReleaseContentSections
-                .Include(rcs => rcs.ContentSection)
-                .ThenInclude(cs => cs.Content)
-                .Where(rcs =>
-                    rcs.ReleaseId == releaseId
-                    && rcs.ContentSection.Type == ContentSectionType.Generic)
-                .SelectMany(rcs => rcs.ContentSection.Content)
-                .ToListAsync();
-
-            return releaseGenericContentBlocks
-                .Any(block => block is HtmlBlock htmlBlock && htmlBlock.Body.IsNullOrEmpty());
+            return await _contentDbContext.ContentBlocks
+                .Where(cb =>
+                    cb.ContentSection!.Release.ReleaseId == releaseId &&
+                    cb.ContentSection.Type == sectionType)
+                .OfType<HtmlBlock>()
+                .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetWarnings(Release release)
@@ -178,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var methodologiesNotApproved = methodologies
-                .Where(m => m.Status != MethodologyStatus.Approved)
+                .Where(m => m.Status != MethodologyApprovalStatus.Approved)
                 .ToList();
 
             if (methodologiesNotApproved.Any())

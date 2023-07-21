@@ -20,7 +20,7 @@ user checks release update
 
 user checks publication is on find statistics page
     [Arguments]    ${publication_name}
-    user navigates to find statistics page on public frontend
+    user navigates to public find statistics page
     user waits until page contains link    ${publication_name}
 
 user waits until details dropdown contains publication
@@ -51,18 +51,30 @@ user goes to release page via breadcrumb
     user waits until h1 is visible    ${publication}
     user waits until page contains title caption    ${release}
 
+user navigates to public find statistics page
+    environment variable should be set    PUBLIC_URL
+    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
+    user waits until h1 is visible    Find statistics and data
+
+user navigates to data tables page on public frontend
+    environment variable should be set    PUBLIC_URL
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
+    user waits until h1 is visible    Create your own tables
+
+user navigates to data catalogue page on public frontend
+    environment variable should be set    PUBLIC_URL
+    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue
+    user waits until page contains title caption    Data catalogue
+    user waits until h1 is visible    Browse our open data
+    user waits until page contains    View all of the open data available and choose files to download.
+
 user navigates to public methodologies page
     environment variable should be set    PUBLIC_URL
     user navigates to public frontend    %{PUBLIC_URL}/methodology
     user waits until h1 is visible    Methodologies
+    user waits until page contains    Browse to find out about the methodology behind specific
 
 user checks methodology note
     [Arguments]    ${number}    ${displayDate}    ${content}
     user waits until element contains    css:#methodologyNotes li:nth-of-type(${number}) time    ${displayDate}
     user waits until element contains    css:#methodologyNotes li:nth-of-type(${number}) p    ${content}
-
-user reloads the stale cached page
-    # Next.js will have returned a stale cached page for the last request and will have created a new cached page in
-    # the background in the meantime using Incremental Static Regeneration, so request the page again.
-    sleep    %{WAIT_NEXT_ISR}
-    user reloads page

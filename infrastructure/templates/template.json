@@ -132,10 +132,7 @@
     "skuAdminSignalR": {
       "type": "string",
       "defaultValue": "Free_F1",
-      "allowedValues": [
-        "Free_F1",
-        "Standard_S1"
-      ]
+      "allowedValues": ["Free_F1", "Standard_S1"]
     },
     "adminSignalRCapacity": {
       "type": "int",
@@ -143,15 +140,7 @@
         "description": "The number of SignalR units."
       },
       "defaultValue": 1,
-      "allowedValues": [
-        1,
-        2,
-        5,
-        10,
-        20,
-        50,
-        100
-      ]
+      "allowedValues": [1, 2, 5, 10, 20, 50, 100]
     },
     "adminFirewallRules": {
       "type": "array",
@@ -291,10 +280,7 @@
     "publicAppBasicAuth": {
       "type": "string",
       "defaultValue": "true",
-      "allowedValues": [
-        "true",
-        "false"
-      ],
+      "allowedValues": ["true", "false"],
       "metadata": {
         "description": "Enables Basic Auth on the public application, the purpose of this is prevent accidential access to the application before it is publically avaliable (following GDS guidance)"
       }
@@ -469,11 +455,7 @@
     "minTlsVersion": {
       "type": "string",
       "defaultValue": "1.2",
-      "allowedValues": [
-        "-1.0",
-        "1.1",
-        "1.2"
-      ]
+      "allowedValues": ["-1.0", "1.1", "1.2"]
     },
     "useSubnets": {
       "type": "bool",
@@ -558,10 +540,7 @@
     "openIdConnectSpaClientRefreshTokenUsage": {
       "type": "string",
       "defaultValue": "OneTimeOnly",
-      "allowedValues": [
-        "ReUse",
-        "OneTimeOnly"
-      ],
+      "allowedValues": ["ReUse", "OneTimeOnly"],
       "metadata": {
         "description": "Whether or not this environment's Admin API supports reusable or one-time refresh tokens"
       }
@@ -569,10 +548,7 @@
     "openIdConnectSpaClientRefreshTokenExpiration": {
       "type": "string",
       "defaultValue": "Absolute",
-      "allowedValues": [
-        "Absolute",
-        "Sliding"
-      ],
+      "allowedValues": ["Absolute", "Sliding"],
       "metadata": {
         "description": "Whether or not this environment's Admin API has refresh tokens expiring at a fixed date or in a within a sliding window that extends with each use of a refresh token"
       }
@@ -633,20 +609,11 @@
     "branch": {
       "type": "string",
       "defaultValue": "master",
-      "allowedValues": [
-        "master",
-        "dev"
-      ]
+      "allowedValues": ["master", "dev"]
     },
     "skuContentDb": {
       "type": "string",
-      "allowedValues": [
-        "Free",
-        "Basic",
-        "Standard",
-        "Premium",
-        "GP_S_Gen5"
-      ]
+      "allowedValues": ["Free", "Basic", "Standard", "Premium", "GP_S_Gen5"]
     },
     "skuStatisticsDb": {
       "type": "string",
@@ -718,6 +685,34 @@
     "dataFactoryConcurrency": {
       "type": "int",
       "defaultValue": 1
+    },
+    "containerRegistryName": {
+      "type": "string",
+      "defaultValue": "eesacr",
+      "metadata": {
+        "description": "The name of the Container registry"
+      }
+    },
+    "dockerRegistryServerUrl": {
+      "type": "string",
+      "defaultValue": "https://[parameters('containerRegistryName')].azurecr.io",
+      "metadata": {
+        "description": "The URL of the Container registry"
+      }
+    },
+    "dockerRegistryServerUsername": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The username to log in to the Container registry"
+      }
+    },
+    "dockerRegistryServerPassword": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "The password to log in to the Container registry"
+      }
     }
   },
   "variables": {
@@ -734,10 +729,10 @@
     "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
     "adminSignalRName": "[concat(parameters('subscription'), '-sr-', parameters('environment'), '-admin')]",
     "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
-    "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
+    "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public-site')]",
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
-    "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public')]",
-    "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public')]",
+    "publicPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-public-site')]",
+    "publicAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-public-site')]",
     "coreStorageAccountName": "[concat(parameters('subscription'), parameters('storageAccountPrefix'), 'eescore')]",
     "coreStorageAccountId": "[concat(resourceGroup().id,'/providers/','Microsoft.Storage/storageAccounts/', variables('coreStorageAccountName'))]",
     "coreSqlServerName": "[concat(parameters('subscription'), '-sqlsvr-', parameters('environment'), '-01')]",
@@ -1233,7 +1228,6 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
-              "https://ees-pnpm-linux-container.azurewebsites.net",
               "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
@@ -1321,7 +1315,6 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
-              "https://ees-pnpm-linux-container.azurewebsites.net",
               "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
@@ -1464,7 +1457,6 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
-              "https://ees-pnpm-linux-container.azurewebsites.net",
               "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
@@ -1545,7 +1537,6 @@
           "cors": {
             "allowedOrigins": [
               "[concat('https://', parameters('domain'))]",
-              "https://ees-pnpm-linux-container.azurewebsites.net",
               "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
               "https://localhost:3000",
               "http://localhost:3000",
@@ -1948,8 +1939,67 @@
       }
     },
     {
+      "condition": "[equals(parameters('environmentName'), 'Development')]",
+      "type": "Microsoft.ContainerRegistry/registries",
+      "apiVersion": "2022-02-01-preview",
+      "name": "[parameters('containerRegistryName')]",
+      "location": "[resourceGroup().location]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Standard"
+      },
+      "tags": {
+        "Department": "[parameters('departmentName')]",
+        "Solution": "[parameters('solutionName')]",
+        "ServiceType": "Container Registry",
+        "Environment": "[parameters('environmentName')]",
+        "Subscription": "[parameters('subscriptionName')]",
+        "CostCentre": "[parameters('costCentre')]",
+        "ServiceOwner": "[parameters('serviceOwnerName')]",
+        "DateProvisioned": "[parameters('dateProvisioned')]",
+        "CreatedBy": "[parameters('createdBy')]",
+        "DeploymentRepo": "[parameters('deploymentRepo')]",
+        "DeploymentScript": "[parameters('deploymentScript')]"
+      },
+      "properties": {
+        "adminUserEnabled": false,
+        "policies": {
+          "quarantinePolicy": {
+            "status": "disabled"
+          },
+          "trustPolicy": {
+            "type": "Notary",
+            "status": "disabled"
+          },
+          "retentionPolicy": {
+            "days": 7,
+            "status": "disabled"
+          },
+          "exportPolicy": {
+            "status": "enabled"
+          },
+          "azureADAuthenticationAsArmPolicy": {
+            "status": "enabled"
+          },
+          "softDeletePolicy": {
+            "retentionDays": 7,
+            "status": "enabled"
+          }
+        },
+        "encryption": {
+          "status": "disabled"
+        },
+        "dataEndpointEnabled": false,
+        "publicNetworkAccess": "Enabled",
+        "networkRuleBypassOptions": "AzureServices",
+        "zoneRedundancy": "Disabled",
+        "anonymousPullEnabled": false
+      }
+    },
+    {
       "type": "Microsoft.Web/sites",
       "name": "[variables('publicAppName')]",
+      "kind": "app,linux,container",
       "apiVersion": "2021-02-01",
       "location": "[resourceGroup().location]",
       "identity": {
@@ -1974,12 +2024,19 @@
         "hostingEnvironment": "",
         "httpsOnly": true,
         "clientAffinityEnabled": false,
+        "reserved": true,
         "siteConfig": {
+          "acrUseManagedIdentityCreds": false,
           "http20Enabled": true,
           "minTlsVersion": "[parameters('minTlsVersion')]",
           "ftpsState": "FtpsOnly",
-          "phpVersion": "off",
-          "netFrameworkVersion": "v6.0",
+          "preWarmedInstanceCount": 1,
+          "framework": "node",
+          "nodeVersion": "16-lts",
+          "WEBSITES_PORT": 3000,
+          "DOCKER_REGISTRY_SERVER_URL": "[parameters('dockerRegistryServerUrl')]",
+          "DOCKER_REGISTRY_SERVER_USERNAME": "[parameters('dockerRegistryServerUsername')]",
+          "DOCKER_REGISTRY_SERVER_PASSWORD": "[parameters('dockerRegistryServerPassword')]",
           "AlwaysOn": true,
           "webSocketsEnabled": false,
           "remoteDebuggingEnabled": false,
@@ -2014,8 +2071,7 @@
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "14.16.0",
-        "WEBSITE_RUN_FROM_PACKAGE": "1"
+        "WEBSITE_NODE_DEFAULT_VERSION": "16.14.2"
       }
     },
     {
@@ -2025,6 +2081,7 @@
         "Name": "[first(split(parameters('skuPublic'), ' '))]"
       },
       "name": "[variables('publicPlanName')]",
+      "kind": "app,linux,container",
       "apiVersion": "2022-03-01",
       "location": "[resourceGroup().location]",
       "tags": {
@@ -2044,7 +2101,8 @@
         "name": "[variables('publicPlanName')]",
         "workerSizeId": "0",
         "numberOfWorkers": "1",
-        "hostingEnvironment": ""
+        "hostingEnvironment": "",
+        "reserved": true
       }
     },
     {
@@ -2089,7 +2147,6 @@
               "action": "Allow"
             },
             {
-
               "condition": "[parameters('useSubnets')]",
               "id": "[variables('importerSubnetRef')]",
               "action": "Allow"
@@ -2115,9 +2172,7 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": [
-            "[variables('coreStorageAccountName')]"
-          ]
+          "dependsOn": ["[variables('coreStorageAccountName')]"]
         }
       ],
       "tags": {
@@ -2133,9 +2188,7 @@
         "DeploymentRepo": "[parameters('deploymentRepo')]",
         "DeploymentScript": "[parameters('deploymentScript')]"
       },
-      "dependsOn": [
-        "[variables('vNetRef')]"
-      ],
+      "dependsOn": ["[variables('vNetRef')]"],
       "sku": {
         "name": "Standard_RAGRS"
       }
@@ -2169,9 +2222,7 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "dependsOn": [
-            "[variables('coreSqlServerName')]"
-          ],
+          "dependsOn": ["[variables('coreSqlServerName')]"],
           "sku": {
             "name": "[parameters('skuStatisticsDb')]",
             "tier": "[parameters('tierStatisticsDb')]",
@@ -2206,9 +2257,7 @@
             "DeploymentRepo": "[parameters('deploymentRepo')]",
             "DeploymentScript": "[parameters('deploymentScript')]"
           },
-          "dependsOn": [
-            "[variables('coreSqlServerName')]"
-          ],
+          "dependsOn": ["[variables('coreSqlServerName')]"],
           "sku": {
             "name": "[parameters('skuContentDb')]",
             "tier": "[parameters('tierContentDb')]",
@@ -2382,7 +2431,7 @@
       ],
       "copy": {
         "name": "networkRuleLoop",
-        "count":  "[length(variables('sqlAllowedSubnets'))]"
+        "count": "[length(variables('sqlAllowedSubnets'))]"
       }
     },
     {
@@ -2567,7 +2616,7 @@
       ],
       "copy": {
         "name": "networkRuleLoop",
-        "count":  "[length(variables('publicSqlAllowedSubnets'))]"
+        "count": "[length(variables('publicSqlAllowedSubnets'))]"
       }
     },
     {
@@ -2611,9 +2660,7 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": [
-            "[variables('notificationsstorageAccountName')]"
-          ]
+          "dependsOn": ["[variables('notificationsstorageAccountName')]"]
         }
       ],
       "tags": {
@@ -2679,9 +2726,7 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": [
-            "[variables('publicStorageAccountName')]"
-          ]
+          "dependsOn": ["[variables('publicStorageAccountName')]"]
         }
       ],
       "tags": {
@@ -2810,7 +2855,6 @@
           "allowedOrigins": [
             "[concat('https://', parameters('domain'))]",
             "[concat('https://', variables('publicAppName'), '.azurewebsites.net')]",
-            "https://ees-pnpm-linux-container.azurewebsites.net",
             "https://localhost:3000",
             "http://localhost:3000",
             "http://127.0.0.1"
@@ -2960,8 +3004,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-            ]
+            "allowedOrigins": []
           },
           "connectionStrings": [
             {
@@ -3116,8 +3159,7 @@
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
           "cors": {
-            "allowedOrigins": [
-            ]
+            "allowedOrigins": []
           },
           "connectionStrings": [
             {
@@ -3204,9 +3246,7 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": [
-            "[variables('publisherStorageAccountName')]"
-          ]
+          "dependsOn": ["[variables('publisherStorageAccountName')]"]
         }
       ],
       "tags": {
@@ -3246,9 +3286,7 @@
               "days": "[parameters('blobDeleteRetentionDays')]"
             }
           },
-          "dependsOn": [
-            "[variables('loggingStorageAccountName')]"
-          ]
+          "dependsOn": ["[variables('loggingStorageAccountName')]"]
         }
       ],
       "tags": {
@@ -3286,9 +3324,7 @@
       },
       "properties": {
         "addressSpace": {
-          "addressPrefixes": [
-            "10.0.0.0/16"
-          ]
+          "addressPrefixes": ["10.0.0.0/16"]
         },
         "subnets": [
           {
@@ -3525,112 +3561,72 @@
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
             "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
+              "keys": [],
+              "secrets": ["Get", "List"],
+              "certificates": []
             }
           },
           {
             "tenantId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').principalId]",
             "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
+              "keys": [],
+              "secrets": ["Get", "List"],
+              "certificates": []
             }
           },
           {
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('publisherAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
+              "keys": [],
+              "secrets": ["Get", "List"],
+              "certificates": []
             }
           },
           {
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('notificationsAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
+              "keys": [],
+              "secrets": ["Get", "List"],
+              "certificates": []
             }
           },
           {
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('importerAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
+              "keys": [],
+              "secrets": ["Get", "List"],
+              "certificates": []
             }
           },
           {
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('contentAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
+              "keys": [],
+              "secrets": ["Get", "List"],
+              "certificates": []
             }
           },
           {
             "tenantId": "[subscription().tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('dataAppName')), '2019-08-01', 'Full').identity.principalId]",
             "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
+              "keys": [],
+              "secrets": ["Get", "List"],
+              "certificates": []
             }
           },
           {
             "tenantId": "[subscription().tenantId]",
             "objectId": "[parameters('devopsSPN')]", // Devops SPN
             "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
+              "keys": [],
+              "secrets": ["Get", "List"],
+              "certificates": []
             }
           },
 
@@ -3784,8 +3780,7 @@
       "apiVersion": "2014-04-01",
       "type": "Microsoft.Insights/autoscaleSettings",
       "location": "[resourceGroup().location]",
-      "tags": {
-      },
+      "tags": {},
       "properties": {
         "name": "[concat(variables('dataAppName'), '-autoscale')]",
         "enabled": "[parameters('autoscalePublicApplication')]",
@@ -3816,8 +3811,7 @@
                   "timeAggregation": "Average",
                   "timeGrain": "PT1M",
                   "timeWindow": "PT10M",
-                  "Dimensions": [
-                  ],
+                  "Dimensions": [],
                   "dividePerInstance": false
                 }
               },
@@ -3838,16 +3832,14 @@
                   "timeAggregation": "Average",
                   "timeGrain": "PT1M",
                   "timeWindow": "PT10M",
-                  "Dimensions": [
-                  ],
+                  "Dimensions": [],
                   "dividePerInstance": false
                 }
               }
             ]
           }
         ],
-        "notifications": [
-        ],
+        "notifications": [],
         "targetResourceLocation": ""
       }
     },
@@ -3856,8 +3848,7 @@
       "apiVersion": "2014-04-01",
       "type": "Microsoft.Insights/autoscaleSettings",
       "location": "[resourceGroup().location]",
-      "tags": {
-      },
+      "tags": {},
       "properties": {
         "name": "[concat(variables('contentAppName'), '-autoscale')]",
         "enabled": "[parameters('autoscalePublicApplication')]",
@@ -3888,8 +3879,7 @@
                   "timeAggregation": "Average",
                   "timeGrain": "PT1M",
                   "timeWindow": "PT10M",
-                  "Dimensions": [
-                  ],
+                  "Dimensions": [],
                   "dividePerInstance": false
                 }
               },
@@ -3910,16 +3900,14 @@
                   "timeAggregation": "Average",
                   "timeGrain": "PT1M",
                   "timeWindow": "PT10M",
-                  "Dimensions": [
-                  ],
+                  "Dimensions": [],
                   "dividePerInstance": false
                 }
               }
             ]
           }
         ],
-        "notifications": [
-        ],
+        "notifications": [],
         "targetResourceLocation": ""
       }
     },
@@ -3928,8 +3916,7 @@
       "apiVersion": "2014-04-01",
       "type": "Microsoft.Insights/autoscaleSettings",
       "location": "[resourceGroup().location]",
-      "tags": {
-      },
+      "tags": {},
       "properties": {
         "name": "[concat(variables('publicAppName'), '-autoscale')]",
         "enabled": "[parameters('autoscalePublicApplication')]",
@@ -3960,8 +3947,7 @@
                   "timeAggregation": "Average",
                   "timeGrain": "PT1M",
                   "timeWindow": "PT10M",
-                  "Dimensions": [
-                  ],
+                  "Dimensions": [],
                   "dividePerInstance": false
                 }
               },
@@ -3982,16 +3968,14 @@
                   "timeAggregation": "Average",
                   "timeGrain": "PT1M",
                   "timeWindow": "PT10M",
-                  "Dimensions": [
-                  ],
+                  "Dimensions": [],
                   "dividePerInstance": false
                 }
               }
             ]
           }
         ],
-        "notifications": [
-        ],
+        "notifications": [],
         "targetResourceLocation": ""
       }
     },
@@ -4032,7 +4016,7 @@
                             },
                             "alertTargetIDs": {
                               "items": {
-                                  "type": "string"
+                                "type": "string"
                               },
                               "type": "array"
                             },
@@ -4070,7 +4054,7 @@
                       "type": "object"
                     },
                     "schemaId": {
-                        "type": "string"
+                      "type": "string"
                     }
                   },
                   "type": "object"
@@ -4137,9 +4121,7 @@
         "description": "[variables('metricAlerts')[copyIndex()].description]",
         "severity": 3,
         "enabled": "[parameters('enableAlerts')]",
-        "scopes": [
-          "[variables('metricAlerts')[copyIndex()].resourceId]"
-        ],
+        "scopes": ["[variables('metricAlerts')[copyIndex()].resourceId]"],
         "evaluationFrequency": "PT1M",
         "windowSize": "PT5M",
         "criteria": {

@@ -23,9 +23,7 @@ const FormTextSearchInput = ({
 
   const [handleChange] = useDebouncedCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      if (onChange) {
-        onChange(event);
-      }
+      onChange?.(event);
     },
     debounceTime,
   );

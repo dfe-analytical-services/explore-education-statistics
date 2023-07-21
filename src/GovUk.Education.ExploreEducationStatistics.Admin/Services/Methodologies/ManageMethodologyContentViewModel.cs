@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public string Title { get; set; } = string.Empty;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public MethodologyStatus Status { get; set; }
+        public MethodologyApprovalStatus Status { get; set; }
 
         public DateTime? Published { get; set; }
 

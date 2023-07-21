@@ -20,7 +20,7 @@ user navigates to content page
     [Arguments]    ${PUBLICATION_NAME}
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add note    %{WAIT_SMALL}
 
     user waits for page to finish loading
     user waits until page does not contain loading spinner

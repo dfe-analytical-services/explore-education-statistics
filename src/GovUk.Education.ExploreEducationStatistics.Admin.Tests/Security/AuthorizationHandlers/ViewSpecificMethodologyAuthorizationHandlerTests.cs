@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             Id = Guid.NewGuid(),
             MethodologyId = Guid.NewGuid(),
-            Status = MethodologyStatus.Approved,
+            Status = MethodologyApprovalStatus.Approved,
         };
 
         private static readonly Publication OwningPublication = new()

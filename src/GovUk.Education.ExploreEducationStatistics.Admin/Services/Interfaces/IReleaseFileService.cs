@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,18 +42,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             IEnumerable<Guid>? fileIds = null,
             CancellationToken cancellationToken = default);
 
-        Task<Either<ActionResult, Unit>> Update(Guid releaseId, Guid fileId, ReleaseFileUpdateViewModel update);
+        Task<Either<ActionResult, Unit>> UpdateDataFileDetails(Guid releaseId, Guid fileId, ReleaseDataFileUpdateRequest update);
 
         Task<Either<ActionResult, IEnumerable<FileInfo>>> GetAncillaryFiles(Guid releaseId);
 
         Task<Either<ActionResult, FileInfo>> UploadAncillary(
             Guid releaseId,
-            ReleaseAncillaryFileUploadViewModel upload);
+            ReleaseAncillaryFileUploadRequest upload);
 
-        Task<Either<ActionResult, FileInfo>> ReplaceAncillary(
+        Task<Either<ActionResult, FileInfo>> UpdateAncillary(
             Guid releaseId,
             Guid fileId,
-            IFormFile newFile);
+            ReleaseAncillaryFileUpdateRequest request);
 
         Task<Either<ActionResult, FileInfo>> UploadChart(Guid releaseId,
             IFormFile formFile,

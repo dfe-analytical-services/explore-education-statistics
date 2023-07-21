@@ -5,7 +5,7 @@ import { Formik } from 'formik';
 import React, { useMemo } from 'react';
 import { InviteUserPublicationRole } from '@admin/pages/users/UserInvitePage';
 import ButtonText from '@common/components/ButtonText';
-import { keyBy } from 'lodash';
+import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import { PublicationSummary } from '@common/services/publicationService';
 

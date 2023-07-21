@@ -59,6 +59,77 @@ Validate checklist errors and warnings after adding headline text block
     user checks page does not contain testid    releaseChecklist-errors
     user checks page does not contain testid    releaseChecklist-success
 
+Add empty Summary section text block to the page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user clicks button    Add a summary text block    id:releaseSummary
+    user waits until element contains    id:releaseSummary    This section is empty    %{WAIT_SMALL}
+
+Add content section with empty content block to the page
+    user creates new content section    1    Test section one
+    user adds text block to editable accordion section    Test section one    id:releaseMainContent
+
+Add empty content section to the page
+    user creates new content section    2    Test section two
+
+Add empty Related dashboards section text block to the page
+    user clicks button    Add dashboards section
+    user waits until page contains accordion section    View related dashboard(s)
+
+Validate checklist errors and warnings after adding empty content sections
+    user edits release status
+
+    user checks checklist warnings contains
+    ...    4 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
+    user checks checklist warnings contains link    No next expected release date has been added
+    user checks checklist warnings contains link    No data files uploaded
+    user checks checklist warnings contains link    A public pre-release access list has not been created
+
+    user checks checklist errors contains
+    ...    4 issues that must be resolved before this release can be published.
+    user checks checklist errors contains link
+    ...    Release content should not contain an empty summary section
+    user checks checklist errors contains link
+    ...    Release content should not contain any empty sections
+    user checks checklist errors contains link
+    ...    Release content should not contain empty text blocks
+    user checks checklist errors contains link
+    ...    Release content should not contain an empty related dashboards section
+
+Add content to text block in Summary section
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds content to summary text block
+    ...    Summary test text
+
+Add content to text block in Test section one
+    user opens accordion section    Test section one    id:releaseMainContent
+    user adds content to autosaving accordion section text block    Test section one    1
+    ...    Test section one text    id:releaseMainContent
+
+Add text block with content to Test section two
+    user opens accordion section    Test section two    id:releaseMainContent
+    user adds text block to editable accordion section    Test section two    id:releaseMainContent
+    user adds content to autosaving accordion section text block    Test section two    1
+    ...    Test section two text    id:releaseMainContent
+
+Add content to text block in Related dashboards section
+    user opens accordion section    View related dashboard(s)    id:data-accordion
+    user adds content to autosaving text block    id:related-dashboards-content
+    ...    Related dashboards test text
+
+Validate checklist errors and warnings after adding content to text blocks
+    user edits release status
+
+    user checks checklist warnings contains
+    ...    4 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
+    user checks checklist warnings contains link    No next expected release date has been added
+    user checks checklist warnings contains link    No data files uploaded
+    user checks checklist warnings contains link    A public pre-release access list has not been created
+
+    user checks page does not contain testid    releaseChecklist-errors
+    user checks page does not contain testid    releaseChecklist-success
+
 Submit release for Higher Review
     user clicks radio    Ready for higher review (this will notify approvers)
     user enters text into element    id:releaseStatusForm-internalReleaseNote    Submitted for Higher Review

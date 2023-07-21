@@ -27,7 +27,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
@@ -2021,6 +2021,201 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.NotNull(
                     await context.Methodologies.AsQueryable()
                         .SingleAsync(m => m.Id == unrelatedMethodologyId));
+            }
+        }
+
+        [Fact]
+        public async Task GetMethodologyStatuses()
+        {
+            var methodologyId = Guid.NewGuid();
+            var unrelatedMethodologyId = Guid.NewGuid();
+
+            var methodology = new Methodology
+            {
+                Id = methodologyId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = ListOf(
+                    new MethodologyVersion
+                    {
+                        PublishingStrategy = Immediately,
+                        Status = Draft,
+                        Version = 0,
+                    },
+                    new MethodologyVersion
+                    {
+                        PublishingStrategy = WithRelease,
+                        Status = Approved,
+                        Version = 1,
+                    }
+                ),
+            };
+
+            var unrelatedMethodology = new Methodology
+            {
+                Id = unrelatedMethodologyId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = ListOf(new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+
+            var methodologyStatuses = new List<MethodologyStatus>
+            {
+                new()
+                {
+                    MethodologyVersion = methodology.Versions[0],
+                    InternalReleaseNote = "Status 1 note",
+                    ApprovalStatus = Approved,
+                    Created = new DateTime(2000, 1, 1),
+                    CreatedById = UserId,
+                },
+                new()
+                {
+                    MethodologyVersion = methodology.Versions[1],
+                    InternalReleaseNote = "Status 2 note",
+                    ApprovalStatus = Approved,
+                    Created = new DateTime(2001, 1, 1),
+                    CreatedById = UserId,
+                },
+                new()
+                {
+                    MethodologyVersion = unrelatedMethodology.Versions[0],
+                    InternalReleaseNote = "Unrelated note",
+                    ApprovalStatus = Approved,
+                    Created = new DateTime(2002, 1, 1),
+                    CreatedById = Guid.NewGuid(),
+                }
+            };
+
+            var user = new User
+            {
+                Id = UserId,
+                Email = "test@test.com",
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddRangeAsync(methodology, unrelatedMethodology);
+                await context.MethodologyStatus.AddRangeAsync(methodologyStatuses);
+                await context.Users.AddAsync(user);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+
+                var result = await service.GetMethodologyStatuses(methodology.Versions[0].Id);
+
+                var statuses = result.AssertRight();
+
+                Assert.NotNull(statuses);
+                Assert.Equal(2, statuses.Count);
+
+                Assert.Equal(methodologyStatuses[1].Id, statuses[0].MethodologyStatusId); // because OrderByDesc
+                Assert.Equal(1, statuses[0].MethodologyVersion);
+                Assert.Equal(methodologyStatuses[1].InternalReleaseNote, statuses[0].InternalReleaseNote);
+                Assert.Equal(methodologyStatuses[1].ApprovalStatus, statuses[0].ApprovalStatus);
+                Assert.Equal(methodologyStatuses[1].Created, statuses[0].Created);
+                Assert.Equal("test@test.com", statuses[0].CreatedByEmail);
+
+                Assert.Equal(methodologyStatuses[0].Id, statuses[1].MethodologyStatusId);
+                Assert.Equal(0, statuses[1].MethodologyVersion);
+                Assert.Equal(methodologyStatuses[0].InternalReleaseNote, statuses[1].InternalReleaseNote);
+                Assert.Equal(methodologyStatuses[0].ApprovalStatus, statuses[1].ApprovalStatus);
+                Assert.Equal(methodologyStatuses[0].Created, statuses[1].Created);
+                Assert.Equal("test@test.com", statuses[1].CreatedByEmail);
+            }
+        }
+
+        [Fact]
+        public async Task GetMethodologyStatuses_NoMethodologyVersion()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+
+                var result = await service.GetMethodologyStatuses(Guid.NewGuid());
+
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task GetMethodologyStatuses_NoStatuses()
+        {
+            var methodologyId = Guid.NewGuid();
+            var unrelatedMethodologyId = Guid.NewGuid();
+
+            var methodology = new Methodology
+            {
+                Id = methodologyId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = ListOf(
+                    new MethodologyVersion
+                    {
+                        PublishingStrategy = Immediately,
+                        Status = Draft,
+                    },
+                    new MethodologyVersion
+                    {
+                        PublishingStrategy = WithRelease,
+                        Status = Approved,
+                    }
+                ),
+            };
+
+            var unrelatedMethodology = new Methodology
+            {
+                Id = unrelatedMethodologyId,
+                Slug = "pupil-absence-statistics-methodology",
+                OwningPublicationTitle = "Pupil absence statistics: methodology",
+                Versions = ListOf(new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    PublishingStrategy = Immediately,
+                    Status = Draft
+                })
+            };
+
+            var methodologyStatuses = new List<MethodologyStatus>
+            {
+                new()
+                {
+                    MethodologyVersion = unrelatedMethodology.Versions[0],
+                    InternalReleaseNote = "Unrelated note",
+                    ApprovalStatus = Approved,
+                    Created = new DateTime(2002, 1, 1),
+                    CreatedById = Guid.NewGuid(),
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Methodologies.AddRangeAsync(methodology, unrelatedMethodology);
+                await context.MethodologyStatus.AddRangeAsync(methodologyStatuses);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+
+                var result = await service.GetMethodologyStatuses(methodology.Versions[0].Id);
+
+                var statuses = result.AssertRight();
+
+                Assert.NotNull(statuses);
+                Assert.Empty(statuses);
             }
         }
 

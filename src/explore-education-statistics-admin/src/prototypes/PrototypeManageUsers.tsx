@@ -150,6 +150,7 @@ const PrototypeManageUsers = () => {
                   {userList.map((item, index) => (
                     <div
                       className="dfe-flex dfe-flex-wrap dfe-align-items--center dfe-justify-content--space-between dfe-flex-underline"
+                      // eslint-disable-next-line react/no-array-index-key
                       key={index.toString()}
                     >
                       <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">{`${item.name} ${item.surname}`}</h2>
@@ -274,11 +275,13 @@ const PrototypeManageUsers = () => {
                 Previous releases
               </h2>
               {currentReleases.slice(1).map((item, index) => (
+                // eslint-disable-next-line react/no-array-index-key
                 <div key={index.toString()}>
                   <Details summary={item}>
                     {userList.map((item2, index2) => (
                       <div
                         className="dfe-flex dfe-flex-wrap dfe-align-items--center dfe-justify-content--space-between dfe-flex-underline"
+                        // eslint-disable-next-line react/no-array-index-key
                         key={index2.toString()}
                       >
                         <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">{`${item2.name} ${item2.surname}`}</h2>
@@ -347,6 +350,7 @@ const PrototypeManageUsers = () => {
                             ? 'dfe-flex-underline'
                             : ''
                         }`}
+                        // eslint-disable-next-line react/no-array-index-key
                         key={index.toString()}
                       >
                         <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">

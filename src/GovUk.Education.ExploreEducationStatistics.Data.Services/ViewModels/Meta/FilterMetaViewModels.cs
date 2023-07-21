@@ -14,6 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         // TODO EES-3755 Change Name to not be nullable after Permalink snapshot work is complete.
         // This type within Permalinks created before EES-613 has no Name.
         public string? Name { get; init; } = string.Empty;
+        public string? GroupCsvColumn { get; init; }
         public Guid? TotalValue { get; init; }
         public int Order { get; init; }
 
@@ -25,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
             Hint = filter.Hint;
             Legend = filter.Label;
             Name = filter.Name;
+            GroupCsvColumn = filter.GroupCsvColumn;
             TotalValue = totalFilterItemId;
             Order = order;
         }

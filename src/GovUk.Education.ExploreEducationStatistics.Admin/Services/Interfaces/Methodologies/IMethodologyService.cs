@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies
@@ -34,5 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, MethodologyVersionViewModel>> UpdateMethodology(
             Guid methodologyVersionId,
             MethodologyUpdateRequest request);
+
+        Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
+            MethodologyVersion methodologyVersion);
+
+        Task<Either<ActionResult, List<MethodologyStatusViewModel>>> GetMethodologyStatuses(Guid methodologyVersionId);
     }
 }

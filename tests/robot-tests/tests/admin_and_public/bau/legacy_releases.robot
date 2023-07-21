@@ -103,9 +103,6 @@ Validate public frontend shows changes made to legacy release after saving publi
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
-    user reloads the stale cached page
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
-
     user opens details dropdown    View releases (1)
 
     ${other_releases}=    user gets details content element    View releases (1)

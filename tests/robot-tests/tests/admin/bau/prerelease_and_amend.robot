@@ -151,12 +151,10 @@ Add release note to amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note
 
-Check that Pre-release users and Public access list are empty in new amendment
+Check amendment has no prerelease users
     user clicks link    Pre-release access
     user waits until h2 is visible    Manage pre-release user access
     user checks page contains    No pre-release users have been invited.
-    user clicks link    Public access list
-    user checks page does not contain    Initial test public access list
 
 Check that there is no Pre-release warning text on the sign off page during amendment
     user clicks link    Sign off
@@ -190,10 +188,10 @@ Invite Pre-release users during amendment
     user checks list item contains    testid:invitableList    2    EES-test.ANALYST1@education.gov.uk    ${modal}
     user clicks button    Confirm
 
-Create public prerelease access list for amendment
-    user clicks link    Pre-release access
-    user waits until h2 is visible    Manage pre-release user access
-    user creates public prerelease access list    Amended test public access list
+Check amendment has original release's public access list and then update
+    user clicks link    Public access list
+    user checks page contains    Initial test public access list
+    user updates public prerelease access list    Amended test public access list
 
 Validate prerelease has not started for Analyst user during amendment as it is still in draft
     ${current_url}=    get location

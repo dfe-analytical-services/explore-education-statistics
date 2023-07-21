@@ -704,11 +704,14 @@ Add release note to first amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Create public prerelease access list for amendment
+Check public prerelease access list for amendment is same as original release
     user clicks link    Pre-release access
     user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
-    user creates public prerelease access list    Amended public access list
+    user checks page contains    Test public access list
+
+Update public prerelease access list
+    user updates public prerelease access list    Amended public access list
 
 Approve amendment for scheduled release
     ${days_until_release}=    set variable    1
@@ -735,9 +738,6 @@ Verify amendment is on Find Statistics page again
 
 Navigate to amendment release page
     user clicks link    ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
-
-    user reloads the stale cached page
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
     user waits until page contains title caption    ${RELEASE_NAME}
@@ -955,9 +955,6 @@ Verify published date on publication page has been updated
 Navigate to amended public release
     user waits for caches to expire
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
-
-    user reloads the stale cached page
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Verify public published date has been updated
