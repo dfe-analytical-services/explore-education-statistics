@@ -131,6 +131,12 @@
   position: relative;
   //padding: 1rem;
 }
+.prototypeCardChevronOneHalf {
+  border-top: 1px solid $govuk-border-colour;
+  flex: 0 1 48%;
+  padding: 1rem 1.5rem 1rem 0;
+  position: relative;
+}
 .prototypeCardNoBorder {
   border: 0;
 }
@@ -465,13 +471,13 @@
   position: sticky;
   top: 1rem;
 
-  @include govuk-media-query($until: desktop) {
+  /* @include govuk-media-query($until: desktop) {
     display: none;
-  }
+  } */
 }
 
 .stickyLinks {
-  border-right: 2px solid $govuk-link-colour;
+  //border-right: 2px solid $govuk-link-colour;
   margin-right: 1rem;
   max-width: 250px;
   padding-right: 1rem;
@@ -552,4 +558,8 @@
 
 :global(.govuk-tabs__panel) {
   scroll-margin-top: 10rem;
+}
+
+:global(.govuk-heading-l) {
+  scroll-margin-top: 1rem;
 }
