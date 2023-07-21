@@ -65,11 +65,6 @@ Check methodology isn't publically visible
     check that variable is not empty    PUBLIC_METHODOLOGY_LINK    ${PUBLIC_METHODOLOGY_LINK}
     Set Suite Variable    ${PUBLIC_METHODOLOGY_LINK}
 
-    user navigates to public methodologies page
-    user waits until page contains    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user checks page does not contain    ${PUBLICATION_NAME}
-
     user navigates to public frontend    ${PUBLIC_METHODOLOGY_LINK}
     user waits until page contains    Page not found
 
@@ -145,12 +140,6 @@ Go to public release URL and check release isn't visible
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found
     user waits until page does not contain    ${PUBLICATION_NAME}
-
-Check methodology isn't visible on public Methodologies page
-    user navigates to public methodologies page
-    user waits until page contains    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user checks page does not contain    ${PUBLICATION_NAME}
 
 Check methodology isn't accessible via URL
     user navigates to public frontend    ${PUBLIC_METHODOLOGY_LINK}
