@@ -10,7 +10,9 @@ import {
   methodologySummaryEditRoute,
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
-import methodologyService from '@admin/services/methodologyService';
+import methodologyService, {
+  MethodologyApprovalStatus,
+} from '@admin/services/methodologyService';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -109,7 +111,7 @@ const MethodologyPage = ({
               </div> */}
             </div>
 
-            <Tag>{methodology.status}</Tag>
+            <Tag>{getMethodologyApprovalStatusLabel(methodology.status)}</Tag>
 
             {methodology.amendment && (
               <Tag className="govuk-!-margin-left-2">Amendment</Tag>
@@ -154,6 +156,21 @@ const MethodologyPage = ({
       </LoadingSpinner>
     </Page>
   );
+};
+
+const getMethodologyApprovalStatusLabel = (
+  approvalStatus: MethodologyApprovalStatus,
+) => {
+  switch (approvalStatus) {
+    case 'Draft':
+      return 'Draft';
+    case 'HigherLevelReview':
+      return 'In Review';
+    case 'Approved':
+      return 'Approved';
+    default:
+      return undefined;
+  }
 };
 
 export default MethodologyPage;

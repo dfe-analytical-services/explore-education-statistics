@@ -26,6 +26,8 @@ const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
 >;
 
+// @MarkFix Add tests for methodology status history
+// @MarkFix Should I have removed Internal note SummaryListItem from MethodologyStatusPage?
 describe('MethodologyStatusPage', () => {
   // @MarkFix add tests for HigherLevelReview
   // @MarkFix review existing tests and update if necessary
@@ -72,7 +74,6 @@ describe('MethodologyStatusPage', () => {
     });
 
     expect(screen.getByTestId('Status')).toHaveTextContent('In Draft');
-    expect(screen.queryByTestId('Internal note-key')).not.toBeInTheDocument();
     expect(screen.queryByTestId('When to publish-key')).not.toBeInTheDocument();
     expect(
       screen.queryByTestId('Publish with release-key'),
@@ -100,13 +101,6 @@ describe('MethodologyStatusPage', () => {
     });
 
     expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
-
-    expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
-      'Internal note',
-    );
-    expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
-      'Test internal release note',
-    );
 
     expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
       'When to publish',
@@ -145,13 +139,6 @@ describe('MethodologyStatusPage', () => {
     });
 
     expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
-
-    expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
-      'Internal note',
-    );
-    expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
-      'Test internal release note',
-    );
 
     expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
       'When to publish',

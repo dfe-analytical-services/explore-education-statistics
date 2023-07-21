@@ -12,7 +12,6 @@ import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWith
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import { MethodologySummary } from '@common/services/types/methodology';
 import uniqBy from 'lodash/uniqBy';
 
 interface Props {

@@ -28,6 +28,7 @@ interface FormValues {
 
 const statusMap: Dictionary<string> = {
   Draft: 'In Draft',
+  HigherLevelReview: 'Awaiting higher review',
   Approved: 'Approved',
 };
 
@@ -54,7 +55,7 @@ const MethodologyStatusPage = () => {
     refetch: refreshPermissions,
     isLoading,
   } = useQuery(
-    permissionQueries.canUpdateMethodologyApprovalStatus(methodologyId),
+    permissionQueries.canUpdateMethodologyApprovalStatus(currentMethodology.id),
   );
 
   const handleSubmit = async ({
@@ -119,9 +120,6 @@ const MethodologyStatusPage = () => {
                 </SummaryListItem>
                 {currentMethodology.status === 'Approved' && (
                   <>
-                    <SummaryListItem term="Internal note">
-                      {currentMethodology.internalReleaseNote}
-                    </SummaryListItem>
                     <SummaryListItem term="When to publish">
                       {currentMethodology.publishingStrategy === 'WithRelease'
                         ? 'With a specific release'
@@ -219,6 +217,7 @@ const MethodologyStatusPage = () => {
           ) : (
             <MethodologyStatusEditPage
               methodology={currentMethodology}
+              statusPermissions={permissions}
               onCancel={toggleForm.off}
               onSubmit={handleSubmit}
             />

@@ -122,15 +122,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 _userService.CheckCanUpdateMethodologyVersion);
         }
 
-        public record MethodologyApprovalStatusPermissions
-        {
-            public bool CanMarkDraft = false;
-            public bool CanMarkHigherLevelReview = false;
-            public bool CanMarkApproved = false;
-        }
+        public record MethodologyApprovalStatusPermissions(
+            bool CanMarkDraft, bool CanMarkHigherLevelReview, bool CanMarkApproved);
 
-        [HttpGet("permissions/methodology/{methodologyId:guid}/status")]
-        public async Task<ActionResult<MethodologyApprovalStatusPermissions>> CanUpdateMethodologyApprovalStatus(Guid methodologyVersionId)
+        [HttpGet("permissions/methodology/{methodologyVersionId:guid}/status")]
+        public async Task<ActionResult<MethodologyApprovalStatusPermissions>> CanUpdateMethodologyApprovalStatus(
+            Guid methodologyVersionId)
         {
             return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(methodologyVersionId)
                 .OnSuccess(async methodologyVersion =>
@@ -143,23 +140,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                         .CheckCanApproveMethodologyVersion(methodologyVersion);
 
                     return new MethodologyApprovalStatusPermissions
-                    {
-                        CanMarkDraft = canMarkDraft.IsRight,
-                        CanMarkHigherLevelReview = canMarkHigherLevelReview.IsRight,
-                        CanMarkApproved = canMarkApproved.IsRight,
-                    };
+                    (
+                        CanMarkDraft: canMarkDraft.IsRight,
+                        CanMarkHigherLevelReview: canMarkHigherLevelReview.IsRight,
+                        CanMarkApproved: canMarkApproved.IsRight
+                    );
                 })
-                .OrElse (() => new MethodologyApprovalStatusPermissions());
+                .OrElse (() => new MethodologyApprovalStatusPermissions(
+                    false, false, false));
         }
 
-        [HttpGet("permissions/methodology/{methodologyId:guid}/status/draft")]
+        [HttpGet("permissions/methodology/{methodologyId:guid}/status/draft")] // @MarkFix can be removed?
         public Task<ActionResult<bool>> CanMarkMethodologyAsDraft(Guid methodologyId)
         {
             return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
                 _userService.CheckCanMarkMethodologyVersionAsDraft);
         }
 
-        [HttpGet("permissions/methodology/{methodologyId:guid}/status/approve")]
+        [HttpGet("permissions/methodology/{methodologyId:guid}/status/approve")] // @MarkFix can be removed?
         public Task<ActionResult<bool>> CanApproveMethodology(Guid methodologyId)
         {
             return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
