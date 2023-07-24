@@ -41,6 +41,7 @@ import PrototypeDataSelected from './PrototypeDataSelected';
 import PrototypeDataSelected2 from './PrototypeDataSelected2';
 import PrototypeDataSelected3 from './PrototypeDataSelected3';
 import PrototypeDataSelected4 from './PrototypeDataSelected4';
+import PrototypeDataSelected5 from './PrototypeDataSelected5';
 import PrototypeMethodology from './PrototypeMethodology';
 import PrototypeDashboard from './PrototypeDashboard';
 import PrototypeDashboard2 from './PrototypeDashboard2';
@@ -233,6 +234,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Dataset selected4',
     path: '/prototypes/data-selected4',
     component: PrototypeDataSelected4,
+  },
+  {
+    name: 'Dataset selected5',
+    path: '/prototypes/data-selected5',
+    component: PrototypeDataSelected5,
   },
   {
     name: 'Methodology',

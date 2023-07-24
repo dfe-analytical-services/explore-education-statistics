@@ -560,6 +560,14 @@
   scroll-margin-top: 10rem;
 }
 
-:global(.govuk-heading-l) {
+.sectionScroll {
   scroll-margin-top: 1rem;
+}
+
+:global(.govuk-pagination--block) {
+  margin-top: 5rem;
+}
+
+:global(.govuk-pagination__link-title) {
+  margin-left: 0.3rem;
 }
