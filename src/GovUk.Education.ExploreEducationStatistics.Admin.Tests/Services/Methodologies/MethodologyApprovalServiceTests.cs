@@ -33,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyApprovalServiceTests
     {
+        // @MarkFix add/update tests for higher review stuff
         private static readonly Guid UserId = Guid.NewGuid();
 
         [Fact]
@@ -1040,7 +1041,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyImageService? methodologyImageService = null,
             IPublishingService? publishingService = null,
             IUserService? userService = null,
-            IMethodologyCacheService? methodologyCacheService = null)
+            IUserReleaseRoleService? userReleaseRoleService = null,
+            IMethodologyCacheService? methodologyCacheService = null,
+            IEmailTemplateService? emailTemplateService = null)
+
         {
             return new(
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
@@ -1051,7 +1055,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
                 userService ?? AlwaysTrueUserService(UserId).Object,
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
+                userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict));
         }
     }
 }

@@ -208,6 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result.AssertRight();
         }
 
+        // @MarkFix methodology higher review test here
+
         private static Mock<IConfiguration> ConfigurationMock()
         {
             return CreateMockConfiguration(
@@ -215,6 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 TupleOf("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
                 TupleOf("NotifyReleaseRoleTemplateId", "release-role-template-id"),
                 TupleOf("NotifyHigherReviewersTemplateId", "notify-higher-reviewers-template-id"),
+                TupleOf("NotifyMethodologyHigherReviewersTemplateId", "notify-methodology-higher-reviewers-template-id"),
                 TupleOf("AdminUri", "admin-uri"));
         }
 

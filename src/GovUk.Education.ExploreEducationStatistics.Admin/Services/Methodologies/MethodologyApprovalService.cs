@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -19,7 +20,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -33,7 +33,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
+        private readonly IUserReleaseRoleService _userReleaseRoleService;
         private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IEmailTemplateService _emailTemplateService;
 
         public MethodologyApprovalService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -43,8 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
-            IUserService userService, 
-            IMethodologyCacheService methodologyCacheService)
+            IUserService userService,
+            IUserReleaseRoleService userReleaseRoleService,
+            IMethodologyCacheService methodologyCacheService,
+            IEmailTemplateService emailTemplateService)
         {
             _persistenceHelper = persistenceHelper;
             _context = context;
@@ -54,7 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
+            _userReleaseRoleService = userReleaseRoleService;
             _methodologyCacheService = methodologyCacheService;
+            _emailTemplateService = emailTemplateService;
         }
 
         public async Task<Either<ActionResult, MethodologyVersion>> UpdateApprovalStatus(
@@ -119,8 +125,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             await _methodologyCacheService.UpdateSummariesTree();
                         }
 
+                        if (request.Status == MethodologyApprovalStatus.HigherLevelReview)
+                        {
+                            await NotifyApprovers(methodologyVersion);
+                        }
+
                         return methodologyVersion;
                     });
+        }
+
+        private async Task NotifyApprovers(MethodologyVersion methodologyVersion)
+        {
+            var owningPublicationId = await _context.PublicationMethodologies
+                .Where(pm => pm.MethodologyId == methodologyVersion.MethodologyId
+                && pm.Owner)
+                .Select(pm => pm.PublicationId)
+                .SingleAsync();
+
+            var userReleaseRoles = await _userReleaseRoleService
+                .ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId);
+
+            var userPublicationRoles = await _context.UserPublicationRoles
+                .Include(upr => upr.User)
+                .Where(upr => owningPublicationId == upr.PublicationId
+                              && upr.Role == PublicationRole.Approver)
+                .ToListAsync();
+
+            var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
+            if (notifyHigherReviewers)
+            {
+                userReleaseRoles.Select(urr => urr.User.Email)
+                    .Concat(userPublicationRoles.Select(upr => upr.User.Email))
+                    .Distinct()
+                    .ForEach(email =>
+                    {
+                        _emailTemplateService.SendMethodologyHigherReviewEmail(email, methodologyVersion.Id, methodologyVersion.Title);
+                    });
+            }
         }
 
         private async Task<Either<ActionResult, Unit>> CheckMethodologyCanDependOnRelease(

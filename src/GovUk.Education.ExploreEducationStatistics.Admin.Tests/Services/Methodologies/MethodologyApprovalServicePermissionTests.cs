@@ -81,7 +81,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyImageService? methodologyImageService = null,
             IPublishingService? publishingService = null,
             IUserService? userService = null,
-            IMethodologyCacheService? methodologyCacheService = null)
+            IUserReleaseRoleService? userReleaseRoleService = null,
+            IMethodologyCacheService? methodologyCacheService = null,
+            IEmailTemplateService? emailTemplateService = null)
         {
             return new(
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
@@ -92,7 +94,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
                 userService ?? Mock.Of<IUserService>(),
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
+                userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict));
         }
         
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()

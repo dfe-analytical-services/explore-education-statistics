@@ -155,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 MarkMethodologyAsHigherLevelReviewRequirement requirement,
                 MethodologyVersion methodologyVersion)
             {
-                // If the Methodology is already public, it cannot be marked as draft
+                // If the Methodology is already public, it cannot be marked for higher level review
                 if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
                 {
                     return;
