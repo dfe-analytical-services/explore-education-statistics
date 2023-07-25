@@ -20,19 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var glossaryEntries = new List<GlossaryCategoryViewModel>
             {
-                new()
-                {
-                    Heading = "Glossary Category 1",
-                    Entries = new List<GlossaryEntryViewModel>
+                new(
+                    Heading: 'A',
+                    Entries: new List<GlossaryEntryViewModel>
                     {
-                        new()
-                        {
-                            Body = "A body",
-                            Slug = "A slug",
-                            Title = "A title"
-                        }
-                    }
-                }
+                        new(
+                            Body: "A body",
+                            Slug: "A slug",
+                            Title: "A title")
+                    })
             };
 
             var (controller, mocks) = BuildControllerAndDependencies();
@@ -50,12 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task GetGlossaryEntry()
         {
-            var glossaryEntry = new GlossaryEntryViewModel
-            {
-                Body = "A body",
-                Slug = "A slug",
-                Title = "A title"
-            };
+            var glossaryEntry = new GlossaryEntryViewModel(
+                Body: "A body",
+                Slug: "A slug",
+                Title: "A title"
+            );
 
             var (controller, mocks) =
                 BuildControllerAndDependencies();

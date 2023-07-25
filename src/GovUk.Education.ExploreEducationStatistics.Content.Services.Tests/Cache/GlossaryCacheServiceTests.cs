@@ -19,7 +19,12 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
 {
     private readonly List<GlossaryCategoryViewModel> _glossary = new()
     {
-        new GlossaryCategoryViewModel()
+        new GlossaryCategoryViewModel(
+            Heading: 'A',
+            Entries: new List<GlossaryEntryViewModel>
+            {
+                new(Title: "A title", Slug: "A slug", Body: "A body")
+            })
     };
 
     [Fact]
@@ -93,19 +98,16 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
     [Fact]
     public void GlossaryCategoryViewModel_SerializeAndDeserialize()
     {
-        var original = new GlossaryCategoryViewModel
-        {
-            Heading = "Glossary Category 1",
-            Entries = new List<GlossaryEntryViewModel>
+        var original = new GlossaryCategoryViewModel(
+            Heading: 'A',
+            Entries: new List<GlossaryEntryViewModel>
             {
-                new()
-                {
-                    Body = "A body",
-                    Slug = "A slug",
-                    Title = "A title"
-                }
-            }
-        };
+                new(
+                    Body: "A body",
+                    Slug: "A slug",
+                    Title: "A title"
+                )
+            });
 
         var converted = DeserializeObject<GlossaryCategoryViewModel>(SerializeObject(original));
         converted.AssertDeepEqualTo(original);
