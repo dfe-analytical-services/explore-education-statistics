@@ -1,4 +1,5 @@
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
+import PrototypePrevNextNav from '@admin/prototypes/components/PrototypePrevNextNav';
 import React, { useState } from 'react';
 import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
@@ -19,6 +20,11 @@ const PrototypeHomepage = () => {
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
   const [dataType, setDataType] = useState(urlDataType || 'api');
   const [sectionSelected, setSectionSelected] = useState('dataSummary');
+  const [sectionShowAll, setSectionShowAll] = useState(false);
+
+  const changeSectionState = (newSection: string) => {
+    setSectionSelected(newSection);
+  };
 
   window.addEventListener('DOMContentLoaded', () => {
     alert('hello');
@@ -142,7 +148,6 @@ const PrototypeHomepage = () => {
                           )}
                           href="#dataSummary"
                           onClick={e => {
-                            e.preventDefault();
                             setSectionSelected('dataSummary');
                           }}
                         >
@@ -161,7 +166,6 @@ const PrototypeHomepage = () => {
                           )}
                           href="#dataPreview"
                           onClick={e => {
-                            e.preventDefault();
                             setSectionSelected('dataPreview');
                           }}
                         >
@@ -180,7 +184,6 @@ const PrototypeHomepage = () => {
                           )}
                           href="#changelog"
                           onClick={e => {
-                            e.preventDefault();
                             setSectionSelected('changelog');
                           }}
                         >
@@ -199,7 +202,6 @@ const PrototypeHomepage = () => {
                           )}
                           href="#versionHistory"
                           onClick={e => {
-                            e.preventDefault();
                             setSectionSelected('versionHistory');
                           }}
                         >
@@ -218,7 +220,6 @@ const PrototypeHomepage = () => {
                           )}
                           href="#endPoints"
                           onClick={e => {
-                            e.preventDefault();
                             setSectionSelected('endPoints');
                           }}
                         >
@@ -237,7 +238,6 @@ const PrototypeHomepage = () => {
                           )}
                           href="#download"
                           onClick={e => {
-                            e.preventDefault();
                             setSectionSelected('download');
                           }}
                         >
@@ -260,12 +260,33 @@ const PrototypeHomepage = () => {
                         </a>
                       </li>
                     </ul>
+
+                    <h3 className="govuk-heading-s">Page view</h3>
+                    <ul className="govuk-list  govuk-list--spaced">
+                      <li>
+                        <a
+                          className={classNames(
+                            'govuk-link--no-visited-state',
+                            styles.prototypeLinkNoUnderline,
+                          )}
+                          href="#"
+                          onClick={e => {
+                            e.preventDefault();
+                            setSectionShowAll(!sectionShowAll);
+                          }}
+                        >
+                          {sectionShowAll
+                            ? 'Show as individual sections'
+                            : 'Show all sections on page'}
+                        </a>
+                      </li>
+                    </ul>
                   </div>
                 </div>
               </div>
             </div>
             <div className="govuk-grid-column-three-quarters">
-              {sectionSelected === 'dataSummary' && (
+              {(sectionShowAll || sectionSelected === 'dataSummary') && (
                 <section id="dataSummary" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l govuk-!-margin-top-0 ">
                     Data set summary
@@ -337,41 +358,20 @@ const PrototypeHomepage = () => {
                           Standard /Framework flag
                                 </SummaryListItem> */}
                   </SummaryList>
-
-                  <nav className="govuk-pagination govuk-pagination--block">
-                    <div className="govuk-pagination__next">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('dataPreview');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--next"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Next
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          Data preview
-                        </span>
-                      </a>
-                    </div>
-                  </nav>
+                  {!sectionShowAll && (
+                    <PrototypePrevNextNav
+                      changeSectionState={changeSectionState}
+                      nextId="dataPreview"
+                      nextTitle="Data preview"
+                    />
+                  )}
+                  {sectionShowAll && (
+                    <hr className="govuk-visibility-hidden govuk-!-margin-bottom-9" />
+                  )}
                 </section>
               )}
 
-              {sectionSelected === 'dataPreview' && (
+              {(sectionShowAll || sectionSelected === 'dataPreview') && (
                 <section id="dataPreview" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l" id="dataPreview">
                     Data preview
@@ -552,67 +552,19 @@ const PrototypeHomepage = () => {
                     </a>
                   </div>
 
-                  <nav className="govuk-pagination govuk-pagination--block">
-                    <div className="govuk-pagination__prev">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('dataSummary');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--prev"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Previous
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          Data set summary
-                        </span>
-                      </a>
-                    </div>
-                    <div className="govuk-pagination__next">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('changelog');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--next"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Next
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          Changelog
-                        </span>
-                      </a>
-                    </div>
-                  </nav>
+                  {!sectionShowAll && (
+                    <PrototypePrevNextNav
+                      changeSectionState={changeSectionState}
+                      nextId="changelog"
+                      nextTitle="Changelog"
+                      prevId="dataSummary"
+                      prevTitle="Data set summary"
+                    />
+                  )}
+                  {sectionShowAll && <hr className="govuk-!-margin-bottom-9" />}
                 </section>
               )}
-              {sectionSelected === 'changelog' && (
+              {(sectionShowAll || sectionSelected === 'changelog') && (
                 <section id="changelog" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l">Changelog</h2>
                   <h4>
@@ -710,72 +662,24 @@ const PrototypeHomepage = () => {
                       sessions
                     </li>
                   </ul>
-                  <nav className="govuk-pagination govuk-pagination--block">
-                    <div className="govuk-pagination__prev">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('dataPreview');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--prev"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Previous
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          Data preview
-                        </span>
-                      </a>
-                    </div>
-                    <div className="govuk-pagination__next">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('versionHistory');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--next"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Next
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          Version history
-                        </span>
-                      </a>
-                    </div>
-                  </nav>
+                  {!sectionShowAll && (
+                    <PrototypePrevNextNav
+                      changeSectionState={changeSectionState}
+                      prevId="dataPreview"
+                      prevTitle="Data preview"
+                      nextId="versionHistory"
+                      nextTitle="Version history"
+                    />
+                  )}
+                  {sectionShowAll && <hr className="govuk-!-margin-bottom-9" />}
                 </section>
               )}
-              {sectionSelected === 'versionHistory' && (
+              {(sectionShowAll || sectionSelected === 'versionHistory') && (
                 <section id="versionHistory" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l" id="versionHistory">
                     Version history
                   </h2>
-                  <table>
+                  <table className="govuk-!-margin-bottom-9">
                     <caption className="govuk-visually-hidden">
                       <h3>API data set version history</h3>
                     </caption>
@@ -839,67 +743,18 @@ const PrototypeHomepage = () => {
                       </tr>
                     </tbody>
                   </table>
-                  <nav className="govuk-pagination govuk-pagination--block">
-                    <div className="govuk-pagination__prev">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('changelog');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--prev"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Previous
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          Changelog
-                        </span>
-                      </a>
-                    </div>
-                    <div className="govuk-pagination__next">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('endPoints');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--next"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Next
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          API end points quick start
-                        </span>
-                      </a>
-                    </div>
-                  </nav>
+                  {!sectionShowAll && (
+                    <PrototypePrevNextNav
+                      changeSectionState={changeSectionState}
+                      nextId="endPoints"
+                      nextTitle="API endpoints quick start"
+                      prevId="changelog"
+                      prevTitle="Changelog"
+                    />
+                  )}
                 </section>
               )}
-              {sectionSelected === 'endPoints' && (
+              {(sectionShowAll || sectionSelected === 'endPoints') && (
                 <section id="endPoints" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l">API endpoints quick start</h2>
                   <div className="govuk-inset-text">
@@ -963,67 +818,19 @@ const PrototypeHomepage = () => {
                   <a href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/endpoints/QueryDataSetPost/">
                     Guidance, query data set (POST)
                   </a>
-                  <nav className="govuk-pagination govuk-pagination--block">
-                    <div className="govuk-pagination__prev">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('versionHistory');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--prev"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Previous
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          Version history
-                        </span>
-                      </a>
-                    </div>
-                    <div className="govuk-pagination__next">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('download');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--next"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m8.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Next
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          Download data or create tables
-                        </span>
-                      </a>
-                    </div>
-                  </nav>
+                  {!sectionShowAll && (
+                    <PrototypePrevNextNav
+                      changeSectionState={changeSectionState}
+                      nextId="download"
+                      nextTitle="Download data or create tables"
+                      prevId="versionHistory"
+                      prevTitle="Version history"
+                    />
+                  )}
+                  {sectionShowAll && <hr className="govuk-!-margin-bottom-9" />}
                 </section>
               )}
-              {sectionSelected === 'download' && (
+              {(sectionShowAll || sectionSelected === 'download') && (
                 <section id="download">
                   <h2 className="govuk-heading-l" id="download">
                     Download data or create tables
@@ -1077,36 +884,13 @@ const PrototypeHomepage = () => {
                       </p>
                     </div>
                   </div>
-                  <nav className="govuk-pagination govuk-pagination--block">
-                    <div className="govuk-pagination__prev">
-                      <a
-                        href="#"
-                        onClick={e => {
-                          e.preventDefault();
-                          setSectionSelected('endPoints');
-                        }}
-                        className="govuk-link govuk-pagination__link"
-                      >
-                        <svg
-                          className="govuk-pagination__icon govuk-pagination__icon--prev"
-                          xmlns="http://www.w3.org/2000/svg"
-                          height="13"
-                          width="15"
-                          aria-hidden="true"
-                          focusable="false"
-                          viewBox="0 0 15 13"
-                        >
-                          <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z" />
-                        </svg>
-                        <span className="govuk-pagination__link-title">
-                          Previous
-                        </span>
-                        <span className="govuk-pagination__link-label">
-                          API endpoints quick start
-                        </span>
-                      </a>
-                    </div>
-                  </nav>
+                  {!sectionShowAll && (
+                    <PrototypePrevNextNav
+                      changeSectionState={changeSectionState}
+                      prevId="endPoints"
+                      prevTitle="API endpoints quick start"
+                    />
+                  )}
                 </section>
               )}
             </div>
