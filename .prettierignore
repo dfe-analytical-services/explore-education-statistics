@@ -4,7 +4,7 @@ coverage/
 node_modules/
 *.min.css
 *.min.js
-
+# Artifacts can leak between jobs on self-hosted runners
+wwwroot/
 # This file is massive and holds the formatter
 src/explore-education-statistics-common/src/modules/charts/files/ukGeoJson.json
-src/explore-education-statistics-frontend/src/html
