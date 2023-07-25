@@ -31,6 +31,7 @@ const config = {
     '^@common-test/(.*)$':
       '<rootDir>/../explore-education-statistics-common/test/$1',
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
+    '^marked$': '<rootDir>/node_modules/marked/lib/marked.umd.js',
   },
   moduleFileExtensions: [
     'web.js',
