@@ -15,7 +15,7 @@ import React from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
-import produce from 'immer';
+import { produce } from 'immer';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/publicationService');

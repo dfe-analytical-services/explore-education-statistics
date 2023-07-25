@@ -19,7 +19,7 @@ import _tableBuilderService, {
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import produce from 'immer';
+import { produce } from 'immer';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import { generatePath, Route } from 'react-router-dom';

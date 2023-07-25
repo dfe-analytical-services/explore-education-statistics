@@ -17,7 +17,7 @@ import { MinorAxisDomainValues } from '@common/modules/charts/util/domainTicks';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import produce from 'immer';
+import { produce } from 'immer';
 import upperFirst from 'lodash/upperFirst';
 import React, { useMemo } from 'react';
 

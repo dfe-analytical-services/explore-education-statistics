@@ -1,5 +1,5 @@
 import logger from '@common/services/logger';
-import produce, { Immutable } from 'immer';
+import { produce, Immutable } from 'immer';
 import {
   Dispatch,
   Reducer,
