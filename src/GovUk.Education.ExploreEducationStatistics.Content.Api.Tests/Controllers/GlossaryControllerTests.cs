@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
     public class GlossaryControllerTests
     {
         [Fact]
-        public async Task GetAllGlossaryEntries()
+        public async Task GetGlossary()
         {
             var glossaryEntries = new List<GlossaryCategoryViewModel>
             {
@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 .Setup(s => s.GetGlossary())
                 .ReturnsAsync(glossaryEntries);
 
-            var result = await controller.GetAllGlossaryEntries();
+            var result = await controller.GetGlossary();
             VerifyAllMocks(mocks);
 
             Assert.Equal(glossaryEntries, result);

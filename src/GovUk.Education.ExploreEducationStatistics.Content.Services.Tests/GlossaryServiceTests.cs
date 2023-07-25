@@ -11,12 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
     public class GlossaryServiceTests
     {
         [Fact]
-        public async Task GetAllGlossaryEntries()
+        public async Task GetGlossary()
         {
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(
+                await context.GlossaryEntries.AddRangeAsync(
                     new GlossaryEntry
                     {
                         Title = "Exclusion",
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var glossaryService = new GlossaryService(context);
 
-                var result = await glossaryService.GetAllGlossaryEntries();
+                var result = await glossaryService.GetGlossary();
 
                 Assert.Equal(26, result.Count);
 
@@ -70,16 +70,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetAllGlossaryEntries_NoEntries()
+        public async Task GetGlossary_NoEntries()
         {
             await using var context = InMemoryContentDbContext();
             var glossaryService = new GlossaryService(context);
 
-            var result = await glossaryService.GetAllGlossaryEntries();
+            var result = await glossaryService.GetGlossary();
 
             Assert.Equal(26, result.Count);
 
-            result.ForEach(category => Assert.Empty(category.Entries));
+            Assert.All(result, category => Assert.Empty(category.Entries));
         }
 
         [Fact]
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
+                await context.GlossaryEntries.AddAsync(
                     new GlossaryEntry
                     {
                         Title = "Exclusion",

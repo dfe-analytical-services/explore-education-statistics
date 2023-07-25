@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<List<GlossaryCategoryViewModel>> GetAllGlossaryEntries()
+        public async Task<List<GlossaryCategoryViewModel>> GetGlossary()
         {
             var categories = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
             var categoryDictionary = categories.ToDictionary(

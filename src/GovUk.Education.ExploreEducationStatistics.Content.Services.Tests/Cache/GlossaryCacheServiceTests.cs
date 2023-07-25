@@ -38,7 +38,7 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
         var glossaryService = new Mock<IGlossaryService>(Strict);
 
         glossaryService
-            .Setup(s => s.GetAllGlossaryEntries())
+            .Setup(s => s.GetGlossary())
             .ReturnsAsync(_glossary);
 
         var service = BuildService(glossaryService: glossaryService.Object);
@@ -72,7 +72,7 @@ public class GlossaryCacheServiceTests : CacheServiceTestFixture
         var glossaryService = new Mock<IGlossaryService>(Strict);
 
         glossaryService
-            .Setup(s => s.GetAllGlossaryEntries())
+            .Setup(s => s.GetGlossary())
             .ReturnsAsync(_glossary);
 
         PublicBlobCacheService

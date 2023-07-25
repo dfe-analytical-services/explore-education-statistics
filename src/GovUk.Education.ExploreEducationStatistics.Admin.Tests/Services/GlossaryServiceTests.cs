@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
+                await context.GlossaryEntries.AddRangeAsync(
                     new GlossaryEntry
                     {
                         Title = "Exclusion",
