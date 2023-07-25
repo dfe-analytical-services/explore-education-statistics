@@ -23,16 +23,23 @@ const useCKEditorConfig = ({
   onAutoSave,
   onCancelComment,
   onClickAddComment,
+  onClickAddGlossaryItem,
   onImageUpload,
   onImageUploadCancel,
 }: {
   allowComments?: boolean;
   allowedHeadings?: string[];
   editorInstance?: MutableRefObject<Editor | undefined>;
+  glossaryItems?: {
+    title: string;
+    slug: string;
+    body: string;
+  }[];
   toolbarConfig?: string[];
   onAutoSave?: (content: string) => void;
   onCancelComment?: () => void;
   onClickAddComment?: () => void;
+  onClickAddGlossaryItem?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onRemoveCommentMarker?: (commentId: string) => void;
@@ -95,8 +102,8 @@ const useCKEditorConfig = ({
           addDataGlossaryAttributeToGlossaryLinks: {
             mode: 'automatic',
             callback: (url: string) =>
-              url.startsWith(process.env.PUBLIC_URL) &&
-              url.match(/\/glossary#[a-zA-Z-0-9-]+$/),
+              url?.startsWith(process.env.PUBLIC_URL) &&
+              url?.match(/\/glossary#[a-zA-Z-0-9-]+$/),
             attributes: { 'data-glossary': '' },
           },
           openInNewTab: {
@@ -178,6 +185,11 @@ const useCKEditorConfig = ({
           }
         : undefined,
       alignment: alignmentOptions,
+      glossary: {
+        addGlossaryItem() {
+          onClickAddGlossaryItem?.();
+        },
+      },
     };
   }, [
     allowComments,
@@ -187,6 +199,7 @@ const useCKEditorConfig = ({
     onAutoSave,
     onCancelComment,
     onClickAddComment,
+    onClickAddGlossaryItem,
     onImageUpload,
     onImageUploadCancel,
     reAddComment,

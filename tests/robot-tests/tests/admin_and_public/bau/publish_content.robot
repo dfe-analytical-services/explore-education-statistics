@@ -48,12 +48,15 @@ Add an accordion section to release content
 Add text block with link to absence glossary entry to accordion section
     user adds text block to editable accordion section    Test section    id:releaseMainContent
     ${block}=    user starts editing accordion section text block    Test section    1    id:releaseMainContent
-    user presses keys    Absence
-    user presses keys    CTRL+a
-    user clicks element    xpath://*[@aria-label="Editor toolbar"]//button[3]    # CKEditor link button
-    user waits until page contains element    css:.ck-link-form
-    user presses keys    %{PUBLIC_URL}/glossary#absence
-    user clicks element    css:.ck-button-save
+    ${toolbar}=    get editor toolbar    ${block}
+    ${button}=    user gets button element    Add glossary entry    ${toolbar}
+    user clicks element    ${button}
+    user waits until modal is visible    Insert glossary link
+    user enters text into element    id:glossarySearch-input    abs
+    user waits until page contains element    id:glossarySearch-options
+    user clicks element    id:glossarySearch-option-0
+    user clicks button    Insert
+    user waits until modal is not visible    Insert glossary link
     user clicks button    Save & close
     user waits until element contains    ${block}    Absence
 
