@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private ReleaseImageService SetupReleaseImageService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IBlobStorageService blobStorageService = null,
+            IPrivateBlobStorageService privateBlobStorageService = null,
             IFileUploadsValidatorService fileUploadsValidatorService = null,
             IReleaseFileRepository releaseFileRepository = null,
             IUserService userService = null)
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseImageService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
                 fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
                 releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(),
                 userService ?? Mock.Of<IUserService>()

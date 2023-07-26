@@ -1,6 +1,6 @@
 import { Options } from 'k6/options';
 import merge from 'lodash/merge';
-import { parseIntOptional } from '../utils/utils';
+import { parseFloatOptional, parseIntOptional } from '../utils/utils';
 
 interface Config {
   // Name of the scenario.
@@ -15,10 +15,10 @@ interface Config {
 
 const overrides: Partial<Config> = {
   maxRequestRatePerSecond: parseIntOptional(__ENV.RPS),
-  mainStageDurationMinutes: parseIntOptional(
+  mainStageDurationMinutes: parseFloatOptional(
     __ENV.MAIN_TEST_STAGE_DURATION_MINS,
   ),
-  cooldownStageDurationMinutes: parseIntOptional(
+  cooldownStageDurationMinutes: parseFloatOptional(
     __ENV.MAIN_TEST_STAGE_DURATION_MINS,
   ),
 };

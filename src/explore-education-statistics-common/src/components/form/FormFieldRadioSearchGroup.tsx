@@ -15,6 +15,8 @@ export type FormFieldRadioSearchGroupProps<FormValues> = OmitStrict<
 function FormFieldRadioSearchGroup<FormValues, Value extends string = string>(
   props: FormFieldRadioSearchGroupProps<FormValues>,
 ) {
+  const { onChange } = props;
+
   return (
     <FormField<Value> {...props}>
       {({ id, field }) => {
@@ -24,9 +26,7 @@ function FormFieldRadioSearchGroup<FormValues, Value extends string = string>(
             {...field}
             id={id}
             onChange={(event, option) => {
-              if (props.onChange) {
-                props.onChange(event, option);
-              }
+              onChange?.(event, option);
 
               if (!event.isDefaultPrevented()) {
                 field.onChange(event);

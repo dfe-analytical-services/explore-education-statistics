@@ -2,25 +2,62 @@
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import http from 'k6/http';
+import exec from 'k6/execution';
 import { check, fail } from 'k6';
 import { htmlReport } from 'https://raw.githubusercontent.com/benc-uk/k6-reporter/main/dist/bundle.js';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 import loggingUtils from '../../utils/loggingUtils';
+import steadyRequestRateProfile from '../../configuration/steadyRequestRateProfile';
+import spikeProfile from '../../configuration/spikeProfile';
+import rampingRequestRateProfile from '../../configuration/rampingRequestRateProfile';
+import sequentialRequestProfile from '../../configuration/sequentialRequestsProfile';
+import grafanaService from '../../utils/grafanaService';
+import { stringifyWithoutNulls } from '../../utils/utils';
 
-export const options: Options = {
-  stages: [
-    {
-      duration: '0.1s',
-      target: 80,
-    },
-    {
-      duration: '10m',
-      target: 80,
-    },
-  ],
-  noConnectionReuse: true,
-  insecureSkipTLSVerify: true,
-};
+const profile = (__ENV.PROFILE ?? 'sequential') as
+  | 'load'
+  | 'spike'
+  | 'stress'
+  | 'sequential';
+
+export const options = getOptions();
+
+const name = 'getReleasePage.ts';
+
+function getOptions(): Options {
+  switch (profile) {
+    case 'load': {
+      return steadyRequestRateProfile({
+        mainStageDurationMinutes: 10,
+        cooldownStageDurationMinutes: 10,
+        steadyRequestRatePerSecond: 10,
+      });
+    }
+    case 'spike': {
+      return spikeProfile({
+        preSpikeStageDurationMinutes: 1,
+        spikeStageDurationMinutes: 1,
+        postSpikeStageDurationMinutes: 8,
+        normalTrafficRequestRatePerSecond: 10,
+        spikeRequestRatePerSecond: 30,
+      });
+    }
+    case 'stress': {
+      return rampingRequestRateProfile({
+        mainStageDurationMinutes: 10,
+        cooldownStageDurationMinutes: 10,
+        maxRequestRatePerSecond: 40,
+      });
+    }
+    case 'sequential': {
+      return sequentialRequestProfile({
+        mainStageDurationMinutes: 10,
+      });
+    }
+    default:
+      throw Error(`Unknown profile '${profile}'`);
+  }
+}
 
 export const errorRate = new Rate('ees_errors');
 export const getReleaseSuccessCount = new Counter('ees_get_release_success');
@@ -34,11 +71,28 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
   __ENV.TEST_ENVIRONMENT,
 );
 
+export function logTestStart(config: Options) {
+  console.log(
+    `Starting test ${name}, with configuration:\n\n${stringifyWithoutNulls(
+      config,
+    )}\n\n`,
+  );
+}
+
 export function setup() {
   loggingUtils.logDashboardUrls();
+
+  logTestStart(exec.test.options);
+
+  grafanaService.testStart({
+    name,
+    config: exec.test.options,
+  });
 }
 
 const performTest = () => {
+  console.log('Requesting');
+
   const startTime = Date.now();
   let response;
   try {

@@ -2,7 +2,7 @@ version: "3"
 services:
   data-storage:
     container_name: ees-storage
-    image: mcr.microsoft.com/azure-storage/azurite:3.21.0
+    image: mcr.microsoft.com/azure-storage/azurite:3.24.0
     ports:
       - "10000:10000"
       - "10001:10001"

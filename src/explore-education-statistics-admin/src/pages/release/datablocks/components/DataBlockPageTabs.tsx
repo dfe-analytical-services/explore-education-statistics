@@ -274,6 +274,8 @@ const DataBlockPageTabs = ({
         ...details,
         query,
         charts,
+        dataSetId: dataBlock?.dataSetId ?? '',
+        dataSetName: dataBlock?.dataSetName ?? '',
         table: {
           tableHeaders: mapUnmappedTableHeaders(tableHeaders),
           indicators: [],

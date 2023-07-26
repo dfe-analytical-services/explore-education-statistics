@@ -9,7 +9,7 @@ import parseHtmlString, {
   domToReact,
   attributesToProps,
 } from 'html-react-parser';
-import React, { ReactElement, useEffect, useMemo, useRef } from 'react';
+import React, { ReactElement, useMemo } from 'react';
 import styles from './ContentHtml.module.scss';
 
 export interface ContentHtmlProps {
@@ -18,7 +18,6 @@ export interface ContentHtmlProps {
   sanitizeOptions?: SanitizeHtmlOptions;
   testId?: string;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
-  trackContentLinks?: (url: string, newTab?: boolean) => void;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
 }
 
@@ -28,30 +27,9 @@ export default function ContentHtml({
   sanitizeOptions,
   testId,
   getGlossaryEntry,
-  trackContentLinks,
   trackGlossaryLinks,
 }: ContentHtmlProps) {
   const { isMounted } = useMounted();
-  const contentAreaRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const currentRef = contentAreaRef.current;
-
-    const handleClick = (event: MouseEvent) => {
-      const element = event.target as HTMLAnchorElement;
-
-      if (trackContentLinks && element.tagName === 'A' && element.href) {
-        event.preventDefault();
-        trackContentLinks(element.href, element.target === '_blank');
-      }
-    };
-
-    currentRef?.addEventListener('click', handleClick);
-
-    return () => {
-      currentRef?.removeEventListener('click', handleClick);
-    };
-  }, [contentAreaRef, trackContentLinks]);
 
   const cleanHtml = useMemo(() => {
     return sanitizeHtml(html, sanitizeOptions);
@@ -88,11 +66,7 @@ export default function ContentHtml({
   });
 
   return (
-    <div
-      className={classNames('dfe-content', className)}
-      data-testid={testId}
-      ref={contentAreaRef}
-    >
+    <div className={classNames('dfe-content', className)} data-testid={testId}>
       {parsedContent}
     </div>
   );

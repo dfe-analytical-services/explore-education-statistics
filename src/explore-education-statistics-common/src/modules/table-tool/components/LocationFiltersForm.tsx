@@ -176,6 +176,7 @@ const LocationFiltersForm = ({
                           key={levelKey}
                           name={`locations.${levelKey}`}
                           disabled={form.isSubmitting}
+                          groupLabel={level.legend}
                           legend={level.legend}
                           legendHidden
                           open={hasSingleOption}
@@ -194,6 +195,7 @@ const LocationFiltersForm = ({
                           key={levelKey}
                           name={`locations.${levelKey}`}
                           disabled={form.isSubmitting}
+                          groupLabel={level.legend}
                           legend={level.legend}
                           legendHidden
                           open={hasSingleOption || searchOnly}

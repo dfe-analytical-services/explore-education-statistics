@@ -15,6 +15,7 @@ import React, {
   useMemo,
   useRef,
   Ref,
+  ReactNode,
 } from 'react';
 
 import VisuallyHidden from '../VisuallyHidden';
@@ -40,45 +41,46 @@ export type CheckboxGroupAllChangeEventHandler = (
 
 interface BaseFormCheckboxGroupProps {
   disabled?: boolean;
+  groupLabel?: string;
   id: string;
   name: string;
   options: CheckboxOption[];
-  selectAll?: boolean;
-  selectAllText?: (isAllChecked: boolean, options: CheckboxOption[]) => string;
-  small?: boolean;
   order?: OrderKeys<CheckboxOption>;
   orderDirection?: OrderDirection | OrderDirection[];
+  selectAll?: boolean;
+  selectAllText?: (
+    isAllChecked: boolean,
+    options: CheckboxOption[],
+  ) => string | ReactNode;
+  small?: boolean;
   value: string[];
   onAllChange?: CheckboxGroupAllChangeEventHandler;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: CheckboxChangeEventHandler;
-  hiddenText?: string;
   inputRef?: Ref<HTMLInputElement>;
 }
 
-const getDefaultSelectAllText = (
-  isAllChecked: boolean,
-  opts: CheckboxOption[],
-) => `${isAllChecked ? 'Unselect' : 'Select'} all ${opts.length} options`;
+export const getDefaultSelectAllText = (isAllChecked: boolean, total: number) =>
+  `${isAllChecked ? 'Unselect' : 'Select'} all ${total} options`;
 
 /**
  * Basic checkbox group that should be used as a controlled component.
  */
 export const BaseFormCheckboxGroup = ({
   disabled,
-  value = [],
+  groupLabel,
   id,
   name,
   options,
-  selectAll = false,
-  selectAllText = getDefaultSelectAllText,
-  small,
   order = ['label'],
   orderDirection = ['asc'],
+  selectAll = false,
+  selectAllText,
+  small,
+  value = [],
   onBlur,
   onChange,
   onAllChange,
-  hiddenText,
   inputRef,
 }: BaseFormCheckboxGroupProps) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -122,8 +124,16 @@ export const BaseFormCheckboxGroup = ({
           className={styles.selectAll}
           underline={false}
         >
-          {selectAllText(isAllChecked, options)}
-          {hiddenText && <VisuallyHidden> {hiddenText}</VisuallyHidden>}
+          {selectAllText ? (
+            selectAllText(isAllChecked, options)
+          ) : (
+            <>
+              {getDefaultSelectAllText(isAllChecked, options.length)}
+              {groupLabel && (
+                <VisuallyHidden>{` for ${groupLabel}`}</VisuallyHidden>
+              )}
+            </>
+          )}
         </ButtonText>
       )}
       <>

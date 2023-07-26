@@ -176,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             return featuredTables
                 .Select(ft => new FeaturedTableViewModel(
-                    ft.Id, ft.Name, ft.Description, ft.DataBlock.Query.SubjectId, ft.DataBlockId))
+                    ft.Id, ft.Name, ft.Description, ft.DataBlock.Query.SubjectId, ft.DataBlockId, ft.Order))
                 .ToList();
         }
 

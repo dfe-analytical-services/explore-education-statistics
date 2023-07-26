@@ -1,6 +1,7 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
 
 Force Tags          Admin    Local    Dev    AltersData
@@ -179,6 +180,11 @@ Add data guidance for all subjects
 
     user clicks button    Save guidance
 
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
 Publish release
     user approves original release for immediate publication
 
@@ -229,7 +235,7 @@ Check subject order in data catalogue
     user checks checkbox in position has label    4    Four
 
 Check subject order in data guidance
-    user navigates to find statistics page on public frontend
+    user navigates to public find statistics page
     user clicks link    ${PUBLICATION_NAME}
 
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}

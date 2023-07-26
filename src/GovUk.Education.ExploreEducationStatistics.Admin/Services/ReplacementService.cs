@@ -835,16 +835,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         );
                     }
 
-                    if (dataSet.Location != null
-                        && locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
+                    if (dataSet.Location != null)
                     {
-                        dataSet.Location.Value = targetLocationId;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException(
-                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location?.Value}"
-                        );
+                        if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
+                        {
+                            dataSet.Location.Value = targetLocationId;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set config location: {dataSet.Location.Value}"
+                            );
+                        }
                     }
                 });
         }

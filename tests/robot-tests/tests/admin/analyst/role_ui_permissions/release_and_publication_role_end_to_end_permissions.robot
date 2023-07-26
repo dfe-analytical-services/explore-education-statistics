@@ -2,6 +2,7 @@
 Library             ../../../libs/admin_api.py
 Resource            ../../../libs/admin-common.robot
 Resource            ../../../libs/common.robot
+Resource            ../../../libs/admin/manage-content-common.robot
 Resource            ../../../libs/admin/analyst/role_ui_permissions.robot
 
 Suite Setup         user signs in as bau1
@@ -69,6 +70,11 @@ Check publication owner can add a footnote to ${SUBJECT_NAME}
     user enters text into element    id:footnoteForm-content    test footnote from the publication owner! (analyst)
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Add public prerelease access list
     user clicks link    Pre-release access

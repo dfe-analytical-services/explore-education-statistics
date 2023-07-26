@@ -39,12 +39,35 @@ public class SubjectCsvMetaServiceTests
     [Fact]
     public async Task GetSubjectCsvMeta()
     {
-        var filters = _fixture
-            .DefaultFilter(filterGroupCount: 1, filterItemCount: 2)
-            .GenerateList(2);
+        var filters = _fixture.DefaultFilter()
+            .ForIndex(0, s =>
+                s.SetGroupCsvColumn("filter_0_grouping")
+                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                        .ForInstance(s => s.Set(
+                            fg => fg.Label,
+                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                        .Generate(2)))
+            .ForIndex(1, s =>
+                s.SetGroupCsvColumn("filter_1_grouping")
+                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                        .ForInstance(s => s.Set(
+                            fg => fg.Label,
+                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                        .Generate(2)))
+            .ForIndex(2, s =>
+                s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 2)
+                    .Generate(1)))
+            .GenerateList();
 
-        var filterItems = filters
-            .SelectMany(f => f.FilterGroups)
+        var filter0Items = filters[0].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter1Items = filters[1].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter2Items = filters[2].FilterGroups
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
@@ -72,19 +95,19 @@ public class SubjectCsvMetaServiceTests
         var observations = _fixture.DefaultObservation()
             .WithMeasures(indicators)
             .ForRange(..2, o => o
-                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
                 .SetLocation(locations[0])
                 .SetTimePeriod(2022, AcademicYear))
             .ForRange(2..4, o => o
-                .SetFilterItems(filterItems[0], filterItems[2])
+                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
                 .SetLocation(locations[1])
                 .SetTimePeriod(2022, AcademicYear))
             .ForRange(4..6, o => o
-                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
                 .SetLocation(locations[2])
                 .SetTimePeriod(2023, AcademicYear))
             .ForRange(6..8, o => o
-                .SetFilterItems(filterItems[1], filterItems[3])
+                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1])
                 .SetLocation(locations[3])
                 .SetTimePeriod(2023, AcademicYear))
             .GenerateList();
@@ -152,42 +175,38 @@ public class SubjectCsvMetaServiceTests
 
             var viewModel = result.AssertRight();
 
-            Assert.Equal(2, viewModel.Filters.Count);
+            Assert.Equal(3, viewModel.Filters.Count);
 
             var viewModelFilter0 = viewModel.Filters[filters[0].Name];
             var viewModelFilter1 = viewModel.Filters[filters[1].Name];
+            var viewModelFilter2 = viewModel.Filters[filters[2].Name];
 
-            Assert.Equal(filters[0].Id, viewModelFilter0.Id);
-            Assert.Equal(filters[0].Name, viewModelFilter0.Name);
-            Assert.Equal(filters[1].Id, viewModelFilter1.Id);
-            Assert.Equal(filters[1].Name, viewModelFilter1.Name);
+            AssertFilterCsvViewModel(filters[0], viewModelFilter0);
+            AssertFilterCsvViewModel(filters[1], viewModelFilter1);
+            AssertFilterCsvViewModel(filters[2], viewModelFilter2);
 
             var viewModelFilter0Items = viewModelFilter0.Items;
             Assert.Equal(2, viewModelFilter0Items.Count);
 
-            var viewModelFilter0Item0 = viewModelFilter0Items[filterItems[0].Id];
-            var viewModelFilter0Item1 = viewModelFilter0Items[filterItems[1].Id];
-
-            Assert.Equal(filterItems[0].Id, viewModelFilter0Item0.Id);
-            Assert.Equal(filterItems[0].Label, viewModelFilter0Item0.Label);
-            Assert.Equal(filterItems[1].Id, viewModelFilter0Item1.Id);
-            Assert.Equal(filterItems[1].Label, viewModelFilter0Item1.Label);
+            AssertFilterItemCsvViewModel(filter0Items[0], viewModelFilter0Items[filter0Items[0].Id]);
+            AssertFilterItemCsvViewModel(filter0Items[1], viewModelFilter0Items[filter0Items[1].Id]);
 
             var viewModelFilter1Items = viewModelFilter1.Items;
             Assert.Equal(2, viewModelFilter1Items.Count);
 
-            var viewModelFilter1Item0 = viewModelFilter1Items[filterItems[2].Id];
-            var viewModelFilter1Item1 = viewModelFilter1Items[filterItems[3].Id];
+            AssertFilterItemCsvViewModel(filter1Items[0], viewModelFilter1Items[filter1Items[0].Id]);
+            AssertFilterItemCsvViewModel(filter1Items[1], viewModelFilter1Items[filter1Items[1].Id]);
 
-            Assert.Equal(filterItems[2].Id, viewModelFilter1Item0.Id);
-            Assert.Equal(filterItems[2].Label, viewModelFilter1Item0.Label);
-            Assert.Equal(filterItems[3].Id, viewModelFilter1Item1.Id);
-            Assert.Equal(filterItems[3].Label, viewModelFilter1Item1.Label);
+            var viewModelFilter2Items = viewModelFilter2.Items;
+            Assert.Equal(2, viewModelFilter2Items.Count);
+
+            AssertFilterItemCsvViewModel(filter2Items[0], viewModelFilter2Items[filter2Items[0].Id]);
+            AssertFilterItemCsvViewModel(filter2Items[1], viewModelFilter2Items[filter2Items[1].Id]);
 
             Assert.Equal(3, viewModel.Indicators.Count);
-            AssertIndicatorCsvViewModel(indicators[0], viewModel.Indicators[indicators[0].Name]);
-            AssertIndicatorCsvViewModel(indicators[1], viewModel.Indicators[indicators[1].Name]);
-            AssertIndicatorCsvViewModel(indicators[2], viewModel.Indicators[indicators[2].Name]);
+            AssertIndicatorCsvMetaViewModel(indicators[0], viewModel.Indicators[indicators[0].Name]);
+            AssertIndicatorCsvMetaViewModel(indicators[1], viewModel.Indicators[indicators[1].Name]);
+            AssertIndicatorCsvMetaViewModel(indicators[2], viewModel.Indicators[indicators[2].Name]);
 
             var viewModelLocations = viewModel.Locations;
 
@@ -214,8 +233,15 @@ public class SubjectCsvMetaServiceTests
             )
             .GenerateList();
 
-        var filterItems = filters
-            .SelectMany(f => f.FilterGroups)
+        var filter0Items = filters[0].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter1Items = filters[1].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter2Items = filters[2].FilterGroups
             .SelectMany(fg => fg.FilterItems)
             .ToList();
 
@@ -230,9 +256,9 @@ public class SubjectCsvMetaServiceTests
             .WithLocation(_fixture.DefaultLocation())
             .WithMeasures(indicators)
             .ForIndex(0, o => o
-                .SetFilterItems(filterItems[0], filterItems[4], filterItems[6]))
+                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0]))
             .ForIndex(1, o => o
-                .SetFilterItems(filterItems[1], filterItems[5], filterItems[7]))
+                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[1]))
             .GenerateList();
 
         var releaseSubject = new ReleaseSubject
@@ -309,17 +335,18 @@ public class SubjectCsvMetaServiceTests
 
             var viewModelFilter0Items = viewModelFilter0.Items;
             Assert.Equal(2, viewModelFilter0Items.Count);
-            Assert.Equal(filterItems[0].Id, viewModelFilter0Items[filterItems[0].Id].Id);
+            Assert.Equal(filter0Items[0].Id, viewModelFilter0Items[filter0Items[0].Id].Id);
+            Assert.Equal(filter0Items[1].Id, viewModelFilter0Items[filter0Items[1].Id].Id);
 
             var viewModelFilter1Items = viewModelFilter1.Items;
             Assert.Equal(2, viewModelFilter1Items.Count);
-            Assert.Equal(filterItems[4].Id, viewModelFilter1Items[filterItems[4].Id].Id);
-            Assert.Equal(filterItems[5].Id, viewModelFilter1Items[filterItems[5].Id].Id);
+            Assert.Equal(filter1Items[0].Id, viewModelFilter1Items[filter1Items[0].Id].Id);
+            Assert.Equal(filter1Items[1].Id, viewModelFilter1Items[filter1Items[1].Id].Id);
 
             var viewModelFilter2Items = viewModelFilter2.Items;
             Assert.Equal(2, viewModelFilter2Items.Count);
-            Assert.Equal(filterItems[6].Id, viewModelFilter2Items[filterItems[6].Id].Id);
-            Assert.Equal(filterItems[7].Id, viewModelFilter2Items[filterItems[7].Id].Id);
+            Assert.Equal(filter2Items[0].Id, viewModelFilter2Items[filter2Items[0].Id].Id);
+            Assert.Equal(filter2Items[1].Id, viewModelFilter2Items[filter2Items[1].Id].Id);
         }
     }
 
@@ -848,6 +875,188 @@ public class SubjectCsvMetaServiceTests
                 "region_code",
                 filters[1].Name,
                 filters[0].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name,
+            };
+
+            Assert.Equal(expectedHeaders, viewModel.Headers);
+        }
+    }
+
+    [Fact]
+    public async Task GetSubjectCsvMeta_Headers_FiltersHaveNonDefaultGroups()
+    {
+        var filters = _fixture.DefaultFilter()
+            .ForIndex(0, s =>
+                s.SetGroupCsvColumn("filter_0_grouping")
+                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                        .ForInstance(s => s.Set(
+                            fg => fg.Label,
+                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                        .Generate(2)))
+            .ForIndex(1, s =>
+                s.SetGroupCsvColumn("filter_1_grouping")
+                    .SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1)
+                        .ForInstance(s => s.Set(
+                            fg => fg.Label,
+                            (_, _, context) => $"Filter group {context.FixtureTypeIndex}"))
+                        .Generate(2)))
+            .ForIndex(2, s =>
+                s.SetFilterGroups(_fixture.DefaultFilterGroup(filterItemCount: 1).Generate(1)))
+            .GenerateList();
+
+        var filter0Items = filters[0].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter1Items = filters[1].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var filter2Items = filters[2].FilterGroups
+            .SelectMany(fg => fg.FilterItems)
+            .ToList();
+
+        var indicatorGroups = _fixture.DefaultIndicatorGroup()
+            .ForIndex(0, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(1)))
+            .ForIndex(1, ig => ig
+                .SetIndicators(_fixture.DefaultIndicator().Generate(2)))
+            .GenerateList();
+
+        var indicators = indicatorGroups
+            .SelectMany(ig => ig.Indicators)
+            .ToArray();
+
+        var location = _fixture.DefaultLocation()
+            .WithPresetRegionAndLocalAuthority()
+            .WithGeographicLevel(GeographicLevel.LocalAuthority)
+            .Generate();
+
+        var observations = _fixture.DefaultObservation()
+            .WithMeasures(indicators)
+            .ForIndex(0, o => o
+                .SetFilterItems(filter0Items[0], filter1Items[0], filter2Items[0])
+                .SetLocation(location))
+            .ForIndex(1, o => o
+                .SetFilterItems(filter0Items[1], filter1Items[1], filter2Items[0])
+                .SetLocation(location)
+                .SetTimePeriod(2022, AcademicYear))
+            .GenerateList();
+
+        var releaseSubject = new ReleaseSubject
+        {
+            Release = _fixture.DefaultStatsRelease(),
+            Subject = _fixture.DefaultSubject()
+                .WithFilters(filters)
+                .WithIndicatorGroups(indicatorGroups)
+                .WithObservations(observations),
+        };
+
+        var releaseFile = new ReleaseFile
+        {
+            Release = new Content.Model.Release
+            {
+                Id = releaseSubject.Release.Id,
+            },
+            File = new File
+            {
+                SubjectId = releaseSubject.Subject.Id,
+                Type = FileType.Data
+            }
+        };
+
+        var contextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile);
+            await contentDbContext.SaveChangesAsync();
+
+            await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+            await statisticsDbContext.Filter.AddRangeAsync(filters);
+            await statisticsDbContext.Indicator.AddRangeAsync(indicators);
+            await statisticsDbContext.Observation.AddRangeAsync(observations);
+            await statisticsDbContext.SaveChangesAsync();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contextId))
+        await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+        {
+            var csv = string.Join(
+                ',',
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].GroupCsvColumn,
+                filters[0].GroupCsvColumn,
+                filters[1].Name,
+                filters[0].Name,
+                filters[2].Name,
+                indicators[2].Name,
+                indicators[0].Name,
+                indicators[1].Name
+            );
+
+            var releaseFileBlobService = new Mock<IReleaseFileBlobService>(Strict);
+
+            releaseFileBlobService
+                .Setup(
+                    s => s.StreamBlob(
+                        It.Is<ReleaseFile>(
+                            rf => rf.FileId == releaseFile.FileId && rf.ReleaseId == releaseFile.ReleaseId
+                        ),
+                        null,
+                        default
+                    )
+                )
+                .ReturnsAsync(csv.ToStream());
+
+            var service = BuildService(
+                statisticsDbContext: statisticsDbContext,
+                contentDbContext: contentDbContext,
+                releaseFileBlobService: releaseFileBlobService.Object);
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = releaseSubject.SubjectId,
+                Indicators = indicators.Select(i => i.Id).ToList()
+            };
+
+            var result =
+                await service.GetSubjectCsvMeta(releaseSubject, query, observations);
+
+            VerifyAllMocks(releaseFileBlobService);
+
+            var viewModel = result.AssertRight();
+
+            // Order of headers is dictated by the order of headers in the data file CSV.
+            var expectedHeaders = new List<string>
+            {
+                "time_period",
+                "time_identifier",
+                "geographic_level",
+                "country_name",
+                "country_code",
+                "la_name",
+                "new_la_code",
+                "old_la_code",
+                "region_name",
+                "region_code",
+                filters[1].GroupCsvColumn!,
+                filters[0].GroupCsvColumn!,
+                filters[1].Name,
+                filters[0].Name,
+                filters[2].Name,
                 indicators[2].Name,
                 indicators[0].Name,
                 indicators[1].Name,
@@ -1626,7 +1835,21 @@ public class SubjectCsvMetaServiceTests
         }
     }
 
-    private static void AssertIndicatorCsvViewModel(Indicator indicator, IndicatorCsvMetaViewModel viewModel)
+    private static void AssertFilterCsvViewModel(Filter filter, FilterCsvMetaViewModel viewModel)
+    {
+        Assert.Equal(filter.Id, viewModel.Id);
+        Assert.Equal(filter.Name, viewModel.Name);
+        Assert.Equal(filter.GroupCsvColumn, viewModel.GroupCsvColumn);
+    }
+
+    private static void AssertFilterItemCsvViewModel(FilterItem filterItem, FilterItemCsvMetaViewModel viewModel)
+    {
+        Assert.Equal(filterItem.Id, viewModel.Id);
+        Assert.Equal(filterItem.Label, viewModel.Label);
+        Assert.Equal(filterItem.FilterGroup.Label, viewModel.GroupLabel);
+    }
+
+    private static void AssertIndicatorCsvMetaViewModel(Indicator indicator, IndicatorCsvMetaViewModel viewModel)
     {
         Assert.Equal(indicator.Id, viewModel.Id);
         Assert.Equal(indicator.Name, viewModel.Name);

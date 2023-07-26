@@ -31,6 +31,7 @@ export interface UploadAncillaryFileRequest {
 export interface AncillaryFileUpdateRequest {
   title: string;
   summary: string;
+  file?: File | null;
 }
 
 function mapFile({ name, ...file }: AncillaryFileInfo): AncillaryFile {
@@ -74,13 +75,17 @@ const releaseAncillaryFileService = {
 
     return mapFile(file);
   },
-  async replaceFile(
+  async updateFile(
     releaseId: string,
     fileId: string,
-    newFile: File,
+    request: AncillaryFileUpdateRequest,
   ): Promise<AncillaryFile> {
     const data = new FormData();
-    data.append('newFile', newFile);
+    data.append('title', request.title);
+    data.append('summary', request.summary);
+    if (request.file) {
+      data.append('file', request.file);
+    }
 
     const file = await client.put<AncillaryFileInfo>(
       `release/${releaseId}/ancillary/${fileId}`,
@@ -98,13 +103,6 @@ const releaseAncillaryFileService = {
         responseType: 'blob',
       })
       .then(response => downloadFile(response, fileName));
-  },
-  updateFile(
-    releaseId: string,
-    fileId: string,
-    data: AncillaryFileUpdateRequest,
-  ): Promise<void> {
-    return client.patch(`/release/${releaseId}/file/${fileId}`, data);
   },
 };
 

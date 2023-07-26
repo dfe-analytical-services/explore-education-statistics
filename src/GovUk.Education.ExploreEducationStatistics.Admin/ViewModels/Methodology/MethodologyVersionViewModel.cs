@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
         public string Slug { get; set; } = string.Empty;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public MethodologyStatus Status { get; set; }
+        public MethodologyApprovalStatus Status { get; set; }
 
         public string Title { get; set; } = string.Empty;
 

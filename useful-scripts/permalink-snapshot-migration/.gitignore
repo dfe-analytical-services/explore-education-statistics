@@ -1,2 +1,3 @@
-﻿migration_results.csv
-permalinks.csv
+﻿permalinks.csv
+migration_results_*.csv
+responses_*/

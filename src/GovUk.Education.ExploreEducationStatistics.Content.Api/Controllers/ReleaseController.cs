@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedules;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -18,8 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class ReleaseController : ControllerBase
     {
-        private const string HalfHourlyExpirySchedule = "*/30 * * * *";
-
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IReleaseCacheService _releaseCacheService;

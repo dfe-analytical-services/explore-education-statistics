@@ -72,19 +72,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test blob");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.StreamFile(release.Id, releaseFile.File.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.True(result.IsRight);
 
@@ -181,18 +181,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupDownloadToStreamNotFound(PublicReleaseFiles, releaseFile.PublicPath());
+            publicBlobStorageService.SetupDownloadToStreamNotFound(PublicReleaseFiles, releaseFile.PublicPath());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.StreamFile(release.Id, releaseFile.File.Id);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertNotFound();
             }
@@ -242,15 +242,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data blob");
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
 
             var subjectIds = releaseFiles
@@ -282,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
@@ -293,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
+                MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
 
                 result.AssertRight();
 
@@ -358,15 +358,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data 1 blob");
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test data 2 blob");
 
             var subjectIds = releaseFiles
@@ -398,7 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
@@ -409,7 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
+                MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
 
                 result.AssertRight();
 
@@ -485,26 +485,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var path = GenerateZipFilePath();
             var stream = File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile3.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test 2 blob");
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test 3 blob");
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile3.PublicPath(), "Test 1 blob");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -514,7 +514,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertRight();
 
@@ -600,13 +600,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var path = GenerateZipFilePath();
             var stream = File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -616,7 +616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertRight();
 
@@ -673,17 +673,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var path = GenerateZipFilePath();
             var stream = File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             // Files do not exist in blob storage
-            blobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), false);
-            blobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), false);
+            publicBlobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), false);
+            publicBlobStorageService.SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), false);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -693,7 +693,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertRight();
 
@@ -751,13 +751,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var path = GenerateZipFilePath();
             var stream = File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -767,7 +767,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileIds: fileIds
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertRight();
 
@@ -800,18 +800,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var path = GenerateZipFilePath();
             var stream = File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var fileIds = ListOf(Guid.NewGuid(), Guid.NewGuid());
                 var result = await service.ZipFilesToStream(release.Id, stream, fileIds);
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 Assert.True(result.IsRight);
 
@@ -871,14 +871,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var tokenSource = new CancellationTokenSource();
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             // After the first file has completed, we cancel the request
             // to prevent the next file from being fetched.
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(
                     container: PublicReleaseFiles,
                     path: releaseFile1.PublicPath(),
@@ -890,7 +890,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var fileIds = releaseFiles.Select(file => file.FileId).ToList();
 
@@ -901,7 +901,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     cancellationToken: tokenSource.Token
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertRight();
 
@@ -958,25 +958,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile2.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test data blob");
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
 
             var allFilesZipPath = release.AllFilesZipPath();
 
             // No 'All files' zip can be found in blob storage - not cached
-            blobStorageService
+            publicBlobStorageService
                 .SetupFindBlob(PublicReleaseFiles, allFilesZipPath, null);
 
             // 'All files' zip will be uploaded to blob storage to be cached
-            blobStorageService
+            publicBlobStorageService
                 .Setup(
                     s =>
                         s.UploadStream(
@@ -1019,7 +1019,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
+                    publicBlobStorageService: publicBlobStorageService.Object,
                     dataGuidanceFileWriter: dataGuidanceFileWriter.Object);
 
                 var result = await service.ZipFilesToStream(
@@ -1027,7 +1027,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     outputStream: stream
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataGuidanceFileWriter);
+                MockUtils.VerifyAllMocks(publicBlobStorageService, dataGuidanceFileWriter);
 
                 result.AssertRight();
 
@@ -1067,12 +1067,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             var allFilesZipPath = release.AllFilesZipPath();
 
             // 'All files' zip is in blob storage - cached
-            blobStorageService
+            publicBlobStorageService
                 .SetupFindBlob(
                     PublicReleaseFiles,
                     allFilesZipPath,
@@ -1084,7 +1084,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     )
                 );
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, allFilesZipPath, "Test cached all files zip");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -1094,14 +1094,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.ZipFilesToStream(
                     releaseId: release.Id,
                     outputStream: stream
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertRight();
 
@@ -1144,12 +1144,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
 
             var allFilesZipPath = release.AllFilesZipPath();
 
             // 'All files' zip is in blob storage - cached, but stale
-            blobStorageService
+            publicBlobStorageService
                 .SetupFindBlob(
                     PublicReleaseFiles,
                     allFilesZipPath,
@@ -1161,13 +1161,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     )
                 );
 
-            blobStorageService
+            publicBlobStorageService
                 .SetupCheckBlobExists(PublicReleaseFiles, releaseFile1.PublicPath(), true);
-            blobStorageService
+            publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test ancillary blob");
 
             // 'All files' zip will be uploaded to blob storage to be re-cached
-            blobStorageService
+            publicBlobStorageService
                 .Setup(
                     s =>
                         s.UploadStream(
@@ -1188,14 +1188,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var service = SetupReleaseFileService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                    publicBlobStorageService: publicBlobStorageService.Object);
 
                 var result = await service.ZipFilesToStream(
                     releaseId: release.Id,
                     outputStream: stream
                 );
 
-                MockUtils.VerifyAllMocks(blobStorageService);
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
 
                 result.AssertRight();
 
@@ -1219,14 +1219,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static ReleaseFileService SetupReleaseFileService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IBlobStorageService? blobStorageService = null,
+            IPublicBlobStorageService? publicBlobStorageService = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
         {
             return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                blobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
+                publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(MockBehavior.Strict),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(MockBehavior.Strict),
                 userService ?? MockUtils.AlwaysTrueUserService().Object
             );

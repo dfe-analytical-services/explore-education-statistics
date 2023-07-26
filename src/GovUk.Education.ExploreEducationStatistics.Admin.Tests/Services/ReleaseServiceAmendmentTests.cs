@@ -654,10 +654,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var originalFile2 = releaseFiles.First(f =>
                     f.File.Filename == amendmentDataFile2.File.Filename);
                 AssertAmendedReleaseFileCorrect(originalFile2, amendmentDataFile2, amendment);
-                
-                // Assert that the amendment does not have the PreReleaseAccessList copied over from the 
-                // original Release.
-                Assert.Null(amendment.PreReleaseAccessList);
+
+                Assert.Equal(release.PreReleaseAccessList, amendment.PreReleaseAccessList);
 
                 Assert.True(amendment.Amendment);
             }

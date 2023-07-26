@@ -21,6 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Name { get; init; } = string.Empty;
 
+        public string? DataSetName { get; set; }
+        
+        public Guid DataSetId { get; set; }
+
         public string? HighlightName { get; set; }
 
         public string? HighlightDescription { get; set; }

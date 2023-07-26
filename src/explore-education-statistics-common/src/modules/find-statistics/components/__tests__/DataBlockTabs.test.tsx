@@ -29,6 +29,8 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 describe('DataBlockTabs', () => {
   const testDataBlock: DataBlock = {
     id: 'block-1',
+    dataSetName: 'Test data set',
+    dataSetId: 'test-data-set',
     type: 'DataBlock',
     heading: '',
     order: 0,
@@ -83,6 +85,8 @@ describe('DataBlockTabs', () => {
 
   const testDataBlockMap: DataBlock = {
     id: 'block-1',
+    dataSetId: 'test-data-set',
+    dataSetName: 'Test data set',
     type: 'DataBlock',
     heading: '',
     order: 0,

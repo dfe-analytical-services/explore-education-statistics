@@ -52,18 +52,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
     public class ValidatorService : IValidatorService
     {
         private readonly ILogger<IValidatorService> _logger;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IFileTypeService _fileTypeService;
         private readonly IDataImportService _dataImportService;
         
         public ValidatorService(
             ILogger<ValidatorService> logger,
-            IBlobStorageService blobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
             IFileTypeService fileTypeService,
             IDataImportService dataImportService)
         {
             _logger = logger;
-            _blobStorageService = blobStorageService;
+            _privateBlobStorageService = privateBlobStorageService;
             _fileTypeService = fileTypeService;
             _dataImportService = dataImportService;
         }
@@ -88,10 +88,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await _dataImportService.UpdateStatus(import.Id, DataImportStatus.STAGE_1, 0);
 
-            var dataFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles, 
+            var dataFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, 
                 import.File.Path());
                     
-            var metaFileStreamProvider = () => _blobStorageService.StreamBlob(PrivateReleaseFiles,
+            var metaFileStreamProvider = () => _privateBlobStorageService.StreamBlob(PrivateReleaseFiles,
                 import.MetaFile.Path());
 
             return await

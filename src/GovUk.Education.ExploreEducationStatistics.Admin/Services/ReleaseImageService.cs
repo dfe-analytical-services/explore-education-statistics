@@ -26,21 +26,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly IReleaseFileRepository _releaseFileRepository;
         private readonly IUserService _userService;
 
         public ReleaseImageService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IBlobStorageService blobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
             IFileUploadsValidatorService fileUploadsValidatorService,
             IReleaseFileRepository releaseFileRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
-            _blobStorageService = blobStorageService;
+            _privateBlobStorageService = privateBlobStorageService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _releaseFileRepository = releaseFileRepository;
             _userService = userService;
@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .Include(rf => rf.File)
                     .Where(rf => rf.ReleaseId == releaseId && rf.FileId == fileId))
                 .OnSuccessCombineWith(rf =>
-                    _blobStorageService.DownloadToStream(PrivateReleaseFiles, rf.Path(), new MemoryStream()))
+                    _privateBlobStorageService.DownloadToStream(PrivateReleaseFiles, rf.Path(), new MemoryStream()))
                 .OnSuccess(releaseFileAndStream =>
                 {
                     var (releaseFile, stream) = releaseFileAndStream;
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await _contentDbContext.SaveChangesAsync();
 
-            await _blobStorageService.UploadFile(
+            await _privateBlobStorageService.UploadFile(
                 containerName: PrivateReleaseFiles,
                 path: releaseFile.Path(),
                 file: formFile);

@@ -35,6 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Get()
         {
+            var subjectId = Guid.NewGuid();
+            
             var dataBlock = new DataBlock
             {
                 Heading = "Test heading",
@@ -43,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Order = 5,
                 Query = new ObservationQueryContext
                 {
+                    SubjectId = subjectId,
                     Filters = new List<Guid>
                     {
                         Guid.NewGuid(),
@@ -75,6 +78,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Width = 500,
                     }
                 },
+                
+            };
+
+            var release = new Release();
+
+            var releaseFile = new ReleaseFile
+            {
+                Name = "test release file",
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
             };
 
             var featuredTable = new FeaturedTable
@@ -84,17 +103,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 DataBlock = dataBlock,
             };
 
+            var releaseContentBlock = new ReleaseContentBlock 
+            {
+                Release = release,
+                ContentBlock = dataBlock
+            };
+
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.ReleaseContentBlocks.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = new Release(),
-                        ContentBlock = dataBlock,
-                    }
-                );
-                await context.FeaturedTables.AddAsync(featuredTable);
+                await context.AddRangeAsync(release, releaseFile, releaseContentBlock, featuredTable);
                 await context.SaveChangesAsync();
             }
 
@@ -113,6 +132,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(featuredTable.Name, retrievedResult.HighlightName);
                 Assert.Equal(featuredTable.Description, retrievedResult.HighlightDescription);
 
+                Assert.Equal(subjectId, retrievedResult.DataSetId);
+                Assert.Equal("test release file", retrievedResult.DataSetName);
+
                 dataBlock.Query.AssertDeepEqualTo(retrievedResult.Query);
                 dataBlock.Table.AssertDeepEqualTo(retrievedResult.Table);
                 dataBlock.Charts.AssertDeepEqualTo(retrievedResult.Charts);
@@ -122,21 +144,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Get_NoFeaturedTable()
         {
+            var subjectId = Guid.NewGuid();
+
             var dataBlock = new DataBlock
             {
                 Name = "Test name",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                }
+            };
+
+            var release = new Release();
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
+            };
+
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                Release = release,
+                ContentBlock = dataBlock
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.ReleaseContentBlocks.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = new Release(),
-                        ContentBlock = dataBlock,
-                    }
-                );
+                await context.AddRangeAsync(release, releaseFile, releaseContentBlock);                
                 await context.SaveChangesAsync();
             }
 
@@ -155,8 +197,90 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task Get_ReleaseContentBlockFileWithoutNameReturnsEmptyString()
+        {
+            var subjectId = Guid.NewGuid();
+            
+            var dataBlock = new DataBlock
+            {
+                Heading = "Test name",
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        Height = 400,
+                        Width = 500,
+                    }
+                },
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                }
+            };
+
+            var release = new Release();
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
+            };
+            
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+
+                await context.AddRangeAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock,
+                    },
+                    releaseFile
+                );
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Get(dataBlock.Id);
+                
+                var retrievedResult = result.AssertRight();
+                
+                Assert.Equal(dataBlock.Heading, retrievedResult.Heading);
+                
+                Assert.Equal(subjectId, retrievedResult.DataSetId);
+                Assert.Equal(string.Empty, retrievedResult.DataSetName);
+            }
+        }
+
+        [Fact]
         public async Task Get_ChartWithoutTitleReturnsHeading()
         {
+            var subjectId = Guid.NewGuid();
+
+            var release = new Release();
+            
+            var releaseFile = new ReleaseFile
+            {
+                Name = "test release file",
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
+            };
+
             var dataBlock = new DataBlock
             {
                 Heading = "Test heading",
@@ -169,18 +293,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Width = 500,
                     }
                 },
+                Query = new ObservationQueryContext
+                {
+                    SubjectId  = subjectId
+                },
+            };
+
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                Release = release,
+                ContentBlock = dataBlock,
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = new Release(),
-                        ContentBlock = dataBlock,
-                    }
-                );
+                await context.AddRangeAsync(releaseContentBlock, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -196,6 +324,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(viewModel.Charts);
                 Assert.Equal(dataBlock.Heading, viewModel.Charts[0].Title);
+            }
+        }
+
+        [Fact]
+        public async Task Get_ReleaseContentBlockWithReleaseFileReturnsDataSetName()
+        {
+            var subjectId = Guid.NewGuid();
+            
+            var dataBlock = new DataBlock
+            {
+                Heading = "Test heading",
+                Charts = new List<IChart>
+                {
+                    new LineChart
+                    {
+                        Height = 400,
+                        Width = 500,
+                    }
+                },
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                }
+            };
+            
+            var release = new Release();
+
+            var releaseFile = new ReleaseFile
+            {
+                Name = "test file name",
+                Release = release,
+                File = new File
+                {
+                    
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
+            };
+            
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddRangeAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock,
+                    },
+                   releaseFile
+                );
+                await context.SaveChangesAsync();
+            }
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildDataBlockService(context);
+                var result = await service.Get(dataBlock.Id);
+
+                var retrievedResult = result.AssertRight();
+
+                Assert.Equal("test file name", retrievedResult.DataSetName);
+                Assert.Equal(subjectId, retrievedResult.DataSetId);
             }
         }
 
@@ -289,6 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Name = "Test highlight name 1",
                 Description = "Test highlight description 1",
                 DataBlock = dataBlock1,
+                Release = release,
             };
 
             var dataBlock2 = new DataBlock
@@ -330,6 +523,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Name = "Test highlight name 2",
                 Description = "Test highlight description 2",
                 DataBlock = dataBlock2,
+                Release = release,
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -364,8 +558,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.Heading, listResult[0].Heading);
                 Assert.Equal(dataBlock1.Name, listResult[0].Name);
                 Assert.Equal(dataBlock1.Created, listResult[0].Created);
-                Assert.Equal(dataBlock1.HighlightName, listResult[0].HighlightName);
-                Assert.Equal(dataBlock1.HighlightDescription, listResult[0].HighlightDescription);
+                Assert.Equal(featuredTable1.Name, listResult[0].HighlightName);
+                Assert.Equal(featuredTable1.Description, listResult[0].HighlightDescription);
                 Assert.Equal(dataBlock1.Source, listResult[0].Source);
                 Assert.Equal(1, listResult[0].ChartsCount);
                 Assert.True(listResult[0].InContent);
@@ -373,8 +567,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock2.Heading, listResult[1].Heading);
                 Assert.Equal(dataBlock2.Name, listResult[1].Name);
                 Assert.Equal(dataBlock2.Created, listResult[1].Created);
-                Assert.Equal(dataBlock2.HighlightName, listResult[1].HighlightName);
-                Assert.Equal(dataBlock2.HighlightDescription, listResult[1].HighlightDescription);
+                Assert.Equal(featuredTable2.Name, listResult[1].HighlightName);
+                Assert.Equal(featuredTable2.Description, listResult[1].HighlightDescription);
                 Assert.Equal(dataBlock2.Source, listResult[1].Source);
                 Assert.Equal(0, listResult[1].ChartsCount);
                 Assert.False(listResult[1].InContent);
@@ -479,6 +673,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Name = "Test highlight name 1",
                 Description = "Test highlight description 1",
                 DataBlock = dataBlock1,
+                Release = release,
             };
 
             var dataBlock2 = new DataBlock
@@ -516,8 +711,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock1.Heading, viewModel.Heading);
                 Assert.Equal(dataBlock1.Name, viewModel.Name);
                 Assert.Equal(dataBlock1.Created, viewModel.Created);
-                Assert.Equal(dataBlock1.HighlightName, viewModel.HighlightName);
-                Assert.Equal(dataBlock1.HighlightDescription, viewModel.HighlightDescription);
+                Assert.Equal(featuredTable1.Name, viewModel.HighlightName);
+                Assert.Equal(featuredTable1.Description, viewModel.HighlightDescription);
                 Assert.Equal(dataBlock1.Source, viewModel.Source);
                 Assert.Equal(1, viewModel.ChartsCount);
                 Assert.True(viewModel.InContent);
@@ -932,13 +1127,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Create()
         {
+            var subjectId = Guid.NewGuid();
+
             var release = new Release();
 
-            var contextId = Guid.NewGuid().ToString();
+            var releaseFile = new ReleaseFile
+            {
+                Name = "test release file",
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
+            };
 
+            var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(release);
+                await context.AddRangeAsync(release, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -949,6 +1158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Source = "Test source",
                 Query = new ObservationQueryContext
                 {
+                    SubjectId = subjectId,
                     Filters = new List<Guid>
                     {
                         Guid.NewGuid(),
@@ -1033,18 +1243,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Create_BlankChartTitleUsesHeading()
         {
+            var subjectId = Guid.NewGuid();
+
             var release = new Release();
 
+            var releaseFile = new ReleaseFile
+            {
+                Name = "test release file",
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
+            };
+            
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(release);
+                await context.AddRangeAsync(release, releaseFile);
                 await context.SaveChangesAsync();
             }
 
             var createRequest = new DataBlockCreateViewModel
             {
                 Heading = "Test heading",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                },
                 Charts = new List<IChart>
                 {
                     new LineChart
@@ -1112,6 +1341,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Update()
         {
+            var subjectId = Guid.NewGuid();
+
             var release = new Release
             {
                 Id = Guid.NewGuid(),
@@ -1120,17 +1351,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid()
                 }
             };
+            
+            var releaseFile = new ReleaseFile
+            {
+                Name = "test file",
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
+            };
 
             var dataBlock = new DataBlock
             {
                 Heading = "Old heading",
                 Name = "Old name",
-                HighlightName = "Old highlight name",
-                HighlightDescription = "Old highlight description",
                 Source = "Old source",
                 Order = 5,
                 Query = new ObservationQueryContext
                 {
+                    SubjectId = subjectId,
                     Filters = new List<Guid>
                     {
                         Guid.NewGuid(),
@@ -1168,15 +1411,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseContentBlock = new ReleaseContentBlock
             {
                 Release = release,
-                ContentBlock = dataBlock
+                ContentBlock = dataBlock,
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
-                    releaseContentBlock
+                await context.AddRangeAsync(
+                    releaseContentBlock,
+                    releaseFile
                 );
                 await context.SaveChangesAsync();
             }
@@ -1186,6 +1430,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Heading = "New heading",
                 Name = "New name",
                 Source = "New source",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                },
                 Charts = new List<IChart>
                 {
                     new LineChart
@@ -1229,6 +1477,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.Name, updateResult.Name);
                 Assert.Equal(updateRequest.Source, updateResult.Source);
                 Assert.Equal(dataBlock.Order, updateResult.Order);
+                Assert.Equal(subjectId, updateResult.DataSetId);
+                Assert.Equal("test file", updateResult.DataSetName);
 
                 Assert.Equal(updateRequest.Query, updateResult.Query);
                 Assert.Equal(updateRequest.Table, updateResult.Table);
@@ -1253,6 +1503,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Update_HeadingUpdateAlsoChangesChartTitle()
         {
+            var subjectId = Guid.NewGuid();
+
             var release = new Release
             {
                 Id = Guid.NewGuid(),
@@ -1261,9 +1513,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid()
                 }
             };
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }            
+            };
 
             var dataBlock = new DataBlock
             {
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                },
                 Heading = "Old heading",
                 Charts = new List<IChart>
                 {
@@ -1285,13 +1552,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(releaseContentBlock);
+                await context.AddRangeAsync(releaseContentBlock, releaseFile);
                 await context.SaveChangesAsync();
             }
 
             var updateRequest = new DataBlockUpdateViewModel
             {
                 Heading = "New heading",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                },
                 Charts = new List<IChart>
                 {
                     new LineChart
@@ -1366,6 +1637,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Update_RemoveOldInfographic()
         {
+            var subjectId = Guid.NewGuid();
+
             var release = new Release
             {
                 Id = Guid.NewGuid(),
@@ -1374,11 +1647,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = Guid.NewGuid()
                 }
             };
-            
             var fileId = Guid.NewGuid();
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subjectId,
+                    Filename = "test filename",
+                    Type = FileType.Data
+                }
+            };
 
             var dataBlock = new DataBlock
             {
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                },
                 Charts = new List<IChart>
                 {
                     new InfographicChart
@@ -1407,13 +1695,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(releaseContentBlock);
-                await context.AddAsync(file);
+                await context.AddRangeAsync(releaseContentBlock, file, releaseFile);
                 await context.SaveChangesAsync();
             }
 
             var updateRequest = new DataBlockUpdateViewModel
             {
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                },
                 Charts = new List<IChart>
                 {
                     new LineChart

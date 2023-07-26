@@ -326,7 +326,7 @@ describe('LocationFiltersForm', () => {
       />,
     );
 
-    const searchInput = screen.getByLabelText('Search options');
+    const searchInput = screen.getByLabelText(/Search options/);
 
     userEvent.type(searchInput, 'school');
 

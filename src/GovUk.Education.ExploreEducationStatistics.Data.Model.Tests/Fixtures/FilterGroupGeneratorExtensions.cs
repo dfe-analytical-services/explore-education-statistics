@@ -46,7 +46,7 @@ public static class FilterGroupGeneratorExtensions
             .SetDefault(fg => fg.Id)
             .Set(
                 fg => fg.Label, 
-                (_, _, ctx) => ctx.Index == 0 ? "Default" : $"Filter Group {ctx.Index + 2}");
+                (_, _, ctx) => ctx.Index == 0 ? "Default" : $"Filter group {ctx.Index + 1}");
 
     public static InstanceSetters<FilterGroup> SetLabel(
         this InstanceSetters<FilterGroup> setters,

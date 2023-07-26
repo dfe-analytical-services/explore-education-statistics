@@ -200,6 +200,7 @@ describe('PreReleaseTableToolPage', () => {
       name: 'Test highlight',
       description: 'Test highlight description',
       subjectId: 'subject-1',
+      order: 0,
     },
   ];
   const testSubjects: Subject[] = [
@@ -227,6 +228,8 @@ describe('PreReleaseTableToolPage', () => {
 
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',
+    dataSetId: 'data-set-1',
+    dataSetName: 'Test data set',
     name: 'Test block',
     highlightName: 'Test highlight name',
     source: '',

@@ -23,7 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             Image
         };
 
-        public ReleaseFileRepository(ContentDbContext contentDbContext)
+        public ReleaseFileRepository(
+            ContentDbContext contentDbContext)
         {
             _contentDbContext = contentDbContext;
         }
@@ -36,7 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             FileType type,
             Guid createdById,
             string? name = null,
-            string? summary = null)
+            string? summary = null,
+            Guid? newFileId = null)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -50,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 Summary = summary,
                 File = new File
                 {
+                    Id = newFileId ?? Guid.NewGuid(),
                     CreatedById = createdById,
                     RootPath = releaseId,
                     Filename = filename,
@@ -111,6 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
         public async Task<ReleaseFile> Update(Guid releaseId,
             Guid fileId,
+            Guid? newFileId = null,
             string? name = null,
             string? fileName = null,
             string? summary = null)
@@ -124,6 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
             _contentDbContext.Update(releaseFile);
 
+            releaseFile.FileId = newFileId ?? releaseFile.FileId;
             releaseFile.Name = name ?? releaseFile.Name;
             releaseFile.File.Filename = fileName ?? releaseFile.File.Filename;
             releaseFile.Summary = summary ?? releaseFile.Summary;

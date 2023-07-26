@@ -223,6 +223,7 @@ const FiltersForm = ({
                 <div className="govuk-grid-column-one-half-from-desktop govuk-!-margin-bottom-6">
                   <RHFFormFieldCheckboxSearchSubGroups
                     disabled={formState.isSubmitting}
+                    groupLabel="Indicators"
                     hint="Select at least one indicator below"
                     legend={
                       <>
@@ -288,6 +289,7 @@ const FiltersForm = ({
                           return (
                             <RHFFormFieldCheckboxGroupsMenu
                               disabled={formState.isSubmitting}
+                              groupLabel={filterGroup.legend}
                               hint={filterGroup.hint}
                               id={`${formId}-${filterName}`}
                               key={filterKey}

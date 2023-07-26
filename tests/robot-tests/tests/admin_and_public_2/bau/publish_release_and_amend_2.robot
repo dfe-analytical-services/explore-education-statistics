@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Library             ../../libs/admin_api.py
 
@@ -96,6 +97,11 @@ Add second footnote to subject
     user enters text into element    label:Footnote    Footnote 2 ${SUBJECT_NAME}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Add public prerelease access list
     user clicks link    Pre-release access

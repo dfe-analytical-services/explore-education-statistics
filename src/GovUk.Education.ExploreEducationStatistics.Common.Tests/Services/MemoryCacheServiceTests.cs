@@ -11,6 +11,7 @@ using Moq;
 using NCrontab;
 using Xunit;
 using static System.Globalization.DateTimeStyles;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cache.CronSchedules;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
@@ -18,8 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
 
 public class MemoryCacheServiceTests
 {
-    private readonly CrontabSchedule _hourlyExpirySchedule = CrontabSchedule.Parse("0 * * * *");
-    private readonly CrontabSchedule _halfHourlyExpirySchedule = CrontabSchedule.Parse("*/30 * * * *");
+    private readonly CrontabSchedule _hourlyExpirySchedule = CrontabSchedule.Parse(HourlyExpirySchedule);
+    private readonly CrontabSchedule _halfHourlyExpirySchedule = CrontabSchedule.Parse(HalfHourlyExpirySchedule);
 
     private record SampleClassSuperclass;
 

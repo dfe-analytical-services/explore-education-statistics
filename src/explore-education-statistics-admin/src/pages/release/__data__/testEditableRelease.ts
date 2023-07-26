@@ -120,6 +120,8 @@ export const testEditableRelease: EditableRelease = {
         {
           heading: "'prma' from 'My Pub' in England for 2017/18",
           name: 'DataBlock 1',
+          dataSetId: 'dataSet-1',
+          dataSetName: 'My Pub',
           source: '',
           query: {
             subjectId: '36aa28ce-83ca-49b5-8c27-b34e77b062c9',
@@ -216,6 +218,8 @@ export const testEditableRelease: EditableRelease = {
         charts: [],
         table: emptyTable,
         type: 'DataBlock',
+        dataSetId: 'dataSet-1',
+        dataSetName: 'My Pub',
         id: 'a3197018-66b6-4ce5-97fa-da2355270c40',
         order: 0,
         comments: [],

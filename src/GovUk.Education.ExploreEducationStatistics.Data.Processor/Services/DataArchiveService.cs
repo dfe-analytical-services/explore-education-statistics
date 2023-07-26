@@ -12,18 +12,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class DataArchiveService : IDataArchiveService
     {
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
 
-        public DataArchiveService(IBlobStorageService blobStorageService)
+        public DataArchiveService(IPrivateBlobStorageService privateBlobStorageService)
         {
-            _blobStorageService = blobStorageService;
+            _privateBlobStorageService = privateBlobStorageService;
         }
 
         public async Task ExtractDataFiles(DataImport import)
         {
             var path = import.ZipFile!.Path();
 
-            await using var zipBlobFileStream = await _blobStorageService.StreamBlob(PrivateReleaseFiles, path);
+            await using var zipBlobFileStream = await _privateBlobStorageService.StreamBlob(PrivateReleaseFiles, path);
             using var archive = new ZipArchive(zipBlobFileStream);
 
             var file1 = archive.Entries[0];
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await using (var stream = dataFile.Open())
             {
-                await _blobStorageService.UploadStream(
+                await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
                     path: import.File.Path(),
                     stream: stream,
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             await using (var stream = metadataFile.Open())
             {
-                await _blobStorageService.UploadStream(
+                await _privateBlobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
                     path: import.MetaFile.Path(),
                     stream: stream,

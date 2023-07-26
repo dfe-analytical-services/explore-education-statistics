@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly IFileRepository _fileRepository;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
@@ -35,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public MethodologyImageService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IBlobStorageService blobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
             IFileUploadsValidatorService fileUploadsValidatorService,
             IFileRepository fileRepository,
             IMethodologyFileRepository methodologyFileRepository,
@@ -43,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
-            _blobStorageService = blobStorageService;
+            _privateBlobStorageService = privateBlobStorageService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _fileRepository = fileRepository;
             _methodologyFileRepository = methodologyFileRepository;
@@ -86,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             if (methodologyLinks.Count == 1 &&
                                 methodologyLinks[0].MethodologyVersionId == methodologyVersionId)
                             {
-                                await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
+                                await _privateBlobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
                                 await _fileRepository.Delete(file.Id);
                             }
                         });
@@ -100,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     .Include(mf => mf.File)
                     .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
                 .OnSuccessCombineWith(mf =>
-                    _blobStorageService.DownloadToStream(PrivateMethodologyFiles, mf.Path(), new MemoryStream()))
+                    _privateBlobStorageService.DownloadToStream(PrivateMethodologyFiles, mf.Path(), new MemoryStream()))
                 .OnSuccess(methodologyFileAndStream =>
                 {
                     var (methodologyFile, stream) = methodologyFileAndStream;
@@ -141,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             await _contentDbContext.SaveChangesAsync();
 
-            await _blobStorageService.UploadFile(
+            await _privateBlobStorageService.UploadFile(
                 containerName: PrivateMethodologyFiles,
                 path: methodologyFile.Path(),
                 file: formFile);

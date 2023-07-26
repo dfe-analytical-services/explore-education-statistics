@@ -1,11 +1,20 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 public record SubjectCsvMetaViewModel
 {
+    private Lazy<Dictionary<string, FilterCsvMetaViewModel>> FiltersByGroupingColumnLazy => new(
+        () => Filters
+            .Values
+            .Where(filter => filter.GroupCsvColumn != null)
+            .ToDictionary(
+                filter => filter.GroupCsvColumn!,
+                filter => filter));
+
     public IReadOnlyDictionary<string, FilterCsvMetaViewModel> Filters { get; init; } =
         new Dictionary<string, FilterCsvMetaViewModel>();
 
@@ -16,4 +25,6 @@ public record SubjectCsvMetaViewModel
         new Dictionary<string, IndicatorCsvMetaViewModel>();
 
     public List<string> Headers { get; init; } = new();
+
+    public Dictionary<string, FilterCsvMetaViewModel> FiltersByGroupingColumn => FiltersByGroupingColumnLazy.Value;
 }

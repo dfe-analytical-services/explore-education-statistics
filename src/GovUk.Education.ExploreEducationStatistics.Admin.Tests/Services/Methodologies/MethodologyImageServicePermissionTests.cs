@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
@@ -88,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         private MethodologyImageService SetupMethodologyImageService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IBlobStorageService blobStorageService = null,
+            IPrivateBlobStorageService privateBlobStorageService = null,
             IFileUploadsValidatorService fileUploadsValidatorService = null,
             IFileRepository fileRepository = null,
             IMethodologyFileRepository methodologyFileRepository = null,
@@ -97,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             return new(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                privateBlobStorageService ?? Mock.Of<IPrivateBlobStorageService>(),
                 fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
                 fileRepository ?? Mock.Of<IFileRepository>(),
                 methodologyFileRepository ?? Mock.Of<IMethodologyFileRepository>(),

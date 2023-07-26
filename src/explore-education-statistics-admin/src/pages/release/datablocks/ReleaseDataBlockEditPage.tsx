@@ -142,6 +142,11 @@ const ReleaseDataBlockEditPage = ({
                     url={`${config.PublicAppUrl}/data-tables/fast-track/${dataBlockId}`}
                   />
                 </SummaryListItem>
+                {dataBlock.dataSetName && (
+                  <SummaryListItem term="Data set name">
+                    {dataBlock.dataSetName}
+                  </SummaryListItem>
+                )}
               </SummaryList>
 
               {canUpdateRelease && (

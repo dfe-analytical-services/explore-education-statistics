@@ -57,7 +57,6 @@ const VerticalBarBlock = ({
   legend,
   includeNonNumericData,
   showDataLabels,
-  dataLabelPosition,
 }: VerticalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
   if (
@@ -179,8 +178,7 @@ const VerticalBarBlock = ({
                   ? {
                       fontSize: 14,
                       offset: 5,
-                      position:
-                        dataLabelPosition === 'inside' ? 'insideTop' : 'top',
+                      position: 'top',
                       formatter: (value: string | number) =>
                         formatPretty(
                           value.toString(),
@@ -212,11 +210,14 @@ const VerticalBarBlock = ({
           {axes.minor.referenceLines?.map(referenceLine =>
             createReferenceLine({
               axis: 'y',
+              axisDomain: minorDomainTicks.domain,
               axisType: 'minor',
               chartData,
               label: referenceLine.label,
               otherAxisDomain: majorDomainTicks.domain,
+              otherAxisEnd: referenceLine.otherAxisEnd,
               otherAxisPosition: referenceLine.otherAxisPosition,
+              otherAxisStart: referenceLine.otherAxisStart,
               position: referenceLine.position,
               style: referenceLine.style,
               y: referenceLine.position,

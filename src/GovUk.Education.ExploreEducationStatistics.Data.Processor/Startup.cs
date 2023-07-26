@@ -1,5 +1,4 @@
 ﻿using System;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -14,7 +13,6 @@ using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 [assembly: FunctionsStartup(typeof(Startup))]
@@ -29,19 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddDbContext<ContentDbContext>(options =>
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("ContentDb"),
                         providerOptions => providerOptions.EnableCustomRetryOnFailure()))
-                .AddSingleton<IBlobStorageService, BlobStorageService>(
-                    provider =>
-                    {
-                        var connectionString = GetConfigurationValue(provider, "CoreStorage");
-
-                        var blobStorageService = new BlobStorageService(
-                            connectionString,
-                            new BlobServiceClient(connectionString),
-                            provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                            new StorageInstanceCreationUtil()
-                        );
-                        return blobStorageService;
-                    })
+                .AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>()
                 .AddSingleton<IStorageQueueService, StorageQueueService>(provider =>
                     new StorageQueueService(
                         GetConfigurationValue(provider, "CoreStorage"),

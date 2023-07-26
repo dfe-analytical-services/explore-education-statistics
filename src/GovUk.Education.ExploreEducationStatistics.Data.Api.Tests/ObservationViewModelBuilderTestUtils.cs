@@ -12,35 +12,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests;
 // TODO EES-3755 Remove after Permalink snapshot migration work is complete
 internal static class ObservationViewModelBuilderTestUtils
 {
-    public static ObservationViewModel BuildObservationViewModelWithoutLocationId(
+    public static ObservationViewModel BuildObservationViewModel(
         Observation observation,
-        IEnumerable<Indicator> indicators)
+        IEnumerable<Indicator> indicators,
+        ObservationViewModelTestBuildStrategy buildStrategy)
     {
         // Build the view model with location id as normal
         var viewModel = ObservationViewModelBuilder.BuildObservation(observation, indicators.Select(i => i.Id));
 
-        // Swap out the location id for a location view model to represent how permalink data would be like
-        // with observations that had a location object prior to location id being added and location being removed.
+        // Depending on the build strategy to test permalinks built with different states of location data,
+        // we might want to add or remove the location id from the view model and/or add a location object
+        switch (buildStrategy)
+        {
+            case ObservationViewModelTestBuildStrategy.WithLocationIdOnly:
+                break;
+            case ObservationViewModelTestBuildStrategy.WithLocationIdAndLocationObject:
+                viewModel.Location = observation.Location.AsLocationViewModel();
+                break;
+            case ObservationViewModelTestBuildStrategy.WithLocationObjectOnly:
+                viewModel.Location = observation.Location.AsLocationViewModel();
 
-        // Ideally location id should have been made nullable to match the possibility that it can be null in permalink data
-        // but we'll leave it for now given that this possibility is about to disappear with the snapshot migration.
-        viewModel.LocationId = Guid.Empty;
+                // Remove the location id
+                // Ideally location id should have been made nullable to match the possibility that it can be null in permalink data
+                // but we'll leave it for now given that this possibility is about to disappear with the snapshot migration.
+                viewModel.LocationId = Guid.Empty;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(buildStrategy), buildStrategy, null);
+        }
 
-        viewModel.Location = observation.Location.AsLocationViewModel();
         return viewModel;
     }
+}
 
-    public static ObservationViewModel BuildObservationViewModelWithLocationIdAndLocation(
-        Observation observation,
-        IEnumerable<Indicator> indicators)
-    {
-        // Build the view model with location id as normal
-        var viewModel = ObservationViewModelBuilder.BuildObservation(observation, indicators.Select(i => i.Id));
+internal enum ObservationViewModelTestBuildStrategy
+{
+    /// <summary>
+    /// Build the observation view model with a location id as normal.
+    /// </summary>
+    WithLocationIdOnly,
 
-        // Add the location view model object to represent how the permalink data would be like with observations
-        // when location id was added but before location was removed.
-        viewModel.Location = observation.Location.AsLocationViewModel();
+    /// <summary>
+    /// Build the observation view model without a location id and include the location object instead.
+    /// </summary>
+    WithLocationObjectOnly,
 
-        return viewModel;
-    }
+    /// <summary>
+    /// Build the observation view model with a location id and also include the location object.
+    /// </summary>
+    WithLocationIdAndLocationObject
 }

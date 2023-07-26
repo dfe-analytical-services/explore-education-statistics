@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Threading;
 using AspectInjector.Broker;
 using Microsoft.Extensions.Configuration;
 

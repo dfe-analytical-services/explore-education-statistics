@@ -29,6 +29,7 @@ const FormRadioSearchGroup = ({
     legendSize = 'm',
     error,
     name,
+    onChange,
     onFieldsetFocus,
     onFieldsetBlur,
     options = [],
@@ -96,9 +97,7 @@ const FormRadioSearchGroup = ({
             options={filteredOptions}
             onChange={(event, option) => {
               setSelectedOption(event.target.value);
-              if (props.onChange) {
-                props.onChange(event, option);
-              }
+              onChange?.(event, option);
             }}
           />
         ) : (

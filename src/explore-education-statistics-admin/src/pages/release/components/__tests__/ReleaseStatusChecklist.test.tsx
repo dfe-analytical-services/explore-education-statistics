@@ -17,6 +17,11 @@ describe('ReleaseStatusChecklist', () => {
               { code: 'DataFileReplacementsMustBeCompleted' },
               { code: 'PublicDataGuidanceRequired' },
               { code: 'ReleaseNoteRequired' },
+              { code: 'SummarySectionContainsEmptyHtmlBlock' },
+              { code: 'EmptyContentSectionExists' },
+              { code: 'GenericSectionsContainEmptyHtmlBlock' },
+              { code: 'RelatedDashboardsSectionContainsEmptyHtmlBlock' },
+              { code: 'ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock' },
             ],
           }}
           release={testRelease}
@@ -32,7 +37,7 @@ describe('ReleaseStatusChecklist', () => {
       screen.queryByRole('heading', { name: 'Warnings' }),
     ).not.toBeInTheDocument();
 
-    expect(screen.getByText('4 issues')).toBeInTheDocument();
+    expect(screen.getByText('9 issues')).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
@@ -66,6 +71,53 @@ describe('ReleaseStatusChecklist', () => {
       screen.getByRole('link', {
         name:
           'A public release note for this amendment is required, add this near the top of the content page',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Release content should not contain an empty summary section',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Release content should not contain any empty sections',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name: 'Release content should not contain empty text blocks',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name:
+          'Release content should not contain an empty related dashboards section',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/content',
+    );
+
+    expect(
+      screen.getByRole('link', {
+        name:
+          'Release must contain a key statistic or a non-empty headline text block',
       }),
     ).toHaveAttribute(
       'href',

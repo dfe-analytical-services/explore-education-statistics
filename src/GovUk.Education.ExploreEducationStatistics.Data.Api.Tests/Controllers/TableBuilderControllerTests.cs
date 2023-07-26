@@ -483,7 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             VerifyAllMocks(BlobCacheService, releaseRepository);
 
-            response.AssertNotFound();;
+            response.AssertNotFound();
         }
 
         [Fact]

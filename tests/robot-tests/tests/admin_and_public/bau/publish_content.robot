@@ -27,6 +27,10 @@ Navigate to release content
     user waits until page contains button    Add dashboards section
     user waits until page contains button    Add new section
 
+Add headline text block to release content
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
 Add Related dashboards section to release content
     user clicks button    Add dashboards section
     user waits until page contains accordion section    View related dashboard(s)
@@ -59,10 +63,12 @@ Check glossary info icon appears on release preview
     user waits until page contains button    Absence
 
 Click glossary info icon and validate glossary entry
+    user closes admin feedback banner if needed
+
     user clicks button    Absence
-    user waits until h2 is visible    Absence
+    ${modal}=    user waits until modal is visible    Absence
     user checks page contains    When a pupil misses (or is absent from) at least 1 possible school session.
-    user clicks button    Close
+    user clicks button    Close    ${modal}
     user waits until page does not contain element    xpath://h2[text()="Absence"]
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
 

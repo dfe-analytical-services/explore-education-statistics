@@ -84,10 +84,8 @@ describe('ReleaseAncillaryFilePage', () => {
       >('release-1', 'file-1', {
         title: 'Updated test title',
         summary: 'Updated test summary',
+        file,
       });
-      expect(releaseAncillaryFileService.replaceFile).toHaveBeenCalledWith<
-        Parameters<typeof releaseAncillaryFileService.replaceFile>
-      >('release-1', 'file-1', file);
     });
   });
 

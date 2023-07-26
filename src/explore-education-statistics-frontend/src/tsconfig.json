@@ -16,7 +16,7 @@
       "@frontend-test/*": [
         "../test/*"
       ]
-    }
+    },
   },
   "exclude": [
     "node_modules"

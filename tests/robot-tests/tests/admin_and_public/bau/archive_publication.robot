@@ -2,6 +2,7 @@
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
+Resource            ../../libs/admin/manage-content-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
@@ -43,6 +44,11 @@ Add data guidance to archive-publication subject
 
     user clicks button    Save guidance
     user waits until page contains button    Edit guidance
+
+Add headline text block to archive-publication content
+    user navigates to content page    ${PUBLICATION_NAME_ARCHIVE}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
 
 Go to "Sign off" page and approve archive-publication release
     user clicks link    Sign off
@@ -182,6 +188,11 @@ Add data guidance to superseding-publication subject
     user clicks button    Save guidance
     user waits until page contains button    Edit guidance
 
+Add headline text block to superseding-publication content
+    user navigates to content page    ${PUBLICATION_NAME_SUPERSEDE}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
 Go to "Sign off" page and approve superseding-publication release
     user clicks link    Sign off
     user approves original release for immediate publication
@@ -198,6 +209,8 @@ Check public superseding-publication release page displays correctly
     user waits until page contains    This is the latest data
 
 Check public archive-publication release page displays correctly
+    user waits for caches to expire
+
     user navigates to public frontend    ${PUBLICATION_ARCHIVE_URL}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user checks page does not contain    This is the latest data
@@ -375,7 +388,7 @@ Set archive-publication to be no longer be superseded
     user clicks button    Confirm    ${modal}
     user waits until modal is not visible    Confirm publication changes
 
-    sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
+    user waits for caches to expire
 
 Check can create a release for archive-publication which is no longer archived
     [Documentation]    Failing due to https://dfedigital.atlassian.net/browse/EES-4269

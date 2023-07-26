@@ -61,8 +61,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
             <span
               class="govuk-visually-hidden"
             >
-               
-              for Group A
+               for Group A
             </span>
           </button>
           <div
@@ -129,8 +128,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
             <span
               class="govuk-visually-hidden"
             >
-               
-              for Group B
+               for Group B
             </span>
           </button>
           <div

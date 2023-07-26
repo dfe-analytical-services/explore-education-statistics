@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IDataArchiveValidationService _dataArchiveValidationService;
         private readonly IFileUploadsValidatorService _fileUploadsValidatorService;
         private readonly IFileRepository _fileRepository;
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public ReleaseDataFileService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IBlobStorageService blobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
             IDataArchiveValidationService dataArchiveValidationService,
             IFileUploadsValidatorService fileUploadsValidatorService,
             IFileRepository fileRepository,
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
-            _blobStorageService = blobStorageService;
+            _privateBlobStorageService = privateBlobStorageService;
             _dataArchiveValidationService = dataArchiveValidationService;
             _fileUploadsValidatorService = fileUploadsValidatorService;
             _fileRepository = fileRepository;
@@ -105,11 +105,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         else
                         {
                             await _dataImportService.DeleteImport(file.Id);
-                            await _blobStorageService.DeleteBlob(
+                            await _privateBlobStorageService.DeleteBlob(
                                 PrivateReleaseFiles,
                                 file.Path()
                             );
-                            await _blobStorageService.DeleteBlob(
+                            await _privateBlobStorageService.DeleteBlob(
                                 PrivateReleaseFiles,
                                 metaFile.Path()
                             );
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             if (file.SourceId.HasValue)
                             {
                                 var zipFile = await _fileRepository.Get(file.SourceId.Value);
-                                await _blobStorageService.DeleteBlob(
+                                await _privateBlobStorageService.DeleteBlob(
                                     PrivateReleaseFiles,
                                     zipFile.Path()
                                 );
@@ -488,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             File file,
             IFormFile formFile)
         {
-            await _blobStorageService.UploadFile(
+            await _privateBlobStorageService.UploadFile(
                 containerName: PrivateReleaseFiles,
                 path: file.Path(),
                 file: formFile

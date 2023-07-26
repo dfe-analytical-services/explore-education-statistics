@@ -1,6 +1,6 @@
 import { Options } from 'k6/options';
 import merge from 'lodash/merge';
-import { parseIntOptional } from '../utils/utils';
+import { parseFloatOptional } from '../utils/utils';
 
 interface Config {
   // Total duration of the main stage of the test, providing a steady stream
@@ -9,7 +9,7 @@ interface Config {
 }
 
 const overrides: Partial<Config> = {
-  mainStageDurationMinutes: parseIntOptional(
+  mainStageDurationMinutes: parseFloatOptional(
     __ENV.MAIN_TEST_STAGE_DURATION_MINS,
   ),
 };

@@ -23,15 +23,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     [Authorize(Roles = RoleNames.BauUser)]
     public class BauCacheController : ControllerBase
     {
-        private readonly IBlobStorageService _privateBlobStorageService;
-        private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IPrivateBlobStorageService _privateBlobStorageService;
+        private readonly IPublicBlobStorageService _publicBlobStorageService;
         private readonly IGlossaryCacheService _glossaryCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IPublicationCacheService _publicationCacheService;
 
         public BauCacheController(
-            IBlobStorageService privateBlobStorageService,
-            IBlobStorageService publicBlobStorageService,
+            IPrivateBlobStorageService privateBlobStorageService,
+            IPublicBlobStorageService publicBlobStorageService,
             IGlossaryCacheService glossaryCacheService,
             IMethodologyCacheService methodologyCacheService, 
             IPublicationCacheService publicationCacheService)

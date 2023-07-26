@@ -9,10 +9,7 @@ import KeyStatDataBlock from '@common/modules/find-statistics/components/KeyStat
 import useGetReleaseFile from '@common/modules/release/hooks/useGetReleaseFile';
 import { Release } from '@common/services/publicationService';
 import glossaryService from '@frontend/services/glossaryService';
-import {
-  logEvent,
-  logOutboundLink,
-} from '@frontend/services/googleAnalyticsService';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
 
@@ -65,13 +62,6 @@ const PublicationReleaseHeadlinesSection = ({
           key={block.id}
           block={block}
           getGlossaryEntry={glossaryService.getEntry}
-          trackContentLinks={(url, newTab) => {
-            logOutboundLink(
-              `Publication release headlines link: ${url}`,
-              url,
-              newTab,
-            );
-          }}
           trackGlossaryLinks={glossaryEntrySlug =>
             logEvent({
               category: `Publication Release Headlines Glossary Link`,

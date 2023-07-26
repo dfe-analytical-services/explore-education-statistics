@@ -1,13 +1,13 @@
 import client from '@admin/services/utils/service';
 import { IdTitlePair } from '@admin/services/types/common';
 
-export type MethodologyStatus = 'Draft' | 'Approved';
+export type MethodologyApprovalStatus = 'Draft' | 'Approved';
 export type MethodologyPublishingStrategy = 'WithRelease' | 'Immediately';
 
 export type UpdateMethodology = {
   latestInternalReleaseNote?: string;
   title: string;
-  status: MethodologyStatus;
+  status: MethodologyApprovalStatus;
   publishingStrategy?: MethodologyPublishingStrategy;
   withReleaseId?: string;
 };
@@ -22,7 +22,7 @@ export interface BaseMethodologyVersion {
   amendment: boolean;
   previousVersionId?: string;
   title: string;
-  status: MethodologyStatus;
+  status: MethodologyApprovalStatus;
   published?: string;
   methodologyId: string;
 }
@@ -46,6 +46,15 @@ export interface MethodologyVersionSummary extends BaseMethodologyVersion {
     canMakeAmendmentOfMethodology: boolean;
     canRemoveMethodologyLink: boolean;
   };
+}
+
+export interface MethodologyStatus {
+  methodologyStatusId: string;
+  internalReleaseNote: string;
+  approvalStatus: MethodologyApprovalStatus;
+  created: string;
+  createdByEmail?: string;
+  methodologyVersion: number;
 }
 
 const methodologyService = {
@@ -84,6 +93,11 @@ const methodologyService = {
 
   deleteMethodology(methodologyId: string): Promise<void> {
     return client.delete(`/methodology/${methodologyId}`);
+  },
+  getMethodologyStatuses(
+    methodologyVersionId: string,
+  ): Promise<MethodologyStatus[]> {
+    return client.get(`/methodology/${methodologyVersionId}/status`);
   },
 };
 

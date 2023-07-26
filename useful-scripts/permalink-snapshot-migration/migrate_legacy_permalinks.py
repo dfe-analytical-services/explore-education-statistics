@@ -2,6 +2,7 @@ import argparse
 import csv
 import os
 import time
+from datetime import datetime
 
 import certifi
 import requests
@@ -9,20 +10,20 @@ import requests
 """
 This is the script for migrating legacy permalinks to permalink snapshots.
 It uses a Data API migration endpoint `PUT /api/permalink/{permalinkId}/snapshot`.
-It reads a CSV file named 'permalinks.csv' and outputs a CSV file named 'migration_results.csv'.
+It reads a CSV file named 'permalinks.csv' and outputs a CSV file named 'migration_results_{env}_{datetime}.csv'.
 
-Usage: `pipenv run python migrate_legacy_permalinks.py [-h] [--data-api-url [DATA_API_URL]] [--sleep [SLEEP]] [--timeout [TIMEOUT]]`
+Usage: `pipenv run python migrate_legacy_permalinks.py [-h] [--env {local,dev,test,preprod,prod}] [--sleep [SLEEP]] [--timeout [TIMEOUT]]`
 
 Instructions:
 
-1. List all the legacy permalinks by running a query against the Content database to get all the legacy permalinks:
+1. List all the legacy permalinks which do not have a snapshot by running a query against the Content database:
 
 ```
-SELECT LOWER(Id) AS permalink_id,
-       IIF(LegacyHasSnapshot = 1, 'True', 'False') AS migrated
+SELECT LOWER(Id) AS permalink_id
 FROM content.dbo.Permalinks
 WHERE Legacy = 1
-ORDER BY Created
+AND LegacyHasSnapshot IS NULL
+ORDER BY LegacyContentLength DESC
 ```
 
 2. Place the results of the database query with column headers in a new file.
@@ -31,21 +32,29 @@ Save it in the same directory as this script with filename 'permalinks.csv'.
 Example of 'permalinks.csv' input file:
 
 ```
-permalink_id,migrated
-a227b04a-42af-4139-28e5-08db35ad5bb4,False
-a57e9ae9-b442-4005-caec-08db3b6d5a38,False
+permalink_id
+a227b04a-42af-4139-28e5-08db35ad5bb4
+a57e9ae9-b442-4005-caec-08db3b6d5a38
 ```
 
 3. Run the script.
 4. Inspect the console log for errors and view the result CSV file 'migration_results.csv'.
 5. Refresh the database query and update the input file before re-running.
-
 """
 
 
 class MigrateLegacyPermalinks:
-    def __init__(self, data_api_url: str, sleep: float, timeout: float):
-        self.data_api_url = data_api_url
+    DATA_API_URLS = {
+        "local": "http://localhost:5000/api",
+        "dev": "https://data.dev.explore-education-statistics.service.gov.uk/api",
+        "test": "https://data.test.explore-education-statistics.service.gov.uk/api",
+        "preprod": "https://data.pre-production.explore-education-statistics.service.gov.uk/api",
+        "prod": "https://data.explore-education-statistics.service.gov.uk/api",
+    }
+
+    def __init__(self, env: str, sleep: float, timeout: float):
+        self.env = env
+        self.data_api_url = MigrateLegacyPermalinks.DATA_API_URLS[env]
         self.session = requests.Session()
         self.timeout = timeout
         self.sleep = sleep
@@ -68,13 +77,13 @@ class MigrateLegacyPermalinks:
         return response.status_code, response_time
 
     def _migrate_permalinks(self, permalinks: list[list[str]]) -> None:
-        with open("migration_results.csv", "w", newline="") as output_file:
+        output_filename = f"migration_results_{self.env}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
+        with open(output_filename, "w", newline="") as output_file:
             output_writer = csv.writer(output_file)
 
             output_writer.writerow(
                 [
                     "permalink_id",
-                    "ignored",
                     "connection_error",
                     "timeout",
                     "exception",
@@ -84,32 +93,29 @@ class MigrateLegacyPermalinks:
             )
             output_file.flush()
 
-            for permalink_id, migrated in permalinks:
-                ignored: bool = migrated == "True"
+            for (permalink_id,) in permalinks:
                 connection_error: bool | None = None
                 timeout: bool | None = None
                 exception: bool | None = None
                 status_code: int | None = None
                 response_time: float | None = None
 
-                if not ignored:
-                    try:
-                        status_code, response_time = self._migrate_permalink(permalink_id)
-                    except requests.exceptions.ConnectionError:
-                        connection_error = True
-                        print(f"Request to migrate permalink Id {permalink_id} failed to connect")
-                    except requests.exceptions.Timeout:
-                        timeout = True
-                        print(f"Request to migrate permalink Id {permalink_id} timed out after {self.timeout} seconds")
-                    except requests.exceptions.RequestException as e:
-                        exception = True
-                        print(f"Request to migrate permalink Id {permalink_id} failed with error: {str(e)}")
+                try:
+                    status_code, response_time = self._migrate_permalink(permalink_id)
+                except requests.exceptions.ConnectionError:
+                    connection_error = True
+                    print(f"Request to migrate permalink Id {permalink_id} failed to connect")
+                except requests.exceptions.Timeout:
+                    timeout = True
+                    print(f"Request to migrate permalink Id {permalink_id} timed out after {self.timeout} seconds")
+                except requests.exceptions.RequestException as e:
+                    exception = True
+                    print(f"Request to migrate permalink Id {permalink_id} failed with error: {str(e)}")
 
                 # write a result row to the output csv file
                 output_writer.writerow(
                     [
                         permalink_id,
-                        ignored,
                         connection_error,
                         timeout,
                         exception,
@@ -141,11 +147,11 @@ if __name__ == "__main__":
     )
 
     ap.add_argument(
-        "--data-api-url",
-        dest="data_api_url",
-        default="http://localhost:5000/api",
-        nargs="?",
-        help="URL of the Data API e.g. http://localhost:5000/api",
+        "--env",
+        dest="env",
+        default="local",
+        choices=["local", "dev", "test", "preprod", "prod"],
+        help="The environment to run against",
         type=str,
         required=False,
     )
@@ -172,5 +178,5 @@ if __name__ == "__main__":
 
     args = ap.parse_args()
 
-    migrator = MigrateLegacyPermalinks(data_api_url=args.data_api_url, sleep=args.sleep, timeout=args.timeout)
+    migrator = MigrateLegacyPermalinks(env=args.env, sleep=args.sleep, timeout=args.timeout)
     migrator.main()

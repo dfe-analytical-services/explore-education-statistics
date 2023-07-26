@@ -200,11 +200,15 @@ User navigates to Data blocks page to edit block
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
 Edit data block
-    #just updating the table title and source
     user waits until table is visible
+
     user clicks link    Edit block    css:tbody > tr:first-child
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until h2 is visible    Data block details
+
+    user checks page contains element    //*[@data-testid="Data set name-key" and contains(text(), "Data set name")]
+    user checks page contains element
+    ...    //*[@data-testid="Data set name-value" and contains(text(), "Dates test subject")]
 
     user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
     user enters text into element    id:dataBlockDetailsForm-heading    Updated dates table title
@@ -579,7 +583,6 @@ Edit data block for amendment
     user checks table cell contains    1    1    ${DATABLOCK_NAME}
     user checks table cell contains    1    2    Yes
     user checks table cell contains    1    3    Yes
-    user checks table cell contains    1    4    None
 
     user clicks link    Edit block    css:tbody > tr:first-child
 
@@ -701,11 +704,14 @@ Add release note to first amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Create public prerelease access list for amendment
+Check public prerelease access list for amendment is same as original release
     user clicks link    Pre-release access
     user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
-    user creates public prerelease access list    Amended public access list
+    user checks page contains    Test public access list
+
+Update public prerelease access list
+    user updates public prerelease access list    Amended public access list
 
 Approve amendment for scheduled release
     ${days_until_release}=    set variable    1
@@ -727,11 +733,13 @@ Approve amendment for scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
 
 Verify amendment is on Find Statistics page again
+    user waits for caches to expire
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Navigate to amendment release page
     user clicks link    ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+
     user waits until page contains title caption    ${RELEASE_NAME}
 
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-and-amend-%{RUN_IDENTIFIER}
@@ -945,8 +953,9 @@ Verify published date on publication page has been updated
     user checks element contains    ${row}    ${EXPECTED_PUBLISHED_DATE}
 
 Navigate to amended public release
+    user waits for caches to expire
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
-    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Verify public published date has been updated
     user checks summary list contains    Published    ${EXPECTED_PUBLISHED_DATE}

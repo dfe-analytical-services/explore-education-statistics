@@ -117,14 +117,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await GetReleaseContentBlock(id)
                 .OnSuccessDo(rcb => _userService.CheckCanViewRelease(rcb.Release))
-                .OnSuccess(CheckIsDataBlock)
-                .OnSuccess(async dataBlock =>
+                .OnSuccessCombineWith(CheckIsDataBlock)
+                .OnSuccess(async tuple =>
                 {
-                    // Remove as part of EES-4273 - we fetch these from the FeaturedTables table now
-                    dataBlock.HighlightName = null;
-                    dataBlock.HighlightDescription = null;
+                    var (releaseContentBlock, dataBlock) = tuple;
+                    var releaseId = releaseContentBlock.ReleaseId;
 
                     var viewModel = _mapper.Map<DataBlockViewModel>(dataBlock);
+
+                    var subjectId = dataBlock.Query.SubjectId;
+
+                    viewModel.DataSetId = subjectId;
+
+                    viewModel.DataSetName = await _context.ReleaseFiles
+                        .Where(rf =>
+                            rf.ReleaseId == releaseId &&
+                            rf.File.SubjectId == subjectId &&
+                            rf.File.Type == FileType.Data)
+                        .Select(rf => rf.Name)
+                        .SingleAsync() ?? "";
 
                     var featuredTable = await _context.FeaturedTables.SingleOrDefaultAsync(
                         ft => ft.DataBlockId == dataBlock.Id);

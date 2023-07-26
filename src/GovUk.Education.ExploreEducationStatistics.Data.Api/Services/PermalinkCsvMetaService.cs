@@ -54,6 +54,12 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         LegacyPermalink permalink,
         CancellationToken cancellationToken = default)
     {
+        var tableResultMeta = permalink.FullTable.SubjectMeta.AsSubjectResultMetaViewModel();
+
+        var tableResultMetaWithGroupCsvColumns = await GetTableResultMetaWithGroupCsvColumns(
+            tableResultMeta,
+            cancellationToken);
+
         // The method of generating the csv is conditional on whether location id's are present in the permalink.
         // A change made to add location id's to the observations took place first in EES-3203 followed by a change to
         // add id's to the subject meta locations in EES-2955. These changes happened in Feb/March 2022.
@@ -63,7 +69,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
             Guid.Empty; // LocationId is not nullable but it is possible for the value to be missing
 
         var tableSubjectMetaLocationsHaveIds = LocationAttributeHasLeafNodeWithLocationId(
-            permalink.FullTable.SubjectMeta.LocationsHierarchical.First().Value.First());
+            tableResultMetaWithGroupCsvColumns.Locations.First().Value.First());
 
         var hasLocationIds = observationsHaveLocationIds && tableSubjectMetaLocationsHaveIds;
         if (hasLocationIds)
@@ -77,7 +83,7 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
             // Locations are returned here in the csv meta keyed by location id for the purpose of writing the csv
             // where they will be looked up using the location id's found in each observation.
             return await GetCsvMeta(permalink.Query.SubjectId,
-                permalink.FullTable.SubjectMeta.AsSubjectResultMetaViewModel(),
+                tableResultMetaWithGroupCsvColumns,
                 cancellationToken);
         }
 
@@ -96,7 +102,6 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         // or at best the local authority and region if generated after the LA-region location hierarchy was introduced.
         // By using the location object within the observation we will also get the country.
 
-        var tableResultMeta = permalink.FullTable.SubjectMeta;
         var releaseSubject = await _releaseSubjectService.FindForLatestPublishedVersion(permalink.Query.SubjectId);
 
         var csvStream = releaseSubject is not null
@@ -105,15 +110,17 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var locationCols = GetLocationsColumns(permalink.FullTable.Results);
 
-        var csvFilters = tableResultMeta.Filters.Values.ToDictionary(
-            filter => filter.Name ?? filter.Legend.SnakeCase(),
-            filter => new FilterCsvMetaViewModel(filter)
-        );
+        var csvFilters = tableResultMetaWithGroupCsvColumns.Filters.Values
+            .ToDictionary(
+                filter => filter.Name ?? filter.Legend.SnakeCase(),
+                filter => new FilterCsvMetaViewModel(filter)
+            );
 
-        var csvIndicators = tableResultMeta.Indicators.ToDictionary(
-            indicator => indicator.Name ?? indicator.Label.SnakeCase(),
-            indicator => new IndicatorCsvMetaViewModel(indicator)
-        );
+        var csvIndicators = tableResultMetaWithGroupCsvColumns.Indicators
+            .ToDictionary(
+                indicator => indicator.Name ?? indicator.Label.SnakeCase(),
+                indicator => new IndicatorCsvMetaViewModel(indicator)
+            );
 
         // Prefer using the data file stream over the observations locations to generate the headers
         var headers = csvStream is not null
@@ -198,6 +205,54 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
         }
     }
 
+    /// <summary>
+    /// Attempts to get any GroupCsvColumn values from the database for filters that have them which weren't
+    /// present in the permalink at the time of generation. These are required to generate the csv if any filters have
+    /// non-default groups of filter items where the group column is present.
+    /// </summary>
+    /// <param name="tableResultMeta"></param>
+    /// <param name="cancellationToken"></param>
+    /// <returns>Table result meta containing filters populated with GroupCsvColumn values from the database</returns>
+    private async Task<SubjectResultMetaViewModel> GetTableResultMetaWithGroupCsvColumns(
+        SubjectResultMetaViewModel tableResultMeta,
+        CancellationToken cancellationToken = default)
+    {
+        var filterIds = tableResultMeta.Filters.Values
+            .Select(filter => filter.Id)
+            .ToList();
+
+        var filtersFoundInDb = await _statisticsDbContext.Filter
+            .Where(filter => filterIds.Contains(filter.Id))
+            .ToDictionaryAsync(filter => filter.Id,
+                filter => filter.GroupCsvColumn,
+                cancellationToken: cancellationToken);
+
+        if (!filtersFoundInDb.Any())
+        {
+            return tableResultMeta;
+        }
+
+        // Apply the GroupCsvColumn values to the table result meta
+        return tableResultMeta with
+        {
+            Filters = tableResultMeta.Filters
+                .ToDictionary(kvp => kvp.Key,
+                    kvp =>
+                    {
+                        var filter = kvp.Value;
+                        if (filtersFoundInDb.TryGetValue(filter.Id, out var groupCsvColumn))
+                        {
+                            return filter with
+                            {
+                                GroupCsvColumn = groupCsvColumn
+                            };
+                        }
+
+                        return filter;
+                    })
+        };
+    }
+
     private static List<string> ListCsvHeaders(
         IDictionary<string, FilterCsvMetaViewModel> filters,
         IDictionary<string, IndicatorCsvMetaViewModel> indicators,
@@ -219,7 +274,13 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
             .Select(attribute => attribute.Key)
             .ToHashSet();
 
+        var filterGroupCsvColumns = filters
+            .Select(kvp => kvp.Value.GroupCsvColumn)
+            .WhereNotNull()
+            .ToList();
+
         filteredHeaders.AddRange(allLocationCols.Where(locationCols.Contains));
+        filteredHeaders.AddRange(filterGroupCsvColumns);
         filteredHeaders.AddRange(filters.Keys);
         filteredHeaders.AddRange(indicators.Keys);
 
@@ -242,7 +303,13 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var locationCols = LocationCsvUtils.AllCsvColumns().ToHashSet();
 
+        var filterGroupCsvColumns = filters
+            .Select(kvp => kvp.Value.GroupCsvColumn)
+            .WhereNotNull()
+            .ToList();
+
         filteredHeaders.AddRange(headers.Where(locationCols.Contains));
+        filteredHeaders.AddRange(headers.Where(filterGroupCsvColumns.Contains));
         filteredHeaders.AddRange(headers.Where(filters.ContainsKey));
         filteredHeaders.AddRange(headers.Where(indicators.ContainsKey));
 
@@ -263,7 +330,13 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
 
         var allLocationCols = LocationCsvUtils.AllCsvColumns();
 
+        var filterGroupCsvColumns = filters
+            .Select(kvp => kvp.Value.GroupCsvColumn)
+            .WhereNotNull()
+            .ToList();
+
         filteredHeaders.AddRange(allLocationCols.Where(locationCols.Contains));
+        filteredHeaders.AddRange(filterGroupCsvColumns);
         filteredHeaders.AddRange(filters.Keys);
         filteredHeaders.AddRange(indicators.Keys);
 

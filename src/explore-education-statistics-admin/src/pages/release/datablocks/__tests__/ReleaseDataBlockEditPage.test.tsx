@@ -19,6 +19,7 @@ import _tableBuilderService, {
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import produce from 'immer';
 import React from 'react';
 import { MemoryRouter } from 'react-router';
 import { generatePath, Route } from 'react-router-dom';
@@ -40,6 +41,8 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 describe('ReleaseDataBlockEditPage', () => {
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',
+    dataSetId: 'data-set-1',
+    dataSetName: 'Test data set',
     name: 'Test name 1',
     heading: 'Test title 1',
     highlightName: 'Test highlight name 1',
@@ -225,6 +228,35 @@ describe('ReleaseDataBlockEditPage', () => {
 
     expect(options[0]).toHaveTextContent('Test name 2');
     expect(options[1]).toHaveTextContent('Test name 1');
+  });
+
+  test('renders with correct data block details with data set name', async () => {
+    renderPage();
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText('Select a data block to edit'),
+      ).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Data set name')).toBeInTheDocument();
+  });
+
+  test('renders with correct data block details without data set name', async () => {
+    dataBlockService.getDataBlock.mockResolvedValue(
+      produce(testDataBlock, draft => {
+        draft.dataSetName = undefined;
+      }),
+    );
+    renderPage();
+
+    await waitFor(() => {
+      expect(
+        screen.getByLabelText('Select a data block to edit'),
+      ).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Data set name')).not.toBeInTheDocument();
   });
 
   test('clicking `Delete this data block` button shows modal', async () => {

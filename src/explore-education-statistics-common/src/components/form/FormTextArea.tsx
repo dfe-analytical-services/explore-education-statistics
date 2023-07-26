@@ -17,7 +17,6 @@ export interface FormTextAreaProps extends FormLabelProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
-  testId?: string;
   maxLength?: number;
   name: string;
   rows?: number;

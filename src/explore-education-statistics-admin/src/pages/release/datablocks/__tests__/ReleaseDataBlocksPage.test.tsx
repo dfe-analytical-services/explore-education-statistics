@@ -7,19 +7,27 @@ import _dataBlockService, {
   DeleteDataBlockPlan,
   ReleaseDataBlockSummary,
 } from '@admin/services/dataBlockService';
+import _featuredTableService, {
+  FeaturedTable,
+} from '@admin/services/featuredTableService';
 import _permissionService from '@admin/services/permissionService';
+import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { generatePath, MemoryRouter } from 'react-router';
 import { Route } from 'react-router-dom';
 
 jest.mock('@admin/services/dataBlockService');
+jest.mock('@admin/services/featuredTableService');
 jest.mock('@admin/services/permissionService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
   typeof _dataBlockService
+>;
+const featuredTableService = _featuredTableService as jest.Mocked<
+  typeof _featuredTableService
 >;
 const permissionService = _permissionService as jest.Mocked<
   typeof _permissionService
@@ -31,7 +39,6 @@ describe('ReleaseDataBlocksPage', () => {
       id: 'block-1',
       name: 'Block 1',
       created: undefined,
-      highlightName: 'Block 1 highlight name',
       heading: 'Block 1 heading',
       source: 'Block 1 source',
       inContent: true,
@@ -46,6 +53,41 @@ describe('ReleaseDataBlocksPage', () => {
       inContent: false,
       chartsCount: 0,
     },
+    {
+      id: 'block-3',
+      name: 'Block 3',
+      created: '2021-01-01T15:00:00.0000000',
+      heading: 'Block 3 heading',
+      source: 'Block 3 source',
+      inContent: false,
+      chartsCount: 0,
+    },
+    {
+      id: 'block-4',
+      name: 'Block 4',
+      created: '2021-02-01T15:00:00.0000000',
+      heading: 'Block 4 heading',
+      source: 'Block 4 source',
+      inContent: false,
+      chartsCount: 0,
+    },
+  ];
+
+  const testFeaturedTables: FeaturedTable[] = [
+    {
+      id: 'featured-1',
+      dataBlockId: 'block-1',
+      description: 'Featured 1 description',
+      name: 'Featured 1',
+      order: 0,
+    },
+    {
+      id: 'featured-2',
+      dataBlockId: 'block-3',
+      description: 'Featured 2 description',
+      name: 'Featured 3',
+      order: 1,
+    },
   ];
 
   const testBlock1DeletePlan: DeleteDataBlockPlan = {
@@ -56,8 +98,8 @@ describe('ReleaseDataBlocksPage', () => {
         infographicFilesInfo: [],
         isKeyStatistic: true,
         featuredTable: {
-          name: 'Featured table name',
-          description: 'Featured table description',
+          name: 'Featured 1',
+          description: 'Featured 1 description',
         },
       },
     ],
@@ -67,60 +109,121 @@ describe('ReleaseDataBlocksPage', () => {
     permissionService.canUpdateRelease.mockResolvedValue(true);
   });
 
-  test('renders list of data blocks correctly', async () => {
+  test('renders featured tables and data blocks correctly', async () => {
     dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
+    featuredTableService.listFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
 
     renderPage();
 
     await waitFor(() => {
-      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
     });
 
-    const rows = screen.getAllByRole('row');
+    const featuredTablesTable = within(screen.getByTestId('featuredTables'));
+    const featuredTablesRows = featuredTablesTable.getAllByRole('row');
+    expect(featuredTablesRows).toHaveLength(3);
 
-    expect(rows).toHaveLength(3);
-
-    const row1Cells = within(rows[1]).getAllByRole('cell');
-
-    expect(row1Cells).toHaveLength(6);
-    expect(row1Cells[0]).toHaveTextContent('Block 1');
-    expect(row1Cells[1]).toHaveTextContent('Yes');
-    expect(row1Cells[2]).toHaveTextContent('Yes');
-    expect(row1Cells[3]).toHaveTextContent('Block 1 highlight name');
-    expect(row1Cells[4]).toHaveTextContent('Not available');
+    const featuredTablesRow1Cells = within(featuredTablesRows[1]).getAllByRole(
+      'cell',
+    );
+    expect(featuredTablesRow1Cells).toHaveLength(6);
+    expect(featuredTablesRow1Cells[0]).toHaveTextContent('Block 1');
+    expect(featuredTablesRow1Cells[1]).toHaveTextContent('Yes');
+    expect(featuredTablesRow1Cells[2]).toHaveTextContent('Yes');
+    expect(featuredTablesRow1Cells[3]).toHaveTextContent('Featured 1');
+    expect(featuredTablesRow1Cells[4]).toHaveTextContent('Not available');
     expect(
-      within(row1Cells[5]).getByRole('link', { name: 'Edit block' }),
+      within(featuredTablesRow1Cells[5]).getByRole('link', {
+        name: 'Edit block',
+      }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/data-blocks/block-1',
     );
     expect(
-      within(row1Cells[5]).getByRole('button', { name: 'Delete block' }),
+      within(featuredTablesRow1Cells[5]).getByRole('button', {
+        name: 'Delete block',
+      }),
     ).toBeInTheDocument();
 
-    const row2Cells = within(rows[2]).getAllByRole('cell');
-
-    expect(row2Cells).toHaveLength(6);
-    expect(row2Cells[0]).toHaveTextContent('Block 2');
-    expect(row2Cells[1]).toHaveTextContent('No');
-    expect(row2Cells[2]).toHaveTextContent('No');
-    expect(row2Cells[3]).toHaveTextContent('None');
-    expect(row2Cells[4]).toHaveTextContent('1 January 2021 15:00');
+    const featuredTablesRow2Cells = within(featuredTablesRows[2]).getAllByRole(
+      'cell',
+    );
+    expect(featuredTablesRow2Cells).toHaveLength(6);
+    expect(featuredTablesRow2Cells[0]).toHaveTextContent('Block 3');
+    expect(featuredTablesRow2Cells[1]).toHaveTextContent('No');
+    expect(featuredTablesRow2Cells[2]).toHaveTextContent('No');
+    expect(featuredTablesRow2Cells[3]).toHaveTextContent('Featured 3');
+    expect(featuredTablesRow2Cells[4]).toHaveTextContent(
+      '1 January 2021 15:00',
+    );
     expect(
-      within(row2Cells[5]).getByRole('link', { name: 'Edit block' }),
+      within(featuredTablesRow2Cells[5]).getByRole('link', {
+        name: 'Edit block',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data-blocks/block-3',
+    );
+    expect(
+      within(featuredTablesRow2Cells[5]).getByRole('button', {
+        name: 'Delete block',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Reorder featured tables' }),
+    ).toBeInTheDocument();
+
+    const dataBlocksTable = within(screen.getByTestId('dataBlocks'));
+    const dataBlocksRows = dataBlocksTable.getAllByRole('row');
+    expect(dataBlocksRows).toHaveLength(3);
+
+    const dataBlocksRow1Cells = within(dataBlocksRows[1]).getAllByRole('cell');
+    expect(dataBlocksRow1Cells).toHaveLength(5);
+    expect(dataBlocksRow1Cells[0]).toHaveTextContent('Block 2');
+    expect(dataBlocksRow1Cells[1]).toHaveTextContent('No');
+    expect(dataBlocksRow1Cells[2]).toHaveTextContent('No');
+    expect(dataBlocksRow1Cells[3]).toHaveTextContent('1 January 2021 15:00');
+    expect(
+      within(dataBlocksRow1Cells[4]).getByRole('link', { name: 'Edit block' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/data-blocks/block-2',
     );
     expect(
-      within(row2Cells[5]).getByRole('button', { name: 'Delete block' }),
+      within(dataBlocksRow1Cells[4]).getByRole('button', {
+        name: 'Delete block',
+      }),
+    ).toBeInTheDocument();
+
+    const dataBlocksRow2Cells = within(dataBlocksRows[2]).getAllByRole('cell');
+    expect(dataBlocksRow2Cells).toHaveLength(5);
+    expect(dataBlocksRow2Cells[0]).toHaveTextContent('Block 4');
+    expect(dataBlocksRow2Cells[1]).toHaveTextContent('No');
+    expect(dataBlocksRow2Cells[2]).toHaveTextContent('No');
+    expect(dataBlocksRow2Cells[3]).toHaveTextContent('1 February 2021 15:00');
+    expect(
+      within(dataBlocksRow2Cells[4]).getByRole('link', { name: 'Edit block' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data-blocks/block-4',
+    );
+    expect(
+      within(dataBlocksRow2Cells[4]).getByRole('button', {
+        name: 'Delete block',
+      }),
     ).toBeInTheDocument();
   });
 
   test('renders page correctly when release cannot be updated', async () => {
     permissionService.canUpdateRelease.mockResolvedValue(false);
-
     dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
+    featuredTableService.listFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
 
     renderPage();
 
@@ -130,42 +233,94 @@ describe('ReleaseDataBlocksPage', () => {
           /This release has been approved, and can no longer be updated/,
         ),
       ).toBeInTheDocument();
-
-      expect(screen.getByRole('table')).toBeInTheDocument();
     });
 
-    const rows = screen.getAllByRole('row');
+    const featuredTablesTable = within(screen.getByTestId('featuredTables'));
+    const featuredTablesRows = featuredTablesTable.getAllByRole('row');
+    expect(featuredTablesRows).toHaveLength(3);
 
-    expect(rows).toHaveLength(3);
-
-    const row1Cells = within(rows[1]).getAllByRole('cell');
-
-    expect(row1Cells).toHaveLength(6);
-    expect(row1Cells[0]).toHaveTextContent('Block 1');
-    expect(row1Cells[1]).toHaveTextContent('Yes');
-    expect(row1Cells[2]).toHaveTextContent('Yes');
-    expect(row1Cells[3]).toHaveTextContent('Block 1 highlight name');
-    expect(row1Cells[4]).toHaveTextContent('Not available');
+    const featuredTablesRow1Cells = within(featuredTablesRows[1]).getAllByRole(
+      'cell',
+    );
+    expect(featuredTablesRow1Cells).toHaveLength(6);
+    expect(featuredTablesRow1Cells[0]).toHaveTextContent('Block 1');
+    expect(featuredTablesRow1Cells[1]).toHaveTextContent('Yes');
+    expect(featuredTablesRow1Cells[2]).toHaveTextContent('Yes');
+    expect(featuredTablesRow1Cells[3]).toHaveTextContent('Featured 1');
+    expect(featuredTablesRow1Cells[4]).toHaveTextContent('Not available');
     expect(
-      within(row1Cells[5]).getByRole('link', { name: 'View block' }),
-    ).toBeInTheDocument();
+      within(featuredTablesRow1Cells[5]).queryByRole('link', {
+        name: 'Edit block',
+      }),
+    ).not.toBeInTheDocument();
     expect(
-      within(row1Cells[5]).queryByRole('button', { name: 'Delete block' }),
+      within(featuredTablesRow1Cells[5]).queryByRole('button', {
+        name: 'Delete block',
+      }),
     ).not.toBeInTheDocument();
 
-    const row2Cells = within(rows[2]).getAllByRole('cell');
+    const featuredTablesRow2Cells = within(featuredTablesRows[2]).getAllByRole(
+      'cell',
+    );
+    expect(featuredTablesRow2Cells).toHaveLength(6);
+    expect(featuredTablesRow2Cells[0]).toHaveTextContent('Block 3');
+    expect(featuredTablesRow2Cells[1]).toHaveTextContent('No');
+    expect(featuredTablesRow2Cells[2]).toHaveTextContent('No');
+    expect(featuredTablesRow2Cells[3]).toHaveTextContent('Featured 3');
+    expect(featuredTablesRow2Cells[4]).toHaveTextContent(
+      '1 January 2021 15:00',
+    );
+    expect(
+      within(featuredTablesRow2Cells[5]).queryByRole('link', {
+        name: 'Edit block',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(featuredTablesRow2Cells[5]).queryByRole('button', {
+        name: 'Delete block',
+      }),
+    ).not.toBeInTheDocument();
 
-    expect(row2Cells).toHaveLength(6);
-    expect(row2Cells[0]).toHaveTextContent('Block 2');
-    expect(row2Cells[1]).toHaveTextContent('No');
-    expect(row2Cells[2]).toHaveTextContent('No');
-    expect(row2Cells[3]).toHaveTextContent('None');
-    expect(row2Cells[4]).toHaveTextContent('1 January 2021 15:00');
     expect(
-      within(row2Cells[5]).getByRole('link', { name: 'View block' }),
-    ).toBeInTheDocument();
+      screen.queryByRole('button', { name: 'Reorder featured tables' }),
+    ).not.toBeInTheDocument();
+
+    const dataBlocksTable = within(screen.getByTestId('dataBlocks'));
+    const dataBlocksRows = dataBlocksTable.getAllByRole('row');
+    expect(dataBlocksRows).toHaveLength(3);
+
+    const dataBlocksRow1Cells = within(dataBlocksRows[1]).getAllByRole('cell');
+    expect(dataBlocksRow1Cells).toHaveLength(5);
+    expect(dataBlocksRow1Cells[0]).toHaveTextContent('Block 2');
+    expect(dataBlocksRow1Cells[1]).toHaveTextContent('No');
+    expect(dataBlocksRow1Cells[2]).toHaveTextContent('No');
+    expect(dataBlocksRow1Cells[3]).toHaveTextContent('1 January 2021 15:00');
     expect(
-      within(row2Cells[5]).queryByRole('button', { name: 'Delete block' }),
+      within(dataBlocksRow1Cells[4]).queryByRole('link', {
+        name: 'Edit block',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(dataBlocksRow1Cells[4]).queryByRole('button', {
+        name: 'Delete block',
+      }),
+    ).not.toBeInTheDocument();
+
+    const dataBlocksRow2Cells = within(dataBlocksRows[2]).getAllByRole('cell');
+    expect(dataBlocksRow2Cells).toHaveLength(5);
+    expect(dataBlocksRow2Cells[0]).toHaveTextContent('Block 4');
+    expect(dataBlocksRow2Cells[1]).toHaveTextContent('No');
+    expect(dataBlocksRow2Cells[2]).toHaveTextContent('No');
+    expect(dataBlocksRow2Cells[3]).toHaveTextContent('1 February 2021 15:00');
+    expect(
+      within(dataBlocksRow2Cells[4]).queryByRole('link', {
+        name: 'Edit block',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(dataBlocksRow2Cells[4]).queryByRole('button', {
+        name: 'Delete block',
+      }),
     ).not.toBeInTheDocument();
 
     expect(
@@ -180,11 +335,14 @@ describe('ReleaseDataBlocksPage', () => {
   test('clicking `Delete block` button shows modal', async () => {
     dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
     dataBlockService.getDeleteBlockPlan.mockResolvedValue(testBlock1DeletePlan);
+    featuredTableService.listFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
 
     renderPage();
 
     await waitFor(() => {
-      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
     });
 
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
@@ -213,11 +371,14 @@ describe('ReleaseDataBlocksPage', () => {
   test('clicking `Cancel` button hides modal', async () => {
     dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
     dataBlockService.getDeleteBlockPlan.mockResolvedValue(testBlock1DeletePlan);
+    featuredTableService.listFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
 
     renderPage();
 
     await waitFor(() => {
-      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
     });
 
     const buttons = screen.getAllByRole('button', { name: 'Delete block' });
@@ -240,11 +401,14 @@ describe('ReleaseDataBlocksPage', () => {
   test('clicking `Confirm` button hides modal and deletes data block', async () => {
     dataBlockService.listDataBlocks.mockResolvedValue(testDataBlocks);
     dataBlockService.getDeleteBlockPlan.mockResolvedValue(testBlock1DeletePlan);
+    featuredTableService.listFeaturedTables.mockResolvedValue(
+      testFeaturedTables,
+    );
 
     renderPage();
 
     await waitFor(() => {
-      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByTestId('dataBlocks')).toBeInTheDocument();
     });
 
     const buttons = screen.getAllByRole('button', { name: 'Delete block' });
@@ -269,21 +433,34 @@ describe('ReleaseDataBlocksPage', () => {
       'block-1',
     );
 
-    const rows = screen.getAllByRole('row');
+    const featuredTablesTable = within(screen.getByTestId('featuredTables'));
+    const featuredTablesRows = featuredTablesTable.getAllByRole('row');
+    expect(featuredTablesRows).toHaveLength(2);
 
-    expect(rows).toHaveLength(2);
-
-    const row1Cells = within(rows[1]).getAllByRole('cell');
-
-    expect(row1Cells[0]).toHaveTextContent('Block 2');
-    expect(row1Cells[1]).toHaveTextContent('No');
-    expect(row1Cells[2]).toHaveTextContent('No');
-    expect(row1Cells[3]).toHaveTextContent('None');
-    expect(row1Cells[4]).toHaveTextContent('1 January 2021 15:00');
-    expect(within(row1Cells[5]).getByRole('link')).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-1/data-blocks/block-2',
+    const featuredTablesRow1Cells = within(featuredTablesRows[1]).getAllByRole(
+      'cell',
     );
+    expect(featuredTablesRow1Cells).toHaveLength(6);
+    expect(featuredTablesRow1Cells[0]).toHaveTextContent('Block 3');
+    expect(featuredTablesRow1Cells[1]).toHaveTextContent('No');
+    expect(featuredTablesRow1Cells[2]).toHaveTextContent('No');
+    expect(featuredTablesRow1Cells[3]).toHaveTextContent('Featured 3');
+    expect(featuredTablesRow1Cells[4]).toHaveTextContent(
+      '1 January 2021 15:00',
+    );
+    expect(
+      within(featuredTablesRow1Cells[5]).getByRole('link', {
+        name: 'Edit block',
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data-blocks/block-3',
+    );
+    expect(
+      within(featuredTablesRow1Cells[5]).getByRole('button', {
+        name: 'Delete block',
+      }),
+    ).toBeInTheDocument();
   });
 
   const renderPage = () => {

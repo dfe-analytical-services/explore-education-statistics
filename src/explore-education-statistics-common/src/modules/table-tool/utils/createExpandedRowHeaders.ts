@@ -1,5 +1,5 @@
 import Header from '@common/modules/table-tool/utils/Header';
-import { ExpandedHeader } from '@common/modules/table-tool/utils/mapTableToJson';
+import { TableCellJson } from '@common/modules/table-tool/utils/mapTableToJson';
 import last from 'lodash/last';
 
 /**
@@ -11,15 +11,26 @@ import last from 'lodash/last';
  */
 export default function createExpandedRowHeaders(
   rowHeaders: Header[],
-): ExpandedHeader[][] {
-  const headers = rowHeaders.reduce<ExpandedHeader[][]>((acc, header) => {
+): TableCellJson[][] {
+  const maxDepth = rowHeaders.reduce((acc, header) => {
+    const { maxCrossSpan } = header;
+    return maxCrossSpan > acc ? maxCrossSpan : acc;
+  }, 0);
+
+  // Keep track of levels that can be collapsed (i.e. when each
+  // header in the level only has a single matching child)
+  let collapsibleLevels: boolean[] = [
+    rowHeaders.every(rowHeader => rowHeader.hasSingleMatchingChild()),
+  ];
+
+  return rowHeaders.reduce<TableCellJson[][]>((acc, header) => {
     // To construct these headers, we use a depth-first
     // search algorithm. This requires a 'stack' data-structure to
     // track the correct order of header nodes as we process
     // them (stacks have last in, first out ordering).
     const stack = [header];
 
-    let row: ExpandedHeader[] = [];
+    let row: TableCellJson[] = [];
 
     while (stack.length > 0) {
       const current = stack.shift();
@@ -42,21 +53,21 @@ export default function createExpandedRowHeaders(
         !matchesPreviousHeader ||
         (matchesPreviousHeader && current.hasSiblings())
       ) {
-        const isGroup = current.hasChildren();
+        const { depth, crossSpan } = current;
+
+        if (collapsibleLevels[depth] === undefined && current.parent) {
+          collapsibleLevels[depth] = current.parent.children.every(rowHeader =>
+            rowHeader.hasSingleMatchingChild(),
+          );
+        }
 
         row.push({
-          id: current.id,
           text: current.text,
-          span: current.span,
-          isGroup,
-          crossSpan: current.crossSpan,
+          rowSpan: current.span,
+          scope: maxDepth > depth + crossSpan ? 'rowgroup' : 'row',
+          colSpan: collapsibleLevels[depth] ? 1 : crossSpan,
+          tag: 'th',
         });
-      } else if (!current.hasChildren() && prev && prev.crossSpan > 1) {
-        // This one is a bit weird, but we have to directly update
-        // the previous header's `isGroup` to allow the header
-        // to have `scope="row"` in the table i.e. it's the
-        // header cell directly adjacent to non-header cells.
-        prev.isGroup = false;
       }
 
       if (current.hasChildren()) {
@@ -69,17 +80,15 @@ export default function createExpandedRowHeaders(
         // This means that these following row positions should be
         // completely empty and we want to avoid placing our current
         // row into any of these positions.
-        const prevSpan = last(last(acc))?.span ?? 0;
+        const prevSpan = last(last(acc))?.rowSpan ?? 0;
+
         const index = acc.length > 0 ? acc.length - 1 + prevSpan : 0;
 
         acc[index] = row;
-
         row = [];
       }
     }
-
+    collapsibleLevels = [collapsibleLevels[0]];
     return acc;
   }, []);
-
-  return headers;
 }

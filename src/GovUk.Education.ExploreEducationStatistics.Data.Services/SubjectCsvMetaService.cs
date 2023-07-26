@@ -65,7 +65,9 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
                     var locations = GetLocations(observations);
                     var filters = await GetFilters(observations);
                     var indicators = await GetIndicators(query);
-                    var headers = await ListCsvHeaders(csvStream, filters, indicators, locations);
+                    var headers = csvStream is not null
+                        ? await ListCsvHeaders(csvStream, filters, indicators)
+                        : ListCsvHeaders(filters, indicators, locations);
 
                     return new SubjectCsvMetaViewModel
                     {
@@ -107,8 +109,7 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
         }
     }
 
-    private static async Task<List<string>> ListCsvHeaders(
-        Stream? csvStream,
+    private static List<string> ListCsvHeaders(
         IDictionary<string, FilterCsvMetaViewModel> filters,
         IDictionary<string, IndicatorCsvMetaViewModel> indicators,
         IDictionary<Guid, Dictionary<string, string>> locations)
@@ -120,31 +121,53 @@ public class SubjectCsvMetaService : ISubjectCsvMetaService
             "geographic_level"
         };
 
-        if (csvStream is null)
+        var allLocationCols = LocationCsvUtils.AllCsvColumns();
+
+        // Strip out any location columns that may be completely empty.
+        var locationCols = locations
+            .SelectMany(location => location.Value)
+            .Where(attribute => !attribute.Value.IsNullOrEmpty())
+            .Select(attribute => attribute.Key)
+            .ToHashSet();
+
+        var filterGroupCsvColumns = filters
+            .Select(kvp => kvp.Value.GroupCsvColumn)
+            .WhereNotNull()
+            .ToList();
+
+        filteredHeaders.AddRange(allLocationCols.Where(locationCols.Contains));
+        filteredHeaders.AddRange(filterGroupCsvColumns);
+        filteredHeaders.AddRange(filters.Keys);
+        filteredHeaders.AddRange(indicators.Keys);
+
+        return filteredHeaders;
+    }
+
+    private static async Task<List<string>> ListCsvHeaders(
+        Stream csvStream,
+        IDictionary<string, FilterCsvMetaViewModel> filters,
+        IDictionary<string, IndicatorCsvMetaViewModel> indicators)
+    {
+        var filteredHeaders = new List<string>
         {
-            var allLocationCols = LocationCsvUtils.AllCsvColumns();
+            "time_period",
+            "time_identifier",
+            "geographic_level"
+        };
 
-            // Strip out any location columns that may be completely empty.
-            var locationCols = locations
-                .SelectMany(location => location.Value)
-                .Where(attribute => !attribute.Value.IsNullOrEmpty())
-                .Select(attribute => attribute.Key)
-                .ToHashSet();
+        var headers = await CsvUtils.GetCsvHeaders(csvStream);
 
-            filteredHeaders.AddRange(allLocationCols.Where(locationCols.Contains));
-            filteredHeaders.AddRange(filters.Keys);
-            filteredHeaders.AddRange(indicators.Keys);
-        }
-        else
-        {
-            var headers = await CsvUtils.GetCsvHeaders(csvStream);
+        var locationCols = LocationCsvUtils.AllCsvColumns().ToHashSet();
 
-            var locationCols = LocationCsvUtils.AllCsvColumns().ToHashSet();
+        var filterGroupCsvColumns = filters
+            .Select(kvp => kvp.Value.GroupCsvColumn)
+            .WhereNotNull()
+            .ToList();
 
-            filteredHeaders.AddRange(headers.Where(locationCols.Contains));
-            filteredHeaders.AddRange(headers.Where(filters.ContainsKey));
-            filteredHeaders.AddRange(headers.Where(indicators.ContainsKey));
-        }
+        filteredHeaders.AddRange(headers.Where(locationCols.Contains));
+        filteredHeaders.AddRange(headers.Where(filterGroupCsvColumns.Contains));
+        filteredHeaders.AddRange(headers.Where(filters.ContainsKey));
+        filteredHeaders.AddRange(headers.Where(indicators.ContainsKey));
 
         return filteredHeaders;
     }

@@ -64,21 +64,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentReleaseService, ContentReleaseService>()
                 .AddScoped<IReleaseFileRepository, ReleaseFileRepository>()
                 .AddScoped<IReleaseCacheService, ReleaseCacheService>()
-
-                .AddScoped<IPublishingService, PublishingService>(provider =>
-                    new PublishingService(
-                        publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
-                        privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
-                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        methodologyService: provider.GetRequiredService<IMethodologyService>(),
-                        publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
-                        releaseService: provider.GetRequiredService<IReleaseService>(),
-                        logger: provider.GetRequiredService<ILogger<PublishingService>>()))
+                .AddScoped<IPublishingService, PublishingService>()
+                .AddScoped<IPublicBlobStorageService, PublicBlobStorageService>()
+                .AddScoped<IPrivateBlobStorageService, PrivateBlobStorageService>()
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
-                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        privateBlobCacheService: GetBlobCacheService(provider, "CoreStorage"),
-                        publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
+                        publicBlobStorageService: provider.GetRequiredService<IPublicBlobStorageService>(),
+                        privateBlobCacheService: new BlobCacheService(
+                            provider.GetRequiredService<IPrivateBlobStorageService>(),
+                            provider.GetRequiredService<ILogger<BlobCacheService>>()),
+                        publicBlobCacheService: new BlobCacheService(
+                            provider.GetRequiredService<IPublicBlobStorageService>(),
+                            provider.GetRequiredService<ILogger<BlobCacheService>>()),
                         releaseCacheService: provider.GetRequiredService<IReleaseCacheService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
@@ -96,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         context: provider.GetRequiredService<ContentDbContext>(),
                         storageQueueService: new StorageQueueService(
                             GetConfigurationValue(provider,
-                            "NotificationStorage"),
+                                "NotificationStorage"),
                             new StorageInstanceCreationUtil())))
                 .AddScoped<IQueueService, QueueService>(provider =>
                     new QueueService(
@@ -117,23 +114,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
-        }
-
-        private static IBlobCacheService GetBlobCacheService(IServiceProvider provider, string connectionStringKey)
-        {
-            return new BlobCacheService(
-                blobStorageService: GetBlobStorageService(provider, connectionStringKey),
-                logger: provider.GetRequiredService<ILogger<BlobCacheService>>());
-        }
-
-        private static IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
-        {
-            var connectionString = GetConfigurationValue(provider, connectionStringKey);
-            return new BlobStorageService(
-                connectionString,
-                new BlobServiceClient(connectionString),
-                provider.GetRequiredService<ILogger<BlobStorageService>>(),
-                new StorageInstanceCreationUtil());
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)

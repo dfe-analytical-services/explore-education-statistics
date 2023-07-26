@@ -5,18 +5,19 @@ import PageSearchForm, {
 } from '@common/components/PageSearchForm';
 
 const PageSearchFormWithAnalytics = (props: PageSearchFormProps) => {
+  const { id, onSearch } = props;
   return (
     <PageSearchForm
       {...props}
       onSearch={(searchTerm: string) => {
         logEvent({
           category: window.location.pathname,
-          action: props.id || 'PageSearchForm',
+          action: id || 'PageSearchForm',
           label: searchTerm,
         });
 
-        if (typeof props.onSearch === 'function') {
-          props.onSearch(searchTerm);
+        if (typeof onSearch === 'function') {
+          onSearch(searchTerm);
         }
       }}
     />

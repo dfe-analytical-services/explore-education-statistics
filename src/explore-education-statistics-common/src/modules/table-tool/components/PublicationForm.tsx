@@ -19,7 +19,7 @@ import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizar
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import styles from '@common/modules/table-tool/components/PublicationForm.module.scss';
-import { orderBy } from 'lodash';
+import orderBy from 'lodash/orderBy';
 import { Formik } from 'formik';
 import React, { ReactNode, useMemo, useState } from 'react';
 

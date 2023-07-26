@@ -72,14 +72,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private ReleaseFileService BuildReleaseFileService(
             ContentDbContext? contentDbContext = null,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-            IBlobStorageService? blobStorageService = null,
+            IPublicBlobStorageService? publicBlobStorageService = null,
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
         {
             return new(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
                 userService ?? Mock.Of<IUserService>()
             );

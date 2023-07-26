@@ -106,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     Name: "name",
                     Description: "description",
                     SubjectId: Guid.NewGuid(),
-                    DataBlockId: Guid.NewGuid()
+                    DataBlockId: Guid.NewGuid(),
+                    Order: 0
                 ),
             };
 
@@ -158,7 +159,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 },
                 new List<string> { "level1" },
                 new List<string> { "filter1", },
-
                 new List<string>
                 {
                     "indicator1", "indicator2", "indicator3", "indicator4",

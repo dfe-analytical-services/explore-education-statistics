@@ -21,15 +21,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
     public class MethodologyImageService : IMethodologyImageService
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IBlobStorageService _blobStorageService;
+        private readonly IPublicBlobStorageService _publicBlobStorageService;
         private readonly IUserService _userService;
 
         public MethodologyImageService(IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IBlobStorageService blobStorageService,
+            IPublicBlobStorageService publicBlobStorageService,
             IUserService userService)
         {
             _persistenceHelper = persistenceHelper;
-            _blobStorageService = blobStorageService;
+            _publicBlobStorageService = publicBlobStorageService;
             _userService = userService;
         }
 
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
                 .OnSuccessDo(mf => _userService.CheckCanViewMethodologyVersion(mf.MethodologyVersion))
                 .OnSuccessCombineWith(mf =>
-                    _blobStorageService.DownloadToStream(PublicMethodologyFiles, mf.Path(), new MemoryStream()))
+                    _publicBlobStorageService.DownloadToStream(PublicMethodologyFiles, mf.Path(), new MemoryStream()))
                 .OnSuccess(methodologyFileAndStream =>
                 {
                     var (methodologyFile, stream) = methodologyFileAndStream;

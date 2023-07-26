@@ -3,8 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -115,14 +115,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailures();
         }
 
-        [HttpPatch("release/{releaseId:guid}/file/{fileId:guid}")]
-        public async Task<ActionResult<Unit>> Update(
+        [HttpPatch("release/{releaseId:guid}/data/{fileId:guid}")]
+        public async Task<ActionResult<Unit>> UpdateDataFileDetails(
             Guid releaseId,
             Guid fileId,
-            ReleaseFileUpdateViewModel update)
+            ReleaseDataFileUpdateRequest update)
         {
             return await _releaseFileService
-                .Update(releaseId: releaseId, fileId: fileId, update: update)
+                .UpdateDataFileDetails(releaseId: releaseId, fileId: fileId, update: update)
                 .HandleFailuresOrNoContent();
         }
 
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
         public async Task<ActionResult<FileInfo>> UploadAncillary(
             Guid releaseId,
-            [FromForm] ReleaseAncillaryFileUploadViewModel upload)
+            [FromForm] ReleaseAncillaryFileUploadRequest upload)
         {
             return await _releaseFileService
                 .UploadAncillary(releaseId, upload)
@@ -149,13 +149,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpPut("release/{releaseId:guid}/ancillary/{fileId:guid}")]
         [RequestSizeLimit(int.MaxValue)]
         [RequestFormLimits(ValueLengthLimit = int.MaxValue, MultipartBodyLengthLimit = int.MaxValue)]
-        public async Task<ActionResult<FileInfo>> ReplaceAncillary(
+        public async Task<ActionResult<FileInfo>> UpdateAncillary(
             Guid releaseId,
             Guid fileId,
-            [FromForm] IFormFile newFile)
+            [FromForm] ReleaseAncillaryFileUpdateRequest request)
         {
             return await _releaseFileService
-                .ReplaceAncillary(releaseId, fileId, newFile)
+                .UpdateAncillary(releaseId, fileId, request)
                 .HandleFailuresOrOk();
         }
 

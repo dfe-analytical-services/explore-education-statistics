@@ -21,6 +21,13 @@ Create publicly accessible Publication
     user creates test release via api    ${PUBLICATION_ID}    AY    2021
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Academic year 2021/22
+
+Add headline text block to Content page
+    user navigates to content page    ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+
+User approves release
     user approves original release for immediate publication
 
 Create Methodology with some content and images

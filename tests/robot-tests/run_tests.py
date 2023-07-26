@@ -178,7 +178,7 @@ required_env_vars = [
     "WAIT_SMALL",
     "FAIL_TEST_SUITES_FAST",
     "IDENTITY_PROVIDER",
-    "WAIT_MEMORY_CACHE_EXPIRY",
+    "WAIT_CACHE_EXPIRY",
     "EXPIRED_INVITE_USER_EMAIL",
     "PUBLISHER_FUNCTIONS_URL",
 ]
@@ -284,7 +284,10 @@ def admin_request(method, endpoint, body=None):
 
         assert response.status_code not in {401, 403}, "Failed to reauthenticate."
 
-    assert response.status_code < 300, f"Admin request responded with {response.status_code} and {response.text}"
+    if response.status_code == 400 and response.text.find("SlugNotUnique") != -1:
+        raise Exception(f"SlugNotUnique for {body}")
+    else:
+        assert response.status_code < 300, f"Admin request responded with {response.status_code} and {response.text}"
     return response
 
 
