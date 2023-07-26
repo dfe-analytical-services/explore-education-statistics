@@ -289,7 +289,23 @@ const PrototypeHomepage = () => {
                     {sectionShowAll && (
                       <>
                         <hr />
-                        <a href="#">Back to top of page</a>
+                        <a href="#">
+                          <svg
+                            role="presentation"
+                            focusable="false"
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="13"
+                            height="17"
+                            viewBox="0 0 13 17"
+                            className="govuk-!-margin-right-1"
+                          >
+                            <path
+                              fill="currentColor"
+                              d="M6.5 0L0 6.5 1.4 8l4-4v12.7h2V4l4.3 4L13 6.4z"
+                            />
+                          </svg>
+                          Back to top
+                        </a>
                       </>
                     )}
                   </div>
@@ -842,7 +858,7 @@ const PrototypeHomepage = () => {
                 </section>
               )}
               {(sectionShowAll || sectionSelected === 'download') && (
-                <section id="download">
+                <section id="download" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l" id="download">
                     Download data or create tables
                   </h2>
@@ -902,6 +918,7 @@ const PrototypeHomepage = () => {
                       prevTitle="API endpoints quick start"
                     />
                   )}
+                  <div style={{ marginBottom: '90vh' }} />
                 </section>
               )}
             </div>
