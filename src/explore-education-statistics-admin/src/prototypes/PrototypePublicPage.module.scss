@@ -466,14 +466,14 @@
 }
 
 .stickyLinksContainer {
-  //float: right;
-  //margin-right: -375px;
-  position: sticky;
   top: 1rem;
 
-  /* @include govuk-media-query($until: desktop) {
-    display: none;
-  } */
+  @include govuk-media-query($from: tablet) {
+    position: sticky;
+  }
+  @include govuk-media-query($until: tablet) {
+    margin-bottom: 3rem;
+  }
 }
 
 .stickyLinks {

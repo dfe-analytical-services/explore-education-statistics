@@ -1,9 +1,10 @@
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import PrototypePrevNextNav from '@admin/prototypes/components/PrototypePrevNextNav';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import ContentSectionIndex from '@common/components/ContentSectionIndex';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
@@ -15,35 +16,17 @@ const PrototypeHomepage = () => {
   const params = new URLSearchParams(window.location.search);
   const urlDataType = params.get('dataType');
   const latestRelease = 'Academic year 2021/22';
+  const contentRef = useRef<HTMLDivElement>(null);
   const [fullWidth, setFullWidth] = useState(false);
   const [fullTable, setFullTable] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
   const [dataType, setDataType] = useState(urlDataType || 'api');
   const [sectionSelected, setSectionSelected] = useState('dataSummary');
-  const [sectionShowAll, setSectionShowAll] = useState(false);
+  const [sectionShowAll, setSectionShowAll] = useState(true);
 
   const changeSectionState = (newSection: string) => {
     setSectionSelected(newSection);
   };
-
-  window.addEventListener('DOMContentLoaded', () => {
-    alert('hello');
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        const id = entry.target.getAttribute('id');
-        if (entry.intersectionRatio > 0) {
-          alert('1');
-        } else {
-          alert('2');
-        }
-      });
-    });
-
-    // Track all sections that have an `id` applied
-    document.querySelectorAll('section[id]').forEach(section => {
-      observer.observe(section);
-    });
-  });
 
   return (
     <div
@@ -61,69 +44,79 @@ const PrototypeHomepage = () => {
         backLinkText=" Back to apprenticeships and traineeships data catalogue"
       >
         <>
-          <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">
-            <span className="govuk-caption-xl">Data catalogue v5</span>{' '}
-            Apprenticeship Achievement Rates Detailed Series {dataType}
-          </h1>
-          <span className="govuk-tag">National statistics</span>{' '}
-          {selectedRelease === latestRelease && (
-            <span className="govuk-tag">latest data</span>
-          )}
-          {selectedRelease !== latestRelease && (
-            <span className="govuk-tag govuk-tag--red">
-              Not the latest data
-            </span>
-          )}
-          {selectedRelease === 'Academic year 2019/20' && (
-            <>
-              <div className="govuk-inset-text">
-                <div className="govuk-warning-text">
-                  <span className="govuk-warning-text__icon" aria-hidden="true">
-                    !
-                  </span>
-                  <strong className="govuk-warning-text__text">
-                    <span className="govuk-warning-text__assistive">
-                      Warning
-                    </span>
-                    <p>
-                      <strong>
-                        This version of the API data set has been deprecated.
-                      </strong>
-                    </p>
-                    <p>
-                      <a
-                        href="#"
-                        onClick={e => {
-                          setSelectedRelease(latestRelease);
-                        }}
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-full">
+              <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">
+                <span className="govuk-caption-xl">Data catalogue v5</span>{' '}
+                Apprenticeship Achievement Rates Detailed Series {dataType}
+              </h1>
+              <span className="govuk-tag">National statistics</span>{' '}
+              {selectedRelease === latestRelease && (
+                <span className="govuk-tag">latest data</span>
+              )}
+              {selectedRelease !== latestRelease && (
+                <span className="govuk-tag govuk-tag--red">
+                  Not the latest data
+                </span>
+              )}
+              {selectedRelease === 'Academic year 2019/20' && (
+                <>
+                  <div className="govuk-inset-text">
+                    <div className="govuk-warning-text">
+                      <span
+                        className="govuk-warning-text__icon"
+                        aria-hidden="true"
                       >
-                        View the latest available data set: {latestRelease}
-                      </a>
-                    </p>
-                  </strong>
-                </div>
-              </div>
-            </>
-          )}
-          {selectedRelease !== latestRelease &&
-            selectedRelease !== 'Academic year 2019/20' && (
-              <p className="govuk-!-margin-top-6">
-                <a
-                  href="#"
-                  onClick={e => {
-                    setSelectedRelease(latestRelease);
-                  }}
-                >
-                  View the latest data: {latestRelease}
-                </a>
+                        !
+                      </span>
+                      <strong className="govuk-warning-text__text">
+                        <span className="govuk-warning-text__assistive">
+                          Warning
+                        </span>
+                        <p>
+                          <strong>
+                            This version of the API data set has been
+                            deprecated.
+                          </strong>
+                        </p>
+                        <p>
+                          <a
+                            href="#"
+                            onClick={e => {
+                              setSelectedRelease(latestRelease);
+                            }}
+                          >
+                            View the latest available data set: {latestRelease}
+                          </a>
+                        </p>
+                      </strong>
+                    </div>
+                  </div>
+                </>
+              )}
+              {selectedRelease !== latestRelease &&
+                selectedRelease !== 'Academic year 2019/20' && (
+                  <p className="govuk-!-margin-top-6">
+                    <a
+                      href="#"
+                      onClick={e => {
+                        setSelectedRelease(latestRelease);
+                      }}
+                    >
+                      View the latest data: {latestRelease}
+                    </a>
+                  </p>
+                )}
+              <p className="govuk-body-l govuk-!-margin-top-6">
+                Apprenticeship and traineeship starts, achievements and
+                participation. Includes breakdowns by age, sex, ethnicity,
+                subject, provider, geography etc.
               </p>
-            )}
-          <p className="govuk-body-l govuk-!-margin-top-6">
-            Apprenticeship and traineeship starts, achievements and
-            participation. Includes breakdowns by age, sex, ethnicity, subject,
-            provider, geography etc.
-          </p>
+            </div>
+          </div>
+
           <hr className="govuk-!-margin-top-6" />
+
           <div className="govuk-grid-row">
             <div className={styles.stickyLinksContainer}>
               <div>
@@ -135,6 +128,7 @@ const PrototypeHomepage = () => {
                 >
                   <div className={classNames(styles.stickyLinks)}>
                     <h2 className="govuk-heading-m">Contents</h2>
+
                     <ul className="govuk-list  govuk-list--spaced" id="pageNav">
                       <li>
                         <a
@@ -146,7 +140,7 @@ const PrototypeHomepage = () => {
                                 sectionSelected === 'dataSummary',
                             },
                           )}
-                          href="#dataSummary"
+                          href={sectionShowAll ? '#dataSummary' : '#'}
                           onClick={e => {
                             setSectionSelected('dataSummary');
                           }}
@@ -164,7 +158,7 @@ const PrototypeHomepage = () => {
                                 sectionSelected === 'dataPreview',
                             },
                           )}
-                          href="#dataPreview"
+                          href={sectionShowAll ? '#dataPreview' : '#'}
                           onClick={e => {
                             setSectionSelected('dataPreview');
                           }}
@@ -182,7 +176,7 @@ const PrototypeHomepage = () => {
                                 sectionSelected === 'changelog',
                             },
                           )}
-                          href="#changelog"
+                          href={sectionShowAll ? '#changelog' : '#'}
                           onClick={e => {
                             setSectionSelected('changelog');
                           }}
@@ -200,7 +194,7 @@ const PrototypeHomepage = () => {
                                 sectionSelected === 'versionHistory',
                             },
                           )}
-                          href="#versionHistory"
+                          href={sectionShowAll ? '#versionHistory' : '#'}
                           onClick={e => {
                             setSectionSelected('versionHistory');
                           }}
@@ -218,7 +212,7 @@ const PrototypeHomepage = () => {
                                 sectionSelected === 'endPoints',
                             },
                           )}
-                          href="#endPoints"
+                          href={sectionShowAll ? '#endPoints' : '#'}
                           onClick={e => {
                             setSectionSelected('endPoints');
                           }}
@@ -236,7 +230,7 @@ const PrototypeHomepage = () => {
                                 sectionSelected === 'download',
                             },
                           )}
-                          href="#download"
+                          href={sectionShowAll ? '#download' : '#'}
                           onClick={e => {
                             setSectionSelected('download');
                           }}
@@ -247,22 +241,18 @@ const PrototypeHomepage = () => {
                     </ul>
 
                     <h3 className="govuk-heading-s">Help and guidance</h3>
-                    <ul className="govuk-list  govuk-list--spaced">
+                    <ul className="govuk-list govuk-list--spaced">
                       <li>
-                        <a
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                          )}
-                          href="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
-                        >
+                        <Link to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/">
                           API documentation
-                        </a>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link to="./releaseData">View related release</Link>
                       </li>
                     </ul>
-
                     <h3 className="govuk-heading-s">Page view</h3>
-                    <ul className="govuk-list  govuk-list--spaced">
+                    <ul className="govuk-list">
                       <li>
                         <a
                           className={classNames(
@@ -281,11 +271,18 @@ const PrototypeHomepage = () => {
                         </a>
                       </li>
                     </ul>
+
+                    {sectionShowAll && (
+                      <>
+                        <hr />
+                        <a href="#">Back to top of page</a>
+                      </>
+                    )}
                   </div>
                 </div>
               </div>
             </div>
-            <div className="govuk-grid-column-three-quarters">
+            <div className="govuk-grid-column-three-quarters" ref={contentRef}>
               {(sectionShowAll || sectionSelected === 'dataSummary') && (
                 <section id="dataSummary" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l govuk-!-margin-top-0 ">
@@ -334,7 +331,7 @@ const PrototypeHomepage = () => {
                     <SummaryListItem term="Related release">
                       {selectedRelease},{' '}
                       <a href="./releaseData">
-                        view release{' '}
+                        view this release{' '}
                         <span className="govuk-visually-hidden">
                           for {selectedRelease}
                         </span>
@@ -349,14 +346,14 @@ const PrototypeHomepage = () => {
                     <SummaryListItem term="Time period">
                       Academic years 2018/19 to 2020/21
                     </SummaryListItem>
-                    {/* <SummaryListItem term="Indicators">
-                          Achievement rate, Achievers, Completers, Leavers, Pass
-                          rate, Retention rate
-                        </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Age, Level, demographic - ethnicity, gender and lldd,
-                          Standard /Framework flag
-                                </SummaryListItem> */}
+                    <SummaryListItem term="Indicators">
+                      Achievement rate, Achievers, Completers, Leavers, Pass
+                      rate, Retention rate
+                    </SummaryListItem>
+                    <SummaryListItem term="Filters">
+                      Age, Level, demographic - ethnicity, gender and lldd,
+                      Standard /Framework flag
+                    </SummaryListItem>
                   </SummaryList>
                   {!sectionShowAll && (
                     <PrototypePrevNextNav

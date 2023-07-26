@@ -218,7 +218,7 @@ const prototypeRoutes: PrototypeRoute[] = [
   {
     name: 'Dataset selected',
     path: '/prototypes/data-selected',
-    component: PrototypeDataSelected2,
+    component: PrototypeDataSelected5,
   },
   {
     name: 'Dataset selected ORIGINAL',
