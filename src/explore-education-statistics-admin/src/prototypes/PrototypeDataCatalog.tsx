@@ -65,6 +65,7 @@ const PrototypeDataCatalogue = () => {
     (selectedTheme && selectedTheme !== 'all-themes') ||
     (selectedReleaseType && selectedReleaseType !== 'all-release-types');
 
+  /* eslint-disable-next-line */
   const filteredPublications = useMemo(() => {
     const themeTitle = getSelectedTheme(selectedTheme)?.title;
     const filteredByThemeAndTopic =
@@ -232,8 +233,11 @@ const PrototypeDataCatalogue = () => {
               <select
                 className="govuk-select"
                 id="publication"
-                /* eslint-disable-next-line */
                 onBlur={e => {
+                  alert('test');
+                }}
+                /* eslint-disable-next-line */
+                onChange={e => {
                   setSelectedPublication(e.target.value);
                   setTotalResults(32);
                 }}
