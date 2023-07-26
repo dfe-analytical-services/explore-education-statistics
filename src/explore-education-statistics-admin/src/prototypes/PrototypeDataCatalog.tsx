@@ -183,8 +183,9 @@ const PrototypeDataCatalogue = () => {
               <select
                 className="govuk-select"
                 id="theme"
+                onBlur={e => {}}
                 /* eslint-disable-next-line */
-                onBlur={e => {
+                onChange={e => {
                   params.delete('theme');
                   setSelectedTheme(e.target.value);
                   setSelectedPublication('All publications');
@@ -308,8 +309,9 @@ const PrototypeDataCatalogue = () => {
                   /* eslint-disable-next-line react/jsx-props-no-spreading */
                   {...(selectedPublication !==
                     'Apprenticeships and traineeships' && { disabled: true })}
+                  onBlur={e => {}}
                   // eslint-disable-next-line jsx-a11y/no-onchange
-                  onBlur={e => {
+                  onChange={e => {
                     setSelectedRelease(e.target.value);
                   }}
                 >

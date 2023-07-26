@@ -243,12 +243,26 @@ const PrototypeHomepage = () => {
                     <h3 className="govuk-heading-s">Help and guidance</h3>
                     <ul className="govuk-list govuk-list--spaced">
                       <li>
-                        <Link to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/">
+                        <Link
+                          to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                          className={classNames(
+                            'govuk-link--no-visited-state',
+                            styles.prototypeLinkNoUnderline,
+                          )}
+                        >
                           API documentation
                         </Link>
                       </li>
                       <li>
-                        <Link to="./releaseData">View related release</Link>
+                        <Link
+                          to="./releaseData"
+                          className={classNames(
+                            'govuk-link--no-visited-state',
+                            styles.prototypeLinkNoUnderline,
+                          )}
+                        >
+                          View related release
+                        </Link>
                       </li>
                     </ul>
                     <h3 className="govuk-heading-s">Page view</h3>
