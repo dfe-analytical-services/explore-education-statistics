@@ -233,9 +233,7 @@ const PrototypeDataCatalogue = () => {
               <select
                 className="govuk-select"
                 id="publication"
-                onBlur={e => {
-                  alert('test');
-                }}
+                onBlur={e => {}}
                 /* eslint-disable-next-line */
                 onChange={e => {
                   setSelectedPublication(e.target.value);
