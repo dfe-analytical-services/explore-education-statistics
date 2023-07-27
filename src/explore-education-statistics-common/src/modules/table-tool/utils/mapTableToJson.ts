@@ -17,6 +17,14 @@ import sumBy from 'lodash/sumBy';
 
 export type Scope = 'colgroup' | 'col' | 'rowgroup' | 'row';
 
+export interface ExpandedHeader {
+  id: string;
+  text: string;
+  span: number;
+  crossSpan: number;
+  isGroup: boolean;
+}
+
 export interface TableCellJson {
   colSpan?: number;
   rowSpan?: number;
@@ -101,32 +109,18 @@ export default function mapTableToJson({
     return addFilters(acc, filters);
   }, []);
 
-  const rows: TableCellJson[][] = tableCartesian.map(row =>
-    row.map(cell => ({ text: cell.text, tag: 'td' })),
-  );
+  const rows = tableCartesian.map(row => row.map(cell => cell.text));
 
   const expandedColumnHeaders = createExpandedColumnHeaders(columnHeaders);
 
   const expandedRowHeaders = createExpandedRowHeaders(rowHeaders);
 
-  const totalColumns = sumBy(
-    expandedRowHeaders[0],
-    header => header.colSpan ?? 0,
-  );
-
-  // Insert a spacer cell at the start of column headers.
-  const spacerCell: TableCellJson = {
-    colSpan: totalColumns,
-    rowSpan: expandedColumnHeaders.length,
-    tag: 'td',
-  };
-
-  expandedColumnHeaders[0].unshift(spacerCell);
+  const totalColumns = sumBy(expandedRowHeaders[0], header => header.crossSpan);
 
   return {
     tableJson: {
-      thead: expandedColumnHeaders,
-      tbody: rows.map((row, index) => [...expandedRowHeaders[index], ...row]),
+      thead: mapTableHead(expandedColumnHeaders, totalColumns),
+      tbody: mapTableBody(rows, expandedRowHeaders),
     },
     hasMissingRowsOrColumns: query
       ? hasMissingRowsOrColumns({
@@ -191,4 +185,75 @@ function addFilters(headers: Header[], filters: Filter[]) {
   });
 
   return headers;
+}
+
+/**
+ * Maps the expanded column headers to JSON
+ */
+function mapTableHead(
+  expandedColumnHeaders: ExpandedHeader[][],
+  totalColumns: number,
+): TableCellJson[][] {
+  return expandedColumnHeaders.map((columns, rowIndex) => {
+    const row: TableCellJson[] = [];
+    // add a spacer td to the first header row
+    if (rowIndex === 0) {
+      row.push({
+        colSpan: totalColumns,
+        rowSpan: expandedColumnHeaders.length,
+        tag: 'td',
+      });
+    }
+
+    row.push(
+      ...columns.map<TableCellJson>(col => ({
+        colSpan: col.span,
+        rowSpan: col.crossSpan,
+        scope:
+          rowIndex + col.crossSpan !== expandedColumnHeaders.length
+            ? 'colgroup'
+            : 'col',
+        text: col.text,
+        tag: 'th',
+      })),
+    );
+
+    return row;
+  });
+}
+
+/**
+ * Maps the table body to JSON
+ */
+function mapTableBody(
+  rows: string[][],
+  rowHeaders: ExpandedHeader[][],
+): TableCellJson[][] {
+  return rows.map((row, rowIndex) => {
+    const rowsJson: TableCellJson[] = [];
+
+    // add the row header
+    const rowsHeaderJson: TableCellJson[] = rowHeaders[rowIndex]?.map(
+      header => ({
+        rowSpan: header.span,
+        colSpan: header.crossSpan,
+        scope: header.isGroup ? 'rowgroup' : 'row',
+        text: header.text,
+        tag: 'th',
+      }),
+    );
+
+    rowsJson.push(...rowsHeaderJson);
+
+    rowsJson.push(
+      ...row.map<TableCellJson>(cell => {
+        return {
+          tag: 'td',
+          text: cell,
+        };
+      }),
+    );
+
+    return rowsJson;
+  });
 }
