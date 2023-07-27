@@ -16,6 +16,7 @@ import { RadioOption } from '@common/components/form/FormRadioGroup';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React, { useMemo } from 'react';
+import getMethodologyApprovalStatusLabel from '@admin/pages/release/utils/methodologyUtil';
 
 const errorMappings = [
   mapFieldErrors<FormValues>({
@@ -52,7 +53,9 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
                 </SummaryListItem>
                 <SummaryListItem term="Status">
                   <TagGroup>
-                    <Tag>{methodology.status}</Tag>
+                    <Tag>
+                      {getMethodologyApprovalStatusLabel(methodology.status)}
+                    </Tag>
                     {methodology.amendment && <Tag>Amendment</Tag>}
                   </TagGroup>
                 </SummaryListItem>

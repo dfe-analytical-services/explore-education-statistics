@@ -31,6 +31,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
+import getMethodologyApprovalStatusLabel from '@admin/pages/release/utils/methodologyUtil';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
@@ -172,7 +173,9 @@ const PublicationMethodologiesPage = () => {
                         methodology.status === 'Approved' &&
                         methodology.published
                           ? 'Published'
-                          : methodology.status
+                          : getMethodologyApprovalStatusLabel(
+                              methodology.status,
+                            )
                       }${methodology.amendment ? ' Amendment' : ''}`}
                     </Tag>
                   </td>

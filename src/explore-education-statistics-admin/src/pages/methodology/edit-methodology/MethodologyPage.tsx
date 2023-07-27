@@ -10,9 +10,7 @@ import {
   methodologySummaryEditRoute,
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
-import methodologyService, {
-  MethodologyApprovalStatus,
-} from '@admin/services/methodologyService';
+import methodologyService from '@admin/services/methodologyService';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -20,6 +18,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import Tag from '@common/components/Tag';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import { getMethodologyApprovalStatusLabel } from '@admin/pages/release/utils/methodologyUtil';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
@@ -96,19 +95,6 @@ const MethodologyPage = ({
                   }
                 />
               </div>
-
-              {/* EES-2464
-              <div className="govuk-grid-column-one-third">
-                <RelatedInformation heading="Help and guidance">
-                  <ul className="govuk-list">
-                    <li>
-                      <Link to="/documentation" target="blank">
-                        Creating new methodology
-                      </Link>
-                    </li>
-                  </ul>
-                </RelatedInformation>
-              </div> */}
             </div>
 
             <Tag>{getMethodologyApprovalStatusLabel(methodology.status)}</Tag>
@@ -156,21 +142,6 @@ const MethodologyPage = ({
       </LoadingSpinner>
     </Page>
   );
-};
-
-const getMethodologyApprovalStatusLabel = (
-  approvalStatus: MethodologyApprovalStatus,
-) => {
-  switch (approvalStatus) {
-    case 'Draft':
-      return 'Draft';
-    case 'HigherLevelReview':
-      return 'In Review';
-    case 'Approved':
-      return 'Approved';
-    default:
-      return undefined;
-  }
 };
 
 export default MethodologyPage;
