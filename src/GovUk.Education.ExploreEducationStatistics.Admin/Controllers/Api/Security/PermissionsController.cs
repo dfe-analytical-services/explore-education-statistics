@@ -150,20 +150,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                     false, false, false));
         }
 
-        [HttpGet("permissions/methodology/{methodologyId:guid}/status/draft")] // @MarkFix can be removed?
-        public Task<ActionResult<bool>> CanMarkMethodologyAsDraft(Guid methodologyId)
-        {
-            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
-                _userService.CheckCanMarkMethodologyVersionAsDraft);
-        }
-
-        [HttpGet("permissions/methodology/{methodologyId:guid}/status/approve")] // @MarkFix can be removed?
-        public Task<ActionResult<bool>> CanApproveMethodology(Guid methodologyId)
-        {
-            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
-                _userService.CheckCanApproveMethodologyVersion);
-        }
-
         private async Task<ActionResult<bool>> CheckPolicyAgainstEntity<TEntity>(
             Guid entityId,
             Func<TEntity, Task<Either<ActionResult, TEntity>>> policyCheck)
