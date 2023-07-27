@@ -2,7 +2,6 @@ import classNames from 'classnames';
 import Link from '@admin/components/Link';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
-import PageTitle from '@admin/components/PageTitle';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import PrototypeFeaturedLinks from '@admin/prototypes/components/PrototypeFeaturedLinks';
 import PrototypeStep2Options from '@admin/prototypes/components/PrototypeTableStep2Options';
@@ -38,11 +37,9 @@ const PrototypeTableHighlights = () => {
   );
   const publication = 'pub-1';
 
-  const [sourcePublication, setSourcePublication] = useState(
-    urlSource === 'publicationPage',
-  );
+  const [sourcePublication] = useState(urlSource === 'publicationPage');
 
-  const [sourceDataCat, setDataCat] = useState(urlSource === 'dataCat');
+  const [sourceDataCat] = useState(urlSource === 'dataCat');
 
   return (
     <div
@@ -208,7 +205,7 @@ const PrototypeTableHighlights = () => {
                                 'govuk-!-padding-right-5',
                               )}
                             >
-                              {/*<fieldset className="govuk-fieldset govuk-!-margin-top-3">
+                              {/* <fieldset className="govuk-fieldset govuk-!-margin-top-3">
                                 <div className="govuk-radios__item">
                                   <input
                                     type="radio"

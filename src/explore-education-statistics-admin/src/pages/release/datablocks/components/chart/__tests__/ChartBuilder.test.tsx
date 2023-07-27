@@ -3,7 +3,7 @@ import {
   ChartBuilderForms,
   ChartBuilderFormsContextProvider,
 } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -106,7 +106,7 @@ describe('ChartBuilder', () => {
     ).toBeInTheDocument();
   });
 
-  //describe('data sets', () => {
+  // describe('data sets', () => {
   //  test('adding data sets', async () => {
   //    render(
   //      <ChartBuilderFormsContextProvider initialForms={testFormState}>
@@ -338,5 +338,5 @@ describe('ChartBuilder', () => {
 
   //    expect(screen.getAllByRole('row')).toHaveLength(1);
   //  });
-  //});
+  // });
 });

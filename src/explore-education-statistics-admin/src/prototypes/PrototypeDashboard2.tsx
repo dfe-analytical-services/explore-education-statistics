@@ -1,12 +1,11 @@
 import classNames from 'classnames';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import PrototypeDashboardContent from '@admin/prototypes/components/PrototypeDashboardContent';
-import PageSearchForm from '@common/components/PageSearchForm';
-import React, { useState } from 'react';
+import React from 'react';
 import styles from './PrototypePublicPage.module.scss';
 
 const PrototypeReleaseData = () => {
-  const [showContents, setShowContents] = useState(true);
+  // const [showContents, setShowContents] = useState(true);
 
   return (
     <div className={styles.prototypePublicPage}>

@@ -15,7 +15,7 @@ const ReleaseDataPage = () => {
     'publishedReleases',
     [],
   );
-  const [_, setChangelog] = useStorageItem<Changelog | undefined>('changelog');
+  const [, setChangelog] = useStorageItem<Changelog | undefined>('changelog');
 
   return (
     <>

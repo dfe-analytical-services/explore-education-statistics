@@ -3,9 +3,6 @@ import React, { useState } from 'react';
 import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import RelatedInformation from '@common/components/RelatedInformation';
-import Tabs from '@common/components/Tabs';
-import TabsSection from '@common/components/TabsSection';
 import UrlContainer from '@common/components/UrlContainer';
 import Link from '../components/Link';
 import styles from './PrototypePublicPage.module.scss';
@@ -17,17 +14,17 @@ const PrototypeHomepage = () => {
   const [fullWidth, setFullWidth] = useState(false);
   const [fullTable, setFullTable] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
-  const [dataType, setDataType] = useState(urlDataType || 'api');
+  const [dataType] = useState(urlDataType || 'api');
 
   window.addEventListener('DOMContentLoaded', () => {
-    alert('hello');
+    // alert('hello');
     const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
-        const id = entry.target.getAttribute('id');
+        // const id = entry.target.getAttribute('id');
         if (entry.intersectionRatio > 0) {
-          alert('1');
+          // alert('1');
         } else {
-          alert('2');
+          // alert('2');
         }
       });
     });
@@ -86,7 +83,7 @@ const PrototypeHomepage = () => {
                     <p>
                       <a
                         href="#"
-                        onClick={e => {
+                        onClick={_ => {
                           setSelectedRelease(latestRelease);
                         }}
                       >
@@ -103,7 +100,7 @@ const PrototypeHomepage = () => {
               <p className="govuk-!-margin-top-6">
                 <a
                   href="#"
-                  onClick={e => {
+                  onClick={_ => {
                     setSelectedRelease(latestRelease);
                   }}
                 >
@@ -600,7 +597,7 @@ const PrototypeHomepage = () => {
                       <td>
                         <a
                           href="#"
-                          onClick={e => {
+                          onClick={_ => {
                             setSelectedRelease('Academic year 2021/22');
                           }}
                         >
@@ -616,7 +613,7 @@ const PrototypeHomepage = () => {
                       <td>
                         <a
                           href="#"
-                          onClick={e => {
+                          onClick={_ => {
                             setSelectedRelease('Academic year 2020/21');
                           }}
                         >
@@ -632,7 +629,7 @@ const PrototypeHomepage = () => {
                       <td>
                         <a
                           href="#"
-                          onClick={e => {
+                          onClick={_ => {
                             setSelectedRelease('Academic year 2019/20');
                           }}
                         >

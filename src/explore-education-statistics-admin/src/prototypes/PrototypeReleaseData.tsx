@@ -695,7 +695,7 @@ const PrototypeReleaseData = () => {
                           styles.prototypeLinkNoUnderline,
                         )}
                         href="#contentsNoSideNav"
-                        onClick={e => {
+                        onClick={_ => {
                           setShowContents(false);
                         }}
                       >

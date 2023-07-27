@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 import PageTitle from '@admin/components/PageTitle';
 import Link from '@admin/components/Link';
-import PrototypeSortFilters from '@admin/prototypes/components/PrototypeSortFilters';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import React, { useState } from 'react';
 import Details from '@common/components/Details';
@@ -10,7 +9,6 @@ import Tag from '@common/components/Tag';
 import TabsSection from '@common/components/TabsSection';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Button from '@common/components/Button';
-import ButtonLink from '@common/components/ButtonLink';
 import InfoIcon from '@common/components/InfoIcon';
 import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
@@ -33,9 +31,9 @@ const PrototypeManageUsers = () => {
   const [theme, setTheme] = useState('All themes');
   const [themeValue, setThemeValue] = useState('theme-1');
 
-  const [currentPage, setCurrentPage] = useState<number>(0);
-  const [totalResults, setTotalResults] = useState<number>();
-  const [selectedSortOrder, setSelectedSortOrder] = useState('newest');
+  // const [currentPage, setCurrentPage] = useState<number>(0);
+  // const [totalResults, setTotalResults] = useState<number>();
+  // const [selectedSortOrder, setSelectedSortOrder] = useState('newest');
 
   return (
     <PrototypePage

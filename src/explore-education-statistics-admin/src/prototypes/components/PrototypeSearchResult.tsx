@@ -24,7 +24,7 @@ const PrototypeSearchResult = ({
   methodologyTitle2,
   data,
 }: Props) => {
-  const [protoSlug, setProtoSlug] = useState(true);
+  const [protoSlug] = useState(true);
 
   return (
     <>

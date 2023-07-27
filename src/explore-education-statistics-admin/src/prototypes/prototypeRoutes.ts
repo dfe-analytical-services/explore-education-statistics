@@ -38,7 +38,6 @@ import PrototypeTableHighlightsV2b from './PrototypeTableHighlightsUpdateV2-b';
 import PrototypeTableHighlightsV2c from './PrototypeTableHighlightsUpdateV2-c';
 import PrototypeDataCatalog from './PrototypeDataCatalog';
 import PrototypeDataSelected from './PrototypeDataSelected';
-import PrototypeDataSelected2 from './PrototypeDataSelected2';
 import PrototypeDataSelected3 from './PrototypeDataSelected3';
 import PrototypeDataSelected4 from './PrototypeDataSelected4';
 import PrototypeDataSelected5 from './PrototypeDataSelected5';

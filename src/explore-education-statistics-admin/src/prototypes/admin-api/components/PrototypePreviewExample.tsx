@@ -191,7 +191,7 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
                       {!deleteToken ? (
                         <ButtonText
                           variant="warning"
-                          onClick={e => {
+                          onClick={_ => {
                             setDeleteToken(true);
                           }}
                         >

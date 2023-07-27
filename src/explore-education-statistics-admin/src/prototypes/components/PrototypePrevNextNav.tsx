@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface Props {
-  changeSectionState: any;
+  changeSectionState: (newSection: string | undefined) => void;
   nextId?: string;
   nextTitle?: string;
   prevId?: string;

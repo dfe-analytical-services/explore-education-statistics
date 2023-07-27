@@ -2,7 +2,6 @@ import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import methodologyService, {
   MethodologyApprovalStatus,
-  MethodologyStatus,
 } from '@admin/services/methodologyService';
 import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';

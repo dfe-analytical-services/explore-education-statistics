@@ -10,7 +10,7 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService from '@common/services/tableBuilderService';
-import { Chart, DataBlock } from '@common/services/types/blocks';
+import { DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor } from '@testing-library/dom';
 import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
@@ -201,7 +201,7 @@ describe('DataBlockTabs', () => {
     });
   });
 
-  //test('renders line chart', async () => {
+  // test('renders line chart', async () => {
   //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
   //    testChartTableData,
   //  );
@@ -229,9 +229,9 @@ describe('DataBlockTabs', () => {
 
   //    expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
   //  });
-  //});
+  // });
 
-  //test('renders horizontal chart', async () => {
+  // test('renders horizontal chart', async () => {
   //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
   //    testChartTableData,
   //  );
@@ -263,9 +263,9 @@ describe('DataBlockTabs', () => {
   //    expect(screen.getAllByRole('tab')).toHaveLength(2);
   //    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
   //  });
-  //});
+  // });
 
-  //test('renders vertical chart', async () => {
+  // test('renders vertical chart', async () => {
   //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
   //    testChartTableData,
   //  );
@@ -297,7 +297,7 @@ describe('DataBlockTabs', () => {
   //    expect(screen.getAllByRole('tab')).toHaveLength(2);
   //    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
   //  });
-  //});
+  // });
 
   test('renders table', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(

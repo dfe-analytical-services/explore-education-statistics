@@ -4,10 +4,6 @@ import React, { useRef, useState } from 'react';
 import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import ContentSectionIndex from '@common/components/ContentSectionIndex';
-import RelatedInformation from '@common/components/RelatedInformation';
-import Tabs from '@common/components/Tabs';
-import TabsSection from '@common/components/TabsSection';
 import UrlContainer from '@common/components/UrlContainer';
 import Link from '../components/Link';
 import styles from './PrototypePublicPage.module.scss';
@@ -20,11 +16,13 @@ const PrototypeHomepage = () => {
   const [fullWidth, setFullWidth] = useState(false);
   const [fullTable, setFullTable] = useState(false);
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
-  const [dataType, setDataType] = useState(urlDataType || 'api');
-  const [sectionSelected, setSectionSelected] = useState('dataSummary');
+  const [dataType] = useState(urlDataType || 'api');
+  const [sectionSelected, setSectionSelected] = useState(
+    'dataSummary' as string | undefined,
+  );
   const [sectionShowAll, setSectionShowAll] = useState(true);
 
-  const changeSectionState = (newSection: string) => {
+  const changeSectionState = (newSection: string | undefined) => {
     setSectionSelected(newSection);
   };
 
@@ -64,7 +62,7 @@ const PrototypeHomepage = () => {
                   <p className="govuk-!-margin-top-6">
                     <a
                       href="#"
-                      onClick={e => {
+                      onClick={_ => {
                         setSelectedRelease(latestRelease);
                       }}
                     >
@@ -100,7 +98,7 @@ const PrototypeHomepage = () => {
                         <p>
                           <a
                             href="#"
-                            onClick={e => {
+                            onClick={_ => {
                               setSelectedRelease(latestRelease);
                             }}
                           >
@@ -154,7 +152,7 @@ const PrototypeHomepage = () => {
                             },
                           )}
                           href={sectionShowAll ? '#dataSummary' : '#'}
-                          onClick={e => {
+                          onClick={_ => {
                             setSectionSelected('dataSummary');
                           }}
                         >
@@ -172,7 +170,7 @@ const PrototypeHomepage = () => {
                             },
                           )}
                           href={sectionShowAll ? '#dataPreview' : '#'}
-                          onClick={e => {
+                          onClick={_ => {
                             setSectionSelected('dataPreview');
                           }}
                         >
@@ -190,7 +188,7 @@ const PrototypeHomepage = () => {
                             },
                           )}
                           href={sectionShowAll ? '#changelog' : '#'}
-                          onClick={e => {
+                          onClick={_ => {
                             setSectionSelected('changelog');
                           }}
                         >
@@ -208,7 +206,7 @@ const PrototypeHomepage = () => {
                             },
                           )}
                           href={sectionShowAll ? '#versionHistory' : '#'}
-                          onClick={e => {
+                          onClick={_ => {
                             setSectionSelected('versionHistory');
                           }}
                         >
@@ -226,7 +224,7 @@ const PrototypeHomepage = () => {
                             },
                           )}
                           href={sectionShowAll ? '#endPoints' : '#'}
-                          onClick={e => {
+                          onClick={_ => {
                             setSectionSelected('endPoints');
                           }}
                         >
@@ -244,7 +242,7 @@ const PrototypeHomepage = () => {
                             },
                           )}
                           href={sectionShowAll ? '#download' : '#'}
-                          onClick={e => {
+                          onClick={_ => {
                             setSectionSelected('download');
                           }}
                         >
@@ -735,7 +733,7 @@ const PrototypeHomepage = () => {
                         <td>
                           <a
                             href="#"
-                            onClick={e => {
+                            onClick={_ => {
                               setSelectedRelease('Academic year 2021/22');
                               setSectionSelected('dataSummary');
                             }}
@@ -752,7 +750,7 @@ const PrototypeHomepage = () => {
                         <td>
                           <a
                             href="#"
-                            onClick={e => {
+                            onClick={_ => {
                               setSelectedRelease('Academic year 2020/21');
                               setSectionSelected('dataSummary');
                             }}
@@ -769,7 +767,7 @@ const PrototypeHomepage = () => {
                         <td>
                           <a
                             href="#"
-                            onClick={e => {
+                            onClick={_ => {
                               setSelectedRelease('Academic year 2019/20');
                               setSectionSelected('dataSummary');
                             }}

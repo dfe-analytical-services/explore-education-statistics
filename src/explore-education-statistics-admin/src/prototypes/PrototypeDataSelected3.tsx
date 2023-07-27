@@ -73,7 +73,7 @@ const PrototypeHomepage = () => {
                         <p>
                           <a
                             href="#"
-                            onClick={e => {
+                            onClick={_ => {
                               setSelectedRelease(latestRelease);
                             }}
                           >
@@ -90,7 +90,7 @@ const PrototypeHomepage = () => {
                   <p className="govuk-!-margin-top-6">
                     <a
                       href="#"
-                      onClick={e => {
+                      onClick={_ => {
                         setSelectedRelease(latestRelease);
                       }}
                     >
@@ -226,7 +226,7 @@ const PrototypeHomepage = () => {
                     <li>
                       <a
                         href="#"
-                        onClick={e => {
+                        onClick={_ => {
                           setDataType('api');
                         }}
                       >
@@ -717,7 +717,7 @@ const PrototypeHomepage = () => {
                       <td>
                         <a
                           href="#"
-                          onClick={e => {
+                          onClick={_ => {
                             setSelectedRelease('Academic year 2021/22');
                           }}
                         >
@@ -733,7 +733,7 @@ const PrototypeHomepage = () => {
                       <td>
                         <a
                           href="#"
-                          onClick={e => {
+                          onClick={_ => {
                             setSelectedRelease('Academic year 2020/21');
                           }}
                         >
@@ -749,7 +749,7 @@ const PrototypeHomepage = () => {
                       <td>
                         <a
                           href="#"
-                          onClick={e => {
+                          onClick={_ => {
                             setSelectedRelease('Academic year 2019/20');
                           }}
                         >

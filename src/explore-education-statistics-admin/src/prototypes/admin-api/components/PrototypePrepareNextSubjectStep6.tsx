@@ -23,7 +23,7 @@ const PrototypePrepareNextSubjectStep6 = ({
   } = usePrototypeNextSubjectContext();
 
   // save in local storage as no db
-  const [_, setChangelog] = useStorageItem<Changelog>('changelog');
+  const [, setChangelog] = useStorageItem<Changelog>('changelog');
 
   const stepHeading = (
     <WizardStepHeading {...stepProps}>Complete linking</WizardStepHeading>

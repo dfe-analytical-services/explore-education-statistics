@@ -30,7 +30,6 @@ export interface AccordionSectionProps {
   headingTag?: 'h2' | 'h3' | 'h4';
   id?: string;
   open?: boolean;
-  testId?: string;
   onToggle?: ToggleHandler;
 }
 

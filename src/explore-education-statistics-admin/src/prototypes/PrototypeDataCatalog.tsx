@@ -19,9 +19,9 @@ const PrototypeDataCatalogue = () => {
   const urlSource = params.get('source');
   const urlDataType = params.get('dataType');
 
-  const [fullList, setFullList] = useState(true);
+  const [fullList] = useState(true);
   const [listCompact, setListCompact] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery] = useState('');
   const [selectedTheme, setSelectedTheme] = useState(
     urlTheme === 'fe' ? 'Further education' : 'All themes',
   );
@@ -30,15 +30,17 @@ const PrototypeDataCatalogue = () => {
       ? 'Apprenticeships and traineeships'
       : 'All publications',
   );
-  const [selectedReleaseType, setSelectedReleaseType] = useState(
-    'all-release-types',
-  );
+  const selectedReleaseType = 'all-release-types';
+  // const [selectedReleaseType, setSelectedReleaseType] = useState(
+  //  'all-release-types',
+  // );
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalResults, setTotalResults] = useState<number>();
   const [selectedSortOrder, setSelectedSortOrder] = useState('newest');
-  const [sourcePublication, setSourcePublication] = useState(
-    urlSource === 'publicationPage',
-  );
+  const sourcePublication = urlSource === 'publicationPage';
+  // const [sourcePublication, setSourcePublication] = useState(
+  //   urlSource === 'publicationPage',
+  // );
   const latestRelease = 'Academic year 2021/22';
   const [selectedRelease, setSelectedRelease] = useState(latestRelease);
   const [dataType, setDataType] = useState(
@@ -183,7 +185,7 @@ const PrototypeDataCatalogue = () => {
               <select
                 className="govuk-select"
                 id="theme"
-                onBlur={e => {}}
+                onBlur={_ => {}}
                 /* eslint-disable-next-line */
                 onChange={e => {
                   params.delete('theme');
@@ -234,7 +236,7 @@ const PrototypeDataCatalogue = () => {
               <select
                 className="govuk-select"
                 id="publication"
-                onBlur={e => {}}
+                onBlur={_ => {}}
                 /* eslint-disable-next-line */
                 onChange={e => {
                   setSelectedPublication(e.target.value);
@@ -309,7 +311,7 @@ const PrototypeDataCatalogue = () => {
                   /* eslint-disable-next-line react/jsx-props-no-spreading */
                   {...(selectedPublication !==
                     'Apprenticeships and traineeships' && { disabled: true })}
-                  onBlur={e => {}}
+                  onBlur={_ => {}}
                   // eslint-disable-next-line jsx-a11y/no-onchange
                   onChange={e => {
                     setSelectedRelease(e.target.value);
@@ -506,7 +508,7 @@ const PrototypeDataCatalogue = () => {
                       <p className="govuk-!-margin-top-3">
                         <a
                           href="#"
-                          onClick={e => {
+                          onClick={_ => {
                             setSelectedRelease(latestRelease);
                           }}
                         >
