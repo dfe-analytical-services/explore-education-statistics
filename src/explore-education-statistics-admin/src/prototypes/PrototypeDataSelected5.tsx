@@ -59,6 +59,24 @@ const PrototypeHomepage = () => {
                   Not the latest data
                 </span>
               )}
+              {selectedRelease !== latestRelease &&
+                selectedRelease !== 'Academic year 2019/20' && (
+                  <p className="govuk-!-margin-top-6">
+                    <a
+                      href="#"
+                      onClick={e => {
+                        setSelectedRelease(latestRelease);
+                      }}
+                    >
+                      View the latest data: {latestRelease}
+                    </a>
+                  </p>
+                )}
+              <p className="govuk-body-l govuk-!-margin-top-6">
+                Apprenticeship and traineeship starts, achievements and
+                participation. Includes breakdowns by age, sex, ethnicity,
+                subject, provider, geography etc.
+              </p>
               {selectedRelease === 'Academic year 2019/20' && (
                 <>
                   <div className="govuk-inset-text">
@@ -94,24 +112,19 @@ const PrototypeHomepage = () => {
                   </div>
                 </>
               )}
-              {selectedRelease !== latestRelease &&
-                selectedRelease !== 'Academic year 2019/20' && (
-                  <p className="govuk-!-margin-top-6">
-                    <a
-                      href="#"
-                      onClick={e => {
-                        setSelectedRelease(latestRelease);
-                      }}
-                    >
-                      View the latest data: {latestRelease}
-                    </a>
-                  </p>
-                )}
-              <p className="govuk-body-l govuk-!-margin-top-6">
-                Apprenticeship and traineeship starts, achievements and
-                participation. Includes breakdowns by age, sex, ethnicity,
-                subject, provider, geography etc.
-              </p>
+              {selectedRelease === 'Academic year 2020/21' && (
+                <>
+                  <div className="govuk-inset-text">
+                    <p>
+                      <strong>Version 2.0</strong> is now available, however
+                      this could introduce breaking changes to any existing
+                      queries you may have set up. This version is still
+                      available to use, but doesn't contain the latest academic
+                      year's data{' '}
+                    </p>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -724,6 +737,7 @@ const PrototypeHomepage = () => {
                             href="#"
                             onClick={e => {
                               setSelectedRelease('Academic year 2021/22');
+                              setSectionSelected('dataSummary');
                             }}
                           >
                             2.0
@@ -740,6 +754,7 @@ const PrototypeHomepage = () => {
                             href="#"
                             onClick={e => {
                               setSelectedRelease('Academic year 2020/21');
+                              setSectionSelected('dataSummary');
                             }}
                           >
                             1.1
@@ -756,6 +771,7 @@ const PrototypeHomepage = () => {
                             href="#"
                             onClick={e => {
                               setSelectedRelease('Academic year 2019/20');
+                              setSectionSelected('dataSummary');
                             }}
                           >
                             1.0

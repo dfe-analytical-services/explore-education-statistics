@@ -356,7 +356,7 @@ const PrototypeDataCatalogue = () => {
                     className="govuk-label govuk-radios__label"
                     htmlFor="filetype-2"
                   >
-                    Data downloads (csv)
+                    Data downloads (CSV)
                   </label>
                 </div>
                 <div className="govuk-radios__item">
@@ -405,7 +405,7 @@ const PrototypeDataCatalogue = () => {
                       <h2 className="govuk-!-margin-bottom-0">All themes </h2>
                       <h3 className="govuk-!-margin-bottom-0">
                         {dataType === 'csv'
-                          ? '500 Open data (csv) data sets'
+                          ? '500 data downloads (CSV)'
                           : '120 API data sets'}
                       </h3>
                     </>
@@ -419,7 +419,7 @@ const PrototypeDataCatalogue = () => {
                       </h2>
                       <h3 className="govuk-!-margin-bottom-0">
                         {dataType === 'csv'
-                          ? '90 Open data (csv) data sets'
+                          ? '90 data downloads (CSV)'
                           : '30 API data sets'}
                       </h3>
                     </>
@@ -471,7 +471,7 @@ const PrototypeDataCatalogue = () => {
                 <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                   <h3 className="govuk-heading-m govuk-!-margin-bottom-3">
                     {dataType === 'csv'
-                      ? '32 Open data (csv) data sets'
+                      ? '32 data downloads (CSV)'
                       : '12 API data sets'}
                   </h3>
                 </div>
