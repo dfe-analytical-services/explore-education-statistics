@@ -53,7 +53,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 );
         }
 
-        // @MarkFix HigherLevelReview test goes here
+        [Fact]
+        public async Task UpdateApprovalStatus_HigherReview()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodologyVersion, CanSubmitSpecificMethodologyToHigherReview)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupService(userService: userService.Object);
+                        return service.UpdateApprovalStatus(_methodologyVersion.Id, new MethodologyApprovalUpdateRequest
+                        {
+                            Status = HigherLevelReview,
+                        });
+                    }
+                );
+        }
 
         [Fact]
         public async Task UpdateApprovalStatus_MarkAsDraft()

@@ -208,7 +208,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             result.AssertRight();
         }
 
-        // @MarkFix methodology higher review test here
+        [Fact]
+        public void SendMethodologyHigherReviewEmail()
+        {
+            const string expectedTemplateId = "notify-methodology-higher-reviewers-template-id";
+            var methodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Owning publication title",
+                }
+            };
+
+            var expectedValues = new Dictionary<string, dynamic>
+            {
+                {"url", $"https://admin-uri/methodology/{methodologyVersion.Id}/summary"},
+                {"methodology", methodologyVersion.Title},
+            };
+
+            var emailService = new Mock<IEmailService>(Strict);
+
+            emailService.Setup(mock =>
+                    mock.SendEmail(
+                        "test@test.com",
+                        expectedTemplateId,
+                        expectedValues
+                    ))
+                .Returns(Unit.Instance);
+
+            var service = SetupEmailTemplateService(emailService: emailService.Object);
+
+            var result = service.SendMethodologyHigherReviewEmail(
+                "test@test.com", methodologyVersion.Id, methodologyVersion.Title);
+
+            emailService.Verify(
+                s => s.SendEmail(
+                    "test@test.com",
+                    expectedTemplateId,
+                    expectedValues
+                ), Times.Once
+            );
+
+            VerifyAllMocks(emailService);
+
+            result.AssertRight();
+        }
 
         private static Mock<IConfiguration> ConfigurationMock()
         {
