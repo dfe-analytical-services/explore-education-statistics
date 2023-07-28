@@ -68,8 +68,6 @@ const MethodologyStatusPage = () => {
       return;
     }
 
-    // @MarkFix check new status against permissions object?
-
     const nextSummary = await methodologyService.updateMethodology(
       methodologyId,
       {

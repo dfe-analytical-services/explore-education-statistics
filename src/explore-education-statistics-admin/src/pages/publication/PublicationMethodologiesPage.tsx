@@ -151,7 +151,7 @@ const PublicationMethodologiesPage = () => {
           </thead>
           <tbody>
             {methodologyVersions.map(methodology => {
-              const canEdit = // @MarkFix have backend return single permission for this?
+              const canEdit =
                 methodology.permissions.canApproveMethodology ||
                 methodology.permissions.canSubmitMethodologyForHigherReview ||
                 methodology.permissions.canMarkMethodologyAsDraft ||

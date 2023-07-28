@@ -38,7 +38,7 @@ const PreReleaseMethodologiesPage = ({
     return {
       externalMethodology,
       methodologyVersions: latestMethodologyVersions.filter(
-        // @MarkFix include amendments as previous version may still be available for prerelease?
+        // Include amendments as previous version may be published and available for prerelease
         methodologyVersion =>
           methodologyVersion.status === 'Approved' ||
           methodologyVersion.amendment,
@@ -66,9 +66,9 @@ const PreReleaseMethodologiesPage = ({
                           publicationId,
                           releaseId,
                           methodologyId:
-                            // @MarkFix If latest methodology version is unapproved,
-                            // it will be unpublished, so we link to previous version
-                            // which will be published
+                            // If latest methodology version is unapproved, it will
+                            // be an unpublished amendment. So we link to previous
+                            // version which will be published
                             methodology.status !== 'Approved' &&
                             methodology.previousVersionId
                               ? methodology.previousVersionId
@@ -85,8 +85,8 @@ const PreReleaseMethodologiesPage = ({
                         !methodology.published && <Tag>Approved</Tag>}
 
                       {
-                        // @MarkFix If latest version is unapproved amendment,
-                        // we link to previous version which will be published
+                        // If latest version is unapproved amendment,
+                        // we link to previous version above, and that will be published
                         ((methodology.amendment &&
                           methodology.status !== 'Approved') ||
                           methodology.published) && <Tag>Published</Tag>
