@@ -23,7 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     // ReSharper disable once ClassNeverInstantiated.Global
     public class MarkMethodologyAsApprovedAuthorizationHandlerTests
     {
-        // @MarkFix review these tests and update if necessary
         private static readonly Guid UserId = Guid.NewGuid();
 
         private static readonly MethodologyVersion MethodologyVersion = new()

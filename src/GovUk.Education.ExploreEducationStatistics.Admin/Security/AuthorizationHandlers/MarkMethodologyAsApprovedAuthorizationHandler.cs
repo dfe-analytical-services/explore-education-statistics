@@ -9,6 +9,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
+
 // ReSharper disable once ClassNeverInstantiated.Global
 public class MarkMethodologyAsApprovedRequirement : IAuthorizationRequirement
 {
