@@ -138,7 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(BuildMethodologyVersionViewModel);
         }
 
-        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListMethodologies(Guid publicationId)
+        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(Guid publicationId)
         {
             return await _persistenceHelper.CheckEntityExists<Publication>(publicationId,
                     q => q.Include(p => p.Methodologies)

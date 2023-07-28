@@ -46,7 +46,7 @@ const PublicationMethodologiesPage = () => {
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [externalMethodology, methodologyVersions] = await Promise.all([
       publicationService.getExternalMethodology(publication.id),
-      methodologyService.listMethodologyVersions(publication.id),
+      methodologyService.listLatestMethodologyVersions(publication.id),
     ]);
 
     return {
@@ -151,8 +151,9 @@ const PublicationMethodologiesPage = () => {
           </thead>
           <tbody>
             {methodologyVersions.map(methodology => {
-              const canEdit =
+              const canEdit = // @MarkFix have backend return single permission for this?
                 methodology.permissions.canApproveMethodology ||
+                methodology.permissions.canSubmitMethodologyForHigherReview ||
                 methodology.permissions.canMarkMethodologyAsDraft ||
                 methodology.permissions.canUpdateMethodology;
 

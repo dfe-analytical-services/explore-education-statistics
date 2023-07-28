@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task ListMethodologies()
+        public async Task ListLatestMethodologyVersions()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             contentPersistenceHelper: MockPersistenceHelper<ContentDbContext, Publication>(
                                 _publication.Id, _publication).Object,
                             userService: userService.Object);
-                        return service.ListMethodologies(_publication.Id);
+                        return service.ListLatestMethodologyVersions(_publication.Id);
                     }
                 );
         }

@@ -45,6 +45,7 @@ export interface MethodologyVersionSummary extends BaseMethodologyVersion {
     canDeleteMethodology: boolean;
     canUpdateMethodology: boolean;
     canApproveMethodology: boolean;
+    canSubmitMethodologyForHigherReview: boolean;
     canMarkMethodologyAsDraft: boolean;
     canMakeAmendmentOfMethodology: boolean;
     canRemoveMethodologyLink: boolean;
@@ -82,7 +83,7 @@ const methodologyService = {
     );
   },
 
-  listMethodologyVersions(
+  listLatestMethodologyVersions(
     publicationId: string,
   ): Promise<MethodologyVersionSummary[]> {
     return client.get(`/publication/${publicationId}/methodologies`);

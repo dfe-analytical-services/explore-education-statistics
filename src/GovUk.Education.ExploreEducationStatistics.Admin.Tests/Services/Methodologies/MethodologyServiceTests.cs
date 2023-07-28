@@ -1009,7 +1009,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task ListMethodologies()
+        public async Task ListLatestMethodologyVersions()
         {
             var methodology1 = new Methodology
             {
@@ -1113,7 +1113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext);
 
-                var result = await service.ListMethodologies(publication.Id);
+                var result = await service.ListLatestMethodologyVersions(publication.Id);
                 var viewModels = result.AssertRight();
 
                 // Check that the latest versions of the methodologies are returned in title order
@@ -1149,7 +1149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task ListMethodologies_VerifyPermissions()
+        public async Task ListLatestMethodologyVersions_VerifyPermissions()
         {
             var publication = new Publication
             {
@@ -1186,6 +1186,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(false);
             userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanApproveSpecificMethodology))
                 .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanSubmitSpecificMethodologyToHigherReview))
+                .ReturnsAsync(false);
             userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanMarkSpecificMethodologyAsDraft))
                 .ReturnsAsync(true);
             userService.Setup(s => s.MatchesPolicy(It.IsAny<MethodologyVersion>(), CanMakeAmendmentOfSpecificMethodology))
@@ -1198,7 +1200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     userService: userService.Object);
 
-                var result = await service.ListMethodologies(publication.Id);
+                var result = await service.ListLatestMethodologyVersions(publication.Id);
                 var viewModels = result.AssertRight();
 
                 VerifyAllMocks(userService);
@@ -1209,6 +1211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(permissions.CanDeleteMethodology);
                 Assert.False(permissions.CanUpdateMethodology);
                 Assert.True(permissions.CanApproveMethodology);
+                Assert.False(permissions.CanSubmitMethodologyForHigherReview);
                 Assert.True(permissions.CanMarkMethodologyAsDraft);
                 Assert.False(permissions.CanMakeAmendmentOfMethodology);
                 Assert.True(permissions.CanRemoveMethodologyLink);

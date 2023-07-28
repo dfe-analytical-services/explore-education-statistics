@@ -171,17 +171,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ListMethodologies_Returns_Ok()
+        public async Task ListLatestMethodologyVersions_Returns_Ok()
         {
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
             methodologyService
-                .Setup(s => s.ListMethodologies(_id))
+                .Setup(s => s.ListLatestMethodologyVersions(_id))
                 .ReturnsAsync(ListOf(new MethodologyVersionSummaryViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
 
-            var result = await controller.ListMethodologies(_id);
+            var result = await controller.ListLatestMethodologyVersions(_id);
 
             VerifyAllMocks(methodologyService);
 
