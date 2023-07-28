@@ -16,23 +16,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
     public class GlossaryControllerTests
     {
         [Fact]
-        public async Task GetAllGlossaryEntries()
+        public async Task GetGlossary()
         {
             var glossaryEntries = new List<GlossaryCategoryViewModel>
             {
-                new()
-                {
-                    Heading = "Glossary Category 1",
-                    Entries = new List<GlossaryEntryViewModel>
+                new(
+                    Heading: 'A',
+                    Entries: new List<GlossaryEntryViewModel>
                     {
-                        new()
-                        {
-                            Body = "A body",
-                            Slug = "A slug",
-                            Title = "A title"
-                        }
-                    }
-                }
+                        new(
+                            Body: "A body",
+                            Slug: "A slug",
+                            Title: "A title")
+                    })
             };
 
             var (controller, mocks) = BuildControllerAndDependencies();
@@ -41,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 .Setup(s => s.GetGlossary())
                 .ReturnsAsync(glossaryEntries);
 
-            var result = await controller.GetAllGlossaryEntries();
+            var result = await controller.GetGlossary();
             VerifyAllMocks(mocks);
 
             Assert.Equal(glossaryEntries, result);
@@ -50,12 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         [Fact]
         public async Task GetGlossaryEntry()
         {
-            var glossaryEntry = new GlossaryEntryViewModel
-            {
-                Body = "A body",
-                Slug = "A slug",
-                Title = "A title"
-            };
+            var glossaryEntry = new GlossaryEntryViewModel(
+                Body: "A body",
+                Slug: "A slug",
+                Title: "A title"
+            );
 
             var (controller, mocks) =
                 BuildControllerAndDependencies();
