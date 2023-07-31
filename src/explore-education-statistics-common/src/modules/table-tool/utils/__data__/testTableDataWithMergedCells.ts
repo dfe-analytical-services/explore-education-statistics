@@ -649,3 +649,67 @@ export const testTableWithMergedAndUnmergedCellsInLastLevelOfHeaders: FullTable 
     },
   ],
 };
+
+export const testTableWithMergedCellsAndMissingDataColHeadersConfig: TableHeadersConfig = {
+  columns: [category1Group2Filter1, category1Group1Filter1],
+  columnGroups: [[category2Group1Filter1, category2Group1Filter2]],
+  rows: [timePeriod1],
+  rowGroups: [[indicator1]],
+};
+
+export const testTableWithMergedCellsAndMissingDataRowHeadersConfig: TableHeadersConfig = {
+  columns: [timePeriod1],
+  columnGroups: [[indicator1]],
+  rows: [category1Group2Filter1, category1Group1Filter1],
+  rowGroups: [[category2Group1Filter1, category2Group1Filter2]],
+};
+
+export const testTableWithMergedCellsAndMissingData: FullTable = {
+  subjectMeta: {
+    ...testInitialTableSubjectMeta,
+    filters: {
+      Category1: {
+        name: 'category_1',
+        options: [category1Group1Filter1, category1Group2Filter1],
+        order: 0,
+      },
+      Category2: {
+        name: 'category_2',
+        options: [category2Group1Filter1, category2Group1Filter2],
+        order: 0,
+      },
+    },
+    indicators: [indicator1],
+    locations: [location1],
+    timePeriodRange: [timePeriod1],
+  },
+  results: [
+    {
+      filters: [category1Group2Filter1.id, category2Group1Filter1.id],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '43870',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category2Group1Filter1.id, category1Group1Filter1.id],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '56840',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group1Filter1.id, category2Group1Filter2.id],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '320',
+      },
+      timePeriod: timePeriod1.id,
+    },
+  ],
+};
