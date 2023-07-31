@@ -3,11 +3,15 @@ require('core-js/features/array/flat');
 
 const next = require('next');
 const path = require('path');
+const { loadEnvConfig } = require('@next/env');
 const appInsights = require('applicationinsights');
 const express = require('express');
 const basicAuth = require('express-basic-auth');
 const helmet = require('helmet');
 const referrerPolicy = require('referrer-policy');
+const process = require('process');
+
+loadEnvConfig(process.cwd());
 
 if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
   appInsights
@@ -22,11 +26,6 @@ if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
     .setSendLiveMetrics(true)
     .start();
 }
-
-const port = process.env.PORT || 3000;
-const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
-const handleRequest = app.getRequestHandler();
 
 const cspConnectSrc = [
   "'self'",
@@ -47,6 +46,11 @@ const cspScriptSrc = [
   "'unsafe-inline'",
   "'unsafe-eval'",
 ];
+
+const port = process.env.PORT || 3000;
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
+const handleRequest = app.getRequestHandler();
 
 async function startServer() {
   try {
