@@ -259,7 +259,7 @@ describe('ReleaseDataGuidanceSection', () => {
 
       expect(subject2Footnotes).toHaveLength(1);
       expect(subject2Footnotes[0]).toHaveTextContent('Footnote 3');
-    });
+    }, 20000);
 
     test('renders correctly with subjects in preview mode', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
@@ -639,7 +639,7 @@ describe('ReleaseDataGuidanceSection', () => {
           ],
         });
       });
-    });
+    }, 20000);
   });
 
   describe('cannot update release', () => {

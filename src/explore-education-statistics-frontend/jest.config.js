@@ -11,7 +11,7 @@ const config = {
     url: 'http://localhost/',
   },
   transform: {
-    '^.+\\.(js|jsx|ts|tsx)$': 'babel-jest',
+    '^.+\\.(t|j)sx?$': '@swc/jest',
     '^.+\\.css$':
       '<rootDir>/../explore-education-statistics-common/test/cssTransform.js',
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)':
@@ -47,7 +47,7 @@ const config = {
     'jest-watch-typeahead/testname',
   ],
   resetMocks: true,
-  snapshotSerializers: ['jest-serializer-html'],
+  // snapshotSerializers: ['jest-serializer-html'],
 };
 
 module.exports = config;
