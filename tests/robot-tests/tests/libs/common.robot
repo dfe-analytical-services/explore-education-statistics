@@ -96,7 +96,7 @@ user opens chrome headlessly
 
     ${prefs}=    Create Dictionary    download.default_directory=${DOWNLOADS_DIR}
     Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
-    Create Webdriver    Chrome    ${alias}    chrome_options=${c_opts}
+    Create Webdriver    Chrome    ${alias}    options=${c_opts}
 
     ${all_opts}=    Call Method    ${c_opts}    to_capabilities
 
@@ -111,7 +111,7 @@ user opens chrome visually
 
     ${prefs}=    Create Dictionary    download.default_directory=${DOWNLOADS_DIR}
     Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
-    Create Webdriver    Chrome    ${alias}    chrome_options=${c_opts}
+    Create Webdriver    Chrome    ${alias}    options=${c_opts}
     ${all_opts}=    Call Method    ${c_opts}    to_capabilities
 
     maximize browser window
