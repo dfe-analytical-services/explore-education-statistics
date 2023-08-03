@@ -16,8 +16,7 @@ pr: [ 'master', 'dev' ]
 
 jobs:
   - job: 'Backend'
-    pool:
-      vmImage: 'windows-2022'
+    pool: 'ees-ubuntu2204-large'
     steps:
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'
@@ -116,10 +115,7 @@ jobs:
           targetPath: '$(Build.ArtifactStagingDirectory)/processor'
 
   - job: 'Admin'
-    pool:
-      vmImage: 'ubuntu-20.04'
-      demands:
-        - azureps
+    pool: 'ees-ubuntu2204-xlarge'
     steps:
       - task: NodeTool@0
         displayName: 'Install Node.js $(NODE_VERSION)'
@@ -199,9 +195,7 @@ jobs:
           targetPath: '$(Build.ArtifactStagingDirectory)'
 
   - job: 'Frontend'
-    pool:
-      vmImage: 'ubuntu-20.04'
-      demands: azureps
+    pool: 'ees-ubuntu2204-xlarge'
     steps:
       - task: NodeTool@0
         displayName: 'Install Node.js $(NODE_VERSION)'
@@ -290,7 +284,7 @@ jobs:
 
   - job: 'MiscellaneousArtifacts'
     pool:
-      vmImage: 'ubuntu-20.04'
+      vmImage: 'ubuntu-22.04'
     steps:
       - task: CopyFiles@2
         displayName: 'Copy Pipfiles to tests'

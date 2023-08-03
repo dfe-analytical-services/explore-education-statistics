@@ -3,5 +3,6 @@ build/
 coverage/
 node_modules/
 *.min.css
-
+# Artifacts can leak between jobs on self-hosted runners
+wwwroot/
 src/explore-education-statistics-ckeditor/sample
