@@ -1543,4 +1543,971 @@ describe('createExpandedColumnHeaders', () => {
       expandedColumnHeaders,
     );
   });
+
+  describe('a mix of rows with merged headers without siblings and merged headers with siblings', () => {
+    test('returns correct headers for scenario 1', () => {
+      const columnHeaders: Header[] = [
+        new Header('A', 'A')
+          .addChild(
+            new Header('C', 'C')
+              .addChild(new Header('D', 'D'))
+              .addChild(new Header('Total', 'Total')),
+          )
+          .addChild(
+            new Header('Total', 'Total').addChild(new Header('Total', 'Total')),
+          ),
+        new Header('B', 'B').addChild(
+          new Header('Total', 'Total').addChild(new Header('Total', 'Total')),
+        ),
+      ];
+
+      const expandedColumnHeaders: TableCellJson[][] = [
+        [
+          {
+            colSpan: 3,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'A',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'B',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'D',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+        ],
+      ];
+
+      expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+        expandedColumnHeaders,
+      );
+    });
+
+    test('returns correct headers for scenario 2', () => {
+      const columnHeaders: Header[] = [
+        new Header('A', 'A').addChild(
+          new Header('Total', 'Total').addChild(
+            new Header('Total', 'Total')
+              .addChild(new Header('C', 'C'))
+              .addChild(new Header('D', 'D')),
+          ),
+        ),
+        new Header('B', 'B')
+          .addChild(
+            new Header('Total', 'Total').addChild(
+              new Header('Total', 'Total')
+                .addChild(new Header('C', 'C'))
+                .addChild(new Header('D', 'D')),
+            ),
+          )
+          .addChild(
+            new Header('E', 'E').addChild(
+              new Header('F', 'F')
+                .addChild(new Header('C', 'C'))
+                .addChild(new Header('D', 'D')),
+            ),
+          ),
+      ];
+
+      const expandedColumnHeaders: TableCellJson[][] = [
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'A',
+          },
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'B',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 2,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 2,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'E',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'F',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'D',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'D',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'D',
+          },
+        ],
+      ];
+
+      expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+        expandedColumnHeaders,
+      );
+    });
+
+    test('returns correct headers for scenario 3', () => {
+      const columnHeaders: Header[] = [
+        new Header('A', 'A').addChild(
+          new Header('Total', 'Total').addChild(
+            new Header('Total', 'Total').addChild(new Header('Total', 'Total')),
+          ),
+        ),
+        new Header('B', 'B')
+          .addChild(
+            new Header('Total', 'Total').addChild(
+              new Header('Total', 'Total')
+                .addChild(new Header('Total', 'Total'))
+                .addChild(new Header('D', 'D')),
+            ),
+          )
+          .addChild(
+            new Header('E', 'E').addChild(
+              new Header('F', 'F')
+                .addChild(new Header('Total', 'Total'))
+                .addChild(new Header('D', 'D')),
+            ),
+          ),
+      ];
+
+      const expandedColumnHeaders: TableCellJson[][] = [
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'A',
+          },
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'B',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 3,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 2,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'E',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'F',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'D',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'D',
+          },
+        ],
+      ];
+
+      expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+        expandedColumnHeaders,
+      );
+    });
+
+    test('returns correct headers for scenario 4', () => {
+      const columnHeaders: Header[] = [
+        new Header('E', 'E').addChild(
+          new Header('Total', 'Total').addChild(new Header('Total', 'Total')),
+        ),
+        new Header('A', 'A')
+          .addChild(
+            new Header('C', 'C')
+              .addChild(new Header('D', 'D'))
+              .addChild(new Header('Total', 'Total')),
+          )
+          .addChild(
+            new Header('Total', 'Total').addChild(new Header('Total', 'Total')),
+          ),
+        new Header('B', 'B').addChild(
+          new Header('Total', 'Total').addChild(new Header('Total', 'Total')),
+        ),
+      ];
+
+      const expandedColumnHeaders: TableCellJson[][] = [
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'E',
+          },
+          {
+            colSpan: 3,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'A',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'B',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'D',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Total',
+          },
+        ],
+      ];
+
+      expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+        expandedColumnHeaders,
+      );
+    });
+
+    test('returns correct headers for scenario 5', () => {
+      const columnHeaders: Header[] = [
+        new Header('A', 'A').addChild(
+          new Header('Total', 'Total').addChild(
+            new Header('Total', 'Total')
+              .addChild(new Header('C', 'C').addChild(new Header('C', 'C')))
+              .addChild(
+                new Header('D', 'D')
+                  .addChild(new Header('G', 'G'))
+                  .addChild(new Header('C', 'C')),
+              ),
+          ),
+        ),
+        new Header('B', 'B')
+          .addChild(
+            new Header('Total', 'Total').addChild(
+              new Header('Total', 'Total')
+                .addChild(
+                  new Header('C', 'C')
+                    .addChild(new Header('G', 'G'))
+                    .addChild(new Header('C', 'C')),
+                )
+                .addChild(
+                  new Header('D', 'D')
+                    .addChild(new Header('G', 'G'))
+                    .addChild(new Header('C', 'C')),
+                ),
+            ),
+          )
+          .addChild(
+            new Header('E', 'E').addChild(
+              new Header('F', 'F').addChild(
+                new Header('C', 'C').addChild(new Header('C', 'C')),
+              ),
+            ),
+          ),
+      ];
+
+      const expandedColumnHeaders: TableCellJson[][] = [
+        [
+          {
+            colSpan: 3,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'A',
+          },
+          {
+            colSpan: 5,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'B',
+          },
+        ],
+        [
+          {
+            colSpan: 3,
+            rowSpan: 2,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 4,
+            rowSpan: 2,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Total',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'E',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'F',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'D',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'D',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'G',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'G',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'G',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+        ],
+      ];
+
+      expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+        expandedColumnHeaders,
+      );
+    });
+
+    test('returns correct headers for scenario 6', () => {
+      const columnHeaders: Header[] = [
+        new Header('A', 'A')
+          .addChild(new Header('C', 'C').addChild(new Header('C', 'C')))
+          .addChild(new Header('D', 'D').addChild(new Header('D', 'D'))),
+        new Header('B', 'B')
+          .addChild(
+            new Header('E', 'E')
+              .addChild(new Header('F', 'F'))
+              .addChild(new Header('G', 'G')),
+          )
+          .addChild(
+            new Header('H', 'H')
+              .addChild(new Header('I', 'I'))
+              .addChild(new Header('J', 'J')),
+          ),
+      ];
+
+      const expandedColumnHeaders: TableCellJson[][] = [
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'A',
+          },
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'B',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'D',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'E',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'H',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'F',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'G',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'I',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'J',
+          },
+        ],
+      ];
+
+      expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+        expandedColumnHeaders,
+      );
+    });
+
+    test('returns correct headers for scenario 7', () => {
+      const columnHeaders: Header[] = [
+        new Header('A', 'A').addChild(
+          new Header('C', 'C')
+            .addChild(new Header('F', 'F').addChild(new Header('G', 'G')))
+            .addChild(new Header('H', 'H').addChild(new Header('H', 'H')))
+            .addChild(new Header('F', 'F').addChild(new Header('F', 'F'))),
+        ),
+
+        new Header('B', 'B').addChild(
+          new Header('E', 'E')
+            .addChild(new Header('H', 'H').addChild(new Header('H', 'H')))
+            .addChild(new Header('F', 'F').addChild(new Header('F', 'F'))),
+        ),
+      ];
+
+      const expandedColumnHeaders: TableCellJson[][] = [
+        [
+          {
+            colSpan: 3,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'A',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'B',
+          },
+        ],
+        [
+          {
+            colSpan: 3,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'E',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'F',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'H',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'F',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'H',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'F',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'G',
+          },
+        ],
+      ];
+
+      expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+        expandedColumnHeaders,
+      );
+    });
+
+    test('returns correct headers for scenario 8', () => {
+      const columnHeaders: Header[] = [
+        new Header('A', 'A').addChild(
+          new Header('C', 'C')
+            .addChild(
+              new Header('F', 'F').addChild(
+                new Header('G', 'G')
+                  .addChild(new Header('X', 'X'))
+                  .addChild(new Header('Y', 'Y')),
+              ),
+            )
+            .addChild(
+              new Header('H', 'H').addChild(
+                new Header('H', 'H')
+                  .addChild(new Header('X', 'X'))
+                  .addChild(new Header('Y', 'Y')),
+              ),
+            ),
+        ),
+        new Header('B', 'B').addChild(
+          new Header('E', 'E')
+            .addChild(
+              new Header('F', 'F').addChild(
+                new Header('F', 'F')
+                  .addChild(new Header('X', 'X'))
+                  .addChild(new Header('Y', 'Y')),
+              ),
+            )
+            .addChild(
+              new Header('H', 'H').addChild(
+                new Header('H', 'H')
+                  .addChild(new Header('X', 'X'))
+                  .addChild(new Header('Y', 'Y')),
+              ),
+            ),
+        ),
+      ];
+
+      const expandedColumnHeaders: TableCellJson[][] = [
+        [
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'A',
+          },
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'B',
+          },
+        ],
+        [
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'C',
+          },
+          {
+            colSpan: 4,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'E',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'F',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 2,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'H',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 2,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'F',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 2,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'H',
+          },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'G',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'X',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Y',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'X',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Y',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'X',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Y',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'X',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Y',
+          },
+        ],
+      ];
+
+      expect(createExpandedColumnHeaders(columnHeaders)).toEqual(
+        expandedColumnHeaders,
+      );
+    });
+  });
 });

@@ -12,16 +12,7 @@ import last from 'lodash/last';
 export default function createExpandedRowHeaders(
   rowHeaders: Header[],
 ): TableCellJson[][] {
-  const maxDepth = rowHeaders.reduce((acc, header) => {
-    const { maxCrossSpan } = header;
-    return maxCrossSpan > acc ? maxCrossSpan : acc;
-  }, 0);
-
-  // Keep track of levels that can be collapsed (i.e. when each
-  // header in the level only has a single matching child)
-  let collapsibleLevels: boolean[] = [
-    rowHeaders.every(rowHeader => rowHeader.hasSingleMatchingChild()),
-  ];
+  const { maxDepth, collapsibleLevels } = getRowHeadersInfo(rowHeaders);
 
   return rowHeaders.reduce<TableCellJson[][]>((acc, header) => {
     // To construct these headers, we use a depth-first
@@ -54,18 +45,13 @@ export default function createExpandedRowHeaders(
         (matchesPreviousHeader && current.hasSiblings())
       ) {
         const { depth, crossSpan } = current;
-
-        if (collapsibleLevels[depth] === undefined && current.parent) {
-          collapsibleLevels[depth] = current.parent.children.every(rowHeader =>
-            rowHeader.hasSingleMatchingChild(),
-          );
-        }
+        const isCollapsibleLevel = collapsibleLevels[depth];
 
         row.push({
           text: current.text,
           rowSpan: current.span,
           scope: maxDepth > depth + crossSpan ? 'rowgroup' : 'row',
-          colSpan: collapsibleLevels[depth] ? 1 : crossSpan,
+          colSpan: isCollapsibleLevel ? 1 : crossSpan,
           tag: 'th',
         });
       }
@@ -88,7 +74,50 @@ export default function createExpandedRowHeaders(
         row = [];
       }
     }
-    collapsibleLevels = [collapsibleLevels[0]];
     return acc;
   }, []);
+}
+
+function getRowHeadersInfo(
+  rowHeaders: Header[],
+): {
+  maxDepth: number;
+  collapsibleLevels: boolean[];
+} {
+  const isTopLevelCollapsible = rowHeaders.every(rowHeader =>
+    rowHeader.hasSingleMatchingChild(),
+  );
+
+  let maxDepth = 0;
+  const collapsibleLevels = [isTopLevelCollapsible];
+
+  rowHeaders.forEach(header => {
+    const { maxCrossSpan } = header;
+
+    let current: Header | undefined = header;
+
+    while (current) {
+      const { depth } = current;
+
+      if (current.parent) {
+        const isCollapsibleRowHeaderLevel =
+          current.hasSiblings() &&
+          current.parent.children.every(child =>
+            child.hasSingleMatchingChild(),
+          );
+
+        collapsibleLevels[depth] =
+          (collapsibleLevels[depth] ?? true) && isCollapsibleRowHeaderLevel;
+      }
+
+      current = current.getFirstChild();
+    }
+
+    maxDepth = maxCrossSpan > maxDepth ? maxCrossSpan : maxDepth;
+  });
+
+  return {
+    maxDepth,
+    collapsibleLevels,
+  };
 }

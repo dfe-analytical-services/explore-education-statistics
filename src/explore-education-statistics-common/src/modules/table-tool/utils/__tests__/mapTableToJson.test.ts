@@ -34,6 +34,9 @@ import {
   testTableWithOnlyMergedCellsInLastLevelOfRowHeadersConfig,
   testTableWithMergedAndUnmergedCellsInLastLevelOfHeaders,
   testTableWithMergedAndUnmergedCellsInLastLevelOfRowHeadersConfig,
+  testTableWithMergedCellsAndMissingData,
+  testTableWithMergedCellsAndMissingDataRowHeadersConfig,
+  testTableWithMergedCellsAndMissingDataColHeadersConfig,
 } from '@common/modules/table-tool/utils/__data__/testTableDataWithMergedCells';
 import mapTableToJson, {
   TableCellJson,
@@ -1757,6 +1760,81 @@ describe('mapTableToJson', () => {
         ],
       ]);
     });
+
+    test('returns the correct JSON with merged cells and missing data', () => {
+      const result = mapTableToJson({
+        tableHeadersConfig: testTableWithMergedCellsAndMissingDataColHeadersConfig,
+        subjectMeta: testTableWithMergedCellsAndMissingData.subjectMeta,
+        results: testTableWithMergedCellsAndMissingData.results,
+      }).tableJson;
+
+      expect(result.thead).toEqual<TableCellJson[][]>([
+        [
+          { colSpan: 1, rowSpan: 3, tag: 'td' },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Category 2 Group 1 Filter 1',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Category 2 Group 1 Filter 2',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'colgroup',
+            tag: 'th',
+            text: 'Category 1 Group 2',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'Category 1 Group 1',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'col',
+            tag: 'th',
+            text: 'Category 1 Group 1',
+          },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Category 1 Group 2 Filter 1',
+          },
+        ],
+      ]);
+
+      expect(result.tbody).toEqual<TableCellJson[][]>([
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'row',
+            tag: 'th',
+            text: 'Indicator 1',
+          },
+          { tag: 'td', text: '43,870' },
+          { tag: 'td', text: '56,840' },
+          { tag: 'td', text: '320' },
+        ],
+      ]);
+    });
   });
 
   describe('Handles merged row headers', () => {
@@ -2384,6 +2462,82 @@ describe('mapTableToJson', () => {
             text: 'Category 1 Group 2 Filter 1',
           },
           { tag: 'td', text: '87' },
+        ],
+      ]);
+    });
+
+    test('returns the correct JSON with merged cells and missing data', () => {
+      const result = mapTableToJson({
+        tableHeadersConfig: testTableWithMergedCellsAndMissingDataRowHeadersConfig,
+        subjectMeta: testTableWithMergedCellsAndMissingData.subjectMeta,
+        results: testTableWithMergedCellsAndMissingData.results,
+      }).tableJson;
+
+      expect(result.thead).toEqual<TableCellJson[][]>([
+        [
+          { colSpan: 3, rowSpan: 1, tag: 'td' },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'col',
+            tag: 'th',
+            text: 'Indicator 1',
+          },
+        ],
+      ]);
+
+      expect(result.tbody).toEqual<TableCellJson[][]>([
+        [
+          {
+            colSpan: 1,
+            rowSpan: 2,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Category 2 Group 1 Filter 1',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Category 1 Group 2',
+          },
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'row',
+            tag: 'th',
+            text: 'Category 1 Group 2 Filter 1',
+          },
+          { tag: 'td', text: '43,870' },
+        ],
+        [
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'row',
+            tag: 'th',
+            text: 'Category 1 Group 1',
+          },
+
+          { tag: 'td', text: '56,840' },
+        ],
+        [
+          {
+            colSpan: 1,
+            rowSpan: 1,
+            scope: 'rowgroup',
+            tag: 'th',
+            text: 'Category 2 Group 1 Filter 2',
+          },
+          {
+            colSpan: 2,
+            rowSpan: 1,
+            scope: 'row',
+            tag: 'th',
+            text: 'Category 1 Group 1',
+          },
+          { tag: 'td', text: '320' },
         ],
       ]);
     });
