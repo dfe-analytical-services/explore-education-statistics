@@ -1,21 +1,23 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using System.Linq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
+
+public record GlossaryEntryViewModel(string Title, string Slug, string Body);
+
+public record GlossaryCategoryViewModel(char Heading, List<GlossaryEntryViewModel> Entries)
 {
-    public class GlossaryEntryViewModel
+    // ReSharper disable once StringLiteralTypo
+    private static readonly char[] AzCharArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".ToCharArray();
+
+    public static Dictionary<char, GlossaryCategoryViewModel> BuildGlossaryCategories()
     {
-        public string Title { get; set; } = string.Empty;
-
-        public string Slug { get; set; } = string.Empty;
-
-        public string Body { get; set; } = string.Empty;
-    }
-
-    public class GlossaryCategoryViewModel
-    {
-        public string Heading { get; set; } = string.Empty;
-
-        public List<GlossaryEntryViewModel> Entries { get; set; }
+        return AzCharArray.ToDictionary(
+            c => c,
+            c => new GlossaryCategoryViewModel(
+                Heading: c,
+                Entries: new List<GlossaryEntryViewModel>()
+            ));
     }
 }

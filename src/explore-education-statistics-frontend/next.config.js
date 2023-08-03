@@ -16,7 +16,6 @@ const nextConfig = {
     GA_TRACKING_ID: process.env.GA_TRACKING_ID,
     PUBLIC_URL: process.env.PUBLIC_URL,
   },
-  productionBrowserSourceMaps: true,
   async redirects() {
     return [
       {

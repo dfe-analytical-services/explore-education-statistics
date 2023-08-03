@@ -6,12 +6,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspectInjector" Version="2.7.3" PrivateAssets="all" />
+        <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
         <PackageReference Include="AutoMapper" Version="9.0.0" />
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
-        <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
+        <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="System.Linq.Async" Version="5.1.0" />
-        <PackageReference Include="System.Linq.Async.Queryable" Version="5.0.0" />
+        <PackageReference Include="System.Linq.Async.Queryable" Version="5.1.0" />
     </ItemGroup>
 
     <ItemGroup>

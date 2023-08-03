@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("glossary-entries")]
-        public async Task<List<GlossaryCategoryViewModel>> GetAllGlossaryEntries()
+        public async Task<List<GlossaryCategoryViewModel>> GetGlossary()
         {
             return await _glossaryCacheService.GetGlossary();
         }
