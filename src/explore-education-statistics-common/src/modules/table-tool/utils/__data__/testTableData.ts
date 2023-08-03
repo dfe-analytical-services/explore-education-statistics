@@ -3,9 +3,9 @@ import {
   Indicator,
   LocationFilter,
   TimePeriodFilter,
-} from '@common/modules/table-tool/types/filters';
-import { FullTable } from '@common/modules/table-tool/types/fullTable';
-import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+} from '../../types/filters';
+import { FullTable } from '../../types/fullTable';
+import { TableHeadersConfig } from '../../types/tableHeaders';
 
 const category1GroupTotalFilter1 = new CategoryFilter({
   value: 'category-1-filter-1',
@@ -14,7 +14,6 @@ const category1GroupTotalFilter1 = new CategoryFilter({
   isTotal: true,
   category: 'Category 1',
 });
-
 const category1Group1Filter2 = new CategoryFilter({
   value: 'category-1-filter-2',
   label: 'Category 1 Filter 2',
@@ -23,22 +22,18 @@ const category1Group1Filter2 = new CategoryFilter({
   category: 'Category 1',
 });
 
-export const testInitialTableSubjectMeta: FullTable['subjectMeta'] = {
-  filters: {},
-  footnotes: [],
-  indicators: [],
-  locations: [],
-  boundaryLevels: [],
-  publicationName: 'Publication name',
-  subjectName: 'Subject name',
-  timePeriodRange: [],
-  geoJsonAvailable: true,
-};
-
 const category1Group1Filter3 = new CategoryFilter({
   value: 'category-1-filter-3',
   label: 'Category 1 Filter 3',
   group: 'Group 1',
+  isTotal: false,
+  category: 'Category 1',
+});
+
+const category1Group2Filter4 = new CategoryFilter({
+  value: 'category-1-filter-4',
+  label: 'Category 1 Filter 4',
+  group: 'Group 2',
   isTotal: false,
   category: 'Category 1',
 });
@@ -50,7 +45,6 @@ const category2GroupDefaultFilter1 = new CategoryFilter({
   isTotal: false,
   category: 'Category 2',
 });
-
 const category2GroupDefaultFilter2 = new CategoryFilter({
   value: 'category-2-filter-2',
   label: 'Category 2 Filter 2',
@@ -59,55 +53,64 @@ const category2GroupDefaultFilter2 = new CategoryFilter({
   category: 'Category 2',
 });
 
+const category3Group1Filter1 = new CategoryFilter({
+  value: 'category-3-filter-1',
+  label: 'Category 3 Filter 1',
+  group: 'Group 1',
+  isTotal: false,
+  category: 'Category 3',
+});
+
+const category3Group2Filter2 = new CategoryFilter({
+  value: 'category-3-filter-2',
+  label: 'Category 3 Filter 2',
+  group: 'Group 2',
+  isTotal: false,
+  category: 'Category 3',
+});
+
 const indicator1 = new Indicator({
   value: 'indicator-1',
   label: 'Indicator 1',
   unit: '',
   name: 'indicator_1',
 });
-
 const indicator2 = new Indicator({
   value: 'indicator-2',
   label: 'Indicator 2',
   unit: '',
   name: 'indicator_2',
 });
-
 const location1 = new LocationFilter({
   value: 'la-1',
   label: 'LA 1',
   group: 'Region 1',
   level: 'localAuthority',
 });
-
 const location2 = new LocationFilter({
   value: 'la-2',
   label: 'LA 2',
   group: 'Region 1',
   level: 'localAuthority',
 });
-
 const location3 = new LocationFilter({
   value: 'la-3',
   label: 'LA 3',
   group: 'Region 2',
   level: 'localAuthority',
 });
-
 const location4 = new LocationFilter({
   value: 'la-4',
   label: 'LA 4',
   group: 'Region 2',
   level: 'localAuthority',
 });
-
 const timePeriod1 = new TimePeriodFilter({
   label: '2012/13',
   year: 2012,
   code: 'AY',
   order: 0,
 });
-
 const timePeriod2 = new TimePeriodFilter({
   label: '2013/14',
   year: 2013,
@@ -115,8 +118,28 @@ const timePeriod2 = new TimePeriodFilter({
   order: 1,
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const timePeriod3 = new TimePeriodFilter({
+  label: '2014/15',
+  year: 2014,
+  code: 'AY',
+  order: 2,
+});
+
+const initialTableSubjectMeta: FullTable['subjectMeta'] = {
+  filters: {},
+  footnotes: [],
+  indicators: [],
+  locations: [],
+  boundaryLevels: [],
+  publicationName: 'Publication name',
+  subjectName: 'Subject name',
+  timePeriodRange: [],
+  geoJsonAvailable: true,
+};
+
 const testSubjectMeta1: FullTable['subjectMeta'] = {
-  ...testInitialTableSubjectMeta,
+  ...initialTableSubjectMeta,
   filters: {
     Category1: {
       name: 'category_1',
@@ -133,7 +156,6 @@ const testSubjectMeta1: FullTable['subjectMeta'] = {
   locations: [location1, location2],
   timePeriodRange: [timePeriod1],
 };
-
 export const testTableWithOneLevelOfRowAndColHeaders: FullTable = {
   subjectMeta: testSubjectMeta1,
   results: [
@@ -157,7 +179,6 @@ export const testTableWithOneLevelOfRowAndColHeaders: FullTable = {
     },
   ],
 };
-
 export const testTableWithMissingTimePeriod: FullTable = {
   ...testTableWithOneLevelOfRowAndColHeaders,
   subjectMeta: {
@@ -165,28 +186,24 @@ export const testTableWithMissingTimePeriod: FullTable = {
     timePeriodRange: [timePeriod1, timePeriod2],
   },
 };
-
 export const testTableWithOneLevelOfRowAndColHeadersConfig: TableHeadersConfig = {
   columns: [timePeriod1],
   columnGroups: [],
   rows: [indicator1],
   rowGroups: [[location1, location2]],
 };
-
 export const testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig: TableHeadersConfig = {
   columns: [timePeriod1],
   columnGroups: [],
   rows: [location1, location2],
   rowGroups: [[indicator1]],
 };
-
 export const testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig: TableHeadersConfig = {
   columns: [location1, location2],
   columnGroups: [[timePeriod1]],
   rows: [indicator1],
   rowGroups: [],
 };
-
 export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
   subjectMeta: testSubjectMeta1,
   results: [
@@ -272,7 +289,6 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
     },
   ],
 };
-
 export const testTableWithTwoLevelsOfRowAndColHeadersConfig: TableHeadersConfig = {
   columnGroups: [[location1, location2]],
   rowGroups: [[category2GroupDefaultFilter1, category2GroupDefaultFilter2]],
@@ -282,7 +298,7 @@ export const testTableWithTwoLevelsOfRowAndColHeadersConfig: TableHeadersConfig 
 
 export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
   subjectMeta: {
-    ...testInitialTableSubjectMeta,
+    ...initialTableSubjectMeta,
     filters: {
       Category1: {
         name: 'category_1',
@@ -622,7 +638,6 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
     },
   ],
 };
-
 export const testTableWithThreeLevelsOfRowAndColHeadersConfig: TableHeadersConfig = {
   columns: [timePeriod1, timePeriod2],
   columnGroups: [
@@ -631,4 +646,109 @@ export const testTableWithThreeLevelsOfRowAndColHeadersConfig: TableHeadersConfi
   ],
   rows: [indicator1, indicator2],
   rowGroups: [[location1, location2, location3, location4]],
+};
+
+export const testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabels: FullTable = {
+  subjectMeta: {
+    ...initialTableSubjectMeta,
+    filters: {
+      Category1: {
+        name: 'category_1',
+        options: [category1Group1Filter2, category1Group2Filter4],
+        order: 0,
+      },
+      Category3: {
+        name: 'category_3',
+        options: [category3Group1Filter1, category3Group2Filter2],
+        order: 1,
+      },
+    },
+    indicators: [indicator1],
+    locations: [location1],
+    timePeriodRange: [timePeriod1, timePeriod2],
+  },
+  results: [
+    {
+      filters: [category1Group1Filter2.id, category3Group1Filter1.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '20',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group1Filter2.id, category3Group1Filter1.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '7163',
+      },
+      timePeriod: timePeriod2.id,
+    },
+    {
+      filters: [category1Group1Filter2.id, category3Group2Filter2.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '44',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group1Filter2.id, category3Group2Filter2.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '32',
+      },
+      timePeriod: timePeriod2.id,
+    },
+    {
+      filters: [category1Group2Filter4.id, category3Group1Filter1.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '767',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group2Filter4.id, category3Group1Filter1.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '19340',
+      },
+      timePeriod: timePeriod2.id,
+    },
+    {
+      filters: [category1Group2Filter4.id, category3Group2Filter2.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '331',
+      },
+      timePeriod: timePeriod1.id,
+    },
+    {
+      filters: [category1Group2Filter4.id, category3Group2Filter2.id],
+      geographicLevel: 'localAuthority',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '2458',
+      },
+      timePeriod: timePeriod2.id,
+    },
+  ],
+};
+
+export const testTableWithThreeLevelsOfColHeadersWithMultipleGroupsWithSameLabelsConfig: TableHeadersConfig = {
+  columnGroups: [
+    [category3Group1Filter1, category3Group2Filter2],
+    [category1Group1Filter2, category1Group2Filter4],
+  ],
+  columns: [timePeriod1, timePeriod2],
+  rowGroups: [[location1]],
+  rows: [indicator1],
 };
