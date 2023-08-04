@@ -167,12 +167,6 @@ jobs:
           script: 'pnpm i'
 
       - task: 'Bash@3'
-        displayName: 'pnpm format'
-        inputs:
-          targetType: 'inline'
-          script: 'pnpm format'
-
-      - task: 'Bash@3'
         displayName: 'pnpm run build'
         inputs:
           targetType: 'inline'
