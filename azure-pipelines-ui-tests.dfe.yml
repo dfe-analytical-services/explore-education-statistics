@@ -47,7 +47,7 @@ jobs:
     displayName: Public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 3
+      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
@@ -58,7 +58,7 @@ jobs:
   #  condition: not(succeeded())
   #  inputs:
   #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-  #    arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 3 --rerun-failed-suites
+  #    arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2 --rerun-failed-suites
   #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
@@ -106,7 +106,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 3
+      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2
     #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained ampersands.
       workingDirectory: tests/robot-tests
     env:
@@ -118,7 +118,7 @@ jobs:
   #  condition: not(succeeded())
   #  inputs:
   #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-  #    arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 3 --rerun-failed-suites
+  #    arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2 --rerun-failed-suites
   #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
@@ -165,7 +165,7 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 3
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
@@ -176,7 +176,7 @@ jobs:
   #  condition: not(succeeded())
   #  inputs:
   #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 3 --rerun-failed-suites
+  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2 --rerun-failed-suites
   #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
@@ -224,7 +224,7 @@ jobs:
     displayName: Admin public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 3
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
@@ -235,7 +235,7 @@ jobs:
   #  condition: not(succeeded())
   #  inputs:
   #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 3 --rerun-failed-suites
+  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2 --rerun-failed-suites
   #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
