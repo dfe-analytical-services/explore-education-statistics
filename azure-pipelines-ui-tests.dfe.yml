@@ -22,6 +22,8 @@ jobs:
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
   pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
   steps:
   - checkout: self
     clean: true
@@ -80,6 +82,8 @@ jobs:
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
   pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
   steps:
   - checkout: self
     clean: true
@@ -139,6 +143,8 @@ jobs:
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
   pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
   steps:
   - checkout: self
     clean: true
@@ -199,6 +205,8 @@ jobs:
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
   pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
   steps:
   - checkout: self
     clean: true
