@@ -17,6 +17,8 @@ pr: [ 'master', 'dev' ]
 jobs:
   - job: 'Backend'
     pool: 'ees-ubuntu2204-large'
+    workspace:
+      clean: all
     steps:
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'
@@ -116,6 +118,8 @@ jobs:
 
   - job: 'Admin'
     pool: 'ees-ubuntu2204-xlarge'
+    workspace:
+      clean: all
     steps:
       - task: NodeTool@0
         displayName: 'Install Node.js $(NODE_VERSION)'
@@ -196,6 +200,8 @@ jobs:
 
   - job: 'Frontend'
     pool: 'ees-ubuntu2204-xlarge'
+    workspace:
+      clean: all
     steps:
       - task: NodeTool@0
         displayName: 'Install Node.js $(NODE_VERSION)'
@@ -285,6 +291,8 @@ jobs:
   - job: 'MiscellaneousArtifacts'
     pool:
       vmImage: 'ubuntu-22.04'
+    workspace:
+      clean: all
     steps:
       - task: CopyFiles@2
         displayName: 'Copy Pipfiles to tests'
