@@ -1,5 +1,14 @@
+parameters:
+  - name: DeployBranches
+    displayName: Branches that should be deployed
+    type: object
+    default:
+      - master
+      - dev
+
 variables:
   BuildConfiguration: 'Release'
+  IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
   NODE_VERSION: 16.14.2
   DOTNET_VERSION: 6.0.x
@@ -12,7 +21,9 @@ trigger:
   paths:
     exclude:
     - infrastructure/
-pr: [ 'master', 'dev' ]
+pr:
+  - master
+  - dev
 
 jobs:
   - job: 'Backend'
@@ -261,7 +272,7 @@ jobs:
 
       - task: Docker@2
         displayName: 'Build public frontend Docker image'
-        condition: ne(variables['Build.Reason'], 'PullRequest')
+        condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: 's101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection'
           repository: 'ees-public-frontend'
@@ -273,7 +284,7 @@ jobs:
 
       - task: Docker@2
         displayName: 'Push public frontend Docker image'
-        condition: ne(variables['Build.Reason'], 'PullRequest')
+        condition: eq(variables.IsBranchDeployable, true)
         inputs:
           containerRegistry: 's101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection'
           repository: 'ees-public-frontend'
