@@ -150,7 +150,7 @@ describe('ReleaseDataUploadsSection', () => {
     const section1 = within(sections[0]);
 
     expect(
-      section1.getByRole('button', { name: 'Test data 1' }),
+      section1.getByRole('button', { name: /Test data 1/ }),
     ).toBeInTheDocument();
 
     expect(section1.getByTestId('Subject title')).toHaveTextContent(
@@ -173,7 +173,7 @@ describe('ReleaseDataUploadsSection', () => {
     const section2 = within(sections[1]);
 
     expect(
-      section2.getByRole('button', { name: 'Test data 2' }),
+      section2.getByRole('button', { name: /Test data 2/ }),
     ).toBeInTheDocument();
 
     expect(section2.getByTestId('Subject title')).toHaveTextContent(
@@ -227,7 +227,7 @@ describe('ReleaseDataUploadsSection', () => {
     const section1 = getAccordionSection(0);
 
     expect(
-      section1.getByRole('button', { name: 'Test data 1' }),
+      section1.getByRole('button', { name: /Test data 1/ }),
     ).toBeInTheDocument();
 
     expect(section1.getByTestId('Status')).toHaveTextContent(
@@ -455,7 +455,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       expect(
         within(screen.getByTestId('accordionSection')).getByRole('button', {
-          name: 'Test data 1',
+          name: /Test data 1/,
         }),
       ).toBeInTheDocument();
     });
@@ -738,13 +738,13 @@ describe('ReleaseDataUploadsSection', () => {
       const section1 = within(sections[0]);
 
       expect(
-        section1.getByRole('button', { name: 'Test data 1' }),
+        section1.getByRole('button', { name: /Test data 1/ }),
       ).toBeInTheDocument();
 
       const section2 = within(sections[1]);
 
       expect(
-        section2.getByRole('button', { name: 'Test data 2' }),
+        section2.getByRole('button', { name: /Test data 2/ }),
       ).toBeInTheDocument();
 
       expect(section2.getByTestId('Subject title')).toHaveTextContent(
@@ -754,7 +754,7 @@ describe('ReleaseDataUploadsSection', () => {
       const section3 = within(sections[2]);
 
       expect(
-        section3.getByRole('button', { name: 'Test title' }),
+        section3.getByRole('button', { name: /Test title/ }),
       ).toBeInTheDocument();
 
       expect(section3.getByTestId('Subject title')).toHaveTextContent(
@@ -836,11 +836,11 @@ describe('ReleaseDataUploadsSection', () => {
       expect(sections).toHaveLength(3);
 
       expect(
-        section1.getByRole('button', { name: 'Test data 1' }),
+        section1.getByRole('button', { name: /Test data 1/ }),
       ).toBeInTheDocument();
 
       expect(
-        section2.getByRole('button', { name: 'Test data 2' }),
+        section2.getByRole('button', { name: /Test data 2/ }),
       ).toBeInTheDocument();
 
       expect(section2.getByTestId('Subject title')).toHaveTextContent(
@@ -848,7 +848,7 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       expect(
-        section3.getByRole('button', { name: 'Test zip title' }),
+        section3.getByRole('button', { name: /Test zip title/ }),
       ).toBeInTheDocument();
 
       expect(section3.getByTestId('Subject title')).toHaveTextContent(

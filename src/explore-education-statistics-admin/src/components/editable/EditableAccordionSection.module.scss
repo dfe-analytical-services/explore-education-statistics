@@ -1,5 +1,3 @@
-@import '~govuk-frontend/govuk/base';
-
 .editable-header {
   position: relative;
 
@@ -13,38 +11,12 @@
   }
 }
 
-.dragContainer {
-  position: relative;
-
-  &::before {
-    color: govuk-colour('dark-grey');
-    content: '\2630';
-    cursor: grab;
-    font-size: 2.25rem;
-    height: 2.25rem;
-    position: absolute;
-    right: 0;
-    top: govuk-spacing(1);
-  }
-
-  &:focus {
-    @include govuk-focused-text;
-  }
-
-  :global(.govuk-accordion__section-header) {
-    cursor: grab;
-  }
+.draggableItem {
+  padding-left: 0 !important;
 
   :global(.govuk-accordion__section-heading) {
     font-size: 1.5rem;
-  }
-}
-
-.isDragging {
-  @include govuk-focused-text;
-
-  :global(.govuk-accordion__section-header) {
-    cursor: grabbing;
-    font-size: 1.5rem;
+    line-height: 1;
+    padding-left: 40px;
   }
 }

@@ -69,7 +69,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(contentAccordionSections[0]).getByRole('button', {
-        name: 'Section 1',
+        name: /Section 1/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -81,7 +81,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(contentAccordionSections[1]).getByRole('button', {
-        name: 'Section 2',
+        name: /Section 2/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -107,7 +107,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(annexAccordionSections[0]).getByRole('button', {
-        name: 'Annex 1',
+        name: /Annex 1/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -119,7 +119,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(annexAccordionSections[1]).getByRole('button', {
-        name: 'Annex 2',
+        name: /Annex 2/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -131,7 +131,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(annexAccordionSections[2]).getByRole('button', {
-        name: 'Annex 3',
+        name: /Annex 3/,
       }),
     ).toBeInTheDocument();
     expect(

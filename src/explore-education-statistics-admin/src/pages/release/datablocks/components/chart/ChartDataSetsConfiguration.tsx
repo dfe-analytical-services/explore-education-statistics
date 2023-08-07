@@ -212,7 +212,6 @@ const ChartDataSetsConfiguration = ({
         dataSets.length === 0 && (
           <ErrorSummary
             title="Cannot save chart"
-            id={`${formId}-dataSets-errorSummary`}
             errors={[
               {
                 id: forms.dataSets.id,
@@ -247,7 +246,7 @@ const ChartDataSetsConfiguration = ({
                 <tr>
                   <th>Data set</th>
                   {!isReordering && (
-                    <th className="dfe-align--right">
+                    <th className="govuk-!-text-align-right">
                       {dataSets.length > 0 && (
                         <ButtonText
                           className="govuk-!-margin-bottom-0"
@@ -291,7 +290,7 @@ const ChartDataSetsConfiguration = ({
                         )}
                       </td>
                       {!isReordering && (
-                        <td className="dfe-align--right">
+                        <td className="govuk-!-text-align-right">
                           <ButtonText
                             className="govuk-!-margin-bottom-0"
                             onClick={() => {

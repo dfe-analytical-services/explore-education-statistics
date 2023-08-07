@@ -62,6 +62,7 @@ const Page = ({
           </p>
           <p className="govuk-!-margin-bottom-2">
             <Link
+              className="govuk-link--inverse"
               to="https://forms.office.com/Pages/ResponsePage.aspx?id=yXfS-grGoU2187O4s0qC-XMiKzsnr8xJoWM_DeGwIu9UQVNYVkxZSEJVVjhPOURXSjJVMjhZRTdYMi4u"
               target="_blank"
               rel="noopener noreferrer"

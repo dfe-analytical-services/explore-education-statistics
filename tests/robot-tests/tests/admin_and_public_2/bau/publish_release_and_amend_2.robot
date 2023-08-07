@@ -50,8 +50,8 @@ Add data guidance to second Subject
     user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
     ...    data guidance content
     user clicks button    Save guidance
-    user waits until page contains button    ${SUBJECT_NAME}
-    user waits until page contains button    ${SECOND_SUBJECT}
+    user waits until page contains accordion section    ${SUBJECT_NAME}
+    user waits until page contains accordion section    ${SECOND_SUBJECT}
 
 Navigate to 'Footnotes' page
     user clicks link    Footnotes

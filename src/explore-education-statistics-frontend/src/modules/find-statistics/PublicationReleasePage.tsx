@@ -90,7 +90,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <div>
               {!release.publication.isSuperseded && !release.latestRelease && (
                 <Link
-                  className="dfe-print-hidden dfe-block govuk-!-margin-bottom-3"
+                  className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
                   unvisited
                   to={`/find-statistics/${release.publication.slug}`}
                 >
@@ -173,7 +173,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
             <SummaryListItem term="Receive updates">
               <Link
-                className="dfe-print-hidden govuk-!-font-weight-bold"
+                className="govuk-!-display-none-print govuk-!-font-weight-bold"
                 unvisited
                 to={`/subscriptions?slug=${release.publication.slug}`}
                 data-testid={`subscription-${release.publication.slug}`}

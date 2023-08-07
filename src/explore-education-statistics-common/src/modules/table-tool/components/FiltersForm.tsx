@@ -208,7 +208,6 @@ const FiltersForm = ({
             <RHFForm id={formId} showSubmitError onSubmit={handleSubmitForm}>
               {tableQueryError && formState.submitCount > 0 && (
                 <TableQueryError
-                  id={`${formId}-tableQueryError`}
                   errorCode={tableQueryError}
                   releaseId={selectedPublication?.selectedRelease.id}
                   showDownloadOption={showTableQueryErrorDownload}

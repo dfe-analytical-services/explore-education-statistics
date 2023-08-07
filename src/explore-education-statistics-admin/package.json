@@ -74,7 +74,7 @@
     "formik": "^2.1.7",
     "fs-extra": "^9.0.1",
     "geojson": "^0.5.0",
-    "govuk-frontend": "^3.11.0",
+    "govuk-frontend": "^4.7.0",
     "history": "^4.10.1",
     "html-webpack-plugin": "^5.3.2",
     "i": "^0.3.7",

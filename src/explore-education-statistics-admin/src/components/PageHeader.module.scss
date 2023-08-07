@@ -40,7 +40,7 @@ $envs: (
     }
     :global(.govuk-header__logotype) {
       align-items: center;
-      display: flex;
+      display: inline-flex;
     }
     :global(.govuk-header__logotype::after) {
       background-color: $colour;

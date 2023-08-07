@@ -72,7 +72,7 @@ describe('ReleaseFileUploadsSection', () => {
     const section1 = within(sections[0]);
 
     expect(
-      section1.getByRole('button', { name: 'Test file 1' }),
+      section1.getByRole('button', { name: /Test file 1/ }),
     ).toBeInTheDocument();
 
     expect(section1.getByTestId('Title')).toHaveTextContent('Test file 1');
@@ -89,7 +89,7 @@ describe('ReleaseFileUploadsSection', () => {
     const section2 = within(sections[1]);
 
     expect(
-      section2.getByRole('button', { name: 'Test file 2' }),
+      section2.getByRole('button', { name: /Test file 2/ }),
     ).toBeInTheDocument();
 
     expect(section2.getByTestId('Title')).toHaveTextContent('Test file 2');
@@ -209,7 +209,7 @@ describe('ReleaseFileUploadsSection', () => {
 
       expect(
         within(updatedSections[0]).getByRole('button', {
-          name: 'Test file 1',
+          name: /Test file 1/,
         }),
       ).toBeInTheDocument();
     });
@@ -380,19 +380,19 @@ describe('ReleaseFileUploadsSection', () => {
       const section1 = within(sections[0]);
 
       expect(
-        section1.getByRole('button', { name: 'Test file 1' }),
+        section1.getByRole('button', { name: /Test file 1/ }),
       ).toBeInTheDocument();
 
       const section2 = within(sections[1]);
 
       expect(
-        section2.getByRole('button', { name: 'Test file 2' }),
+        section2.getByRole('button', { name: /Test file 2/ }),
       ).toBeInTheDocument();
 
       const section3 = within(sections[2]);
 
       expect(
-        section3.getByRole('button', { name: 'Test file 3' }),
+        section3.getByRole('button', { name: /Test file 3/ }),
       ).toBeInTheDocument();
 
       expect(section3.getByTestId('Title')).toHaveTextContent('Test file 3');

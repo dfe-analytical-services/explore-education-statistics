@@ -245,7 +245,9 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Test section 1 (unsaved changes)' }),
+      screen.getByRole('heading', {
+        name: /Test section 1 \(unsaved changes\)/,
+      }),
     ).toBeInTheDocument();
   });
 
@@ -284,7 +286,9 @@ describe('ReleaseContentAccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Test section 1 (unsaved changes)' }),
+      screen.getByRole('heading', {
+        name: /Test section 1 \(unsaved changes\)/,
+      }),
     ).toBeInTheDocument();
   });
 

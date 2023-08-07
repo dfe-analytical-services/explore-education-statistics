@@ -68,9 +68,9 @@ const FormFieldset = ({
         </legend>
 
         {hint && (
-          <span className="govuk-hint" id={`${fieldId}-hint`}>
+          <div className="govuk-hint" id={`${fieldId}-hint`}>
             {hint}
-          </span>
+          </div>
         )}
 
         {error && <ErrorMessage id={`${fieldId}-error`}>{error}</ErrorMessage>}

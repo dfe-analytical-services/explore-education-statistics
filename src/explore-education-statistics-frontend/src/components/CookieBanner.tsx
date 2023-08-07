@@ -27,6 +27,7 @@ function CookieBanner({ wide }: Props) {
         className={classNames('govuk-cookie-banner', 'govuk-width-container', {
           'dfe-width-container--wide': wide,
         })}
+        data-nosnippet
         role="region"
         aria-label="Cookies on Explore Education Statistics"
       >

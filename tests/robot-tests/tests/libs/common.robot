@@ -247,22 +247,22 @@ user waits until element contains testid
 user waits until page contains accordion section
     [Arguments]    ${section_title}    ${wait}=${timeout}
     user waits until page contains element
-    ...    xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
+    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[text()="${section_title}"]]    ${wait}
 
 user waits until page does not contain accordion section
     [Arguments]    ${section_title}    ${wait}=${timeout}
     user waits until page does not contain element
-    ...    xpath://*[contains(@class,"govuk-accordion__section-button") and text()="${section_title}"]    ${wait}
+    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[text()="${section_title}"]]    ${wait}
 
 user verifies accordion is open
     [Arguments]    ${section_text}
     user waits until page contains element
-    ...    xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="true"]
+    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[text()="${section_text}"] and @aria-expanded="true"]
 
 user verifies accordion is closed
     [Arguments]    ${section_text}
     user waits until page contains element
-    ...    xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="false"]
+    ...    xpath://button[@class='govuk-accordion__section-button'][.//span[text()="${section_text}"] and @aria-expanded="false"]
 
 user checks there are x accordion sections
     [Arguments]    ${count}    ${parent}=css:body
@@ -271,7 +271,7 @@ user checks there are x accordion sections
 user checks accordion is in position
     [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]
     user waits until parent contains element    ${parent}
-    ...    xpath:(.//*[@data-testid="accordionSection"])[${position}]//button[starts-with(text(), "${section_text}")]
+    ...    xpath:(.//*[@data-testid="accordionSection"])[${position}]//span[starts-with(text(), "${section_text}")]
 
 user waits until accordion section contains text
     [Arguments]    ${section_text}    ${text}    ${wait}=${timeout}
@@ -351,10 +351,11 @@ user gets accordion section content element from heading element
     ${content}=    get child element    ${parent}    css:[aria-labelledby="${content_id}"]
     [Return]    ${content}
 
-user scrolls to accordion section content
+user scrolls to accordion section
     [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
+    ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
     ${content}=    user gets accordion section content element    ${heading_text}    ${parent}
-    user scrolls to element    ${content}
+    user scrolls to element    ${header_button}
     # Workaround to get lazy loaded data blocks to render
     user scrolls down    1
 

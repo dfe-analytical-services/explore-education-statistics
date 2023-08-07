@@ -11,7 +11,6 @@ import { useWatch } from 'react-hook-form';
 import isEqual from 'lodash/isEqual';
 
 interface Props {
-  id: string;
   releaseId?: string;
   showDownloadOption?: boolean;
   subject: Subject;
@@ -26,7 +25,6 @@ interface ErrorMessageText {
 }
 
 const TableQueryError = ({
-  id,
   releaseId,
   showDownloadOption = true,
   subject,
@@ -79,7 +77,7 @@ const TableQueryError = ({
   }
 
   return (
-    <BaseErrorSummary id={id} ref={ref} title="There is a problem">
+    <BaseErrorSummary ref={ref} title="There is a problem">
       <p>{errorMessage}</p>
       {showDownloadOption ? (
         <>

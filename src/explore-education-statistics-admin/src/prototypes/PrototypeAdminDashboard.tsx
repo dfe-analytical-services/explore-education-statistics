@@ -119,7 +119,7 @@ const PrototypeManageUsers = () => {
                   </ul>
                 </div>
                 <div className="govuk-grid-column-one-quarter">
-                  <div className="dfe-align--right">
+                  <div className="govuk-!-text-align-right">
                     {showCreatePub && (
                       <a href="#" className="govuk-button">
                         Create new publication
@@ -154,7 +154,7 @@ const PrototypeManageUsers = () => {
               </ul>
             </div>
             <div className="govuk-grid-column-one-quarter">
-              <div className="dfe-align--right">
+              <div className="govuk-!-text-align-right">
                 {showCreatePub && (
                   <a href="#" className="govuk-button">
                     Create new publication
@@ -179,7 +179,7 @@ const PrototypeManageUsers = () => {
                   </ul>
                 </div>
                 <div className="govuk-grid-column-one-quarter">
-                  <div className="dfe-align--right">
+                  <div className="govuk-!-text-align-right">
                     {showCreatePub && (
                       <a href="#" className="govuk-button">
                         Create new publication
@@ -659,7 +659,7 @@ const PrototypeManageUsers = () => {
           </div>
         </TabsSection>
       </Tabs>
-      <div className="dfe-align--right govuk-!-margin-top-9">
+      <div className="govuk-!-text-align-right govuk-!-margin-top-9">
         <ul className="govuk-list">
           <li>
             {showCreatePub ? (

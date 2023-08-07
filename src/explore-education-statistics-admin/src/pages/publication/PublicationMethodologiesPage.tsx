@@ -187,7 +187,7 @@ const PublicationMethodologiesPage = () => {
 
                     <td>
                       <Link
-                        className="govuk-!-margin-right-4 dfe-inline-block"
+                        className="govuk-!-margin-right-4 govuk-!-display-inline-block"
                         data-testid={canEdit ? 'edit' : 'view'}
                         to={generatePath<MethodologyRouteParams>(
                           methodologySummaryRoute.path,
@@ -208,7 +208,7 @@ const PublicationMethodologiesPage = () => {
                           {methodology.amendment &&
                             methodology.previousVersionId && (
                               <Link
-                                className="govuk-!-margin-right-4 dfe-inline-block"
+                                className="govuk-!-margin-right-4 govuk-!-display-inline-block"
                                 data-testid="view-existing-version"
                                 to={generatePath<MethodologyRouteParams>(
                                   methodologySummaryRoute.path,

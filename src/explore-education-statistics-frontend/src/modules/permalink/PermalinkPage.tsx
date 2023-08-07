@@ -99,7 +99,7 @@ const PermalinkPage: NextPage<Props> = ({ data, newPermalinks }) => {
         />
       </div>
 
-      <div className="dfe-hide-print">
+      <div className="govuk-!-display-none-print">
         <DownloadTable
           fileName={`permalink-${data.id}`}
           footnotes={footnotes}

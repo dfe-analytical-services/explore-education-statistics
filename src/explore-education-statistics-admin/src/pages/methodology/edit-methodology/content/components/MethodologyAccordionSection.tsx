@@ -173,7 +173,7 @@ const MethodologyAccordionSection = ({
         )}
       />
       {editingMode === 'edit' && !isReordering && (
-        <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+        <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
           <Button variant="secondary" onClick={addBlockToAccordionSection}>
             Add text block
           </Button>

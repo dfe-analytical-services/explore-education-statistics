@@ -6,7 +6,7 @@ import { PublicationSortOption } from '@common/services/publicationService';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
-const paginationLinkClassName = 'govuk-link govuk-pagination__link';
+const paginationLinkClassName = 'govuk-pagination__link';
 
 type Params = {
   newDesign?: boolean;

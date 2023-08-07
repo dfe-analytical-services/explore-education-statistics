@@ -15,22 +15,31 @@ exports[`AccordionSection renders correctly with required props 1`] = `
               id="accordionSection-heading"
               type="button"
       >
-        Test heading
-        <span aria-hidden="true"
-              class="govuk-accordion__icon"
-        >
+        <span class="govuk-accordion__section-heading-text">
+          <span class="govuk-accordion__section-heading-text-focus">
+            Test heading
+          </span>
+        </span>
+        <span class="govuk-accordion__section-toggle">
+          <span class="govuk-accordion__section-toggle-focus">
+            <span class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down">
+            </span>
+            <span class="govuk-accordion__section-toggle-text">
+              Show
+            </span>
+          </span>
         </span>
       </button>
     </h2>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContentCollapsed"
+       class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>
       Test content
     </p>
-    <div class="dfe-print-hidden">
+    <div class="govuk-!-display-none-print">
       <a href="#main-content"
          class="govuk-link govuk-link--no-visited-state"
       >
@@ -56,25 +65,36 @@ exports[`AccordionSection renders with caption 1`] = `
               id="accordionSection-heading"
               type="button"
       >
-        Test heading
-        <span aria-hidden="true"
-              class="govuk-accordion__icon"
-        >
+        <span class="govuk-accordion__section-heading-text">
+          <span class="govuk-accordion__section-heading-text-focus">
+            Test heading
+          </span>
+        </span>
+        <span class="govuk-accordion__section-summary govuk-body">
+          <span class="govuk-accordion__section-summary-focus">
+            Some caption text
+          </span>
+        </span>
+        <span class="govuk-accordion__section-toggle">
+          <span class="govuk-accordion__section-toggle-focus">
+            <span class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down">
+            </span>
+            <span class="govuk-accordion__section-toggle-text">
+              Show
+            </span>
+          </span>
         </span>
       </button>
     </h2>
-    <div class="govuk-accordion__section-summary govuk-body">
-      Some caption text
-    </div>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContentCollapsed"
+       class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>
       Test content
     </p>
-    <div class="dfe-print-hidden">
+    <div class="govuk-!-display-none-print">
       <a href="#main-content"
          class="govuk-link govuk-link--no-visited-state"
       >
@@ -100,22 +120,31 @@ exports[`AccordionSection renders with different heading size 1`] = `
               id="accordionSection-heading"
               type="button"
       >
-        Test heading
-        <span aria-hidden="true"
-              class="govuk-accordion__icon"
-        >
+        <span class="govuk-accordion__section-heading-text">
+          <span class="govuk-accordion__section-heading-text-focus">
+            Test heading
+          </span>
+        </span>
+        <span class="govuk-accordion__section-toggle">
+          <span class="govuk-accordion__section-toggle-focus">
+            <span class="govuk-accordion-nav__chevron govuk-accordion-nav__chevron--down">
+            </span>
+            <span class="govuk-accordion__section-toggle-text">
+              Show
+            </span>
+          </span>
         </span>
       </button>
     </h3>
   </div>
   <div aria-labelledby="accordionSection-heading"
-       class="govuk-accordion__section-content sectionContentCollapsed"
+       class="govuk-accordion__section-content"
        id="accordionSection-content"
   >
     <p>
       Test content
     </p>
-    <div class="dfe-print-hidden">
+    <div class="govuk-!-display-none-print">
       <a href="#main-content"
          class="govuk-link govuk-link--no-visited-state"
       >

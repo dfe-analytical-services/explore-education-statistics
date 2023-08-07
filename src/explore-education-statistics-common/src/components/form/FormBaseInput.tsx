@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
   FocusEventHandler,
+  HTMLAttributes,
   KeyboardEventHandler,
   memo,
   MouseEventHandler,
@@ -18,6 +19,7 @@ export interface FormBaseInputProps extends FormLabelProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
+  inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
   list?: string;
   name: string;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
@@ -39,8 +41,9 @@ const FormBaseInput = ({
   className,
   error,
   hint,
-  id,
   hideLabel,
+  id,
+  inputMode,
   label,
   labelSize,
   width,
@@ -62,6 +65,7 @@ const FormBaseInput = ({
         'govuk-input--error': !!error,
       })}
       id={id}
+      inputMode={inputMode}
       type={type}
     />
   );
@@ -76,9 +80,9 @@ const FormBaseInput = ({
       />
 
       {hint && (
-        <span id={`${id}-hint`} className="govuk-hint">
+        <div id={`${id}-hint`} className="govuk-hint">
           {hint}
-        </span>
+        </div>
       )}
 
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}

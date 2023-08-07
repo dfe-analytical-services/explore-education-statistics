@@ -485,7 +485,7 @@ user deletes subject file
     [Arguments]    ${SUBJECT_NAME}
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user opens accordion section    ${SUBJECT_NAME}
-    user scrolls to accordion section content    ${SUBJECT_NAME}
+    user scrolls to accordion section    ${SUBJECT_NAME}
     ${accordion}=    user gets accordion section content element    ${SUBJECT_NAME}
     ${button}=    user gets button element    Delete files    ${accordion}
     user clicks element    ${button}

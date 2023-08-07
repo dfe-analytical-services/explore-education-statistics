@@ -236,10 +236,10 @@ describe('PublicationReleasePage', () => {
     render(<PublicationReleasePage release={testRelease} />);
 
     expect(
-      screen.getByRole('button', { name: 'National statistics' }),
+      screen.getByRole('heading', { name: 'National statistics' }),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: 'Official statistics' }),
+      screen.queryByRole('heading', { name: 'Official statistics' }),
     ).not.toBeInTheDocument();
   });
 
@@ -271,11 +271,11 @@ describe('PublicationReleasePage', () => {
     );
 
     expect(
-      screen.queryByRole('button', { name: 'National statistics' }),
+      screen.queryByRole('heading', { name: 'National statistics' }),
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'Official statistics' }),
+      screen.getByRole('heading', { name: 'Official statistics' }),
     ).toBeInTheDocument();
   });
 

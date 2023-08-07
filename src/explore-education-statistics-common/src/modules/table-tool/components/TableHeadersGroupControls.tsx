@@ -54,7 +54,7 @@ const TableHeadersGroupControls = ({
               ariaExpanded={isExpanded}
               className={classNames(
                 styles.showMoreButton,
-                'govuk-!-width-full govuk-!-margin-bottom-6 dfe-align--centre',
+                'govuk-!-width-full govuk-!-margin-bottom-6 govuk-!-text-align-centre',
               )}
               disabled={!!disableControls}
               onClick={() => toggleExpandedList(id)}

@@ -220,7 +220,7 @@ const PreReleaseUserAccessForm = ({
                   <td>{user.email}</td>
 
                   {!isReleaseLive && (
-                    <td className="dfe-align--right">
+                    <td className="govuk-!-text-align-right">
                       <ButtonText
                         disabled={isRemoving}
                         onClick={async () => {

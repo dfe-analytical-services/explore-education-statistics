@@ -99,7 +99,7 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
                             <td className="govuk-!-width-two-thirds">
                               {subject.name}
                             </td>
-                            <td className="dfe-align--right">
+                            <td className="govuk-!-text-align-right">
                               <Button
                                 className="govuk-!-margin-bottom-0 govuk-!-margin-right-2"
                                 onClick={() => setReorderingFilters(subject)}

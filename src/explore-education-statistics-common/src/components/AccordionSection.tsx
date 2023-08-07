@@ -39,6 +39,7 @@ const classes = {
   sectionButton: 'govuk-accordion__section-button',
   sectionContent: 'govuk-accordion__section-content',
   sectionHeading: 'govuk-accordion__section-heading',
+  sectionHeadingText: 'govuk-accordion__section-heading-text',
   expanded: 'govuk-accordion__section--expanded',
 };
 
@@ -58,78 +59,80 @@ const AccordionSection = ({
   open = false,
   onToggle,
 }: AccordionSectionProps) => {
-  const { isMounted, onMounted } = useMounted();
+  const { isMounted } = useMounted();
 
   const headingId = `${id}-heading`;
   const contentId = `${id}-content`;
   const anchorId = `${anchorLinkIdPrefix}-${kebabCase(heading)}`;
 
   return (
-    <div
-      className={classNames(classes.section, styles.section, className, {
-        [classes.expanded]: open,
-      })}
-      data-testid="accordionSection"
-      id={id}
-    >
-      <div className="govuk-accordion__section-header">
-        {anchorLinkUrl && (
-          <CopyLinkButton
-            className={styles.copyLinkButton}
-            url={anchorLinkUrl(anchorId)}
-          />
-        )}
-        {header ??
-          createElement(
-            headingTag,
-            {
-              className: classes.sectionHeading,
-              id: anchorId,
-            },
-            isMounted ? (
-              <button
-                aria-controls={contentId}
-                aria-expanded={open}
-                className={classes.sectionButton}
-                id={headingId}
-                type="button"
-                onClick={() => {
-                  if (onToggle) {
-                    onToggle(!open, id);
-                  }
-                }}
-              >
-                {heading}
-                <span aria-hidden className="govuk-accordion__icon" />
-              </button>
-            ) : (
-              <span id={headingId} className={classes.sectionButton}>
-                {heading}
-              </span>
-            ),
-          )}
-
-        {caption && (
-          <div className="govuk-accordion__section-summary govuk-body">
-            {caption}
-          </div>
-        )}
-      </div>
+    <>
       <div
-        aria-labelledby={headingId}
-        className={classNames(
-          classes.sectionContent,
-          onMounted({ [styles.sectionContentCollapsed]: !open }),
-        )}
-        id={contentId}
+        className={classNames(classes.section, styles.section, className, {
+          [classes.expanded]: open,
+          [styles.hasAnchorLink]: anchorLinkUrl,
+        })}
+        data-testid="accordionSection"
+        id={id}
       >
-        {typeof children === 'function'
-          ? children({ open, contentId, headingId })
-          : children}
+        <div className="govuk-accordion__section-header">
+          {anchorLinkUrl && (
+            <CopyLinkButton
+              className={styles.copyLinkButton}
+              url={anchorLinkUrl(anchorId)}
+            />
+          )}
+          {header ??
+            createElement(
+              headingTag,
+              {
+                className: classes.sectionHeading,
+                id: anchorId,
+              },
+              isMounted ? (
+                <button
+                  aria-controls={contentId}
+                  aria-expanded={open}
+                  className={classes.sectionButton}
+                  id={headingId}
+                  type="button"
+                  onClick={() => {
+                    onToggle?.(!open, id);
+                  }}
+                >
+                  <HeadingContent caption={caption} heading={heading} />
+                  <span className="govuk-accordion__section-toggle">
+                    <span className="govuk-accordion__section-toggle-focus">
+                      <span
+                        className={classNames('govuk-accordion-nav__chevron', {
+                          'govuk-accordion-nav__chevron--down': !open,
+                        })}
+                      />
+                      <span className="govuk-accordion__section-toggle-text">
+                        {open ? 'Hide' : 'Show'}
+                      </span>
+                    </span>
+                  </span>
+                </button>
+              ) : (
+                <HeadingContent caption={caption} heading={heading} />
+              ),
+            )}
+        </div>
 
-        {goToTop && <GoToTopLink />}
+        <div
+          aria-labelledby={headingId}
+          className={classNames(classes.sectionContent)}
+          id={contentId}
+        >
+          {typeof children === 'function'
+            ? children({ open, contentId, headingId })
+            : children}
+
+          {goToTop && <GoToTopLink />}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -148,3 +151,28 @@ export const openAllParentAccordionSections = (target: HTMLElement) => {
     }
   });
 };
+
+function HeadingContent({
+  caption,
+  heading,
+}: {
+  caption?: string;
+  heading: string;
+}) {
+  return (
+    <>
+      <span className={classes.sectionHeadingText}>
+        <span className="govuk-accordion__section-heading-text-focus">
+          {heading}
+        </span>
+      </span>
+      {caption && (
+        <span className="govuk-accordion__section-summary govuk-body">
+          <span className="govuk-accordion__section-summary-focus">
+            {caption}
+          </span>
+        </span>
+      )}
+    </>
+  );
+}
