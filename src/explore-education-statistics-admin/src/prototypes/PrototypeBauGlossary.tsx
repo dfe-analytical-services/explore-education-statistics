@@ -110,40 +110,6 @@ const PrototypeBauGlossary = () => {
                 Save
               </Button>
 
-<<<<<<< HEAD
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    setEdit(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </div>
-              <div className="govuk-grid-column-one-half govuk-!-text-align-right">
-                {!newEntry && (
-                  <>
-                    <Button
-                      variant="warning"
-                      onClick={() => {
-                        toggleDeleteModal(true);
-                      }}
-                    >
-                      Delete this item
-                    </Button>
-                    <ModalConfirm
-                      open={showDeleteModal}
-                      title="Confirm delete"
-                      onExit={() => toggleDeleteModal(false)}
-                      onConfirm={() => toggleDeleteModal(false)}
-                      onCancel={() => toggleDeleteModal(false)}
-                    >
-                      <p>Are you sure you want to delete this item?</p>
-                    </ModalConfirm>
-                  </>
-                )}
-              </div>
-=======
               <Button
                 variant="secondary"
                 onClick={() => {
@@ -152,7 +118,6 @@ const PrototypeBauGlossary = () => {
               >
                 Cancel
               </Button>
->>>>>>> 50a2dd93e (EES-3409 - fix eslint errors and warnings after upgrade)
             </div>
             <div className="govuk-grid-column-one-half dfe-align--right">
               {!newEntry && (

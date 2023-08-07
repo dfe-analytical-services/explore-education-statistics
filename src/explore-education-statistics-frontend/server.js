@@ -9,9 +9,8 @@ const express = require('express');
 const basicAuth = require('express-basic-auth');
 const helmet = require('helmet');
 const referrerPolicy = require('referrer-policy');
-const process = require('process');
 
-loadEnvConfig(process.cwd());
+loadEnvConfig(__dirname);
 
 if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
   appInsights
@@ -122,9 +121,8 @@ async function startServer() {
 }
 
 startServer().catch(e => {
-  if (appInsights.defaultClient) {
-    appInsights.defaultClient.trackException({ exception: e });
-  }
+  appInsights.defaultClient?.trackException({ exception: e });
+
   // eslint-disable-next-line no-console
   console.error(e);
   process.exit(1);

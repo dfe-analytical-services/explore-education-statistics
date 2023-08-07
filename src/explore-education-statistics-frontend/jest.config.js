@@ -47,7 +47,7 @@ const config = {
     'jest-watch-typeahead/testname',
   ],
   resetMocks: true,
-  // snapshotSerializers: ['jest-serializer-html'],
+  snapshotSerializers: ['jest-serializer-html'],
 };
 
 module.exports = config;

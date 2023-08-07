@@ -268,7 +268,7 @@ describe('ChartAxisConfiguration', () => {
     expect(
       screen.getByRole('link', { name: 'Tick spacing must be positive' }),
     ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
-  }, 20000);
+  });
 
   test('shows validation error if invalid label width given', async () => {
     render(
