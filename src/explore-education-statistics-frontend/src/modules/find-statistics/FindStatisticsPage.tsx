@@ -169,6 +169,12 @@ const FindStatisticsPage: NextPage = () => {
             to help you understand and analyse our range of statistics.
           </p>
         </div>
+        <pre>
+          content API: {process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL}
+          data API: {process.env.NEXT_PUBLIC_DATA_API_BASE_URL}
+          notification API: {process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL}
+        </pre>
+
         <div className="govuk-grid-column-one-third">
           <RelatedInformation heading="Related information">
             <ul className="govuk-list">
