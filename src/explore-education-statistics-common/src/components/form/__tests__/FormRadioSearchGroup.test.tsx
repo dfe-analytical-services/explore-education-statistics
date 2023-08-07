@@ -6,6 +6,10 @@ import FormRadioSearchGroup from '@common/components/form//FormRadioSearchGroup'
 jest.mock('lodash/debounce');
 
 describe('FormRadioSearchGroup', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   test('renders list of radio buttons in correct order', () => {
     const { container } = render(
       <FormRadioSearchGroup
@@ -31,8 +35,6 @@ describe('FormRadioSearchGroup', () => {
   });
 
   test('providing a search term renders only relevant radio buttons', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormRadioSearchGroup
         name="testRadios"
@@ -60,8 +62,6 @@ describe('FormRadioSearchGroup', () => {
   });
 
   test('does not throw error if search term that is invalid regex is used', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormRadioSearchGroup
         name="testRadios"
@@ -126,8 +126,6 @@ describe('FormRadioSearchGroup', () => {
   });
 
   test('shows a message if no search results are found', async () => {
-    jest.useFakeTimers();
-
     render(
       <FormRadioSearchGroup
         name="testRadios"

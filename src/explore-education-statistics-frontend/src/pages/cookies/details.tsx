@@ -5,7 +5,7 @@ import Link from '@frontend/components/Link';
 import { NextPage } from 'next';
 
 const CookiesPage: NextPage = () => {
-  const trackingId = process.env.GA_TRACKING_ID.replace('G-', '');
+  const trackingId = process.env.NEXT_PUBLIC_GA_TRACKING_ID.replace('G-', '');
   return (
     <Page
       title="Details about cookies"

@@ -14,7 +14,7 @@ interface Props {
 const MethodologySectionBlocks = ({ blocks, methodologyId }: Props) => {
   const transformImageAttributes = useMethodologyImageAttributeTransformer({
     methodologyId,
-    rootUrl: process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+    rootUrl: process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace('/api', ''),
   });
   return blocks.length > 0 ? (
     <>

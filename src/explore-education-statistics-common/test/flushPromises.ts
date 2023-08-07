@@ -1,3 +1,5 @@
+import { setImmediate } from 'timers';
+
 /**
  * Flush all pending promises.
  *
@@ -9,6 +11,6 @@
  * be flushed before we can observe them being resolved correctly.
  * @see https://stackoverflow.com/questions/52177631/jest-timer-and-promise-dont-work-well-settimeout-and-async-function
  */
-export default function flushPromises() {
-  return new Promise(resolve => setImmediate(resolve));
+export default async function flushPromises(): Promise<void> {
+  await new Promise(setImmediate);
 }

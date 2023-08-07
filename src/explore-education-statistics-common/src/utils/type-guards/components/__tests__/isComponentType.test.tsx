@@ -1,10 +1,10 @@
-import React, { Component } from 'react';
+import React, { Component, ReactNode } from 'react';
 import isComponentType from '../isComponentType';
 
 describe('isComponentType', () => {
   // eslint-disable-next-line react/prefer-stateless-function
   class TestClassComponent extends Component {
-    public render(): React.ReactNode {
+    public render(): ReactNode {
       return null;
     }
   }

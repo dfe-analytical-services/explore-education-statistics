@@ -190,8 +190,8 @@ const ReleaseDataUploadsSection = ({
           }}
           errorMappings={errorMappings}
           onSubmit={handleSubmit}
-          validationSchema={baseSchema =>
-            baseSchema.shape({
+          validationSchema={baseSchema => {
+            return baseSchema.shape({
               subjectTitle: Yup.string()
                 .trim()
                 .required('Enter a subject title')
@@ -210,8 +210,8 @@ const ReleaseDataUploadsSection = ({
                     );
                   },
                 }),
-            })
-          }
+            });
+          }}
           beforeFields={
             <FormFieldTextInput<FormValues>
               name="subjectTitle"

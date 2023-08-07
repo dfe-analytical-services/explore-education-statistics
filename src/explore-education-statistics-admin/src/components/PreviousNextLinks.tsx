@@ -76,7 +76,7 @@ const PreviousNextLinks = ({ previousSection, nextSection }: Props) => {
     );
   }
 
-  return <></>;
+  return null;
 };
 
 export default PreviousNextLinks;

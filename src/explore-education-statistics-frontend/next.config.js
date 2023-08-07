@@ -3,18 +3,17 @@ const flowRight = require('lodash/fp/flowRight');
 const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
+/**
+ * @type {import('next').NextConfig}
+ */
 const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: false,
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   env: {
     BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
-  },
-  publicRuntimeConfig: {
-    APP_ENV: process.env.APP_ENV,
-    CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
-    DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
-    NOTIFICATION_API_BASE_URL: process.env.NOTIFICATION_API_BASE_URL,
-    APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
-    GA_TRACKING_ID: process.env.GA_TRACKING_ID,
-    PUBLIC_URL: process.env.PUBLIC_URL,
   },
   async redirects() {
     return [
@@ -35,6 +34,19 @@ const nextConfig = {
       },
     ];
   },
+  async headers() {
+    return [
+      {
+        source: '/fonts/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+    ];
+  },
   webpack(config, options) {
     const { dev, isServer } = options;
 
@@ -44,7 +56,7 @@ const nextConfig = {
       config.plugins.push(
         new ForkTsCheckerPlugin({
           typescript: {
-            configFile: path.resolve(__dirname, 'src/tsconfig.json'),
+            configFile: path.resolve(__dirname, 'tsconfig.json'),
           },
         }),
       );
@@ -100,13 +112,7 @@ module.exports = flowRight(
     // because we remove the target modules as part
     // of the build to reduce total artifact size.
     process.env.NEXT_CONFIG_MODE !== 'server'
-      ? [
-          'explore-education-statistics-common',
-          // Need to add explicit dependencies as they may be un-transpiled
-          // (ES6+) and cause IE11 to throw syntax errors.
-          'explore-education-statistics-common/node_modules/sanitize-html',
-          'explore-education-statistics-common/node_modules/nanoid',
-        ]
+      ? ['explore-education-statistics-common']
       : [],
   ),
 )(nextConfig);

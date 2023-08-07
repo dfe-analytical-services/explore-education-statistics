@@ -202,7 +202,7 @@ const PrototypeManageUsers = () => {
                             </>
                           ))}
                         </Details>
-                      </div>*/}
+                      </div> */}
                       <ModalConfirm
                         open={showDeleteUserModal}
                         title="Confirm user removal"
@@ -255,17 +255,15 @@ const PrototypeManageUsers = () => {
                   </a>
                 </>
               )) || (
-                <>
-                  <WarningMessage className="govuk-!-margin-top-9">
-                    There are currently no team members associated to this
-                    publication
-                    <p className="govuk-!-margin-bottom-0">
-                      Please{' '}
-                      <a href="#manage-release-users-2">invite new users</a> to
-                      join.
-                    </p>
-                  </WarningMessage>
-                </>
+                <WarningMessage className="govuk-!-margin-top-9">
+                  There are currently no team members associated to this
+                  publication
+                  <p className="govuk-!-margin-bottom-0">
+                    Please{' '}
+                    <a href="#manage-release-users-2">invite new users</a> to
+                    join.
+                  </p>
+                </WarningMessage>
               )}
             </fieldset>
           </form>
@@ -343,28 +341,26 @@ const PrototypeManageUsers = () => {
                     Set user roles for individual releases
                   </legend>
                   {currentReleases.map((item, index) => (
-                    <>
-                      <div
-                        className={`dfe-flex dfe-align-items--center dfe-justify-content--space-between ${
-                          index < currentReleases.length - 1
-                            ? 'dfe-flex-underline'
-                            : ''
-                        }`}
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={index.toString()}
-                      >
-                        <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">
-                          {item}
-                        </h2>
-                        <div className="dfe-flex-basis--50 govuk-!-text-align-right govuk-!-padding-2">
-                          <PrototypeChangeUserRole
-                            selectedRole
-                            name="Invited user"
-                            release={item}
-                          />
-                        </div>
+                    <div
+                      className={`dfe-flex dfe-align-items--center dfe-justify-content--space-between ${
+                        index < currentReleases.length - 1
+                          ? 'dfe-flex-underline'
+                          : ''
+                      }`}
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={index.toString()}
+                    >
+                      <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">
+                        {item}
+                      </h2>
+                      <div className="dfe-flex-basis--50 dfe-align--right govuk-!-padding-2">
+                        <PrototypeChangeUserRole
+                          selectedRole
+                          name="Invited user"
+                          release={item}
+                        />
                       </div>
-                    </>
+                    </div>
                   ))}
                 </fieldset>
               </Details>

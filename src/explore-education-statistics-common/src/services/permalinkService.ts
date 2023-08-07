@@ -38,7 +38,7 @@ interface CreatePermalink {
   };
 }
 
-export default {
+const permalinkService = {
   createPermalink(
     query: CreatePermalink,
     releaseId?: string,
@@ -64,3 +64,4 @@ export default {
     });
   },
 };
+export default permalinkService;

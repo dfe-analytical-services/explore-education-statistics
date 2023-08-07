@@ -9,6 +9,8 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { NestedPartial } from '@common/types';
 
+export type TitleType = 'default' | 'alternative';
+
 export type ChartType =
   | 'line'
   | 'verticalbar'
@@ -107,7 +109,7 @@ export interface ChartProps {
   data: TableDataResult[];
   meta: FullTableMeta;
   title?: string;
-  titleType?: 'default' | 'alternative';
+  titleType?: TitleType;
   alt: string;
   height: number;
   width?: number;
@@ -144,7 +146,7 @@ export interface ChartDefinitionOptions {
   width?: number;
   barThickness?: number;
   title?: string;
-  titleType: 'default' | 'alternative';
+  titleType: TitleType;
   alt: string;
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;

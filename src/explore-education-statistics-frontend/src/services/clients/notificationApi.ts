@@ -1,11 +1,11 @@
 import Client from '@common/services/api/Client';
-import { commaSeparated } from '@common/services/util/paramSerializers';
 import axios from 'axios';
+import qs from 'qs';
 
 const notificationApi = new Client(
   axios.create({
-    baseURL: process.env.NOTIFICATION_API_BASE_URL,
-    paramsSerializer: commaSeparated,
+    baseURL: process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL,
+    paramsSerializer: params => qs.stringify(params, { arrayFormat: 'comma' }),
   }),
 );
 

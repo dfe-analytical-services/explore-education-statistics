@@ -66,73 +66,71 @@ const AccordionSection = ({
   const anchorId = `${anchorLinkIdPrefix}-${kebabCase(heading)}`;
 
   return (
-    <>
-      <div
-        className={classNames(classes.section, styles.section, className, {
-          [classes.expanded]: open,
-          [styles.hasAnchorLink]: anchorLinkUrl,
-        })}
-        data-testid="accordionSection"
-        id={id}
-      >
-        <div className="govuk-accordion__section-header">
-          {anchorLinkUrl && (
-            <CopyLinkButton
-              className={styles.copyLinkButton}
-              url={anchorLinkUrl(anchorId)}
-            />
-          )}
-          {header ??
-            createElement(
-              headingTag,
-              {
-                className: classes.sectionHeading,
-                id: anchorId,
-              },
-              isMounted ? (
-                <button
-                  aria-controls={contentId}
-                  aria-expanded={open}
-                  className={classes.sectionButton}
-                  id={headingId}
-                  type="button"
-                  onClick={() => {
-                    onToggle?.(!open, id);
-                  }}
-                >
-                  <HeadingContent caption={caption} heading={heading} />
-                  <span className="govuk-accordion__section-toggle">
-                    <span className="govuk-accordion__section-toggle-focus">
-                      <span
-                        className={classNames('govuk-accordion-nav__chevron', {
-                          'govuk-accordion-nav__chevron--down': !open,
-                        })}
-                      />
-                      <span className="govuk-accordion__section-toggle-text">
-                        {open ? 'Hide' : 'Show'}
-                      </span>
+    <div
+      className={classNames(classes.section, styles.section, className, {
+        [classes.expanded]: open,
+        [styles.hasAnchorLink]: anchorLinkUrl,
+      })}
+      data-testid="accordionSection"
+      id={id}
+    >
+      <div className="govuk-accordion__section-header">
+        {anchorLinkUrl && (
+          <CopyLinkButton
+            className={styles.copyLinkButton}
+            url={anchorLinkUrl(anchorId)}
+          />
+        )}
+        {header ??
+          createElement(
+            headingTag,
+            {
+              className: classes.sectionHeading,
+              id: anchorId,
+            },
+            isMounted ? (
+              <button
+                aria-controls={contentId}
+                aria-expanded={open}
+                className={classes.sectionButton}
+                id={headingId}
+                type="button"
+                onClick={() => {
+                  onToggle?.(!open, id);
+                }}
+              >
+                <HeadingContent caption={caption} heading={heading} />
+                <span className="govuk-accordion__section-toggle">
+                  <span className="govuk-accordion__section-toggle-focus">
+                    <span
+                      className={classNames('govuk-accordion-nav__chevron', {
+                        'govuk-accordion-nav__chevron--down': !open,
+                      })}
+                    />
+                    <span className="govuk-accordion__section-toggle-text">
+                      {open ? 'Hide' : 'Show'}
                     </span>
                   </span>
-                </button>
-              ) : (
-                <HeadingContent caption={caption} heading={heading} />
-              ),
-            )}
-        </div>
-
-        <div
-          aria-labelledby={headingId}
-          className={classNames(classes.sectionContent)}
-          id={contentId}
-        >
-          {typeof children === 'function'
-            ? children({ open, contentId, headingId })
-            : children}
-
-          {goToTop && <GoToTopLink />}
-        </div>
+                </span>
+              </button>
+            ) : (
+              <HeadingContent caption={caption} heading={heading} />
+            ),
+          )}
       </div>
-    </>
+
+      <div
+        aria-labelledby={headingId}
+        className={classNames(classes.sectionContent)}
+        id={contentId}
+      >
+        {typeof children === 'function'
+          ? children({ open, contentId, headingId })
+          : children}
+
+        {goToTop && <GoToTopLink />}
+      </div>
+    </div>
   );
 };
 

@@ -252,9 +252,11 @@ describe('ReleaseDataUploadsSection', () => {
       expect(screen.queryAllByTestId('accordionSection')).toHaveLength(0);
     });
 
-    expect(
-      screen.getByText('No data files have been uploaded.'),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText('No data files have been uploaded.'),
+      ).toBeInTheDocument();
+    });
   });
 
   describe('deleting data file', () => {
@@ -579,7 +581,14 @@ describe('ReleaseDataUploadsSection', () => {
         screen.getByLabelText('Subject title'),
         'Test data 1',
       );
-      userEvent.tab();
+
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
+      userEvent.click(screen.getByLabelText('Subject title'));
 
       await waitFor(() => {
         expect(
@@ -627,7 +636,7 @@ describe('ReleaseDataUploadsSection', () => {
           }),
         ).toBeInTheDocument();
         expect(
-          screen.queryByText('Choose a zip file', {
+          screen.queryByText('Choose a ZIP file that is not empty', {
             selector: '#dataFileUploadForm-metadataFile-error',
           }),
         ).not.toBeInTheDocument();
@@ -662,12 +671,12 @@ describe('ReleaseDataUploadsSection', () => {
         ).toBeInTheDocument();
 
         expect(
-          screen.queryByText('Choose a data file', {
+          screen.queryByText('Choose a data file that is not empty', {
             selector: '#dataFileUploadForm-dataFile-error',
           }),
         ).not.toBeInTheDocument();
         expect(
-          screen.queryByText('Choose a metadata file', {
+          screen.queryByText('Choose a metadata file that is not empty', {
             selector: '#dataFileUploadForm-metadataFile-error',
           }),
         ).not.toBeInTheDocument();

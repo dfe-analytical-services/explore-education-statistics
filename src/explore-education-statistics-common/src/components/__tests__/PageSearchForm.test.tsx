@@ -1,3 +1,4 @@
+import flushTasks from '@common-test/flushTasks';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
@@ -13,10 +14,6 @@ const labelText = 'Find on this page';
 describe('PageSearchForm', () => {
   beforeEach(() => {
     jest.useFakeTimers();
-  });
-
-  afterEach(() => {
-    jest.useRealTimers();
   });
 
   test('does not render results if input is less than default 3 characters', async () => {
@@ -454,12 +451,12 @@ describe('PageSearchForm', () => {
 
     userEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    await waitFor(() => {
-      const target = container.querySelector('#target');
+    await flushTasks();
 
-      expect(target).toHaveFocus();
-      expect(target).toHaveScrolledIntoView();
-    });
+    const target = container.querySelector('#target');
+
+    expect(target).toHaveFocus();
+    expect(target).toHaveScrolledIntoView();
   });
 
   test('pressing Enter on result scrolls and focuses the element', async () => {
@@ -481,12 +478,11 @@ describe('PageSearchForm', () => {
     fireEvent.keyDown(listBox, { key: 'ArrowDown' });
     fireEvent.keyDown(listBox, { key: 'Enter' });
 
-    await waitFor(() => {
-      const target = container.querySelector('#target');
+    await flushTasks();
 
-      expect(target).toHaveFocus();
-      expect(target).toHaveScrolledIntoView();
-    });
+    const target = container.querySelector('#target');
+    expect(target).toHaveFocus();
+    expect(target).toHaveScrolledIntoView();
   });
 
   test('opens parent accordion of selected result', async () => {
@@ -548,9 +544,9 @@ describe('PageSearchForm', () => {
 
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    await waitFor(() => {
-      expect(summary).toHaveAttribute('aria-expanded', 'true');
-    });
+    await flushTasks();
+
+    expect(summary).toHaveAttribute('aria-expanded', 'true');
   });
 
   test('opens parent tab section of selected result', async () => {
@@ -587,10 +583,10 @@ describe('PageSearchForm', () => {
 
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
-    await waitFor(() => {
-      expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
-      expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
-    });
+    await flushTasks();
+
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
   });
 
   test('opens nested sections of selected result', async () => {
@@ -629,10 +625,15 @@ describe('PageSearchForm', () => {
     const tabs = container.querySelectorAll('[role="tab"]');
     const summary = container.querySelector('summary');
 
+    expect(accordionSection).toHaveAttribute('aria-expanded', 'false');
+
     fireEvent.click(container.querySelector('[role="option"]') as HTMLElement);
 
+    await flushTasks();
+
+    expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
+
     await waitFor(() => {
-      expect(accordionSection).toHaveAttribute('aria-expanded', 'true');
       expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
       expect(summary).toHaveAttribute('aria-expanded', 'true');
     });

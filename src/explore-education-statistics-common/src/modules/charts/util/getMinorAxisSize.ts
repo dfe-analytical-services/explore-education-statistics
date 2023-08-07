@@ -29,7 +29,7 @@ const getMinorAxisSize = ({
   const highestValueLength = dataSetCategories
     .reduce((acc, dataSetCategory) => {
       const value = Object.values(dataSetCategory.dataSets).reduce(
-        (acc2 = acc, dataSet) => (dataSet.value > acc2 ? dataSet.value : acc2),
+        (acc2, dataSet) => (dataSet.value > acc2 ? dataSet.value : acc2),
         0,
       );
       return value > acc ? value : acc;

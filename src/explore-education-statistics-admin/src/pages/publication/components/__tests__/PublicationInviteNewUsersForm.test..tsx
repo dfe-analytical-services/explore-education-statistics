@@ -31,21 +31,21 @@ describe('PublicationInviteNewUsersForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Invite a user to edit Publication title'),
+        screen.getByText('Invite a user to edit this publication'),
       ).toBeInTheDocument();
       expect(
-        screen.getByLabelText('Academic year 2000/01'),
+        screen.getByLabelText('Academic year 2023/24'),
       ).toBeInTheDocument();
       expect(
-        screen.getByLabelText('Academic year 2001/02'),
+        screen.getByLabelText('Academic year 2022/23'),
       ).toBeInTheDocument();
       expect(
-        screen.getByLabelText('Academic year 2002/03'),
+        screen.getByLabelText('Academic year 2021/22'),
       ).toBeInTheDocument();
     });
 
     const emailInput = screen.getByLabelText('Enter an email address');
-    await userEvent.type(emailInput, 'test@test.com');
+    userEvent.type(emailInput, 'test@test.com');
 
     const checkboxes = screen.getAllByLabelText(
       /Academic year /,
@@ -53,13 +53,13 @@ describe('PublicationInviteNewUsersForm', () => {
     expect(checkboxes).toHaveLength(3);
 
     expect(checkboxes[0].checked).toBe(true);
-    expect(checkboxes[0]).toHaveAttribute('value', 'release1-id');
+    expect(checkboxes[0]).toHaveAttribute('value', 'release-1');
 
     expect(checkboxes[1].checked).toBe(true);
-    expect(checkboxes[1]).toHaveAttribute('value', 'release2-id');
+    expect(checkboxes[1]).toHaveAttribute('value', 'release-2');
 
     expect(checkboxes[2].checked).toBe(true);
-    expect(checkboxes[2]).toHaveAttribute('value', 'release3-id');
+    expect(checkboxes[2]).toHaveAttribute('value', 'release-3');
 
     userEvent.click(checkboxes[1]);
 
@@ -76,8 +76,8 @@ describe('PublicationInviteNewUsersForm', () => {
       expect(
         userService.inviteContributor,
       ).toHaveBeenCalledWith('test@test.com', 'publication-id', [
-        'release1-id',
-        'release3-id',
+        'release-1',
+        'release-3',
       ]);
     });
   });
@@ -93,7 +93,7 @@ describe('PublicationInviteNewUsersForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Invite a user to edit Publication title'),
+        screen.getByText('Invite a user to edit this publication'),
       ).toBeInTheDocument();
     });
 
@@ -122,12 +122,12 @@ describe('PublicationInviteNewUsersForm', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Invite a user to edit Publication title'),
+        screen.getByText('Invite a user to edit this publication'),
       ).toBeInTheDocument();
     });
 
     const emailInput = screen.getByLabelText('Enter an email address');
-    await userEvent.type(emailInput, 'test@test.com');
+    userEvent.type(emailInput, 'test@test.com');
 
     const checkboxes = screen.getAllByLabelText(
       /Academic year /,

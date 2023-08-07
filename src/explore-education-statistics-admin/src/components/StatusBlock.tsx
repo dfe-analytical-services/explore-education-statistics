@@ -7,7 +7,7 @@ export interface StatusBlockProps {
   className?: string;
   checklistStyle?: boolean;
   color?: StatusBlockColors;
-  id?: string | undefined;
+  id?: string;
   text: string;
 }
 

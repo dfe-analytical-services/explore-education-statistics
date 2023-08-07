@@ -35,7 +35,10 @@ const PageMeta = ({
       <meta property="og:title" content={title} />
       <meta property="og:description" content={description} />
       {imgUrl && (
-        <meta property="og:image" content={process.env.PUBLIC_URL + imgUrl} />
+        <meta
+          property="og:image"
+          content={process.env.NEXT_PUBLIC_URL + imgUrl}
+        />
       )}
 
       {/* <!-- Twitter --> */}
@@ -45,7 +48,7 @@ const PageMeta = ({
       {imgUrl && (
         <meta
           property="twitter:image"
-          content={process.env.PUBLIC_URL + imgUrl}
+          content={process.env.NEXT_PUBLIC_URL + imgUrl}
         />
       )}
     </Head>

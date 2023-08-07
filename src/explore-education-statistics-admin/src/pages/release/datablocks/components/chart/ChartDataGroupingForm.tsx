@@ -85,23 +85,31 @@ export default function ChartDataGroupingForm({
           )
           .when('type', {
             is: 'Custom',
-            then: Yup.array().required('Add one or more custom groups'),
+            then: s =>
+              s
+                .required('Add one or more custom groups')
+                .test(
+                  'at-least-one',
+                  'Add one or more custom groups',
+                  function atLeastOne(value) {
+                    return value && value.length > 0;
+                  },
+                ),
           }),
         numberOfGroups: Yup.number().when('type', {
           is: 'EqualIntervals',
-          then: Yup.number().required('Enter a number of data groups'),
-          otherwise: Yup.number(),
+          then: s => s.required('Enter a number of data groups'),
+          otherwise: s => s.notRequired(),
         }),
         numberOfGroupsQuantiles: Yup.number().when('type', {
           is: 'Quantiles',
-          then: Yup.number().required('Enter a number of data groups'),
-          otherwise: Yup.number(),
+          then: s => s.required('Enter a number of data groups'),
+          otherwise: s => s.notRequired(),
         }),
         copyCustomGroups: Yup.string().when('type', {
           is: 'CopyCustom',
-          then: Yup.string().required(
-            'Select a data set to copy custom groups from',
-          ),
+          then: s => s.required('Select a data set to copy custom groups from'),
+          otherwise: s => s.notRequired(),
         }),
         type: Yup.string()
           .oneOf<GroupingType>([

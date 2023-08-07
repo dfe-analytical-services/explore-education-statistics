@@ -48,5 +48,13 @@ beforeEach(() => {
 
 afterEach(() => {
   window.location.hash = '';
+
+  // Cleanup any fake timers that have been set, or
+  // these will leak out to other test cases.
+  if (jest.isMockFunction(setTimeout) || setTimeout.clock) {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  }
+
   mockDate.reset();
 });

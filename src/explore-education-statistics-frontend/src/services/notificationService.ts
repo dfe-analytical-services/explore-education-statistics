@@ -6,13 +6,13 @@ export interface SubscriptionData {
   title: string;
 }
 
-export default {
-  subscribeToPublication(query: {
-    email: string;
-    id: string;
-    slug: string;
-    title: string;
-  }): Promise<SubscriptionData> {
+type SubscribeQuery = SubscriptionData & {
+  id: string;
+};
+
+const notificationService = {
+  subscribeToPublication(query: SubscribeQuery): Promise<SubscriptionData> {
     return notificationApi.post('/publication/subscribe', query);
   },
 };
+export default notificationService;

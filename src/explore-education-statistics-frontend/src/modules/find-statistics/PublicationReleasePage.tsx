@@ -34,6 +34,7 @@ import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import WarningMessage from '@common/components/WarningMessage';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -231,7 +232,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <li>
                     <ButtonLink
                       className="govuk-button  govuk-!-margin-bottom-3"
-                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+                      to={`${process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL}/releases/${release.id}/files`}
                       onClick={() => {
                         logEvent({
                           category: `${release.publication.title} release page - Useful information`,
@@ -438,7 +439,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           release={release}
           renderAllFilesLink={
             <Link
-              to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+              to={`${process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL}/releases/${release.id}/files`}
               onClick={() => {
                 logEvent({
                   category: 'Downloads',
@@ -470,7 +471,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           renderDownloadLink={file => {
             return (
               <Link
-                to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files/${file.id}`}
+                to={`${process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL}/releases/${release.id}/files/${file.id}`}
                 onClick={() => {
                   logEvent({
                     category: 'Downloads',
@@ -571,23 +572,23 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const {
-    publication: publicationSlug,
-    release: releaseSlug,
-  } = query as Dictionary<string>;
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const {
+      publication: publicationSlug,
+      release: releaseSlug,
+    } = query as Dictionary<string>;
 
-  const release = await (releaseSlug
-    ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
-    : publicationService.getLatestPublicationRelease(publicationSlug));
+    const release = await (releaseSlug
+      ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
+      : publicationService.getLatestPublicationRelease(publicationSlug));
 
-  return {
-    props: {
-      release,
-    },
-  };
-};
+    return {
+      props: {
+        release,
+      },
+    };
+  },
+);
 
 export default PublicationReleasePage;

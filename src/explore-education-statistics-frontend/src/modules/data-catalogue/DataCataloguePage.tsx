@@ -2,9 +2,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import PublicationForm, {
   PublicationFormSubmitHandler,
 } from '@common/modules/table-tool/components/PublicationForm';
-import Wizard, {
-  InjectedWizardProps,
-} from '@common/modules/table-tool/components/Wizard';
+import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import downloadService from '@common/services/downloadService';
 import publicationService, {
@@ -143,33 +141,6 @@ const DataCataloguePage: NextPage<Props> = ({
     });
   };
 
-  const PublicationStep = (props: InjectedWizardProps) => {
-    return (
-      <PublicationForm
-        {...props}
-        initialValues={{
-          publicationId: state.query.publication?.id ?? '',
-        }}
-        onSubmit={handlePublicationFormSubmit}
-        themes={themes}
-        renderSummaryAfter={
-          state.query.publication?.isSuperseded &&
-          state.query.publication.supersededBy ? (
-            <WarningMessage testId="superseded-warning">
-              This publication has been superseded by{' '}
-              <Link
-                testId="superseded-by-link"
-                to={`/data-catalogue?publicationSlug=${state.query.publication.supersededBy.slug}`}
-              >
-                {state.query.publication.supersededBy.title}
-              </Link>
-            </WarningMessage>
-          ) : null
-        }
-      />
-    );
-  };
-
   return (
     <Page
       caption="Data catalogue"
@@ -182,7 +153,30 @@ const DataCataloguePage: NextPage<Props> = ({
 
       <Wizard initialStep={state.initialStep} id="dataCatalogueWizard">
         <WizardStep onBack={handlePublicationStepBack}>
-          {stepProps => <PublicationStep {...stepProps} />}
+          {stepProps => (
+            <PublicationForm
+              {...stepProps}
+              initialValues={{
+                publicationId: state.query.publication?.id ?? '',
+              }}
+              onSubmit={handlePublicationFormSubmit}
+              themes={themes}
+              renderSummaryAfter={
+                state.query.publication?.isSuperseded &&
+                state.query.publication.supersededBy ? (
+                  <WarningMessage testId="superseded-warning">
+                    This publication has been superseded by{' '}
+                    <Link
+                      testId="superseded-by-link"
+                      to={`/data-catalogue?publicationSlug=${state.query.publication.supersededBy.slug}`}
+                    >
+                      {state.query.publication.supersededBy.title}
+                    </Link>
+                  </WarningMessage>
+                ) : null
+              }
+            />
+          )}
         </WizardStep>
         <WizardStep>
           {stepProps => (

@@ -84,8 +84,10 @@ export default function ReleaseFileUploadsSection({
           files={files}
           submitText="Add file"
           resetAfterSubmit
-          validationSchema={Yup.object({
-            file: Yup.file().required('Choose a file'),
+          validationSchema={Yup.object<Partial<AncillaryFileFormValues>>({
+            file: Yup.file()
+              .required('Choose a file')
+              .minSize(0, 'Choose a file that is not empty'),
           })}
           onSubmit={handleSubmit}
         />

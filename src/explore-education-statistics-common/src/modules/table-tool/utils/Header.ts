@@ -27,7 +27,7 @@ export default class Header {
       return 0;
     }
 
-    return this.parent?.depth + 1;
+    return this.parent.depth + 1;
   }
 
   public get crossSpan(): number {
