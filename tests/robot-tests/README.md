@@ -2,6 +2,7 @@
 
 - [Explore Education Statistics Robot Framework tests](#explore-education-statistics-robot-framework-tests)
   - [**What is this?**](#what-is-this)
+  - [**Pyenv installation**](#pyenv-installation)
   - [**What do I need to install?**](#what-do-i-need-to-install)
   - [**Code style**](#code-style)
   - [**How do I run the tests?**](#how-do-i-run-the-tests)
@@ -17,6 +18,7 @@
   - [**Guidelines for people writing UI tests**](#guidelines-for-people-writing-ui-tests)
   - [**Parallelism / Pabot**](#parallelism--pabot)
   - [**Test data:**](#test-data)
+  - [**Library bugs**](#Library-bugs)
   - [**IDE**](#ide)
     - [**Additional IntelliJ settings**](#additional-intellij-settings)
   - [**Troubleshooting**](#troubleshooting)
@@ -27,17 +29,43 @@
 - [**Who should I talk to?**](#who-should-i-talk-to)
 
 
-## **What is this?**
+## What is this?
 This test framework runs UI tests against the Explore Education Statistics service using Selenium and Robot Framework.
 
-Currently, these tests are being maintained so they can be run on Windows. They're not being maintained for Linux or MacOS, but they may work without too much trouble. 
+Currently, these tests are being maintained so they can be run on Windows and Ubuntu
 
-## **What do I need to install?**
 
-Firstly, install Python 3.10 or greater
-   * For Windows, you'll need to download Python3 from here: https://www.python.org/downloads/
-   * For Linux, use the package manager (i.e. On Ubuntu, `sudo apt-get install python3.10`)
-   * For Mac, use the package manager: `brew install python@3.10`. You then need to change the default python symlink to the version you've just installed `ln -s -f /usr/local/bin/python3.10 /usr/local/bin/python` 
+## Pyenv installation
+  Pyenv is a tool for installing and managing multiple versions of Python on a single machine. It is the recommended way of installing and managing python.
+  
+  Install pyenv using [chocolatey](https://chocolatey.org/install)
+
+  ```bash
+  choco install pyenv-win
+  pyenv install 3.101
+  ```
+
+  **Linux**
+
+  ```bash
+  curl https://pyenv.run | bash
+  pyenv install 3.101
+
+  ```
+
+  **Mac**
+
+  ```bash
+  brew install pyenv
+  pyenv install 3.101
+  ```
+
+## What do I need to install?
+
+Firstly, install Python 3.10. You can use pyenv to do this which is the recommended way of installing and managing python. See [pyenv installation instructions](
+  #pyenv-installation
+)
+
 
 Then ensure python and pip are included in your PATH environment variable
    * `python --version` should return a version >= 3.10. If it doesn't you can try using the commands `python3` or `python3.10`, if you have multiple versions of python installed on your machine.
@@ -46,23 +74,20 @@ Then ensure python and pip are included in your PATH environment variable
    
 Then install `pipenv`:
 
-```
+```bash
 pip install pipenv
 ```
 
 NOTE: If the above command doesn't work (or any of the subsequent commands in this README) then you can prefix `python -m ` to the command as below:
-```
+
+```bash
 python -m pip install pipenv
 ```
 
 From the project root run:
 
-```
+```bash
 pipenv install
-```
-OR
-```
-python -m pipenv install
 ```
 
 If you intend to run the tests from your local machine, you will also need to create `.env` files for the relevant environments: 
@@ -77,7 +102,7 @@ You can copy and rename the `.env.example` file in the `robot-tests` directory, 
 
 Variables you may want to set in a `.env` file are documented in `.env.example`.
 
-## **Code style**
+## Code style
 
 In order to adhear to various linting & formatting rules, we use a few formatting and static-analysis tools to keep both Python & RobotFramework code clean. These are as follows:
 
@@ -93,11 +118,11 @@ We use Isort to organise imports
 * [Robotframework-tidy](https://pypi.org/project/robotframework-tidy/):
 We use RobotFramework-tidy to format robotframework test code
 
-## **How do I run the tests?**
+## How do I run the tests?
 
 From the `tests/robot-tests` directory run:
 
-```
+```bash
 pipenv run python run_tests.py
 ```
 
@@ -105,7 +130,7 @@ This script is responsible for running the UI tests. All available options for `
 
 Here is an example:
 
-- `pipenv run python run_tests.py -f tests/admin/bau/ -i robot -b chrome -e dev`
+- `pipenv run python run_tests.py -f tests -e local -i robot --custom-env .env.keycloak`
 
 ## **Running tests on the pipeline**
 
@@ -131,10 +156,10 @@ NOTE: The `run_tests.py` script only downloads `chromedriver` if it doesn't alre
 
 `run_tests.py` currently downloads the latest chromedriver by default. You can select a specific version by deleteing your webdriver directory and using the script's `--chromedriver` argument. This will download the chromedrive version you've chosen.
 
-The latest version of chromedriver should always work for the pipeline. But if you need a specific version for the CI pipeline, you will need to add the `--chromedriver` argument to the `run_tests.py` call inside `scripts/pipeline-run-rf-tests.sh`. You can check [this repository](https://github.com/actions/virtual-environments/tree/master/images) for the version of chrome used on the Azure agent you're using. At the time of writing, the robot tests use the [Ubuntu 2004 image](https://github.com/actions/virtual-environments/blob/master/images/linux/Ubuntu2004-README.md)
+The latest version of chromedriver should always work for the pipeline. But if you need a specific version for the CI pipeline, you will need to add the `--chromedriver` argument to the `run_tests.py` call inside `scripts/run_tests_pipeline.py`. You can check [this repository](https://github.com/actions/virtual-environments/tree/master/images) for the version of chrome used on the Azure agent you're using. At the time of writing, the robot tests use the [Ubuntu 22.04 image](https://github.com/actions/virtual-environments/blob/master/images/linux)
 
 
-## **Directory structure**
+## Directory structure
 This section details what the various directories in robot-tests contain.
 
 ## scripts
@@ -149,7 +174,7 @@ This holds the actual robot framework/selenium tests. The tests are themselves o
 ## webdriver
 This holds chromedriver, used by selenium to interact with the browser.
 
-## **Snapshots**
+## Snapshots
 To monitor changes to pages on Production, we use snapshots that are stored in `robot-tests/tests/snapshots`. These snapshots are created using the `create_snapshots.py` script in the `robot-tests/scripts` directory. 
 
 You can refresh the current snapshots by running:
@@ -162,7 +187,7 @@ pipenv run python scripts/create_snapshots.py
 These snapshot files are used by the test suite `tests/general_public/check_snapshots.robot`. If the snapshot doesn't match the current page, the test case fails, and an alert is sent to Slack.
 
 
-## **Guidelines for people writing UI tests**
+## Guidelines for people writing UI tests
 
 ## Parallelism / Pabot
 It is essential that the test suites can run in parallel. This might not be the case if one test suite relies on test data that another changes. This might cause the tests, when run in parallel, to fail in unpredictable ways, making it difficult to determine what test data is the failure-making culprit.
@@ -177,7 +202,7 @@ After a group discussion, it was decided that tests will, as far as is possible,
 
 This however isn't the case for some tests. Certain tests rely on other utilities (written in robot) that are responsible for bootstrapping a given environment with test data. Test suites to create the bootstrapped data can be found in `tests/bootstrap_data`.
 
-## **IDE**
+## IDE
 
 If searching for an IDE to add/edit these tests, consider using IntelliJ, Pycharm or VScode with the following extensions: 
 
@@ -188,7 +213,7 @@ IntelliJ / Pycharm:
 VScode:
 - [Robot Framework Intellisense](https://marketplace.visualstudio.com/items?itemName=TomiTurtiainen.rf-intellisense)
 
-### **Additional IntelliJ settings**
+### Additional IntelliJ settings
   This should give you autocompletion and allow you to click through to keywords defined in both `.robot` and `.py` files. For this to work in, you'll need to change the Project Structure to use "No SDK".
 
   IntelliJ also allows you use to External Tools to right click on a file and run that file exclusively with these settings:
@@ -200,11 +225,11 @@ VScode:
 
 We provide a suite of tests for visually checking tables, charts and permalinks and comparing before and after images. More information can be found in the [Visual Testing README](scripts/visual-testing/README.md).
 
-## **Troubleshooting**
+## Troubleshooting
 
 ### The tests are flaky when I run them locally.
 
-Try running the frontend with `npm run build & npm run start:prod`.
+Try running the frontend with `pnpm build & pnpm start`.
 
 ### Test fails after not finding an element after x amount of seconds.
 
@@ -249,8 +274,12 @@ There is a known bug with pyderman which is responsible for downloading chromedr
 
 To fix this, you can manually download the correct [chromedriver](https://chromedriver.chromium.org/downloads) and put it in the webdriver directory.
 
-# Who should I talk to?
+### Library-bugs
 
-Luke Howsam  
+There are currently some bugs with the libraries we use for testing. This mainly pertains to running the tests on Mac. This bug basically means that the tests will fail when trying to operate the keyboard. 
+See the open issue raised [here](https://github.com/robotframework/SeleniumLibrary/issues/1803)
+
+## Who should I talk to?
 Mark Youngman
 Duncan Watson
+Nusrath Mohammed
