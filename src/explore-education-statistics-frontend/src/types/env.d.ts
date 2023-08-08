@@ -3,8 +3,8 @@ declare namespace NodeJS {
     APP_ENV: 'Production' | 'Pre-Production' | 'Test' | 'Development' | 'Local';
     APPINSIGHTS_INSTRUMENTATIONKEY: string;
     BUILD_NUMBER: string;
-    NEXT_PUBLIC_GA_TRACKING_ID: string;
-    NEXT_PUBLIC_NOTIFICATION_API_BASE_URL: string;
-    NEXT_PUBLIC_URL: string;
+    GA_TRACKING_ID: string;
+    NOTIFICATION_API_BASE_URL: string;
+    URL: string;
   }
 }

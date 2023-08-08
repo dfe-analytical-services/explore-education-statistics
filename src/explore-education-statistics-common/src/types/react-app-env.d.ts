@@ -7,8 +7,8 @@ declare namespace NodeJS {
     APP_ROOT_ID: string;
     NODE_ENV: 'development' | 'production' | 'test';
     PUBLIC_URL: string;
-    NEXT_PUBLIC_CONTENT_API_BASE_URL: string;
-    NEXT_PUBLIC_DATA_API_BASE_URL: string;
+    CONTENT_API_BASE_URL: string;
+    DATA_API_BASE_URL: string;
   }
 }
 

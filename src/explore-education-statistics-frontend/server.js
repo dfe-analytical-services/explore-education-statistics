@@ -28,9 +28,9 @@ if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
 
 const cspConnectSrc = [
   "'self'",
-  process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace('/api', ''),
-  process.env.NEXT_PUBLIC_DATA_API_BASE_URL.replace('/api', ''),
-  process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL.replace('/api', ''),
+  process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+  process.env.DATA_API_BASE_URL.replace('/api', ''),
+  process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
   'https://*.googletagmanager.com',
   'https://*.google-analytics.com',
   'https://*.analytics.google.com',
@@ -71,7 +71,7 @@ async function startServer() {
           styleSrc: ["'self'", "'unsafe-inline'"],
           imgSrc: [
             "'self'",
-            process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL.replace('/api', ''),
+            process.env.CONTENT_API_BASE_URL.replace('/api', ''),
             'data:',
             'https://*.googletagmanager.com',
             'https://*.google-analytics.com/',

@@ -15,6 +15,15 @@ const nextConfig = {
   env: {
     BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
   },
+  publicRuntimeConfig: {
+    APP_ENV: process.env.APP_ENV,
+    CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
+    DATA_API_BASE_URL: process.env.DATA_API_BASE_URL,
+    NOTIFICATION_API_BASE_URL: process.env.NOTIFICATION_API_BASE_URL,
+    APPINSIGHTS_INSTRUMENTATIONKEY: process.env.APPINSIGHTS_INSTRUMENTATIONKEY,
+    GA_TRACKING_ID: process.env.GA_TRACKING_ID,
+    PUBLIC_URL: process.env.PUBLIC_URL,
+  },
   async redirects() {
     return [
       {

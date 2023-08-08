@@ -2064,14 +2064,14 @@
         "BASIC_AUTH": "[parameters('publicAppBasicAuth')]",
         "BASIC_AUTH_USERNAME": "[parameters('publicAppBasicAuthUsername')]",
         "BASIC_AUTH_PASSWORD": "[parameters('publicAppBasicAuthPassword')]",
-        "NEXT_PUBLIC_CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
-        "NEXT_PUBLIC_DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
-        "NEXT_PUBLIC_NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
-        "NEXT_PUBLIC_GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
+        "CONTENT_API_BASE_URL": "[concat('https://', parameters('contentApiUrl'),'/api')]",
+        "DATA_API_BASE_URL": "[concat('https://', parameters('dataApiUrl'),'/api')]",
+        "NOTIFICATION_API_BASE_URL": "[concat('https://', variables('notificationsAppName'),'.azurewebsites.net/api')]",
+        "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
-        "NEXT_PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "18.12.1"
+        "URL": "[concat(variables('publicAppUrl'), '/')]",
+        "WEBSITE_NODE_DEFAULT_VERSION": "18.17.0"
       }
     },
     {

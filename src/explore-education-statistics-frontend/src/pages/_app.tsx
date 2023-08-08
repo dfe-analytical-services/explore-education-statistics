@@ -56,17 +56,16 @@ const App = ({ Component, pageProps, cookies }: Props) => {
 
   loadEnv();
 
-  contentApi.axios.defaults.baseURL =
-    process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL;
-  dataApi.axios.defaults.baseURL = process.env.NEXT_PUBLIC_DATA_API_BASE_URL;
+  contentApi.axios.defaults.baseURL = process.env.CONTENT_API_BASE_URL;
+  dataApi.axios.defaults.baseURL = process.env.DATA_API_BASE_URL;
   notificationApi.axios.defaults.baseURL =
-    process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL;
+    process.env.NOTIFICATION_API_BASE_URL;
 
   useMounted(() => {
     if (process.env.GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
       import('@frontend/services/googleAnalyticsService').then(
         ({ initGoogleAnalytics, logPageView }) => {
-          initGoogleAnalytics(process.env.NEXT_PUBLIC_GA_TRACKING_ID);
+          initGoogleAnalytics(process.env.GA_TRACKING_ID);
 
           logPageView();
 
