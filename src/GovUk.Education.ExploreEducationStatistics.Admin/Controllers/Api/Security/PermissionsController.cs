@@ -25,28 +25,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
         private readonly IPreReleaseService _preReleaseService;
+        private readonly IUserPublicationRoleRepository _publicationRoleRepository;
+        private readonly IUserReleaseRoleRepository _releaseRoleRepository;
 
         public PermissionsController(IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseFileService releaseFileService,
             IUserService userService,
-            IPreReleaseService preReleaseService)
+            IPreReleaseService preReleaseService, 
+            IUserPublicationRoleRepository publicationRoleRepository, 
+            IUserReleaseRoleRepository releaseRoleRepository)
         {
             _persistenceHelper = persistenceHelper;
             _releaseFileService = releaseFileService;
             _userService = userService;
             _preReleaseService = preReleaseService;
+            _publicationRoleRepository = publicationRoleRepository;
+            _releaseRoleRepository = releaseRoleRepository;
         }
 
         [HttpGet("permissions/access")]
         public async Task<ActionResult<GlobalPermissionsViewModel>> GetGlobalPermissions()
         {
+            var isBauUser = await _userService.CheckIsBauUser().IsRight();
+            
             return new GlobalPermissionsViewModel(
                 CanAccessSystem: await _userService.CheckCanAccessSystem().IsRight(),
                 CanAccessAnalystPages: await _userService.CheckCanAccessAnalystPages().IsRight(),
                 CanAccessAllImports: await _userService.CheckCanViewAllImports().IsRight(),
                 CanAccessPrereleasePages: await _userService.CheckCanAccessPrereleasePages().IsRight(),
                 CanManageAllTaxonomy: await _userService.CheckCanManageAllTaxonomy().IsRight(),
-                IsBauUser: await _userService.CheckIsBauUser().IsRight());
+                IsBauUser: isBauUser,
+                IsApprover: isBauUser || await IsReleaseApprover() || await IsPublicationApprover());
+        }
+
+        private async Task<bool> IsReleaseApprover()
+        {
+            return (await _releaseRoleRepository.GetDistinctRolesByUser(_userService.GetUserId()))
+                .Contains(ReleaseRole.Approver);
+        }
+
+        private async Task<bool> IsPublicationApprover()
+        {
+            return (await _publicationRoleRepository.GetDistinctRolesByUser(_userService.GetUserId()))
+                .Contains(PublicationRole.Approver);
         }
 
         [HttpGet("permissions/topic/{topicId:guid}/publication/create")]

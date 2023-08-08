@@ -13,11 +13,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -42,6 +44,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class ReleaseServiceTests
     {
         private readonly Guid _userId = Guid.NewGuid();
+        
+        private readonly DataFixture _fixture = new();
 
         [Fact]
         public async Task CreateReleaseNoTemplate()
@@ -1623,6 +1627,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 VerifyAllMocks(releaseCacheService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var saved = await context.Releases
+                    .SingleAsync(r => r.Id == releaseId);
+
+                // The published date retrieved from the database should always be represented in UTC
+                // because of the conversion setup in the database context config.
+                Assert.Equal(DateTimeKind.Utc, saved.Published!.Value.Kind);
+
+                // Make sure the request date was converted to UTC before it was updated on the release
+                Assert.Equal(DateTime.Parse("2022-08-08T08:30:00Z", styles: DateTimeStyles.AdjustToUniversal), saved.Published);
+            }
+        }
+
+        [Fact]
+        public async Task ListReleasesForApproval()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            var publication = _fixture
+                .DefaultPublication()
+                .WithReleases(_fixture
+                    .DefaultRelease()
+                    .ForIndex(0, r => r.SetReleaseStatus())
+                    .Generate(3));
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(contentDbContext: context);
+
+                var result = await service
+                    .ListReleasesForApproval(_userId);
+
+                // VerifyAllMocks(releaseCacheService);
 
                 result.AssertRight();
             }

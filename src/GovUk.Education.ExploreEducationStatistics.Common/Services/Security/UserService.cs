@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -33,9 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Security
             return GetUser().GetUserId();
         }
 
-        private ClaimsPrincipal GetUser()
+        private ClaimsPrincipal? GetUser()
         {
-            return _httpContextAccessor.HttpContext.User;
+            return _httpContextAccessor.HttpContext?.User;
         }
     }
 }
