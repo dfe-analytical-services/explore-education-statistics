@@ -4,7 +4,7 @@ import qs from 'qs';
 
 const notificationApi = new Client(
   axios.create({
-    baseURL: process.env.NEXT_PUBLIC_NOTIFICATION_API_BASE_URL,
+    baseURL: process.env.NOTIFICATION_API_BASE_URL,
     paramsSerializer: params => qs.stringify(params, { arrayFormat: 'comma' }),
   }),
 );

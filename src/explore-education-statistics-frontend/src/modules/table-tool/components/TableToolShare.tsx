@@ -42,9 +42,7 @@ const TableToolShare = ({ tableHeaders, query }: Props) => {
       },
     });
 
-    setPermalinkUrl(
-      `${process.env.NEXT_PUBLIC_URL}data-tables/permalink/${id}`,
-    );
+    setPermalinkUrl(`${process.env.PUBLIC_URL}data-tables/permalink/${id}`);
     setPermalinkLoading(false);
 
     setScreenReaderMessage(`Shareable link generated. ${linkInstructions}`);

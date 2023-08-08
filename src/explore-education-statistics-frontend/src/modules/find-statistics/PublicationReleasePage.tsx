@@ -232,7 +232,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <li>
                     <ButtonLink
                       className="govuk-button  govuk-!-margin-bottom-3"
-                      to={`${process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
                       onClick={() => {
                         logEvent({
                           category: `${release.publication.title} release page - Useful information`,
@@ -439,7 +439,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           release={release}
           renderAllFilesLink={
             <Link
-              to={`${process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
               onClick={() => {
                 logEvent({
                   category: 'Downloads',
@@ -471,7 +471,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           renderDownloadLink={file => {
             return (
               <Link
-                to={`${process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL}/releases/${release.id}/files/${file.id}`}
+                to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files/${file.id}`}
                 onClick={() => {
                   logEvent({
                     category: 'Downloads',
