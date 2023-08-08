@@ -1,7 +1,6 @@
 import FormattedDate from '@common/components/FormattedDate';
 import WarningMessage from '@common/components/WarningMessage';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
-import permalinkService, { Permalink } from '@common/services/permalinkService';
 import permalinkSnapshotService, {
   PermalinkSnapshot,
 } from '@common/services/permalinkSnapshotService';
@@ -11,7 +10,6 @@ import PrintThisPage from '@frontend/components/PrintThisPage';
 import styles from '@frontend/modules/permalink/PermalinkPage.module.scss';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import FixedMultiHeaderDataTable from '@common/modules/table-tool/components/FixedMultiHeaderDataTable';
-import PermalinkPageOld from '@frontend/modules/permalink/PermalinkPageOld';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef } from 'react';
 import { Dictionary } from '@common/types';
@@ -22,15 +20,11 @@ const captionId = 'dataTableCaption';
 const footnotesId = 'dataTableFootnotes';
 
 interface Props {
-  data: PermalinkSnapshot | Permalink; // TO DO - EES-4259 change to only PermalinkSnapshot and remove old Permalink type
-  newPermalinks: boolean; // TO DO - EES-4259 remove `newPermalinks` param and tidy up
+  data: PermalinkSnapshot;
 }
 
-const PermalinkPage: NextPage<Props> = ({ data, newPermalinks }) => {
+const PermalinkPage: NextPage<Props> = ({ data }) => {
   const tableRef = useRef<HTMLDivElement>(null);
-  if (!newPermalinks) {
-    return <PermalinkPageOld data={data as Permalink} />;
-  }
 
   const { dataSetTitle, publicationTitle, table } = data as PermalinkSnapshot;
 
@@ -138,19 +132,13 @@ const PermalinkPage: NextPage<Props> = ({ data, newPermalinks }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
-    const { newPermalinks, permalink } = query as Dictionary<string>;
-    // TO DO - EES-4259 remove `newPermalinks` and tidy up
-    let data: Permalink | PermalinkSnapshot;
-    if (newPermalinks) {
-      data = await permalinkSnapshotService.getPermalink(permalink);
-    } else {
-      data = await permalinkService.getPermalink(permalink);
-    }
+    const { permalink } = query as Dictionary<string>;
+
+    const data = await permalinkSnapshotService.getPermalink(permalink);
 
     return {
       props: {
         data,
-        newPermalinks: !!newPermalinks,
       },
     };
   },

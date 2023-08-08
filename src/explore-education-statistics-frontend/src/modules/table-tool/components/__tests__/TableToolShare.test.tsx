@@ -2,29 +2,24 @@ import TableToolShare from '@frontend/modules/table-tool/components/TableToolSha
 import {
   testTableHeaders,
   testQuery,
-  testSelectedPublicationWithLatestRelease,
 } from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
-import _permalinkService, {
-  Permalink,
-} from '@common/services/permalinkService';
+import _permalinkSnapshotService, {
+  PermalinkSnapshot,
+} from '@common/services/permalinkSnapshotService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-jest.mock('@common/services/permalinkService');
+jest.mock('@common/services/permalinkSnapshotService');
 
-const permalinkService = _permalinkService as jest.Mocked<
-  typeof _permalinkService
+const permalinkSnapshotService = _permalinkSnapshotService as jest.Mocked<
+  typeof _permalinkSnapshotService
 >;
 
 describe('TableToolShare', () => {
   test('renders the generate button', () => {
     render(
-      <TableToolShare
-        query={testQuery}
-        tableHeaders={testTableHeaders}
-        selectedPublication={testSelectedPublicationWithLatestRelease}
-      />,
+      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
     );
 
     expect(screen.getByText('Save table')).toBeInTheDocument();
@@ -34,15 +29,11 @@ describe('TableToolShare', () => {
   });
 
   test('shows the share link when the button is clicked', async () => {
-    permalinkService.createPermalink.mockResolvedValue({
+    permalinkSnapshotService.createPermalink.mockResolvedValue({
       id: 'permalink-id',
-    } as Permalink);
+    } as PermalinkSnapshot);
     render(
-      <TableToolShare
-        query={testQuery}
-        tableHeaders={testTableHeaders}
-        selectedPublication={testSelectedPublicationWithLatestRelease}
-      />,
+      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
     );
 
     userEvent.click(
@@ -81,16 +72,12 @@ describe('TableToolShare', () => {
   });
 
   test('copies the link to the clipboard when the copy button is clicked', async () => {
-    permalinkService.createPermalink.mockResolvedValue({
+    permalinkSnapshotService.createPermalink.mockResolvedValue({
       id: 'permalink-id',
-    } as Permalink);
+    } as PermalinkSnapshot);
 
     render(
-      <TableToolShare
-        query={testQuery}
-        tableHeaders={testTableHeaders}
-        selectedPublication={testSelectedPublicationWithLatestRelease}
-      />,
+      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
     );
 
     userEvent.click(

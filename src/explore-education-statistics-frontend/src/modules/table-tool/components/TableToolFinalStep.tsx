@@ -22,7 +22,6 @@ interface TableToolFinalStepProps {
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   selectedPublication: SelectedPublication;
-  newPermalinks?: boolean; // TO DO - EES-4259 remove `newPermalinks` param and tidy up
   onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
 }
 
@@ -31,7 +30,6 @@ const TableToolFinalStep = ({
   tableHeaders,
   query,
   selectedPublication,
-  newPermalinks,
   onReorderTableHeaders,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
@@ -136,12 +134,7 @@ const TableToolFinalStep = ({
       {!hasTableError && (
         <>
           <div className="govuk-!-margin-bottom-7">
-            <TableToolShare
-              tableHeaders={tableHeaders}
-              query={query}
-              selectedPublication={selectedPublication}
-              newPermalinks={newPermalinks}
-            />
+            <TableToolShare tableHeaders={tableHeaders} query={query} />
           </div>
 
           <DownloadTable
