@@ -15,7 +15,6 @@ import {
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { lazy, Suspense, useEffect } from 'react';
-import { CookiesProvider } from 'react-cookie';
 import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
@@ -79,35 +78,33 @@ function App() {
             <QueryClientProvider client={queryClient}>
               <AuthContextProvider>
                 <LastLocationContextProvider>
-                  <CookiesProvider>
-                    <PageErrorBoundary>
-                      <Switch>
-                        {Object.entries(apiAuthorizationRouteList).map(
-                          ([key, authRoute]) => (
-                            <Route exact key={key} {...authRoute} />
-                          ),
-                        )}
+                  <PageErrorBoundary>
+                    <Switch>
+                      {Object.entries(apiAuthorizationRouteList).map(
+                        ([key, authRoute]) => (
+                          <Route exact key={key} {...authRoute} />
+                        ),
+                      )}
 
-                        {Object.entries(routes).map(([key, route]) => (
-                          <ProtectedRoute key={key} {...route} />
-                        ))}
+                      {Object.entries(routes).map(([key, route]) => (
+                        <ProtectedRoute key={key} {...route} />
+                      ))}
 
-                        {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
-                        {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
-                        <ProtectedRoute
-                          path="/prototypes"
-                          protectionAction={user => user.permissions.isBauUser}
-                          component={PrototypesEntry}
-                        />
+                      {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
+                      {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
+                      <ProtectedRoute
+                        path="/prototypes"
+                        protectionAction={user => user.permissions.isBauUser}
+                        component={PrototypesEntry}
+                      />
 
-                        <ProtectedRoute
-                          path="*"
-                          allowAnonymousUsers
-                          component={PageNotFoundPage}
-                        />
-                      </Switch>
-                    </PageErrorBoundary>
-                  </CookiesProvider>
+                      <ProtectedRoute
+                        path="*"
+                        allowAnonymousUsers
+                        component={PageNotFoundPage}
+                      />
+                    </Switch>
+                  </PageErrorBoundary>
                 </LastLocationContextProvider>
               </AuthContextProvider>
             </QueryClientProvider>
