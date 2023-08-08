@@ -16,6 +16,7 @@ export interface ReleaseStatusPermissions {
   canMarkHigherLevelReview: boolean;
   canMarkApproved: boolean;
 }
+
 export interface MethodologyStatusPermissions {
   canMarkDraft: boolean;
   canMarkHigherLevelReview: boolean;
@@ -58,7 +59,7 @@ const permissionService = {
   canUpdateMethodology(methodologyId: string): Promise<boolean> {
     return client.get(`/permissions/methodology/${methodologyId}/update`);
   },
-  canUpdateMethodologyApprovalStatus(
+  getMethodologyApprovalPermissions(
     methodologyId: string,
   ): Promise<MethodologyStatusPermissions> {
     return client.get(`/permissions/methodology/${methodologyId}/status`);

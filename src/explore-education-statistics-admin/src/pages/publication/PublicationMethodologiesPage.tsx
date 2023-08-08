@@ -31,7 +31,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
-import getMethodologyApprovalStatusLabel from '@admin/pages/release/utils/methodologyUtil';
+import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
 
 interface Model {
   externalMethodology?: ExternalMethodology;

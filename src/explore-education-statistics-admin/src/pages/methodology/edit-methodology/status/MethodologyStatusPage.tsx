@@ -55,7 +55,7 @@ const MethodologyStatusPage = () => {
     refetch: refreshPermissions,
     isLoading,
   } = useQuery(
-    permissionQueries.canUpdateMethodologyApprovalStatus(currentMethodology.id),
+    permissionQueries.getMethodologyApprovalPermissions(currentMethodology.id),
   );
 
   const handleSubmit = async ({

@@ -53,7 +53,7 @@ describe('MethodologyStatusPage', () => {
   };
 
   test('renders Draft status details', async () => {
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: false,
@@ -70,16 +70,16 @@ describe('MethodologyStatusPage', () => {
     });
 
     expect(screen.getByTestId('Status')).toHaveTextContent('In Draft');
-    expect(screen.queryByTestId('When to publish-key')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('When to publish')).not.toBeInTheDocument();
     expect(
-      screen.queryByTestId('Publish with release-key'),
+      screen.queryByTestId('Publish with release'),
     ).not.toBeInTheDocument();
 
     expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
   });
 
   test('renders Higher review status details', async () => {
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: false,
@@ -98,16 +98,16 @@ describe('MethodologyStatusPage', () => {
     expect(screen.getByTestId('Status')).toHaveTextContent(
       'Awaiting higher review',
     );
-    expect(screen.queryByTestId('When to publish-key')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('When to publish')).not.toBeInTheDocument();
     expect(
-      screen.queryByTestId('Publish with release-key'),
+      screen.queryByTestId('Publish with release'),
     ).not.toBeInTheDocument();
 
     expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
   });
 
   test('renders Approved details for publishing immediately', async () => {
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: false,
@@ -126,22 +126,19 @@ describe('MethodologyStatusPage', () => {
 
     expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
 
-    expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
-      'When to publish',
-    );
-    expect(screen.getByTestId('When to publish-value')).toHaveTextContent(
+    expect(screen.getByTestId('When to publish')).toHaveTextContent(
       'Immediately',
     );
 
     expect(
-      screen.queryByTestId('Publish with release-key'),
+      screen.queryByTestId('Publish with release'),
     ).not.toBeInTheDocument();
 
     expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
   });
 
   test('renders Approved details for publishing with release', async () => {
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: false,
@@ -164,17 +161,11 @@ describe('MethodologyStatusPage', () => {
 
     expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
 
-    expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
-      'When to publish',
-    );
-    expect(screen.getByTestId('When to publish-value')).toHaveTextContent(
+    expect(screen.getByTestId('When to publish')).toHaveTextContent(
       'With a specific release',
     );
 
-    expect(screen.getByTestId('Publish with release-key')).toHaveTextContent(
-      'Publish with release',
-    );
-    expect(screen.getByTestId('Publish with release-value')).toHaveTextContent(
+    expect(screen.getByTestId('Publish with release')).toHaveTextContent(
       'Dependant Release',
     );
 
@@ -182,7 +173,7 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can approve methodology', async () => {
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: true,
@@ -200,7 +191,7 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can mark methodology as draft', async () => {
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: true,
       canMarkHigherLevelReview: false,
       canMarkApproved: false,
@@ -218,7 +209,7 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can mark methodology for higher review', async () => {
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: true,
       canMarkApproved: false,
@@ -237,7 +228,7 @@ describe('MethodologyStatusPage', () => {
 
   test('renders status form when Edit button is clicked', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: true,
@@ -265,7 +256,7 @@ describe('MethodologyStatusPage', () => {
 
   test('renders the owning publication', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: true,
@@ -276,10 +267,7 @@ describe('MethodologyStatusPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
 
-      expect(screen.getByTestId('Owning publication-key')).toHaveTextContent(
-        'Owning publication',
-      );
-      expect(screen.getByTestId('Owning publication-value')).toHaveTextContent(
+      expect(screen.getByTestId('Owning publication')).toHaveTextContent(
         'Owning publication title',
       );
     });
@@ -287,7 +275,7 @@ describe('MethodologyStatusPage', () => {
 
   test('renders the other publications', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: true,
@@ -298,7 +286,7 @@ describe('MethodologyStatusPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
 
-      expect(screen.getByTestId('Other publications-key')).toHaveTextContent(
+      expect(screen.getByTestId('Other publications')).toHaveTextContent(
         'Other publications',
       );
       const otherPublications = screen.queryAllByTestId(
@@ -312,7 +300,7 @@ describe('MethodologyStatusPage', () => {
 
   test('does not render the other publications section if there are none', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canUpdateMethodologyApprovalStatus.mockResolvedValue({
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
       canMarkDraft: false,
       canMarkHigherLevelReview: false,
       canMarkApproved: true,
@@ -324,10 +312,7 @@ describe('MethodologyStatusPage', () => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
 
       expect(
-        screen.queryByTestId('Other publications-key'),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('Other publications-value'),
+        screen.queryByTestId('Other publications'),
       ).not.toBeInTheDocument();
     });
   });

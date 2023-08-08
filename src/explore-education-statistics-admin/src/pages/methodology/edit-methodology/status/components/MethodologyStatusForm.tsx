@@ -26,7 +26,7 @@ export interface FormValues {
 interface Props {
   isPublished?: string;
   methodology: MethodologyVersion;
-  statusPermissions: MethodologyStatusPermissions | undefined;
+  statusPermissions?: MethodologyStatusPermissions;
   unpublishedReleases: IdTitlePair[];
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;

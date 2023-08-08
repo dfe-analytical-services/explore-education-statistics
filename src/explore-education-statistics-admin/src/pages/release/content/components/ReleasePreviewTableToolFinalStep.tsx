@@ -22,7 +22,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 
 interface Model {
   methodologies: MethodologyVersionSummary[];
-  externalMethodology?: ExternalMethodology | undefined;
+  externalMethodology?: ExternalMethodology;
   contact: Contact;
 }
 

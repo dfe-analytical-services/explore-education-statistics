@@ -1,8 +1,8 @@
 import { MethodologyApprovalStatus } from '@admin/services/methodologyService';
 
-const getMethodologyApprovalStatusLabel = (
+export default function getMethodologyApprovalStatusLabel(
   approvalStatus: MethodologyApprovalStatus,
-): string | undefined => {
+): string {
   switch (approvalStatus) {
     case 'Draft':
       return 'Draft';
@@ -11,8 +11,8 @@ const getMethodologyApprovalStatusLabel = (
     case 'Approved':
       return 'Approved';
     default:
-      return undefined;
+      throw new Error(
+        `Unsupported methodology approval status: ${approvalStatus}`,
+      );
   }
-};
-
-export default getMethodologyApprovalStatusLabel;
+}

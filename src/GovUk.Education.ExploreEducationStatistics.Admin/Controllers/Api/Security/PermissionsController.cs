@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             bool CanMarkDraft, bool CanMarkHigherLevelReview, bool CanMarkApproved);
 
         [HttpGet("permissions/methodology/{methodologyVersionId:guid}/status")]
-        public async Task<ActionResult<MethodologyApprovalStatusPermissions>> CanUpdateMethodologyApprovalStatus(
+        public async Task<ActionResult<MethodologyApprovalStatusPermissions>> GetMethodologyApprovalPermissions(
             Guid methodologyVersionId)
         {
             return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(methodologyVersionId)

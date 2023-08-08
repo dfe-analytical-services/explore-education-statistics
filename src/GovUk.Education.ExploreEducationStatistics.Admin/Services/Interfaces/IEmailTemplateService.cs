@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Release release,
             ReleaseRole role);
 
-        Either<ActionResult, Unit> SendHigherReviewEmail(string email, Release release);
+        Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, Release release);
 
         Either<ActionResult, Unit> SendMethodologyHigherReviewEmail(
             string email,

@@ -1627,10 +1627,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
                     .ReturnsAsync(ListOf(userReleaseRole1, userReleaseRole2));
 
-                emailTemplateService.Setup(mock => mock.SendHigherReviewEmail(userReleaseRole1.User.Email, It.Is<Release>(r => r.Id == release.Id)))
+                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole1.User.Email, It.Is<Release>(r => r.Id == release.Id)))
                     .Returns(Unit.Instance);
 
-                emailTemplateService.Setup(mock => mock.SendHigherReviewEmail(userReleaseRole2.User.Email, It.Is<Release>(r => r.Id == release.Id)))
+                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(userReleaseRole2.User.Email, It.Is<Release>(r => r.Id == release.Id)))
                     .Returns(Unit.Instance);
 
                 var releaseService = BuildService(
@@ -1697,7 +1697,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, release.Publication.Id))
                     .ReturnsAsync(new List<UserReleaseRole>());
 
-                emailTemplateService.Setup(mock => mock.SendHigherReviewEmail(
+                emailTemplateService.Setup(mock => mock.SendReleaseHigherReviewEmail(
                     userPublicationApproverRole.User.Email,
                     It.Is<Release>(r => r.Id == release.Id))).Returns(Unit.Instance);
 

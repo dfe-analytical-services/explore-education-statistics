@@ -18,7 +18,7 @@ interface FormValues {
 
 interface Props {
   methodology: MethodologyVersion;
-  statusPermissions: MethodologyStatusPermissions | undefined;
+  statusPermissions?: MethodologyStatusPermissions;
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
 }

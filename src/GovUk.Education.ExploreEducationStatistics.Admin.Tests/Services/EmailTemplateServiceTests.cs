@@ -159,9 +159,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public void SendHigherReviewEmail()
+        public void SendReleaseHigherReviewEmail()
         {
-            const string expectedTemplateId = "notify-higher-reviewers-template-id";
+            const string expectedTemplateId = "notify-release-higher-reviewers-template-id";
             var release = new Release
             {
                 Id = Guid.NewGuid(),
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-            var result = service.SendHigherReviewEmail("test@test.com", release);
+            var result = service.SendReleaseHigherReviewEmail("test@test.com", release);
 
             emailService.Verify(
                 s => s.SendEmail(
@@ -261,7 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 TupleOf("NotifyInviteWithRolesTemplateId", "invite-with-roles-template-id"),
                 TupleOf("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
                 TupleOf("NotifyReleaseRoleTemplateId", "release-role-template-id"),
-                TupleOf("NotifyHigherReviewersTemplateId", "notify-higher-reviewers-template-id"),
+                TupleOf("NotifyReleaseHigherReviewersTemplateId", "notify-release-higher-reviewers-template-id"),
                 TupleOf("NotifyMethodologyHigherReviewersTemplateId", "notify-methodology-higher-reviewers-template-id"),
                 TupleOf("AdminUri", "admin-uri"));
         }

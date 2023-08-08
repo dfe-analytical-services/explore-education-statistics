@@ -355,7 +355,7 @@
       "type": "securestring",
       "defaultValue": "change-me"
     },
-    "notifyHigherReviewersTemplateId": {
+    "notifyReleaseHigherReviewersTemplateId": {
       "type": "securestring",
       "defaultValue": "change-me",
       "metadata": {
@@ -1735,7 +1735,7 @@
         "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
         "NotifyContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
-        "NotifyHigherReviewersTemplateId": "[parameters('notifyHigherReviewersTemplateId')]",
+        "NotifyReleaseHigherReviewersTemplateId": "[parameters('notifyReleaseHigherReviewersTemplateId')]",
         "NotifyMethodologyHigherReviewersTemplateId": "[parameters('notifyMethodologyHigherReviewersTemplateId')]",
         "AdminUri": "[parameters('adminUri')]",
         "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",

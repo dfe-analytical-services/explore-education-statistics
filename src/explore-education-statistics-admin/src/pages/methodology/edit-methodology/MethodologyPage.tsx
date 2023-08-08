@@ -18,7 +18,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import Tag from '@common/components/Tag';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
-import getMethodologyApprovalStatusLabel from '@admin/pages/release/utils/methodologyUtil';
+import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
