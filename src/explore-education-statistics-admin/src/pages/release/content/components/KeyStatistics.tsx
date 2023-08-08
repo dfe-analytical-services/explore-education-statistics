@@ -94,7 +94,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                         ref={draggableProvided.innerRef}
                         className={classNames({
                           [styles.draggable]: isReordering,
-                          [keyStatStyles.column]: !isReordering,
+                          [keyStatStyles.wrapper]: !isReordering,
                           [styles.isDragging]: snapshot.isDragging,
                         })}
                         data-testid="keyStat"
