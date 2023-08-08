@@ -10,7 +10,7 @@ import { contentApi, dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
 import notificationApi from '@frontend/services/clients/notificationApi';
-import { AppProps } from 'next/app';
+import NextApp, { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -19,6 +19,10 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import loadEnv from '@frontend/loadEnv';
+import { parseCookies } from 'nookies';
+
+loadEnv();
 
 const ApplicationInsightsTracking = () => {
   const appInsights = useApplicationInsights();
@@ -49,6 +53,8 @@ const App = ({ Component, pageProps, cookies }: Props) => {
   const router = useRouter();
   const { getCookie } = useCookies(cookies);
   const [queryClient] = useState(() => new QueryClient());
+
+  loadEnv();
 
   contentApi.axios.defaults.baseURL =
     process.env.NEXT_PUBLIC_CONTENT_API_BASE_URL;
@@ -92,3 +98,14 @@ const App = ({ Component, pageProps, cookies }: Props) => {
 };
 
 export default App;
+
+App.getInitialProps = async (appContext: AppContext) => {
+  const appProps = await NextApp.getInitialProps(appContext);
+
+  loadEnv();
+
+  return {
+    ...appProps,
+    cookies: parseCookies(appContext.ctx),
+  };
+};
