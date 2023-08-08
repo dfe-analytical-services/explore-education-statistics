@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`PermalinkPage with newPermalinks renders correctly with permalink 1`] = `
+exports[`PermalinkPage renders correctly with permalink 1`] = `
 <table
   aria-labelledby="dataTableCaption"
   class="govuk-table table"

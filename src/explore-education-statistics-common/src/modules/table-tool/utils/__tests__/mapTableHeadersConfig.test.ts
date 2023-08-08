@@ -1,4 +1,4 @@
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkSnapshotService';
 import {
   CategoryFilter,
   Indicator,
