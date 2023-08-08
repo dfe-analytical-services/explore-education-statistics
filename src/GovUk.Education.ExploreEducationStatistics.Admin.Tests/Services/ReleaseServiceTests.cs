@@ -32,8 +32,10 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static Moq.MockBehavior;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -82,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2018/19", result.YearTitle);
                 Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
-                Assert.Equal(ReleaseApprovalStatus.Draft, result.ApprovalStatus);
+                Assert.Equal(Draft, result.ApprovalStatus);
 
                 Assert.False(result.Amendment);
                 Assert.False(result.LatestRelease); // Most recent - but not published yet.
@@ -102,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2018, actual.Year);
                 Assert.Equal(TimeIdentifier.AcademicYear, actual.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, actual.Type);
-                Assert.Equal(ReleaseApprovalStatus.Draft, actual.ApprovalStatus);
+                Assert.Equal(Draft, actual.ApprovalStatus);
                 Assert.Equal(0, actual.Version);
 
                 Assert.Null(actual.PreviousVersionId);
@@ -267,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
+                ApprovalStatus = Draft
             };
 
             var subject = new Subject
@@ -357,7 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
+                ApprovalStatus = Draft
             };
 
             var subject = new Subject
@@ -407,7 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
+                ApprovalStatus = Draft
             };
 
             var subject = new Subject
@@ -535,7 +537,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ApprovalStatus = ReleaseApprovalStatus.Draft
+                ApprovalStatus = Draft
             };
 
             var subject = new Subject
@@ -1650,42 +1652,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var publication = _fixture
+            var user = new User();
+            var otherUser = new User();
+            
+            var publications = _fixture
                 .DefaultPublication()
-                .WithReleases(_fixture
-                    .DefaultRelease()
-                    .ForIndex(0, r => r.SetReleaseStatus())
-                    .Generate(3));
+                .ForInstance(s => s
+                    .SetReleases(_fixture
+                        .DefaultRelease()
+                        .WithApprovalStatuses(ListOf(Draft, HigherLevelReview, Approved))
+                        .GenerateList()))
+                .GenerateList(4);
+
+            var contributorReleaseRolesForUser = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithRole(ReleaseRole.Contributor)
+                .WithReleases(publications[0].Releases)
+                .GenerateList();
+            
+            var approverReleaseRolesForUser = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithRole(ReleaseRole.Approver)
+                .WithReleases(publications[1].Releases)
+                .GenerateList();
+            
+            var prereleaseReleaseRolesForUser = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithRole(ReleaseRole.PrereleaseViewer)
+                .WithReleases(publications[2].Releases)
+                .GenerateList();
+            
+            var approverReleaseRolesForOtherUser = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(otherUser)
+                .WithRole(ReleaseRole.Approver)
+                .WithReleases(publications.SelectMany(publication => publication.Releases))
+                .GenerateList();
             
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.Publications.AddAsync(publication);
+                await context.Publications.AddRangeAsync(publications);
+                await context.UserReleaseRoles.AddRangeAsync(contributorReleaseRolesForUser);
+                await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForUser);
+                await context.UserReleaseRoles.AddRangeAsync(prereleaseReleaseRolesForUser);
+                await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForOtherUser);
                 await context.SaveChangesAsync();
             }
             
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var service = BuildReleaseService(contentDbContext: context);
+                var service = BuildReleaseService(context);
 
                 var result = await service
                     .ListReleasesForApproval(_userId);
 
                 // VerifyAllMocks(releaseCacheService);
 
-                result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var saved = await context.Releases
-                    .SingleAsync(r => r.Id == releaseId);
-
-                // The published date retrieved from the database should always be represented in UTC
-                // because of the conversion setup in the database context config.
-                Assert.Equal(DateTimeKind.Utc, saved.Published!.Value.Kind);
-
-                // Make sure the request date was converted to UTC before it was updated on the release
-                Assert.Equal(DateTime.Parse("2022-08-08T08:30:00Z", styles: DateTimeStyles.AdjustToUniversal), saved.Published);
+                var viewModels = result.AssertRight();
+                Assert.Single(viewModels);
+                Assert.Equal(publications[1].Releases[1].Id, viewModels[0].Id);
             }
         }
 

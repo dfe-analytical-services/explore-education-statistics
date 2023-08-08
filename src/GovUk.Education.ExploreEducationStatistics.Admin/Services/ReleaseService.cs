@@ -455,9 +455,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var indirectReleasesWithApprovalRole = await _context
                 .UserPublicationRoles
                 .Include(role => role.Publication)
+                .ThenInclude(publication => publication.Releases)
                 .Where(role => role.Role == PublicationRole.Approver)
                 .Select(role => role.Publication)
-                .Include(publication => publication.Releases)
                 .SelectMany(publication => publication.Releases.Select(release => release.Id))
                 .ToListAsync();
 
@@ -466,11 +466,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Distinct();
 
             var releasesForApproval = await _context
-                .ReleaseStatus
-                .Where(rs => 
-                    rs.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
-                    && releaseIdsForApproval.Contains(rs.ReleaseId))
-                .Select(rs => rs.Release)
+                .Releases
+                .Where(release => 
+                    release.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
+                    && releaseIdsForApproval.Contains(release.Id))
                 .ToListAsync();
 
             return releasesForApproval
