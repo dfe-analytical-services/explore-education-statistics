@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
-            public TopicViewModel Topic { get; set; }
+            public ThemeViewModel Theme { get; set; }
 
             public Contact Contact { get; set; }
 

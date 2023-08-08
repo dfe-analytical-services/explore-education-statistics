@@ -72,36 +72,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree()
         {
             var themes = await _contentDbContext.Themes
-                .Include(theme => theme.Topics)
-                .ThenInclude(topic => topic.Publications)
+                .Include(theme => theme.Publications)
                 .AsNoTracking()
                 .Select(theme => new AllMethodologiesThemeViewModel
                 {
                     Id = theme.Id,
                     Title = theme.Title,
-                    Topics = theme.Topics.Select(topic => new AllMethodologiesTopicViewModel
-                    {
-                        Id = topic.Id,
-                        Title = topic.Title,
-                        Publications = topic.Publications.Select(publication =>
-                            new AllMethodologiesPublicationViewModel
-                            {
-                                Id = publication.Id,
-                                Title = publication.Title
-                            }).ToList()
-                    }).ToList()
+                    Publications = theme.Publications.Select(publication =>
+                        new AllMethodologiesPublicationViewModel
+                        {
+                            Id = publication.Id,
+                            Title = publication.Title
+                        }).ToList()
                 })
                 .ToListAsync();
 
-            await themes.SelectMany(model => model.Topics)
+            await themes
                 .SelectMany(model => model.Publications)
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async publication =>
                     publication.Methodologies = await BuildMethodologiesForPublication(publication.Id));
 
-            themes.ForEach(theme => theme.RemoveTopicNodesWithoutMethodologiesAndSort());
+            themes.ForEach(theme => theme.RemovePublicationNodesWithoutMethodologiesAndSort());
 
-            return themes.Where(theme => theme.Topics.Any())
+            return themes.Where(theme => theme.Publications.Any())
                 .OrderBy(theme => theme.Title)
                 .ToList();
         }

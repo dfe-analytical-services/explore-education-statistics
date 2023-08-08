@@ -93,6 +93,7 @@ export type UpdatePublicationLegacyRelease = Partial<
 
 const publicationService = {
   listPublications(topicId?: string): Promise<Publication[]> {
+    // @MarkFix takes a themeId
     return client.get('/publications', {
       params: { topicId },
     });

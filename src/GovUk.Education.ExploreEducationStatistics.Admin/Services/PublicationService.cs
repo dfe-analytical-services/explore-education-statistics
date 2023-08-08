@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
-            Guid? topicId = null)
+            Guid? themeId = null)
         {
             return await _userService
                 .CheckCanAccessSystem()
@@ -65,13 +65,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OnSuccess(async () =>
                     {
                         var hydratedPublication = HydratePublication(
-                            _publicationRepository.QueryPublicationsForTopic(topicId));
+                            _publicationRepository.QueryPublicationsForTheme(themeId));
                         return await hydratedPublication.ToListAsync();
                     })
                     .OrElse(() =>
                     {
                         var userId = _userService.GetUserId();
-                        return _publicationRepository.ListPublicationsForUser(userId, topicId);
+                        return _publicationRepository.ListPublicationsForUser(userId, themeId);
                     })
                 )
                 .OnSuccess(async publications =>
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, PublicationCreateViewModel>> CreatePublication(
             PublicationCreateRequest publication)
         {
-            return await ValidateSelectedTopic(publication.TopicId)
+            return await ValidateSelectedTheme(publication.ThemeId)
                 .OnSuccess(async _ =>
                 {
                     if (_context.Publications.Any(p => p.Slug == publication.Slug))
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Contact = contact.Entity,
                         Title = publication.Title,
                         Summary = publication.Summary,
-                        TopicId = publication.TopicId,
+                        ThemeId = publication.ThemeId,
                         Slug = publication.Slug,
                     });
 
@@ -164,16 +164,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccessDo(async publication =>
                 {
-                    if (publication.TopicId != updatedPublication.TopicId)
+                    if (publication.ThemeId != updatedPublication.ThemeId)
                     {
-                        return await ValidateSelectedTopic(updatedPublication.TopicId);
+                        return await ValidateSelectedTheme(updatedPublication.ThemeId);
                     }
 
                     return Unit.Instance;
                 })
                 .OnSuccessDo(async publication =>
                 {
-                    if (publication.TopicId != updatedPublication.TopicId)
+                    if (publication.ThemeId != updatedPublication.ThemeId)
                     {
                         return await _userService.CheckCanUpdatePublication();
                     }
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     publication.Title = updatedPublication.Title;
                     publication.Summary = updatedPublication.Summary;
-                    publication.TopicId = updatedPublication.TopicId;
+                    publication.ThemeId = updatedPublication.ThemeId;
                     publication.Updated = DateTime.UtcNow;
                     publication.SupersededById = updatedPublication.SupersededById;
 
@@ -242,17 +242,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ForEachAwaitAsync(p => _publicationCacheService.UpdatePublication(p.Slug));
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(
-            Guid? topicId)
+        private async Task<Either<ActionResult, Unit>> ValidateSelectedTheme(
+            Guid? themeId)
         {
-            var topic = await _context.Topics.FindAsync(topicId);
+            var theme = await _context.Themes.FindAsync(themeId);
 
-            if (topic == null)
+            if (theme == null)
             {
-                return ValidationActionResult(TopicDoesNotExist);
+                return ValidationActionResult(ThemeDoesNotExist);
             }
 
-            return await _userService.CheckCanCreatePublicationForTopic(topic)
+            return await _userService.CheckCanCreatePublicationForTheme(theme)
                 .OnSuccess(_ => Unit.Instance);
         }
 
@@ -455,8 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public static IQueryable<Publication> HydratePublication(IQueryable<Publication> values)
         {
             return values
-                .Include(p => p.Topic)
-                .ThenInclude(topic => topic.Theme);
+                .Include(p => p.Theme);
         }
 
         private async Task<PublicationViewModel> GeneratePublicationViewModel(Publication publication,

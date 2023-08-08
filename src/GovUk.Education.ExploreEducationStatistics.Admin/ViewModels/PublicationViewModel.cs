@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Slug { get; set; } = Empty;
 
-        public IdTitleViewModel Topic { get; set; } = null!;
-
         public IdTitleViewModel Theme { get; set; } = null!;
 
         public Guid? SupersededById { get; set; }

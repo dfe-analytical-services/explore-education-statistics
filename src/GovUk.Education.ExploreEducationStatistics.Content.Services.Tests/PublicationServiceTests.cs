@@ -83,16 +83,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Order = 0,
                     }
                 },
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Title = "Test topic",
-                    Slug = "test-topic",
-                    Theme = new Theme
-                    {
-                        Title = "Test theme",
-                        Slug = "test-theme",
-                        Summary = "Test theme summary"
-                    }
+                    Title = "Test theme",
+                    Slug = "test-theme",
+                    Summary = "Test theme summary"
                 },
                 Contact = new Contact
                 {
@@ -145,10 +140,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     publicationViewModel.LegacyReleases[0].Description);
                 Assert.Equal(publication.LegacyReleases[0].Url, publicationViewModel.LegacyReleases[0].Url);
 
-                Assert.Equal(publication.Topic.Theme.Id, publicationViewModel.Topic.Theme.Id);
-                Assert.Equal(publication.Topic.Theme.Slug, publicationViewModel.Topic.Theme.Slug);
-                Assert.Equal(publication.Topic.Theme.Title, publicationViewModel.Topic.Theme.Title);
-                Assert.Equal(publication.Topic.Theme.Summary, publicationViewModel.Topic.Theme.Summary);
+                Assert.Equal(publication.Theme.Id, publicationViewModel.Theme.Id);
+                Assert.Equal(publication.Theme.Slug, publicationViewModel.Theme.Slug);
+                Assert.Equal(publication.Theme.Title, publicationViewModel.Theme.Title);
+                Assert.Equal(publication.Theme.Summary, publicationViewModel.Theme.Summary);
 
                 Assert.Equal(publication.Contact.TeamName, publicationViewModel.Contact.TeamName);
                 Assert.Equal(publication.Contact.TeamEmail, publicationViewModel.Contact.TeamEmail);
@@ -189,15 +184,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Published = DateTime.UtcNow
                     },
                 },
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Title = "Test topic",
-                    Slug = "test-topic",
-                    Theme = new Theme
-                    {
-                        Title = "Test theme",
-                        Slug = "test-theme",
-                    }
+                    Title = "Test theme",
+                    Slug = "test-theme",
                 },
                 Contact = new Contact
                 {
@@ -257,15 +247,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         TimePeriodCoverage = TimeIdentifier.AcademicYear
                     }
                 },
-                Topic = new Topic
+                Theme = new Theme
                 {
-                    Title = "Test topic",
-                    Slug = "test-topic",
-                    Theme = new Theme
-                    {
-                        Title = "Test theme",
-                        Slug = "test-theme",
-                    }
+                    Title = "Test theme",
+                    Slug = "test-theme",
                 },
                 Contact = new Contact
                 {
@@ -412,33 +397,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     Title = "Theme A",
                     Summary = "Theme A summary",
-                    Topics = new List<Topic>
-                    {
-                        new()
-                        {
-                            Title = "Topic A",
-                            Publications = ListOf(publicationA)
-                        },
-                        new()
-                        {
-                            Title = "Topic B",
-                            Publications = ListOf(publicationB)
-                        }
-                    },
+                    Publications = ListOf(publicationA, publicationB),
                 },
                 new()
                 {
                     Title = "Theme B",
                     Summary = "Theme B summary",
-                    Topics = new List<Topic>
-                    {
-                        new()
-                        {
-                            Title = "Topic C",
-                            Slug = "topic-C",
-                            Publications = ListOf(publicationC)
-                        },
-                    },
+                    Publications = ListOf(publicationC),
                 }
             };
 
@@ -463,36 +428,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("Theme B", publicationTree[1].Title);
                 Assert.Equal("Theme B summary", publicationTree[1].Summary);
 
-                Assert.Equal(2, publicationTree[0].Topics.Count);
-                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
-                Assert.Equal("Topic B", publicationTree[0].Topics[1].Title);
+                var themeAPublications = publicationTree[0].Publications;
 
-                Assert.Single(publicationTree[1].Topics);
-                Assert.Equal("Topic C", publicationTree[1].Topics[0].Title);
+                Assert.Equal(2, themeAPublications.Count);
+                Assert.Equal("publication-a", themeAPublications[0].Slug);
+                Assert.Equal("Publication A", themeAPublications[0].Title);
+                Assert.False(themeAPublications[0].LatestReleaseHasData);
+                Assert.False(themeAPublications[0].AnyLiveReleaseHasData);
 
-                var topicAPublications = publicationTree[0].Topics[0].Publications;
+                Assert.Equal("publication-b", themeAPublications[1].Slug);
+                Assert.Equal("Publication B", themeAPublications[1].Title);
+                Assert.False(themeAPublications[1].LatestReleaseHasData);
+                Assert.False(themeAPublications[1].AnyLiveReleaseHasData);
 
-                Assert.Single(topicAPublications);
-                Assert.Equal("publication-a", topicAPublications[0].Slug);
-                Assert.Equal("Publication A", topicAPublications[0].Title);
-                Assert.False(topicAPublications[0].LatestReleaseHasData);
-                Assert.False(topicAPublications[0].AnyLiveReleaseHasData);
+                var themeBPublications = publicationTree[1].Publications;
 
-                var topicBPublications = publicationTree[0].Topics[1].Publications;
-
-                Assert.Single(topicBPublications);
-                Assert.Equal("publication-b", topicBPublications[0].Slug);
-                Assert.Equal("Publication B", topicBPublications[0].Title);
-                Assert.False(topicBPublications[0].LatestReleaseHasData);
-                Assert.False(topicBPublications[0].AnyLiveReleaseHasData);
-
-                var topicCPublications = publicationTree[1].Topics[0].Publications;
-
-                Assert.Single(topicCPublications);
-                Assert.Equal("publication-c", topicCPublications[0].Slug);
-                Assert.Equal("Publication C", topicCPublications[0].Title);
-                Assert.False(topicCPublications[0].LatestReleaseHasData);
-                Assert.False(topicCPublications[0].AnyLiveReleaseHasData);
+                Assert.Single(themeBPublications);
+                Assert.Equal("publication-c", themeBPublications[0].Slug);
+                Assert.Equal("Publication C", themeBPublications[0].Title);
+                Assert.False(themeBPublications[0].LatestReleaseHasData);
+                Assert.False(themeBPublications[0].AnyLiveReleaseHasData);
             }
         }
 
@@ -515,36 +470,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 new()
                 {
                     Title = "Theme B",
-                    Topics = new List<Topic>
+                    Publications = new List<Publication>
                     {
                         new()
                         {
-                            Title = "Topic A",
-                            Publications = new List<Publication>
+                            Title = "Publication A",
+                            LatestPublishedRelease = release,
+                            Releases = new List<Release>
                             {
-                                new()
-                                {
-                                    Title = "Publication A",
-                                    LatestPublishedRelease = release,
-                                    Releases = new List<Release>
-                                    {
-                                        release
-                                    }
-                                }
+                                release
                             }
-                        },
+                        }
                     },
                 },
                 new()
                 {
                     Title = "Theme C",
-                    Topics = new List<Topic>
-                    {
-                        new()
-                        {
-                            Title = "Topic B"
-                        }
-                    }
                 }
             };
 
@@ -565,13 +506,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Single(publicationTree);
                 Assert.Equal("Theme B", publicationTree[0].Title);
 
-                Assert.Single(publicationTree[0].Topics);
-                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
-
-                var publications = publicationTree[0].Topics[0].Publications;
-
-                Assert.Single(publications);
-                Assert.Equal("Publication A", publications[0].Title);
+                var publication = Assert.Single(publicationTree[0].Publications);
+                Assert.Equal("Publication A", publication.Title);
             }
         }
 
@@ -597,56 +533,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 new()
                 {
                     Title = "Theme A",
-                    Topics = new List<Topic>
+                    Publications = new List<Publication>
                     {
+                        // Publication has a published release
                         new()
                         {
-                            Title = "Topic A",
-                            Publications = new List<Publication>
+                            Title = "Publication A",
+                            LatestPublishedRelease = releaseB,
+                            Releases = new List<Release>
                             {
-                                // Publication has a published release
-                                new()
-                                {
-                                    Title = "Publication A",
-                                    LatestPublishedRelease = releaseB,
-                                    Releases = new List<Release>
-                                    {
-                                        releaseB
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                releaseB
+                            },
+                        },
+                    },
                 },
                 new()
                 {
                     Title = "Theme B",
-                    Topics = new List<Topic>
+                    Publications = new List<Publication>
                     {
+                        // Publication has a published and an unpublished release
                         new()
                         {
-                            Title = "Topic B",
-                            Publications = new List<Publication>
+                            Title = "Publication B",
+                            LatestPublishedRelease = releaseA,
+                            Releases = new List<Release>
                             {
-                                // Publication has a published and an unpublished release
+                                releaseA,
                                 new()
                                 {
-                                    Title = "Publication B",
-                                    LatestPublishedRelease = releaseA,
-                                    Releases = new List<Release>
-                                    {
-                                        releaseA,
-                                        new()
-                                        {
-                                            ReleaseName = "2021",
-                                            TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                                            Published = null
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                                    ReleaseName = "2021",
+                                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                    Published = null
+                                },
+                            },
+                        },
+                    },
                 },
                 new()
                 {
@@ -1796,12 +1718,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Published = DateTime.UtcNow
             };
 
-            var topic = new Topic
+            var theme = new Theme
             {
-                Theme = new Theme
-                {
-                    Title = "Theme title"
-                }
+                Title = "Theme title"
             };
 
             var publications = new List<Publication>
@@ -1812,7 +1731,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication B",
                     LatestPublishedReleaseId = releaseB.Id,
                     LatestPublishedRelease = releaseB,
-                    Topic = topic
+                    Theme = theme,
                 },
                 new()
                 {
@@ -1820,7 +1739,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication C",
                     LatestPublishedReleaseId = releaseC.Id,
                     LatestPublishedRelease = releaseC,
-                    Topic = topic
+                    Theme = theme,
                 },
                 new()
                 {
@@ -1828,7 +1747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseId = releaseA.Id,
                     LatestPublishedRelease = releaseA,
-                    Topic = topic
+                    Theme = theme,
                 },
             };
 
@@ -1892,12 +1811,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Published = DateTime.UtcNow
             };
 
-            var topic = new Topic
+            var theme = new Theme
             {
-                Theme = new Theme
-                {
-                    Title = "Theme title"
-                }
+                Title = "Theme title"
             };
 
             var publications = new List<Publication>
@@ -1908,7 +1824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication B",
                     LatestPublishedReleaseId = releaseB.Id,
                     LatestPublishedRelease = releaseB,
-                    Topic = topic
+                    Theme = theme,
                 },
                 new()
                 {
@@ -1916,7 +1832,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication C",
                     LatestPublishedReleaseId = releaseC.Id,
                     LatestPublishedRelease = releaseC,
-                    Topic = topic
+                    Theme = theme,
                 },
                 new()
                 {
@@ -1924,7 +1840,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Title = "Publication A",
                     LatestPublishedReleaseId = releaseA.Id,
                     LatestPublishedRelease = releaseA,
-                    Topic = topic
+                    Theme = theme,
                 },
             };
 

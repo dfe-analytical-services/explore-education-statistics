@@ -25,9 +25,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<LegacyRelease> LegacyReleases { get; set; } = new();
 
-        public Guid TopicId { get; set; }
+        public Guid ThemeId { get; set; }
 
-        public Topic Topic { get; set; } = null!;
+        public Theme Theme { get; set; }
+
+        //public Guid TopicId { get; set; }
+
+        //public Topic Topic { get; set; } = null!;
 
         public Guid ContactId { get; set; }
 

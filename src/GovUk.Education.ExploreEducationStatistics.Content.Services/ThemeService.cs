@@ -22,11 +22,10 @@ public class ThemeService : IThemeService
     {
         return await _contentDbContext.Themes
             .Where(theme =>
-                theme.Topics.Any(topic =>
-                    topic.Publications.Any(publication =>
-                        publication.LatestPublishedReleaseId.HasValue &&
-                        (publication.SupersededById == null ||
-                         !publication.SupersededBy!.LatestPublishedReleaseId.HasValue))))
+                theme.Publications.Any(publication =>
+                    publication.LatestPublishedReleaseId.HasValue &&
+                    (publication.SupersededById == null ||
+                     !publication.SupersededBy!.LatestPublishedReleaseId.HasValue)))
             .OrderBy(theme => theme.Title)
             .Select(theme => new ThemeViewModel(
                 theme.Id,

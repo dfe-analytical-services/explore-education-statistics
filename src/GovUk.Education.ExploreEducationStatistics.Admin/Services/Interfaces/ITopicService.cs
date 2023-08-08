@@ -10,10 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, TopicViewModel>> CreateTopic(TopicSaveViewModel created);
 
-        Task<Either<ActionResult, TopicViewModel>> UpdateTopic(Guid id, TopicSaveViewModel updated);
-
-        Task<Either<ActionResult, TopicViewModel>> GetTopic(Guid topicId);
-
         Task<Either<ActionResult, Unit>> DeleteTopic(Guid topicId);
     }
 }

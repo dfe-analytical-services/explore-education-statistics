@@ -105,39 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, TopicViewModel>> UpdateTopic(
-            Guid topicId,
-            TopicSaveViewModel updated)
-        {
-            return await _userService.CheckCanManageAllTaxonomy()
-                .OnSuccess(() => _persistenceHelper.CheckEntityExists<Topic>(topicId))
-                .OnSuccessDo(() => ValidateSelectedTheme(updated.ThemeId))
-                .OnSuccess(
-                    async topic =>
-                    {
-                        if (_contentContext.Topics.Any(
-                            t => t.Slug == updated.Slug
-                                 && t.Id != topicId
-                                 && t.ThemeId == updated.ThemeId
-                        ))
-                        {
-                            return ValidationActionResult(ValidationErrorMessages.SlugNotUnique);
-                        }
-
-                        topic.Title = updated.Title;
-                        topic.Slug = updated.Slug;
-                        topic.ThemeId = updated.ThemeId;
-
-                        _contentContext.Topics.Update(topic);
-                        await _contentContext.SaveChangesAsync();
-
-                        await _publishingService.TaxonomyChanged();
-
-                        return await GetTopic(topic.Id);
-                    }
-                );
-        }
-
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTheme(Guid themeId)
         {
             var theme = await _contentContext.Themes.FindAsync(themeId);

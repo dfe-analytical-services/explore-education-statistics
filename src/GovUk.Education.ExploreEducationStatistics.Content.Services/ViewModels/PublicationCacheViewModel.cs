@@ -22,7 +22,7 @@ public record PublicationCacheViewModel
 
     public List<LegacyReleaseViewModel> LegacyReleases { get; init; } = new();
 
-    public TopicViewModel Topic { get; init; } = null!;
+    public ThemeViewModel Theme { get; init; } = null!;
 
     public ContactViewModel Contact { get; init; } = null!;
 

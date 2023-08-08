@@ -48,7 +48,7 @@ const permissionService = {
     return client.get(`/permissions/release/${releaseId}/amend`);
   },
   canCreatePublicationForTopic(topicId: string): Promise<boolean> {
-    return client.get(`/permissions/topic/${topicId}/publication/create`);
+    return client.get(`/permissions/topic/${topicId}/publication/create`); // @MarkFix switch to take themeId
   },
   canUpdateMethodology(methodologyId: string): Promise<boolean> {
     return client.get(`/permissions/methodology/${methodologyId}/update`);

@@ -31,10 +31,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publications")]
         public async Task<ActionResult<List<PublicationViewModel>>> ListPublications(
-            [FromQuery] Guid? topicId)
+            [FromQuery] Guid? themeId)
         {
             return await _publicationService
-                .ListPublications(topicId)
+                .ListPublications(themeId)
                 .HandleFailuresOrOk();
         }
 

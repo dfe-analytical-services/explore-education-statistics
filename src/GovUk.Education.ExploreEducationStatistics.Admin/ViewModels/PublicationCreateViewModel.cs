@@ -17,8 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public Contact Contact { get; set; } = null!;
 
-        public IdTitleViewModel Topic { get; set; } = null!;
-
         public IdTitleViewModel Theme { get; set; } = null!;
 
         public Guid? SupersededById { get; set; }

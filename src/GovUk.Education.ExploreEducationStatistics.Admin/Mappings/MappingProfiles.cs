@@ -24,7 +24,6 @@ using ReleaseNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Vi
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 using ThemeViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ThemeViewModel;
-using TopicViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.TopicViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 {
@@ -76,15 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             CreateMap<MethodologyVersion, IdTitleViewModel>();
 
             CreateMap<Theme, IdTitleViewModel>();
-            CreateMap<Topic, IdTitleViewModel>();
-            CreateMap<Publication, PublicationViewModel>()
-                .ForMember(
-                    dest => dest.Theme,
-                    m => m.MapFrom(p => p.Topic.Theme));
-            CreateMap<Publication, PublicationCreateViewModel>()
-                .ForMember(
-                    dest => dest.Theme,
-                    m => m.MapFrom(p => p.Topic.Theme));
+            CreateMap<Publication, PublicationViewModel>();
+            CreateMap<Publication, PublicationCreateViewModel>();
 
             CreateMap<Contact, ContactViewModel>();
 
@@ -105,9 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Release, Data.Model.Release>();
 
-            CreateMap<Theme, ThemeViewModel>()
-                .ForMember(theme => theme.Topics, m => m.MapFrom(t => t.Topics.OrderBy(topic => topic.Title)));
-            CreateMap<Topic, TopicViewModel>();
+            CreateMap<Theme, ThemeViewModel>();
 
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
@@ -127,12 +117,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         Title = r.Publication.Title,
                         Slug = r.Publication.Slug,
                         Contact = r.Publication.Contact,
-                        Topic = new ManageContentPageViewModel.TopicViewModel
+                        Theme = new ManageContentPageViewModel.ThemeViewModel
                         {
-                            Theme = new ManageContentPageViewModel.ThemeViewModel
-                            {
-                                Title = r.Publication.Topic.Theme.Title
-                            }
+                            Title = r.Publication.Theme.Title
                         },
                         Releases = r.Publication.Releases
                             .FindAll(otherRelease => r.Id != otherRelease.Id &&

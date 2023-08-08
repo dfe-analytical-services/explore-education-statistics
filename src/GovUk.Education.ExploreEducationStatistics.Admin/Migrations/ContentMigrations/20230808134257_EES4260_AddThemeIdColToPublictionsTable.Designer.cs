@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230808134257_EES4260_AddThemeIdColToPublictionsTable")]
+    partial class EES4260_AddThemeIdColToPublictionsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -672,6 +674,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("CountFilterItems")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountFootnotes")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountIndicators")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountLocations")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountObservations")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CountTimePeriods")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -679,7 +699,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("MigratedFromLegacy")
+                    b.Property<bool>("Legacy")
+                        .HasColumnType("bit");
+
+                    b.Property<long?>("LegacyContentLength")
+                        .HasColumnType("bigint");
+
+                    b.Property<bool?>("LegacyHasConfigurationHeaders")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("LegacyHasSnapshot")
                         .HasColumnType("bit");
 
                     b.Property<string>("PublicationTitle")

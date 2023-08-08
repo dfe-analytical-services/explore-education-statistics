@@ -40,7 +40,7 @@ public class PublicationCacheService : IPublicationCacheService
         return await fullPublicationTree
             .ToAsyncEnumerable()
             .SelectAwait(async theme => await FilterPublicationTreeTheme(theme, filter))
-            .Where(theme => theme.Topics.Any())
+            .Where(theme => theme.Publications.Any())
             .OrderBy(theme => theme.Title)
             .ToListAsync();
     }
@@ -68,11 +68,10 @@ public class PublicationCacheService : IPublicationCacheService
         PublicationTreeThemeViewModel theme,
         PublicationTreeFilter filter)
     {
-        var topics = await theme.Topics
+        var publications = await theme.Publications
             .ToAsyncEnumerable()
-            .SelectAwait(async topic => await FilterPublicationTreeTopic(topic, filter))
-            .Where(topic => topic.Publications.Any())
-            .OrderBy(topic => topic.Title)
+            .Where(publication => FilterPublicationTreePublication(publication, filter))
+            .OrderBy(publication => publication.Title)
             .ToListAsync();
 
         return new PublicationTreeThemeViewModel
@@ -80,24 +79,6 @@ public class PublicationCacheService : IPublicationCacheService
             Id = theme.Id,
             Title = theme.Title,
             Summary = theme.Summary,
-            Topics = topics,
-        };
-    }
-
-    private static async Task<PublicationTreeTopicViewModel> FilterPublicationTreeTopic(
-        PublicationTreeTopicViewModel topic,
-        PublicationTreeFilter filter)
-    {
-        var publications = await topic.Publications
-            .ToAsyncEnumerable()
-            .Where(publication => FilterPublicationTreePublication(publication, filter))
-            .OrderBy(publication => publication.Title)
-            .ToListAsync();
-
-        return new PublicationTreeTopicViewModel
-        {
-            Id = topic.Id,
-            Title = topic.Title,
             Publications = publications
         };
     }

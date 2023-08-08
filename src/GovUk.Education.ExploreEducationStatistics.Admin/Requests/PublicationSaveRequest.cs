@@ -12,7 +12,7 @@ public record PublicationSaveRequest
 
         [Required, MaxLength(160)] public string Summary { get; set; } = Empty;
 
-        [Required] public Guid TopicId { get; set; }
+        [Required] public Guid ThemeId { get; set; }
 
         private string _slug = Empty;
 

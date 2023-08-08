@@ -49,10 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 IsBauUser: await _userService.CheckIsBauUser().IsRight());
         }
 
-        [HttpGet("permissions/topic/{topicId:guid}/publication/create")]
-        public Task<ActionResult<bool>> CanCreatePublicationForTopic(Guid topicId)
+        [HttpGet("permissions/theme/{themeId:guid}/publication/create")]
+        public Task<ActionResult<bool>> CanCreatePublicationForTheme(Guid themeId)
         {
-            return CheckPolicyAgainstEntity<Topic>(topicId, _userService.CheckCanCreatePublicationForTopic);
+            return CheckPolicyAgainstEntity<Theme>(themeId, _userService.CheckCanCreatePublicationForTheme);
         }
 
         [HttpGet("permissions/release/{releaseId:guid}/update")]

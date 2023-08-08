@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class TopicViewModel
+    public class TopicViewModel // @MarkFix used by CreateTopic and GetTopic, which are used by the UI tests
     {
         public Guid Id { get; set; }
 
@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid ThemeId { get; set; }
     }
 
-    public class TopicSaveViewModel
+    public class TopicSaveViewModel // @MarkFix used by CreateTopic, which is used by the UI tests
     {
         [Required]
         public string Title { get; set; }

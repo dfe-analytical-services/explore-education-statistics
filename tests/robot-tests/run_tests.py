@@ -299,7 +299,7 @@ def create_test_theme():
     return admin_request("POST", "/api/themes", {"title": "Test theme", "summary": "Test theme summary"})
 
 
-def create_test_topic():
+def create_test_topic():  # @MarkFix switch to Theme
     assert os.getenv("TEST_THEME_ID") is not None
 
     topic_name = f'UI test topic {os.getenv("RUN_IDENTIFIER")}'
@@ -309,7 +309,7 @@ def create_test_topic():
     os.environ["TEST_TOPIC_ID"] = resp.json()["id"]
 
 
-def delete_test_topic():
+def delete_test_topic():  # @MarkFix switch to Theme
     if os.getenv("TEST_TOPIC_ID") is not None:
         admin_request("DELETE", f'/api/topics/{os.getenv("TEST_TOPIC_ID")}')
 

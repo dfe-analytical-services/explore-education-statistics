@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.LegacyReleases)
                 .Include(r => r.Publication)
-                .ThenInclude(publication => publication.Topic.Theme)
+                .ThenInclude(publication => publication.Theme)
                 .Include(r => r.Content)
                 .ThenInclude(join => join.ContentSection)
                 .ThenInclude(section => section.Content)

@@ -41,9 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Theme
         ThemeDoesNotExist,
 
-        // Topic
-        TopicDoesNotExist,
-
         // File
         CannotOverwriteFile,
         FileCannotBeEmpty,

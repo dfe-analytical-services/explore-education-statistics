@@ -130,10 +130,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
 
         // Publication
 
-        public static Task<Either<ActionResult, Topic>> CheckCanCreatePublicationForTopic(
-            this IUserService userService, Topic topic)
+        public static Task<Either<ActionResult, Theme>> CheckCanCreatePublicationForTheme(
+            this IUserService userService, Theme theme)
         {
-            return userService.CheckPolicy(topic, SecurityPolicies.CanCreatePublicationForSpecificTopic);
+            return userService.CheckPolicy(theme, SecurityPolicies.CanCreatePublicationForSpecificTheme);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanUpdatePublicationSummary(

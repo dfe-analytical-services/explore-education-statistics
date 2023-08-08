@@ -109,8 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Theme>(id, q => 
-                    q.Include(t => t.Topics))
+                .CheckEntityExists<Theme>(id)
                 .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
                 .OnSuccess(_mapper.Map<ThemeViewModel>);
         }
@@ -122,11 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(
                     async _ => await _userService
                         .CheckCanManageAllTaxonomy()
-                        .OnSuccess(
-                            async () => await _context.Themes
-                                .Include(theme => theme.Topics)
-                                .ToListAsync()
-                        )
+                        .OnSuccess(async () => await _context.Themes.ToListAsync())
                         .OrElse(GetUserThemes)
                 )
                 .OnSuccess(
@@ -141,17 +136,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService.CheckCanManageAllTaxonomy()
                 .OnSuccess(
-                    () => _persistenceHelper.CheckEntityExists<Theme>(
-                        themeId,
-                        q => q.Include(t => t.Topics)
-                    )
+                    () => _persistenceHelper.CheckEntityExists<Theme>(themeId)
                 )
                 .OnSuccessDo(CheckCanDeleteTheme)
                 .OnSuccessVoid(async theme =>
                 {
-                    var topicIds = theme.Topics.Select(topic => topic.Id).ToList();
-                    await topicIds.ForEachAsync(_topicService.DeleteTopic);
-
                     _context.Themes.Remove(theme);
                     await _context.SaveChangesAsync();
 
@@ -182,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userId = _userService.GetUserId();
 
-            var topics = await _context
+            return await _context
                 .UserReleaseRoles
                 .AsQueryable()
                 .Where(userReleaseRole => 
@@ -196,20 +185,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         userPublicationRole.UserId == userId &&
                         ListOf(Owner, Approver).Contains(userPublicationRole.Role))
                     .Select(userPublicationRole => userPublicationRole.Publication))
-                .Include(publication => publication.Topic)
-                .ThenInclude(topic => topic.Theme)
-                .Select(publication => publication.Topic)
+                .Include(publication => publication.Theme)
+                .Select(publication => publication.Theme)
                 .Distinct()
                 .ToListAsync();
-
-            return topics
-                .GroupBy(topic => topic.Theme)
-                .Select(group =>
-                    {
-                        group.Key.Topics = group.ToList();
-                        return group.Key;
-                    })
-                .ToList();
         }
     }
 }

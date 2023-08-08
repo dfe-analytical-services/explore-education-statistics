@@ -3,19 +3,19 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
-    public class CreatePublicationForSpecificTopicRequirement : IAuthorizationRequirement
+    public class CreatePublicationForSpecificThemeRequirement : IAuthorizationRequirement
     {}
     
-    public class CreatePublicationForSpecificTopicAuthorizationHandler : CompoundAuthorizationHandler<
-        CreatePublicationForSpecificTopicRequirement, Topic>
+    public class CreatePublicationForSpecificThemeAuthorizationHandler : CompoundAuthorizationHandler<
+        CreatePublicationForSpecificThemeRequirement, Theme>
     {
-        public CreatePublicationForSpecificTopicAuthorizationHandler() 
-            : base(new CanCreateForAnyTopicAuthorizationHandler()) {}
+        public CreatePublicationForSpecificThemeAuthorizationHandler()
+            : base(new CanCreateForAnyThemeAuthorizationHandler()) {}
         
-        public class CanCreateForAnyTopicAuthorizationHandler : HasClaimAuthorizationHandler<
-            CreatePublicationForSpecificTopicRequirement>
+        public class CanCreateForAnyThemeAuthorizationHandler : HasClaimAuthorizationHandler<
+            CreatePublicationForSpecificThemeRequirement>
         {
-            public CanCreateForAnyTopicAuthorizationHandler() 
+            public CanCreateForAnyThemeAuthorizationHandler()
                 : base(SecurityClaimTypes.CreateAnyPublication) {}
         }
     }

@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<PublicationMethodology> PublicationMethodologies { get; set; }
         public virtual DbSet<MethodologyFile> MethodologyFiles { get; set; }
         public virtual DbSet<Theme> Themes { get; set; }
-        public virtual DbSet<Topic> Topics { get; set; }
+        public virtual DbSet<Topic> Topics { get; set; } // @MarkFix remove
         public virtual DbSet<Publication> Publications { get; set; }
         public virtual DbSet<Release> Releases { get; set; }
         public virtual DbSet<ReleaseStatus> ReleaseStatus { get; set; }

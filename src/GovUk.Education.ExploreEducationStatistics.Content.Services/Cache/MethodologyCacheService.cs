@@ -46,8 +46,7 @@ public class MethodologyCacheService : IMethodologyCacheService
             .OnSuccess(methodologiesByTheme =>
             {
                 var matchingPublication = methodologiesByTheme
-                    .SelectMany(theme => theme.Topics)
-                    .SelectMany(topic => topic.Publications)
+                    .SelectMany(theme => theme.Publications)
                     .SingleOrDefault(publication => publication.Id == publicationId);
                 return matchingPublication?.Methodologies ?? new List<MethodologyVersionSummaryViewModel>();
             });

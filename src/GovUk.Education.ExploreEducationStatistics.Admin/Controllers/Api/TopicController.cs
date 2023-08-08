@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _topicService = topicService;
         }
 
-        [HttpPost("topics")]
+        [HttpPost("topics")] // @MarkFix Used by UI tests
         public async Task<ActionResult<TopicViewModel>> CreateTopic(
             TopicSaveViewModel topic)
         {
@@ -29,25 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("topics/{topicId:guid}")]
-        public async Task<ActionResult<TopicViewModel>> UpdateTopic(
-            Guid topicId,
-            TopicSaveViewModel topic)
-        {
-            return await _topicService
-                .UpdateTopic(topicId, topic)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpGet("topics/{topicId:guid}")]
-        public async Task<ActionResult<TopicViewModel>> GetTopic(Guid topicId)
-        {
-            return await _topicService
-                .GetTopic(topicId)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpDelete("topics/{topicId:guid}")]
+        [HttpDelete("topics/{topicId:guid}")] // @MarkFix Used by UI tests
         public async Task<ActionResult> DeleteTopic(Guid topicId)
         {
             return await _topicService
