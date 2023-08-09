@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -36,8 +35,7 @@ public record FilterCsvMetaViewModel
     public FilterCsvMetaViewModel(FilterMetaViewModel filter)
     {
         Id = filter.Id;
-        // TODO EES-3755 Remove fallback after Permalink snapshot work is complete
-        Name = filter.Name ?? filter.Legend.SnakeCase();
+        Name = filter.Name;
         GroupCsvColumn = filter.GroupCsvColumn;
         Items = filter.Options
             .SelectMany(kvp =>

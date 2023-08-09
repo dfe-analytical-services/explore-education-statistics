@@ -16,37 +16,12 @@ public class Permalink : ICreatedTimestamp<DateTime>
 
     public Guid SubjectId { get; init; }
 
-    public int CountFilterItems { get; set; }
-
-    public int CountFootnotes { get; set; }
-
-    public int CountIndicators { get; set; }
-
-    public int CountLocations { get; set; }
-
-    public int CountObservations { get; set; }
-
-    public int CountTimePeriods { get; set; }
-
     /// <summary>
-    /// True if this is a legacy Permalink
+    /// True if this is a Permalink created before the migration to use Permalink snapshots
+    /// in the work done by epic EES-4226. We plan to temporarily retain this flag while there might be a need to
+    /// fall back to the legacy Permalink data to fix any issues that might arise from the migration.
     /// </summary>
-    public bool Legacy { get; set; }
-
-    /// <summary>
-    /// True if the legacy Permalink snapshot (table and CSV) has been generated
-    /// </summary>
-    public bool? LegacyHasSnapshot { get; set; }
-
-    /// <summary>
-    /// Content length in bytes of the legacy Permalink in blob storage 
-    /// </summary>
-    public long? LegacyContentLength { get; set; }
-
-    /// <summary>
-    /// True if the legacy Permalink in blob storage has table configuration headers
-    /// </summary>
-    public bool? LegacyHasConfigurationHeaders { get; set; }
+    public bool Legacy { get; init; }
 
     public DateTime Created { get; set; }
 }

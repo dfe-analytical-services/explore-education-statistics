@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 
@@ -38,8 +37,7 @@ public record IndicatorCsvMetaViewModel
         Id = indicator.Value;
         DecimalPlaces = indicator.DecimalPlaces;
         Label = indicator.Label;
-        // TODO EES-3755 Remove fallback after Permalink snapshot work is complete
-        Name = indicator.Name ?? indicator.Label.SnakeCase();
+        Name = indicator.Name;
         Unit = indicator.Unit;
     }
 }
