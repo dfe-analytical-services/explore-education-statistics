@@ -2,15 +2,16 @@ import FormThemeTopicSelect from '@admin/components/form/FormThemeTopicSelect';
 import useQueryParams from '@admin/hooks/useQueryParams';
 import TopicPublications from '@admin/pages/admin-dashboard/components/TopicPublications';
 import { ThemeTopicParams, dashboardRoute } from '@admin/routes/routes';
-import themeService, { Theme } from '@admin/services/themeService';
+import { Theme } from '@admin/services/themeService';
 import { Topic } from '@admin/services/topicService';
 import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import themeQueries from '@admin/queries/themeQueries';
 import useStorageItem from '@common/hooks/useStorageItem';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useMemo } from 'react';
 import { useHistory, useLocation } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
 
 interface Props {
   isBauUser: boolean;
@@ -24,8 +25,8 @@ const PublicationsTab = ({ isBauUser }: Props) => {
   const [savedThemeTopic, setSavedThemeTopic] =
     useStorageItem<ThemeTopicParams>('dashboardThemeTopic', undefined);
 
-  const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
-    themeService.getThemes,
+  const { data: themes, isLoading: isLoadingThemes } = useQuery(
+    themeQueries.listThemes,
   );
 
   const selectedTheme = useMemo<Theme | undefined>(() => {
@@ -105,7 +106,7 @@ const PublicationsTab = ({ isBauUser }: Props) => {
   return (
     <LoadingSpinner
       hideText
-      loading={loadingThemes}
+      loading={isLoadingThemes}
       text="Loading your publications"
     >
       <h2>View and manage your publications</h2>
