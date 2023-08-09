@@ -49,11 +49,22 @@ public partial class EES3755_RemoveTemporaryFieldsFromPermalink : Migration
         migrationBuilder.DropColumn(
             name: "LegacyHasSnapshot",
             table: "Permalinks");
+
+        // Legacy column retained to facilitate fallback to legacy data for resolving migration related issues.
+        migrationBuilder.RenameColumn(
+            name: "Legacy",
+            table: "Permalinks",
+            newName: "MigratedFromLegacy");
     }
 
     protected override void Down(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.Sql("GRANT UPDATE ON dbo.Permalinks TO [data]");
+
+        migrationBuilder.RenameColumn(
+            name: "MigratedFromLegacy",
+            table: "Permalinks",
+            newName: "Legacy");
 
         migrationBuilder.AddColumn<int>(
             name: "CountFilterItems",

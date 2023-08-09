@@ -430,7 +430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal(release.Id, permalink.ReleaseId);
                 Assert.Equal(subject.Id, permalink.SubjectId);
 
-                Assert.False(permalink.Legacy);
+                Assert.False(permalink.MigratedFromLegacy);
             }
         }
 
@@ -745,7 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Assert.Equal(release.Id, permalink.ReleaseId);
                 Assert.Equal(subject.Id, permalink.SubjectId);
 
-                Assert.False(permalink.Legacy);
+                Assert.False(permalink.MigratedFromLegacy);
             }
         }
 
