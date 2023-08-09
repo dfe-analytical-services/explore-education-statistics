@@ -27,8 +27,10 @@ export interface Methodology {
   }[];
 }
 
-export default {
+const methodologyService = {
   getMethodology(methodologySlug: string): Promise<Methodology> {
     return contentApi.get(`/methodologies/${methodologySlug}`);
   },
 };
+
+export default methodologyService;

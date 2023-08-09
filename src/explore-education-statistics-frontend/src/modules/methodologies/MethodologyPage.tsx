@@ -12,6 +12,7 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import MethodologyContentSection from '@frontend/modules/methodologies/components/MethodologyContentSection';
 import MethodologySectionBlocks from '@frontend/modules/methodologies/components/MethodologySectionBlocks';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
@@ -206,20 +207,20 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const { methodology: methodologySlug } = query;
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const { methodology: methodologySlug } = query;
 
-  const data = await methodologyService.getMethodology(
-    methodologySlug as string,
-  );
+    const data = await methodologyService.getMethodology(
+      methodologySlug as string,
+    );
 
-  return {
-    props: {
-      data,
-    },
-  };
-};
+    return {
+      props: {
+        data,
+      },
+    };
+  },
+);
 
 export default MethodologyPage;

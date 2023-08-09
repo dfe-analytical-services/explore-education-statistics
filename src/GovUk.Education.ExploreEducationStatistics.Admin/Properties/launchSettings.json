@@ -18,7 +18,7 @@
     "GovUk.Education.ExploreStatistics.Admin": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://0.0.0.0:5021;http://0.0.0.0:5020",
+      "applicationUrl": "https://0.0.0.0:5021;http://0.0.0.0:5020;https://[::1]:5021;http://[::1]:5020",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -26,7 +26,7 @@
     "GovUk.Education.ExploreStatistics.AdminKeycloak": {
       "commandName": "Project",
       "launchBrowser": true,
-      "applicationUrl": "https://0.0.0.0:5021;http://0.0.0.0:5020",
+      "applicationUrl": "https://0.0.0.0:5021;http://0.0.0.0:5020;https://[::1]:5021;http://[::1]:5020",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "IdpProviderConfiguration": "Keycloak"

@@ -7,8 +7,7 @@ import generateTableTitle from '@common/modules/table-tool/utils/generateTableTi
 import logger from '@common/services/logger';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
-import deduplicatePermalinkLocations from '@common/services/util/permalinkServiceUtils';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkSnapshotService';
 import { TableDataResponse } from '@common/services/tableBuilderService';
 
 interface SuccessBody {
@@ -44,13 +43,7 @@ export default async function createPermalinkTable(
   }
 
   try {
-    // TO DO - EES-4259
-    // For old permalinks with duplicate locations.
-    // Can be removed once the permalinks migration is done.
-    const dedupedUnmappedFullTable = deduplicatePermalinkLocations(
-      unmappedFullTable,
-    );
-    const fullTable = mapFullTable(dedupedUnmappedFullTable);
+    const fullTable = mapFullTable(unmappedFullTable);
     const tableHeadersConfig = mapTableHeadersConfig(
       configuration.tableHeaders,
       fullTable,

@@ -7,6 +7,7 @@ import glossaryService from '@frontend/services/glossaryService';
 import Page from '@frontend/components/Page';
 import { GetServerSideProps } from 'next';
 import React from 'react';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 
 interface Props {
   release: PreReleaseAccessListSummary;
@@ -50,21 +51,21 @@ const PreReleaseAccessListPage = ({ release }: Props) => {
 
 export default PreReleaseAccessListPage;
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const { publication, release } = query as {
-    publication: string;
-    release: string;
-  };
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const { publication, release } = query as {
+      publication: string;
+      release: string;
+    };
 
-  const data = await (release
-    ? publicationService.getPreReleaseAccessList(publication, release)
-    : publicationService.getLatestPreReleaseAccessList(publication));
+    const data = await (release
+      ? publicationService.getPreReleaseAccessList(publication, release)
+      : publicationService.getLatestPreReleaseAccessList(publication));
 
-  return {
-    props: {
-      release: data,
-    },
-  };
-};
+    return {
+      props: {
+        release: data,
+      },
+    };
+  },
+);

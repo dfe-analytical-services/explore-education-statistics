@@ -4,7 +4,7 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import {
   TableHeader,
   UnmappedTableHeadersConfig,
-} from '@common/services/permalinkService';
+} from '@common/services/permalinkSnapshotService';
 
 /**
  * This function remaps the config filters into

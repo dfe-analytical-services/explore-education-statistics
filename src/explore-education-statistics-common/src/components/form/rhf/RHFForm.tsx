@@ -151,7 +151,6 @@ export default function RHFForm<TFormValues extends FieldValues>({
         {showErrorSummary && (
           <ErrorSummary
             errors={allErrors}
-            id={`${id}-summary`}
             focusOnError={hasSummaryFocus}
             onFocus={toggleSummaryFocus.off}
           />

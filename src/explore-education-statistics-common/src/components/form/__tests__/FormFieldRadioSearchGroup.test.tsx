@@ -314,9 +314,11 @@ describe('FormFieldRadioSearchGroup', () => {
   });
 
   describe('search', () => {
-    test('providing a search term filters the radios', async () => {
+    beforeEach(() => {
       jest.useFakeTimers();
+    });
 
+    test('providing a search term filters the radios', async () => {
       render(
         <Formik
           initialValues={{
@@ -352,8 +354,6 @@ describe('FormFieldRadioSearchGroup', () => {
     });
 
     test('providing a search term does not remove a radio that has already been checked', async () => {
-      jest.useFakeTimers();
-
       render(
         <Formik
           initialValues={{

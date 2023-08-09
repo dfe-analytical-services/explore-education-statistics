@@ -2,41 +2,23 @@
 
 .section {
   @media print {
-    display: block !important;
     page-break-inside: avoid;
   }
 }
 
-.sectionContentCollapsed {
-  display: block !important;
-  height: 0;
-  overflow: hidden;
-  padding: 0 !important;
+.hasAnchorLink {
   position: relative;
-  visibility: hidden;
-
-  @media print {
-    height: auto;
-    overflow: visible;
-    padding: 15px 0 !important;
-    visibility: visible;
-  }
 }
 
 .copyLinkButton {
   position: absolute;
-  right: 40px;
+  right: 0;
   top: 4px;
   width: auto;
   z-index: 1;
 
   @include govuk-media-query($from: tablet) {
-    left: -50px;
+    margin-left: -50px;
     right: auto;
-    top: 10px;
-
-    &:active {
-      top: 10px;
-    }
   }
 }

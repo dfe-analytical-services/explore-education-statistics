@@ -22,10 +22,6 @@ describe('ReleaseContentHubContext', () => {
     jest.useFakeTimers();
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   test('starts in a Disconnected state', () => {
     const { result } = renderHook(() => useReleaseContentHubContext(), {
       wrapper,

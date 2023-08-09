@@ -60,7 +60,7 @@ const DraggableItem = ({
           data-testid={testId}
           ref={draggableProvided.innerRef}
         >
-          {!hideDragHandle && (
+          {!hideDragHandle && isReordering && (
             <>
               {overrideDragHandle ??
                 DragHandle({ className: dragHandleClassName })}

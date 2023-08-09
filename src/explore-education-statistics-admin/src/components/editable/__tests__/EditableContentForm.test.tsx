@@ -191,8 +191,6 @@ describe('EditableContentForm', () => {
 
       jest.advanceTimersByTime(500);
       expect(handleAction).toHaveBeenCalledTimes(1);
-
-      jest.useRealTimers();
     });
 
     test('calls `onIdle` handler when user has been idle for specified `idleTimeout`', () => {
@@ -217,8 +215,6 @@ describe('EditableContentForm', () => {
       jest.advanceTimersByTime(5000);
 
       expect(handleIdle).toHaveBeenCalledTimes(1);
-
-      jest.useRealTimers();
     });
   });
 

@@ -6,10 +6,6 @@ import FormCheckboxSearchGroup from '../FormCheckboxSearchGroup';
 jest.mock('lodash/debounce');
 
 describe('FormCheckboxSearchGroup', () => {
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   describe('without searchOnly', () => {
     test('renders list of checkboxes in correct order', () => {
       const { container } = render(

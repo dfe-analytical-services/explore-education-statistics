@@ -1,6 +1,5 @@
 import { Dictionary } from '@common/types';
-import isAxiosError from '@common/utils/error/isAxiosError';
-import { AxiosError } from 'axios';
+import { AxiosError, isAxiosError } from 'axios';
 import { FormikErrors } from 'formik';
 import camelCase from 'lodash/camelCase';
 import set from 'lodash/set';

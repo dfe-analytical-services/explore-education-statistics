@@ -1,3 +1,4 @@
+import flushPromises from '@common-test/flushPromises';
 import ModalConfirm from '@common/components/ModalConfirm';
 import delay from '@common/utils/delay';
 import {
@@ -18,6 +19,10 @@ describe('ModalConfirm', () => {
 
   afterAll(() => {
     process.env.APP_ROOT_ID = originalAppRootId;
+  });
+
+  beforeEach(() => {
+    jest.useFakeTimers();
   });
 
   describe('confirming', () => {
@@ -91,8 +96,6 @@ describe('ModalConfirm', () => {
     });
 
     test('re-enables buttons once `onConfirm` has completed', async () => {
-      jest.useFakeTimers();
-
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
       const handleConfirm = jest.fn(async () => {
@@ -116,6 +119,8 @@ describe('ModalConfirm', () => {
 
       jest.advanceTimersByTime(500);
 
+      await flushPromises();
+
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
@@ -123,8 +128,6 @@ describe('ModalConfirm', () => {
     });
 
     test('re-enables exiting once `onConfirm` has completed', async () => {
-      jest.useFakeTimers();
-
       const handleExit = jest.fn();
       const handleCancel = jest.fn();
       const handleConfirm = jest.fn(async () => {
@@ -144,6 +147,8 @@ describe('ModalConfirm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       jest.advanceTimersByTime(500);
+
+      await flushPromises();
 
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
@@ -234,8 +239,6 @@ describe('ModalConfirm', () => {
     });
 
     test('re-enables buttons once `onCancel` has completed', async () => {
-      jest.useFakeTimers();
-
       const handleExit = jest.fn();
       const handleCancel = jest.fn(async () => {
         await delay(500);
@@ -259,6 +262,8 @@ describe('ModalConfirm', () => {
 
       jest.advanceTimersByTime(500);
 
+      await flushPromises();
+
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Confirm' })).toBeEnabled();
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();
@@ -266,8 +271,6 @@ describe('ModalConfirm', () => {
     });
 
     test('re-enables exiting once `onCancel` has completed', async () => {
-      jest.useFakeTimers();
-
       const handleExit = jest.fn();
       const handleCancel = jest.fn(async () => {
         await delay(500);
@@ -287,6 +290,8 @@ describe('ModalConfirm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
       jest.advanceTimersByTime(500);
+
+      await flushPromises();
 
       await waitFor(() => {
         expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled();

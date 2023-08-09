@@ -6,15 +6,15 @@ import {
   UseFormReturn,
 } from 'react-hook-form';
 import React, { ReactNode, useEffect, useRef } from 'react';
-import { Schema } from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 import isEqual from 'lodash/isEqual';
+import { ObjectSchema, Schema } from 'yup';
 
 interface FormProviderProps<TFormValues extends FieldValues> {
   children: ReactNode | ((form: UseFormReturn<TFormValues>) => ReactNode);
   enableReinitialize?: boolean;
   initialValues?: UseFormProps<TFormValues>['defaultValues'];
-  validationSchema?: Schema<TFormValues>;
+  validationSchema?: ObjectSchema<TFormValues> & Schema<TFormValues>;
 }
 
 export default function FormProvider<TFormValues extends FieldValues>({
@@ -27,6 +27,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
     defaultValues: initialValues,
     mode: 'onBlur',
     resolver: validationSchema ? yupResolver(validationSchema) : undefined,
+    shouldFocusError: false,
   });
 
   const previousInitialValues = useRef(initialValues);

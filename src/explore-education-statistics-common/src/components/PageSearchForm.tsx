@@ -73,7 +73,7 @@ const PageSearchForm = ({
         parent.parentElement.classList.contains(accordionSectionClasses.section)
       ) {
         const accordionHeader = parent.parentElement.querySelector(
-          `.${accordionSectionClasses.sectionButton}`,
+          `.${accordionSectionClasses.sectionHeadingText}`,
         );
 
         if (accordionHeader) {

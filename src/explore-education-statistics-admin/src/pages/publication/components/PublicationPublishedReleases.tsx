@@ -118,7 +118,7 @@ export default function PublicationPublishedReleases({
             />
 
             {hasNextPage && showMoreNumber > 0 && (
-              <div className="dfe-flex dfe-align--centre">
+              <div className="dfe-flex govuk-!-text-align-centre">
                 <ButtonText
                   onClick={async () => {
                     const { data } = await fetchNextPage();

@@ -12,10 +12,6 @@ describe('useHubState', () => {
     jest.useFakeTimers();
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   test('calls `start` on hub when mounted', () => {
     mockHub.start.mockResolvedValue();
 

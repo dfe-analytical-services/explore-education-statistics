@@ -1359,6 +1359,8 @@ describe('ChartDataGroupingsConfiguration', () => {
 
     userEvent.click(modal.getByRole('button', { name: 'Done' }));
 
+    userEvent.tab();
+
     await waitFor(() => {
       expect(modal.getByText('There is a problem')).toBeInTheDocument();
     });

@@ -1,3 +1,5 @@
+// Feature flag for new link styles, will be enabled by default in the next version.
+$govuk-new-link-styles: true;
 // import the breakpoints before govuk/all so our extra values are picked up in the build.
 @import '~explore-education-statistics-common/src/styles/breakpoints';
 @import '~govuk-frontend/govuk/all';

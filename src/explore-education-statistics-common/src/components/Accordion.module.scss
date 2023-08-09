@@ -11,6 +11,7 @@
       display: none !important;
     }
   }
+
   .accordion :global(.govuk-accordion__section-content) {
     @media print {
       display: block !important;

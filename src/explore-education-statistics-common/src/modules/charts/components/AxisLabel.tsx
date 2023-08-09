@@ -31,7 +31,7 @@ const AxisLabel = ({
           [styles.labelRotated]: rotated,
         })}
       >
-        <div className="dfe-align--centre" style={textStyle}>
+        <div className="govuk-!-text-align-centre" style={textStyle}>
           {children}
         </div>
       </div>

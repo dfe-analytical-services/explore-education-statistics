@@ -30,11 +30,11 @@ exports[`FormTextArea renders correctly with hint 1`] = `
 >
   Test input
 </label>
-<span id="test-input-hint"
-      class="govuk-hint"
+<div id="test-input-hint"
+     class="govuk-hint"
 >
   Fill me in
-</span>
+</div>
 <textarea data-testid="comment-textarea"
           aria-describedby="test-input-hint"
           class="govuk-textarea"

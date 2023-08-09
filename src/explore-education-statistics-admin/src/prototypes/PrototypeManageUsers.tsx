@@ -161,7 +161,7 @@ const PrototypeManageUsers = () => {
                         className="dfe-flex-basis--30 govuk-!-margin-top-1 govuk-!-margin-bottom-1"
                       />
 
-                      <div className="dfe-align--right dfe-flex-basis--10">
+                      <div className="govuk-!-text-align-right dfe-flex-basis--10">
                         <a
                           href="#"
                           onClick={() => {
@@ -178,7 +178,7 @@ const PrototypeManageUsers = () => {
                           {item.releases.map((item2, index2) =>(
                             <>
                               <div className={`dfe-flex dfe-align-items--center ${index2 < (item.releases.length-1) ? 'dfe-flex-underline' : ''}`} key={index2.toString()}>
-                                <div className="dfe-flex-basis--60 dfe-align--right govuk-!-padding-2">
+                                <div className="dfe-flex-basis--60 govuk-!-text-align-right govuk-!-padding-2">
                                   <PrototypeChangeUserRole 
                                     selectedRole={item2.role} 
                                     name={`${item.name} ${item.surname}`} 
@@ -186,7 +186,7 @@ const PrototypeManageUsers = () => {
                                     roleId={`${index}-${index2}`} 
                                   />
                                 </div>
-                                <div className="dfe-flex-basis--40 dfe-align--right">
+                                <div className="dfe-flex-basis--40 govuk-!-text-align-right">
                                   <a
                                     href="#"
                                     onClick={() => {
@@ -202,7 +202,7 @@ const PrototypeManageUsers = () => {
                             </>
                           ))}
                         </Details>
-                      </div>*/}
+                      </div> */}
                       <ModalConfirm
                         open={showDeleteUserModal}
                         title="Confirm user removal"
@@ -255,17 +255,15 @@ const PrototypeManageUsers = () => {
                   </a>
                 </>
               )) || (
-                <>
-                  <WarningMessage className="govuk-!-margin-top-9">
-                    There are currently no team members associated to this
-                    publication
-                    <p className="govuk-!-margin-bottom-0">
-                      Please{' '}
-                      <a href="#manage-release-users-2">invite new users</a> to
-                      join.
-                    </p>
-                  </WarningMessage>
-                </>
+                <WarningMessage className="govuk-!-margin-top-9">
+                  There are currently no team members associated to this
+                  publication
+                  <p className="govuk-!-margin-bottom-0">
+                    Please{' '}
+                    <a href="#manage-release-users-2">invite new users</a> to
+                    join.
+                  </p>
+                </WarningMessage>
               )}
             </fieldset>
           </form>
@@ -292,7 +290,7 @@ const PrototypeManageUsers = () => {
                           release={item2.releases[index + 1].release}
                           className="dfe-flex-basis--30 govuk-!-margin-top-1 govuk-!-margin-bottom-1"
                         />
-                        <div className="dfe-align--right dfe-flex-basis--10">
+                        <div className="govuk-!-text-align-right dfe-flex-basis--10">
                           <a
                             href="#"
                             onClick={() => {
@@ -343,28 +341,26 @@ const PrototypeManageUsers = () => {
                     Set user roles for individual releases
                   </legend>
                   {currentReleases.map((item, index) => (
-                    <>
-                      <div
-                        className={`dfe-flex dfe-align-items--center dfe-justify-content--space-between ${
-                          index < currentReleases.length - 1
-                            ? 'dfe-flex-underline'
-                            : ''
-                        }`}
-                        // eslint-disable-next-line react/no-array-index-key
-                        key={index.toString()}
-                      >
-                        <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">
-                          {item}
-                        </h2>
-                        <div className="dfe-flex-basis--50 dfe-align--right govuk-!-padding-2">
-                          <PrototypeChangeUserRole
-                            selectedRole
-                            name="Invited user"
-                            release={item}
-                          />
-                        </div>
+                    <div
+                      className={`dfe-flex dfe-align-items--center dfe-justify-content--space-between ${
+                        index < currentReleases.length - 1
+                          ? 'dfe-flex-underline'
+                          : ''
+                      }`}
+                      // eslint-disable-next-line react/no-array-index-key
+                      key={index.toString()}
+                    >
+                      <h2 className="govuk-heading-s govuk-!-margin-bottom-0 dfe-flex-basis--50">
+                        {item}
+                      </h2>
+                      <div className="dfe-flex-basis--50 dfe-align--right govuk-!-padding-2">
+                        <PrototypeChangeUserRole
+                          selectedRole
+                          name="Invited user"
+                          release={item}
+                        />
                       </div>
-                    </>
+                    </div>
                   ))}
                 </fieldset>
               </Details>

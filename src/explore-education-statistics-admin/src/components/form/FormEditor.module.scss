@@ -40,6 +40,7 @@ $active-colour: lighten(govuk-colour('orange'), 10);
   :global(.commentStyle) {
     background: lighten(govuk-colour('yellow'), 20);
   }
+
   :global(.commentStyle--active) {
     background: $active-colour;
   }

@@ -11,10 +11,6 @@ describe('useBlockLock', () => {
     jest.useFakeTimers();
   });
 
-  afterEach(() => {
-    jest.useRealTimers();
-  });
-
   const testUser1: UserDetails = {
     id: 'user-1',
     email: 'jane@test.com',

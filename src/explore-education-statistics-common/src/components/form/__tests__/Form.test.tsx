@@ -346,7 +346,7 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveFocus();
+      expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
   });
 
@@ -376,7 +376,7 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveFocus();
+      expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
 
     const input = screen.getByLabelText('First name');
@@ -393,7 +393,7 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).not.toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
   });
 
   test('re-focuses error summary on re-submit', async () => {
@@ -424,16 +424,16 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveFocus();
+      expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
 
     screen.getByLabelText('First name').focus();
-    expect(screen.getByRole('alert')).not.toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveFocus();
+      expect(screen.getByTestId('errorSummary')).toHaveFocus();
     });
   });
 });

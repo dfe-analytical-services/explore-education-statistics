@@ -21,8 +21,9 @@ jobs:
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
-  pool:
-    vmImage: ubuntu-20.04
+  pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
   steps:
   - checkout: self
     clean: true
@@ -51,7 +52,7 @@ jobs:
       arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2
       workingDirectory: tests/robot-tests
     env:
-      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
+      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
   #- task: PythonScript@0
@@ -80,8 +81,9 @@ jobs:
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
-  pool:
-    vmImage: ubuntu-20.04
+  pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
   steps:
   - checkout: self
     clean: true
@@ -109,10 +111,10 @@ jobs:
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
       arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2
-    #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained apersands.
+    #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained ampersands.
       workingDirectory: tests/robot-tests
     env:
-      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
+      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
   #- task: PythonScript@0
@@ -140,8 +142,9 @@ jobs:
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
-  pool:
-    vmImage: ubuntu-20.04
+  pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
   steps:
   - checkout: self
     clean: true
@@ -171,7 +174,7 @@ jobs:
       arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2
       workingDirectory: tests/robot-tests
     env:
-      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
+      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
   #- task: PythonScript@0
@@ -195,14 +198,15 @@ jobs:
     inputs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin
-      
+
 - job: 'AdminAndPublic'
   displayName: Admin & public suites
   timeoutInMinutes: 160
   cancelTimeoutInMinutes: 10
   condition: succeededOrFailed()
-  pool:
-    vmImage: ubuntu-20.04
+  pool: ees-ubuntu2204-large
+  workspace:
+    clean: all
   steps:
   - checkout: self
     clean: true
@@ -231,7 +235,7 @@ jobs:
       arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2
       workingDirectory: tests/robot-tests
     env:
-      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)  
+      SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
   #- task: PythonScript@0

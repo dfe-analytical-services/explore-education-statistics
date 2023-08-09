@@ -4,13 +4,10 @@
   }
 }
 
-.dfe-print-hidden {
-  @include print-hide();
-}
-
 @mixin print-break-avoid() {
   page-break-inside: avoid;
 }
+
 .dfe-print-break-avoid {
   @include print-break-avoid();
 }
@@ -18,6 +15,7 @@
 @mixin dfe-print-break-before() {
   page-break-before: always;
 }
+
 .dfe-print-break-before {
   @include dfe-print-break-before();
 }

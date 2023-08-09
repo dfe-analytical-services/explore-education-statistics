@@ -335,7 +335,7 @@ describe('FormFieldCheckboxGroup', () => {
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Unselect all 3 options' }),
-    ).toBeNull();
+    ).not.toBeInTheDocument();
 
     userEvent.click(checkbox1);
     userEvent.click(checkbox2);
@@ -346,7 +346,7 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox3.checked).toBe(true);
     expect(
       screen.queryByRole('button', { name: 'Select all 3 options' }),
-    ).toBeNull();
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Unselect all 3 options' }),
     ).toBeInTheDocument();
@@ -381,7 +381,7 @@ describe('FormFieldCheckboxGroup', () => {
     expect(checkbox.checked).toBe(true);
     expect(
       screen.queryByRole('button', { name: 'Select all 3 options' }),
-    ).toBeNull();
+    ).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Unselect all 3 options' }),
     ).toBeInTheDocument();
@@ -394,7 +394,7 @@ describe('FormFieldCheckboxGroup', () => {
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Unselect all 3 options' }),
-    ).toBeNull();
+    ).not.toBeInTheDocument();
   });
 
   describe('error messages', () => {
@@ -406,7 +406,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -424,7 +424,9 @@ describe('FormFieldCheckboxGroup', () => {
         </Formik>,
       );
 
-      expect(screen.queryByText('Select at least one option')).toBeNull();
+      expect(
+        screen.queryByText('Select at least one option'),
+      ).not.toBeInTheDocument();
     });
 
     test('displays validation message when form is submitted', async () => {
@@ -435,7 +437,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {props => (
@@ -457,7 +459,9 @@ describe('FormFieldCheckboxGroup', () => {
         </Formik>,
       );
 
-      expect(screen.queryByText('Select at least one option')).toBeNull();
+      expect(
+        screen.queryByText('Select at least one option'),
+      ).not.toBeInTheDocument();
 
       userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -476,7 +480,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -512,7 +516,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -530,13 +534,7 @@ describe('FormFieldCheckboxGroup', () => {
         </Formik>,
       );
 
-      const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
-
       userEvent.tab();
-
-      userEvent.click(checkbox);
-      userEvent.click(checkbox);
-
       userEvent.tab();
 
       await waitFor(() => {
@@ -557,7 +555,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -578,7 +576,9 @@ describe('FormFieldCheckboxGroup', () => {
       const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
 
       expect(checkbox.checked).toBe(true);
-      expect(screen.queryByText('Select at least one option')).toBeNull();
+      expect(
+        screen.queryByText('Select at least one option'),
+      ).not.toBeInTheDocument();
 
       userEvent.click(checkbox);
 
@@ -599,7 +599,7 @@ describe('FormFieldCheckboxGroup', () => {
           }}
           onSubmit={noop}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           {() => (
@@ -621,14 +621,18 @@ describe('FormFieldCheckboxGroup', () => {
       const checkbox = screen.getByLabelText('Checkbox 1') as HTMLInputElement;
 
       expect(checkbox.checked).toBe(true);
-      expect(screen.queryByText('Select at least one option')).toBeNull();
+      expect(
+        screen.queryByText('Select at least one option'),
+      ).not.toBeInTheDocument();
 
       userEvent.click(checkbox);
 
       expect(checkbox.checked).toBe(false);
 
       await waitFor(() => {
-        expect(screen.queryByText('Select at least one option')).toBeNull();
+        expect(
+          screen.queryByText('Select at least one option'),
+        ).not.toBeInTheDocument();
       });
     });
   });

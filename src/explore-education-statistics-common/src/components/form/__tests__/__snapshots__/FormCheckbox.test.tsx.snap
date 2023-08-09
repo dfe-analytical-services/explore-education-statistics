@@ -63,11 +63,11 @@ exports[`FormCheckbox renders correctly when \`hint\` is provided 1`] = `
   >
     Test checkbox
   </label>
-  <span id="test-checkbox-item-hint"
-        class="govuk-hint govuk-checkboxes__hint"
+  <div id="test-checkbox-item-hint"
+       class="govuk-hint govuk-checkboxes__hint"
   >
     Click me to proceed
-  </span>
+  </div>
 </div>
 `;
 

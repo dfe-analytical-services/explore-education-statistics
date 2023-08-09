@@ -26,7 +26,7 @@ import tableBuilderService, {
   ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import minDelay from '@common/utils/minDelay';
-import produce from 'immer';
+import { produce } from 'immer';
 import omit from 'lodash/omit';
 import React, { useCallback, useState } from 'react';
 import featuredTableService from '@admin/services/featuredTableService';

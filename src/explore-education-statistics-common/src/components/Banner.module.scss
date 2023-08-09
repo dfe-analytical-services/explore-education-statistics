@@ -8,19 +8,6 @@
   p {
     color: govuk-colour('white');
   }
-
-  a {
-    color: govuk-colour('white') !important;
-  }
-
-  a:hover {
-    text-decoration: none;
-  }
-
-  a:focus {
-    @include govuk-focused-text;
-    color: govuk-colour('black') !important;
-  }
 }
 
 .close {

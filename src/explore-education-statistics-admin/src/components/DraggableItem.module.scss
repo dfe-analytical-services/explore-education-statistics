@@ -39,6 +39,7 @@ $vertical-spacing: govuk-spacing(3);
 
 .hideDragHandle {
   padding-left: 0;
+
   &::before {
     content: none;
   }

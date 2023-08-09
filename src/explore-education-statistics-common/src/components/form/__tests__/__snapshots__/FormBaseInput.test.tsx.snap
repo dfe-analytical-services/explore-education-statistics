@@ -28,11 +28,11 @@ exports[`FormTextInput renders correctly with hint 1`] = `
 >
   Test input
 </label>
-<span id="test-input-hint"
-      class="govuk-hint"
+<div id="test-input-hint"
+     class="govuk-hint"
 >
   Fill me in
-</span>
+</div>
 <input name="testInput"
        aria-describedby="test-input-hint"
        class="govuk-input"
@@ -60,11 +60,11 @@ exports[`FormTextInput renders with a specific width class 1`] = `
 >
   Test input
 </label>
-<span id="test-input-hint"
-      class="govuk-hint"
+<div id="test-input-hint"
+     class="govuk-hint"
 >
   Fill me in
-</span>
+</div>
 <input name="testInput"
        aria-describedby="test-input-hint"
        class="govuk-input govuk-input--width-20"
@@ -79,11 +79,11 @@ exports[`FormTextInput renders with an add on 1`] = `
 >
   Test input
 </label>
-<span id="test-input-hint"
-      class="govuk-hint"
+<div id="test-input-hint"
+     class="govuk-hint"
 >
   Fill me in
-</span>
+</div>
 <div class="dfe-flex">
   <input name="testInput"
          aria-describedby="test-input-hint"

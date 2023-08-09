@@ -32,7 +32,7 @@ const LegacyReleaseForm = ({
   const handleSubmit = useFormSubmit(onSubmit);
 
   return (
-    <Formik
+    <Formik<FormValues>
       initialValues={initialValues}
       onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({

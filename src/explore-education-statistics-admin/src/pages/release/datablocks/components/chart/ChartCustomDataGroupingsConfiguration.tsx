@@ -38,7 +38,7 @@ export default function ChartCustomDataGroupingsConfiguration({
         <tr>
           <th>{`Min ${unitLabel}`}</th>
           <th>{`Max ${unitLabel}`}</th>
-          <th className="dfe-align--right">Actions</th>
+          <th className="govuk-!-text-align-right">Actions</th>
         </tr>
       </thead>
       <tbody>

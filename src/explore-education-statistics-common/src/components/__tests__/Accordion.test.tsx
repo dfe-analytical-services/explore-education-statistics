@@ -12,7 +12,7 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    const button = screen.getByRole('button', { name: 'Test heading' });
+    const button = screen.getByRole('button', { name: /Test heading/ });
 
     expect(button).toHaveAttribute('aria-expanded', 'false');
 
@@ -30,7 +30,7 @@ describe('Accordion', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Test heading' }),
+      screen.getByRole('button', { name: /Test heading/ }),
     ).toHaveAttribute('aria-expanded', 'false');
   });
 
@@ -44,7 +44,7 @@ describe('Accordion', () => {
     );
 
     expect(
-      screen.getByRole('button', { name: 'Test heading' }),
+      screen.getByRole('button', { name: /Test heading/ }),
     ).toHaveAttribute('aria-expanded', 'true');
   });
 
@@ -55,7 +55,7 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    const heading = screen.getByRole('button', { name: 'Test heading' });
+    const heading = screen.getByRole('button', { name: /Test heading/ });
 
     expect(heading).toHaveAttribute('aria-expanded', 'false');
 
@@ -72,7 +72,7 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    const headings = screen.getAllByRole('button', { name: 'Test heading' });
+    const headings = screen.getAllByRole('button', { name: /Test heading/ });
     const contents = screen.getAllByText('Test content');
 
     expect(headings[0]).toHaveAttribute('id', 'test-sections-1-heading');
@@ -92,7 +92,7 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    const headings = screen.getAllByRole('button', { name: 'Test heading' });
+    const headings = screen.getAllByRole('button', { name: /Test heading/ });
     const contents = screen.getAllByText('Test content');
 
     expect(headings[0]).toHaveAttribute('id', 'custom-1-heading');
@@ -117,7 +117,7 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    const heading = screen.getByRole('button', { name: 'Test heading 1' });
+    const heading = screen.getByRole('button', { name: /Test heading 1/ });
 
     jest.runOnlyPendingTimers();
 
@@ -147,7 +147,7 @@ describe('Accordion', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: 'Test heading 1' }),
+        screen.getByRole('button', { name: /Test heading 1/ }),
       ).toHaveAttribute('aria-expanded', 'true');
       expect(content.scrollIntoView).toHaveBeenCalled();
     });
@@ -172,7 +172,7 @@ describe('Accordion', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: 'Test heading 2' }),
+        screen.getByRole('button', { name: /Test heading 2/ }),
       ).toHaveAttribute('aria-expanded', 'true');
 
       const content = container.querySelector('#test-heading') as HTMLElement;
@@ -198,7 +198,7 @@ describe('Accordion', () => {
 
     jest.runOnlyPendingTimers();
 
-    const heading = screen.getByRole('button', { name: 'Test heading 1' });
+    const heading = screen.getByRole('button', { name: /Test heading 1/ });
 
     expect(heading).toHaveAttribute('aria-expanded', 'true');
 
@@ -207,7 +207,7 @@ describe('Accordion', () => {
     expect(heading).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('does not render `Open/close all sections` button if `showOpenAll` is false', () => {
+  test('does not render `Show/Hide all sections` button if `showOpenAll` is false', () => {
     render(
       <Accordion id="test-sections" showOpenAll={false}>
         <AccordionSection heading="Test heading 1">
@@ -223,11 +223,11 @@ describe('Accordion', () => {
       screen.queryByRole('button', { name: /Close all/ }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Open all/ }),
+      screen.queryByRole('button', { name: /Show all sections/ }),
     ).not.toBeInTheDocument();
   });
 
-  test('clicking on `Open all sections` reveals all sections', () => {
+  test('clicking on `Show all sections` reveals all sections', () => {
     render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1">
@@ -239,7 +239,9 @@ describe('Accordion', () => {
       </Accordion>,
     );
 
-    const button = screen.getByRole('button', { name: 'Open all sections' });
+    const button = screen.getByRole('button', {
+      name: 'Show all sections',
+    });
     const sections = screen.getAllByRole('button', { name: /Test heading/ });
 
     expect(button).toHaveAttribute('aria-expanded', 'false');
@@ -253,7 +255,7 @@ describe('Accordion', () => {
     expect(sections[1]).toHaveAttribute('aria-expanded', 'true');
   });
 
-  test('clicking on `Open all` causes `onToggleAll` handler to be called with new state', () => {
+  test('clicking on `Show all sections` causes `onToggleAll` handler to be called with new state', () => {
     const toggleAll = jest.fn();
 
     render(
@@ -264,12 +266,12 @@ describe('Accordion', () => {
 
     expect(toggleAll).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Open all sections' }));
+    userEvent.click(screen.getByRole('button', { name: 'Show all sections' }));
 
     expect(toggleAll).toHaveBeenCalledWith(true);
   });
 
-  test('clicking on `Close all sections` closes all sections', () => {
+  test('clicking on `Hide all sections` closes all sections', () => {
     render(
       <Accordion id="test-sections">
         <AccordionSection heading="Test heading 1" open>
@@ -282,7 +284,7 @@ describe('Accordion', () => {
     );
 
     const closeAllButton = screen.getByRole('button', {
-      name: 'Close all sections',
+      name: 'Hide all sections',
     });
     const sections = screen.getAllByRole('button', { name: /Test heading/ });
 
@@ -297,7 +299,7 @@ describe('Accordion', () => {
     expect(sections[1]).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('clicking on `Close all sections` causes `onToggleAll` handler to be called with new state', () => {
+  test('clicking on `Hide all sections` causes `onToggleAll` handler to be called with new state', () => {
     const toggleAll = jest.fn();
 
     render(
@@ -310,7 +312,7 @@ describe('Accordion', () => {
 
     expect(toggleAll).not.toHaveBeenCalled();
 
-    userEvent.click(screen.getByRole('button', { name: 'Close all sections' }));
+    userEvent.click(screen.getByRole('button', { name: 'Hide all sections' }));
 
     expect(toggleAll).toHaveBeenCalledWith(false);
   });

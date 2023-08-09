@@ -2,7 +2,24 @@ import { TableJson } from '@common/modules/table-tool/utils/mapTableToJson';
 import { dataApi } from '@common/services/api';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import { Footnote } from '@common/services/types/footnotes';
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+
+export type TableHeader =
+  | {
+      type: 'TimePeriod' | 'Indicator' | 'Filter';
+      value: string;
+    }
+  | {
+      type: 'Location';
+      value: string;
+      level: string;
+    };
+
+export interface UnmappedTableHeadersConfig {
+  columnGroups: TableHeader[][];
+  columns: TableHeader[];
+  rowGroups: TableHeader[][];
+  rows: TableHeader[];
+}
 
 export interface PermalinkSnapshot {
   created: string;

@@ -36,11 +36,11 @@ exports[`FormFieldset renders correctly with hint 1`] = `
     <legend class="govuk-fieldset__legend govuk-fieldset__legend--l">
       Fill the form
     </legend>
-    <span class="govuk-hint"
-          id="test-fieldset-hint"
+    <div class="govuk-hint"
+         id="test-fieldset-hint"
     >
       All fields are required
-    </span>
+    </div>
     <input type="text"
            name="test-input-1"
     >

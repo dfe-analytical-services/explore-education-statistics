@@ -80,15 +80,9 @@ describe('DraftReleasesTable', () => {
     } as ReleaseWithPermissions,
   ];
 
-  beforeAll(() => {
-    jest.useFakeTimers();
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
-  });
-
   beforeEach(() => {
+    jest.useFakeTimers();
+
     releaseService.getReleaseChecklist.mockResolvedValue({
       errors: [
         {

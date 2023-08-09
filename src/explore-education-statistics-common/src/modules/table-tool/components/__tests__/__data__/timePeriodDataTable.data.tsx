@@ -1,4 +1,4 @@
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkSnapshotService';
 import { TableDataResponse } from '@common/services/tableBuilderService';
 
 export const testData1Table: TableDataResponse = {

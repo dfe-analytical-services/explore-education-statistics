@@ -127,7 +127,6 @@ const Form = ({
         {showErrorSummary && (
           <ErrorSummary
             errors={allErrors}
-            id={`${id}-summary`}
             focusOnError={hasSummaryFocus}
             onFocus={toggleSummaryFocus.off}
           />

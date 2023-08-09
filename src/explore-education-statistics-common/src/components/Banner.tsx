@@ -26,7 +26,7 @@ export default function Banner({
         <div className="govuk-grid-row">
           <div className="govuk-grid-column-three-quarters">{children}</div>
           {onClose && (
-            <div className="govuk-grid-column-one-quarter dfe-align--right">
+            <div className="govuk-grid-column-one-quarter govuk-!-text-align-right">
               <ButtonText
                 className={classNames(styles.close, 'govuk-!-margin-bottom-2')}
                 onClick={onClose}

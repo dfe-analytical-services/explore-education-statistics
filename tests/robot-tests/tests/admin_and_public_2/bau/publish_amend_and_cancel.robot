@@ -445,7 +445,7 @@ Verify that release content is unchanged
     user checks accordion is in position    Test embedded dashboard section    3    id:releaseMainContent
 
 Verify that the Dates data block accordion is unchanged
-    user scrolls to accordion section content    Dates data block    id:releaseMainContent
+    user scrolls to accordion section    Dates data block    id:releaseMainContent
     user opens accordion section    Dates data block    id:releaseMainContent
     ${section}=    user gets accordion section content element    Dates data block    id:releaseMainContent
 

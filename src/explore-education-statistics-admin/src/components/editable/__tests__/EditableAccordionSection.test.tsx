@@ -26,7 +26,7 @@ describe('EditableAccordionSection', () => {
       );
 
       expect(
-        screen.getByRole('heading', { name: 'Test section' }),
+        screen.getByRole('heading', { name: /Test section/ }),
       ).toBeInTheDocument();
       expect(screen.getByText('Test content')).toBeInTheDocument();
 
@@ -67,7 +67,7 @@ describe('EditableAccordionSection', () => {
       );
 
       expect(
-        screen.getByRole('heading', { name: 'Test section' }),
+        screen.getByRole('heading', { name: /Test section/ }),
       ).toBeInTheDocument();
       expect(screen.getByText('Test content')).toBeInTheDocument();
 

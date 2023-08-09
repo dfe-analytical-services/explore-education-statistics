@@ -5,6 +5,10 @@ import { render, screen } from '@testing-library/react';
 import ButtonText from '../ButtonText';
 
 describe('ButtonText', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   test('renders correctly with required props', () => {
     const { container } = render(<ButtonText>Test button</ButtonText>);
 

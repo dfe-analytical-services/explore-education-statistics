@@ -224,7 +224,7 @@ Navigate to the 'Content' page
 
 Verify data block is updated correctly
     #checking if data block cache has been invalidated by verifying the updates on the block
-    user scrolls to accordion section content    Dates data block    id:releaseMainContent
+    user scrolls to accordion section    Dates data block    id:releaseMainContent
     user opens accordion section    Dates data block    id:releaseMainContent
     ${section}=    user gets accordion section content element    Dates data block    id:releaseMainContent
 
@@ -390,13 +390,14 @@ Verify accordions are correct
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content
 
-    user checks there are x accordion sections    2    id:help-and-support-accordion
-    user checks accordion is in position    National statistics    1    id:help-and-support-accordion
-    user checks accordion is in position    Contact us    2    id:help-and-support-accordion
+Verify help and support section is correct
+    user checks page contains    Help and support
+    user checks page contains    National statistics
+    user checks page contains    Contact us
 
 Verify Dates data block accordion section
     user opens accordion section    Dates data block    id:content
-    user scrolls to accordion section content    Dates data block    id:content
+    user scrolls to accordion section    Dates data block    id:content
     ${section}=    user gets accordion section content element    Dates data block    id:content
 
     user checks chart title contains    ${section}    Updated dates table title
@@ -844,12 +845,15 @@ Verify amendment accordions are correct
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
     user checks accordion is in position    Test embedded dashboard section    3    id:content
-    user checks accordion is in position    Experimental statistics    1    id:help-and-support-accordion
-    user checks accordion is in position    Contact us    2    id:help-and-support-accordion
+
+Verify amendment help and support section is correct
+    user checks page contains    Help and support
+    user checks page contains    Experimental statistics
+    user checks page contains    Contact us
 
 Verify amendment Dates data block accordion section
     user opens accordion section    Dates data block    id:content
-    user scrolls to accordion section content    Dates data block    id:content
+    user scrolls to accordion section    Dates data block    id:content
     ${section}=    user gets accordion section content element    Dates data block    id:content
 
     user checks chart title contains    ${section}    Amended sample title

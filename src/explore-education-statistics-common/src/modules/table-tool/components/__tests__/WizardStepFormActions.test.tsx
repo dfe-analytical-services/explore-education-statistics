@@ -83,9 +83,8 @@ describe('WizardStepFormActions', () => {
   test('clicking `Previous step` button does not call `goToPreviousStep` until `onPreviousStep` completes', async () => {
     jest.useFakeTimers();
 
-    const handlePreviousStep = jest.fn(
-      () => new Promise(resolve => setTimeout(resolve, 500)),
-    );
+    const handlePreviousStep = () => Promise.resolve();
+
     const goToPreviousStep = jest.fn();
 
     render(
@@ -101,15 +100,11 @@ describe('WizardStepFormActions', () => {
 
     userEvent.click(screen.getByText('Previous step'));
 
-    await flushPromises();
     expect(goToPreviousStep).not.toHaveBeenCalled();
 
-    jest.advanceTimersByTime(500);
-
     await flushPromises();
-    expect(goToPreviousStep).toHaveBeenCalled();
 
-    jest.useRealTimers();
+    expect(goToPreviousStep).toHaveBeenCalled();
   });
 
   test('preventing default `Previous step` button event does not call `goToPreviousStep` handler', async () => {

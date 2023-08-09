@@ -11,7 +11,7 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import produce from 'immer';
+import { produce } from 'immer';
 
 export const testMapConfiguration: Chart = {
   axes: {

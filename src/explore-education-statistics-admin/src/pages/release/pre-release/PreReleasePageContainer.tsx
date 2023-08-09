@@ -182,7 +182,6 @@ const PreReleasePageContainer = ({
           : []
       }
       homePath={user?.permissions.canAccessAnalystPages ? '/' : ''}
-      showBanner={false}
     >
       <LoadingSpinner loading={isLoading}>{renderPage()}</LoadingSpinner>
     </Page>

@@ -7,7 +7,7 @@ import ChartRenderer, {
 } from '@common/modules/charts/components/ChartRenderer';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
-import produce from 'immer';
+import { produce } from 'immer';
 
 jest.mock('recharts/lib/util/LogUtils');
 

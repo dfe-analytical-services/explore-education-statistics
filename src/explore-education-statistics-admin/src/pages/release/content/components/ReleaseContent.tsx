@@ -154,7 +154,7 @@ const ReleaseContent = () => {
                 />
                 {editingMode === 'edit' &&
                   release.summarySection.content?.length === 0 && (
-                    <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+                    <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
                       <Button variant="secondary" onClick={addSummaryBlock}>
                         Add a summary text block
                       </Button>
@@ -405,7 +405,7 @@ const ReleaseContent = () => {
       )}
       {editingMode === 'edit' &&
         !release.relatedDashboardsSection?.content.length && (
-          <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+          <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
             <Button onClick={addRelatedDashboardsBlock}>
               Add dashboards section
             </Button>

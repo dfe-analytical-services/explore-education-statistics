@@ -11,7 +11,7 @@ describe('AccordionSection', () => {
     );
 
     expect(
-      screen.getByRole('heading', { level: 2, name: 'Test heading' }),
+      screen.getByRole('heading', { level: 2, name: /Test heading/ }),
     ).toBeInTheDocument();
     expect(screen.getByText('Test content')).toBeInTheDocument();
     expect(container.innerHTML).toMatchSnapshot();
@@ -47,7 +47,7 @@ describe('AccordionSection', () => {
       </AccordionSection>,
     );
     expect(
-      screen.getByRole('heading', { name: 'Test heading' }),
+      screen.getByRole('heading', { name: /Test heading/ }),
     ).toHaveAttribute('id', 'section-test-heading');
   });
 

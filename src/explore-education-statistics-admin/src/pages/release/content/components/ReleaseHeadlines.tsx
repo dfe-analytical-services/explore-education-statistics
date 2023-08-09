@@ -62,7 +62,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
 
         {editingMode === 'edit' &&
           release.headlinesSection.content?.length === 0 && (
-            <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+            <div className="govuk-!-margin-bottom-8 govuk-!-text-align-centre">
               <Button variant="secondary" onClick={addBlock}>
                 Add a headlines text block
               </Button>

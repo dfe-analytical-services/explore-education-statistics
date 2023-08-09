@@ -25,9 +25,9 @@ export interface AccordionProps {
   id: string;
   openAll?: boolean;
   showOpenAll?: boolean;
+  toggleAllHiddenText?: string;
   onToggleAll?: (open: boolean) => void;
   onSectionOpen?: (accordionSection: { id: string; title: string }) => void;
-  toggleAllHiddenText?: string;
 }
 
 const Accordion = ({
@@ -36,9 +36,9 @@ const Accordion = ({
   id,
   openAll,
   showOpenAll = true,
+  toggleAllHiddenText,
   onToggleAll,
   onSectionOpen,
-  toggleAllHiddenText,
 }: AccordionProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -170,7 +170,7 @@ const Accordion = ({
           <button
             aria-expanded={isAllOpen}
             type="button"
-            className="govuk-accordion__open-all"
+            className="govuk-accordion__show-all"
             onClick={() => {
               updateOpenSections(draft => {
                 Object.keys(draft).forEach(key => {
@@ -183,12 +183,19 @@ const Accordion = ({
               }
             }}
           >
-            {isAllOpen ? 'Close all ' : 'Open all '}
-            <VisuallyHidden>
-              {!toggleAllHiddenText
-                ? ' sections'
-                : `${' '}${toggleAllHiddenText}`}
-            </VisuallyHidden>
+            <span
+              className={classNames('govuk-accordion-nav__chevron', {
+                'govuk-accordion-nav__chevron--down': !isAllOpen,
+              })}
+            />
+
+            <span className="govuk-accordion__show-all-text">
+              {`${isAllOpen ? 'Hide' : 'Show'} all `}
+              {toggleAllHiddenText && (
+                <VisuallyHidden>{toggleAllHiddenText} </VisuallyHidden>
+              )}
+              sections
+            </span>
           </button>
         </div>
       )}

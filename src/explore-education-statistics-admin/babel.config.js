@@ -14,6 +14,14 @@ module.exports = {
       plugins: [
         'explore-education-statistics-common/babel-url-import-meta-plugin.js',
       ],
+      presets: [
+        [
+          '@babel/preset-react',
+          {
+            runtime: 'automatic',
+          },
+        ],
+      ],
     },
   },
 };

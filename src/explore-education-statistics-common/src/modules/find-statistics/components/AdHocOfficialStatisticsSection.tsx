@@ -2,6 +2,7 @@ import React from 'react';
 
 const AdHocOfficialStatisticsSection = () => (
   <>
+    <h3>Ad hoc official statistics</h3>
     <p>
       Ad hoc official statistics are one off publications that have been
       produced as far as possible in line with the Code of Practice for

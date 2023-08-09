@@ -2,6 +2,7 @@ import React from 'react';
 
 const NationalStatisticsSection = () => (
   <>
+    <h3>National statistics</h3>
     <p>
       The{' '}
       <a href="https://www.statisticsauthority.gov.uk/">

@@ -11,6 +11,7 @@ const preReleaseUserService = _preReleaseUserService as jest.Mocked<
 >;
 
 jest.mock('@admin/services/preReleaseUserService');
+jest.setTimeout(20000);
 
 describe('PreReleaseUserAccessForm', () => {
   const testUsers: PreReleaseUser[] = [

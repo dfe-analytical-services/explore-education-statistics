@@ -75,7 +75,10 @@ const BasicReleaseSummary = ({ release }: Props) => {
           <ReleaseNotesSection release={release} />
         </SummaryListItem>
         <SummaryListItem term="Receive updates">
-          <a className="dfe-print-hidden govuk-!-font-weight-bold" href="#">
+          <a
+            className="govuk-!-display-none-print govuk-!-font-weight-bold"
+            href="#"
+          >
             Sign up for email alerts
           </a>
         </SummaryListItem>

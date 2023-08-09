@@ -36,7 +36,7 @@ interface Props<FormValues extends ReleaseSummaryFormValues> {
   ) => FormValues;
   validationSchema?: (
     baseSchema: ObjectSchema<ReleaseSummaryFormValues>,
-  ) => ObjectSchema<FormValues>;
+  ) => ObjectSchema<FormValues | ReleaseSummaryFormValues>;
   onSubmit: (values: FormValues, actions: FormikHelpers<FormValues>) => void;
   onCancel: () => void;
 }
@@ -84,17 +84,15 @@ const ReleaseSummaryForm = <
       ) || timePeriodCoverageGroups[0]
     );
   };
-
-  const baseSchema = Yup.object<ReleaseSummaryFormValues>({
+  const baseSchema: ObjectSchema<ReleaseSummaryFormValues> = Yup.object({
     timePeriodCoverageCode: Yup.string().required('Choose a time period'),
     timePeriodCoverageStartYear: Yup.string()
       .required('Enter a year')
       .length(4, 'Year must be exactly 4 characters'),
-    releaseType: Yup.mixed<ReleaseSummaryFormValues['releaseType']>()
+    releaseType: Yup.string()
       .required('Choose a release type')
       .oneOf(Object.keys(releaseTypes) as ReleaseType[]),
   });
-
   return (
     <Formik<FormValues>
       enableReinitialize

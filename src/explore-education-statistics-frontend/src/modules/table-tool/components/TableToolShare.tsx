@@ -7,7 +7,6 @@ import UrlContainer from '@common/components/UrlContainer';
 import { SelectedPublication } from '@common/modules/table-tool/types/selectedPublication';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
-import permalinkService from '@common/services/permalinkService';
 import permalinkSnapshotService from '@common/services/permalinkSnapshotService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import ButtonLink from '@frontend/components/ButtonLink';
@@ -19,16 +18,9 @@ const linkInstructions =
 interface Props {
   tableHeaders?: TableHeadersConfig;
   query: TableDataQuery;
-  selectedPublication: SelectedPublication;
-  newPermalinks?: boolean; // TO DO - EES-4259 remove `newPermalinks` param and tidy up
 }
 
-const TableToolShare = ({
-  tableHeaders,
-  query,
-  selectedPublication,
-  newPermalinks,
-}: Props) => {
+const TableToolShare = ({ tableHeaders, query }: Props) => {
   const [permalinkUrl, setPermalinkUrl] = useState('');
   const [permalinkLoading, setPermalinkLoading] = useState<boolean>(false);
   const [screenReaderMessage, setScreenReaderMessage] = useState('');
@@ -43,34 +35,14 @@ const TableToolShare = ({
     }
     setPermalinkLoading(true);
 
-    let id: string;
+    const { id } = await permalinkSnapshotService.createPermalink({
+      query,
+      configuration: {
+        tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+      },
+    });
 
-    if (newPermalinks) {
-      const snapshotResponse = await permalinkSnapshotService.createPermalink({
-        query,
-        configuration: {
-          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-        },
-      });
-      id = snapshotResponse.id;
-    } else {
-      const response = await permalinkService.createPermalink(
-        {
-          query,
-          configuration: {
-            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-          },
-        },
-        selectedPublication.selectedRelease.id,
-      );
-      id = response.id;
-    }
-
-    const url = newPermalinks
-      ? `${process.env.PUBLIC_URL}data-tables/permalink/${id}?newPermalinks=true`
-      : `${process.env.PUBLIC_URL}data-tables/permalink/${id}`;
-
-    setPermalinkUrl(url);
+    setPermalinkUrl(`${process.env.PUBLIC_URL}data-tables/permalink/${id}`);
     setPermalinkLoading(false);
 
     setScreenReaderMessage(`Shareable link generated. ${linkInstructions}`);

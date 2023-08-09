@@ -136,25 +136,24 @@ export const BaseFormCheckboxGroup = ({
           )}
         </ButtonText>
       )}
-      <>
-        {naturalOrderBy(options, order, orderDirection).map(option => (
-          <FormCheckbox
-            disabled={disabled}
-            {...option}
-            id={
-              option.id
-                ? `${id}-${option.id}`
-                : `${id}-${option.value.replace(/\s/g, '-')}`
-            }
-            name={name}
-            key={option.value}
-            checked={value.includes(option.value)}
-            onBlur={onBlur}
-            onChange={onChange}
-            inputRef={inputRef}
-          />
-        ))}
-      </>
+
+      {naturalOrderBy(options, order, orderDirection).map(option => (
+        <FormCheckbox
+          disabled={disabled}
+          {...option}
+          id={
+            option.id
+              ? `${id}-${option.id}`
+              : `${id}-${option.value.replace(/\s/g, '-')}`
+          }
+          name={name}
+          key={option.value}
+          checked={value.includes(option.value)}
+          onBlur={onBlur}
+          onChange={onChange}
+          inputRef={inputRef}
+        />
+      ))}
     </div>
   );
 };

@@ -1,5 +1,3 @@
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import React, { ReactNode } from 'react';
 import { Contact } from '@common/services/publicationService';
 
@@ -15,18 +13,18 @@ const TableToolInfo = ({
   releaseLink,
 }: Props) => {
   return (
-    <Accordion id="TableToolInfo">
-      <AccordionSection heading="Related information">
-        <ul className="govuk-list">
-          {releaseLink && <li>Publication: {releaseLink}</li>}
-          {methodologyLinks?.map((methodologyLink, index) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <li key={index}>Methodology: {methodologyLink}</li>
-          ))}
-        </ul>
-      </AccordionSection>
+    <>
+      <h3>Related information</h3>
+      <ul className="govuk-list">
+        {releaseLink && <li>Publication: {releaseLink}</li>}
+        {methodologyLinks?.map((methodologyLink, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <li key={index}>Methodology: {methodologyLink}</li>
+        ))}
+      </ul>
       {contactDetails && (
-        <AccordionSection heading="Contact us">
+        <>
+          <h3>Contact us</h3>
           <p>
             If you have a question about the data or methods used to create this
             table contact the named statistician:
@@ -40,9 +38,9 @@ const TableToolInfo = ({
             </a>
           </p>
           <p>Telephone: {contactDetails.contactTelNo}</p>
-        </AccordionSection>
+        </>
       )}
-    </Accordion>
+    </>
   );
 };
 

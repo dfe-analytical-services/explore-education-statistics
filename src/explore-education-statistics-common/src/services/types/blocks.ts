@@ -4,7 +4,7 @@ import {
   AxisType,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkSnapshotService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
 

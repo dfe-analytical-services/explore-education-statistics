@@ -232,7 +232,7 @@ interface PublicationTreeOptions {
   publicationFilter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
 }
 
-export default {
+const publicationService = {
   getPublicationTitle(publicationSlug: string): Promise<PublicationTitle> {
     return contentApi.get(`/publications/${publicationSlug}/title`);
   },
@@ -295,3 +295,4 @@ export default {
     });
   },
 };
+export default publicationService;

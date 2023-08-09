@@ -1,4 +1,5 @@
 import flushPromises from '@common-test/flushPromises';
+import flushTasks from '@common-test/flushTasks';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -6,6 +7,10 @@ import Wizard from '../Wizard';
 import WizardStep from '../WizardStep';
 
 describe('Wizard', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   test('does not render children that are not WizardSteps', () => {
     render(
       <Wizard id="test-wizard">
@@ -240,8 +245,6 @@ describe('Wizard', () => {
   });
 
   test('calling `setCurrentStep` with a task will not transition the wizard until it completes', async () => {
-    jest.useFakeTimers();
-
     const task = jest.fn(
       () => new Promise<void>(resolve => setTimeout(resolve, 500)),
     );
@@ -272,17 +275,13 @@ describe('Wizard', () => {
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    // Task needs to complete first
-    jest.advanceTimersByTime(500);
-    await flushPromises();
+    await flushTasks();
 
     // Moved to next step
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
     expect(step3).toHaveAttribute('aria-current', 'step');
-
-    jest.useRealTimers();
   });
 
   test('calling `goToPreviousStep` render prop moves wizard to previous step', () => {
@@ -354,8 +353,6 @@ describe('Wizard', () => {
   });
 
   test('calling `goToPreviousStep` with a task will not transition the wizard until it completes', async () => {
-    jest.useFakeTimers();
-
     const task = jest.fn(
       () => new Promise<void>(resolve => setTimeout(resolve, 500)),
     );
@@ -397,8 +394,6 @@ describe('Wizard', () => {
     expect(step1).toHaveAttribute('aria-current', 'step');
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
-
-    jest.useRealTimers();
   });
 
   test('calling `goToPreviousStep` with a task sets correct loading render props', async () => {
@@ -514,8 +509,6 @@ describe('Wizard', () => {
   });
 
   test('calling `goToNextStep` with a task will not transition the wizard until it completes', async () => {
-    jest.useFakeTimers();
-
     const task = jest.fn(
       () => new Promise<void>(resolve => setTimeout(resolve, 500)),
     );
@@ -555,8 +548,6 @@ describe('Wizard', () => {
     expect(step2).toBeVisible();
     expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
-
-    jest.useRealTimers();
   });
 
   test('calling `goToNextStep` with a task sets correct loading render props', async () => {
@@ -631,8 +622,6 @@ describe('Wizard', () => {
   });
 
   test('does not scroll and focus first step when `scrollOnMount` is true', () => {
-    jest.useFakeTimers();
-
     render(
       <Wizard id="test-wizard" scrollOnMount>
         <WizardStep>Step 1</WizardStep>
@@ -658,8 +647,6 @@ describe('Wizard', () => {
   });
 
   test('scrolls to and focuses step when step changes', () => {
-    jest.useFakeTimers();
-
     render(
       <Wizard id="test-wizard">
         <WizardStep>
@@ -742,6 +729,8 @@ describe('Wizard', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
+    await flushPromises();
+
     await waitFor(() => {
       expect(step1).toBeVisible();
       expect(step2).toBeVisible();
@@ -799,11 +788,7 @@ describe('Wizard', () => {
   });
 
   test('moving back does not occur until `onBack` has completed', async () => {
-    jest.useFakeTimers();
-
-    const handleBack = jest.fn(
-      () => new Promise(resolve => setTimeout(resolve, 500)),
-    );
+    const handleBack = jest.fn(() => Promise.resolve());
 
     render(
       <Wizard id="test-wizard" initialStep={2}>
@@ -821,9 +806,7 @@ describe('Wizard', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Go to step 1' }));
 
-    await waitFor(() => {
-      expect(handleBack).toHaveBeenCalledTimes(1);
-    });
+    expect(handleBack).toHaveBeenCalledTimes(1);
 
     const step1 = screen.getByTestId('wizardStep-1');
     const step2 = screen.getByTestId('wizardStep-2');
@@ -831,21 +814,15 @@ describe('Wizard', () => {
     expect(step1).not.toHaveAttribute('aria-current');
     expect(step2).toHaveAttribute('aria-current', 'step');
 
-    jest.advanceTimersByTime(500);
+    await flushPromises();
 
-    await waitFor(() => {
-      expect(step1).toHaveAttribute('aria-current', 'step');
-      expect(step2).not.toHaveAttribute('aria-current');
-    });
+    expect(step1).toHaveAttribute('aria-current', 'step');
+    expect(step2).not.toHaveAttribute('aria-current');
 
     expect(handleBack).toHaveBeenCalledTimes(1);
-
-    jest.useRealTimers();
   });
 
   test('renders correct loading states whilst `onBack` is running', async () => {
-    jest.useFakeTimers();
-
     const handleBack = jest.fn(
       () => new Promise(resolve => setTimeout(resolve, 500)),
     );
@@ -897,7 +874,5 @@ describe('Wizard', () => {
 
     expect(screen.getByText('Step 3 - isLoading: false')).toBeInTheDocument();
     expect(screen.getByText('Step 3 - loadingStep: 1')).toBeInTheDocument();
-
-    jest.useRealTimers();
   });
 });

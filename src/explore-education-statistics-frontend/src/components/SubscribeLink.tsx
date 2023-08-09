@@ -8,7 +8,7 @@ export interface SubscribeLinkProps {
 const SubscribeLink = ({ slug }: SubscribeLinkProps) => {
   return (
     <Link
-      className="dfe-print-hidden"
+      className="govuk-!-display-none-print"
       unvisited
       to={`/subscriptions?slug=${slug}`}
       data-testid={`subsciption-${slug}`}

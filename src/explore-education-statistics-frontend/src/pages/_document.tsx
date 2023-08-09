@@ -1,19 +1,8 @@
-import BaseDocument, {
-  DocumentContext,
-  Head,
-  Html,
-  Main,
-  NextScript,
-} from 'next/document';
+import BaseDocument, { Head, Html, Main, NextScript } from 'next/document';
 import React from 'react';
 
 class Document extends BaseDocument {
-  public static async getInitialProps(ctx: DocumentContext) {
-    const initialProps = await BaseDocument.getInitialProps(ctx);
-    return { ...initialProps };
-  }
-
-  public render() {
+  render() {
     return (
       <Html lang="en" className="govuk-template app-html-class">
         <Head>

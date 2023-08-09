@@ -4,14 +4,17 @@
   :global(.govuk-panel__title) {
     color: govuk-colour('white');
   }
+
   :global(.govuk-link) {
     color: govuk-colour('white');
     cursor: pointer;
     margin-top: 1rem;
   }
+
   :global(.govuk-link :hover) {
     text-decoration: none;
   }
+
   :global(.govuk-panel__body) {
     margin-bottom: 1rem;
   }

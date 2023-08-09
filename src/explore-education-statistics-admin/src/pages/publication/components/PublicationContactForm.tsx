@@ -36,7 +36,16 @@ const PublicationContactForm = ({
       .required('Enter a team email')
       .email('Enter a valid team email'),
     contactName: Yup.string().required('Enter a contact name'),
-    contactTelNo: Yup.string().required('Enter a contact telephone'),
+    contactTelNo: Yup.string().test({
+      name: 'telephone',
+      message: 'Enter a contact telephone',
+      test: value => {
+        if (!value) {
+          return false;
+        }
+        return true;
+      },
+    }),
   });
 
   return (

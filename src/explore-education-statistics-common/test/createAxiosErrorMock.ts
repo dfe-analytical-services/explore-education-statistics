@@ -1,6 +1,6 @@
 import { Dictionary } from '@common/types';
 import { ServerValidationErrorResponse } from '@common/validation/serverValidations';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosHeaders } from 'axios';
 
 interface CreateAxiosErrorOptions<T> {
   name?: string;
@@ -19,11 +19,15 @@ export default function createAxiosErrorMock<T>(
   return {
     name: options.name ?? 'AxiosError',
     request: {},
-    config: {},
+    config: {
+      headers: new AxiosHeaders(),
+    },
     isAxiosError: true,
     message: options.message ?? `Request failed with status code ${status}`,
     response: {
-      config: {},
+      config: {
+        headers: new AxiosHeaders(),
+      },
       headers: options.headers ?? {},
       data: options.data,
       status,

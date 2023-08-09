@@ -3,7 +3,7 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import produce from 'immer';
+import { produce } from 'immer';
 
 describe('createDataSetCategories', () => {
   const testTable: TableDataResponse = {

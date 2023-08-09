@@ -32,7 +32,7 @@ const DraftReleaseRow = ({ isBauUser, release, onDelete }: Props) => {
       {!isBauUser && <DraftReleaseRowIssues releaseId={release.id} />}
       <td>
         <Link
-          className="govuk-!-margin-right-4 dfe-inline-block"
+          className="govuk-!-margin-right-4 govuk-!-display-inline-block"
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId: release.publicationId,
             releaseId: release.id,
@@ -44,7 +44,7 @@ const DraftReleaseRow = ({ isBauUser, release, onDelete }: Props) => {
 
         {release.amendment && (
           <Link
-            className="govuk-!-margin-right-4 dfe-inline-block"
+            className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
               publicationId: release.publicationId,
               releaseId: release.previousVersionId,

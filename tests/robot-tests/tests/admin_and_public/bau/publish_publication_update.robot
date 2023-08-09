@@ -85,8 +85,7 @@ Go to public release page
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    %{WAIT_MEDIUM}
 
 Validate publication details are updated on public page
-    ${section}=    user opens accordion section    Contact us    css:#help-and-support-accordion
-    user checks element contains    ${section}    Team name updated
-    user checks element contains    ${section}    email_updated@test.com
-    user checks element contains    ${section}    Contact name updated
-    user checks element contains    ${section}    4321 4321
+    user checks page contains    Team name updated
+    user checks page contains    email_updated@test.com
+    user checks page contains    Contact name updated
+    user checks page contains    4321 4321

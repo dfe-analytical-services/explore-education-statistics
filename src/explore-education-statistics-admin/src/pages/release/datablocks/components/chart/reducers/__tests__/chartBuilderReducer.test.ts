@@ -15,7 +15,7 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { Chart } from '@common/services/types/blocks';
 import { renderHook } from '@testing-library/react-hooks';
-import produce from 'immer';
+import { produce } from 'immer';
 
 describe('chartBuilderReducer', () => {
   const testChartDefinition: ChartDefinition = {
