@@ -135,50 +135,48 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
                   />
 
                   {unmappedItems.length > 0 && (
-                    <>
-                      <FormFieldset
-                        className="govuk-!-margin-top-6"
-                        id="unmapped"
-                        legend={
-                          <>
-                            <span style={{ textTransform: 'capitalize' }}>
-                              {namePlural}{' '}
-                            </span>
-                            that cannot be found in the new data set (
-                            {unmappedItems.length} of{' '}
-                            {mappedItems.length + unmappedItems.length}){' '}
-                            <span className="govuk-tag govuk-tag--red">
-                              Requires action
-                            </span>
-                          </>
+                    <FormFieldset
+                      className="govuk-!-margin-top-6"
+                      id="unmapped"
+                      legend={
+                        <>
+                          <span style={{ textTransform: 'capitalize' }}>
+                            {namePlural}{' '}
+                          </span>
+                          that cannot be found in the new data set (
+                          {unmappedItems.length} of{' '}
+                          {mappedItems.length + unmappedItems.length}){' '}
+                          <span className="govuk-tag govuk-tag--red">
+                            Requires action
+                          </span>
+                        </>
+                      }
+                      legendSize="m"
+                      error={
+                        form.submitCount > 0 && unmappedItems.length
+                          ? `All ${namePlural} from the current data set should be mapped to the next data set`
+                          : undefined
+                      }
+                    >
+                      <PrototypeFacetList
+                        heading={`${grouping} (${unmappedItems.length})`}
+                        items={unmappedItems.map(item => [
+                          {
+                            label: item.label,
+                            id: item.id,
+                            caption: getCaption(item),
+                          },
+                          { label: 'Not mapped' },
+                        ])}
+                        type="unmapped"
+                        onClick={id =>
+                          setItemToMap(
+                            unmappedItems.find(item => item.id === id),
+                          )
                         }
-                        legendSize="m"
-                        error={
-                          form.submitCount > 0 && unmappedItems.length
-                            ? `All ${namePlural} from the current data set should be mapped to the next data set`
-                            : undefined
-                        }
-                      >
-                        <PrototypeFacetList
-                          heading={`${grouping} (${unmappedItems.length})`}
-                          items={unmappedItems.map(item => [
-                            {
-                              label: item.label,
-                              id: item.id,
-                              caption: getCaption(item),
-                            },
-                            { label: 'Not mapped' },
-                          ])}
-                          type="unmapped"
-                          onClick={id =>
-                            setItemToMap(
-                              unmappedItems.find(item => item.id === id),
-                            )
-                          }
-                          grouped={name !== 'indicator'}
-                        />
-                      </FormFieldset>
-                    </>
+                        grouped={name !== 'indicator'}
+                      />
+                    </FormFieldset>
                   )}
 
                   <h2>Summary of {name} changes in this data set</h2>

@@ -227,7 +227,7 @@ const PrototypeTableHighlights = () => {
                                     All featured tables
                                   </label>
                                 </div>
-                                    </fieldset>*/}
+                                    </fieldset> */}
 
                               <fieldset className="govuk-fieldset govuk-!-margin-top-6">
                                 <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">

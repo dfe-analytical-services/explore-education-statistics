@@ -93,21 +93,19 @@ const PrototypePublicationSubjects = () => {
 
   if (subjectToEdit) {
     return (
-      <>
-        <PrototypeEditPublicationSubjectTitle
-          publicationSubject={subjectToEdit}
-          onClose={() => setSubjectToEdit(undefined)}
-          onSubmit={updatedPublicationSubject => {
-            const updated = publicationSubjects.map(subject =>
-              subject.title === subjectToEdit.title
-                ? updatedPublicationSubject
-                : subject,
-            );
-            setPublicationSubjects(updated);
-            setSubjectToEdit(undefined);
-          }}
-        />
-      </>
+      <PrototypeEditPublicationSubjectTitle
+        publicationSubject={subjectToEdit}
+        onClose={() => setSubjectToEdit(undefined)}
+        onSubmit={updatedPublicationSubject => {
+          const updated = publicationSubjects.map(subject =>
+            subject.title === subjectToEdit.title
+              ? updatedPublicationSubject
+              : subject,
+          );
+          setPublicationSubjects(updated);
+          setSubjectToEdit(undefined);
+        }}
+      />
     );
   }
 

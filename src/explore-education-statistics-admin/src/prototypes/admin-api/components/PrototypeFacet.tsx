@@ -9,32 +9,37 @@ interface Props {
   onClick?: (id: string) => void;
 }
 
-const PrototypeFacet = ({ item, itemType, onClick }: Props) => {
-  const Inner = () => (
-    <>
-      <span className={styles.label}>Current data set </span>
-      <span
-        className={classNames(styles.map, {
-          [styles.mapDisableOption]: itemType === 'new',
-        })}
-      >
-        {itemType === 'new' && <p>Not applicable to current data set</p>}
-        {item[0].label}
-        {item[0].caption && (
-          <span className={styles.caption}> {item[0].caption}</span>
-        )}{' '}
-      </span>
-      <span className={styles.divider} />
-      <span className={styles.label}>Next data set </span>
-      <span className={styles.map}>
-        {item[1].label}
-        {item[1].caption && (
-          <span className={styles.caption}> {item[1].caption}</span>
-        )}
-      </span>
-    </>
-  );
+interface InnerProps {
+  item: [Facet, Facet];
+  itemType: 'mapped' | 'unmapped' | 'new' | 'noMappings';
+}
 
+const Inner = ({ item, itemType }: InnerProps) => (
+  <>
+    <span className={styles.label}>Current data set </span>
+    <span
+      className={classNames(styles.map, {
+        [styles.mapDisableOption]: itemType === 'new',
+      })}
+    >
+      {itemType === 'new' && <p>Not applicable to current data set</p>}
+      {item[0].label}
+      {item[0].caption && (
+        <span className={styles.caption}> {item[0].caption}</span>
+      )}{' '}
+    </span>
+    <span className={styles.divider} />
+    <span className={styles.label}>Next data set </span>
+    <span className={styles.map}>
+      {item[1].label}
+      {item[1].caption && (
+        <span className={styles.caption}> {item[1].caption}</span>
+      )}
+    </span>
+  </>
+);
+
+const PrototypeFacet = ({ item, itemType, onClick }: Props) => {
   if (
     itemType === 'unmapped' ||
     itemType === 'mapped' ||
@@ -52,14 +57,14 @@ const PrototypeFacet = ({ item, itemType, onClick }: Props) => {
           [styles.itemWarning]: itemType === 'unmapped',
         })}
       >
-        <Inner />
+        <Inner item={item} itemType={itemType} />
       </button>
     );
   }
 
   return (
     <div className={styles.item}>
-      <Inner />
+      <Inner item={item} itemType={itemType} />
     </div>
   );
 };

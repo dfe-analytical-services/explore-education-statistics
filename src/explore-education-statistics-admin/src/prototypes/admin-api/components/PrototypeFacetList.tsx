@@ -17,6 +17,32 @@ interface Props {
   onClick?: (id: string) => void;
 }
 
+interface InnerProps {
+  items: [Facet, Facet][];
+  type: 'mapped' | 'unmapped' | 'new' | 'noMappings';
+  onClick?: (id: string) => void;
+}
+
+const Inner = ({ items, type, onClick }: InnerProps) => (
+  <div className={styles.container}>
+    <div aria-hidden className="dfe-flex">
+      <span className={styles.heading}>Current data set</span>
+      <span className={styles.heading}>New data set</span>
+    </div>
+    {items.map((item, index) => {
+      return (
+        <PrototypeFacet
+          item={item}
+          // eslint-disable-next-line react/no-array-index-key
+          key={index}
+          itemType={type}
+          onClick={onClick}
+        />
+      );
+    })}
+  </div>
+);
+
 const PrototypeFacetList = ({
   grouped,
   heading,
@@ -24,33 +50,13 @@ const PrototypeFacetList = ({
   type,
   onClick,
 }: Props) => {
-  const Inner = () => (
-    <div className={styles.container}>
-      <div aria-hidden className="dfe-flex">
-        <span className={styles.heading}>Current data set</span>
-        <span className={styles.heading}>New data set</span>
-      </div>
-      {items.map((item, index) => {
-        return (
-          <PrototypeFacet
-            item={item}
-            // eslint-disable-next-line react/no-array-index-key
-            key={index}
-            itemType={type}
-            onClick={onClick}
-          />
-        );
-      })}
-    </div>
-  );
-
   if (grouped) {
     return (
       <Details open summary={heading}>
-        <Inner />
+        <Inner items={items} type={type} onClick={onClick} />
       </Details>
     );
   }
-  return <Inner />;
+  return <Inner items={items} type={type} onClick={onClick} />;
 };
 export default PrototypeFacetList;

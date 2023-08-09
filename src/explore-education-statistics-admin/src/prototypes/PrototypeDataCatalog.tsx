@@ -1005,236 +1005,214 @@ const PrototypeDataCatalogue = () => {
             {selectedPublication === 'All publications' &&
               selectedTheme === 'All themes' &&
               !fullList && (
-                <>
-                  <div className={styles.prototypeGrid2col}>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme('Childrens social care');
-                            e.preventDefault();
-                          }}
-                        >
-                          Childrens social care
-                        </a>
-                      </h3>
-                      <p>9 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedPublication('COVID 19');
-                            e.preventDefault();
-                          }}
-                        >
-                          COVID 19
-                        </a>
-                      </h3>
-                      <p>7 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme(
-                              'Destinations of pupils and students',
-                            );
-                            e.preventDefault();
-                          }}
-                        >
-                          Destinations of pupils and students
-                        </a>
-                      </h3>
-                      <p>7 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme('Early years');
-                            e.preventDefault();
-                          }}
-                        >
-                          Early years
-                        </a>
-                      </h3>
-                      <p>4 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme('Finance and funding');
-                            e.preventDefault();
-                          }}
-                        >
-                          Finance and funding
-                        </a>
-                      </h3>
-                      <p>4 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme('Further education');
-                            e.preventDefault();
-                          }}
-                        >
-                          Further education
-                        </a>
-                      </h3>
-                      <p>9 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme('Pupils and schools');
-                            e.preventDefault();
-                          }}
-                        >
-                          Pupils and schools
-                        </a>
-                      </h3>
-                      <p>20 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme(
-                              'School and college outcomes and performance',
-                            );
-                            e.preventDefault();
-                          }}
-                        >
-                          School and college outcomes and performance
-                        </a>
-                      </h3>
-                      <p>9 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme('Teachers and school workforce');
-                            e.preventDefault();
-                          }}
-                        >
-                          Teachers and school workforce
-                        </a>
-                      </h3>
-                      <p>5 Publications</p>
-                    </div>
-                    <div
-                      className={classNames(
-                        styles.prototypeCardChevronOneThird,
-                      )}
-                    >
-                      <h3>
-                        <a
-                          href="#"
-                          className={classNames(
-                            styles.prototypeCardChevronLink,
-                            'govuk-link--no-visited-state',
-                          )}
-                          onClick={e => {
-                            setSelectedTheme(
-                              'UK education and training statistics',
-                            );
-                            e.preventDefault();
-                          }}
-                        >
-                          UK education and training statistics
-                        </a>
-                      </h3>
-                      <p>1 Publication</p>
-                    </div>
+                <div className={styles.prototypeGrid2col}>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme('Childrens social care');
+                          e.preventDefault();
+                        }}
+                      >
+                        Childrens social care
+                      </a>
+                    </h3>
+                    <p>9 Publications</p>
                   </div>
-                </>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedPublication('COVID 19');
+                          e.preventDefault();
+                        }}
+                      >
+                        COVID 19
+                      </a>
+                    </h3>
+                    <p>7 Publications</p>
+                  </div>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme(
+                            'Destinations of pupils and students',
+                          );
+                          e.preventDefault();
+                        }}
+                      >
+                        Destinations of pupils and students
+                      </a>
+                    </h3>
+                    <p>7 Publications</p>
+                  </div>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme('Early years');
+                          e.preventDefault();
+                        }}
+                      >
+                        Early years
+                      </a>
+                    </h3>
+                    <p>4 Publications</p>
+                  </div>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme('Finance and funding');
+                          e.preventDefault();
+                        }}
+                      >
+                        Finance and funding
+                      </a>
+                    </h3>
+                    <p>4 Publications</p>
+                  </div>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme('Further education');
+                          e.preventDefault();
+                        }}
+                      >
+                        Further education
+                      </a>
+                    </h3>
+                    <p>9 Publications</p>
+                  </div>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme('Pupils and schools');
+                          e.preventDefault();
+                        }}
+                      >
+                        Pupils and schools
+                      </a>
+                    </h3>
+                    <p>20 Publications</p>
+                  </div>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme(
+                            'School and college outcomes and performance',
+                          );
+                          e.preventDefault();
+                        }}
+                      >
+                        School and college outcomes and performance
+                      </a>
+                    </h3>
+                    <p>9 Publications</p>
+                  </div>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme('Teachers and school workforce');
+                          e.preventDefault();
+                        }}
+                      >
+                        Teachers and school workforce
+                      </a>
+                    </h3>
+                    <p>5 Publications</p>
+                  </div>
+                  <div
+                    className={classNames(styles.prototypeCardChevronOneThird)}
+                  >
+                    <h3>
+                      <a
+                        href="#"
+                        className={classNames(
+                          styles.prototypeCardChevronLink,
+                          'govuk-link--no-visited-state',
+                        )}
+                        onClick={e => {
+                          setSelectedTheme(
+                            'UK education and training statistics',
+                          );
+                          e.preventDefault();
+                        }}
+                      >
+                        UK education and training statistics
+                      </a>
+                    </h3>
+                    <p>1 Publication</p>
+                  </div>
+                </div>
               )}
             {selectedPublication === 'All publications' &&
               selectedTheme === 'Further education' &&
@@ -1797,415 +1775,409 @@ const PrototypeDataCatalogue = () => {
                 </>
               )}
             {selectedPublication === 'Apprenticeships and traineeships' && (
-              <>
-                <ul className="govuk-list">
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">Annual Headlines - detailed series</a>
-                    </h3>
-                    <p>Time series of headline apprenticeship figures</p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 45 Kb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 1.4
-                          </SummaryListItem>
-                        )}
+              <ul className="govuk-list">
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">Annual Headlines - detailed series</a>
+                  </h3>
+                  <p>Time series of headline apprenticeship figures</p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 45 Kb
+                        </SummaryListItem>
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 1.4
+                        </SummaryListItem>
+                      )}
 
-                        <SummaryListItem term="Indicators">
-                          Starts, Achievements, Learner participation,
-                          Percentage Starts, Percentage Achievements, Percentage
-                          Learner participation
+                      <SummaryListItem term="Indicators">
+                        Starts, Achievements, Learner participation, Percentage
+                        Starts, Percentage Achievements, Percentage Learner
+                        participation
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Apprenticeship level, Funding type, Age group
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        Academic years 2015/16 to 2021/22
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">
+                      Apprenticeship Achievement Rates Demographics
+                    </a>
+                  </h3>
+                  <p>Apprenticeship national achievement rate tables</p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 28 Kb
                         </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Apprenticeship level, Funding type, Age group
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 1.5
                         </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Achievement rate, Achievers, Completers, Leavers, Pass
+                        rate, Retention rate
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Age, Level, demographic - ethnicity, gender and lldd,
+                        Standard /Framework flag
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        Academic years 2018/19 to 2020/21
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href={`./data-selected?dataType=${dataType}`}>
+                      Apprenticeship Achievement Rates Detailed Series
+                    </a>
+                  </h3>
+                  <p>Apprenticeship national achievement rate tables</p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 2 Mb
                         </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          Academic years 2015/16 to 2021/22
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 2.0
                         </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">
-                        Apprenticeship Achievement Rates Demographics
-                      </a>
-                    </h3>
-                    <p>Apprenticeship national achievement rate tables</p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 28 Kb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 1.5
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Achievement rate, Achievers, Completers, Leavers, Pass
-                          rate, Retention rate
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Achievement rate, Achievers, Completers, Leavers, Pass
+                        rate, Retention rate
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Age, Level, demographic - ethnicity, gender and lldd,
+                        Standard /Framework flag
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        Academic years 2018/19 to 2020/21
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">Apprenticeship Achievement Rates Headlines</a>
+                  </h3>
+                  <p>Apprenticeship national achievement rate tables</p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 9 Kb
                         </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Age, Level, demographic - ethnicity, gender and lldd,
-                          Standard /Framework flag
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 1.1
                         </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Achievement rate, Leavers, Pass rate, Retention rate
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Level, Detailed Level, Sector Subject Area, Standard
+                        /Framework flag
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        Academic years 2018/19 to 2020/21
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">Apprenticeship Service - incentives</a>
+                  </h3>
+                  <p>
+                    Incentive claims recorded on the apprenticeship service as
+                    of June 2022
+                  </p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 18 kb
                         </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          Academic years 2018/19 to 2020/21
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 1.0
                         </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href={`./data-selected?dataType=${dataType}`}>
-                        Apprenticeship Achievement Rates Detailed Series
-                      </a>
-                    </h3>
-                    <p>Apprenticeship national achievement rate tables</p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 2 Mb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 2.0
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Achievement rate, Achievers, Completers, Leavers, Pass
-                          rate, Retention rate
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Incentive claims
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Age group, Detailed apprenticeship level, Apprenticeship
+                        start month, Sector subject area Tier 1
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        August 2020 onwards
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">Charts data</a>
+                  </h3>
+                  <p>
+                    Historical time series of headline adult (19+) further
+                    education and skills learner participation, containing
+                    breakdowns by provision type and in some cases level. Also
+                    includes all age apprenticeship participation figures.
+                  </p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 2 kb
                         </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Age, Level, demographic - ethnicity, gender and lldd,
-                          Standard /Framework flag
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 2.0
                         </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Adult Apprenticeship, Adult Community learning, Adult
+                        Education & training, Adult FE & skills, Adult FE &
+                        skills - Level 4+, Adult FE & skills - Full Level 2,
+                        Adult FE & skills - Full Level3, Apprenticeships -
+                        Advanced, Apprenticeships - Higher, Apprenticeships -
+                        Intermediate, All age Apprenticeships
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">-</SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        Academic years 2005/06 to 2021/22
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">
+                      Duration, planned length of stay and length of employment
+                    </a>
+                  </h3>
+                  <p>
+                    Apprenticeship duration, apprenticeship planned length of
+                    stay and length of employment
+                  </p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 28 kb
                         </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          Academic years 2018/19 to 2020/21
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 1.2
                         </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">Apprenticeship Achievement Rates Headlines</a>
-                    </h3>
-                    <p>Apprenticeship national achievement rate tables</p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 9 Kb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 1.1
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Achievement rate, Leavers, Pass rate, Retention rate
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Starts, Starts (used in duration calculations), Average
+                        expected duration
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Age group, Detailed level, Length of employment, Planned
+                        length of stay
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        Academic years 2014/15 to 2021/22
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">Find an apprenticeship adverts and vacancies</a>
+                  </h3>
+                  <p>
+                    Adverts and vacancies as reported on the Find an
+                    apprenticeship website
+                  </p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 20 kb
                         </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Level, Detailed Level, Sector Subject Area, Standard
-                          /Framework flag
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 1.0
                         </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Adverts, Vacancies
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Month, level
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        August 2018 to October 2022
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">Geographical breakdowns - detailed</a>
+                  </h3>
+                  <p>
+                    Detailed geographical breakdowns (National, Regional, Local
+                    Authority District) of apprenticeship starts and
+                    achievements
+                  </p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 62 Mb
                         </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          Academic years 2018/19 to 2020/21
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 1.0
                         </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">Apprenticeship Service - incentives</a>
-                    </h3>
-                    <p>
-                      Incentive claims recorded on the apprenticeship service as
-                      of June 2022
-                    </p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 18 kb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 1.0
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Incentive claims
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Starts, Achievements
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Apprenticeship level, Ethnicity group, Sex, Sector
+                        subject area (tier 1), Region, Local Authority District
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        Local Authority District; National; Regional
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        Academic year 2021/22
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+                <li>
+                  <hr />
+                  <h3>
+                    <a href="#">
+                      Geographical breakdowns - latest regional summary
+                    </a>
+                  </h3>
+                  <p>Headline regional breakdowns of apprenticeship starts</p>
+                  {!listCompact && (
+                    <SummaryList noBorder>
+                      {dataType === 'csv' && (
+                        <SummaryListItem term="Filetype and size">
+                          csv, 16 kb
                         </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Age group, Detailed apprenticeship level,
-                          Apprenticeship start month, Sector subject area Tier 1
+                      )}
+                      {dataType === 'api' && (
+                        <SummaryListItem term="API status">
+                          <span className="govuk-tag govuk-tag--turquoise">
+                            ACTIVE
+                          </span>{' '}
+                          Version 1.0
                         </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National
-                        </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          August 2020 onwards
-                        </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">Charts data</a>
-                    </h3>
-                    <p>
-                      Historical time series of headline adult (19+) further
-                      education and skills learner participation, containing
-                      breakdowns by provision type and in some cases level. Also
-                      includes all age apprenticeship participation figures.
-                    </p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 2 kb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 2.0
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Adult Apprenticeship, Adult Community learning, Adult
-                          Education & training, Adult FE & skills, Adult FE &
-                          skills - Level 4+, Adult FE & skills - Full Level 2,
-                          Adult FE & skills - Full Level3, Apprenticeships -
-                          Advanced, Apprenticeships - Higher, Apprenticeships -
-                          Intermediate, All age Apprenticeships
-                        </SummaryListItem>
-                        <SummaryListItem term="Filters">-</SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National
-                        </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          Academic years 2005/06 to 2021/22
-                        </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">
-                        Duration, planned length of stay and length of
-                        employment
-                      </a>
-                    </h3>
-                    <p>
-                      Apprenticeship duration, apprenticeship planned length of
-                      stay and length of employment
-                    </p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 28 kb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 1.2
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Starts, Starts (used in duration calculations),
-                          Average expected duration
-                        </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Age group, Detailed level, Length of employment,
-                          Planned length of stay
-                        </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National
-                        </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          Academic years 2014/15 to 2021/22
-                        </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">
-                        Find an apprenticeship adverts and vacancies
-                      </a>
-                    </h3>
-                    <p>
-                      Adverts and vacancies as reported on the Find an
-                      apprenticeship website
-                    </p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 20 kb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 1.0
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Adverts, Vacancies
-                        </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Month, level
-                        </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National
-                        </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          August 2018 to October 2022
-                        </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">Geographical breakdowns - detailed</a>
-                    </h3>
-                    <p>
-                      Detailed geographical breakdowns (National, Regional,
-                      Local Authority District) of apprenticeship starts and
-                      achievements
-                    </p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 62 Mb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 1.0
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Starts, Achievements
-                        </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Apprenticeship level, Ethnicity group, Sex, Sector
-                          subject area (tier 1), Region, Local Authority
-                          District
-                        </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          Local Authority District; National; Regional
-                        </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          Academic year 2021/22
-                        </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                  <li>
-                    <hr />
-                    <h3>
-                      <a href="#">
-                        Geographical breakdowns - latest regional summary
-                      </a>
-                    </h3>
-                    <p>Headline regional breakdowns of apprenticeship starts</p>
-                    {!listCompact && (
-                      <SummaryList noBorder>
-                        {dataType === 'csv' && (
-                          <SummaryListItem term="Filetype and size">
-                            csv, 16 kb
-                          </SummaryListItem>
-                        )}
-                        {dataType === 'api' && (
-                          <SummaryListItem term="API status">
-                            <span className="govuk-tag govuk-tag--turquoise">
-                              ACTIVE
-                            </span>{' '}
-                            Version 1.0
-                          </SummaryListItem>
-                        )}
-                        <SummaryListItem term="Indicators">
-                          Starts
-                        </SummaryListItem>
-                        <SummaryListItem term="Filters">
-                          Region, Apprenticeship level
-                        </SummaryListItem>
-                        <SummaryListItem term="Geographic level">
-                          National, Regional
-                        </SummaryListItem>
-                        <SummaryListItem term="Time period">
-                          Academic years 2018/19 to 2021/22
-                        </SummaryListItem>
-                      </SummaryList>
-                    )}
-                  </li>
-                </ul>
-              </>
+                      )}
+                      <SummaryListItem term="Indicators">
+                        Starts
+                      </SummaryListItem>
+                      <SummaryListItem term="Filters">
+                        Region, Apprenticeship level
+                      </SummaryListItem>
+                      <SummaryListItem term="Geographic level">
+                        National, Regional
+                      </SummaryListItem>
+                      <SummaryListItem term="Time period">
+                        Academic years 2018/19 to 2021/22
+                      </SummaryListItem>
+                    </SummaryList>
+                  )}
+                </li>
+              </ul>
             )}
             {totalResults !== 0 && (
               <>

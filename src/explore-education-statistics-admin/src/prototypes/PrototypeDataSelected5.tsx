@@ -76,52 +76,46 @@ const PrototypeHomepage = () => {
                 subject, provider, geography etc.
               </p>
               {selectedRelease === 'Academic year 2019/20' && (
-                <>
-                  <div className="govuk-inset-text">
-                    <div className="govuk-warning-text">
-                      <span
-                        className="govuk-warning-text__icon"
-                        aria-hidden="true"
-                      >
-                        !
+                <div className="govuk-inset-text">
+                  <div className="govuk-warning-text">
+                    <span
+                      className="govuk-warning-text__icon"
+                      aria-hidden="true"
+                    >
+                      !
+                    </span>
+                    <strong className="govuk-warning-text__text">
+                      <span className="govuk-warning-text__assistive">
+                        Warning
                       </span>
-                      <strong className="govuk-warning-text__text">
-                        <span className="govuk-warning-text__assistive">
-                          Warning
-                        </span>
-                        <p>
-                          <strong>
-                            This version of the API data set has been
-                            deprecated.
-                          </strong>
-                        </p>
-                        <p>
-                          <a
-                            href="#"
-                            onClick={_ => {
-                              setSelectedRelease(latestRelease);
-                            }}
-                          >
-                            View the latest available data set: {latestRelease}
-                          </a>
-                        </p>
-                      </strong>
-                    </div>
+                      <p>
+                        <strong>
+                          This version of the API data set has been deprecated.
+                        </strong>
+                      </p>
+                      <p>
+                        <a
+                          href="#"
+                          onClick={_ => {
+                            setSelectedRelease(latestRelease);
+                          }}
+                        >
+                          View the latest available data set: {latestRelease}
+                        </a>
+                      </p>
+                    </strong>
                   </div>
-                </>
+                </div>
               )}
               {selectedRelease === 'Academic year 2020/21' && (
-                <>
-                  <div className="govuk-inset-text">
-                    <p>
-                      <strong>Version 2.0</strong> is now available, however
-                      this could introduce breaking changes to any existing
-                      queries you may have set up. This version is still
-                      available to use, but doesn't contain the latest academic
-                      year's data{' '}
-                    </p>
-                  </div>
-                </>
+                <div className="govuk-inset-text">
+                  <p>
+                    <strong>Version 2.0</strong> is now available, however this
+                    could introduce breaking changes to any existing queries you
+                    may have set up. This version is still available to use, but
+                    doesn't contain the latest academic year's data{' '}
+                  </p>
+                </div>
               )}
             </div>
           </div>

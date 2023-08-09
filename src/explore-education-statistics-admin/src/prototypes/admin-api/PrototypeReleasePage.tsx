@@ -77,45 +77,43 @@ const PrototypeReleasePage = ({ match }: RouteComponentProps<MatchProps>) => {
       : 'Academic Year 2021/22';
 
   return (
-    <>
-      <PrototypePage
-        wide
-        breadcrumbs={[
-          { name: 'Publication', link: '#' },
-          { name: 'Edit release' },
-        ]}
-      >
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-two-thirds">
-            <PageTitle
-              caption={`Edit release for ${release}`}
-              title="Characteristics of children in need"
-            />
-          </div>
-          {/* <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
-        {release.amendment && (
-          <Tag className="govuk-!-margin-left-2">Amendment</Tag>
-        )}
-        {release.live && <Tag className="govuk-!-margin-left-2">Live</Tag>} */}
+    <PrototypePage
+      wide
+      breadcrumbs={[
+        { name: 'Publication', link: '#' },
+        { name: 'Edit release' },
+      ]}
+    >
+      <div className="govuk-grid-row">
+        <div className="govuk-grid-column-two-thirds">
+          <PageTitle
+            caption={`Edit release for ${release}`}
+            title="Characteristics of children in need"
+          />
         </div>
+        {/* <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
+      {release.amendment && (
+        <Tag className="govuk-!-margin-left-2">Amendment</Tag>
+      )}
+      {release.live && <Tag className="govuk-!-margin-left-2">Live</Tag>} */}
+      </div>
 
-        <NavBar
-          routes={navRoutes.map(route => ({
-            title: route.title,
-            to: generatePath<RouteParams>(route.path, {
-              id: match.params.id,
-            }),
-          }))}
-          label="Release"
-        />
+      <NavBar
+        routes={navRoutes.map(route => ({
+          title: route.title,
+          to: generatePath<RouteParams>(route.path, {
+            id: match.params.id,
+          }),
+        }))}
+        label="Release"
+      />
 
-        <Switch>
-          {routes.map(route => (
-            <Route exact key={route.path} {...route} />
-          ))}
-        </Switch>
-      </PrototypePage>
-    </>
+      <Switch>
+        {routes.map(route => (
+          <Route exact key={route.path} {...route} />
+        ))}
+      </Switch>
+    </PrototypePage>
   );
 };
 

@@ -140,24 +140,20 @@ const PrototypePublicationSubjectList = ({
                           ? nextSubject.version
                           : subject.version}{' '}
                         {subject.release !== currentRelease && (
-                          <>
-                            <div className="govuk-tag govuk-!-margin-right-3 govuk-!-margin-left-1">
-                              Live
-                            </div>
-                          </>
+                          <div className="govuk-tag govuk-!-margin-right-3 govuk-!-margin-left-1">
+                            Live
+                          </div>
                         )}
                         {isCurrentReleasePublished && nextSubject && (
-                          <>
-                            <a
-                              href="#"
-                              onClick={e => {
-                                e.preventDefault();
-                                setArchiveList(!archiveList);
-                              }}
-                            >
-                              {archiveList ? 'Hide' : 'Show'} version history
-                            </a>
-                          </>
+                          <a
+                            href="#"
+                            onClick={e => {
+                              e.preventDefault();
+                              setArchiveList(!archiveList);
+                            }}
+                          >
+                            {archiveList ? 'Hide' : 'Show'} version history
+                          </a>
                         )}
                         {subject.release === currentRelease && (
                           <>

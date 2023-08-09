@@ -65,35 +65,31 @@ const PrototypeHomepage = () => {
             </span>
           )}
           {selectedRelease === 'Academic year 2019/20' && (
-            <>
-              <div className="govuk-inset-text">
-                <div className="govuk-warning-text">
-                  <span className="govuk-warning-text__icon" aria-hidden="true">
-                    !
-                  </span>
-                  <strong className="govuk-warning-text__text">
-                    <span className="govuk-warning-text__assistive">
-                      Warning
-                    </span>
-                    <p>
-                      <strong>
-                        This version of the API data set has been deprecated.
-                      </strong>
-                    </p>
-                    <p>
-                      <a
-                        href="#"
-                        onClick={_ => {
-                          setSelectedRelease(latestRelease);
-                        }}
-                      >
-                        View the latest available data set: {latestRelease}
-                      </a>
-                    </p>
-                  </strong>
-                </div>
+            <div className="govuk-inset-text">
+              <div className="govuk-warning-text">
+                <span className="govuk-warning-text__icon" aria-hidden="true">
+                  !
+                </span>
+                <strong className="govuk-warning-text__text">
+                  <span className="govuk-warning-text__assistive">Warning</span>
+                  <p>
+                    <strong>
+                      This version of the API data set has been deprecated.
+                    </strong>
+                  </p>
+                  <p>
+                    <a
+                      href="#"
+                      onClick={_ => {
+                        setSelectedRelease(latestRelease);
+                      }}
+                    >
+                      View the latest available data set: {latestRelease}
+                    </a>
+                  </p>
+                </strong>
               </div>
-            </>
+            </div>
           )}
           {selectedRelease !== latestRelease &&
             selectedRelease !== 'Academic year 2019/20' && (

@@ -143,25 +143,21 @@ const FeaturedLink = ({ dataset, publication }: Props) => {
             )}
 
             {(dataset === 'subject-all' || dataset === 'subject-3') && (
-              <>
-                <PrototypeChevronCard
-                  title="Headline measures for regions and local authorities"
-                  url="https://explore-education-statistics.service.gov.uk/data-tables/fast-track/97a699fd-1d72-473e-d48c-08dabceba8ca"
-                  description="Attainment 8, EBacc APS and other headline measures for regions and local authorities, state-funded schools (LA), 2021/22"
-                  view={showList}
-                />
-              </>
+              <PrototypeChevronCard
+                title="Headline measures for regions and local authorities"
+                url="https://explore-education-statistics.service.gov.uk/data-tables/fast-track/97a699fd-1d72-473e-d48c-08dabceba8ca"
+                description="Attainment 8, EBacc APS and other headline measures for regions and local authorities, state-funded schools (LA), 2021/22"
+                view={showList}
+              />
             )}
 
             {(dataset === 'subject-all' || dataset === 'subject-4') && (
-              <>
-                <PrototypeChevronCard
-                  title="Regional and LA breakdown of headline measures for SEN description"
-                  url="https://explore-education-statistics.service.gov.uk/data-tables/fast-track/97a699fd-1d72-473e-d48c-08dabceba8ca"
-                  description="Regional and LA breakdown of headline measures for SEN description categories, state-funded schools (LA), 2021/22"
-                  view={showList}
-                />
-              </>
+              <PrototypeChevronCard
+                title="Regional and LA breakdown of headline measures for SEN description"
+                url="https://explore-education-statistics.service.gov.uk/data-tables/fast-track/97a699fd-1d72-473e-d48c-08dabceba8ca"
+                description="Regional and LA breakdown of headline measures for SEN description categories, state-funded schools (LA), 2021/22"
+                view={showList}
+              />
             )}
           </>
         )}
