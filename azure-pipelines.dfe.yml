@@ -281,6 +281,8 @@ jobs:
           buildContext: '$(System.DefaultWorkingDirectory)'
           tags: $(Build.BuildNumber)
           arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
+        env:
+          DOCKER_BUILDKIT: 1
 
       - task: Docker@2
         displayName: 'Push public frontend Docker image'
