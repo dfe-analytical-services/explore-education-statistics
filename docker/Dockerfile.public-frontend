@@ -15,14 +15,14 @@ COPY src/tsconfig.json ./src/tsconfig.json
 
 RUN corepack enable
 
-RUN pnpm i
-RUN pnpm --filter=explore-education-statistics-frontend... install
+RUN pnpm --filter=explore-education-statistics-frontend... --ignore-scripts --frozen-lockfile install
 RUN pnpm --filter=explore-education-statistics-frontend build
 
 FROM node:18.17.0-alpine AS runner
 
 WORKDIR /usr/src/app
 
+COPY --from=builder /app/.npmrc .
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/pnpm-lock.yaml .
 COPY --from=builder /app/pnpm-workspace.yaml .
@@ -31,8 +31,7 @@ COPY --from=builder /app/src/explore-education-statistics-frontend/ ./src/explor
 
 RUN corepack enable
 
-RUN pnpm i
-RUN pnpm --filter=explore-education-statistics-frontend... --prod install --ignore-scripts
+RUN pnpm --filter=explore-education-statistics-frontend... --prod --ignore-scripts --frozen-lockfile install
 
 WORKDIR /usr/src/app/src/explore-education-statistics-frontend
 
