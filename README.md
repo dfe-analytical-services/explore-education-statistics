@@ -34,7 +34,6 @@ The project is primarily composed of two areas:
     - Admin API
 
 - **Admin API**
-
   - Depends on:
     - SQLServer `content` database
     - SQLServer `statistics` database
@@ -49,7 +48,7 @@ The project is primarily composed of two areas:
   - Azure function for sending notifications
 
 - **Data Processor**
-  - Azure function for handling dataset imports into the admin
+  - Azure function for handling dataset imports into the admin. Also referred to as the "importer".
 
 ## Getting started
 
@@ -63,41 +62,68 @@ You will need the following groups of dependencies to run the project successful
    - [.NET Core v6.0](https://dotnet.microsoft.com/download/dotnet-core/6.0)
    - [Azure Functions Core Tools v4+](https://github.com/Azure/azure-functions-core-tools)
    
-2. To run the databases, you can use either:
-
-   - [SQL Server 2017+](https://www.microsoft.com/en-gb/sql-server/sql-server-downloads)
+2. To run the databases:
    - [Docker and Docker Compose](https://docs.docker.com/) - see [Setting up the database](#setting-up-the-database-and-storage-emulator)
 
 3. To emulate Azure storage services (blobs, tables and queues) you will require one of the following 
    options.
-   
-   - [Azurite for Docker and Docker Compose](https://docs.docker.com/) - recommended approach if 
-     using Linux. See [Setting up the storage emulator](#setting-up-the-database-and-storage-emulator)
-   - [Azure Storage Emulator](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator) -
-     recommended approach if using Windows. The x64 installer can be found [here](https://download.microsoft.com/download/3/9/F/39F968FA-DEBB-4960-8F9E-0E7BB3035959/SQLEXPR_x64_ENU.exe).
-    
-   - Previous options that are **no longer** recommended: 
-     - Azure Storage Emulator on a Windows VM - if you don't want to use Azurite for Docker, you can 
-       install the Azure Storage Emulator on a [Windows 10 VM](https://developer.microsoft.com/en-us/windows/downloads/virtual-machines/).
-       
-       You will need to expose ports 10001, 10002 and 10003 for the host to access in the emulator 
-       in the VM. You will most likely need to install SQL Server on this VM too, as the emulator 
-       will need this to function.
-       
-     - Alternatively, if opting to not use Storage Explorer at all, you could create your own Storage 
-       Account on Azure and amend your storage connection strings to point to this.
-       - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/) 
-       - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
- 
-4. **Linux only** - Add symlinks to libmagic-1
+   - [Azurite for Docker and Docker Compose](https://docs.docker.com/) - recommended approach. See [Setting up the storage emulator](#setting-up-the-database-and-storage-emulator)
 
-   ```
+     - Alternatively, if opting to not use Storage Explorer at all, you could create your own Storage
+       Account on Azure and amend your storage connection strings to point to this.
+       - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/)
+       - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
+
+
+4. Setup libmagic (Linux and Mac only)
+
+**Linux only** 
+
+  Add symlinks to libmagic-1:
+
+   ```sh
    cd /usr/lib/x86_64-linux-gnu/
    sudo ln -s libmagic.so.1.0.0 libmagic-1.so
    sudo ln -s libmagic.so.1.0.0 libmagic-1.so.1
    ```
 
    See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
+   
+   Use correct version of `magic.mgc` file (Ubuntu 22.04 or later only):
+
+   If you're using Ubuntu 22.04 or later you'll need to place an updated [magic.mgc](https://github.com/hey-red/Mime/blob/master/src/Mime/content/magic.mgc) file in `src/GovUk.Education.ExploreEducationStatistics.Common/libs` due to an issue with mismatched versions of `libmagic` and `magic.mgc`. You will then need to rebuild the project to ensure the new file is copied to the output directory.
+
+**Mac only**
+
+   Install and link libmagic:
+
+    ```sh
+    brew install libmagic
+    brew link libmagic
+    env ARCHFLAGS="-arch x86_64" sudo gem install ruby-filemagic -- --with-magic-include=/usr/local/include --with-magic-lib=/usr/local/lib/
+    ```
+
+
+  Download and link the `dylib` magic file.
+
+    Depending on the arch of your machine, you will need to download a different dylib file dependent on the arch of your machine. You can find the correct file [in the runtimes section](https://github.com/hey-red/Mime/tree/master/src/Mime/runtimes) of the library
+
+    Download this file and place it somewhere where you won't accidentally delete it. Then link it to the correct location:
+
+    ```sh
+    sudo ln -s /Users/${whoami}/path/to/folder/libmagic-1.dylib /usr/local/liblibmagic-1
+    sudo ln -s /Users/${whoami}/path/to/folder/libmagic-1.dylib /usr/local/lib/liblibmagic-1
+    ```
+
+  Upgrade version of `Mime` in `src/GovUk.Education.ExploreEducationStatistics.Common`
+
+  You'll need to upgrade the version of Mime to `3.4.0` in order for it to work with the new version of `libmagic`. You can do this by editing the `Mime` dependency in the `src/GovUk.Education.ExploreEducationStatistics.Common/` cs proj file:
+
+  ```sh
+    <PackageReference Include="Mime" Version="3.4.0" />
+  ```
+
+  you'll then need to rebuild the project to ensure changes take effect.
 
 ### Install PNPM via corepack
 
@@ -107,6 +133,13 @@ Corepack is a tool installed as part of your Node.js installation that allows yo
 
 ```bash
 corepack enable
+```
+
+If for some reason the above corepack command doesn't work, you can install PNPM manually by running:
+
+```bash
+PNPM_VERSION=$(node -e "console.log(require('./package.json').engines.pnpm)")
+curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=$PNPM_VERSION sh -
 ```
 
 This will install the package manager version specified in the `package.json` file. You can check that this has been installed by running:
@@ -127,19 +160,11 @@ Add the following to your `hosts` file:
 
 1. Start the database and storage emulator:
 
-   - If using Docker:
-
      ```bash
      cd src
      docker-compose up -d db data-storage
      ```
 
-   - If using Windows, ensure SQL Server is running then you can start the Storage Emulator, with the 
-     default instance of SQL Server as its data source:
-
-     ```
-     AzureStorageEmulator.exe init /server .
-     ```
 
 2. Add the following to your `hosts` file:
 
@@ -148,15 +173,13 @@ Add the following to your `hosts` file:
    127.0.0.1    data-storage
    ```
    
-   If using a VM, the IP addresses in this file should be set to your VM's network IP address.
+   On unix based machines this is located in `/etc/hosts`. On Windows this is located in `C:\Windows\System32\drivers\etc\hosts`.
    
 #### Use a pre-built development database
 
-We regularly create new development databases that are uploaded to [Confluence](https://dfedigital.atlassian.net/wiki/spaces/EES/pages/2004189186/Testing) and Google Drive. Ask a team member if you need to 
-request access.
+We regularly create new development databases that are uploaded Google Drive. Ask a team member if you need to request access.
 
-These are already bootstrapped with seed data to run tests and start the project. This is the 
-**recommended** way of running the project. 
+These are already bootstrapped with seed data to run tests and start the project. This is the **recommended** way of running the project.
 
 This data will need to be loaded into SQL Server:
 
@@ -169,8 +192,7 @@ This data will need to be loaded into SQL Server:
     - The Docker container user needs ownership fo the ees-mssql folder. Run  
     `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
      permissions.
-  - In Windows
-    - Attach the database using SSMS.
+
 
 #### Use a bare database
 
@@ -234,21 +256,29 @@ Keycloak equivalent as a template as to how the configuration in the file should
 1. Start up Keycloak:
 
   ```bash
-  pnpm start idp 
+  pnpm start idp
   ```
 
 2. Start up Admin with additional Keycloak configuration:
 
   ```bash
-  
-  pnpm start adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for us
+  pnpm start adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for the admin project
   ```
 
 All the standard seed data users can be supported with Keycloak, and use their standard email addresses and the
 password `password` to log in.
 
+The standard accounts used day to day are:
+
+  * bau1 - username `bau1` and password `password`
+  * bau2 - username `bau2` and password `password`
+  * analyst - username `analyst` and password `password`
+  * analyst2 - username `analyst2` and password `password`
+
+
 The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with username `admin` and password
 `admin`. From here, users and OpenID Connect settings can be administered.
+
 
 ##### Adding additional users to Keycloak manually
 
@@ -329,8 +359,7 @@ pnpm start data content
 - To run the admin:
 
 ```bash
-pnpm start admin
-pnpm start frontend
+pnpm start adminKeycloak
 ```
 
 - To run other services:
@@ -341,7 +370,7 @@ pnpm start publisher processor
 
 2. Startup any required backend services (see [Running the backend](#running-the-backend))
 
-3. Run the frontend applications using the following:
+3. Run the frontend application using the following:
     
 ```bash
 pnpm start frontend
@@ -391,6 +420,9 @@ are established using symlinks that PNPM creates.
     
 - `explore-education-statistics-common`
   - Contains common code between the other sub-projects for re-use.
+
+- `explore-education-statistics-ckeditor`
+ - Contains the customised CKEditor build for the admin application.
 
 #### Adding dependencies
 
@@ -541,16 +573,17 @@ cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.A
 dotnet ef migrations add EES1234_MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
 ```
 
-### Resetting the storage emulator
+### Resetting Azurite
 
-During development you might want to reset your storage emulator to clear out all data from 
+During development you might want to reset your Azurite instance to clear out all data from 
 blobs, queues and tables. This is typically done at the same time as resetting the databases.
 
-To delete all data in the storage emulator:
+To delete all data in Azurite simply delete the Azurite docker container, remove the Azurite volume and recreate it:
 
+```bash
+docker-compose up data-storage
 ```
-AzureStorageEmulator.exe clear blob queue table
-```
+
 
 ### Taking a backup of Keycloak users
 
@@ -578,8 +611,6 @@ See the [Publisher Functions README](src/GovUk.Education.ExploreEducationStatist
 Aside from unit tests for each project, we maintain suites of Robot Framework tests that can be found in `tests`.
 
 See the [Robot Framework tests README](tests/robot-tests/README.md) for more information.
-
-## Contributing
 
 ## License
 
