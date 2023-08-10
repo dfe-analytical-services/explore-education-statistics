@@ -448,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var directReleasesWithApprovalRole = await _context
                 .UserReleaseRoles
-                .Where(role => role.Role == ReleaseRole.Approver)
+                .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
                 .Select(role => role.ReleaseId)
                 .ToListAsync();
             
@@ -456,7 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .UserPublicationRoles
                 .Include(role => role.Publication)
                 .ThenInclude(publication => publication.Releases)
-                .Where(role => role.Role == PublicationRole.Approver)
+                .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
                 .Select(role => role.Publication)
                 .SelectMany(publication => publication.Releases.Select(release => release.Id))
                 .ToListAsync();

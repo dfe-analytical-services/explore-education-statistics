@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -25,10 +26,35 @@ public static class PublicationGeneratorExtensions
         IEnumerable<Release> releases)
         => generator.ForInstance(s => s.SetReleases(releases));
     
+    public static Generator<Publication> WithReleases(
+        this Generator<Publication> generator,
+        Func<SetterContext, IEnumerable<Release>> releases)
+        => generator.ForInstance(s => s.SetReleases(releases.Invoke));
+    
     public static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
-        IEnumerable<Release> releases)
-        => setters
-            .Set(d => d.Releases, releases.ToList());
+        IEnumerable<Release> releases) 
+        => setters.SetReleases(_ => releases);
+    
+    private static InstanceSetters<Publication> SetReleases(
+        this InstanceSetters<Publication> setters,
+        Func<SetterContext, IEnumerable<Release>> releases)
+        => setters.Set(
+            p => p.Releases,
+            (_, publication, context) =>
+            {
+                var list = releases.Invoke(context).ToList();
+
+                list.ForEach(release => release.Publication = publication);
+
+                return list;
+            }
+        );
+    
+    // public static InstanceSetters<Publication> SetReleases(
+    //     this InstanceSetters<Publication> setters,
+    //     IEnumerable<Release> releases)
+    //     => setters
+    //         .Set(d => d.Releases, releases.ToList());
 
 }

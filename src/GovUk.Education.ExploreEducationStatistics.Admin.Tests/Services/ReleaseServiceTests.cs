@@ -1023,7 +1023,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var latestIdTitleViewModel = result.AssertRight();
 
                 Assert.NotNull(latestIdTitleViewModel);
-                Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel!.Id);
+                Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel.Id);
                 Assert.Equal("Calendar year 2022", latestIdTitleViewModel.Title);
             }
         }
@@ -1648,7 +1648,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListReleasesForApproval()
+        public async Task ListReleasesForApproval_UserHasApproverRoleOnRelease()
         {
             var contextId = Guid.NewGuid().ToString();
 
@@ -1657,11 +1657,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             
             var publications = _fixture
                 .DefaultPublication()
-                .ForInstance(s => s
-                    .SetReleases(_fixture
-                        .DefaultRelease()
-                        .WithApprovalStatuses(ListOf(Draft, HigherLevelReview, Approved))
-                        .GenerateList()))
+                .WithReleases(_ => _fixture
+                    .DefaultRelease()
+                    .WithApprovalStatuses(ListOf(
+                        Draft, 
+                        HigherLevelReview, 
+                        Approved))
+                    .GenerateList())
                 .GenerateList(4);
 
             var contributorReleaseRolesForUser = _fixture
@@ -1692,6 +1694,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .WithReleases(publications.SelectMany(publication => publication.Releases))
                 .GenerateList();
             
+            var higherReviewReleaseWithApproverRoleForUser = publications[1].Releases[1];
+            
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 await context.Publications.AddRangeAsync(publications);
@@ -1707,13 +1711,154 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildReleaseService(context);
 
                 var result = await service
-                    .ListReleasesForApproval(_userId);
-
-                // VerifyAllMocks(releaseCacheService);
+                    .ListReleasesForApproval(user.Id);
 
                 var viewModels = result.AssertRight();
+                
+                // Assert that the only Release returned for this user is the Release where they have a direct
+                // Approver role on and it is in Higher Review.
                 Assert.Single(viewModels);
-                Assert.Equal(publications[1].Releases[1].Id, viewModels[0].Id);
+                Assert.Equal(higherReviewReleaseWithApproverRoleForUser.Id, viewModels[0].Id);
+            }
+        }
+        
+        [Fact]
+        public async Task ListReleasesForApproval_UserHasApproverRoleOnPublications()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            var user = new User();
+            var otherUser = new User();
+            
+            var publications = _fixture
+                .DefaultPublication()
+                .WithReleases(_ => _fixture
+                    .DefaultRelease()
+                    .WithApprovalStatuses(ListOf(
+                        Draft, 
+                        HigherLevelReview, 
+                        Approved, 
+                        HigherLevelReview))
+                    .GenerateList())
+                .GenerateList(3);
+
+            var ownerPublicationRoleForUser = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithRole(PublicationRole.Owner)
+                .WithPublication(publications[0])
+                .Generate();
+            
+            var approverPublicationRoleForUser = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithRole(PublicationRole.Approver)
+                .WithPublication(publications[1])
+                .Generate();
+            
+            var ownerPublicationRolesForOtherUser = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(otherUser)
+                .WithRole(PublicationRole.Owner)
+                .WithPublications(publications)
+                .GenerateList();
+            
+            var approverPublicationRolesForOtherUser = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(otherUser)
+                .WithRole(PublicationRole.Approver)
+                .WithPublications(publications)
+                .GenerateList();
+            
+            var release1WithApproverRoleForUser = publications[1].Releases[1];
+            var release2WithApproverRoleForUser = publications[1].Releases[3];
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddRangeAsync(publications);
+                await context.UserPublicationRoles.AddRangeAsync(
+                    ownerPublicationRoleForUser, 
+                    approverPublicationRoleForUser);
+                await context.UserPublicationRoles.AddRangeAsync(ownerPublicationRolesForOtherUser);
+                await context.UserPublicationRoles.AddRangeAsync(approverPublicationRolesForOtherUser);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(context);
+
+                var result = await service
+                    .ListReleasesForApproval(user.Id);
+
+                var viewModels = result.AssertRight();
+                
+                // Assert that the only Releases returned for this user are the Releases where they have Approver
+                // role on the overarching Publication and the Releases are in Higher Review.
+                Assert.Equal(2, viewModels.Count);
+                Assert.Equal(release1WithApproverRoleForUser.Id, viewModels[0].Id);
+                Assert.Equal(release2WithApproverRoleForUser.Id, viewModels[1].Id);
+            }
+        }
+        
+        [Fact]
+        public async Task ListReleasesForApproval_MixOfApproverReleaseAndPublicationRoles()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            var user = new User();
+            
+            var publications = _fixture
+                .DefaultPublication()
+                .WithReleases(_ => _fixture
+                    .DefaultRelease()
+                    .WithApprovalStatuses(ListOf(
+                        Draft, 
+                        HigherLevelReview, 
+                        Approved))
+                    .GenerateList())
+                .GenerateList(3);
+
+            var approverPublicationRoleForUser = _fixture
+                .DefaultUserPublicationRole()
+                .WithUser(user)
+                .WithRole(PublicationRole.Approver)
+                .WithPublication(publications[0])
+                .Generate();
+            
+            var approverReleaseRolesForUser = _fixture
+                .DefaultUserReleaseRole()
+                .WithUser(user)
+                .WithRole(ReleaseRole.Approver)
+                .WithReleases(publications[1].Releases)
+                .GenerateList();
+            
+            var release1WithApproverRoleForUser = publications[0].Releases[1];
+            var release2WithApproverRoleForUser = publications[1].Releases[1];
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddRangeAsync(publications);
+                await context.UserPublicationRoles.AddRangeAsync(approverPublicationRoleForUser);
+                await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForUser);
+                await context.SaveChangesAsync();
+            }
+            
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = BuildReleaseService(context);
+
+                var result = await service
+                    .ListReleasesForApproval(user.Id);
+
+                var viewModels = result.AssertRight();
+                
+                // Assert that the only Releases returned for this user are the Releases where they have Approver
+                // role on the overarching Publication and the Releases are in Higher Review, and where the user
+                // has a direct Approver role on a Release in higher review.
+                Assert.Equal(2, viewModels.Count);
+                Assert.Equal(release1WithApproverRoleForUser.Id, viewModels[0].Id);
+                Assert.Equal(release2WithApproverRoleForUser.Id, viewModels[1].Id);
             }
         }
 
