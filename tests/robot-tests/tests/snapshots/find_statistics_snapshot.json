@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships and traineeships",
-    "published": "20 Jul 2023",
+    "published": "10 Aug 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -499,8 +499,15 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "27 Jul 2023",
+    "published": "10 Aug 2023",
     "release_type": "Experimental statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Pupil yield from housing developments",
+    "published": "9 Aug 2023",
+    "release_type": "Management information",
     "theme": "Pupils and schools"
   },
   {
