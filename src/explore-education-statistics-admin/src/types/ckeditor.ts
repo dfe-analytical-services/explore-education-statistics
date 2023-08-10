@@ -198,6 +198,7 @@ export interface Node {
   readonly endOffset: number | null;
   readonly index: number | null;
   readonly isEmpty: boolean;
+  readonly name: string;
   readonly nextSibling: Node | null;
   readonly offsetSize: number;
   readonly parent: Element | null;
