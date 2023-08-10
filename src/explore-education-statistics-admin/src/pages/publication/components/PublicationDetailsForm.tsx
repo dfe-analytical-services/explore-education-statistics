@@ -1,4 +1,4 @@
-import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
+import FormFieldThemeSelect from '@admin/components/form/FormFieldThemeSelect';
 import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
@@ -36,7 +36,7 @@ export interface PublicationDetailsFormValues {
   supersededById?: string;
   title: string;
   summary: string;
-  topicId: string;
+  themeId: string;
 }
 
 interface Props {
@@ -86,7 +86,7 @@ const PublicationDetailsForm = ({
             theme: '',
             title: '',
             summary: '',
-            topicId: '',
+            themeId: '',
           }),
         }}
         validationSchema={Yup.object<PublicationDetailsFormValues>({
@@ -94,7 +94,7 @@ const PublicationDetailsForm = ({
           summary: Yup.string()
             .required('Enter a summary')
             .max(160, 'Summary must be 160 characters or less'),
-          topicId: Yup.string().required('Choose a topic'),
+          themeId: Yup.string().required('Choose a theme'),
         })}
         onSubmit={useFormSubmit(onSubmit, errorMappings)}
       >
@@ -118,13 +118,13 @@ const PublicationDetailsForm = ({
                     maxLength={160}
                   />
                 )}
-                {canUpdatePublication && themes && initialValues?.topicId && (
-                  <FormFieldThemeTopicSelect<PublicationDetailsFormValues>
+                {canUpdatePublication && themes && initialValues?.themeId && (
+                  <FormFieldThemeSelect<PublicationDetailsFormValues>
                     id={id}
                     inline={false}
                     legend="Choose a topic for this publication"
                     legendHidden
-                    name="topicId"
+                    name="themeId"
                     themes={themes}
                   />
                 )}

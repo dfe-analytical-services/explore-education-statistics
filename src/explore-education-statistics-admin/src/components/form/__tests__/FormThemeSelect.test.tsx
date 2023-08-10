@@ -1,10 +1,10 @@
-import FormThemeTopicSelect from '@admin/components/form/FormThemeTopicSelect';
+import FormThemeSelect from '@admin/components/form/FormThemeSelect';
 import { Theme } from '@admin/services/themeService';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-describe('FormThemeTopicSelect', () => {
+describe('FormThemeSelect', () => {
   const testThemes: Theme[] = [
     {
       id: 'theme-1',
@@ -50,7 +50,7 @@ describe('FormThemeTopicSelect', () => {
 
   test('renders correctly with no theme', () => {
     render(
-      <FormThemeTopicSelect id="themeTopic" legend="Theme/topic" themes={[]} />,
+      <FormThemeSelect id="themeTopic" legend="Theme/topic" themes={[]} />,
     );
 
     const themeSelect = screen.getByLabelText('Select theme');
@@ -66,7 +66,7 @@ describe('FormThemeTopicSelect', () => {
 
   test('renders correctly with single theme and topic', () => {
     render(
-      <FormThemeTopicSelect
+      <FormThemeSelect
         id="themeTopic"
         legend="Theme/topic"
         topicId="topic-1"
@@ -114,7 +114,7 @@ describe('FormThemeTopicSelect', () => {
 
   test('renders correctly with multiple themes and topics and no `topicId`', () => {
     render(
-      <FormThemeTopicSelect
+      <FormThemeSelect
         id="themeTopic"
         legend="Theme/topic"
         themes={testThemes}
@@ -154,7 +154,7 @@ describe('FormThemeTopicSelect', () => {
 
   test('renders correctly with multiple themes and topics and initial `topicId`', () => {
     render(
-      <FormThemeTopicSelect
+      <FormThemeSelect
         id="themeTopic"
         legend="Theme/topic"
         topicId="topic-4"
@@ -197,7 +197,7 @@ describe('FormThemeTopicSelect', () => {
     const handleChange = jest.fn();
 
     render(
-      <FormThemeTopicSelect
+      <FormThemeSelect
         id="themeTopic"
         legend="Theme/topic"
         themes={testThemes}
@@ -217,7 +217,7 @@ describe('FormThemeTopicSelect', () => {
     const handleChange = jest.fn();
 
     render(
-      <FormThemeTopicSelect
+      <FormThemeSelect
         id="themeTopic"
         legend="Theme/topic"
         themes={testThemes}

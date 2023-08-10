@@ -2,9 +2,8 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PublicationForm from '@admin/pages/publication/components/PublicationForm';
-import { dashboardRoute, ThemeTopicParams } from '@admin/routes/routes';
+import { dashboardRoute, ThemeParams } from '@admin/routes/routes';
 import publicationService from '@admin/services/publicationService';
-import topicService from '@admin/services/topicService';
 import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -14,19 +13,19 @@ import { RouteComponentProps } from 'react-router';
 const PublicationCreatePage = ({
   history,
   match,
-}: RouteComponentProps<{ topicId: string }>) => {
-  const { topicId } = match.params;
+}: RouteComponentProps<{ themeId: string }>) => {
+  const { themeId } = match.params;
 
-  const { value: topic, isLoading } = useAsyncHandledRetry(
-    () => topicService.getTopic(topicId),
-    [topicId],
+  const { value: theme, isLoading } = useAsyncHandledRetry(
+    () => themeService.getTheme(themeId),
+    [themeId],
   );
 
   if (isLoading) {
     return <LoadingSpinner loading={isLoading} />;
   }
 
-  if (!topic) {
+  if (!theme) {
     return null;
   }
 
@@ -34,20 +33,8 @@ const PublicationCreatePage = ({
     <Page breadcrumbs={[{ name: 'Create new publication' }]}>
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <PageTitle caption={topic.title} title="Create new publication" />
+          <PageTitle caption={theme.title} title="Create new publication" />
         </div>
-        {/* EES-2464
-        <div className="govuk-grid-column-one-third">
-          <RelatedInformation heading="Help and guidance">
-            <ul className="govuk-list">
-              <li>
-                <Link to="/documentation/create-new-publication" target="blank">
-                  Creating a new publication
-                </Link>
-              </li>
-            </ul>
-          </RelatedInformation>
-        </div> */}
       </div>
 
       <PublicationForm
@@ -55,9 +42,8 @@ const PublicationCreatePage = ({
         cancelButton={
           <Link
             unvisited
-            to={appendQuery<ThemeTopicParams>(dashboardRoute.path, {
-              themeId: topic.themeId,
-              topicId,
+            to={appendQuery<ThemeParams>(dashboardRoute.path, {
+              themeId: theme.id,
             })}
           >
             Cancel
@@ -72,7 +58,7 @@ const PublicationCreatePage = ({
         }) => {
           await publicationService.createPublication({
             ...values,
-            topicId: topic.id,
+            themeId: theme.id,
             contact: {
               teamName,
               teamEmail,

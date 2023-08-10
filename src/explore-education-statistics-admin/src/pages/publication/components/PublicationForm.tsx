@@ -1,4 +1,4 @@
-import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
+import FormFieldThemeSelect from '@admin/components/form/FormFieldThemeSelect';
 import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
@@ -22,7 +22,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 export interface FormValues {
   title: string;
   summary: string;
-  topicId?: string;
+  themeId?: string;
   teamName: string;
   teamEmail: string;
   contactName: string;
@@ -100,13 +100,13 @@ const PublicationForm = ({
       supersededById: Yup.string(),
     });
 
-    if (initialValues?.topicId) {
+    if (initialValues?.themeId) {
       return schema.shape({
-        topicId: Yup.string().required('Choose a topic'),
+        topicId: Yup.string().required('Choose a theme'),
       });
     }
     return schema;
-  }, [initialValues?.topicId]);
+  }, [initialValues?.themeId]);
 
   const handleSubmit = useFormSubmit(async (values: FormValues) => {
     await onSubmit(values);
@@ -150,10 +150,10 @@ const PublicationForm = ({
               maxLength={160}
             />
 
-            {themes && initialValues?.topicId && (
-              <FormFieldThemeTopicSelect<FormValues>
-                name="topicId"
-                legend="Choose a topic for this publication"
+            {themes && initialValues?.themeId && (
+              <FormFieldThemeSelect<FormValues>
+                name="themeId"
+                legend="Choose a theme for this publication"
                 legendSize="m"
                 id={id}
                 themes={themes}

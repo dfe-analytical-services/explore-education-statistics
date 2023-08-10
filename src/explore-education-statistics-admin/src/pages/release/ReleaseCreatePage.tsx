@@ -16,7 +16,6 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React from 'react';
-import { ReleaseType } from '@common/services/types/releaseType';
 
 import { generatePath, RouteComponentProps, withRouter } from 'react-router';
 

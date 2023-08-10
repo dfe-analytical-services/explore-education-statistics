@@ -14,8 +14,6 @@ import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
 import ThemeCreatePage from '@admin/pages/themes/ThemeCreatePage';
 import ThemeEditPage from '@admin/pages/themes/ThemeEditPage';
 import ThemesPage from '@admin/pages/themes/ThemesPage';
-import TopicCreatePage from '@admin/pages/themes/topics/TopicCreatePage';
-import TopicEditPage from '@admin/pages/themes/topics/TopicEditPage';
 import administrationRoutes from '@admin/routes/administrationRoutes';
 import documentationRoutes from '@admin/routes/documentationRoutes';
 import {
@@ -31,12 +29,6 @@ export type PublicationRouteParams = {
 export type ThemeParams = {
   themeId: string;
 };
-
-export type TopicParams = {
-  topicId: string;
-};
-
-export type ThemeTopicParams = ThemeParams & TopicParams;
 
 export const homeRoute: ProtectedRouteProps = {
   path: '/',
@@ -79,22 +71,8 @@ export const themeEditRoute: ProtectedRouteProps = {
   exact: true,
 };
 
-export const topicCreateRoute: ProtectedRouteProps = {
-  path: '/themes/:themeId/topics/create',
-  component: TopicCreatePage,
-  protectionAction: user => user.permissions.canManageAllTaxonomy,
-  exact: true,
-};
-
-export const topicEditRoute: ProtectedRouteProps = {
-  path: '/themes/:themeId/topics/:topicId/edit',
-  component: TopicEditPage,
-  protectionAction: user => user.permissions.canManageAllTaxonomy,
-  exact: true,
-};
-
 export const publicationCreateRoute: ProtectedRouteProps = {
-  path: '/topics/:topicId/publications/create',
+  path: '/themes/:themeId/publications/create',
   component: PublicationCreatePage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
   exact: true,
@@ -173,8 +151,6 @@ const routes = {
   themesRoute,
   themeCreateRoute,
   themeEditRoute,
-  topicCreateRoute,
-  topicEditRoute,
   publicationCreateRoute,
   publicationReleaseContributorsRoute,
   methodologyRoute,

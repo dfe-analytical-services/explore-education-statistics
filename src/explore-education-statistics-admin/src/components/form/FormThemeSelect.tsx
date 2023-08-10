@@ -2,11 +2,10 @@ import { Theme } from '@admin/services/themeService';
 import { FormFieldset } from '@common/components/form';
 import { FormFieldsetProps } from '@common/components/form/FormFieldset';
 import FormSelect from '@common/components/form/FormSelect';
-import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
-import styles from './FormThemeTopicSelect.module.scss';
+import styles from './FormThemeSelect.module.scss';
 
-export interface FormThemeTopicSelectProps {
+export interface FormThemeSelectProps {
   error?: string;
   id: string;
   hint?: string;
@@ -15,13 +14,11 @@ export interface FormThemeTopicSelectProps {
   legendHidden?: FormFieldsetProps['legendHidden'];
   legendSize?: FormFieldsetProps['legendSize'];
   themes: Theme[];
-  themeInputName?: string;
-  topicId?: string;
-  topicInputName?: string;
-  onChange?: (topicId: string, themeId: string) => void;
+  themeInputName: string; // @MarkFix needs to be nullable?
+  onChange?: (themeId: string) => void;
 }
 
-const FormThemeTopicSelect = ({
+const FormThemeSelect = ({
   error,
   hint,
   id,
@@ -31,17 +28,14 @@ const FormThemeTopicSelect = ({
   legendSize,
   themes,
   themeInputName = 'theme',
-  topicId,
-  topicInputName = 'topic',
+  themeId,
   onChange,
-}: FormThemeTopicSelectProps) => {
+}: FormThemeSelectProps) => {
   const selectedTheme = useMemo<Theme | undefined>(() => {
-    const matchingTheme = themes.find(theme =>
-      theme.topics.find(topic => topic.id === topicId),
-    );
+    const matchingTheme = themes.find(theme => theme.id === themeId);
 
     return matchingTheme ?? themes[0];
-  }, [themes, topicId]);
+  }, [themes, themeId]);
 
   return (
     <FormFieldset
@@ -77,49 +71,8 @@ const FormThemeTopicSelect = ({
                 return;
               }
 
-              const nextTopic = orderBy(
-                nextTheme.topics,
-                topic => topic.title,
-              )[0];
-
-              if (!nextTopic) {
-                return;
-              }
-
               if (onChange) {
-                onChange(nextTopic.id, nextTheme.id);
-              }
-            }}
-          />
-        </div>
-        <div>
-          <FormSelect
-            id={`${id}-topicId`}
-            label="Select topic"
-            name={topicInputName}
-            className={inline ? styles.select : 'govuk-!-width-one-half'}
-            value={topicId}
-            options={
-              selectedTheme?.topics.map(topic => ({
-                label: topic.title,
-                value: topic.id,
-              })) ?? []
-            }
-            onChange={event => {
-              if (!selectedTheme) {
-                return;
-              }
-
-              const nextTopic = selectedTheme.topics.find(
-                topic => topic.id === event.target.value,
-              );
-
-              if (!nextTopic) {
-                return;
-              }
-
-              if (onChange) {
-                onChange(nextTopic.id, selectedTheme.id);
+                onChange(nextTheme.id);
               }
             }}
           />
@@ -129,4 +82,4 @@ const FormThemeTopicSelect = ({
   );
 };
 
-export default FormThemeTopicSelect;
+export default FormThemeSelect;

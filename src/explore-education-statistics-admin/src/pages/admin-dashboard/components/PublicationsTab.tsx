@@ -1,9 +1,8 @@
-import FormThemeTopicSelect from '@admin/components/form/FormThemeTopicSelect';
+import FormThemeSelect from '@admin/components/form/FormThemeSelect';
 import useQueryParams from '@admin/hooks/useQueryParams';
-import TopicPublications from '@admin/pages/admin-dashboard/components/TopicPublications';
-import { ThemeTopicParams, dashboardRoute } from '@admin/routes/routes';
+import ThemePublications from '@admin/pages/admin-dashboard/components/ThemePublications';
+import { ThemeParams, dashboardRoute } from '@admin/routes/routes';
 import themeService, { Theme } from '@admin/services/themeService';
-import { Topic } from '@admin/services/topicService';
 import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
@@ -21,9 +20,10 @@ const PublicationsTab = ({ isBauUser }: Props) => {
   const location = useLocation();
   const history = useHistory();
 
-  const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<
-    ThemeTopicParams
-  >('dashboardThemeTopic', undefined);
+  const [savedTheme, setSavedTheme] = useStorageItem<ThemeParams>(
+    'dashboardTheme',
+    undefined,
+  );
 
   const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
     themeService.getThemes,
@@ -35,60 +35,39 @@ const PublicationsTab = ({ isBauUser }: Props) => {
     if (!isBauUser) {
       return undefined;
     }
-    const selectedThemeId = themeId || savedThemeTopic?.themeId;
+    const selectedThemeId = themeId || savedTheme?.themeId;
 
     return (
       themes?.find(t => t.id === selectedThemeId) ??
       orderBy(themes, t => t.title)[0]
     );
-  }, [isBauUser, savedThemeTopic, themeId, themes]);
-
-  const selectedTopic = useMemo<Topic | undefined>(() => {
-    if (!selectedTheme) {
-      return undefined;
-    }
-
-    const selectedTopicId = topicId || savedThemeTopic?.topicId;
-
-    return (
-      selectedTheme.topics.find(t => t.id === selectedTopicId) ??
-      orderBy(selectedTheme.topics, t => t.title)[0]
-    );
-  }, [savedThemeTopic, selectedTheme, topicId]);
+  }, [isBauUser, savedTheme, themeId, themes]);
 
   useEffect(() => {
-    if (savedThemeTopic) {
+    if (savedTheme) {
       return;
     }
 
     // Set default theme/topic in storage if it hasn't been set yet (e.g. first time
     // visiting dashboard).
-    if (selectedTheme && selectedTopic) {
-      setSavedThemeTopic({
+    if (selectedTheme) {
+      setSavedTheme({
         themeId: selectedTheme.id,
-        topicId: selectedTopic.id,
       });
     }
-  }, [
-    isBauUser,
-    savedThemeTopic,
-    selectedTheme,
-    selectedTopic,
-    setSavedThemeTopic,
-  ]);
+  }, [isBauUser, savedTheme, selectedTheme, setSavedTheme]);
 
   useEffect(() => {
-    if (!selectedTheme || !selectedTopic) {
+    if (!selectedTheme) {
       return;
     }
 
     // Update query params to reflect the chosen
     // theme/topic if they haven't already been set.
-    if (selectedTheme?.id !== themeId || selectedTopic?.id !== topicId) {
+    if (selectedTheme?.id !== themeId) {
       history.replace(
-        appendQuery<ThemeTopicParams>(location.pathname, {
+        appendQuery<ThemeParams>(location.pathname, {
           themeId: selectedTheme?.id,
-          topicId: selectedTopic?.id,
         }),
       );
     }
@@ -96,9 +75,8 @@ const PublicationsTab = ({ isBauUser }: Props) => {
     isBauUser,
     history,
     location.pathname,
-    savedThemeTopic,
+    savedTheme,
     selectedTheme,
-    selectedTopic,
     themeId,
     topicId,
   ]);
@@ -121,22 +99,20 @@ const PublicationsTab = ({ isBauUser }: Props) => {
       {isBauUser && (
         <>
           {themes && themes.length > 0 && (
-            <FormThemeTopicSelect
+            <FormThemeSelect
               id="publicationsReleases-themeTopic"
               legend="Choose a theme and topic to view publications for"
               legendHidden
               themes={themes}
               topicId={topicId}
-              onChange={(nextTopicId, nextThemeId) => {
-                setSavedThemeTopic({
+              onChange={nextThemeId => {
+                setSavedTheme({
                   themeId: nextThemeId,
-                  topicId: nextTopicId,
                 });
 
                 history.replace(
-                  appendQuery<ThemeTopicParams>(dashboardRoute.path, {
+                  appendQuery<ThemeParams>(dashboardRoute.path, {
                     themeId: nextThemeId,
-                    topicId: nextTopicId,
                   }),
                 );
               }}
@@ -167,22 +143,22 @@ const PublicationsTab = ({ isBauUser }: Props) => {
         </>
       ) : (
         <>
-          {selectedTheme && selectedTopic ? (
-            <TopicPublications
-              key={selectedTopic.id}
+          {selectedTheme ? (
+            <ThemePublications
+              key={selectedTheme.id}
               themeTitle={selectedTheme.title}
-              topic={selectedTopic}
+              theme={selectedTheme}
             />
           ) : (
             <>
               {themes?.map(theme => {
-                return theme.topics.map(topic => (
-                  <TopicPublications
-                    key={topic.id}
+                return (
+                  <ThemePublications
+                    key={theme.id}
                     themeTitle={theme.title}
-                    topic={topic}
+                    theme={theme}
                   />
-                ));
+                );
               })}
             </>
           )}

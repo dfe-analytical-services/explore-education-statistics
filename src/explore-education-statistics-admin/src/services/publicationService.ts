@@ -77,7 +77,7 @@ export interface PublicationCreateRequest {
   summary: string;
   contact: ContactSave;
   supersededById?: string;
-  topicId: string;
+  themeId: string;
 }
 
 export interface ListReleasesParams {
@@ -92,10 +92,9 @@ export type UpdatePublicationLegacyRelease = Partial<
 >;
 
 const publicationService = {
-  listPublications(topicId?: string): Promise<Publication[]> {
-    // @MarkFix takes a themeId
+  listPublications(themeId?: string): Promise<Publication[]> {
     return client.get('/publications', {
-      params: { topicId },
+      params: { themeId },
     });
   },
   getPublicationSummaries(): Promise<PublicationSummary[]> {
