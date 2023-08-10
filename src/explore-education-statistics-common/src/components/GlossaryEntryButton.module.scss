@@ -1,0 +1,11 @@
+@import '~govuk-frontend/govuk/base';
+
+.content {
+  margin-bottom: govuk-spacing(5);
+  max-height: 50vh;
+  overflow-y: auto;
+
+  &:focus {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+}
