@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -252,8 +253,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             return new(
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict)
-            );
+                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict),
+                Mock.Of<IUserService>());
         }
     }
 }

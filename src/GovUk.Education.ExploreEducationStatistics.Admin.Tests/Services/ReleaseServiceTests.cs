@@ -45,9 +45,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServiceTests
     {
-        private readonly Guid _userId = Guid.NewGuid();
-        
         private readonly DataFixture _fixture = new();
+        
+        private readonly Guid _userId = Guid.NewGuid();
 
         [Fact]
         public async Task CreateReleaseNoTemplate()

@@ -9,10 +9,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyServiceTests
     {
+        private readonly DataFixture _fixture = new();
+        
         private static readonly Guid UserId = Guid.NewGuid();
 
         [Fact]
@@ -2220,6 +2224,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.NotNull(statuses);
                 Assert.Empty(statuses);
             }
+        }
+
+        [Fact]
+        public async Task ListMethodologyVersionsForApproval()
+        {
+            var user = new User();
+
+            var publications = _fixture
+                .DefaultPublication()
+                .GenerateList(2);
+            
+            var methodologies = _fixture
+                .DefaultMethodology()
+                .WithMethodologyVersions(_ => _fixture
+                    .DefaultMethodologyVersion()
+                    .Generate(2))
+                .ForIndex(0, s => s.SetOwningPublication(publications[0]))
+                .ForIndex(1, s => s.SetAdoptingPublication(publications[1]))
+                .Generate();
+
+
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddRangeAsync(publications);
+                await context.MethodologyStatus.AddRangeAsync(methodologyStatuses);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(context);
+
+                var result = await service.ListMethodologyVersionsForApproval(user.Id);
+
+                var statuses = result.AssertRight();
+
+                Assert.NotNull(statuses);
+                Assert.Empty(statuses);
+            }
+            
         }
 
         private static MethodologyService SetupMethodologyService(

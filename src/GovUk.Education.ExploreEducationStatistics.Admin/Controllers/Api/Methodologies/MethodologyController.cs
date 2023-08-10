@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,13 +20,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
     {
         private readonly IMethodologyService _methodologyService;
         private readonly IMethodologyAmendmentService _methodologyAmendmentService;
+        private readonly IUserService _userService;
 
         public MethodologyController(
             IMethodologyService methodologyService,
-            IMethodologyAmendmentService methodologyAmendmentService)
+            IMethodologyAmendmentService methodologyAmendmentService, 
+            IUserService userService)
         {
             _methodologyService = methodologyService;
             _methodologyAmendmentService = methodologyAmendmentService;
+            _userService = userService;
         }
 
         [HttpPut("publication/{publicationId:guid}/methodology/{methodologyId:guid}")]
@@ -117,6 +121,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         {
             return _methodologyService
                 .GetMethodologyStatuses(methodologyVersionId)
+                .HandleFailuresOrOk();
+        }
+        
+        [HttpGet("methodology/approvals")]
+        public async Task<ActionResult<List<MethodologyVersionViewModel>>> ListMethodologyVersionsForApproval()
+        {
+            return await _methodologyService
+                .ListMethodologyVersionsForApproval(_userService.GetUserId())
                 .HandleFailuresOrOk();
         }
     }
