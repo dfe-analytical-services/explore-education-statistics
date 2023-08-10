@@ -37,28 +37,8 @@ Currently, these tests are being maintained so they can be run on Windows and Ub
 
 ## Pyenv installation
   Pyenv is a tool for installing and managing multiple versions of Python on a single machine. It is the recommended way of installing and managing python.
-  
-  Install pyenv using [chocolatey](https://chocolatey.org/install)
 
-  ```bash
-  choco install pyenv-win
-  pyenv install 3.101
-  ```
-
-  **Linux**
-
-  ```bash
-  curl https://pyenv.run | bash
-  pyenv install 3.101
-
-  ```
-
-  **Mac**
-
-  ```bash
-  brew install pyenv
-  pyenv install 3.101
-  ```
+  See the [installation guide](https://github.com/pyenv/pyenv#installation) for details on how to install pyenv for your operating system  
 
 ## What do I need to install?
 
