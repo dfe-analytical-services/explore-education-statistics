@@ -2070,7 +2070,7 @@
         "GA_TRACKING_ID": "[parameters('publicAppGATrackingId')]",
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
-        "URL": "[concat(variables('publicAppUrl'), '/')]",
+        "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
         "WEBSITE_NODE_DEFAULT_VERSION": "18.17.0"
       }
     },
