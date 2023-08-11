@@ -22,6 +22,7 @@ interface ComboBoxRenderProps {
 interface Props {
   afterInput?: ReactNode | ((props: ComboBoxRenderProps) => ReactNode);
   classes?: Partial<Record<'inputLabel', string>>;
+  hideSearchIcon?: boolean;
   id: string;
   inputLabel: ReactNode;
   inputProps?: InputHTMLAttributes<HTMLInputElement>;
@@ -37,6 +38,7 @@ interface Props {
 const FormComboBox = ({
   afterInput,
   classes = {},
+  hideSearchIcon = false,
   id,
   inputLabel,
   inputProps,
@@ -170,7 +172,9 @@ const FormComboBox = ({
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...inputProps}
         role="combobox"
-        className={classNames(inputStyles.searchInput, 'govuk-input')}
+        className={classNames('govuk-input', {
+          [inputStyles.searchInput]: !hideSearchIcon,
+        })}
         id={`${id}-input`}
         value={value}
         ref={inputRef}

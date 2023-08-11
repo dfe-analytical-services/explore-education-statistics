@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "6.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -672,24 +672,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("CountFilterItems")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountFootnotes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountIndicators")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountLocations")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountObservations")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountTimePeriods")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -697,16 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Legacy")
-                        .HasColumnType("bit");
-
-                    b.Property<long?>("LegacyContentLength")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool?>("LegacyHasConfigurationHeaders")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("LegacyHasSnapshot")
+                    b.Property<bool>("MigratedFromLegacy")
                         .HasColumnType("bit");
 
                     b.Property<string>("PublicationTitle")

@@ -14,19 +14,19 @@ import styles from './ContentHtml.module.scss';
 
 export interface ContentHtmlProps {
   className?: string;
+  getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
   html: string;
   sanitizeOptions?: SanitizeHtmlOptions;
   testId?: string;
-  getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
 }
 
 export default function ContentHtml({
   className,
+  getGlossaryEntry,
   html,
   sanitizeOptions,
   testId,
-  getGlossaryEntry,
   trackGlossaryLinks,
 }: ContentHtmlProps) {
   const { isMounted } = useMounted();
@@ -48,8 +48,8 @@ export default function ContentHtml({
       ) {
         return isMounted ? (
           <GlossaryEntryButton
-            href={node.attribs.href}
             getEntry={getGlossaryEntry}
+            href={node.attribs.href}
             onToggle={trackGlossaryLinks}
           >
             {domToReact(node.children)}

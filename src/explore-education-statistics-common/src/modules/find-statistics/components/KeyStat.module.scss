@@ -12,6 +12,7 @@
   margin: 0;
   padding: 0.2rem 0 0.2rem 0.5rem;
   position: relative;
+  text-align: left;
   width: 100%;
 
   &[open] {
@@ -51,7 +52,7 @@
   color: govuk-colour('white');
 }
 
-.column {
+.wrapper {
   box-sizing: border-box;
   display: flex;
   flex: 1 0 100%;
@@ -69,11 +70,20 @@
     flex: 1 0 33.33%;
     max-width: 33.33%;
 
-    // If there are four key stat tiles, have two per row
+    // If there are two or four key stat tiles, have two per row
+    &:first-child:nth-last-child(2),
+    &:first-child:nth-last-child(2) ~ &,
     &:first-child:nth-last-child(4),
     &:first-child:nth-last-child(4) ~ & {
       flex: 0 1 50%;
       max-width: 50%;
     }
+  }
+
+  // If there is only one key stat it should be full width
+  &:only-child {
+    flex: 1;
+    max-width: 100%;
+    text-align: center;
   }
 }

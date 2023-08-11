@@ -15,6 +15,11 @@
     <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.32.1" />
   </ItemGroup>
   <ItemGroup>
+    <FunctionsPreservedDependencies Include="Microsoft.IdentityModel.Logging.dll" />
+    <FunctionsPreservedDependencies Include="Microsoft.IdentityModel.Tokens.dll" />
+    <FunctionsPreservedDependencies Include="System.IdentityModel.Tokens.Jwt.dll" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Notifier.Model\GovUk.Education.ExploreEducationStatistics.Notifier.Model.csproj" />
   </ItemGroup>

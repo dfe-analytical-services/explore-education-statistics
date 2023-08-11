@@ -5,37 +5,28 @@ using System.Dynamic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net.Mime;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using AutoMapper;
 using CsvHelper;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
@@ -50,7 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly ISubjectRepository _subjectRepository;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseRepository _releaseRepository;
-        private readonly IMapper _mapper;
 
         public PermalinkService(
             ContentDbContext contentDbContext,
@@ -60,8 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             IFrontendService frontendService,
             ISubjectRepository subjectRepository,
             IPublicationRepository publicationRepository,
-            IReleaseRepository releaseRepository,
-            IMapper mapper)
+            IReleaseRepository releaseRepository)
         {
             _contentDbContext = contentDbContext;
             _tableBuilderService = tableBuilderService;
@@ -71,14 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _subjectRepository = subjectRepository;
             _publicationRepository = publicationRepository;
             _releaseRepository = releaseRepository;
-            _mapper = mapper;
         }
-
-        public static readonly JsonSerializerSettings LegacyPermalinkSerializerSettings = new()
-        {
-            ContractResolver = new PermalinkContractResolver(),
-            NullValueHandling = NullValueHandling.Ignore
-        };
 
         public async Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
@@ -97,8 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return await _contentDbContext.Permalinks
                 .SingleOrNotFoundAsync(
-                    predicate: permalink => permalink.Id == permalinkId &&
-                                            (!permalink.Legacy || permalink.LegacyHasSnapshot == true),
+                    predicate: permalink => permalink.Id == permalinkId,
                     cancellationToken: cancellationToken);
         }
 
@@ -124,9 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         cancellationToken
                     );
 
-                    // TODO EES-3755 Can we refactor this to use the SubjectCsvMetaService or use
-                    // TableBuilderService.QueryToCsvStream to get the csv directly? This would allow removing
-                    // PermalinkCsvMetaService when the snapshot work is complete.
                     var csvMetaTask = _permalinkCsvMetaService.GetCsvMeta(
                         request.Query.SubjectId,
                         tableResult.SubjectMeta,
@@ -166,12 +144,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         SubjectId = request.Query.SubjectId,
                         PublicationTitle = subjectMeta.PublicationName,
                         DataSetTitle = subjectMeta.SubjectName,
-                        CountFilterItems = CountFilterItems(subjectMeta.Filters),
-                        CountFootnotes = subjectMeta.Footnotes.Count,
-                        CountIndicators = subjectMeta.Indicators.Count,
-                        CountLocations = CountLocations(subjectMeta.Locations),
-                        CountObservations = tableResult.Results.Count(),
-                        CountTimePeriods = subjectMeta.TimePeriodRange.Count
                     };
                     _contentDbContext.Permalinks.Add(permalink);
 
@@ -197,82 +169,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     stream: stream,
                     cancellationToken: cancellationToken
                 ));
-        }
-
-        // TODO EES-3755 Remove after Permalink snapshot work is complete
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> GetLegacy(
-            Guid permalinkId,
-            CancellationToken cancellationToken = default)
-        {
-            return await FindLegacy(permalinkId, cancellationToken).OnSuccess(BuildLegacyViewModel);
-        }
-
-        // TODO EES-3755 Remove after Permalink snapshot work is complete
-        public async Task<Either<ActionResult, Unit>> LegacyDownloadCsvToStream(
-            Guid permalinkId,
-            Stream stream,
-            CancellationToken cancellationToken = default)
-        {
-            return await FindLegacy(permalinkId, cancellationToken)
-                .OnSuccessCombineWith(permalink => _permalinkCsvMetaService.GetCsvMeta(permalink, cancellationToken))
-                .OnSuccessVoid(
-                    async tuple =>
-                    {
-                        var (permalink, meta) = tuple;
-
-                        await using var writer = new StreamWriter(stream, leaveOpen: true);
-                        await using var csv = new CsvWriter(writer, CultureInfo.InvariantCulture, leaveOpen: true);
-
-                        await WriteCsvHeaderRow(csv, meta);
-                        await WriteCsvRows(csv, permalink.FullTable.Results, meta, cancellationToken);
-
-                        await writer.FlushAsync();
-                    }
-                );
-        }
-
-        // TODO EES-3755 Remove after Permalink snapshot work is complete
-        public async Task<Either<ActionResult, Unit>> MigratePermalink(Guid permalinkId,
-            CancellationToken cancellationToken = default)
-        {
-            return await _contentDbContext.Permalinks
-                .SingleOrNotFoundAsync(
-                    predicate: permalink => permalink.Id == permalinkId && permalink.Legacy,
-                    cancellationToken: cancellationToken)
-                .OnSuccess(async permalink =>
-                {
-                    // Return a bad request result if the Permalink already has a snapshot
-                    if (permalink.LegacyHasSnapshot == true)
-                    {
-                        return ValidationUtils.ValidationResult(ValidationErrorMessages.PermalinkSnapshotAlreadyExists);
-                    }
-
-                    return await DownloadLegacyPermalink(permalinkId, cancellationToken)
-                        .OnSuccessCombineWith(legacyPermalink =>
-                            _frontendService.CreateTable(legacyPermalink, cancellationToken))
-                        .OnSuccessCombineWith(tuple =>
-                        {
-                            var (legacyPermalink, _) = tuple;
-                            return _permalinkCsvMetaService.GetCsvMeta(legacyPermalink, cancellationToken);
-                        })
-                        .OnSuccessVoid(async tuple =>
-                        {
-                            var (legacyPermalink, table, csvMeta) = tuple;
-
-                            // To avoid the frontend processing and returning the footnotes unnecessarily,
-                            // add them to the table view model directly
-                            table = table with
-                            {
-                                Footnotes = legacyPermalink.FullTable.SubjectMeta.Footnotes
-                            };
-
-                            await UploadSnapshot(permalink,
-                                observations: legacyPermalink.FullTable.Results,
-                                csvMeta: csvMeta,
-                                table: table,
-                                cancellationToken: cancellationToken);
-                        });
-                });
         }
 
         private static async Task WriteCsvHeaderRow(CsvWriter csv, PermalinkCsvMetaViewModel meta)
@@ -316,21 +212,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             PermalinkCsvMetaViewModel meta,
             HashSet<string> locationHeaders)
         {
-            // Legacy permalinks created before location id's were introduced may have observations with an empty
-            // location id and will have have no locations worked out from the table subject meta.
-            Dictionary<string, string>? legacyLocationValues = null;
-            if (observation.LocationId == Guid.Empty || !meta.Locations.Any())
-            {
-                // We can use the location object to get the location values instead, providing that it exists
-                if (observation.Location == null)
-                {
-                    throw new InvalidOperationException(
-                        "Found observation with no location while mapping csv row for permalink without location id's");
-                }
-
-                legacyLocationValues = observation.Location.GetCsvValues();
-            }
-
             var timePeriod = observation.GetTimePeriodTuple();
 
             var row = new ExpandoObject() as IDictionary<string, object>;
@@ -341,8 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     observation,
                     timePeriod,
                     meta,
-                    locationHeaders,
-                    legacyLocationValues);
+                    locationHeaders);
             }
 
             return row;
@@ -353,8 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             ObservationViewModel observation,
             (int Year, TimeIdentifier TimeIdentifier) timePeriod,
             PermalinkCsvMetaViewModel meta,
-            IReadOnlySet<string> locationHeaders,
-            IReadOnlyDictionary<string, string>? legacyLocationValues)
+            IReadOnlySet<string> locationHeaders)
         {
             switch (header)
             {
@@ -368,24 +247,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             if (locationHeaders.Contains(header))
             {
-                if (legacyLocationValues != null)
-                {
-                    // Prior to this we have determined the location id is missing
-                    // and got csv values from the observation location instead.
-                    // Return the value matching the csv header
-                    if (legacyLocationValues.TryGetValue(header, out var value))
-                    {
-                        return value;
-                    }
-                }
-                else
-                {
-                    var location = meta.Locations[observation.LocationId];
+                var location = meta.Locations[observation.LocationId];
 
-                    if (location.TryGetValue(header, out var value))
-                    {
-                        return value;
-                    }
+                if (location.TryGetValue(header, out var value))
+                {
+                    return value;
                 }
             }
 
@@ -426,103 +292,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return string.Empty;
         }
 
-        // TODO EES-3755 Remove after Permalink snapshot work is complete
-        private async Task<Either<ActionResult, LegacyPermalink>> FindLegacy(
-            Guid permalinkId,
-            CancellationToken cancellationToken)
-        {
-            return await _contentDbContext.Permalinks
-                .SingleOrNotFoundAsync(
-                    predicate: permalink => permalink.Id == permalinkId &&
-                                            permalink.Legacy == true,
-                    cancellationToken: cancellationToken)
-                .OnSuccess(() => DownloadLegacyPermalink(permalinkId, cancellationToken));
-        }
-
-        // TODO EES-3755 Remove after Permalink snapshot work is complete
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(PermalinkCreateRequest request)
-        {
-            return await _subjectRepository.FindPublicationIdForSubject(request.Query.SubjectId)
-                .OrNotFound()
-                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
-                .OnSuccess(release => CreateLegacy(release.Id, request));
-        }
-
-        // TODO EES-3755 Remove after Permalink snapshot work is complete
-        public async Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(Guid releaseId,
-            PermalinkCreateRequest request)
-        {
-            return await _tableBuilderService.Query(releaseId, request.Query)
-                .OnSuccess(async result =>
-                {
-                    var permalinkTableResult = new PermalinkTableBuilderResult(result);
-                    var subjectMeta = permalinkTableResult.SubjectMeta;
-                    var permalink = new Permalink
-                    {
-                        Legacy = true,
-                        PublicationTitle = subjectMeta.PublicationName,
-                        DataSetTitle = subjectMeta.SubjectName,
-                        ReleaseId = releaseId,
-                        SubjectId = request.Query.SubjectId,
-                        CountFilterItems = CountFilterItems(subjectMeta.Filters),
-                        CountFootnotes = subjectMeta.Footnotes.Count,
-                        CountIndicators = subjectMeta.Indicators.Count,
-                        CountLocations = CountLocations(subjectMeta.LocationsHierarchical),
-                        CountObservations = result.Results.Count(),
-                        CountTimePeriods = subjectMeta.TimePeriodRange.Count,
-                        LegacyHasConfigurationHeaders = true
-                    };
-
-                    _contentDbContext.Permalinks.Add(permalink);
-
-                    var legacyPermalink = new LegacyPermalink(
-                        permalink.Id,
-                        permalink.Created,
-                        request.Configuration,
-                        permalinkTableResult,
-                        request.Query);
-
-                    var content = JsonConvert.SerializeObject(
-                        value: legacyPermalink,
-                        settings: LegacyPermalinkSerializerSettings);
-
-                    await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-                    permalink.LegacyContentLength = stream.Length;
-
-                    await _publicBlobStorageService.UploadStream(
-                        containerName: BlobContainers.Permalinks,
-                        path: permalink.Id.ToString(),
-                        stream: stream,
-                        contentType: MediaTypeNames.Application.Json);
-
-                    await _contentDbContext.SaveChangesAsync();
-
-                    return await BuildLegacyViewModel(legacyPermalink);
-                });
-        }
-
-        private static int CountFilterItems(Dictionary<string, FilterMetaViewModel> filters)
-        {
-            return filters.Values.Sum(filter =>
-                filter.Options.Values.Sum(filterGroup =>
-                    filterGroup.Options.Count));
-        }
-
-        private static int CountLocations(
-            Dictionary<string, List<LocationAttributeViewModel>> subjectMetaLocationsHierarchical)
-        {
-            var locationAttributes = subjectMetaLocationsHierarchical.Values
-                .SelectMany(locationAttributes => locationAttributes);
-
-            return CountLocations(locationAttributes);
-        }
-
-        private static int CountLocations(IEnumerable<LocationAttributeViewModel> locationAttributes)
-        {
-            return locationAttributes.Sum(
-                attribute => attribute.Options is null ? 1 : CountLocations(attribute.Options));
-        }
-
         private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink, PermalinkTableViewModel table)
         {
             var status = await GetPermalinkStatus(permalink.SubjectId);
@@ -535,15 +304,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 Status = status,
                 Table = table
             };
-        }
-
-        // TODO EES-3755 Remove after Permalink snapshot work is complete
-        private async Task<LegacyPermalinkViewModel> BuildLegacyViewModel(LegacyPermalink permalink)
-        {
-            var viewModel = _mapper.Map<LegacyPermalinkViewModel>(permalink);
-            viewModel.Status = await GetPermalinkStatus(permalink.Query.SubjectId);
-
-            return viewModel;
         }
 
         private async Task<PermalinkStatus> GetPermalinkStatus(Guid subjectId)
@@ -593,16 +353,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             return PermalinkStatus.Current;
         }
 
-        private async Task<Either<ActionResult, LegacyPermalink>> DownloadLegacyPermalink(Guid permalinkId,
-            CancellationToken cancellationToken = default)
-        {
-            return (await _publicBlobStorageService.GetDeserializedJson<LegacyPermalink>(
-                containerName: BlobContainers.Permalinks,
-                path: permalinkId.ToString(),
-                settings: LegacyPermalinkSerializerSettings,
-                cancellationToken: cancellationToken))!;
-        }
-
         private async Task<Either<ActionResult, PermalinkTableViewModel>> DownloadPermalink(Guid permalinkId,
             CancellationToken cancellationToken = default)
         {
@@ -622,14 +372,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 UploadTableCsv(permalink, observations, csvMeta, cancellationToken),
                 UploadTable(permalink, table, cancellationToken)
             );
-
-            if (permalink.Legacy)
-            {
-                // Flag the legacy permalink as having a snapshot so that it can be accessed by the new routes
-                _contentDbContext.Permalinks.Update(permalink);
-                permalink.LegacyHasSnapshot = true;
-                await _contentDbContext.SaveChangesAsync(cancellationToken);
-            }
         }
 
         private async Task UploadTableCsv(Permalink permalink,
@@ -665,22 +407,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 contentEncoding: ContentEncodings.Zstd,
                 cancellationToken: cancellationToken
             );
-        }
-    }
-
-    // TODO EES-3755 Remove after Permalink snapshot work is complete
-    public class PermalinkContractResolver : DefaultContractResolver
-    {
-        protected override JsonObjectContract CreateObjectContract(Type objectType)
-        {
-            var contract = base.CreateObjectContract(objectType);
-
-            if (objectType == typeof(PermalinkResultSubjectMeta))
-            {
-                contract.Converter = new PermalinkResultSubjectMetaJsonConverter();
-            }
-
-            return contract;
         }
     }
 }

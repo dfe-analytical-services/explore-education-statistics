@@ -3,6 +3,7 @@ import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentForm from '@admin/components/editable/EditableContentForm';
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';
+import glossaryService from '@admin/services/glossaryService';
 import { UserDetails } from '@admin/services/types/user';
 import {
   ImageUploadCancelHandler,
@@ -195,10 +196,13 @@ const EditableContentBlock = ({
               ref={ref}
               onClick={isEditable ? onEditing : undefined}
             >
-              <ContentHtml
-                html={content || '<p>This section is empty</p>'}
-                sanitizeOptions={sanitizeOptions}
-              />
+              <div inert="">
+                <ContentHtml
+                  getGlossaryEntry={glossaryService.getEntry}
+                  html={content || '<p>This section is empty</p>'}
+                  sanitizeOptions={sanitizeOptions}
+                />
+              </div>
               {lockedBy && (
                 <span className={styles.lockedMessage}>
                   {`${lockedBy.displayName} is editing`}

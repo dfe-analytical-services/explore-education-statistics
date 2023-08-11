@@ -1,10 +1,12 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import styles from '@admin/components/form/FormEditor.module.scss';
+import GlossaryItemInsertForm from '@admin/components/editable/GlossaryItemInsertForm';
 import {
   CommentsPlugin,
   DowncastWriter,
   Editor as EditorType,
   Element,
+  GlossaryPlugin,
 } from '@admin/types/ckeditor';
 import { defaultAllowedHeadings } from '@admin/config/ckEditorConfig';
 import useCKEditorConfig from '@admin/hooks/useCKEditorConfig';
@@ -17,6 +19,7 @@ import { CKEditor, CKEditorProps } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
 import ContentHtml from '@common/components/ContentHtml';
+import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
@@ -79,12 +82,14 @@ const FormEditor = ({
 }: FormEditorProps) => {
   const editorInstance = useRef<EditorType>();
   const commentsPlugin = useRef<CommentsPlugin>();
+  const glossaryPlugin = useRef<GlossaryPlugin>();
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   const {
     currentInteraction,
     selectedComment,
     setMarkersOrder,
   } = useCommentsContext();
+  const [showGlossaryModal, toggleGlossaryModal] = useToggle(false);
   const config = useCKEditorConfig({
     allowComments,
     allowedHeadings,
@@ -93,6 +98,7 @@ const FormEditor = ({
     onAutoSave,
     onCancelComment,
     onClickAddComment,
+    onClickAddGlossaryItem: toggleGlossaryModal.on,
     onImageUpload,
     onImageUploadCancel,
   });
@@ -206,6 +212,7 @@ const FormEditor = ({
 
       editorInstance.current = editor;
       commentsPlugin.current = editor.plugins.get<CommentsPlugin>('Comments');
+      glossaryPlugin.current = editor.plugins.get<GlossaryPlugin>('Glossary');
 
       setMarkersOrder(getMarkersOrder([...editor.model.markers]));
     },
@@ -306,15 +313,31 @@ const FormEditor = ({
           }}
         >
           {process.env.NODE_ENV !== 'test' ? (
-            <CKEditor
-              editor={Editor}
-              config={config}
-              data={value}
-              onChange={handleChange}
-              onFocus={toggleFocused.on}
-              onBlur={handleBlur}
-              onReady={handleReady}
-            />
+            <>
+              <CKEditor
+                editor={Editor}
+                config={config}
+                data={value}
+                onChange={handleChange}
+                onFocus={toggleFocused.on}
+                onBlur={handleBlur}
+                onReady={handleReady}
+              />
+              <Modal
+                className="govuk-!-width-one-third"
+                title="Insert glossary link"
+                open={showGlossaryModal}
+                onExit={toggleGlossaryModal.off}
+              >
+                <GlossaryItemInsertForm
+                  onCancel={toggleGlossaryModal.off}
+                  onSubmit={item => {
+                    glossaryPlugin.current?.addGlossaryItem(item);
+                    toggleGlossaryModal.off();
+                  }}
+                />
+              </Modal>
+            </>
           ) : (
             <textarea
               aria-describedby={describedBy}

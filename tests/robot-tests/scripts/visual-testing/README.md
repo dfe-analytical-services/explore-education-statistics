@@ -257,7 +257,5 @@ pipenv run python run_tests.py -f tests/visual_testing/visually_check_permalinks
 ```
 
 ## Who should I talk to?
-
-Luke Howsam  
 Mark Youngman
 Duncan Watson

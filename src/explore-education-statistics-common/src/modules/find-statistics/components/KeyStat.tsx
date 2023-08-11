@@ -12,14 +12,14 @@ export const KeyStatContainer = ({ children }: KeyStatContainerProps) => {
   return <div className={styles.container}>{children}</div>;
 };
 
-interface KeyStatColumnProps {
+interface KeyStatWrapperProps {
   children: ReactNode;
   testId?: string;
 }
 
-export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
+export const KeyStatWrapper = ({ children, testId }: KeyStatWrapperProps) => {
   return (
-    <div className={styles.column} data-testid={testId}>
+    <div className={styles.wrapper} data-testid={testId}>
       {children}
     </div>
   );
@@ -27,24 +27,24 @@ export const KeyStatColumn = ({ children, testId }: KeyStatColumnProps) => {
 
 export interface KeyStatProps {
   children?: ReactNode;
-  title: string;
-  statistic: string;
-  trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
-  hasColumn?: boolean;
+  includeWrapper?: boolean;
+  statistic: string;
   testId?: string;
+  title: string;
+  trend?: string;
 }
 
 const KeyStat = ({
   children,
-  title,
-  statistic,
-  trend,
   guidanceTitle = 'Help',
   guidanceText,
-  hasColumn = true,
+  includeWrapper = true,
+  statistic,
   testId = 'keyStat',
+  title,
+  trend,
 }: KeyStatProps) => {
   const body = (
     <>
@@ -72,8 +72,8 @@ const KeyStat = ({
     </>
   );
 
-  return hasColumn ? (
-    <KeyStatColumn testId={testId}>{body}</KeyStatColumn>
+  return includeWrapper ? (
+    <KeyStatWrapper testId={testId}>{body}</KeyStatWrapper>
   ) : (
     body
   );

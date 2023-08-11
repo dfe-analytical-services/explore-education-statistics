@@ -33,57 +33,6 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     }
 
     [Fact]
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    public async Task CreateLegacyPermalink()
-    {
-        var createRequest = new PermalinkCreateRequest();
-        var expectedResult = new LegacyPermalinkViewModel();
-
-        var permalinkService = new Mock<IPermalinkService>(Strict);
-
-        permalinkService
-            .Setup(s => s.CreateLegacy(It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest))))
-            .ReturnsAsync(expectedResult);
-
-        var client = SetupApp(permalinkService: permalinkService.Object)
-            .CreateClient();
-
-        var response = await client.PostAsync(
-            requestUri: "/api/permalink",
-            content: new JsonNetContent(createRequest));
-
-        VerifyAllMocks(permalinkService);
-
-        response.AssertOk(expectedResult);
-    }
-
-    [Fact]
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    public async Task CreateLegacyPermalink_WithReleaseId()
-    {
-        var releaseId = Guid.NewGuid();
-        var createRequest = new PermalinkCreateRequest();
-        var expectedResult = new LegacyPermalinkViewModel();
-
-        var permalinkService = new Mock<IPermalinkService>(Strict);
-
-        permalinkService
-            .Setup(s => s.CreateLegacy(releaseId, It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest))))
-            .ReturnsAsync(expectedResult);
-
-        var client = SetupApp(permalinkService: permalinkService.Object)
-            .CreateClient();
-
-        var response = await client.PostAsync(
-            requestUri: $"/api/permalink/release/{releaseId}",
-            content: new JsonNetContent(createRequest));
-
-        VerifyAllMocks(permalinkService);
-
-        response.AssertOk(expectedResult);
-    }
-
-    [Fact]
     public async Task CreatePermalink()
     {
         var createRequest = new PermalinkCreateRequest();
@@ -135,38 +84,6 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     }
 
     [Fact]
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    public async Task GetLegacyPermalink()
-    {
-        var permalinkId = Guid.NewGuid();
-        var permalink = new LegacyPermalinkViewModel
-        {
-            Id = permalinkId,
-        };
-
-        var permalinkService = new Mock<IPermalinkService>(Strict);
-
-        permalinkService
-            .Setup(s => s.GetLegacy(permalinkId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(permalink);
-
-        var client = SetupApp(permalinkService: permalinkService.Object)
-            .CreateClient();
-
-        var response = await client.GetAsync(
-            uri: $"/api/permalink/{permalinkId}",
-            headers: new Dictionary<string, string>
-            {
-                { HeaderNames.Accept, "application/json" }
-            }
-        );
-
-        VerifyAllMocks(permalinkService);
-
-        response.AssertOk(permalink);
-    }
-
-    [Fact]
     public async Task GetPermalink()
     {
         var permalinkId = Guid.NewGuid();
@@ -198,34 +115,6 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     }
 
     [Fact]
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    public async Task GetLegacyPermalink_NotFound()
-    {
-        var permalinkId = Guid.NewGuid();
-
-        var permalinkService = new Mock<IPermalinkService>(Strict);
-
-        permalinkService
-            .Setup(s => s.GetLegacy(permalinkId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new NotFoundResult());
-
-        var client = SetupApp(permalinkService: permalinkService.Object)
-            .CreateClient();
-
-        var response = await client.GetAsync(
-            uri: $"/api/permalink/{permalinkId}",
-            headers: new Dictionary<string, string>
-            {
-                { HeaderNames.Accept, "application/json" }
-            }
-        );
-
-        VerifyAllMocks(permalinkService);
-
-        response.AssertNotFound();
-    }
-
-    [Fact]
     public async Task GetPermalink_NotFound()
     {
         var permalinkId = Guid.NewGuid();
@@ -250,37 +139,6 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
         VerifyAllMocks(permalinkService);
 
         response.AssertNotFound();
-    }
-
-    [Fact]
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    public async Task GetLegacyPermalink_Csv()
-    {
-        var permalinkId = Guid.NewGuid();
-        var permalinkService = new Mock<IPermalinkService>(Strict);
-
-        permalinkService
-            .Setup(s => s
-                .LegacyDownloadCsvToStream(permalinkId, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(Unit.Instance)
-            .Callback<Guid, Stream, CancellationToken>(
-                (_, stream, _) => { stream.WriteText("Test csv"); }
-            );
-
-        var client = SetupApp(permalinkService: permalinkService.Object)
-            .CreateClient();
-
-        var response = await client.GetAsync(
-            uri: $"/api/permalink/{permalinkId}",
-            headers: new Dictionary<string, string>
-            {
-                { HeaderNames.Accept, ContentTypes.Csv }
-            }
-        );
-
-        VerifyAllMocks(permalinkService);
-
-        response.AssertOk("Test csv");
     }
 
     [Fact]
@@ -314,35 +172,6 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     }
 
     [Fact]
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    public async Task GetLegacyPermalink_Csv_NotFound()
-    {
-        var permalinkId = Guid.NewGuid();
-
-        var permalinkService = new Mock<IPermalinkService>(Strict);
-
-        permalinkService
-            .Setup(s => s
-                .LegacyDownloadCsvToStream(permalinkId, It.IsAny<Stream>(), It.IsAny<CancellationToken>()))
-            .ReturnsAsync(new NotFoundResult());
-
-        var client = SetupApp(permalinkService: permalinkService.Object)
-            .CreateClient();
-
-        var response = await client.GetAsync(
-            uri: $"/api/permalink/{permalinkId}",
-            headers: new Dictionary<string, string>
-            {
-                { HeaderNames.Accept, ContentTypes.Csv }
-            }
-        );
-
-        VerifyAllMocks(permalinkService);
-
-        response.AssertNotFound();
-    }
-
-    [Fact]
     public async Task GetPermalink_Csv_NotFound()
     {
         var permalinkId = Guid.NewGuid();
@@ -366,17 +195,6 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
         );
 
         VerifyAllMocks(permalinkService);
-
-        response.AssertNotFound();
-    }
-
-    [Fact]
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    public async Task GetLegacyPermalink_InvalidIdReturnsNotFound()
-    {
-        var client = SetupApp().CreateClient();
-
-        var response = await client.GetAsync("/api/permalink/not-a-guid");
 
         response.AssertNotFound();
     }

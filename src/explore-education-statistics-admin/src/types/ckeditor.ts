@@ -29,6 +29,15 @@ export interface CommentsPluginConfig {
   undoRedoComment: (type: CommentUndoRedoActions, markerId: string) => void;
 }
 
+export interface GlossaryItem {
+  url: string;
+  text: string;
+}
+
+export interface GlossaryPluginConfig {
+  addGlossaryItem: (item: GlossaryItem) => void;
+}
+
 export interface AutoSavePluginConfig {
   save: () => void;
   waitingTime: number;
@@ -62,6 +71,7 @@ export interface EditorConfig {
   comments?: CommentsPluginConfig;
   autosave?: AutoSavePluginConfig;
   alignment?: AlignmentConfig;
+  glossary?: GlossaryPluginConfig;
 }
 
 export interface PluginCollection {
@@ -76,6 +86,10 @@ export interface CommentsPlugin extends Plugin {
   removeCommentMarker(id: string): void;
   resolveCommentMarker(id: string, resolved: boolean): void;
   selectCommentMarker(id: string): void;
+}
+
+export interface GlossaryPlugin extends Plugin {
+  addGlossaryItem(item: GlossaryItem): void;
 }
 
 export type CommentUndoRedoActions =

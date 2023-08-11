@@ -8,7 +8,7 @@ import { OmitStrict } from '@common/types';
 import React from 'react';
 
 export interface EditableKeyStatDisplayProps
-  extends OmitStrict<KeyStatProps, 'children' | 'hasColumn'> {
+  extends OmitStrict<KeyStatProps, 'children' | 'includeWrapper'> {
   isReordering: boolean;
   isEditing: boolean;
   onRemove?: () => void;
@@ -25,7 +25,7 @@ export default function EditableKeyStatPreview({
   const { title } = keyStatProps;
 
   return (
-    <KeyStat {...keyStatProps} hasColumn={false}>
+    <KeyStat {...keyStatProps} includeWrapper={false}>
       {isEditing && !isReordering && (
         <ButtonGroup className="govuk-!-margin-top-2">
           <Button onClick={onEdit}>

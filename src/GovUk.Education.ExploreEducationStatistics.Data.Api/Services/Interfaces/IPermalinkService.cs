@@ -12,27 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 
 public interface IPermalinkService
 {
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    Task<Either<ActionResult, LegacyPermalinkViewModel>> GetLegacy(Guid permalinkId,
-        CancellationToken cancellationToken = default);
-
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    Task<Either<ActionResult, Unit>> LegacyDownloadCsvToStream(
-        Guid permalinkId,
-        Stream stream,
-        CancellationToken cancellationToken = default);
-
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(PermalinkCreateRequest request);
-
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    Task<Either<ActionResult, LegacyPermalinkViewModel>> CreateLegacy(Guid releaseId,
-        PermalinkCreateRequest request);
-
-    // TODO EES-3755 Remove after Permalink snapshot migration work is complete
-    Task<Either<ActionResult, Unit>> MigratePermalink(Guid permalinkId,
-        CancellationToken cancellationToken = default);
-
     Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
         CancellationToken cancellationToken = default);
 
