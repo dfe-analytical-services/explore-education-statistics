@@ -50,11 +50,4 @@ public static class PublicationGeneratorExtensions
                 return list;
             }
         );
-    
-    // public static InstanceSetters<Publication> SetReleases(
-    //     this InstanceSetters<Publication> setters,
-    //     IEnumerable<Release> releases)
-    //     => setters
-    //         .Set(d => d.Releases, releases.ToList());
-
 }

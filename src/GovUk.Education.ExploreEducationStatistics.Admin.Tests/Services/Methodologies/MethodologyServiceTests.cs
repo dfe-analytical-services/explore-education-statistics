@@ -36,8 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyServiceTests
     {
-        private readonly DataFixture _fixture = new();
-        
         private static readonly Guid UserId = Guid.NewGuid();
 
         [Fact]
@@ -2226,48 +2224,293 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
-        [Fact]
-        public async Task ListMethodologyVersionsForApproval()
+        public class ListMethodologyVersionsForApproval
         {
-            var user = new User();
-
-            var publications = _fixture
-                .DefaultPublication()
-                .GenerateList(2);
+            private readonly DataFixture _fixture = new();
             
-            var methodologies = _fixture
-                .DefaultMethodology()
-                .WithMethodologyVersions(_ => _fixture
-                    .DefaultMethodologyVersion()
-                    .Generate(2))
-                .ForIndex(0, s => s.SetOwningPublication(publications[0]))
-                .ForIndex(1, s => s.SetAdoptingPublication(publications[1]))
-                .Generate();
-
-
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            [Fact]
+            public async Task ListMethodologyVersionsForApproval_UserIsApproverOnOwningPublication_Included()
             {
-                await context.Publications.AddRangeAsync(publications);
-                await context.MethodologyStatus.AddRangeAsync(methodologyStatuses);
-                await context.SaveChangesAsync();
-            }
+                var user = new User();
 
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupMethodologyService(context);
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(Draft) // TODO DW - revisit when Mark HR work is in
+                        .Generate(1))
+                    .Generate();
 
-                var result = await service.ListMethodologyVersionsForApproval(user.Id);
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
 
-                var statuses = result.AssertRight();
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
 
-                Assert.NotNull(statuses);
-                Assert.Empty(statuses);
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListMethodologyVersionsForApproval(user.Id);
+                    var methodologyVersionsForApproval = result.AssertRight();
+
+                    var methodologyForApproval = Assert.Single(methodologyVersionsForApproval);
+                    Assert.Equal(methodology.Versions[0].Id, methodologyForApproval.Id);
+                }
             }
             
+            [Fact]
+            public async Task ListMethodologyVersionsForApproval_MethodologyVersionNotInHigherReview_NotIncluded()
+            {
+                var user = new User();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(Approved) // TODO DW - revisit when Mark HR work is in
+                        .Generate(1))
+                    .Generate();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListMethodologyVersionsForApproval(user.Id);
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+            
+            [Fact]
+            public async Task ListMethodologyVersionsForApproval_UserIsApproverButOnAdoptingPublication_NotIncluded()
+            {
+                var user = new User();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithAdoptingPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(Draft) // TODO DW - revisit when Mark HR work is in
+                        .Generate(1))
+                    .Generate();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListMethodologyVersionsForApproval(user.Id);
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+            
+            [Fact]
+            public async Task ListMethodologyVersionsForApproval_UserIsOnlyOwnerOnOwningPublication_NotIncluded()
+            {
+                var user = new User();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(Draft) // TODO DW - revisit when Mark HR work is in
+                        .Generate(1))
+                    .Generate();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListMethodologyVersionsForApproval(user.Id);
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+            
+            [Fact]
+            public async Task ListMethodologyVersionsForApproval_DifferentUserIsApproverOnOwningPublication_NotIncluded()
+            {
+                var otherUser = new User();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(Draft) // TODO DW - revisit when Mark HR work is in
+                        .Generate(1))
+                    .Generate();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(otherUser)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListMethodologyVersionsForApproval(Guid.NewGuid());
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+            
+            [Fact]
+            public async Task ListMethodologyVersionsForApproval_MixOfMethodologies()
+            {
+                var user = new User();
+
+                var publications = _fixture
+                    .DefaultPublication()
+                    .GenerateList(2);
+
+                var owningPublication = publications[0];
+                var adoptingPublication = publications[1];
+                
+                var ownedMethodologies = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(owningPublication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatuses(ListOf(Approved, Draft)) // TODO DW - revisit when Mark HR work is in
+                        .GenerateList())
+                    .GenerateList(2);
+                
+                var adoptedMethodologies = _fixture
+                    .DefaultMethodology()
+                    .WithAdoptingPublication(adoptingPublication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatuses(ListOf(Approved, Draft)) // TODO DW - revisit when Mark HR work is in
+                        .GenerateList())
+                    .Generate(2);
+
+                var publicationRolesForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .ForIndex(0, s => s
+                        .SetPublication(owningPublication)
+                        .SetRole(PublicationRole.Approver))
+                    .ForIndex(1, s => s
+                        .SetPublication(owningPublication)
+                        .SetRole(PublicationRole.Owner))
+                    .ForIndex(2, s => s
+                        .SetPublication(adoptingPublication)
+                        .SetRole(PublicationRole.Approver))
+                    .ForIndex(3, s => s
+                        .SetPublication(adoptingPublication)
+                        .SetRole(PublicationRole.Owner))
+                    .GenerateList();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(ownedMethodologies);
+                    await context.Methodologies.AddRangeAsync(adoptedMethodologies);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRolesForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListMethodologyVersionsForApproval(user.Id);
+                    var methodologyVersionsForApproval = result.AssertRight();
+
+                    // Assert that we just get the 2 MethodologyVersions where the user is the Approver of the Owning
+                    // Publication and their statuses are Higher Review.
+                    Assert.Equal(2, methodologyVersionsForApproval.Count);
+                    Assert.Equal(ownedMethodologies[0].Versions[1].Id, methodologyVersionsForApproval[0].Id);
+                    Assert.Equal(ownedMethodologies[1].Versions[1].Id, methodologyVersionsForApproval[1].Id);
+                }
+            }
         }
-
+        
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,

@@ -406,19 +406,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .UserPublicationRoles
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
                 .Select(role => role.PublicationId);
-            
-            var methodologiesToApprove = await _context
-                .MethodologyVersions
-                .Include(methodologyVersion => methodologyVersion.Methodology)
-                .ThenInclude(methodology => methodology.Publications)
-                .Where(methodologyVersion => 
-                    !methodologyVersion.Approved // TODO DW - replace with correct approval status check when Mark's work is in
-                    && methodologyVersion.Methodology.Publications.Any(
-                        publicationMethodology => 
-                            publicationMethodology.Owner 
-                            && publicationIdsForApprover.Contains(publicationMethodology.PublicationId)))
-                .ToListAsync();
 
+            var methodologiesToApprove = _context
+                    .MethodologyVersions
+                    .Include(methodologyVersion => methodologyVersion.Methodology)
+                    .ThenInclude(methodology => methodology.Publications)
+                    .ToList()
+                    .Where(methodologyVersion =>
+                        methodologyVersion.Status !=
+                        MethodologyApprovalStatus
+                            .Approved // TODO DW - replace with correct approval status check when Mark's work is in
+                        && methodologyVersion.Methodology.Publications.Any(
+                            publicationMethodology =>
+                                publicationMethodology.Owner
+                                && publicationIdsForApprover.Contains(publicationMethodology.PublicationId)))
+                // .ToListAsync();
+                ;
             return methodologiesToApprove.Select(_mapper.Map<MethodologyVersionViewModel>).ToList();
         }
 

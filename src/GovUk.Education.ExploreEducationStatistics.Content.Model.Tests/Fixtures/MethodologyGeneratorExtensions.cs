@@ -19,6 +19,16 @@ public static class MethodologyGeneratorExtensions
             .SetDefault(p => p.Id)
             .SetDefault(p => p.Slug);
     
+    public static Generator<Methodology> WithOwningPublication(
+        this Generator<Methodology> generator,
+        Publication publication)
+        => generator.ForInstance(s => s.SetOwningPublication(publication));
+    
+    public static Generator<Methodology> WithAdoptingPublication(
+        this Generator<Methodology> generator,
+        Publication publication)
+        => generator.ForInstance(s => s.SetAdoptingPublication(publication));
+    
     public static Generator<Methodology> WithMethodologyVersions(
         this Generator<Methodology> generator,
         IEnumerable<MethodologyVersion> methodologyVersions)
