@@ -28,9 +28,10 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
 
   const { data: glossary = [], isLoading } = useQuery(glossaryQueries.list);
 
-  const allGlossaryEntries = useMemo(() => glossary.flatMap(g => g.entries), [
-    glossary,
-  ]);
+  const allGlossaryEntries = useMemo(
+    () => glossary.flatMap(g => g.entries),
+    [glossary],
+  );
 
   const [searchResults, setSearchResults] = useState<GlossaryEntry[]>([]);
   const [selectedEntry, setSelectedEntry] = useState<GlossaryEntry>();

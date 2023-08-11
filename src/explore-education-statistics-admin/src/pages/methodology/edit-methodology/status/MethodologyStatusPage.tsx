@@ -43,12 +43,8 @@ const MethodologyStatusPage = () => {
 
   const [isEditing, toggleForm] = useToggle(false);
 
-  const {
-    data: methodologyStatuses,
-    refetch: refreshMethodologyStatuses,
-  } = useQuery(
-    methodologyQueries.getMethodologyStatuses(currentMethodology.id),
-  );
+  const { data: methodologyStatuses, refetch: refreshMethodologyStatuses } =
+    useQuery(methodologyQueries.getMethodologyStatuses(currentMethodology.id));
 
   const {
     data: permissions,

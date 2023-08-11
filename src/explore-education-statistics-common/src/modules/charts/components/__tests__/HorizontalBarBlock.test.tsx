@@ -219,10 +219,10 @@ describe('HorizontalBarBlock', () => {
   });
 
   test('dies gracefully with bad data', () => {
-    const invalidData = (undefined as unknown) as TableDataResponse['results'];
-    const invalidMeta = (undefined as unknown) as FullTableMeta;
-    const invalidAxes = (undefined as unknown) as HorizontalBarProps['axes'];
-    const invalidLegend = (undefined as unknown) as LegendConfiguration;
+    const invalidData = undefined as unknown as TableDataResponse['results'];
+    const invalidMeta = undefined as unknown as FullTableMeta;
+    const invalidAxes = undefined as unknown as HorizontalBarProps['axes'];
+    const invalidLegend = undefined as unknown as LegendConfiguration;
 
     const { container } = render(
       <HorizontalBarBlock

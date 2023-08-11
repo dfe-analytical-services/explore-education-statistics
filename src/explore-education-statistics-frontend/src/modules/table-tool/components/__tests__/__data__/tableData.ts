@@ -217,20 +217,21 @@ export const testSelectedPublicationWithLatestRelease: SelectedPublication = {
   },
 };
 
-export const testSelectedPublicationWithNonLatestRelease: SelectedPublication = {
-  id: '536154f5-7f82-4dc7-060a-08d9097c1945',
-  title: 'Test publication',
-  slug: 'test-publication',
-  selectedRelease: {
-    id: 'selected-release-id',
-    latestData: false,
-    slug: 'selected-release-slug',
-    title: 'Selected Release Title',
-  },
-  latestRelease: {
-    title: 'Latest Release Title',
-  },
-};
+export const testSelectedPublicationWithNonLatestRelease: SelectedPublication =
+  {
+    id: '536154f5-7f82-4dc7-060a-08d9097c1945',
+    title: 'Test publication',
+    slug: 'test-publication',
+    selectedRelease: {
+      id: 'selected-release-id',
+      latestData: false,
+      slug: 'selected-release-slug',
+      title: 'Selected Release Title',
+    },
+    latestRelease: {
+      title: 'Latest Release Title',
+    },
+  };
 
 export const testPublicationRelease: Release = {
   id: '',

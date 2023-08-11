@@ -45,7 +45,7 @@ const TableQueryErrorCodes = [
   'RequestCancelled',
 ] as const;
 
-export type TableQueryErrorCode = typeof TableQueryErrorCodes[number];
+export type TableQueryErrorCode = (typeof TableQueryErrorCodes)[number];
 
 interface Props extends InjectedWizardProps {
   initialValues?: {

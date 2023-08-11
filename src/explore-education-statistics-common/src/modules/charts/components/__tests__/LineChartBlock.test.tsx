@@ -264,10 +264,10 @@ describe('LineChartBlock', () => {
   });
 
   test('dies gracefully with bad data', () => {
-    const invalidData = (undefined as unknown) as TableDataResult[];
-    const invalidMeta = (undefined as unknown) as FullTableMeta;
-    const invalidAxes = (undefined as unknown) as LineChartProps['axes'];
-    const invalidLegend = (undefined as unknown) as LegendConfiguration;
+    const invalidData = undefined as unknown as TableDataResult[];
+    const invalidMeta = undefined as unknown as FullTableMeta;
+    const invalidAxes = undefined as unknown as LineChartProps['axes'];
+    const invalidLegend = undefined as unknown as LegendConfiguration;
 
     const { container } = render(
       <LineChartBlock

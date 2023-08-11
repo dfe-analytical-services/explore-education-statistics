@@ -45,10 +45,7 @@ const ReleaseStatusPage = () => {
     onReleaseChange,
   } = useReleaseContext();
 
-  const {
-    value: release,
-    setState: setRelease,
-  } = useAsyncHandledRetry(
+  const { value: release, setState: setRelease } = useAsyncHandledRetry(
     async () =>
       lastLocation && lastLocation !== location
         ? releaseService.getRelease(releaseId)

@@ -149,10 +149,8 @@ const performTest = ({ topicId, publicationId }: SetupData) => {
 
   console.log(`Uploading subject ${subjectName}`);
 
-  const {
-    response: uploadResponse,
-    id: fileId,
-  } = uploadFileStrategy.getOrImportSubject(adminService, releaseId);
+  const { response: uploadResponse, id: fileId } =
+    uploadFileStrategy.getOrImportSubject(adminService, releaseId);
 
   console.log(`Subject ${subjectName} finished uploading`);
 

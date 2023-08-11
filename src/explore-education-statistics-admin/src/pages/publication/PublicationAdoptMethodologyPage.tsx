@@ -15,11 +15,8 @@ const PublicationAdoptMethodologyPage = () => {
 
   const { publicationId } = usePublicationContext();
 
-  const {
-    value: adoptableMethodologies,
-    isLoading,
-  } = useAsyncHandledRetry(async () =>
-    publicationService.getAdoptableMethodologies(publicationId),
+  const { value: adoptableMethodologies, isLoading } = useAsyncHandledRetry(
+    async () => publicationService.getAdoptableMethodologies(publicationId),
   );
 
   const returnRoute = generatePath<PublicationRouteParams>(

@@ -23,8 +23,7 @@ const PrototypeRelease = () => {
         breadcrumbs={[
           {
             name: 'Childrens social care',
-            link:
-              'https://explore-education-statistics.service.gov.uk/find-statistics#themes-1',
+            link: 'https://explore-education-statistics.service.gov.uk/find-statistics#themes-1',
           },
           {
             name: 'Children looked after in England including adoptions',

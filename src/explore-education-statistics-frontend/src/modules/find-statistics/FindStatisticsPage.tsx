@@ -47,7 +47,12 @@ const FindStatisticsPage: NextPage = () => {
   const mobileFilterButtonRef = useRef<HTMLButtonElement>(null);
   const [showMobileFilters, toggleMobileFilters] = useToggle(false);
 
-  const { data: publicationsData, isError, isFetching, isLoading } = useQuery({
+  const {
+    data: publicationsData,
+    isError,
+    isFetching,
+    isLoading,
+  } = useQuery({
     ...publicationQueries.list(router.query),
     keepPreviousData: true,
     staleTime: 60000,

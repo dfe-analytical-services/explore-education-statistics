@@ -202,8 +202,9 @@ export function hasErrorMessage<T extends string = string>(
     return true;
   }
 
-  return errorMessages.some(errorMessage =>
-    error.response?.data.errors[fieldName].includes(errorMessage),
+  return errorMessages.some(
+    errorMessage =>
+      error.response?.data.errors[fieldName].includes(errorMessage),
   );
 }
 
