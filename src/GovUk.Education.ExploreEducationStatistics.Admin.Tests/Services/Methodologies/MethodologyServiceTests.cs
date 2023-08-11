@@ -2242,7 +2242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithOwningPublication(publication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatus(Draft) // TODO DW - revisit when Mark HR work is in
+                        .WithApprovalStatus(HigherLevelReview)
                         .Generate(1))
                     .Generate();
 
@@ -2282,14 +2282,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultPublication()
                     .Generate();
                 
-                var methodology = _fixture
+                // Generate 2 Methodologies that are not in Higher Review.
+                var methodologies = _fixture
                     .DefaultMethodology()
                     .WithOwningPublication(publication)
-                    .WithMethodologyVersions(_ => _fixture
+                    .ForIndex(0, s => s.SetMethodologyVersions(_fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatus(Approved) // TODO DW - revisit when Mark HR work is in
-                        .Generate(1))
-                    .Generate();
+                        .WithApprovalStatus(Draft)
+                        .Generate(1)))
+                    .ForIndex(1, s => s.SetMethodologyVersions(_fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(Approved)
+                        .Generate(1)))
+                    .GenerateList();
 
                 var publicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
@@ -2301,7 +2306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var contentDbContextId = Guid.NewGuid().ToString();
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
                 {
-                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.Methodologies.AddRangeAsync(methodologies);
                     await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
                     await context.SaveChangesAsync();
                 }
@@ -2309,7 +2314,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     var service = SetupMethodologyService(context);
-
                     var result = await service.ListMethodologyVersionsForApproval(user.Id);
                     Assert.Empty(result.AssertRight());
                 }
@@ -2324,12 +2328,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .DefaultPublication()
                     .Generate();
                 
+                // Create a Methodology that has only been adopted by the User's Publication.
                 var methodology = _fixture
                     .DefaultMethodology()
                     .WithAdoptingPublication(publication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatus(Draft) // TODO DW - revisit when Mark HR work is in
+                        .WithApprovalStatus(HigherLevelReview)
                         .Generate(1))
                     .Generate();
 
@@ -2371,10 +2376,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithOwningPublication(publication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatus(Draft) // TODO DW - revisit when Mark HR work is in
+                        .WithApprovalStatus(HigherLevelReview)
                         .Generate(1))
                     .Generate();
 
+                // Set up the User as an Owner on the Methodology's Publication rather than an Approver.
                 var publicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(user)
@@ -2401,6 +2407,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             [Fact]
             public async Task ListMethodologyVersionsForApproval_DifferentUserIsApproverOnOwningPublication_NotIncluded()
             {
+                // Set up a different User as the Approver for the owning Publication.
                 var otherUser = new User();
 
                 var publication = _fixture
@@ -2412,7 +2419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithOwningPublication(publication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatus(Draft) // TODO DW - revisit when Mark HR work is in
+                        .WithApprovalStatus(HigherLevelReview)
                         .Generate(1))
                     .Generate();
 
@@ -2456,7 +2463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithOwningPublication(owningPublication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatuses(ListOf(Approved, Draft)) // TODO DW - revisit when Mark HR work is in
+                        .WithApprovalStatuses(ListOf(Approved, HigherLevelReview, Draft))
                         .GenerateList())
                     .GenerateList(2);
                 
@@ -2465,7 +2472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .WithAdoptingPublication(adoptingPublication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatuses(ListOf(Approved, Draft)) // TODO DW - revisit when Mark HR work is in
+                        .WithApprovalStatuses(ListOf(Approved, HigherLevelReview, Draft))
                         .GenerateList())
                     .Generate(2);
 

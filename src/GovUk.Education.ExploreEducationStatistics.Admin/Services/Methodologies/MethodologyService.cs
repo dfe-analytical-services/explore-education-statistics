@@ -413,9 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     .ThenInclude(methodology => methodology.Publications)
                     .ToList()
                     .Where(methodologyVersion =>
-                        methodologyVersion.Status !=
-                        MethodologyApprovalStatus
-                            .Approved // TODO DW - replace with correct approval status check when Mark's work is in
+                        methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
                         && methodologyVersion.Methodology.Publications.Any(
                             publicationMethodology =>
                                 publicationMethodology.Owner

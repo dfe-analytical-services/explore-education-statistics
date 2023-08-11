@@ -1649,7 +1649,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             private readonly DataFixture _fixture = new();
         
-            // TODO DW - do we need a check to ensure dupes don't appear via mix of Publication and Release roles? 
             [Fact]
             public async Task ListReleasesForApproval_UserHasApproverRoleOnRelease()
             {
@@ -1862,6 +1861,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Assert.Equal(2, viewModels.Count);
                     Assert.Equal(release1WithApproverRoleForUser.Id, viewModels[0].Id);
                     Assert.Equal(release2WithApproverRoleForUser.Id, viewModels[1].Id);
+                }
+            }            
+            
+            [Fact]
+            public async Task ListReleasesForApproval_UserHasApproverRoleOnPublicationsAndApproverRoleOnRelease()
+            {
+                var contextId = Guid.NewGuid().ToString();
+
+                var user = new User();
+                
+                var publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_ => _fixture
+                        .DefaultRelease()
+                        .WithApprovalStatus(HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+                
+                var approverReleaseRolesForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(user)
+                    .WithRole(ReleaseRole.Approver)
+                    .WithReleases(publication.Releases)
+                    .GenerateList();
+
+                var approverPublicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(user)
+                    .WithRole(PublicationRole.Approver)
+                    .WithPublication(publication)
+                    .Generate();
+                
+                await using (var context = InMemoryApplicationDbContext(contextId))
+                {
+                    await context.Publications.AddRangeAsync(publication);
+                    await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForUser);
+                    await context.UserPublicationRoles.AddRangeAsync(approverPublicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+                
+                await using (var context = InMemoryApplicationDbContext(contextId))
+                {
+                    var service = BuildReleaseService(context);
+
+                    var result = await service.ListReleasesForApproval(user.Id);
+
+                    var viewModels = result.AssertRight();
+                    
+                    // Assert that the Release only appears once despite the user having approval directly via the
+                    // Release itself AND via the overarching Publication.
+                    Assert.Single(viewModels);
+                    Assert.Equal(publication.Releases[0].Id, viewModels[0].Id);
                 }
             }
         }
