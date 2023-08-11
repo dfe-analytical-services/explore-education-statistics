@@ -15,10 +15,7 @@ const PublicationContactPage = () => {
   const { publication, onReload } = usePublicationContext();
   const [readOnly, toggleReadOnly] = useToggle(true);
 
-  const {
-    value: contact,
-    setState: setContact,
-  } = useAsyncHandledRetry(
+  const { value: contact, setState: setContact } = useAsyncHandledRetry(
     async () => publicationService.getContact(publication.id),
     [publication],
   );

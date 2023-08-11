@@ -29,10 +29,7 @@ const MethodologyStatusEditPage = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const {
-    value: unpublishedReleases,
-    isLoading,
-  } = useAsyncHandledRetry(
+  const { value: unpublishedReleases, isLoading } = useAsyncHandledRetry(
     async () => methodologyService.getUnpublishedReleases(methodology.id),
     [methodology.id],
   );

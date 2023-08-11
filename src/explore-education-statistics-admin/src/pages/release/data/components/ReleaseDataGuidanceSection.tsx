@@ -62,10 +62,11 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
   const handleSubmit = useFormSubmit<DataGuidanceFormValues>(
     async (values, helpers) => {
       await minDelay(async () => {
-        const updatedGuidance = await releaseDataGuidanceService.updateDataGuidance(
-          releaseId,
-          values,
-        );
+        const updatedGuidance =
+          await releaseDataGuidanceService.updateDataGuidance(
+            releaseId,
+            values,
+          );
 
         setDataGuidance({ value: updatedGuidance });
 

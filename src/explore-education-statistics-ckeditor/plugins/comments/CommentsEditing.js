@@ -151,9 +151,8 @@ export default class CommentsEditing extends Plugin {
         const viewRange = editor.editing.mapper.toViewRange(
           selectedMarker.getRange(),
         );
-        const domRange = editor.editing.view.domConverter.viewRangeToDom(
-          viewRange,
-        );
+        const domRange =
+          editor.editing.view.domConverter.viewRangeToDom(viewRange);
         scrollViewportToShowTarget({ target: domRange, viewportOffset: 100 });
       }
     });

@@ -8,7 +8,7 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd';
 import React, { Fragment, ReactNode, useCallback } from 'react';
 
 export interface EditableSectionBlockProps<
-  T extends EditableBlock = EditableBlock
+  T extends EditableBlock = EditableBlock,
 > {
   blocks: T[];
   isReordering?: boolean;

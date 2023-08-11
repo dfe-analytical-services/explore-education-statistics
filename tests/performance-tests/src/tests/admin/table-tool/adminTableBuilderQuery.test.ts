@@ -125,12 +125,8 @@ function getOrCreateReleaseWithSubject() {
 export function setup(): SetupData {
   const adminService = createAdminService(adminUrl, authTokens.accessToken);
 
-  const {
-    themeId,
-    topicId,
-    releaseId,
-    subjectId,
-  } = getOrCreateReleaseWithSubject();
+  const { themeId, topicId, releaseId, subjectId } =
+    getOrCreateReleaseWithSubject();
 
   const { subjectMeta } = adminService.getSubjectMeta({ releaseId, subjectId });
 

@@ -31,9 +31,8 @@ const TableToolFinalStep = ({
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const hasTableError = false;
-  const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersConfig
-  >();
+  const [currentTableHeaders, setCurrentTableHeaders] =
+    useState<TableHeadersConfig>();
   const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
 
   const tableHeadersFormId = 'tableHeaderForm';

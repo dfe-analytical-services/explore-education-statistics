@@ -91,15 +91,13 @@ const EditableContentForm = ({
     return error;
   }, []);
 
-  const [
-    { isLoading: isAutoSaving, error: autoSaveError },
-    handleAutoSave,
-  ] = useAsyncCallback(
-    async (nextContent: string) => {
-      await onAutoSave?.(nextContent);
-    },
-    [onAutoSave],
-  );
+  const [{ isLoading: isAutoSaving, error: autoSaveError }, handleAutoSave] =
+    useAsyncCallback(
+      async (nextContent: string) => {
+        await onAutoSave?.(nextContent);
+      },
+      [onAutoSave],
+    );
 
   const handleSubmit = useCallback(
     async (values: FormValues, helpers: FormikHelpers<FormValues>) => {

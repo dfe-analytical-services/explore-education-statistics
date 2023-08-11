@@ -232,9 +232,8 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
                               className={classNames(styles.option, {
                                 [styles.isDragging]:
                                   draggableSnapshot.isDragging,
-                                [styles.isSelected]: selectedIndices.includes(
-                                  index,
-                                ),
+                                [styles.isSelected]:
+                                  selectedIndices.includes(index),
                                 [styles.isGhosted]:
                                   selectedIndices.includes(index) &&
                                   draggingIndex &&

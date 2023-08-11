@@ -38,8 +38,11 @@ const PublicationManageReleaseContributorsPage = ({
     };
   }, [publicationId, releaseId]);
 
-  const { release, publicationContributors = [], releaseContributors = [] } =
-    value ?? {};
+  const {
+    release,
+    publicationContributors = [],
+    releaseContributors = [],
+  } = value ?? {};
 
   return (
     <LoadingSpinner loading={isLoading}>

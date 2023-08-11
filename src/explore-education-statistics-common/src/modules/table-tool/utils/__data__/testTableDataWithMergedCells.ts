@@ -70,19 +70,21 @@ const category2Group1Filter2 = new CategoryFilter({
   category: 'Category 2',
 });
 
-export const testTableWithOnlyMergedCellsInColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category1Group1Filter1, category1Group2Filter2],
-  columnGroups: [],
-  rows: [timePeriod1],
-  rowGroups: [[indicator1]],
-};
+export const testTableWithOnlyMergedCellsInColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category1Group1Filter1, category1Group2Filter2],
+    columnGroups: [],
+    rows: [timePeriod1],
+    rowGroups: [[indicator1]],
+  };
 
-export const testTableWithOnlyMergedCellsInRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [indicator1],
-  rowGroups: [[category1Group1Filter1, category1Group2Filter2]],
-};
+export const testTableWithOnlyMergedCellsInRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [indicator1],
+    rowGroups: [[category1Group1Filter1, category1Group2Filter2]],
+  };
 
 export const testTableWithOnlyMergedCellsInHeaders: FullTable = {
   subjectMeta: {
@@ -120,19 +122,21 @@ export const testTableWithOnlyMergedCellsInHeaders: FullTable = {
   ],
 };
 
-export const testTableWithMergedAndUnMergedCellsInColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category1Group1Filter1, category1Group2Filter1],
-  columnGroups: [],
-  rows: [timePeriod1],
-  rowGroups: [[indicator1]],
-};
+export const testTableWithMergedAndUnMergedCellsInColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category1Group1Filter1, category1Group2Filter1],
+    columnGroups: [],
+    rows: [timePeriod1],
+    rowGroups: [[indicator1]],
+  };
 
-export const testTableWithMergedAndUnmergedCellsInRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [indicator1],
-  rowGroups: [[category1Group1Filter1, category1Group2Filter1]],
-};
+export const testTableWithMergedAndUnmergedCellsInRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [indicator1],
+    rowGroups: [[category1Group1Filter1, category1Group2Filter1]],
+  };
 
 export const testTableWithMergedAndUnMergedCellsInHeaders: FullTable = {
   subjectMeta: {
@@ -170,22 +174,24 @@ export const testTableWithMergedAndUnMergedCellsInHeaders: FullTable = {
   ],
 };
 
-export const testTableWithOnlyMergedCellsInFirstLevelOfColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category2Group1Filter1, category2Group1Filter2],
-  columnGroups: [[category1Group1Filter1, category1Group2Filter2]],
-  rows: [indicator1],
-  rowGroups: [[timePeriod1]],
-};
+export const testTableWithOnlyMergedCellsInFirstLevelOfColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category2Group1Filter1, category2Group1Filter2],
+    columnGroups: [[category1Group1Filter1, category1Group2Filter2]],
+    rows: [indicator1],
+    rowGroups: [[timePeriod1]],
+  };
 
-export const testTableWithOnlyMergedCellsInFirstLevelOfRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [indicator1],
-  rowGroups: [
-    [category1Group1Filter1, category1Group2Filter2],
-    [category2Group1Filter1, category2Group1Filter2],
-  ],
-};
+export const testTableWithOnlyMergedCellsInFirstLevelOfRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [indicator1],
+    rowGroups: [
+      [category1Group1Filter1, category1Group2Filter2],
+      [category2Group1Filter1, category2Group1Filter2],
+    ],
+  };
 
 export const testTableWithOnlyMergedCellsInFirstLevelOfHeaders: FullTable = {
   subjectMeta: {
@@ -246,98 +252,103 @@ export const testTableWithOnlyMergedCellsInFirstLevelOfHeaders: FullTable = {
   ],
 };
 
-export const testTableWithMergedAndUnmergedCellsInFirstLevelOfColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category2Group1Filter1, category2Group1Filter2],
-  columnGroups: [[category1Group1Filter1, category1Group2Filter1]],
-  rows: [indicator1],
-  rowGroups: [[timePeriod1]],
-};
+export const testTableWithMergedAndUnmergedCellsInFirstLevelOfColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category2Group1Filter1, category2Group1Filter2],
+    columnGroups: [[category1Group1Filter1, category1Group2Filter1]],
+    rows: [indicator1],
+    rowGroups: [[timePeriod1]],
+  };
 
-export const testTableWithMergedAndUnmergedCellsInFirstLevelOfRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [indicator1],
-  rowGroups: [
-    [category1Group1Filter1, category1Group2Filter1],
-    [category2Group1Filter1, category2Group1Filter2],
-  ],
-};
+export const testTableWithMergedAndUnmergedCellsInFirstLevelOfRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [indicator1],
+    rowGroups: [
+      [category1Group1Filter1, category1Group2Filter1],
+      [category2Group1Filter1, category2Group1Filter2],
+    ],
+  };
 
-export const testTableWithMergedAndUnmergedCellsInFirstLevelOfHeaders: FullTable = {
-  subjectMeta: {
-    ...testInitialTableSubjectMeta,
-    filters: {
-      Category1: {
-        name: 'category_1',
-        options: [category1Group1Filter1, category1Group2Filter1],
-        order: 0,
+export const testTableWithMergedAndUnmergedCellsInFirstLevelOfHeaders: FullTable =
+  {
+    subjectMeta: {
+      ...testInitialTableSubjectMeta,
+      filters: {
+        Category1: {
+          name: 'category_1',
+          options: [category1Group1Filter1, category1Group2Filter1],
+          order: 0,
+        },
+        Category2: {
+          name: 'category_2',
+          options: [category2Group1Filter1, category2Group1Filter2],
+          order: 0,
+        },
       },
-      Category2: {
-        name: 'category_2',
-        options: [category2Group1Filter1, category2Group1Filter2],
-        order: 0,
-      },
+      indicators: [indicator1],
+      locations: [location1],
+      timePeriodRange: [timePeriod1],
     },
-    indicators: [indicator1],
-    locations: [location1],
-    timePeriodRange: [timePeriod1],
-  },
-  results: [
-    {
-      filters: [category1Group1Filter1.id, category2Group1Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '74',
+    results: [
+      {
+        filters: [category1Group1Filter1.id, category2Group1Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '74',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category1Group1Filter1.id, category2Group1Filter2.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '85',
+      {
+        filters: [category1Group1Filter1.id, category2Group1Filter2.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '85',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category1Group2Filter1.id, category2Group1Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '92',
+      {
+        filters: [category1Group2Filter1.id, category2Group1Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '92',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category1Group2Filter1.id, category2Group1Filter2.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '87',
+      {
+        filters: [category1Group2Filter1.id, category2Group1Filter2.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '87',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-  ],
-};
+    ],
+  };
 
-export const testTableWithOnlyMergedCellsInMiddleLevelOfColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category2Group1Filter1, category2Group1Filter2],
-  columnGroups: [
-    [indicator1],
-    [category1Group1Filter1, category1Group2Filter2],
-  ],
-  rows: [timePeriod1],
-  rowGroups: [],
-};
+export const testTableWithOnlyMergedCellsInMiddleLevelOfColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category2Group1Filter1, category2Group1Filter2],
+    columnGroups: [
+      [indicator1],
+      [category1Group1Filter1, category1Group2Filter2],
+    ],
+    rows: [timePeriod1],
+    rowGroups: [],
+  };
 
-export const testTableWithOnlyMergedCellsInMiddleLevelOfRowsConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [category2Group1Filter1, category2Group1Filter2],
-  rowGroups: [[indicator1], [category1Group1Filter1, category1Group2Filter2]],
-};
+export const testTableWithOnlyMergedCellsInMiddleLevelOfRowsConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [category2Group1Filter1, category2Group1Filter2],
+    rowGroups: [[indicator1], [category1Group1Filter1, category1Group2Filter2]],
+  };
 
 export const testTableWithOnlyMergedCellsInMiddleLevelOfHeaders: FullTable = {
   subjectMeta: {
@@ -398,122 +409,127 @@ export const testTableWithOnlyMergedCellsInMiddleLevelOfHeaders: FullTable = {
   ],
 };
 
-export const testTableWithMergedAndUnmergedCellsInMiddleLevelOfColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category2Group1Filter1, category2Group1Filter2],
-  columnGroups: [
-    [indicator1],
-    [category1Group1Filter1, category1Group2Filter1, category1Group2Filter2],
-  ],
-  rows: [timePeriod1],
-  rowGroups: [],
-};
+export const testTableWithMergedAndUnmergedCellsInMiddleLevelOfColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category2Group1Filter1, category2Group1Filter2],
+    columnGroups: [
+      [indicator1],
+      [category1Group1Filter1, category1Group2Filter1, category1Group2Filter2],
+    ],
+    rows: [timePeriod1],
+    rowGroups: [],
+  };
 
-export const testTableWithMergedAndUnmergedCellsInMiddleLevelOfRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [category2Group1Filter1, category2Group1Filter2],
-  rowGroups: [[indicator1], [category1Group1Filter1, category1Group2Filter1]],
-};
+export const testTableWithMergedAndUnmergedCellsInMiddleLevelOfRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [category2Group1Filter1, category2Group1Filter2],
+    rowGroups: [[indicator1], [category1Group1Filter1, category1Group2Filter1]],
+  };
 
-export const testTableWithMergedAndUnmergedCellsInMiddleLevelOfHeaders: FullTable = {
-  subjectMeta: {
-    ...testInitialTableSubjectMeta,
-    filters: {
-      Category1: {
-        name: 'category_1',
-        options: [
-          category1Group1Filter1,
-          category1Group2Filter1,
-          category1Group2Filter2,
-        ],
-        order: 0,
+export const testTableWithMergedAndUnmergedCellsInMiddleLevelOfHeaders: FullTable =
+  {
+    subjectMeta: {
+      ...testInitialTableSubjectMeta,
+      filters: {
+        Category1: {
+          name: 'category_1',
+          options: [
+            category1Group1Filter1,
+            category1Group2Filter1,
+            category1Group2Filter2,
+          ],
+          order: 0,
+        },
+        Category2: {
+          name: 'category_2',
+          options: [category2Group1Filter1, category2Group1Filter2],
+          order: 1,
+        },
       },
-      Category2: {
-        name: 'category_2',
-        options: [category2Group1Filter1, category2Group1Filter2],
-        order: 1,
-      },
-    },
 
-    indicators: [indicator1],
-    locations: [location1],
+      indicators: [indicator1],
+      locations: [location1],
 
-    timePeriodRange: [timePeriod1],
-  },
-  results: [
-    {
-      filters: [category1Group2Filter2.id, category2Group1Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '79',
-      },
-      timePeriod: timePeriod1.id,
+      timePeriodRange: [timePeriod1],
     },
-    {
-      filters: [category1Group2Filter2.id, category2Group1Filter2.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '74',
+    results: [
+      {
+        filters: [category1Group2Filter2.id, category2Group1Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '79',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category2Group1Filter1.id, category1Group2Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '87',
+      {
+        filters: [category1Group2Filter2.id, category2Group1Filter2.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '74',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category2Group1Filter2.id, category1Group2Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '85',
+      {
+        filters: [category2Group1Filter1.id, category1Group2Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '87',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category2Group1Filter1.id, category1Group1Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '88',
+      {
+        filters: [category2Group1Filter2.id, category1Group2Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '85',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category2Group1Filter2.id, category1Group1Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '85',
+      {
+        filters: [category2Group1Filter1.id, category1Group1Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '88',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-  ],
-};
+      {
+        filters: [category2Group1Filter2.id, category1Group1Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '85',
+        },
+        timePeriod: timePeriod1.id,
+      },
+    ],
+  };
 
-export const testTableWithOnlyMergedCellsInLastLevelOfColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category1Group1Filter1, category1Group2Filter2],
-  columnGroups: [
-    [indicator1],
-    [category2Group1Filter1, category2Group1Filter2],
-  ],
-  rows: [timePeriod1],
-  rowGroups: [],
-};
+export const testTableWithOnlyMergedCellsInLastLevelOfColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category1Group1Filter1, category1Group2Filter2],
+    columnGroups: [
+      [indicator1],
+      [category2Group1Filter1, category2Group1Filter2],
+    ],
+    rows: [timePeriod1],
+    rowGroups: [],
+  };
 
-export const testTableWithOnlyMergedCellsInLastLevelOfRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [category1Group1Filter1, category1Group2Filter2],
-  rowGroups: [[indicator1], [category2Group1Filter1, category2Group1Filter2]],
-};
+export const testTableWithOnlyMergedCellsInLastLevelOfRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [category1Group1Filter1, category1Group2Filter2],
+    rowGroups: [[indicator1], [category2Group1Filter1, category2Group1Filter2]],
+  };
 
 export const testTableWithOnlyMergedCellsInLastLevelOfHeaders: FullTable = {
   subjectMeta: {
@@ -574,95 +590,100 @@ export const testTableWithOnlyMergedCellsInLastLevelOfHeaders: FullTable = {
   ],
 };
 
-export const testTableWithMergedAndUnmergedCellsInLastLevelOfColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category1Group1Filter1, category1Group2Filter1],
-  columnGroups: [
-    [indicator1],
-    [category2Group1Filter1, category2Group1Filter2],
-  ],
-  rows: [timePeriod1],
-  rowGroups: [],
-};
+export const testTableWithMergedAndUnmergedCellsInLastLevelOfColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category1Group1Filter1, category1Group2Filter1],
+    columnGroups: [
+      [indicator1],
+      [category2Group1Filter1, category2Group1Filter2],
+    ],
+    rows: [timePeriod1],
+    rowGroups: [],
+  };
 
-export const testTableWithMergedAndUnmergedCellsInLastLevelOfRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [category1Group1Filter1, category1Group2Filter1],
-  rowGroups: [[indicator1], [category2Group1Filter1, category2Group1Filter2]],
-};
+export const testTableWithMergedAndUnmergedCellsInLastLevelOfRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [category1Group1Filter1, category1Group2Filter1],
+    rowGroups: [[indicator1], [category2Group1Filter1, category2Group1Filter2]],
+  };
 
-export const testTableWithMergedAndUnmergedCellsInLastLevelOfHeaders: FullTable = {
-  subjectMeta: {
-    ...testInitialTableSubjectMeta,
-    filters: {
-      Category1: {
-        name: 'category_1',
-        options: [category1Group1Filter1, category1Group2Filter1],
-        order: 0,
+export const testTableWithMergedAndUnmergedCellsInLastLevelOfHeaders: FullTable =
+  {
+    subjectMeta: {
+      ...testInitialTableSubjectMeta,
+      filters: {
+        Category1: {
+          name: 'category_1',
+          options: [category1Group1Filter1, category1Group2Filter1],
+          order: 0,
+        },
+        Category2: {
+          name: 'category_2',
+          options: [category2Group1Filter1, category2Group1Filter2],
+          order: 0,
+        },
       },
-      Category2: {
-        name: 'category_2',
-        options: [category2Group1Filter1, category2Group1Filter2],
-        order: 0,
-      },
+      indicators: [indicator1],
+      locations: [location1],
+      timePeriodRange: [timePeriod1],
     },
-    indicators: [indicator1],
-    locations: [location1],
-    timePeriodRange: [timePeriod1],
-  },
-  results: [
-    {
-      filters: [category1Group1Filter1.id, category2Group1Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '74',
+    results: [
+      {
+        filters: [category1Group1Filter1.id, category2Group1Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '74',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category1Group1Filter1.id, category2Group1Filter2.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '85',
+      {
+        filters: [category1Group1Filter1.id, category2Group1Filter2.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '85',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category1Group2Filter1.id, category2Group1Filter1.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '92',
+      {
+        filters: [category1Group2Filter1.id, category2Group1Filter1.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '92',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-    {
-      filters: [category1Group2Filter1.id, category2Group1Filter2.id],
-      geographicLevel: 'country',
-      locationId: location1.value,
-      measures: {
-        [indicator1.id]: '87',
+      {
+        filters: [category1Group2Filter1.id, category2Group1Filter2.id],
+        geographicLevel: 'country',
+        locationId: location1.value,
+        measures: {
+          [indicator1.id]: '87',
+        },
+        timePeriod: timePeriod1.id,
       },
-      timePeriod: timePeriod1.id,
-    },
-  ],
-};
+    ],
+  };
 
-export const testTableWithMergedCellsAndMissingDataColHeadersConfig: TableHeadersConfig = {
-  columns: [category1Group2Filter1, category1Group1Filter1],
-  columnGroups: [[category2Group1Filter1, category2Group1Filter2]],
-  rows: [timePeriod1],
-  rowGroups: [[indicator1]],
-};
+export const testTableWithMergedCellsAndMissingDataColHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category1Group2Filter1, category1Group1Filter1],
+    columnGroups: [[category2Group1Filter1, category2Group1Filter2]],
+    rows: [timePeriod1],
+    rowGroups: [[indicator1]],
+  };
 
-export const testTableWithMergedCellsAndMissingDataRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [[indicator1]],
-  rows: [category1Group2Filter1, category1Group1Filter1],
-  rowGroups: [[category2Group1Filter1, category2Group1Filter2]],
-};
+export const testTableWithMergedCellsAndMissingDataRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [[indicator1]],
+    rows: [category1Group2Filter1, category1Group1Filter1],
+    rowGroups: [[category2Group1Filter1, category2Group1Filter2]],
+  };
 
 export const testTableWithMergedCellsAndMissingData: FullTable = {
   subjectMeta: {

@@ -138,9 +138,11 @@ const SubscriptionPage: NextPage<Props> = ({
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
-    const { slug, unsubscribed = '', verified = '' } = query as Dictionary<
-      string
-    >;
+    const {
+      slug,
+      unsubscribed = '',
+      verified = '',
+    } = query as Dictionary<string>;
 
     const data = await publicationService.getPublicationTitle(slug as string);
 

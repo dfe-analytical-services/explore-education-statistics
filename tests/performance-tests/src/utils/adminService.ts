@@ -659,11 +659,7 @@ export class AdminService {
   }
 }
 
-export function getDataFileUploadStrategy({
-  filename,
-}: {
-  filename: string;
-}): {
+export function getDataFileUploadStrategy({ filename }: { filename: string }): {
   filename: string;
   isZip: boolean;
   subjectName: string;
