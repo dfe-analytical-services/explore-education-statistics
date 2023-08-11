@@ -3,11 +3,9 @@ import { useConfig } from '@admin/contexts/ConfigContext';
 import methodologyService, {
   MethodologyApprovalStatus,
 } from '@admin/services/methodologyService';
-import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
@@ -19,6 +17,7 @@ import UrlContainer from '@common/components/UrlContainer';
 import FormattedDate from '@common/components/FormattedDate';
 import { useQuery } from '@tanstack/react-query';
 import methodologyQueries from '@admin/queries/methodologyQueries';
+import permissionQueries from '@admin/queries/permissionQueries';
 
 interface FormValues {
   status: MethodologyApprovalStatus;
@@ -29,6 +28,7 @@ interface FormValues {
 
 const statusMap: Dictionary<string> = {
   Draft: 'In Draft',
+  HigherLevelReview: 'Awaiting higher review',
   Approved: 'Approved',
 };
 
@@ -51,20 +51,12 @@ const MethodologyStatusPage = () => {
   );
 
   const {
-    value: permissions,
-    retry: refreshPermissions,
+    data: permissions,
+    refetch: refreshPermissions,
     isLoading,
-  } = useAsyncRetry(async () => {
-    const [canApprove, canMarkAsDraft] = await Promise.all([
-      permissionService.canApproveMethodology(methodologyId),
-      permissionService.canMarkMethodologyAsDraft(methodologyId),
-    ]);
-
-    return {
-      canApprove,
-      canMarkAsDraft,
-    };
-  }, [methodologyId]);
+  } = useQuery(
+    permissionQueries.getMethodologyApprovalPermissions(currentMethodology.id),
+  );
 
   const handleSubmit = async ({
     latestInternalReleaseNote,
@@ -90,13 +82,16 @@ const MethodologyStatusPage = () => {
 
     onMethodologyChange(nextSummary);
 
-    refreshPermissions();
+    await refreshPermissions();
     await refreshMethodologyStatuses();
 
     toggleForm.off();
   };
 
-  const isEditable = permissions?.canApprove || permissions?.canMarkAsDraft;
+  const isEditable =
+    permissions?.canMarkApproved ||
+    permissions?.canMarkHigherLevelReview ||
+    permissions?.canMarkDraft;
 
   return (
     <LoadingSpinner loading={isLoading}>
@@ -123,9 +118,6 @@ const MethodologyStatusPage = () => {
                 </SummaryListItem>
                 {currentMethodology.status === 'Approved' && (
                   <>
-                    <SummaryListItem term="Internal note">
-                      {currentMethodology.internalReleaseNote}
-                    </SummaryListItem>
                     <SummaryListItem term="When to publish">
                       {currentMethodology.publishingStrategy === 'WithRelease'
                         ? 'With a specific release'
@@ -223,6 +215,7 @@ const MethodologyStatusPage = () => {
           ) : (
             <MethodologyStatusEditPage
               methodology={currentMethodology}
+              statusPermissions={permissions}
               onCancel={toggleForm.off}
               onSubmit={handleSubmit}
             />

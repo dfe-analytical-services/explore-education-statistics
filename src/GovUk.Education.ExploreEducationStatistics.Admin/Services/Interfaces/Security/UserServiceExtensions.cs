@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security
 {
@@ -87,10 +88,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
                 : userService.CheckCanUpdateMethodologyVersion(methodologyVersion);
         }
 
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanUpdateMethodologyVersionStatus(
+            this IUserService userService, MethodologyVersion methodologyVersion, MethodologyApprovalStatus requestedStatus)
+        {
+            return requestedStatus switch
+            {
+                Draft => userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion),
+                HigherLevelReview => userService.CheckCanSubmitMethodologyForHigherReview(methodologyVersion),
+                Approved => userService.CheckCanApproveMethodologyVersion(methodologyVersion),
+                _ => throw new ArgumentOutOfRangeException(nameof(requestedStatus), "Unexpected status")
+            };
+        }
+
         public static Task<Either<ActionResult, MethodologyVersion>> CheckCanMarkMethodologyVersionAsDraft(
             this IUserService userService, MethodologyVersion methodologyVersion)
         {
             return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanMarkSpecificMethodologyAsDraft);
+        }
+
+        public static Task<Either<ActionResult, MethodologyVersion>> CheckCanSubmitMethodologyForHigherReview(
+            this IUserService userService, MethodologyVersion methodologyVersion)
+        {
+            return userService.CheckPolicy(methodologyVersion, SecurityPolicies.CanSubmitSpecificMethodologyToHigherReview);
         }
 
         public static Task<Either<ActionResult, MethodologyVersion>> CheckCanApproveMethodologyVersion(
@@ -222,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
                 }
                 case ReleaseApprovalStatus.HigherLevelReview:
                 {
-                    return userService.CheckCanSubmitReleaseToHigherApproval(release);
+                    return userService.CheckCanSubmitReleaseForHigherReview(release);
                 }
                 case ReleaseApprovalStatus.Approved:
                 {
@@ -241,7 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(release, SecurityPolicies.CanMarkSpecificReleaseAsDraft);
         }
 
-        public static Task<Either<ActionResult, Release>> CheckCanSubmitReleaseToHigherApproval(
+        public static Task<Either<ActionResult, Release>> CheckCanSubmitReleaseForHigherReview(
             this IUserService userService, Release release)
         {
             return userService.CheckPolicy(release, SecurityPolicies.CanSubmitSpecificReleaseToHigherReview);

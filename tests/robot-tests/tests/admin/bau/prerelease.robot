@@ -364,13 +364,11 @@ Go to featured table and validate table
     user validates table rows
 
 Create and validate custom table
-    user clicks link    Table tool
-
-    user waits until h1 is visible    Create your own tables
-
+    user clicks button    Change data set
+    user clicks button    Confirm
     user waits until table tool wizard step is available    1    Select a data set    %{WAIT_SMALL}
-
     user waits until page contains    UI test subject    %{WAIT_SMALL}
+
     user clicks radio    UI test subject
     user clicks element    id:publicationDataStepForm-submit
 
@@ -493,13 +491,11 @@ Go to featured table and validate table as Analyst user
     user validates table rows
 
 Create and validate custom table as Analyst user
-    user clicks link    Table tool
-
-    user waits until h1 is visible    Create your own tables
-
+    user clicks button    Change data set
+    user clicks button    Confirm
     user waits until table tool wizard step is available    1    Select a data set    %{WAIT_SMALL}
-
     user waits until page contains    UI test subject    %{WAIT_SMALL}
+
     user clicks radio    UI test subject
     user clicks element    id:publicationDataStepForm-submit
 

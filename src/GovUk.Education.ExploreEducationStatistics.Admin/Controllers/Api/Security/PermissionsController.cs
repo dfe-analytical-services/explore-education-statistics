@@ -61,24 +61,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
             return CheckPolicyAgainstEntity<Release>(releaseId, _userService.CheckCanUpdateRelease);
         }
 
-        public class ReleaseStatusPermissionsViewModel
-        {
-            public bool CanMarkDraft = false;
-            public bool CanMarkHigherLevelReview = false;
-            public bool CanMarkApproved = false;
-        }
+        public record ReleaseStatusPermissionsViewModel(
+            bool CanMarkDraft, bool CanMarkHigherLevelReview, bool CanMarkApproved);
 
         [HttpGet("permissions/release/{releaseId:guid}/status")]
         public async Task<ActionResult<ReleaseStatusPermissionsViewModel>> GetReleaseStatusPermissions(Guid releaseId)
         {
             return await _persistenceHelper.CheckEntityExists<Release, Guid>(releaseId)
-                .OnSuccess(release => new ReleaseStatusPermissionsViewModel
+                .OnSuccess(async release =>
                 {
-                    CanMarkDraft = _userService.CheckCanMarkReleaseAsDraft(release).Result.IsRight,
-                    CanMarkHigherLevelReview = _userService.CheckCanSubmitReleaseToHigherApproval(release).Result.IsRight,
-                    CanMarkApproved = _userService.CheckCanApproveRelease(release).Result.IsRight,
+                    var canMarkDraft = await _userService
+                        .CheckCanMarkReleaseAsDraft(release);
+                    var canMarkHigherReview = await _userService
+                        .CheckCanSubmitReleaseForHigherReview(release);
+                    var canMarkApproved = await _userService
+                        .CheckCanApproveRelease(release);
+
+                    return new ReleaseStatusPermissionsViewModel(
+                        CanMarkDraft: canMarkDraft.IsRight,
+                        CanMarkHigherLevelReview: canMarkHigherReview.IsRight,
+                        CanMarkApproved: canMarkApproved.IsRight
+                    );
                 })
-                .OrElse(() => new ReleaseStatusPermissionsViewModel());
+                .OrElse(() => new ReleaseStatusPermissionsViewModel(
+                    false, false, false));
         }
 
         [HttpGet("permissions/release/{releaseId:guid}/data/{fileId:guid}")]
@@ -116,18 +122,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 _userService.CheckCanUpdateMethodologyVersion);
         }
 
-        [HttpGet("permissions/methodology/{methodologyId:guid}/status/draft")]
-        public Task<ActionResult<bool>> CanMarkMethodologyAsDraft(Guid methodologyId)
-        {
-            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
-                _userService.CheckCanMarkMethodologyVersionAsDraft);
-        }
+        public record MethodologyApprovalStatusPermissions(
+            bool CanMarkDraft, bool CanMarkHigherLevelReview, bool CanMarkApproved);
 
-        [HttpGet("permissions/methodology/{methodologyId:guid}/status/approve")]
-        public Task<ActionResult<bool>> CanApproveMethodology(Guid methodologyId)
+        [HttpGet("permissions/methodology/{methodologyVersionId:guid}/status")]
+        public async Task<ActionResult<MethodologyApprovalStatusPermissions>> GetMethodologyApprovalPermissions(
+            Guid methodologyVersionId)
         {
-            return CheckPolicyAgainstEntity<MethodologyVersion>(methodologyId,
-                _userService.CheckCanApproveMethodologyVersion);
+            return await _persistenceHelper.CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+                .OnSuccess(async methodologyVersion =>
+                {
+                    var canMarkDraft = await _userService
+                        .CheckCanMarkMethodologyVersionAsDraft(methodologyVersion);
+                    var canMarkHigherLevelReview = await _userService
+                        .CheckCanSubmitMethodologyForHigherReview(methodologyVersion);
+                    var canMarkApproved = await _userService
+                        .CheckCanApproveMethodologyVersion(methodologyVersion);
+
+                    return new MethodologyApprovalStatusPermissions
+                    (
+                        CanMarkDraft: canMarkDraft.IsRight,
+                        CanMarkHigherLevelReview: canMarkHigherLevelReview.IsRight,
+                        CanMarkApproved: canMarkApproved.IsRight
+                    );
+                })
+                .OrElse (() => new MethodologyApprovalStatusPermissions(
+                    false, false, false));
         }
 
         private async Task<ActionResult<bool>> CheckPolicyAgainstEntity<TEntity>(

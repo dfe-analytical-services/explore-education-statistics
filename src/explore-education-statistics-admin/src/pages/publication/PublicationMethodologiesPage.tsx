@@ -31,6 +31,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
+import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
@@ -45,7 +46,7 @@ const PublicationMethodologiesPage = () => {
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [externalMethodology, methodologyVersions] = await Promise.all([
       publicationService.getExternalMethodology(publication.id),
-      methodologyService.listMethodologyVersions(publication.id),
+      methodologyService.listLatestMethodologyVersions(publication.id),
     ]);
 
     return {
@@ -152,6 +153,7 @@ const PublicationMethodologiesPage = () => {
             {methodologyVersions.map(methodology => {
               const canEdit =
                 methodology.permissions.canApproveMethodology ||
+                methodology.permissions.canSubmitMethodologyForHigherReview ||
                 methodology.permissions.canMarkMethodologyAsDraft ||
                 methodology.permissions.canUpdateMethodology;
 
@@ -172,7 +174,9 @@ const PublicationMethodologiesPage = () => {
                         methodology.status === 'Approved' &&
                         methodology.published
                           ? 'Published'
-                          : methodology.status
+                          : getMethodologyApprovalStatusLabel(
+                              methodology.status,
+                            )
                       }${methodology.amendment ? ' Amendment' : ''}`}
                     </Tag>
                   </td>

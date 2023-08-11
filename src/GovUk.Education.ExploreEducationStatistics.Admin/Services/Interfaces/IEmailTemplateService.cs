@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -23,6 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Release release,
             ReleaseRole role);
 
-        Either<ActionResult, Unit> SendHigherReviewEmail(string email, Release release);
+        Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, Release release);
+
+        Either<ActionResult, Unit> SendMethodologyHigherReviewEmail(
+            string email,
+            Guid methodologyVersionId,
+            string methodologyTitle);
     }
 }
