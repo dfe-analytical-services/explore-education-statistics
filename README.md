@@ -181,36 +181,36 @@ The service can be started against a set of non-existent database. If no pre-exi
 3. Start the Admin project and this will configure the contained users' permissions via database migrations. The other 
    projects will then be able to be started, using their own contained users to connect to the databases. 
 
-### Setting up an Identity Provider
+### Setting up an Identity Provider (IdP)
 
-The project uses an OpenID Connect Identity Provider to allow login to the Admin service.
+The project uses an OpenID Connect Identity Provider (IdP) to allow login to the Admin service.
 
 > For team members, Azure AD configuration is available alongside other project passwords with the title `Azure AD IdP 
 configuration`. Place the contents of this into [appsettings.Idp.json](
-src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) and start Admin normally.
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json) and start Admin normally.
 
 An out-of-the-box IdP is provided for ease of setup which runs [Keycloak](https://www.keycloak.org/) in a Docker container 
 and contains a number of users for different roles. The [appsettings.Keycloak.json](
-src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Keycloak.json) configuration file contains the details for 
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Keycloak.json) configuration file contains the details for 
 connecting Admin to this IdP.
 
 Alternatively, you can provide your own OpenID Connect configuration in the [appsettings.Idp.json](
-src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) file that is ignored from Git. You can use the 
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json) file that is ignored from Git. You can use the 
 Keycloak equivalent as a template as to how the configuration in the file should be structured.
 
 #### Using Keycloak
 
 1. Start up Keycloak:
 
-  ```bash
-  pnpm start idp
-  ```
+   ```bash
+   pnpm start idp
+   ```
 
-2. Start up Admin with additional Keycloak configuration:
+2. Start up the Admin:
 
-  ```bash
-  pnpm start adminKeycloak # this sets the environment variable "IdpProviderConfiguration=Keycloak" for the admin project
-  ```
+   ```bash
+   pnpm start admin
+   ```
 
 All the standard seed data users can be supported with Keycloak, and use their standard email addresses and the
 password `password` to log in.
@@ -222,10 +222,8 @@ The standard accounts used day to day are:
   * analyst - username `analyst` and password `password`
   * analyst2 - username `analyst2` and password `password`
 
-
 The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with username `admin` and password
 `admin`. From here, users and OpenID Connect settings can be administered.
-
 
 ##### Adding additional users to Keycloak manually
 
@@ -242,90 +240,96 @@ cd src/
 docker-compose up --build --force-recreate idp
 ```
 
-#### Using a different Identity Provider
+#### Using a custom Identity Provider
 
-If you have your own OpenID Connect IdP set up, you can provide its configuration in the 
-[appsettings.Idp.json](src/GovUk.Education.ExploreEducationStatistics.Admin\appsettings.Idp.json) file that is 
-ignored from Git. You can use the Keycloak equivalent as a template as to how the configuration in the file should
-be structured.
+If you have your own custom OpenID Connect identity provider (IdP), you can provide its config in a 
+[appsettings.Idp.json](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json) file 
+that is ignored from Git.
+
+You can use [appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Keycloak.json) 
+as a template for how the configuration should be structured.
 
 > Note that it must have Implicit Flow enabled and be using the OpenID Connect protocol. It must be set to issue 
 ID Tokens.
+
+If you wish, you can explicitly choose which config to load using the `IdpConfig` environment variable:
+
+```
+IdpConfig=Keycloak # To use default Keycloak
+IdpConfig=Idp      # To use custom IdP
+```
+
+This might be useful if you want to toggle between Keycloak and your custom IdP config, but otherwise, 
+just remove the `appsettings.Idp.json` to default back to Keycloak.
 
 #### Bootstrapping Keycloak users into a blank database
 
 If you are wanting to use Keycloak but with a fresh database, set the following environment variable:
 
 ```
-BootstrapUsersConfiguration=KeycloakBootstrapUsers
+BootstrapUsers=Keycloak
 ```
 
-The effect of setting this environment variable tells the Admin application to generate a set of BAU users
-on startup that are specified in the 
-[src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json](
-src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.KeycloakBootstrapUsers.json) file.
+This environment variable tells the Admin application to generate a set of BAU users on startup that 
+are specified in the [appsettings.KeycloakBootstrapUsers.json](
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.KeycloakBootstrapUsers.json) file.
 
 This allows immediate use of the service with Keycloak against an empty database, as corresponding users will
 now be in both Keycloak and in the SQL Server database.
 
-#### Using multiple Identity Providers and user configurations
+#### Bootstrapping different Identity Provider users
 
-Alternatively you can provide any number of different OpenID Connect IdP configurations and bootstrap user lists 
-by providing files like `src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}.json` 
-and optionally a set of users' email addresses who you want to access the system straight away in a file called 
-`src\GovUk.Education.ExploreEducationStatistics.Admin\appsettings.{NameOfYourIdentityProvider}BootstrapUsers.json`.  
+If you are using your own IdP config (via `appsettings.Idp.json`), you can bootstrap users who you want to
+have access to the system straight away by creating a `appsettings.IdpBootstrapUsers.json` (which is ignored by Git).
+This should contain a set of user emails in a format similar to `appsettings.Keycloak.json`. 
 
-Then set the environment variables:
+Then set the following environment variable before starting the Admin:
 
 ```
-IdpProviderConfiguration={NameOfYourIdentityProvider}
-BootstrapUsersConfiguration={NameOfYourIdentityProvider}BootstrapUsers
+BootstrapUsers=Idp
 ```
 
-and start up Admin wih these environment variables set. This allows you to easily switch between different IdP 
-configurations if you have need of more than one for easy reference.
+## Running the service
 
-### Running the backend
+A good way of running applications/functions is directly through an IDE like [Rider](https://www.jetbrains.com/rider/).
 
-The recommended way of running backend applications/functions is through the [Rider IDE](https://www.jetbrains.com/rider/).
-If this is not available to you then you will need to use one, or a combination, of the following:
+Alternatively, you can use our `run` script. This is a simple wrapper around the various CLI 
+commands you need to run the applications. 
 
-#### Using `run` script
+We've aliased the `run.js` script for convenience in the root package.json (as `pnpm start`).
 
-The `run` script is a simple wrapper around the various CLI commands you need to run the applications. We've aliased the `run.js` script for convenience in the root package.json.
 You will need to ensure you have all the project dependencies as specified in [Requirements](#requirements).
 
 Examples:
 
-- To run the public frontend services:
+- To run the public frontend backend APIs:
 
-```bash
-pnpm start data content
-```
+  ```bash
+  pnpm start data content
+  ```
 
-- To run the admin:
+- To run the public frontend:
 
-```bash
-pnpm start adminKeycloak
-```
+   ```bash
+   pnpm start frontend
+   ```
+
+- To run the admin (front and backend):
+
+  ```bash
+  pnpm start admin
+  ```
 
 - To run other services:
 
-```bash
-pnpm start publisher processor
-```
+  ```bash
+  pnpm start publisher processor
+  ```
 
-2. Startup any required backend services (see [Running the backend](#running-the-backend))
+The frontend applications can be accessed via:
 
-3. Run the frontend application using the following:
-    
-```bash
-pnpm start frontend
-```
-4. Access frontend applications at:
-
-   - `http://localhost:3000` for the public frontend
-   - `http://localhost:5021` for the admin frontend
+- `http://localhost:3000` for the public frontend
+- `http://localhost:5021` for the admin frontend
 
 ## Frontend development
 

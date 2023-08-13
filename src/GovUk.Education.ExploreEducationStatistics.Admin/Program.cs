@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -18,20 +19,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((ctx, builder) =>
                 {
-                    var idpConfigFileRequired = ctx.HostingEnvironment.IsDevelopment();
-                    
-                    var idpConfiguration = 
-                        Environment.GetEnvironmentVariable("IdpProviderConfiguration") ?? "Idp";
-                    
+                    if (!ctx.HostingEnvironment.IsDevelopment())
+                    {
+                        return;
+                    }
+
+                    // Can specify `IdpConfig` variable if you want to choose between a custom config
+                    // and Keycloak, but otherwise, just delete appsettings.Idp.json if you don't need it.
+                    var idpConfig = Environment.GetEnvironmentVariable("IdpConfig") ?? "Idp";
+
+                    var idpFile = builder.GetFileProvider().GetFileInfo($"appsettings.{idpConfig}.json").Exists
+                        ? $"appsettings.{idpConfig}.json"
+                        : "appsettings.Keycloak.json";
+
                     builder.AddJsonFile(
-                        $"appsettings.{idpConfiguration}.json", 
-                        optional: !idpConfigFileRequired, 
-                        reloadOnChange: true);
-                    
-                    builder.AddJsonFile(
-                        $"appsettings.{Environment.GetEnvironmentVariable("BootstrapUsersConfiguration")}.json", 
-                        optional: true, 
-                        reloadOnChange: true);
+                        idpFile,
+                        optional: false,
+                        reloadOnChange: true
+                    );
+
+                    var bootstrapUsers = Environment.GetEnvironmentVariable("BootstrapUsers");
+
+                    if (bootstrapUsers is not null)
+                    {
+                        builder.AddJsonFile(
+                            $"appsettings.{bootstrapUsers}BootstrapUsers.json",
+                            optional: true,
+                            reloadOnChange: true
+                        );
+                    }
 
                     builder.AddJsonFile(
                         "appsettings.Local.json",
@@ -49,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .ConfigureLogging(
                     builder =>
                     {
-                        // Capture logs from early in the application startup 
+                        // Capture logs from early in the application startup
                         // pipeline from Startup.cs or Program.cs itself.
                         builder.AddApplicationInsights();
 

@@ -79,6 +79,7 @@ remote-profile
 
 src/GovUk.Education.ExploreEducationStatistics.*/appsettings.Local.json
 src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.IdpBootstrapUsers.json
 
 ## IdentityServer Developer Signing key
 **/*/tempkey.rsa
