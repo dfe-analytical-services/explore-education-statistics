@@ -34,6 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatues);
 
+        Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesForApproval(Guid userId);
+
         Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases();
 
         Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId);
