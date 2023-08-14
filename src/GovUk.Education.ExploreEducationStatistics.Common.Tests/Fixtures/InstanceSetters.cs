@@ -81,6 +81,14 @@ public class InstanceSetters<T> where T : class
         );
     }
 
+    public InstanceSetters<T> SetDefault(Expression<Func<T, int?>> property)
+    {
+        return Set(
+            property,
+            (faker, _, context) => GetDisplayIndex(context, faker)
+        );
+    }
+
     private static int GetDisplayIndex(SetterContext context, Faker faker)
         => context.FixtureTypeIndex > 0 ? context.FixtureTypeIndex : faker.IndexFaker;
 }
