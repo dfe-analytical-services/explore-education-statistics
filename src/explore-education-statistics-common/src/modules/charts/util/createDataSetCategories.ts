@@ -199,10 +199,13 @@ function getCategoryFilters(
  * Create a map of data sets to their respective key
  * so they can be used in the chart data.
  */
-function createKeyedDataSets(
-  dataSets: Pair<ChildDataSet, number>[],
-  filter: Filter,
-): DataSetCategory['dataSets'] {
+function createKeyedDataSets({
+  dataSets,
+  filter,
+}: {
+  dataSets: Pair<ChildDataSet, number>[];
+  filter?: Filter;
+}): DataSetCategory['dataSets'] {
   return dataSets.reduce<DataSetCategory['dataSets']>(
     (acc, [childDataSet, value]) => {
       const { dataSet } = childDataSet;
@@ -278,8 +281,8 @@ function getSortedDataSetCategoryRange(
 interface Options {
   axisConfiguration: AxisConfiguration;
   data: TableDataResult[];
-  meta: FullTableMeta;
   includeNonNumericData?: boolean;
+  meta: FullTableMeta;
 }
 
 /**
@@ -318,8 +321,8 @@ interface Options {
 export default function createDataSetCategories({
   axisConfiguration,
   data,
-  meta,
   includeNonNumericData = false,
+  meta,
 }: Options): DataSetCategory[] {
   const categoryFilters = getCategoryFilters(axisConfiguration, meta);
   const childDataSets = getChildDataSets(axisConfiguration, meta);
@@ -373,7 +376,10 @@ export default function createDataSetCategories({
 
       return {
         filter,
-        dataSets: createKeyedDataSets(matchingDataSets, filter),
+        dataSets: createKeyedDataSets({
+          dataSets: matchingDataSets,
+          filter: !axisConfiguration.groupByFilterGroups ? filter : undefined,
+        }),
       };
     })
     .filter(category => Object.values(category.dataSets).length > 0);

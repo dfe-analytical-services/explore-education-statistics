@@ -18,6 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public AxisGroupBy? GroupBy;
 
         public string? GroupByFilter;
+        public bool GroupByFilterGroups;
 
         public string SortBy = null!;
         public bool SortAsc = true;

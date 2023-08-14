@@ -58,6 +58,7 @@ export interface AxisConfiguration {
   type: AxisType;
   groupBy?: AxisGroupBy;
   groupByFilter?: string;
+  groupByFilterGroups?: boolean;
   sortBy?: string;
   sortAsc?: boolean;
   dataSets: DataSet[];
