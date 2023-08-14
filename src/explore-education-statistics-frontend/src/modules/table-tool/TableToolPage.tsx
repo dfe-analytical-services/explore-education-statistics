@@ -242,12 +242,11 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async ({
-  query,
-}) => {
-  const { publicationSlug = '', releaseSlug = '' } = query as Dictionary<
-    string
-  >;
+export const getServerSideProps: GetServerSideProps<
+  TableToolPageProps
+> = async ({ query }) => {
+  const { publicationSlug = '', releaseSlug = '' } =
+    query as Dictionary<string>;
 
   const themeMeta = await publicationService.getPublicationTree({
     publicationFilter: 'DataTables',
@@ -266,9 +265,10 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
     };
   }
 
-  const latestRelease = await publicationService.getLatestPublicationReleaseSummary(
-    publicationSlug,
-  );
+  const latestRelease =
+    await publicationService.getLatestPublicationReleaseSummary(
+      publicationSlug,
+    );
 
   const selectedRelease =
     !releaseSlug || latestRelease.slug === releaseSlug

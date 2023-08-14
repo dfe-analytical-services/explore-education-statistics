@@ -40,7 +40,7 @@ export default function refreshAuthTokens({
     return undefined;
   }
 
-  const authTokens = (response.json() as unknown) as {
+  const authTokens = response.json() as unknown as {
     access_token: string;
     refresh_token: string;
     expires_in: Date;

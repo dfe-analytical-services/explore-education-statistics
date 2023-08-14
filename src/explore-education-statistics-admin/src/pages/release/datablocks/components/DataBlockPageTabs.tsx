@@ -241,61 +241,62 @@ const DataBlockPageTabs = ({
     ],
   );
 
-  const handleDataBlockSourceSave: DataBlockSourceWizardSaveHandler = useCallback(
-    async ({ query, table, tableHeaders, details }) => {
-      const charts = produce(dataBlock?.charts ?? [], draft => {
-        const majorAxis = draft[0]?.axes?.major;
-        const legend = draft[0]?.legend;
+  const handleDataBlockSourceSave: DataBlockSourceWizardSaveHandler =
+    useCallback(
+      async ({ query, table, tableHeaders, details }) => {
+        const charts = produce(dataBlock?.charts ?? [], draft => {
+          const majorAxis = draft[0]?.axes?.major;
+          const legend = draft[0]?.legend;
 
-        // If old chart title is the same as the old table title, then the chart title is defaulting to
-        // the table title, so don't inadvertently set the old chart/table title
-        if (
-          dataBlock?.charts[0] &&
-          dataBlock?.charts[0]?.title === dataBlock?.heading
-        ) {
-          draft[0].title = undefined;
-        }
+          // If old chart title is the same as the old table title, then the chart title is defaulting to
+          // the table title, so don't inadvertently set the old chart/table title
+          if (
+            dataBlock?.charts[0] &&
+            dataBlock?.charts[0]?.title === dataBlock?.heading
+          ) {
+            draft[0].title = undefined;
+          }
 
-        // Remove data sets that are no longer applicable to a given table's subject meta.
-        if (majorAxis?.dataSets) {
-          majorAxis.dataSets = majorAxis.dataSets.filter(
-            dataSet => !isOrphanedDataSet(dataSet, table.subjectMeta),
-          );
-        }
-        if (legend?.items) {
-          legend.items = legend.items.filter(
-            item => !isOrphanedDataSet(item.dataSet, table.subjectMeta),
-          );
-        }
-      });
+          // Remove data sets that are no longer applicable to a given table's subject meta.
+          if (majorAxis?.dataSets) {
+            majorAxis.dataSets = majorAxis.dataSets.filter(
+              dataSet => !isOrphanedDataSet(dataSet, table.subjectMeta),
+            );
+          }
+          if (legend?.items) {
+            legend.items = legend.items.filter(
+              item => !isOrphanedDataSet(item.dataSet, table.subjectMeta),
+            );
+          }
+        });
 
-      await handleDataBlockSave({
-        ...(dataBlock ?? {}),
-        ...details,
-        query,
-        charts,
-        dataSetId: dataBlock?.dataSetId ?? '',
-        dataSetName: dataBlock?.dataSetName ?? '',
-        table: {
-          tableHeaders: mapUnmappedTableHeaders(tableHeaders),
-          indicators: [],
-        },
-      });
-
-      setTableState({
-        value: {
-          ...tableState,
-          initialStep: 5,
+        await handleDataBlockSave({
+          ...(dataBlock ?? {}),
+          ...details,
           query,
-          response: {
-            table,
-            tableHeaders,
+          charts,
+          dataSetId: dataBlock?.dataSetId ?? '',
+          dataSetName: dataBlock?.dataSetName ?? '',
+          table: {
+            tableHeaders: mapUnmappedTableHeaders(tableHeaders),
+            indicators: [],
           },
-        },
-      });
-    },
-    [handleDataBlockSave, dataBlock, setTableState, tableState],
-  );
+        });
+
+        setTableState({
+          value: {
+            ...tableState,
+            initialStep: 5,
+            query,
+            response: {
+              table,
+              tableHeaders,
+            },
+          },
+        });
+      },
+      [handleDataBlockSave, dataBlock, setTableState, tableState],
+    );
 
   const handleTableHeadersSave = useCallback(
     async (tableHeaders: TableHeadersConfig) => {

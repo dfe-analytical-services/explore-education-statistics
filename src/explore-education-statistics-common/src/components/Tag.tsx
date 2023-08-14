@@ -14,7 +14,7 @@ export interface TagProps {
     | 'orange'
     | 'yellow';
   className?: string;
-  id?: string | undefined;
+  id?: string;
   strong?: boolean;
 }
 

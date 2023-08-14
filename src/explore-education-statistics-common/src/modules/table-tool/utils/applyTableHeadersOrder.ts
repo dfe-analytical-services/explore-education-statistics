@@ -37,25 +37,21 @@ const applyTableHeadersOrder = ({
     reorderedTableHeaders.columns,
   ];
 
-  const {
-    orderedGroups: orderedRowGroups,
-    newGroups: newRowGroups,
-  } = orderGroups({
-    defaultGroups: defaultRowGroups,
-    reorderedGroups: reorderedRowGroups,
-    otherAxisDefaultGroups: defaultColGroups,
-    otherAxisReorderedGroups: reorderedColGroups,
-  });
+  const { orderedGroups: orderedRowGroups, newGroups: newRowGroups } =
+    orderGroups({
+      defaultGroups: defaultRowGroups,
+      reorderedGroups: reorderedRowGroups,
+      otherAxisDefaultGroups: defaultColGroups,
+      otherAxisReorderedGroups: reorderedColGroups,
+    });
 
-  const {
-    orderedGroups: orderedColumnGroups,
-    newGroups: newColumnGroups,
-  } = orderGroups({
-    defaultGroups: defaultColGroups,
-    reorderedGroups: reorderedColGroups,
-    otherAxisDefaultGroups: defaultRowGroups,
-    otherAxisReorderedGroups: reorderedRowGroups,
-  });
+  const { orderedGroups: orderedColumnGroups, newGroups: newColumnGroups } =
+    orderGroups({
+      defaultGroups: defaultColGroups,
+      reorderedGroups: reorderedColGroups,
+      otherAxisDefaultGroups: defaultRowGroups,
+      otherAxisReorderedGroups: reorderedRowGroups,
+    });
 
   const { allOrderedColumnGroups, allOrderedRowGroups } = appendNewGroups({
     columnGroups: orderedColumnGroups,

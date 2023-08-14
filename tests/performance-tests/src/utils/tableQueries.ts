@@ -39,10 +39,8 @@ export function createTableBuilderQuery({
     ),
   ];
 
-  const allIndicationIds = Object.values(
-    subjectMeta.indicators,
-  ).flatMap(indicatorGroup =>
-    indicatorGroup.options.map(indicator => indicator.value),
+  const allIndicationIds = Object.values(subjectMeta.indicators).flatMap(
+    indicatorGroup => indicatorGroup.options.map(indicator => indicator.value),
   );
 
   const allLocationIds = Object.values(subjectMeta.locations).flatMap(

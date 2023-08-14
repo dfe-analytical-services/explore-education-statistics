@@ -16,12 +16,11 @@ import React, {
   useMemo,
 } from 'react';
 
-export type FormFieldComponentProps<Props, FormValues> = FormFieldProps<
-  FormValues
-> &
-  Omit<Props, 'id' | 'value' | 'error'> & {
-    id?: string;
-  };
+export type FormFieldComponentProps<Props, FormValues> =
+  FormFieldProps<FormValues> &
+    Omit<Props, 'id' | 'value' | 'error'> & {
+      id?: string;
+    };
 
 export interface FormFieldProps<FormValues = unknown> {
   id?: string;

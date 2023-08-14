@@ -323,7 +323,169 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("Test approval", methodologyStatus.InternalReleaseNote);
                 Assert.Equal(Approved, methodologyStatus.ApprovalStatus);
                 Assert.NotNull(methodologyStatus.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
+                Assert.Equal(UserId, methodologyStatus.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateApprovalStatus_SubmittingForHigherReviewAddsMethodologyStatus()
+        {
+            var owningPublicationId = Guid.NewGuid();
+            var methodologyVersion = new MethodologyVersion
+            {
+                Status = Draft,
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Publication title",
+                    Publications = ListOf(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication
+                        {
+                            Id = owningPublicationId,
+                        },
+                    })
+                },
+            };
+
+            var request = new MethodologyApprovalUpdateRequest
+            {
+                LatestInternalReleaseNote = "Submitted for higher review",
+                Status = HigherLevelReview,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+            var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyVersionRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                .ReturnsAsync(false);
+
+            userReleaseRoleService.Setup(mock =>
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId))
+                .ReturnsAsync(new List<UserReleaseRole>());
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    userReleaseRoleService: userReleaseRoleService.Object);
+
+                var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
+                var updatedMethodologyVersion = result.AssertRight();
+
+                VerifyAllMocks(contentService, methodologyVersionRepository);
+
+                Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
+                Assert.Equal(request.Status, updatedMethodologyVersion.Status);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyStatus = await context
+                    .MethodologyStatus
+                    .SingleAsync(ms => ms.MethodologyVersionId == methodologyVersion.Id);
+
+                Assert.Equal("Submitted for higher review", methodologyStatus.InternalReleaseNote);
+                Assert.Equal(HigherLevelReview, methodologyStatus.ApprovalStatus);
+                Assert.NotNull(methodologyStatus.Created);
+                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
+                Assert.Equal(UserId, methodologyStatus.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateApprovalStatus_ApprovedBackToDraftAddsMethodologyStatus()
+        {
+            var owningPublicationId = Guid.NewGuid();
+            var methodologyVersion = new MethodologyVersion
+            {
+                Status = Approved,
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Publication title",
+                    Publications = ListOf(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication
+                        {
+                            Id = owningPublicationId,
+                        },
+                    })
+                },
+            };
+
+            var request = new MethodologyApprovalUpdateRequest
+            {
+                LatestInternalReleaseNote = "Moving to draft",
+                Status = Draft,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+            var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyVersionRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                .ReturnsAsync(false);
+
+            userReleaseRoleService.Setup(mock =>
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId))
+                .ReturnsAsync(new List<UserReleaseRole>());
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    userReleaseRoleService: userReleaseRoleService.Object);
+
+                var result = await service.UpdateApprovalStatus(methodologyVersion.Id, request);
+                var updatedMethodologyVersion = result.AssertRight();
+
+                VerifyAllMocks(contentService, methodologyVersionRepository);
+
+                Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
+                Assert.Equal(request.Status, updatedMethodologyVersion.Status);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyStatus = await context
+                    .MethodologyStatus
+                    .SingleAsync(ms => ms.MethodologyVersionId == methodologyVersion.Id);
+
+                Assert.Equal("Moving to draft", methodologyStatus.InternalReleaseNote);
+                Assert.Equal(Draft, methodologyStatus.ApprovalStatus);
+                Assert.NotNull(methodologyStatus.Created);
+                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(UserId, methodologyStatus.CreatedById);
             }
         }
@@ -347,6 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyApprovalUpdateRequest
             {
+                // Request tailored so MethodologyApprovalUpdateRequest.IsStatusUpdateRequired returns false
                 Status = Draft,
             };
 
@@ -970,7 +1133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyApprovalUpdateRequest
             {
-                LatestInternalReleaseNote = "A release note to be ignored",
+                LatestInternalReleaseNote = "A release note",
                 PublishingStrategy = Immediately,
                 Status = Draft
             };
@@ -1008,8 +1171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
 
-                // Original release note is cleared if unapproving
-                Assert.Null(updatedMethodologyVersion.InternalReleaseNote);
+                Assert.Equal("A release note", updatedMethodologyVersion.InternalReleaseNote);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
@@ -1026,7 +1188,128 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(Draft, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.Null(updatedMethodology.InternalReleaseNote);
+                Assert.Equal("A release note", updatedMethodology.InternalReleaseNote);
+                Assert.True(updatedMethodology.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateApprovalStatus_SubmitDraftForHigherReview()
+        {
+            var owningPublicationId = Guid.NewGuid();
+            var methodologyVersion = new MethodologyVersion
+            {
+                InternalReleaseNote = "Test approval",
+                Published = null,
+                Status = Draft,
+                Methodology = new Methodology
+                {
+                    OwningPublicationTitle = "Publication title",
+                    Publications = ListOf(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = new Publication
+                        {
+                            Id = owningPublicationId,
+                        }
+                    })
+                }
+            };
+
+            var request = new MethodologyApprovalUpdateRequest
+            {
+                LatestInternalReleaseNote = "A release note",
+                Status = HigherLevelReview
+            };
+
+            var userPublicationRole = new UserPublicationRole
+            {
+                PublicationId = owningPublicationId,
+                Role = PublicationRole.Approver,
+                User = new User
+                {
+                    Email = "publication-approver@email.com",
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.UserPublicationRoles.AddAsync(userPublicationRole);
+                await context.SaveChangesAsync();
+            }
+
+            var contentService = new Mock<IMethodologyContentService>(Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+            var userReleaseRoleService = new Mock<IUserReleaseRoleService>(Strict);
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
+
+            contentService.Setup(mock =>
+                    mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
+                .ReturnsAsync(new List<HtmlBlock>());
+
+            methodologyVersionRepository.Setup(mock =>
+                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                .ReturnsAsync(false);
+
+            userReleaseRoleService.Setup(mock =>
+                    mock.ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId))
+                .ReturnsAsync(new List<UserReleaseRole>
+                {
+                    new()
+                    {
+                        Role = ReleaseRole.Approver,
+                        User = new User
+                        {
+                            Email = "release-approver@email.com",
+                        }
+                    },
+                });
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendMethodologyHigherReviewEmail("release-approver@email.com", methodologyVersion.Id,
+                        methodologyVersion.Title))
+                .Returns(Unit.Instance);
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendMethodologyHigherReviewEmail("publication-approver@email.com", methodologyVersion.Id,
+                        methodologyVersion.Title))
+                .Returns(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupService(contentDbContext: context,
+                    methodologyContentService: contentService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    userReleaseRoleService: userReleaseRoleService.Object,
+                    emailTemplateService: emailTemplateService.Object);
+
+                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+
+                VerifyAllMocks(contentService, methodologyVersionRepository);
+
+                Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
+
+                Assert.Equal("A release note", updatedMethodologyVersion.InternalReleaseNote);
+                Assert.Null(updatedMethodologyVersion.Published);
+                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
+                Assert.Equal(request.Status, updatedMethodologyVersion.Status);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedMethodology = await context
+                    .MethodologyVersions
+                    .Include(m => m.Methodology)
+                    .SingleAsync(m => m.Id == methodologyVersion.Id);
+
+                Assert.Null(updatedMethodology.Published);
+                Assert.Equal(HigherLevelReview, updatedMethodology.Status);
+                Assert.Equal("A release note", updatedMethodology.InternalReleaseNote);
                 Assert.True(updatedMethodology.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
             }
@@ -1041,7 +1324,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyImageService? methodologyImageService = null,
             IPublishingService? publishingService = null,
             IUserService? userService = null,
-            IMethodologyCacheService? methodologyCacheService = null)
+            IUserReleaseRoleService? userReleaseRoleService = null,
+            IMethodologyCacheService? methodologyCacheService = null,
+            IEmailTemplateService? emailTemplateService = null)
+
         {
             return new(
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
@@ -1052,7 +1338,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
                 userService ?? AlwaysTrueUserService(UserId).Object,
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
+                userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict));
         }
     }
 }

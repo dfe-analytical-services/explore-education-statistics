@@ -17,14 +17,10 @@ interface Props {
 }
 
 const PublicationScheduledReleases = ({ publicationId, releases }: Props) => {
-  const [
-    showScheduledStatusGuidance,
-    toggleScheduledStatusGuidance,
-  ] = useToggle(false);
-  const [
-    showScheduledStagesGuidance,
-    toggleScheduledStagesGuidance,
-  ] = useToggle(false);
+  const [showScheduledStatusGuidance, toggleScheduledStatusGuidance] =
+    useToggle(false);
+  const [showScheduledStagesGuidance, toggleScheduledStagesGuidance] =
+    useToggle(false);
 
   if (releases.length === 0) {
     return <InsetText>You have no scheduled releases.</InsetText>;

@@ -84,12 +84,10 @@ export const CommentsContextProvider = ({
   onPendingDeleteUndo,
   onUpdate,
 }: CommentsContextProviderProps) => {
-  const [currentInteraction, setCurrentInteraction] = useState<
-    CurrentCommentInteraction
-  >();
-  const [markersOrder, setMarkersOrder] = useState<string[]>(
-    initialMarkersOrder,
-  );
+  const [currentInteraction, setCurrentInteraction] =
+    useState<CurrentCommentInteraction>();
+  const [markersOrder, setMarkersOrder] =
+    useState<string[]>(initialMarkersOrder);
   const [pendingDeletions, setPendingDeletions] = useState<Comment[]>(
     initialPendingDeletions,
   );
@@ -172,28 +170,29 @@ export const CommentsContextProvider = ({
     [comments, pendingDeletions],
   );
 
-  const unresolveComment: CommentsContextState['unresolveComment'] = useCallbackRef(
-    async (commentId, updateMarker) => {
-      const comment = comments.find(c => c.id === commentId);
+  const unresolveComment: CommentsContextState['unresolveComment'] =
+    useCallbackRef(
+      async (commentId, updateMarker) => {
+        const comment = comments.find(c => c.id === commentId);
 
-      if (!comment) {
-        return;
-      }
+        if (!comment) {
+          return;
+        }
 
-      await onUpdate({
-        ...comment,
-        setResolved: false,
-      });
-
-      if (updateMarker) {
-        setCurrentInteraction({
-          type: 'unresolving',
-          id: comment.id,
+        await onUpdate({
+          ...comment,
+          setResolved: false,
         });
-      }
-    },
-    [comments],
-  );
+
+        if (updateMarker) {
+          setCurrentInteraction({
+            type: 'unresolving',
+            id: comment.id,
+          });
+        }
+      },
+      [comments],
+    );
 
   const state = useMemo<CommentsContextState>(() => {
     const addComment: CommentsContextState['addComment'] = async comment => {
@@ -211,9 +210,10 @@ export const CommentsContextProvider = ({
       setPendingDeletions([]);
     };
 
-    const updateComment: CommentsContextState['updateComment'] = async comment => {
-      await onUpdate(comment);
-    };
+    const updateComment: CommentsContextState['updateComment'] =
+      async comment => {
+        await onUpdate(comment);
+      };
 
     return {
       addComment,

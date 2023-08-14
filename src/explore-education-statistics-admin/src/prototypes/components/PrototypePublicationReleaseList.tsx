@@ -15,16 +15,12 @@ const PrototypePublicationReleaseList = () => {
   const [showReleases, setShowReleases] = useState(true);
   const [showDraft, setShowDraft] = useState(true);
   const [showHelpStatusModal, toggleHelpStatusModal] = useToggle(false);
-  const [
-    showHelpStatusPublishedModal,
-    toggleHelpStatusPublishedModal,
-  ] = useToggle(false);
-  const [showScheduledStatusModal, toggleScheduledStatusModal] = useToggle(
-    false,
-  );
-  const [showScheduledStagesModal, toggleScheduledStagesModal] = useToggle(
-    false,
-  );
+  const [showHelpStatusPublishedModal, toggleHelpStatusPublishedModal] =
+    useToggle(false);
+  const [showScheduledStatusModal, toggleScheduledStatusModal] =
+    useToggle(false);
+  const [showScheduledStagesModal, toggleScheduledStagesModal] =
+    useToggle(false);
   const [showReleaseIssuesModal, toggleReleaseIssuesModal] = useToggle(false);
 
   return (

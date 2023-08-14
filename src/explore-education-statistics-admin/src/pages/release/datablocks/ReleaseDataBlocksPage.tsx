@@ -30,9 +30,8 @@ const ReleaseDataBlocksPage = ({
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { publicationId, releaseId } = match.params;
 
-  const [deleteDataBlock, setDeleteDataBlock] = useState<
-    ReleaseDataBlockSummary
-  >();
+  const [deleteDataBlock, setDeleteDataBlock] =
+    useState<ReleaseDataBlockSummary>();
 
   const queryClient = useQueryClient();
 
@@ -40,21 +39,17 @@ const ReleaseDataBlocksPage = ({
     () => featuredTableQueries.list(releaseId),
     [releaseId],
   );
-  const listDataBlocksQuery = useMemo(() => dataBlockQueries.list(releaseId), [
-    releaseId,
-  ]);
-
-  const { data: dataBlocks = [], isLoading: isLoadingDataBlocks } = useQuery(
-    listDataBlocksQuery,
+  const listDataBlocksQuery = useMemo(
+    () => dataBlockQueries.list(releaseId),
+    [releaseId],
   );
-  const {
-    data: featuredTables = [],
-    isLoading: isLoadingFeaturedTables,
-  } = useQuery(listFeaturedTablesQuery);
-  const {
-    data: canUpdateRelease = true,
-    isLoading: isLoadingPermissions,
-  } = useQuery(permissionQueries.canUpdateRelease(releaseId));
+
+  const { data: dataBlocks = [], isLoading: isLoadingDataBlocks } =
+    useQuery(listDataBlocksQuery);
+  const { data: featuredTables = [], isLoading: isLoadingFeaturedTables } =
+    useQuery(listFeaturedTablesQuery);
+  const { data: canUpdateRelease = true, isLoading: isLoadingPermissions } =
+    useQuery(permissionQueries.canUpdateRelease(releaseId));
 
   const handleDelete = useCallback(async () => {
     if (!deleteDataBlock) {

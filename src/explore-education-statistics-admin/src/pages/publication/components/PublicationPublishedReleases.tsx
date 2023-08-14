@@ -34,10 +34,8 @@ export default function PublicationPublishedReleases({
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
   const [focusReleaseId, setFocusReleaseId] = useState<string>();
 
-  const [
-    showPublishedStatusGuidance,
-    togglePublishedStatusGuidance,
-  ] = useToggle(false);
+  const [showPublishedStatusGuidance, togglePublishedStatusGuidance] =
+    useToggle(false);
 
   const {
     data: releases,

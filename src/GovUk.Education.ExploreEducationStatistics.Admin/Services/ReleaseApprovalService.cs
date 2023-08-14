@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                             .Distinct()
                                             .ForEach(email =>
                                             {
-                                                _emailTemplateService.SendHigherReviewEmail(email, release);
+                                                _emailTemplateService.SendReleaseHigherReviewEmail(email, release);
                                             });
                                     }
                                     break;

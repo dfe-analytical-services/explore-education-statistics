@@ -95,19 +95,21 @@ const category4Group2Filter1 = new CategoryFilter({
 });
 
 // Filter 1 and 2 in Category 1 have the same labels as Filter 1 and 2 in Category 2
-export const testTableWithDuplicateFilterLabelsInColumnHeadersConfig: TableHeadersConfig = {
-  columns: [category2Filter1, category2Filter2],
-  columnGroups: [[indicator1], [category1Filter1, category1Filter2]],
-  rows: [timePeriod1],
-  rowGroups: [],
-};
+export const testTableWithDuplicateFilterLabelsInColumnHeadersConfig: TableHeadersConfig =
+  {
+    columns: [category2Filter1, category2Filter2],
+    columnGroups: [[indicator1], [category1Filter1, category1Filter2]],
+    rows: [timePeriod1],
+    rowGroups: [],
+  };
 
-export const testTableWithDuplicateFilterLabelsInRowHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [category2Filter1, category2Filter2],
-  rowGroups: [[indicator1], [category1Filter1, category1Filter2]],
-};
+export const testTableWithDuplicateFilterLabelsInRowHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [category2Filter1, category2Filter2],
+    rowGroups: [[indicator1], [category1Filter1, category1Filter2]],
+  };
 
 export const testTableWithDuplicateFilterLabels: FullTable = {
   subjectMeta: {
@@ -211,25 +213,27 @@ export const testTableWithDuplicateFilterLabelsAndMissingData: FullTable = {
   ],
 };
 
-export const testTableWithMultipleGroupsWithSameLabelsInColumnHeadersConfig: TableHeadersConfig = {
-  columnGroups: [
-    [category3Group1Filter1, category3Group2Filter1],
-    [category4Group1Filter1, category4Group2Filter1],
-  ],
-  columns: [timePeriod1],
-  rowGroups: [],
-  rows: [indicator1],
-};
+export const testTableWithMultipleGroupsWithSameLabelsInColumnHeadersConfig: TableHeadersConfig =
+  {
+    columnGroups: [
+      [category3Group1Filter1, category3Group2Filter1],
+      [category4Group1Filter1, category4Group2Filter1],
+    ],
+    columns: [timePeriod1],
+    rowGroups: [],
+    rows: [indicator1],
+  };
 
-export const testTableWithMultipleGroupsWithSameLabelsInRowHeadersConfig: TableHeadersConfig = {
-  columnGroups: [],
-  columns: [indicator1],
-  rowGroups: [
-    [category3Group1Filter1, category3Group2Filter1],
-    [category4Group1Filter1, category4Group2Filter1],
-  ],
-  rows: [timePeriod1],
-};
+export const testTableWithMultipleGroupsWithSameLabelsInRowHeadersConfig: TableHeadersConfig =
+  {
+    columnGroups: [],
+    columns: [indicator1],
+    rowGroups: [
+      [category3Group1Filter1, category3Group2Filter1],
+      [category4Group1Filter1, category4Group2Filter1],
+    ],
+    rows: [timePeriod1],
+  };
 
 export const testTableWithMultipleGroupsWithSameLabels: FullTable = {
   subjectMeta: {

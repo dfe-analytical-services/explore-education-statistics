@@ -41,9 +41,8 @@ const PreReleasePageContainer = ({
     Model | undefined
   >(async () => {
     try {
-      const preReleaseWindowStatus = await permissionService.getPreReleaseWindowStatus(
-        releaseId,
-      );
+      const preReleaseWindowStatus =
+        await permissionService.getPreReleaseWindowStatus(releaseId);
 
       if (preReleaseWindowStatus.access === 'NoneSet') {
         errorPages.forbidden();

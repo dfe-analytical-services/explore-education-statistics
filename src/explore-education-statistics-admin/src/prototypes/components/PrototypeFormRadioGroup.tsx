@@ -66,13 +66,12 @@ export const BaseFormRadioGroup = <Value extends string = string>({
   );
 };
 
-export type FormRadioGroupProps<
-  Value extends string = string
-> = BaseFormRadioGroupProps<Value> &
-  OmitStrict<FormFieldsetProps, 'useFormId' | 'onBlur' | 'onFocus'> & {
-    onFieldsetBlur?: FocusEventHandler<HTMLFieldSetElement>;
-    onFieldsetFocus?: FocusEventHandler<HTMLFieldSetElement>;
-  };
+export type FormRadioGroupProps<Value extends string = string> =
+  BaseFormRadioGroupProps<Value> &
+    OmitStrict<FormFieldsetProps, 'useFormId' | 'onBlur' | 'onFocus'> & {
+      onFieldsetBlur?: FocusEventHandler<HTMLFieldSetElement>;
+      onFieldsetFocus?: FocusEventHandler<HTMLFieldSetElement>;
+    };
 
 const FormRadioGroup = <Value extends string = string>({
   hint,

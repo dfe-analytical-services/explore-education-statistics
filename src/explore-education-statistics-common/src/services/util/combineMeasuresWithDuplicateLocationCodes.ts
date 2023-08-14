@@ -122,8 +122,8 @@ export default function combineMeasuresWithDuplicateLocationCodes(
     // name so that the order of combined measurement values will match the order of the combined Location names in the
     // table row label e.g. ("Provider 1 / Provider 2" - Achievements: "20 / 35"), where "20" is the "Achievements" value
     // for Provider 1, and "35" is the "Achievements" value for Provider 2.
-    const timePeriodFilterCombinations: TableDataResult[] = allAvailableTimePeriods.flatMap(
-      timePeriod => {
+    const timePeriodFilterCombinations: TableDataResult[] =
+      allAvailableTimePeriods.flatMap(timePeriod => {
         const rowsForTimePeriod = resultsForLocation.filter(
           r => r.timePeriod === timePeriod,
         );
@@ -154,8 +154,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
             ),
           };
         });
-      },
-    );
+      });
 
     const allAvailableLocationNames = Object.keys(
       resultsGroupedByLocationName,

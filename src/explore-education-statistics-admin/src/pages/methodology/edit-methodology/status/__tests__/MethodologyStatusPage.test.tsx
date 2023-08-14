@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import _methodologyService, {
   MethodologyVersion,
@@ -53,8 +53,11 @@ describe('MethodologyStatusPage', () => {
   };
 
   test('renders Draft status details', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
 
     renderPage({
       ...testMethodology,
@@ -67,18 +70,48 @@ describe('MethodologyStatusPage', () => {
     });
 
     expect(screen.getByTestId('Status')).toHaveTextContent('In Draft');
-    expect(screen.queryByTestId('Internal note-key')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('When to publish-key')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('When to publish')).not.toBeInTheDocument();
     expect(
-      screen.queryByTestId('Publish with release-key'),
+      screen.queryByTestId('Publish with release'),
+    ).not.toBeInTheDocument();
+
+    expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
+  });
+
+  test('renders Higher review status details', async () => {
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
+
+    renderPage({
+      ...testMethodology,
+      status: 'HigherLevelReview',
+      publishingStrategy: 'WithRelease',
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Sign off')).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId('Status')).toHaveTextContent(
+      'Awaiting higher review',
+    );
+    expect(screen.queryByTestId('When to publish')).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('Publish with release'),
     ).not.toBeInTheDocument();
 
     expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
   });
 
   test('renders Approved details for publishing immediately', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
 
     renderPage({
       ...testMethodology,
@@ -93,30 +126,23 @@ describe('MethodologyStatusPage', () => {
 
     expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
 
-    expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
-      'Internal note',
-    );
-    expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
-      'Test internal release note',
-    );
-
-    expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
-      'When to publish',
-    );
-    expect(screen.getByTestId('When to publish-value')).toHaveTextContent(
+    expect(screen.getByTestId('When to publish')).toHaveTextContent(
       'Immediately',
     );
 
     expect(
-      screen.queryByTestId('Publish with release-key'),
+      screen.queryByTestId('Publish with release'),
     ).not.toBeInTheDocument();
 
     expect(screen.queryByText('Edit status')).not.toBeInTheDocument();
   });
 
   test('renders Approved details for publishing with release', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
 
     renderPage({
       ...testMethodology,
@@ -135,24 +161,11 @@ describe('MethodologyStatusPage', () => {
 
     expect(screen.getByTestId('Status')).toHaveTextContent('Approved');
 
-    expect(screen.getByTestId('Internal note-key')).toHaveTextContent(
-      'Internal note',
-    );
-    expect(screen.getByTestId('Internal note-value')).toHaveTextContent(
-      'Test internal release note',
-    );
-
-    expect(screen.getByTestId('When to publish-key')).toHaveTextContent(
-      'When to publish',
-    );
-    expect(screen.getByTestId('When to publish-value')).toHaveTextContent(
+    expect(screen.getByTestId('When to publish')).toHaveTextContent(
       'With a specific release',
     );
 
-    expect(screen.getByTestId('Publish with release-key')).toHaveTextContent(
-      'Publish with release',
-    );
-    expect(screen.getByTestId('Publish with release-value')).toHaveTextContent(
+    expect(screen.getByTestId('Publish with release')).toHaveTextContent(
       'Dependant Release',
     );
 
@@ -160,8 +173,11 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can approve methodology', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodology);
 
@@ -175,8 +191,29 @@ describe('MethodologyStatusPage', () => {
   });
 
   test('renders Edit status button if user can mark methodology as draft', async () => {
-    permissionService.canApproveMethodology.mockResolvedValue(false);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(true);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: true,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: false,
+    });
+
+    renderPage(testMethodology);
+
+    await waitFor(() => {
+      expect(screen.getByText('Sign off')).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Edit status' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('renders Edit status button if user can mark methodology for higher review', async () => {
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: true,
+      canMarkApproved: false,
+    });
 
     renderPage(testMethodology);
 
@@ -191,8 +228,11 @@ describe('MethodologyStatusPage', () => {
 
   test('renders status form when Edit button is clicked', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodology);
 
@@ -216,18 +256,18 @@ describe('MethodologyStatusPage', () => {
 
   test('renders the owning publication', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodology);
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
 
-      expect(screen.getByTestId('Owning publication-key')).toHaveTextContent(
-        'Owning publication',
-      );
-      expect(screen.getByTestId('Owning publication-value')).toHaveTextContent(
+      expect(screen.getByTestId('Owning publication')).toHaveTextContent(
         'Owning publication title',
       );
     });
@@ -235,15 +275,18 @@ describe('MethodologyStatusPage', () => {
 
   test('renders the other publications', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodologyWithOtherPublications);
 
     await waitFor(() => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
 
-      expect(screen.getByTestId('Other publications-key')).toHaveTextContent(
+      expect(screen.getByTestId('Other publications')).toHaveTextContent(
         'Other publications',
       );
       const otherPublications = screen.queryAllByTestId(
@@ -257,8 +300,11 @@ describe('MethodologyStatusPage', () => {
 
   test('does not render the other publications section if there are none', async () => {
     methodologyService.getUnpublishedReleases.mockResolvedValue([]);
-    permissionService.canApproveMethodology.mockResolvedValue(true);
-    permissionService.canMarkMethodologyAsDraft.mockResolvedValue(false);
+    permissionService.getMethodologyApprovalPermissions.mockResolvedValue({
+      canMarkDraft: false,
+      canMarkHigherLevelReview: false,
+      canMarkApproved: true,
+    });
 
     renderPage(testMethodology);
 
@@ -266,10 +312,7 @@ describe('MethodologyStatusPage', () => {
       expect(screen.getByText('Sign off')).toBeInTheDocument();
 
       expect(
-        screen.queryByTestId('Other publications-key'),
-      ).not.toBeInTheDocument();
-      expect(
-        screen.queryByTestId('Other publications-value'),
+        screen.queryByTestId('Other publications'),
       ).not.toBeInTheDocument();
     });
   });
@@ -282,6 +325,86 @@ describe('MethodologyStatusPage', () => {
         'http://localhost/methodology/test-methodology',
       );
     });
+  });
+
+  test('does not render the methodology status history if has no statuses', async () => {
+    methodologyService.getMethodologyStatuses.mockResolvedValue([]);
+
+    renderPage(testMethodology);
+
+    await waitFor(() => {
+      expect(screen.getByText('Sign off')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByText('Methodology status history'),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByTestId('methodology-status-history'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders the methodology status history if has statuses', async () => {
+    methodologyService.getMethodologyStatuses.mockResolvedValue([
+      {
+        methodologyStatusId: 'methodology-status-2',
+        internalReleaseNote: 'Internal note 2',
+        approvalStatus: 'Approved',
+        created: '2000-01-02T00:00:00',
+        createdByEmail: 'testuser2@email.com',
+        methodologyVersion: 0,
+      },
+      {
+        methodologyStatusId: 'methodology-status-1',
+        internalReleaseNote: 'Internal note 1',
+        approvalStatus: 'HigherLevelReview',
+        created: '2000-01-01T00:00:00',
+        createdByEmail: 'testuser1@email.com',
+        methodologyVersion: 0,
+      },
+    ]);
+
+    renderPage(testMethodology);
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Methodology status history'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByTestId('methodology-status-history'),
+    ).toBeInTheDocument();
+
+    const rows = screen.getAllByRole('row');
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+    expect(
+      within(row1Cells[0]).getByText('2 January 2000 00:00'),
+    ).toBeInTheDocument();
+    expect(within(row1Cells[1]).getByText('Approved')).toBeInTheDocument();
+    expect(
+      within(row1Cells[2]).getByText('Internal note 2'),
+    ).toBeInTheDocument();
+    expect(within(row1Cells[3]).getByText('1')).toBeInTheDocument();
+    expect(
+      within(row1Cells[4]).getByText('testuser2@email.com'),
+    ).toBeInTheDocument();
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+    expect(
+      within(row2Cells[0]).getByText('1 January 2000 00:00'),
+    ).toBeInTheDocument();
+    expect(
+      within(row2Cells[1]).getByText('HigherLevelReview'),
+    ).toBeInTheDocument();
+    expect(
+      within(row2Cells[2]).getByText('Internal note 1'),
+    ).toBeInTheDocument();
+    expect(within(row2Cells[3]).getByText('1')).toBeInTheDocument();
+    expect(
+      within(row2Cells[4]).getByText('testuser1@email.com'),
+    ).toBeInTheDocument();
   });
 
   function renderPage(methodology: MethodologyVersion) {

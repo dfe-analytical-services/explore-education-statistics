@@ -22,9 +22,8 @@ const PrototypeFindStats = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTheme, setSelectedTheme] = useState('all-themes');
   const [selectedTopic, setSelectedTopic] = useState('');
-  const [selectedReleaseType, setSelectedReleaseType] = useState(
-    'all-release-types',
-  );
+  const [selectedReleaseType, setSelectedReleaseType] =
+    useState('all-release-types');
   const [currentPage, setCurrentPage] = useState<number>(0);
   const [totalResults, setTotalResults] = useState<number>();
   const [selectedSortOrder, setSelectedSortOrder] = useState('newest');

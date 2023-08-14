@@ -15,7 +15,7 @@ type Params = {
 };
 
 interface LinkRenderProps {
-  'aria-current'?: 'page' | undefined;
+  'aria-current'?: 'page';
   'aria-label'?: string;
   'data-testid'?: string;
   children: ReactNode;

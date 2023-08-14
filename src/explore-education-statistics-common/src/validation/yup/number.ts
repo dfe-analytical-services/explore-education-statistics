@@ -15,11 +15,13 @@ addMethod<NumberSchema>(
     min: number,
     message = 'Must be more than or equal to ${path}',
   ) {
-    return this.test('moreThanOrEqual', message, function moreThanOrEqual(
-      value,
-    ) {
-      return !value || value >= this.resolve(min);
-    });
+    return this.test(
+      'moreThanOrEqual',
+      message,
+      function moreThanOrEqual(value) {
+        return !value || value >= this.resolve(min);
+      },
+    );
   },
 );
 
@@ -30,10 +32,12 @@ addMethod<NumberSchema>(
     max: number,
     message = 'Must be less than or equal to ${path}',
   ) {
-    return this.test('lessThanOrEqual', message, function lessThanOrEqual(
-      value,
-    ) {
-      return !value || value <= this.resolve(max);
-    });
+    return this.test(
+      'lessThanOrEqual',
+      message,
+      function lessThanOrEqual(value) {
+        return !value || value <= this.resolve(max);
+      },
+    );
   },
 );

@@ -24,28 +24,26 @@ const ReleaseFootnotesPage = ({
   const { publicationId, releaseId } = match.params;
   const [isReordering, toggleIsReordering] = useToggle(false);
 
-  const {
-    value: canUpdateRelease = false,
-    isLoading: isPermissionLoading,
-  } = useAsyncHandledRetry(
-    () => permissionService.canUpdateRelease(releaseId),
-    [releaseId],
-  );
+  const { value: canUpdateRelease = false, isLoading: isPermissionLoading } =
+    useAsyncHandledRetry(
+      () => permissionService.canUpdateRelease(releaseId),
+      [releaseId],
+    );
 
-  const {
-    value: footnoteMeta,
-    isLoading: isFootnoteMetaLoading,
-  } = useAsyncHandledRetry(() => footnoteService.getFootnoteMeta(releaseId), [
-    releaseId,
-  ]);
+  const { value: footnoteMeta, isLoading: isFootnoteMetaLoading } =
+    useAsyncHandledRetry(
+      () => footnoteService.getFootnoteMeta(releaseId),
+      [releaseId],
+    );
 
   const {
     value: footnotes,
     setState: setFootnotes,
     isLoading: isFootnotesLoading,
-  } = useAsyncHandledRetry(() => footnoteService.getFootnotes(releaseId), [
-    releaseId,
-  ]);
+  } = useAsyncHandledRetry(
+    () => footnoteService.getFootnotes(releaseId),
+    [releaseId],
+  );
 
   const handleReorder = (reorderedFootnotes: Footnote[]) => {
     setFootnotes({

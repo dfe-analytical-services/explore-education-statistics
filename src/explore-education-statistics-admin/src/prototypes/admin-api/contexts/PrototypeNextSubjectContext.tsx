@@ -63,9 +63,8 @@ export const PrototypeNextSubjectContextProvider = ({
   const [locations, setLocations] = useState<Items>(initialLocations);
   const [filters, setFilters] = useState<Items>(initialFilters);
   const [indicators, setIndicators] = useState<Items>(initialIndicators);
-  const [versionType, setVersionType] = useState<VersionType>(
-    initialVersionType,
-  );
+  const [versionType, setVersionType] =
+    useState<VersionType>(initialVersionType);
   const [versionNotes, setVersionNotes] = useState<string | undefined>('');
 
   const value = useMemo<PrototypeNextSubjectContextState>(() => {
@@ -158,75 +157,71 @@ export const PrototypeNextSubjectContextProvider = ({
       }
     };
 
-    const onRemoveNoMappingItem: PrototypeNextSubjectContextState['onRemoveNoMappingItem'] = (
-      item,
-      type,
-    ) => {
-      if (type === 'location') {
-        const updated = produce(locations, draft => {
-          draft.noMappingItems = locations.noMappingItems.filter(
-            noMapppingItem => !isEqual(noMapppingItem, item),
-          );
-          draft.unmappedItems = [item, ...locations.unmappedItems];
-        });
-        setLocations(updated);
-      }
+    const onRemoveNoMappingItem: PrototypeNextSubjectContextState['onRemoveNoMappingItem'] =
+      (item, type) => {
+        if (type === 'location') {
+          const updated = produce(locations, draft => {
+            draft.noMappingItems = locations.noMappingItems.filter(
+              noMapppingItem => !isEqual(noMapppingItem, item),
+            );
+            draft.unmappedItems = [item, ...locations.unmappedItems];
+          });
+          setLocations(updated);
+        }
 
-      if (type === 'filter') {
-        const updated = produce(filters, draft => {
-          draft.noMappingItems = filters.noMappingItems.filter(
-            noMapppingItem => !isEqual(noMapppingItem, item),
-          );
-          draft.unmappedItems = [item, ...filters.unmappedItems];
-        });
-        setFilters(updated);
-      }
+        if (type === 'filter') {
+          const updated = produce(filters, draft => {
+            draft.noMappingItems = filters.noMappingItems.filter(
+              noMapppingItem => !isEqual(noMapppingItem, item),
+            );
+            draft.unmappedItems = [item, ...filters.unmappedItems];
+          });
+          setFilters(updated);
+        }
 
-      if (type === 'indicator') {
-        const updated = produce(indicators, draft => {
-          draft.noMappingItems = indicators.noMappingItems.filter(
-            noMapppingItem => !isEqual(noMapppingItem, item),
-          );
-          draft.unmappedItems = [item, ...indicators.unmappedItems];
-        });
-        setIndicators(updated);
-      }
-    };
+        if (type === 'indicator') {
+          const updated = produce(indicators, draft => {
+            draft.noMappingItems = indicators.noMappingItems.filter(
+              noMapppingItem => !isEqual(noMapppingItem, item),
+            );
+            draft.unmappedItems = [item, ...indicators.unmappedItems];
+          });
+          setIndicators(updated);
+        }
+      };
 
-    const onAddNoMappingItem: PrototypeNextSubjectContextState['onAddNoMappingItem'] = (
-      item,
-      type,
-    ) => {
-      if (type === 'location') {
-        const updated = produce(locations, draft => {
-          draft.noMappingItems = [item, ...locations.noMappingItems];
-          draft.unmappedItems = locations.unmappedItems.filter(
-            unmappedItem => unmappedItem.id !== item.id,
-          );
-        });
-        setLocations(updated);
-      }
+    const onAddNoMappingItem: PrototypeNextSubjectContextState['onAddNoMappingItem'] =
+      (item, type) => {
+        if (type === 'location') {
+          const updated = produce(locations, draft => {
+            draft.noMappingItems = [item, ...locations.noMappingItems];
+            draft.unmappedItems = locations.unmappedItems.filter(
+              unmappedItem => unmappedItem.id !== item.id,
+            );
+          });
+          setLocations(updated);
+        }
 
-      if (type === 'filter') {
-        const updated = produce(filters, draft => {
-          draft.noMappingItems = [item, ...filters.noMappingItems];
-          draft.unmappedItems = filters.unmappedItems.filter(
-            unmappedItem => unmappedItem.id !== item.id,
-          );
-        });
-        setFilters(updated);
-      }
+        if (type === 'filter') {
+          const updated = produce(filters, draft => {
+            draft.noMappingItems = [item, ...filters.noMappingItems];
+            draft.unmappedItems = filters.unmappedItems.filter(
+              unmappedItem => unmappedItem.id !== item.id,
+            );
+          });
+          setFilters(updated);
+        }
 
-      if (type === 'indicator') {
-        const updated = produce(indicators, draft => {
-          draft.noMappingItems = [item, ...indicators.noMappingItems];
-          draft.unmappedItems = indicators.unmappedItems.filter(
-            unmappedItem => unmappedItem.id !== item.id,
-          );
-        });
-        setIndicators(updated);
-      }
-    };
+        if (type === 'indicator') {
+          const updated = produce(indicators, draft => {
+            draft.noMappingItems = [item, ...indicators.noMappingItems];
+            draft.unmappedItems = indicators.unmappedItems.filter(
+              unmappedItem => unmappedItem.id !== item.id,
+            );
+          });
+          setIndicators(updated);
+        }
+      };
 
     return {
       locations,

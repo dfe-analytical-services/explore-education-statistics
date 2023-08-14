@@ -18,6 +18,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import Tag from '@common/components/Tag';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
+import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
@@ -94,22 +95,9 @@ const MethodologyPage = ({
                   }
                 />
               </div>
-
-              {/* EES-2464
-              <div className="govuk-grid-column-one-third">
-                <RelatedInformation heading="Help and guidance">
-                  <ul className="govuk-list">
-                    <li>
-                      <Link to="/documentation" target="blank">
-                        Creating new methodology
-                      </Link>
-                    </li>
-                  </ul>
-                </RelatedInformation>
-              </div> */}
             </div>
 
-            <Tag>{methodology.status}</Tag>
+            <Tag>{getMethodologyApprovalStatusLabel(methodology.status)}</Tag>
 
             {methodology.amendment && (
               <Tag className="govuk-!-margin-left-2">Amendment</Tag>

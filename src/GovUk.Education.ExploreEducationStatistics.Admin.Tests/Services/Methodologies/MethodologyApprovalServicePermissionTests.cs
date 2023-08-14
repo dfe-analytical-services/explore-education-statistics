@@ -54,6 +54,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task UpdateApprovalStatus_HigherReview()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_methodologyVersion, CanSubmitSpecificMethodologyToHigherReview)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupService(userService: userService.Object);
+                        return service.UpdateApprovalStatus(_methodologyVersion.Id, new MethodologyApprovalUpdateRequest
+                        {
+                            Status = HigherLevelReview,
+                        });
+                    }
+                );
+        }
+
+        [Fact]
         public async Task UpdateApprovalStatus_MarkAsDraft()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
@@ -79,7 +96,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyImageService? methodologyImageService = null,
             IPublishingService? publishingService = null,
             IUserService? userService = null,
-            IMethodologyCacheService? methodologyCacheService = null)
+            IUserReleaseRoleService? userReleaseRoleService = null,
+            IMethodologyCacheService? methodologyCacheService = null,
+            IEmailTemplateService? emailTemplateService = null)
         {
             return new(
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
@@ -90,7 +109,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
                 userService ?? Mock.Of<IUserService>(),
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
+                userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict));
         }
         
         private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()

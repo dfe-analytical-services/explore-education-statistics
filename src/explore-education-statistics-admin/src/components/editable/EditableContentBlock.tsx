@@ -80,10 +80,10 @@ const EditableContentBlock = ({
 }: EditableContentBlockProps) => {
   const { comments } = useCommentsContext();
 
-  const content = useMemo(() => (useMarkdown ? toHtml(value) : value), [
-    useMarkdown,
-    value,
-  ]);
+  const content = useMemo(
+    () => (useMarkdown ? toHtml(value) : value),
+    [useMarkdown, value],
+  );
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
     const commentTagAttributes: SanitizeHtmlOptions['allowedAttributes'] = {

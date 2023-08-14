@@ -34,12 +34,8 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
   const allItems = state[namePlural as keyof typeof state] as Items;
 
   const { mappedItems, unmappedItems, newItems, noMappingItems } = allItems;
-  const {
-    onAddNoMappingItem,
-    onMapItem,
-    onRemoveNoMappingItem,
-    onUnmapItem,
-  } = state;
+  const { onAddNoMappingItem, onMapItem, onRemoveNoMappingItem, onUnmapItem } =
+    state;
 
   const [itemToMap, setItemToMap] = useState<MapItem | undefined>(undefined);
   const [itemToUnmap, setItemToUnmap] = useState<

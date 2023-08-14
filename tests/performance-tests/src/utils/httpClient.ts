@@ -81,7 +81,7 @@ export default class HttpClient {
     }
 
     return {
-      json: (response.json() as unknown) as TJson,
+      json: response.json() as unknown as TJson,
       response,
     };
   }
@@ -111,7 +111,7 @@ export default class HttpClient {
     }
 
     return {
-      json: (response.json() as unknown) as TJson,
+      json: response.json() as unknown as TJson,
       response,
     };
   }

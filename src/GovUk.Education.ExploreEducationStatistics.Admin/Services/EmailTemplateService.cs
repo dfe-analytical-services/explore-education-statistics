@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -103,10 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _emailService.SendEmail(email, template, emailValues);
         }
         
-        public Either<ActionResult, Unit> SendHigherReviewEmail(string email, Release release)
+        public Either<ActionResult, Unit> SendReleaseHigherReviewEmail(string email, Release release)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyHigherReviewersTemplateId");
+            var template = _configuration.GetValue<string>("NotifyReleaseHigherReviewersTemplateId");
             
             var emailValues = new Dictionary<string, dynamic>
             {
@@ -115,6 +116,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {"release", release.Title},
             };
             
+            return _emailService.SendEmail(email, template, emailValues);
+        }
+
+        public Either<ActionResult, Unit> SendMethodologyHigherReviewEmail(
+            string email,
+            Guid methodologyVersionId,
+            string methodologyTitle)
+        {
+            var uri = _configuration.GetValue<string>("AdminUri");
+            var template = _configuration.GetValue<string>("NotifyMethodologyHigherReviewersTemplateId");
+
+            var emailValues = new Dictionary<string, dynamic>
+            {
+                {"url", $"https://{uri}/methodology/{methodologyVersionId}/summary"},
+                {"methodology", methodologyTitle},
+            };
+
             return _emailService.SendEmail(email, template, emailValues);
         }
     }

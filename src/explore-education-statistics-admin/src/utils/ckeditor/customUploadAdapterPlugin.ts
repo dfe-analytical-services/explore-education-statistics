@@ -11,9 +11,8 @@ export default function customUploadAdapterPlugin(
 ) {
   return class CustomUploadAdapterPlugin {
     constructor(editor: Editor) {
-      const fileRepository = editor.plugins.get<FileRepository>(
-        'FileRepository',
-      );
+      const fileRepository =
+        editor.plugins.get<FileRepository>('FileRepository');
 
       fileRepository.createUploadAdapter = loader => {
         return new CustomUploadAdapter(loader, onUpload, onCancel);

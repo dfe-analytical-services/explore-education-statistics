@@ -14,13 +14,8 @@ const PrototypePrepareNextSubjectStep6 = ({
   ...stepProps
 }: InjectedWizardProps) => {
   const history = useHistory();
-  const {
-    versionNotes,
-    versionType,
-    locations,
-    filters,
-    indicators,
-  } = usePrototypeNextSubjectContext();
+  const { versionNotes, versionType, locations, filters, indicators } =
+    usePrototypeNextSubjectContext();
 
   // save in local storage as no db
   const [, setChangelog] = useStorageItem<Changelog>('changelog');

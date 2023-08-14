@@ -7,6 +7,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodologyStatusForm';
 import React from 'react';
+import { MethodologyStatusPermissions } from '@admin/services/permissionService';
 
 interface FormValues {
   status: MethodologyApprovalStatus;
@@ -17,19 +18,18 @@ interface FormValues {
 
 interface Props {
   methodology: MethodologyVersion;
+  statusPermissions?: MethodologyStatusPermissions;
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
 }
 
 const MethodologyStatusEditPage = ({
   methodology,
+  statusPermissions,
   onCancel,
   onSubmit,
 }: Props) => {
-  const {
-    value: unpublishedReleases,
-    isLoading,
-  } = useAsyncHandledRetry(
+  const { value: unpublishedReleases, isLoading } = useAsyncHandledRetry(
     async () => methodologyService.getUnpublishedReleases(methodology.id),
     [methodology.id],
   );
@@ -40,6 +40,7 @@ const MethodologyStatusEditPage = ({
         <MethodologyStatusForm
           isPublished={methodology.published}
           methodology={methodology}
+          statusPermissions={statusPermissions}
           unpublishedReleases={unpublishedReleases}
           onCancel={onCancel}
           onSubmit={onSubmit}

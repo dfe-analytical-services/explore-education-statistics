@@ -66,10 +66,8 @@ const PrototypePublicationSubjects = () => {
   const isCurrentReleasePublished = publishedReleases?.includes(currentRelease);
 
   // save in local storage as no db
-  const [
-    savedPublicationSubjects,
-    setSavedPublicationSubjects,
-  ] = useStorageItem<PublicationSubject[]>('publicationSubjects', []);
+  const [savedPublicationSubjects, setSavedPublicationSubjects] =
+    useStorageItem<PublicationSubject[]>('publicationSubjects', []);
 
   const [publicationSubjects, setPublicationSubjects] = useState<
     PublicationSubject[]

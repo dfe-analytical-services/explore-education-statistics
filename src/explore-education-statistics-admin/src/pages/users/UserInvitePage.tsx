@@ -66,17 +66,16 @@ const UserInvitePage = ({
 }: RouteComponentProps & ErrorControlState) => {
   const formId = 'inviteUserForm';
 
-  const { value: model, isLoading } = useAsyncHandledRetry<
-    InviteUserModel
-  >(async () => {
-    const [roles, resourceRoles, releases, publications] = await Promise.all([
-      userService.getRoles(),
-      userService.getResourceRoles(),
-      userService.getReleases(),
-      publicationService.getPublicationSummaries(),
-    ]);
-    return { roles, resourceRoles, releases, publications };
-  }, []);
+  const { value: model, isLoading } =
+    useAsyncHandledRetry<InviteUserModel>(async () => {
+      const [roles, resourceRoles, releases, publications] = await Promise.all([
+        userService.getRoles(),
+        userService.getResourceRoles(),
+        userService.getReleases(),
+        publicationService.getPublicationSummaries(),
+      ]);
+      return { roles, resourceRoles, releases, publications };
+    }, []);
 
   const cancelHandler = () => history.push('/administration/users/invites');
 

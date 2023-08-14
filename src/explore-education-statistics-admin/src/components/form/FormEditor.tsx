@@ -84,11 +84,8 @@ const FormEditor = ({
   const commentsPlugin = useRef<CommentsPlugin>();
   const glossaryPlugin = useRef<GlossaryPlugin>();
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
-  const {
-    currentInteraction,
-    selectedComment,
-    setMarkersOrder,
-  } = useCommentsContext();
+  const { currentInteraction, selectedComment, setMarkersOrder } =
+    useCommentsContext();
   const [showGlossaryModal, toggleGlossaryModal] = useToggle(false);
   const config = useCKEditorConfig({
     allowComments,
@@ -303,9 +300,8 @@ const FormEditor = ({
           })}
           data-testid={testId && isFocused ? `${testId}-focused` : testId}
           ref={thisRef => {
-            const editorElement = thisRef?.querySelector<HTMLDivElement>(
-              '[role="textbox"]',
-            );
+            const editorElement =
+              thisRef?.querySelector<HTMLDivElement>('[role="textbox"]');
 
             if (editorElement) {
               editorRef.current = editorElement;

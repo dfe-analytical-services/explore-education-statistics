@@ -103,7 +103,8 @@ describe('mapTableToJson', () => {
 
   test('returns the correct JSON for a table with two levels of row headers and one level of col headers', () => {
     const result = mapTableToJson({
-      tableHeadersConfig: testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig,
+      tableHeadersConfig:
+        testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig,
       subjectMeta: testTableWithOneLevelOfRowAndColHeaders.subjectMeta,
       results: testTableWithOneLevelOfRowAndColHeaders.results,
     }).tableJson;
@@ -158,7 +159,8 @@ describe('mapTableToJson', () => {
 
   test('returns the correct JSON for a table with two levels of col headers and one level of row headers', () => {
     const result = mapTableToJson({
-      tableHeadersConfig: testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig,
+      tableHeadersConfig:
+        testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig,
       subjectMeta: testTableWithOneLevelOfRowAndColHeaders.subjectMeta,
       results: testTableWithOneLevelOfRowAndColHeaders.results,
     }).tableJson;
@@ -554,7 +556,8 @@ describe('mapTableToJson', () => {
   describe('Handles multiple filter groups with the same labels', () => {
     test('returns the correct JSON when there are multiple groups with the same labels in column headers', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMultipleGroupsWithSameLabelsInColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMultipleGroupsWithSameLabelsInColumnHeadersConfig,
         subjectMeta: testTableWithMultipleGroupsWithSameLabels.subjectMeta,
         results: testTableWithMultipleGroupsWithSameLabels.results,
       }).tableJson;
@@ -674,7 +677,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when there are multiple groups with the same labels in row headers', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMultipleGroupsWithSameLabelsInRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMultipleGroupsWithSameLabelsInRowHeadersConfig,
         subjectMeta: testTableWithMultipleGroupsWithSameLabels.subjectMeta,
         results: testTableWithMultipleGroupsWithSameLabels.results,
       }).tableJson;
@@ -796,7 +800,8 @@ describe('mapTableToJson', () => {
   describe('Handles filters in different groups with the same label', () => {
     test('returns the correct JSON when column headers contain filters in different groups with the same label', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithDuplicateFilterLabelsInColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithDuplicateFilterLabelsInColumnHeadersConfig,
         subjectMeta: testTableWithDuplicateFilterLabels.subjectMeta,
         results: testTableWithDuplicateFilterLabels.results,
       }).tableJson;
@@ -867,7 +872,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when column headers contain filters in different groups with the same label and have missing data', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithDuplicateFilterLabelsInColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithDuplicateFilterLabelsInColumnHeadersConfig,
         subjectMeta:
           testTableWithDuplicateFilterLabelsAndMissingData.subjectMeta,
         results: testTableWithDuplicateFilterLabelsAndMissingData.results,
@@ -913,7 +919,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when row headers contain filters in different groups with the same label', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithDuplicateFilterLabelsInRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithDuplicateFilterLabelsInRowHeadersConfig,
         subjectMeta: testTableWithDuplicateFilterLabels.subjectMeta,
         results: testTableWithDuplicateFilterLabels.results,
       }).tableJson;
@@ -1010,7 +1017,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when row headers contain filters in different groups with the same label and have missing data', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithDuplicateFilterLabelsInRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithDuplicateFilterLabelsInRowHeadersConfig,
         subjectMeta:
           testTableWithDuplicateFilterLabelsAndMissingData.subjectMeta,
         results: testTableWithDuplicateFilterLabelsAndMissingData.results,
@@ -1106,7 +1114,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when column headers contain a single row of merged and unmerged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedAndUnMergedCellsInColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedAndUnMergedCellsInColumnHeadersConfig,
         subjectMeta: testTableWithMergedAndUnMergedCellsInHeaders.subjectMeta,
         results: testTableWithMergedAndUnMergedCellsInHeaders.results,
       }).tableJson;
@@ -1163,7 +1172,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when the first level of column headers contains only merged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithOnlyMergedCellsInFirstLevelOfColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithOnlyMergedCellsInFirstLevelOfColumnHeadersConfig,
         subjectMeta:
           testTableWithOnlyMergedCellsInFirstLevelOfHeaders.subjectMeta,
         results: testTableWithOnlyMergedCellsInFirstLevelOfHeaders.results,
@@ -1238,7 +1248,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when the first level of column headers contains merged and unmerged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedAndUnmergedCellsInFirstLevelOfColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedAndUnmergedCellsInFirstLevelOfColumnHeadersConfig,
         subjectMeta:
           testTableWithMergedAndUnmergedCellsInFirstLevelOfHeaders.subjectMeta,
         results:
@@ -1323,7 +1334,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when a middle level of column headers contains only merged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithOnlyMergedCellsInMiddleLevelOfColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithOnlyMergedCellsInMiddleLevelOfColumnHeadersConfig,
         subjectMeta:
           testTableWithOnlyMergedCellsInMiddleLevelOfHeaders.subjectMeta,
         results: testTableWithOnlyMergedCellsInMiddleLevelOfHeaders.results,
@@ -1419,7 +1431,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when a middle level of column headers contains merged and unmerged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedAndUnmergedCellsInMiddleLevelOfColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedAndUnmergedCellsInMiddleLevelOfColumnHeadersConfig,
         subjectMeta:
           testTableWithMergedAndUnmergedCellsInMiddleLevelOfHeaders.subjectMeta,
         results:
@@ -1554,7 +1567,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when the last level of column headers contains only merged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithOnlyMergedCellsInLastLevelOfColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithOnlyMergedCellsInLastLevelOfColumnHeadersConfig,
         subjectMeta:
           testTableWithOnlyMergedCellsInLastLevelOfHeaders.subjectMeta,
         results: testTableWithOnlyMergedCellsInLastLevelOfHeaders.results,
@@ -1650,7 +1664,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when the last level of column headers contains merged and unmerged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedAndUnmergedCellsInLastLevelOfColumnHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedAndUnmergedCellsInLastLevelOfColumnHeadersConfig,
         subjectMeta:
           testTableWithMergedAndUnmergedCellsInLastLevelOfHeaders.subjectMeta,
         results:
@@ -1763,7 +1778,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON with merged cells and missing data', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedCellsAndMissingDataColHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedCellsAndMissingDataColHeadersConfig,
         subjectMeta: testTableWithMergedCellsAndMissingData.subjectMeta,
         results: testTableWithMergedCellsAndMissingData.results,
       }).tableJson;
@@ -1884,7 +1900,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when row headers contain a single row of merged and unmerged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedAndUnmergedCellsInRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedAndUnmergedCellsInRowHeadersConfig,
         subjectMeta: testTableWithMergedAndUnMergedCellsInHeaders.subjectMeta,
         results: testTableWithMergedAndUnMergedCellsInHeaders.results,
       }).tableJson;
@@ -1935,7 +1952,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when the first level of row headers contains only merged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithOnlyMergedCellsInFirstLevelOfRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithOnlyMergedCellsInFirstLevelOfRowHeadersConfig,
         subjectMeta:
           testTableWithOnlyMergedCellsInFirstLevelOfHeaders.subjectMeta,
         results: testTableWithOnlyMergedCellsInFirstLevelOfHeaders.results,
@@ -2014,7 +2032,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when the first level of row headers contains merged and unmerged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedAndUnmergedCellsInFirstLevelOfRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedAndUnmergedCellsInFirstLevelOfRowHeadersConfig,
         subjectMeta:
           testTableWithMergedAndUnmergedCellsInFirstLevelOfHeaders.subjectMeta,
         results:
@@ -2101,7 +2120,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when a middle level of row headers contains only merged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithOnlyMergedCellsInMiddleLevelOfRowsConfig,
+        tableHeadersConfig:
+          testTableWithOnlyMergedCellsInMiddleLevelOfRowsConfig,
         subjectMeta:
           testTableWithOnlyMergedCellsInMiddleLevelOfHeaders.subjectMeta,
         results: testTableWithOnlyMergedCellsInMiddleLevelOfHeaders.results,
@@ -2187,7 +2207,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when a middle level of row headers contains merged and unmerged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedAndUnmergedCellsInMiddleLevelOfRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedAndUnmergedCellsInMiddleLevelOfRowHeadersConfig,
         subjectMeta:
           testTableWithMergedAndUnmergedCellsInMiddleLevelOfHeaders.subjectMeta,
         results:
@@ -2281,7 +2302,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when the last level of row headers contains only merged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithOnlyMergedCellsInLastLevelOfRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithOnlyMergedCellsInLastLevelOfRowHeadersConfig,
         subjectMeta:
           testTableWithOnlyMergedCellsInLastLevelOfHeaders.subjectMeta,
         results: testTableWithOnlyMergedCellsInLastLevelOfHeaders.results,
@@ -2367,7 +2389,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON when the last level of row headers contains merged and unmerged cells', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedAndUnmergedCellsInLastLevelOfRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedAndUnmergedCellsInLastLevelOfRowHeadersConfig,
         subjectMeta:
           testTableWithMergedAndUnmergedCellsInLastLevelOfHeaders.subjectMeta,
         results:
@@ -2468,7 +2491,8 @@ describe('mapTableToJson', () => {
 
     test('returns the correct JSON with merged cells and missing data', () => {
       const result = mapTableToJson({
-        tableHeadersConfig: testTableWithMergedCellsAndMissingDataRowHeadersConfig,
+        tableHeadersConfig:
+          testTableWithMergedCellsAndMissingDataRowHeadersConfig,
         subjectMeta: testTableWithMergedCellsAndMissingData.subjectMeta,
         results: testTableWithMergedCellsAndMissingData.results,
       }).tableJson;

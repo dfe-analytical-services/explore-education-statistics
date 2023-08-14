@@ -425,8 +425,11 @@ main .message h2 {
   font-size: 1rem;
   user-select: none;
   border-radius: 4px;
-  transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out,
-    border-color 0.2s ease-in-out, opacity 0.2s ease-in-out;
+  transition:
+    color 0.2s ease-in-out,
+    background-color 0.2s ease-in-out,
+    border-color 0.2s ease-in-out,
+    opacity 0.2s ease-in-out;
   background-color: var(--ck-sample-color-button-blue);
   border-color: var(--ck-sample-color-button-blue);
   color: var(--ck-sample-color-white);

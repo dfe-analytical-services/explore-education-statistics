@@ -23,23 +23,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * General role-based page access
                  */
-                // does this user have minimal permissions to access any admin APIs?
                 options.AddPolicy(SecurityPolicies.CanAccessSystem.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.ApplicationAccessGranted.ToString()));
 
-                // does this user have the Bau user role?
                 options.AddPolicy(SecurityPolicies.IsBauUser.ToString(), policy =>
                     policy.RequireRole(RoleNames.BauUser));
 
-                // does this user have permissions to access analyst pages?
                 options.AddPolicy(SecurityPolicies.CanAccessAnalystPages.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AnalystPagesAccessGranted.ToString()));
 
-                // does this user have permissions to access prerelease pages?
                 options.AddPolicy(SecurityPolicies.CanAccessPrereleasePages.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.PrereleasePagesAccessGranted.ToString()));
 
-                // does this user have permissions to invite and manage all users on the system?
                 options.AddPolicy(SecurityPolicies.CanManageUsersOnSystem.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.ManageAnyUser.ToString()));
 
@@ -52,98 +47,75 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanViewAllPublications.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AccessAllPublications.ToString()));
 
-                // does this user have permission to view a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationRequirement()));
 
-                // does this user have permission to update a specific Publication summary?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificPublicationSummary.ToString(), policy =>
                     policy.Requirements.Add(new UpdatePublicationSummaryRequirement()));
 
-                // does this user have permission to update publication details (e.g. title, theme/topic, supersededById)
                 options.AddPolicy(SecurityPolicies.CanUpdatePublication.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.UpdateAllPublications.ToString()));
 
-                // does this user have permission to update a publication's contact?
                 options.AddPolicy(SecurityPolicies.CanUpdateContact.ToString(), policy =>
                     policy.Requirements.Add(new UpdateContactRequirement()));
 
-                // does this user have permission to update a ReleaseRole on a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificReleaseRole.ToString(), policy =>
                     policy.Requirements.Add(new UpdateReleaseRoleRequirement()));
 
-                // does this user have permission to view the team access for releases of a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanViewReleaseTeamAccess.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPublicationReleaseTeamAccessRequirement()));
 
                 /**
                  * Release management
                  */
-                // does this user have permission to create a release under a specific publication?
                 options.AddPolicy(SecurityPolicies.CanCreateReleaseForSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new CreateReleaseForSpecificPublicationRequirement()));
 
-                // does this user have permission to view all Releases across the application?
                 options.AddPolicy(SecurityPolicies.CanViewAllReleases.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.AccessAllReleases.ToString()));
 
-                // does this user have permission to view a specific Release?
                 options.AddPolicy(ContentSecurityPolicies.CanViewSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseRequirement()));
 
-                // does this user have permission to update a specific Release?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new UpdateSpecificReleaseRequirement()));
 
-                // does this user have permission to mark a specific Release as a Draft?
                 options.AddPolicy(SecurityPolicies.CanMarkSpecificReleaseAsDraft.ToString(), policy =>
                     policy.Requirements.Add(new MarkReleaseAsDraftRequirement()));
 
-                // does this user have permission to submit a specific Release to Higher Review?
                 options.AddPolicy(SecurityPolicies.CanSubmitSpecificReleaseToHigherReview.ToString(), policy =>
                     policy.Requirements.Add(new MarkReleaseAsHigherLevelReviewRequirement()));
 
-                // does this user have permission to approve a specific Release?
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new MarkReleaseAsApprovedRequirement()));
 
-                // does this user have permission to make an amendment of an existing release?
                 options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new MakeAmendmentOfSpecificReleaseRequirement()));
 
-                // does this user have permission to publish a specific Release?
                 options.AddPolicy(SecurityPolicies.CanPublishSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new PublishSpecificReleaseRequirement()));
 
-                // does this user have permission to delete an existing release?
                 options.AddPolicy(SecurityPolicies.CanDeleteSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new DeleteSpecificReleaseRequirement()));
 
-                // does this user have permission to view the subject data of a specific Release?
                 options.AddPolicy(DataSecurityPolicies.CanViewSubjectData.ToString(), policy =>
                     policy.Requirements.Add(new ViewSubjectDataRequirement()));
 
-                // does this user have permission to view a specific PreRelease Summary?
                 options.AddPolicy(SecurityPolicies.CanViewSpecificPreReleaseSummary.ToString(), policy =>
                     policy.Requirements.Add(new ViewSpecificPreReleaseSummaryRequirement()));
 
-                // does this user have permission to resolve a specific Comment?
                 options.AddPolicy(SecurityPolicies.CanResolveSpecificComment.ToString(), policy =>
                     policy.Requirements.Add(new ResolveSpecificCommentRequirement()));
 
-                // does this user have permission to update a specific Comment?
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificComment.ToString(), policy =>
                     policy.Requirements.Add(new UpdateSpecificCommentRequirement()));
 
-                // does this user have permission to delete a specific Comment?
                 options.AddPolicy(SecurityPolicies.CanDeleteSpecificComment.ToString(), policy =>
                     policy.Requirements.Add(new DeleteSpecificCommentRequirement()));
 
-                // does this user have permission to cancel an ongoing file import?
                 options.AddPolicy(SecurityPolicies.CanCancelOngoingImports.ToString(), policy =>
                     policy.Requirements.Add(new CancelSpecificFileImportRequirement()));
 
-                // does this user have permission to view a release's status history?
                 options.AddPolicy(SecurityPolicies.CanViewReleaseStatusHistory.ToString(), policy =>
                     policy.Requirements.Add(new ViewReleaseStatusHistoryRequirement()));
 
@@ -162,41 +134,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * Pre Release management
                  */
-                // does this user have permissions to view the prerelease contacts list?
                 options.AddPolicy(SecurityPolicies.CanViewPrereleaseContacts.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.CanViewPrereleaseContacts.ToString()));
 
-                // does this user have permission to assign prerelease contacts to a specific Release?
                 options.AddPolicy(SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement()));
 
                 /**
                  * Taxonomy management
                  */
-                // does this user have permission to manage all taxonomy?
                 options.AddPolicy(SecurityPolicies.CanManageAllTaxonomy.ToString(), policy =>
                     policy.RequireClaim(SecurityClaimTypes.ManageAllTaxonomy.ToString()));
 
-                // does this user have permission to create a publication under a specific topic?
                 options.AddPolicy(SecurityPolicies.CanCreatePublicationForSpecificTopic.ToString(), policy =>
                     policy.Requirements.Add(new CreatePublicationForSpecificTopicRequirement()));
 
                 /**
                  * Methodology management
                  */
-                // does this user have permission to adopt a methodology for a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanAdoptMethodologyForSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new AdoptMethodologyForSpecificPublicationRequirement()));
 
-                // does this user have permission to create a methodology for a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanCreateMethodologyForSpecificPublication.ToString(), policy =>
                     policy.Requirements.Add(new CreateMethodologyForSpecificPublicationRequirement()));
 
-                // does this user have permission to drop a link to an adopted Methodology?
                 options.AddPolicy(SecurityPolicies.CanDropMethodologyLink.ToString(), policy =>
                     policy.Requirements.Add(new DropMethodologyLinkRequirement()));
 
-                // does this user have permission to manage the external methodology for a specific Publication?
                 options.AddPolicy(SecurityPolicies.CanManageExternalMethodologyForSpecificPublication.ToString(),
                     policy =>
                         policy.Requirements.Add(new ManageExternalMethodologyForSpecificPublicationRequirement()));
@@ -207,19 +171,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new UpdateSpecificMethodologyRequirement()));
 
-                // does this user have permission to mark a specific Methodology as Draft?
                 options.AddPolicy(SecurityPolicies.CanMarkSpecificMethodologyAsDraft.ToString(), policy =>
-                    policy.Requirements.Add(new MethodologyStatusAuthorizationHandlers.MarkSpecificMethodologyAsDraftRequirement()));
+                    policy.Requirements.Add(new MarkMethodologyAsDraftRequirement()));
 
-                // does this user have permission to approve a specific Methodology?
+                options.AddPolicy(SecurityPolicies.CanSubmitSpecificMethodologyToHigherReview.ToString(), policy =>
+                    policy.Requirements.Add(new MarkMethodologyAsHigherLevelReviewRequirement()));
+
                 options.AddPolicy(SecurityPolicies.CanApproveSpecificMethodology.ToString(), policy =>
-                    policy.Requirements.Add(new MethodologyStatusAuthorizationHandlers.ApproveSpecificMethodologyRequirement()));
+                    policy.Requirements.Add(new MarkMethodologyAsApprovedRequirement()));
 
-                // does this user have permission to create an Amendment of a specific Methodology?
                 options.AddPolicy(SecurityPolicies.CanMakeAmendmentOfSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new MakeAmendmentOfSpecificMethodologyRequirement()));
 
-                // does this user have permission to cancel a specific Methodology Amendment?
                 options.AddPolicy(SecurityPolicies.CanDeleteSpecificMethodology.ToString(), policy =>
                     policy.Requirements.Add(new DeleteSpecificMethodologyRequirement()));
             });
@@ -285,8 +248,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, DropMethodologyLinkAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificMethodologyAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.MarkSpecificMethodologyAsDraftAuthorizationHandler>();
-            services.AddTransient<IAuthorizationHandler, MethodologyStatusAuthorizationHandlers.ApproveSpecificMethodologyAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MarkMethodologyAsDraftAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MarkMethodologyAsHigherLevelReviewAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, MarkMethodologyAsApprovedAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, MakeAmendmentOfSpecificMethodologyAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, DeleteSpecificMethodologyAuthorizationHandler>();
         }

@@ -40,10 +40,11 @@ const DataBlockTabs = ({
   releaseId,
   onToggle,
 }: DataBlockTabsProps) => {
-  const { value: fullTable, isLoading, error } = useTableQuery(
-    releaseId,
-    dataBlock.id,
-  );
+  const {
+    value: fullTable,
+    isLoading,
+    error,
+  } = useTableQuery(releaseId, dataBlock.id);
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
 

@@ -40,9 +40,8 @@ const PrototypePrepareNextSubjectStep5 = ({
     indicators,
   } = usePrototypeNextSubjectContext();
 
-  const [initialVersionType, setInitialVersionType] = useState<VersionType>(
-    versionType,
-  );
+  const [initialVersionType, setInitialVersionType] =
+    useState<VersionType>(versionType);
 
   useEffect(() => {
     if (

@@ -574,10 +574,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
-    const {
-      publication: publicationSlug,
-      release: releaseSlug,
-    } = query as Dictionary<string>;
+    const { publication: publicationSlug, release: releaseSlug } =
+      query as Dictionary<string>;
 
     const release = await (releaseSlug
       ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)

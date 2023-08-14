@@ -49,10 +49,8 @@ interface MatchProps {
 const PrototypePrepareNextSubjectPage = ({
   match,
 }: RouteComponentProps<MatchProps>) => {
-  const [
-    savedPublicationSubjects,
-    setSavedPublicationSubjects,
-  ] = useStorageItem<PublicationSubject[]>('publicationSubjects', undefined);
+  const [savedPublicationSubjects, setSavedPublicationSubjects] =
+    useStorageItem<PublicationSubject[]>('publicationSubjects', undefined);
 
   const publicationSubjectId = match.params.psid;
   const publicationSubject = savedPublicationSubjects?.find(

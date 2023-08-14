@@ -23,11 +23,8 @@ const TableHeadersGroup = ({
   totalItems,
   onMoveGroupToOtherAxis,
 }: Props) => {
-  const {
-    activeGroup,
-    groupDraggingActive,
-    groupDraggingEnabled,
-  } = useTableHeadersContext();
+  const { activeGroup, groupDraggingActive, groupDraggingEnabled } =
+    useTableHeadersContext();
   const [focusedGroup, setFocusedGroup] = useState<string>();
   const groupId = getTableHeaderGroupId(legend);
   const defaultNumberOfItems = 2;

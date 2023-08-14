@@ -8,12 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.MethodologyStatusAuthorizationHandlers;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 using static Moq.MockBehavior;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
@@ -21,7 +21,7 @@ using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class MarkSpecificMethodologyAsDraftAuthorizationHandlerTests
+    public class MarkMethodologyAsApprovedAuthorizationHandlerTests
     {
         private static readonly Guid UserId = Guid.NewGuid();
 
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ClaimsTests
         {
             [Fact]
-            public async Task NoClaimsAllowMarkingPubliclyAccessibleMethodologyAsDraft()
+            public async Task NoClaimsAllowApprovingPubliclyAccessibleMethodology()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -56,20 +56,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
-                        CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
                             (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyVersionRepository);
 
-                    // No claims should allow a publicly accessible Methodology to be marked as draft
+                    // No claims should allow a publicly accessible Methodology to be approved
                     Assert.False(authContext.HasSucceeded);
                 });
             }
 
             [Fact]
-            public async Task UserWithCorrectClaimCanMarkNonPubliclyAccessibleMethodologyAsDraft()
+            public async Task UserWithCorrectClaimCanApproveNonPubliclyAccessibleDraftMethodology()
             {
+                var methodologyVersion = new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    MethodologyId = Guid.NewGuid(),
+                    Status = Draft
+                };
+
                 await ForEachSecurityClaimAsync(async claim =>
                 {
                     var (
@@ -81,17 +88,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(methodologyVersion.Id))
                         .ReturnsAsync(false);
 
-                    // Only the MarkAllMethodologiesDraft claim should allow a non publicly accessible Methodology to
-                    // be marked as draft
-                    var expectedToPassByClaimAlone = claim == MarkAllMethodologiesDraft;
+                    // Only the ApproveAllMethodologies claim should allow approving a Methodology
+                    var expectedToPassByClaimAlone = claim == ApproveAllMethodologies;
 
                     if (!expectedToPassByClaimAlone)
                     {
                         methodologyRepository.Setup(s =>
-                                s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                                s.GetOwningPublication(methodologyVersion.MethodologyId))
                             .ReturnsAsync(OwningPublication);
 
                         userPublicationRoleRepository
@@ -105,35 +111,96 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var user = CreateClaimsPrincipal(UserId, claim);
                     var authContext =
-                        CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
-                            (user, MethodologyVersion);
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
+                            (user, methodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        userReleaseRoleRepository);
+                    VerifyAllMocks(
+                        methodologyRepository,
+                        methodologyVersionRepository,
+                        userPublicationRoleRepository,
+                        userReleaseRoleRepository,
+                        publicationRepository);
+
+                    Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
+                });
+            }
+
+            [Fact]
+            public async Task UserWithCorrectClaimCanApproveNonPubliclyAccessibleApprovedMethodology()
+            {
+                var methodologyVersion = new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    MethodologyId = Guid.NewGuid(),
+                    Status = Approved
+                };
+
+                await ForEachSecurityClaimAsync(async claim =>
+                {
+                    var (
+                        handler,
+                        methodologyRepository,
+                        methodologyVersionRepository,
+                        userReleaseRoleRepository,
+                        userPublicationRoleRepository,
+                        publicationRepository
+                        ) = CreateHandlerAndDependencies();
+
+                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(methodologyVersion.Id))
+                        .ReturnsAsync(false);
+
+                    // Only the ApproveAllMethodologies claim should allow approving a Methodology
+                    var expectedToPassByClaimAlone = claim == ApproveAllMethodologies;
+
+                    if (!expectedToPassByClaimAlone)
+                    {
+                        methodologyRepository
+                            .Setup(s => s.GetOwningPublication(methodologyVersion.MethodologyId))
+                            .ReturnsAsync(OwningPublication);
+
+                        userPublicationRoleRepository
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            .ReturnsAsync(new List<PublicationRole>());
+
+                        publicationRepository
+                            .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
+                            .ReturnsAsync((Release?)null);
+                    }
+
+                    var user = CreateClaimsPrincipal(UserId, claim);
+                    var authContext =
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
+                            (user, methodologyVersion);
+
+                    await handler.HandleAsync(authContext);
+                    VerifyAllMocks(
+                        methodologyRepository, 
+                        methodologyVersionRepository,
+                        userReleaseRoleRepository,
+                        userPublicationRoleRepository,
+                        publicationRepository);
 
                     Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
                 });
             }
         }
         
-        // TODO DW - should publication owners be able to do this too?
         public class PublicationRoleTests
         {
             [Fact]
-            public async Task ApproversOnOwningPublicationCanMarkMethodologyAsDraft()
+            public async Task ApproversOnOwningPublicationCanApprove()
             {
                 await ForEachPublicationRoleAsync(async publicationRole =>
                 {
-                    // If the user has the Approver role on the Owning Publication of this
-                    // Methodology they are allowed to mark it as draft.
+                    // If the user has the Approver role on the owning Publication, they are allowed to approve it.
                     var expectedToPassByPublicationRole = publicationRole == PublicationRole.Approver;
 
                     var (
                         handler,
                         methodologyRepository,
                         methodologyVersionRepository,
-                        _,
+                        userReleaseRoleRepository,
                         userPublicationRoleRepository,
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
@@ -141,8 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
                         .ReturnsAsync(false);
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -153,22 +220,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         publicationRepository
                             .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                            .ReturnsAsync((Release?)null);
-                        
+                            .ReturnsAsync((Release?) null);
                     }
 
                     var user = CreateClaimsPrincipal(UserId);
 
                     var authContext =
-                        CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement,
-                            MethodologyVersion>(user,
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
+                            user,
                             MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    
                     VerifyAllMocks(
-                        methodologyRepository, 
+                        methodologyRepository,
                         methodologyVersionRepository,
+                        userReleaseRoleRepository,
                         userPublicationRoleRepository,
                         publicationRepository);
 
@@ -180,12 +246,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ReleaseRoleTests
         {
             [Fact]
-            public async Task ApproversOnOwningPublicationsLatestReleaseCanMarkMethodologyAsDraft()
+            public async Task ApproversOnOwningPublicationsLatestReleaseCanApprove()
             {
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {
                     // If the user has the Approver role on the latest Release of the owning Publication of this
-                    // Methodology they are allowed to mark it as draft
+                    // Methodology they are allowed to approve it
                     var expectedToPassByReleaseRole = releaseRole == Approver;
 
                     var latestReleaseForPublication = new Release
@@ -205,8 +271,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
                         .ReturnsAsync(false);
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                    methodologyRepository
+                        .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
@@ -224,14 +290,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var user = CreateClaimsPrincipal(UserId);
 
                     var authContext =
-                        CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement,
-                            MethodologyVersion>(user,
+                        CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>(
+                            user,
                             MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    
                     VerifyAllMocks(
-                        methodologyRepository, 
+                        methodologyRepository,
                         methodologyVersionRepository,
                         userReleaseRoleRepository,
                         userPublicationRoleRepository,
@@ -242,7 +307,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task UsersWithNoRolesOnOwningPublicationsLatestReleaseCannotMarkMethodologyAsDraft()
+            public async Task UsersWithNoRolesOnOwningPublicationsLatestReleaseCannotApprove()
+            {
+                var latestReleaseForPublication = new Release
+                {
+                    Id = Guid.NewGuid()
+                };
+
+                var (
+                    handler,
+                    methodologyRepository,
+                    methodologyVersionRepository,
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository,
+                    publicationRepository
+                    ) = CreateHandlerAndDependencies();
+
+                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                    .ReturnsAsync(false);
+
+                methodologyRepository
+                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                    .ReturnsAsync(OwningPublication);
+
+                userPublicationRoleRepository
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .ReturnsAsync(new List<PublicationRole>());
+
+                publicationRepository
+                    .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
+                    .ReturnsAsync(latestReleaseForPublication);
+
+                userReleaseRoleRepository
+                    .Setup(s => s.GetAllRolesByUserAndRelease(UserId, latestReleaseForPublication.Id))
+                    .ReturnsAsync(new List<ReleaseRole>());
+
+                var user = CreateClaimsPrincipal(UserId);
+
+                var authContext =
+                    CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
+                        (user, MethodologyVersion);
+
+                await handler.HandleAsync(authContext);
+                VerifyAllMocks(
+                    methodologyRepository,
+                    methodologyVersionRepository,
+                    userPublicationRoleRepository,
+                    userReleaseRoleRepository,
+                    publicationRepository);
+
+                // A user with no role on the owning Publication's latest release is not allowed to approve it
+                Assert.False(authContext.HasSucceeded);
+            }
+
+            [Fact]
+            public async Task NoLatestReleaseOnOwningPublicationSoCannotApprove()
             {
                 var (
                     handler,
@@ -256,8 +375,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
                     .ReturnsAsync(false);
 
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                methodologyRepository
+                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
@@ -266,68 +385,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 publicationRepository
                     .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                    .ReturnsAsync((Release?)null);
+                    .ReturnsAsync((Release?) null);
 
                 var user = CreateClaimsPrincipal(UserId);
 
                 var authContext =
-                    CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
-                        (user, MethodologyVersion);
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userReleaseRoleRepository);
-
-                // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
-                Assert.False(authContext.HasSucceeded);
-            }
-
-            [Fact]
-            public async Task NoLatestReleaseForOwningPublicationSoCannotMarkMethodologyAsDraft()
-            {
-                var (
-                    handler,
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    _,
-                    userPublicationRoleRepository,
-                    publicationRepository
-                    ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
-                    .ReturnsAsync(false);
-
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                    .ReturnsAsync(OwningPublication);
-
-                userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
-
-                publicationRepository
-                    .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                    .ReturnsAsync((Release?)null);
-
-                var user = CreateClaimsPrincipal(UserId);
-
-                var authContext =
-                    CreateAuthorizationHandlerContext<MarkSpecificMethodologyAsDraftRequirement, MethodologyVersion>
+                    CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(
-                    methodologyRepository, 
+                    methodologyRepository,
                     methodologyVersionRepository,
                     userPublicationRoleRepository,
+                    userReleaseRoleRepository,
                     publicationRepository);
 
-                // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
                 Assert.False(authContext.HasSucceeded);
             }
         }
 
-        private static (
-            MarkSpecificMethodologyAsDraftAuthorizationHandler,
+        private static
+            (MarkMethodologyAsApprovedAuthorizationHandler,
             Mock<IMethodologyRepository>,
             Mock<IMethodologyVersionRepository>,
             Mock<IUserReleaseRoleRepository>,
@@ -342,14 +421,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
-            var handler = new MarkSpecificMethodologyAsDraftAuthorizationHandler(
+            var handler = new MarkMethodologyAsApprovedAuthorizationHandler(
                 methodologyVersionRepository.Object,
                 methodologyRepository.Object,
                 new AuthorizationHandlerResourceRoleService(
                     userReleaseRoleRepository.Object,
                     userPublicationRoleRepository.Object,
                     publicationRepository.Object)
-                );
+            );
 
             return (
                 handler,
