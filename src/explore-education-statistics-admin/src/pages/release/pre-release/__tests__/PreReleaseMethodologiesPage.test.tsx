@@ -23,9 +23,10 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PreReleaseMethodologiesPage', () => {
   const methodologyPermissions = {
-    canApproveMethodology: false,
     canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
+    canApproveMethodology: false,
+    canSubmitMethodologyForHigherReview: false,
     canMarkMethodologyAsDraft: false,
     canUpdateMethodology: false,
     canRemoveMethodologyLink: false,
@@ -37,7 +38,7 @@ describe('PreReleaseMethodologiesPage', () => {
   };
 
   test('renders correctly with no methodologies', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([]);
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([]);
     publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
@@ -49,7 +50,7 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders correctly with published owned and adopted methodologies and external methodologies', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([
       {
         id: 'methodology-1-id',
         methodologyId: 'methodologyId-1',
@@ -108,7 +109,7 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders approved and scheduled methodologies correctly', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([
       {
         id: 'methodology-1-id',
         methodologyId: 'methodologyId-1',
@@ -139,7 +140,7 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('does not show unapproved draft methodologies', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([
       {
         id: 'methodology-1-id',
         methodologyId: 'methodologyId-1',
@@ -164,7 +165,7 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders correctly and links to the previous approved version for draft amendments', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([
       {
         id: 'methodology-1-id',
         methodologyId: 'methodologyId-1',
@@ -198,7 +199,7 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders correctly for approved amendments', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([
       {
         id: 'methodology-1-id',
         methodologyId: 'methodologyId-1',
@@ -251,7 +252,7 @@ describe('PreReleaseMethodologiesPage', () => {
   });
 
   test('renders when there is only a external methodology', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([]);
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([]);
     publicationService.getExternalMethodology.mockResolvedValue(
       testExternalMethodology,
     );

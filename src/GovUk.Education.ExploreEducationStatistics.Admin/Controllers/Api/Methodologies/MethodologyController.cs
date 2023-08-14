@@ -78,10 +78,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
         }
 
         [HttpGet("publication/{publicationId:guid}/methodologies")]
-        public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> ListMethodologies(Guid publicationId)
+        public async Task<ActionResult<List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(Guid publicationId)
         {
             return await _methodologyService
-                .ListMethodologies(publicationId)
+                .ListLatestMethodologyVersions(publicationId)
                 .HandleFailuresOrOk();
         }
 

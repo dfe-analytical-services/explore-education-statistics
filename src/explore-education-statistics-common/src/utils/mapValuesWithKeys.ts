@@ -7,7 +7,7 @@ import { Dictionary } from '@common/types/util';
  */
 export default function mapValuesWithKeys<
   T extends Dictionary<T[keyof T]>,
-  TResult
+  TResult,
 >(
   object: T,
   mappingFunction: (key: string, value: T[keyof T]) => TResult,

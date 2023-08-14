@@ -178,8 +178,9 @@ describe('MethodologyContext', () => {
   test('UPDATE_BLOCK_FROM_SECTION updates a block from a content section', () => {
     const sectionKey = 'content';
     const sectionId = basicMethodology.content[0].id;
-    const blockToUpdate = (basicMethodology.content[0]
-      .content as EditableContentBlock[])[0];
+    const blockToUpdate = (
+      basicMethodology.content[0].content as EditableContentBlock[]
+    )[0];
 
     const newBody = 'This is some updated text!';
 

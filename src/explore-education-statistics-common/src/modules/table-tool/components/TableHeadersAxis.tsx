@@ -27,10 +27,8 @@ export default function TableHeadersAxis({
   name,
   onMoveGroupToOtherAxis,
 }: Props) {
-  const {
-    groupDraggingActive,
-    groupDraggingEnabled,
-  } = useTableHeadersContext();
+  const { groupDraggingActive, groupDraggingEnabled } =
+    useTableHeadersContext();
   const [field, meta] = useField(name);
 
   return (

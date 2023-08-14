@@ -9,8 +9,7 @@ import { PublicationReleaseSummary } from '@common/services/publicationService';
 export const subjects: Subject[] = [
   {
     id: '5e989b4d-b23e-4582-9984-08d987eb588f',
-    name:
-      'A1 National time series of children in need, referrals and assessments, England 2013 to 2021',
+    name: 'A1 National time series of children in need, referrals and assessments, England 2013 to 2021',
     content:
       "<p>Children in need, episodes of need, referrals and assessments completed by children's social care services.</p>",
     timePeriods: {
@@ -22,8 +21,7 @@ export const subjects: Subject[] = [
       id: '770a131f-a21f-495f-b1c8-08d987eb5897',
       extension: 'csv',
       fileName: 'a1_cin_referrals_assessments_2013_to_2021.csv',
-      name:
-        'A1 National time series of children in need, referrals and assessments, England 2013 to 2021',
+      name: 'A1 National time series of children in need, referrals and assessments, England 2013 to 2021',
       size: '15 Kb',
       type: 'Data',
       created: '2021-10-07T16:05:44.1213125Z',
@@ -33,8 +31,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '8bfceddc-e6da-4b26-998e-08d987eb588f',
-    name:
-      'A2 National time series of section 47s, initial child protection conferences and child protection plans, England 2013 to 2021',
+    name: 'A2 National time series of section 47s, initial child protection conferences and child protection plans, England 2013 to 2021',
     content:
       '<p>Section 47 enquiries, initial child protection conferences and child protection plans.</p>',
     timePeriods: {
@@ -46,8 +43,7 @@ export const subjects: Subject[] = [
       id: 'e1390ee7-5ba0-442d-b1d4-08d987eb5897',
       extension: 'csv',
       fileName: 'a2_section47_icpc_cpp_2013_to_2021.csv',
-      name:
-        'A2 National time series of section 47s, initial child protection conferences and child protection plans, England 2013 to 2021',
+      name: 'A2 National time series of section 47s, initial child protection conferences and child protection plans, England 2013 to 2021',
       size: '11 Kb',
       type: 'Data',
       created: '2021-10-08T08:02:58.3152676Z',
@@ -57,8 +53,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '7e47015e-bf0e-4b42-9990-08d987eb588f',
-    name:
-      'A3 National times series of children in need by gender, age and primary need, England 2018 to 2021',
+    name: 'A3 National times series of children in need by gender, age and primary need, England 2018 to 2021',
     content: '<p>Children in need by gender, age and primary need.</p>',
     timePeriods: {
       from: '2018',
@@ -69,8 +64,7 @@ export const subjects: Subject[] = [
       id: '29fd6241-2504-40a8-b1d6-08d987eb5897',
       extension: 'csv',
       fileName: 'a3_cin_primary_need_by_age_gender_2018_to_2021.csv',
-      name:
-        'A3 National times series of children in need by gender, age and primary need, England 2018 to 2021',
+      name: 'A3 National times series of children in need by gender, age and primary need, England 2018 to 2021',
       size: '12 Kb',
       type: 'Data',
       created: '2021-10-08T08:17:41.217646Z',
@@ -80,8 +74,7 @@ export const subjects: Subject[] = [
   },
   {
     id: 'f92c494b-571f-4dda-99a0-08d987eb588f',
-    name:
-      'A4 National time series of children in need by ethnicity and age and gender, England 2018 to 2021',
+    name: 'A4 National time series of children in need by ethnicity and age and gender, England 2018 to 2021',
     content: '<p>Children in need by gender, age and ethnicity.</p>',
     timePeriods: {
       from: '2018',
@@ -92,8 +85,7 @@ export const subjects: Subject[] = [
       id: '10916365-184e-4c43-b1e6-08d987eb5897',
       extension: 'csv',
       fileName: 'a4_cin_by_ethnicity_and_age_gender_2018_to_2021.csv',
-      name:
-        'A4 National time series of children in need by ethnicity and age and gender, England 2018 to 2021',
+      name: 'A4 National time series of children in need by ethnicity and age and gender, England 2018 to 2021',
       size: '10 Kb',
       type: 'Data',
       created: '2021-10-08T10:45:35.58381Z',
@@ -103,8 +95,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '2c9b1ba9-b79a-4cba-99a4-08d987eb588f',
-    name:
-      'A5 National time series of child protection plans by initial category of abuse and gender, age and ethnicity, England 2018 to 2021',
+    name: 'A5 National time series of child protection plans by initial category of abuse and gender, age and ethnicity, England 2018 to 2021',
     content:
       '<p>Children who were the subject of a child protection plan at 31 March by initial category of abuse by gender, age and ethnicity.</p>',
     timePeriods: {
@@ -117,8 +108,7 @@ export const subjects: Subject[] = [
       extension: 'csv',
       fileName:
         'a5_cpp_initial_category_of_abuse_by_gender_age_ethnicity_2018_to_2021.csv',
-      name:
-        'A5 National time series of child protection plans by initial category of abuse and gender, age and ethnicity, England 2018 to 2021',
+      name: 'A5 National time series of child protection plans by initial category of abuse and gender, age and ethnicity, England 2018 to 2021',
       size: '6 Kb',
       type: 'Data',
       created: '2021-10-08T11:04:14.9637298Z',
@@ -128,8 +118,7 @@ export const subjects: Subject[] = [
   },
   {
     id: 'c8bd097a-c011-4693-999e-08d987eb588f',
-    name:
-      'A6 National time series of child protection plans by initial category of abuse, England 2013 to 2021',
+    name: 'A6 National time series of child protection plans by initial category of abuse, England 2013 to 2021',
     content:
       '<p>Children who were the subject of a child protection plan at 31 March by initial category of abuse.</p>',
     timePeriods: {
@@ -141,8 +130,7 @@ export const subjects: Subject[] = [
       id: '0c59a505-593d-44e2-b1e4-08d987eb5897',
       extension: 'csv',
       fileName: 'a6_cpp_initial_category_of_abuse_2013_to_2021.csv',
-      name:
-        ',A6 National time series of child protection plans by initial category of abuse, England 2013 to 2021',
+      name: ',A6 National time series of child protection plans by initial category of abuse, England 2013 to 2021',
       size: '1 Kb',
       type: 'Data',
       created: '2021-10-08T10:10:01.499493Z',
@@ -152,8 +140,7 @@ export const subjects: Subject[] = [
   },
   {
     id: 'c28569ca-4a59-44cd-9996-08d987eb588f',
-    name:
-      'A7 National time series of children in need by gender, age and ethnicity, England 2015 to 2021',
+    name: 'A7 National time series of children in need by gender, age and ethnicity, England 2015 to 2021',
     content: '<p>Children in need by gender, age and ethnicity.</p>',
     timePeriods: {
       from: '2015',
@@ -164,8 +151,7 @@ export const subjects: Subject[] = [
       id: '2e8e126a-e3ba-4084-b1dc-08d987eb5897',
       extension: 'csv',
       fileName: 'a7_cin_by_age_gender_ethnicity_2015_to_2021.csv',
-      name:
-        'A7 National time series of children in need by gender, age and ethnicity, England 2015 to 2021',
+      name: 'A7 National time series of children in need by gender, age and ethnicity, England 2015 to 2021',
       size: '24 Kb',
       type: 'Data',
       created: '2021-10-08T09:58:15.6856206Z',
@@ -175,8 +161,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '0f2f9b9b-85c8-4441-998c-08d987eb588f',
-    name:
-      'B1 Children in need and episodes of need by local authority, England 2013 to 2021',
+    name: 'B1 Children in need and episodes of need by local authority, England 2013 to 2021',
     content:
       '<p>Children in need episodes at any point during the year, episodes starting and ending in the year and children in need at 31 March.</p>',
     timePeriods: {
@@ -188,8 +173,7 @@ export const subjects: Subject[] = [
       id: '575d47dd-f85f-477e-b1d2-08d987eb5897',
       extension: 'csv',
       fileName: 'b1_children_in_need_2013_to_2021.csv',
-      name:
-        'B1 Children in need and episodes of need by local authority, England 2013 to 2021',
+      name: 'B1 Children in need and episodes of need by local authority, England 2013 to 2021',
       size: '292 Kb',
       type: 'Data',
       created: '2021-10-08T07:49:49.8933633Z',
@@ -199,8 +183,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '949f4689-729f-425d-99ac-08d987eb588f',
-    name:
-      'B2 Children in need at 31 March by recorded disability and local authority, England 2013 to 2021',
+    name: 'B2 Children in need at 31 March by recorded disability and local authority, England 2013 to 2021',
     content: '<p>Children in need by disability.</p>',
     timePeriods: {
       from: '2013',
@@ -211,8 +194,7 @@ export const subjects: Subject[] = [
       id: 'c4ef4a1b-d8ae-49c3-b1f2-08d987eb5897',
       extension: 'csv',
       fileName: 'b2_children_in_need_recorded_disability_2013_to_2021.csv',
-      name:
-        'B2 Children in need at 31 March by recorded disability and local authority, England 2013 to 2021',
+      name: 'B2 Children in need at 31 March by recorded disability and local authority, England 2013 to 2021',
       size: '264 Kb',
       type: 'Data',
       created: '2021-10-08T13:15:55.3925348Z',
@@ -222,8 +204,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '03027d63-f185-49c8-bccc-08d98e1873d8',
-    name:
-      'B3 Children in need at 31 March by primary need and local authority, England 2013 to 2021',
+    name: 'B3 Children in need at 31 March by primary need and local authority, England 2013 to 2021',
     content: '<p>Children in need by primary need at assessment.</p>',
     timePeriods: {
       from: '2013',
@@ -234,8 +215,7 @@ export const subjects: Subject[] = [
       id: 'af34ab75-6f70-4b17-420d-08d98e1873fd',
       extension: 'csv',
       fileName: 'b3_cin_primary_need_2013_to_2021.csv',
-      name:
-        'B3 Children in need at 31 March by primary need and local authority, England 2013 to 2021',
+      name: 'B3 Children in need at 31 March by primary need and local authority, England 2013 to 2021',
       size: '242 Kb',
       type: 'Data',
       created: '2021-10-14T13:10:24.7844085Z',
@@ -245,8 +225,7 @@ export const subjects: Subject[] = [
   },
   {
     id: 'ef301961-dbfc-44a8-99b0-08d987eb588f',
-    name:
-      'B4 Children in need at 31 March by duration of episode and local authority, England 2013 to 2021',
+    name: 'B4 Children in need at 31 March by duration of episode and local authority, England 2013 to 2021',
     content: '<p>Children in need by duration of episode of need.</p>',
     timePeriods: {
       from: '2013',
@@ -257,8 +236,7 @@ export const subjects: Subject[] = [
       id: 'c7445cab-9367-44fe-b1f6-08d987eb5897',
       extension: 'csv',
       fileName: 'b4_children_in_need_duration_of_open_episode_2013_to_2021.csv',
-      name:
-        'B4 Children in need at 31 March by duration of episode and local authority, England 2013 to 2021',
+      name: 'B4 Children in need at 31 March by duration of episode and local authority, England 2013 to 2021',
       size: '254 Kb',
       type: 'Data',
       created: '2021-10-08T13:44:02.0031304Z',
@@ -268,8 +246,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '2ed75fdd-c6b2-433a-99b4-08d987eb588f',
-    name:
-      'B5 Duration of episodes of need ending in the  year to 31 March by local authority, England 2013 to 2021',
+    name: 'B5 Duration of episodes of need ending in the  year to 31 March by local authority, England 2013 to 2021',
     content:
       '<p>Episodes of need ending during the year by duration of episode of need.</p>',
     timePeriods: {
@@ -282,8 +259,7 @@ export const subjects: Subject[] = [
       extension: 'csv',
       fileName:
         'b5_children_in_need_duration_of_ended_episode_2013_to_2021.csv',
-      name:
-        'B5 Duration of episodes of need ending in the  year to 31 March by local authority, England 2013 to 2021',
+      name: 'B5 Duration of episodes of need ending in the  year to 31 March by local authority, England 2013 to 2021',
       size: '254 Kb',
       type: 'Data',
       created: '2021-10-08T14:28:33.4840179Z',
@@ -293,8 +269,7 @@ export const subjects: Subject[] = [
   },
   {
     id: 'ecd8b9bb-822d-4840-20d1-08d98d84ca80',
-    name:
-      'B6 Episodes of need ending in the year to 31 March  by reason for closure and local authority, England 2013 to 2021',
+    name: 'B6 Episodes of need ending in the year to 31 March  by reason for closure and local authority, England 2013 to 2021',
     content:
       '<p>Episodes of need ending during the year by reason for case closure.</p>',
     timePeriods: {
@@ -306,8 +281,7 @@ export const subjects: Subject[] = [
       id: '0b24fb6b-7dee-46b4-0a9f-08d98d84ca8f',
       extension: 'csv',
       fileName: 'b6_children_in_need_reason_for_closure_2013_to_2021.csv',
-      name:
-        'B6 Episodes of need ending in the year to 31 March  by reason for closure and local authority, England 2013 to 2021',
+      name: 'B6 Episodes of need ending in the year to 31 March  by reason for closure and local authority, England 2013 to 2021',
       size: '266 Kb',
       type: 'Data',
       created: '2021-10-12T15:25:03.2491626Z',
@@ -317,8 +291,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '655d0d18-d3e4-4c1d-99be-08d987eb588f',
-    name:
-      "C1 Referrals and re-referrals to children's social care services by local authority, England 2013 to 2021",
+    name: "C1 Referrals and re-referrals to children's social care services by local authority, England 2013 to 2021",
     content:
       "<p>Referrals to children's social care services, referrals &nbsp;within 12 months of a previous referral, referrals which resulted in no further action and referrals which were assessed and resulted in no further action.</p>",
     timePeriods: {
@@ -331,8 +304,7 @@ export const subjects: Subject[] = [
       extension: 'csv',
       fileName:
         'c1_children_in_need_referrals_and_rereferrals_2013_to_2021.csv',
-      name:
-        "C1 Referrals and re-referrals to children's social care services by local authority, England 2013 to 2021",
+      name: "C1 Referrals and re-referrals to children's social care services by local authority, England 2013 to 2021",
       size: '267 Kb',
       type: 'Data',
       created: '2021-10-11T07:54:02.0817658Z',
@@ -342,8 +314,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '84609c65-55d8-49d7-bc5a-08d98e1873d8',
-    name:
-      'C2 Completed assessments by duration of assessment and local authority, England 2014 to 2021',
+    name: 'C2 Completed assessments by duration of assessment and local authority, England 2014 to 2021',
     content:
       "<p>Assessments completed by children's social care services by duration of assessment.</p>",
     timePeriods: {
@@ -355,8 +326,7 @@ export const subjects: Subject[] = [
       id: 'fb9d65f7-41a8-47a2-4198-08d98e1873fd',
       extension: 'csv',
       fileName: 'c2_children_in_need_assessments_duration_2014_to_2021.csv',
-      name:
-        'C2 Completed assessments by duration of assessment and local authority, England 2014 to 2021',
+      name: 'C2 Completed assessments by duration of assessment and local authority, England 2014 to 2021',
       size: '229 Kb',
       type: 'Data',
       created: '2021-10-13T09:08:47.3790075Z',
@@ -366,8 +336,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '74eb4c5b-b276-4d28-f2c7-08d99857c8b0',
-    name:
-      'C3 Factors identified at the end of assessment by local authority, England 2018 to 2021',
+    name: 'C3 Factors identified at the end of assessment by local authority, England 2018 to 2021',
     content: '<p>Factors identified at the end of assessment.</p>',
     timePeriods: {
       from: '2018',
@@ -379,8 +348,7 @@ export const subjects: Subject[] = [
       extension: 'csv',
       fileName:
         'c3_children_in_need_factors_identified_at_end_of_assessment_2018_to_2021.csv',
-      name:
-        'C3 Factors identified at the end of assessment by local authority, England 2018 to 2021',
+      name: 'C3 Factors identified at the end of assessment by local authority, England 2018 to 2021',
       size: '180 Kb',
       type: 'Data',
       created: '2021-10-26T12:07:38.797588Z',
@@ -390,8 +358,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '432a7ff4-e7ef-46a3-bc5c-08d98e1873d8',
-    name:
-      'C4 Section 47s and Initial Child Protection Conferences by local authority, England 2013 to 2021',
+    name: 'C4 Section 47s and Initial Child Protection Conferences by local authority, England 2013 to 2021',
     content:
       '<p>Section 47 enquiries and initial child protection conferences.</p>',
     timePeriods: {
@@ -403,8 +370,7 @@ export const subjects: Subject[] = [
       id: 'cea439fd-07bb-4f8a-419a-08d98e1873fd',
       extension: 'csv',
       fileName: 'c4_children_in_need_section_47s_and_icpcs_2013_to_2021.csv',
-      name:
-        'C4 Section 47s and Initial Child Protection Conferences by local authority, England 2013 to 2021',
+      name: 'C4 Section 47s and Initial Child Protection Conferences by local authority, England 2013 to 2021',
       size: '311 Kb',
       type: 'Data',
       created: '2021-10-13T09:28:55.3417685Z',
@@ -414,8 +380,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '7f16dcfc-6491-40ae-bc58-08d98e1873d8',
-    name:
-      "C5 Referrals to children's social care services by source of referral, England 2014 to 2021",
+    name: "C5 Referrals to children's social care services by source of referral, England 2014 to 2021",
     content:
       "<p>Referrals to children's social care services by source of referral.</p>",
     timePeriods: {
@@ -427,8 +392,7 @@ export const subjects: Subject[] = [
       id: '18dbbfd3-7f22-4889-4196-08d98e1873fd',
       extension: 'csv',
       fileName: 'c5_children_in_need_referrals_by_source_2014_to_2021.csv',
-      name:
-        "C5 Referrals to children's social care services by source of referral, England 2014 to 2021",
+      name: "C5 Referrals to children's social care services by source of referral, England 2014 to 2021",
       size: '214 Kb',
       type: 'Data',
       created: '2021-10-13T08:35:21.2321858Z',
@@ -438,8 +402,7 @@ export const subjects: Subject[] = [
   },
   {
     id: 'd843a8fc-0fc3-4e10-bcec-08d98e1873d8',
-    name:
-      "C6 Referrals to children's social care services by month and local authority, England 2013 to 2021",
+    name: "C6 Referrals to children's social care services by month and local authority, England 2013 to 2021",
     content:
       "<p>Referrals to children's social care services by month of the year.</p>",
     timePeriods: {
@@ -451,8 +414,7 @@ export const subjects: Subject[] = [
       id: '54461f34-10ff-4e4f-422d-08d98e1873fd',
       extension: 'csv',
       fileName: 'c6_children_in_need_referrals_by_month_2013_to_2021.csv',
-      name:
-        "C6 Referrals to children's social care services by month and local authority, England 2013 to 2021",
+      name: "C6 Referrals to children's social care services by month and local authority, England 2013 to 2021",
       size: '250 Kb',
       type: 'Data',
       created: '2021-10-14T15:55:47.6658869Z',
@@ -474,8 +436,7 @@ export const subjects: Subject[] = [
       id: '386431a3-30c2-401e-b206-08d987eb5897',
       extension: 'csv',
       fileName: 'd1_child_protection_plans_2013_to_2021.csv',
-      name:
-        'D1 Child Protection Plans by local authority, England 2013 to 2021',
+      name: 'D1 Child Protection Plans by local authority, England 2013 to 2021',
       size: '271 Kb',
       type: 'Data',
       created: '2021-10-11T08:01:00.6976498Z',
@@ -485,8 +446,7 @@ export const subjects: Subject[] = [
   },
   {
     id: 'b6af0e66-78fc-4a12-bcf2-08d98e1873d8',
-    name:
-      'D2 Child Protection Plans starting in the year by category of abuse and local authority, England 2013 to 2021',
+    name: 'D2 Child Protection Plans starting in the year by category of abuse and local authority, England 2013 to 2021',
     content:
       '<p>Child protection plans starting during the year by initial and latest category of abuse.</p>',
     timePeriods: {
@@ -498,8 +458,7 @@ export const subjects: Subject[] = [
       id: '011e1d7b-8ac5-44f5-4233-08d98e1873fd',
       extension: 'csv',
       fileName: 'd2_cpps_starting_by_category_of_abuse_2013_to_2021.csv',
-      name:
-        'D2 Child Protection Plans starting in the year by category of abuse and local authority, England 2013 to 2021',
+      name: 'D2 Child Protection Plans starting in the year by category of abuse and local authority, England 2013 to 2021',
       size: '289 Kb',
       type: 'Data',
       created: '2021-10-14T16:39:44.5001306Z',
@@ -509,8 +468,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '34c61111-6958-4b47-99c2-08d987eb588f',
-    name:
-      'D3 Child Protection Plans starting during year which were a second or subsequent plan, by local authority, England 2013 to 2021',
+    name: 'D3 Child Protection Plans starting during year which were a second or subsequent plan, by local authority, England 2013 to 2021',
     content:
       '<p>Child protection plans starting in the year and child protection plans which are a second or subsequent plan.</p>',
     timePeriods: {
@@ -522,8 +480,7 @@ export const subjects: Subject[] = [
       id: '0fc24e7b-ffc3-4d96-b208-08d987eb5897',
       extension: 'csv',
       fileName: 'd3_cpps_subsequent_plan_2013_to_2021.csv',
-      name:
-        'D3 Child Protection Plans starting during year which were a second or subsequent plan, by local authority, England 2013 to 2021',
+      name: 'D3 Child Protection Plans starting during year which were a second or subsequent plan, by local authority, England 2013 to 2021',
       size: '252 Kb',
       type: 'Data',
       created: '2021-10-11T08:17:02.0521492Z',
@@ -533,8 +490,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '4ab9b578-8326-4c0e-bcf4-08d98e1873d8',
-    name:
-      'D4 Child Protection Plans at 31 March by category of abuse and local authority, England 2013 to 2021',
+    name: 'D4 Child Protection Plans at 31 March by category of abuse and local authority, England 2013 to 2021',
     content:
       '<p>Children who were the subject of a child protection plan at 31 March by initial and latest category of abuse.</p>',
     timePeriods: {
@@ -546,8 +502,7 @@ export const subjects: Subject[] = [
       id: 'e0f88e9e-7ea7-498b-4235-08d98e1873fd',
       extension: 'csv',
       fileName: 'd4_cpps_at31march_by_category_of_abuse_2013_to_2021.csv',
-      name:
-        'D4 Child Protection Plans at 31 March by category of abuse and local authority, England 2013 to 2021',
+      name: 'D4 Child Protection Plans at 31 March by category of abuse and local authority, England 2013 to 2021',
       size: '287 Kb',
       type: 'Data',
       created: '2021-10-14T16:46:37.3843777Z',
@@ -557,8 +512,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '71a006ac-9c4e-421d-bc8c-08d98e1873d8',
-    name:
-      'D5 Child Protection Plans at 31 March by duration and local authority, England 2013 to 2021',
+    name: 'D5 Child Protection Plans at 31 March by duration and local authority, England 2013 to 2021',
     content:
       '<p>Children who were the subject of a child protection plan at 31 March by duration of the plan.</p>',
     timePeriods: {
@@ -570,8 +524,7 @@ export const subjects: Subject[] = [
       id: 'eea13b62-93eb-4bc1-41cd-08d98e1873fd',
       extension: 'csv',
       fileName: 'd5_cpps_at31march_by_duration_2013_to_2021.csv',
-      name:
-        'D5 Child Protection Plans at 31 March by duration and local authority, England 2013 to 2021',
+      name: 'D5 Child Protection Plans at 31 March by duration and local authority, England 2013 to 2021',
       size: '264 Kb',
       type: 'Data',
       created: '2021-10-13T15:39:18.0125196Z',
@@ -581,8 +534,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '82c7e75b-1317-41a1-bcf6-08d98e1873d8',
-    name:
-      'D6 Child Protection Plans reviewed within timescales by local authority, England 2013 to 2021',
+    name: 'D6 Child Protection Plans reviewed within timescales by local authority, England 2013 to 2021',
     content:
       '<p>Children who were the subject of a child protection plan at 31 March that had been on a plan for at least three months and had reviews carried out within the required timescales.</p>',
     timePeriods: {
@@ -594,8 +546,7 @@ export const subjects: Subject[] = [
       id: 'c27fd5e2-0ead-47c8-4237-08d98e1873fd',
       extension: 'csv',
       fileName: 'd6_cpps_reviewed_within_timescales_2013_to_2021.csv',
-      name:
-        'D6 Child Protection Plans reviewed within timescales by local authority, England 2013 to 2021',
+      name: 'D6 Child Protection Plans reviewed within timescales by local authority, England 2013 to 2021',
       size: '237 Kb',
       type: 'Data',
       created: '2021-10-14T16:51:46.5977166Z',
@@ -605,8 +556,7 @@ export const subjects: Subject[] = [
   },
   {
     id: 'cf86bc9a-9d5c-4fd8-bcf0-08d98e1873d8',
-    name:
-      'D7 Child Protection Plans ending during the year to 31 March by duration and local authority, England 2013 to 2021',
+    name: 'D7 Child Protection Plans ending during the year to 31 March by duration and local authority, England 2013 to 2021',
     content:
       '<p>Child protection plans ending during the year by duration of the plan.</p>',
     timePeriods: {
@@ -618,8 +568,7 @@ export const subjects: Subject[] = [
       id: 'b670a401-9586-42b6-4231-08d98e1873fd',
       extension: 'csv',
       fileName: 'd7_cpps_ending_by_duration_2013_to_2021.csv',
-      name:
-        'D7 Child Protection Plans ending during the year to 31 March by duration and local authority, England 2013 to 2021',
+      name: 'D7 Child Protection Plans ending during the year to 31 March by duration and local authority, England 2013 to 2021',
       size: '276 Kb',
       type: 'Data',
       created: '2021-10-14T16:08:31.3655299Z',
@@ -629,8 +578,7 @@ export const subjects: Subject[] = [
   },
   {
     id: '103bab64-2d9f-44b7-bcf8-08d98e1873d8',
-    name:
-      'D8 Child protection plans ending during the first six months of the year by duration child remained in need and local authority, England 2013 to 2021',
+    name: 'D8 Child protection plans ending during the first six months of the year by duration child remained in need and local authority, England 2013 to 2021',
     content:
       '<p>Child protection plans ending during the first six months of the year by duration of the plan.</p>',
     timePeriods: {
@@ -642,8 +590,7 @@ export const subjects: Subject[] = [
       id: '2a098ea2-1afd-4c5d-4239-08d98e1873fd',
       extension: 'csv',
       fileName: 'd8_cpps_ending_in_first_6months_by_duration_2013_to_2021.csv',
-      name:
-        'D8 Child protection plans ending during the first six months of the year by duration child remained in need and local authority, England 2013 to 2021',
+      name: 'D8 Child protection plans ending during the first six months of the year by duration child remained in need and local authority, England 2013 to 2021',
       size: '296 Kb',
       type: 'Data',
       created: '2021-10-14T16:58:02.1950332Z',

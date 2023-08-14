@@ -179,13 +179,10 @@ describe('ReleaseFootnotesPage', () => {
       });
       userEvent.click(screen.getByRole('button', { name: 'Save order' }));
 
-      expect(
-        footnoteService.updateFootnotesOrder,
-      ).toHaveBeenCalledWith('release-1', [
-        'footnote-1',
-        'footnote-2',
-        'footnote-3',
-      ]);
+      expect(footnoteService.updateFootnotesOrder).toHaveBeenCalledWith(
+        'release-1',
+        ['footnote-1', 'footnote-2', 'footnote-3'],
+      );
     });
   });
 

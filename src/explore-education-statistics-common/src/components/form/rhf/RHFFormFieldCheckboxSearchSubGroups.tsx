@@ -9,7 +9,7 @@ import React, { memo, useCallback } from 'react';
 import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
 export interface RHFFormFieldCheckboxSearchSubGroupsProps<
-  TFormValues extends FieldValues
+  TFormValues extends FieldValues,
 > extends Omit<
     FormCheckboxSearchSubGroupsProps,
     'name' | 'value' | 'inputRef' | 'id'

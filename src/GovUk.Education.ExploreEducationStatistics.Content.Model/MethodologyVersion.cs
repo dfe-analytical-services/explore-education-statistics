@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public enum MethodologyApprovalStatus
     {
         Draft,
+        HigherLevelReview,
         Approved
     }
 

@@ -17,20 +17,17 @@ const ReleaseFootnoteEditPage = ({
 }: RouteComponentProps<ReleaseFootnoteRouteParams>) => {
   const { publicationId, releaseId, footnoteId } = match.params;
 
-  const {
-    value: footnoteMeta,
-    isLoading: isFootnoteMetaLoading,
-  } = useAsyncHandledRetry(() => footnoteService.getFootnoteMeta(releaseId), [
-    releaseId,
-  ]);
+  const { value: footnoteMeta, isLoading: isFootnoteMetaLoading } =
+    useAsyncHandledRetry(
+      () => footnoteService.getFootnoteMeta(releaseId),
+      [releaseId],
+    );
 
-  const {
-    value: footnote,
-    isLoading: isFootnoteLoading,
-  } = useAsyncHandledRetry(
-    () => footnoteService.getFootnote(releaseId, footnoteId),
-    [releaseId, footnoteId],
-  );
+  const { value: footnote, isLoading: isFootnoteLoading } =
+    useAsyncHandledRetry(
+      () => footnoteService.getFootnote(releaseId, footnoteId),
+      [releaseId, footnoteId],
+    );
 
   const footnotesPath = generatePath<ReleaseRouteParams>(
     releaseFootnotesRoute.path,

@@ -21,9 +21,8 @@ const PublicationsTab = ({ isBauUser }: Props) => {
   const location = useLocation();
   const history = useHistory();
 
-  const [savedThemeTopic, setSavedThemeTopic] = useStorageItem<
-    ThemeTopicParams
-  >('dashboardThemeTopic', undefined);
+  const [savedThemeTopic, setSavedThemeTopic] =
+    useStorageItem<ThemeTopicParams>('dashboardThemeTopic', undefined);
 
   const { value: themes, isLoading: loadingThemes } = useAsyncHandledRetry(
     themeService.getThemes,

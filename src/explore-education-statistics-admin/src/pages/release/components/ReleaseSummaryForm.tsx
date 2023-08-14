@@ -42,7 +42,7 @@ interface Props<FormValues extends ReleaseSummaryFormValues> {
 }
 
 const ReleaseSummaryForm = <
-  FormValues extends ReleaseSummaryFormValues = ReleaseSummaryFormValues
+  FormValues extends ReleaseSummaryFormValues = ReleaseSummaryFormValues,
 >({
   additionalFields,
   submitText,

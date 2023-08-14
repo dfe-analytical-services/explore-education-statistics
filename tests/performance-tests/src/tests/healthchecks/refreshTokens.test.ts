@@ -118,8 +118,8 @@ const performTest = () => {
     !check(refreshedTokens2, {
       'response with re-refreshed tokens contained a new accessToken': tokens =>
         tokens.authTokens.accessToken.length > 0,
-      'response with re-refreshed tokens contained a new refreshToken': tokens =>
-        tokens.authTokens.refreshToken.length > 0,
+      'response with re-refreshed tokens contained a new refreshToken':
+        tokens => tokens.authTokens.refreshToken.length > 0,
     })
   ) {
     fail(

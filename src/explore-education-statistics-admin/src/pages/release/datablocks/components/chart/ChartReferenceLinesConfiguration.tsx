@@ -32,7 +32,7 @@ interface AddFormValues {
   otherAxisEnd?: string;
   label: string;
   otherAxisPosition?: number;
-  otherAxisPositionType?: typeof otherAxisPositionTypes[OtherAxisPositionType];
+  otherAxisPositionType?: (typeof otherAxisPositionTypes)[OtherAxisPositionType];
   position: string | number;
   otherAxisStart?: string;
   style: ReferenceLineStyle;
@@ -68,8 +68,8 @@ export default function ChartReferenceLinesConfiguration({
   }, [dataSetCategories]);
 
   const filteredOptions = useMemo<SelectOption[]>(() => {
-    return majorAxisOptions.filter(option =>
-      lines?.every(line => line.position !== option.value),
+    return majorAxisOptions.filter(
+      option => lines?.every(line => line.position !== option.value),
     );
   }, [lines, majorAxisOptions]);
 
@@ -458,11 +458,10 @@ function getOtherAxisPositionLabel({
   }
 
   if (otherAxisEnd && otherAxisStart) {
-    return `${
-      majorAxisOptions.find(option => option.value === otherAxisStart)?.label
-    } - ${
-      majorAxisOptions.find(option => option.value === otherAxisEnd)?.label
-    }`;
+    return `${majorAxisOptions.find(option => option.value === otherAxisStart)
+      ?.label} - ${majorAxisOptions.find(
+      option => option.value === otherAxisEnd,
+    )?.label}`;
   }
 
   return null;

@@ -67,7 +67,8 @@ const PublicationForm = ({
         return { themes };
       }
 
-      const allPublications = await publicationService.getPublicationSummaries();
+      const allPublications =
+        await publicationService.getPublicationSummaries();
       const publications = allPublications.filter(
         publication => publication.id !== publicationId,
       );
@@ -81,9 +82,8 @@ const PublicationForm = ({
 
   const { themes, publications } = value ?? {};
 
-  const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState<boolean>(
-    false,
-  );
+  const [showConfirmSubmitModal, setShowConfirmSubmitModal] =
+    useState<boolean>(false);
 
   const validationSchema = useMemo(() => {
     const schema = Yup.object<FormValues>({

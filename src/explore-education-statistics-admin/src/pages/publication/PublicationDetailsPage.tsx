@@ -13,27 +13,18 @@ import React from 'react';
 
 const PublicationDetailsPage = () => {
   const { publication, onReload } = usePublicationContext();
-  const {
-    id,
-    title,
-    summary,
-    permissions,
-    supersededById,
-    theme,
-    topic,
-  } = publication;
+  const { id, title, summary, permissions, supersededById, theme, topic } =
+    publication;
   const [readOnly, toggleReadOnly] = useToggle(true);
 
-  const {
-    value: supersedingPublication,
-    isLoading,
-  } = useAsyncHandledRetry(async () => {
-    if (!supersededById) {
-      return undefined;
-    }
+  const { value: supersedingPublication, isLoading } =
+    useAsyncHandledRetry(async () => {
+      if (!supersededById) {
+        return undefined;
+      }
 
-    return publicationService.getPublication(supersededById);
-  }, [supersededById]);
+      return publicationService.getPublication(supersededById);
+    }, [supersededById]);
 
   const handleSubmit = async (values: PublicationDetailsFormValues) => {
     await publicationService.updatePublication(publication.id, {

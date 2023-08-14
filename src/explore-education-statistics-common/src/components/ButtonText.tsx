@@ -4,9 +4,8 @@ import classNames from 'classnames';
 import React, { forwardRef, Ref } from 'react';
 
 const ButtonText = (props: ButtonOptions, ref: Ref<HTMLButtonElement>) => {
-  const { className, isDisabled, underline, variant, ...button } = useButton(
-    props,
-  );
+  const { className, isDisabled, underline, variant, ...button } =
+    useButton(props);
 
   return (
     // eslint-disable-next-line react/button-has-type

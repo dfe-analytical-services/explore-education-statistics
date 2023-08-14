@@ -19,9 +19,8 @@ export default function AllFeaturedTables({
 }: Props) {
   const { isMedia: isMobileMedia } = useMobileMedia();
   const [listView, toggleListView] = useToggle(false);
-  const [filteredFeaturedTables, setFilteredFeaturedTables] = useState<
-    FeaturedTable[]
-  >(featuredTables);
+  const [filteredFeaturedTables, setFilteredFeaturedTables] =
+    useState<FeaturedTable[]>(featuredTables);
 
   const handleSearch = (searchTerm: string) => {
     const lowerCaseSearchTerm = searchTerm.toLowerCase();

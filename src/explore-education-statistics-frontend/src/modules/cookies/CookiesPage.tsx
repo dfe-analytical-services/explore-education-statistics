@@ -27,9 +27,8 @@ function CookiesPage({ cookies }: Props) {
   const [submitted, setSubmitted] = useState(false);
   const { back } = useRouter();
 
-  const { getCookie, setBannerSeenCookie, setGADisabledCookie } = useCookies(
-    cookies,
-  );
+  const { getCookie, setBannerSeenCookie, setGADisabledCookie } =
+    useCookies(cookies);
 
   const { isMounted } = useMounted();
 

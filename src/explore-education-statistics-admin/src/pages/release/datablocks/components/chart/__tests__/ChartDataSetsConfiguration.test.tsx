@@ -356,9 +356,8 @@ describe('ChartDataSetsConfiguration', () => {
       const characteristic = screen.getByLabelText('Characteristic');
       expect(characteristic).toBeInTheDocument();
 
-      const characteristicOptions = within(characteristic).getAllByRole(
-        'option',
-      );
+      const characteristicOptions =
+        within(characteristic).getAllByRole('option');
       expect(characteristicOptions).toHaveLength(3);
       expect(characteristicOptions[0]).toHaveTextContent('All options');
       expect(characteristicOptions[1]).toHaveTextContent('Male');

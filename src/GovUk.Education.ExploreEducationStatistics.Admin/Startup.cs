@@ -515,7 +515,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
                     publishingService: provider.GetRequiredService<IPublishingService>(),
                     userService: provider.GetRequiredService<IUserService>(),
-                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>()));
+                    userReleaseRoleService: provider.GetRequiredService<IUserReleaseRoleService>(),
+                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                    emailTemplateService: provider.GetRequiredService<IEmailTemplateService>()));
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();

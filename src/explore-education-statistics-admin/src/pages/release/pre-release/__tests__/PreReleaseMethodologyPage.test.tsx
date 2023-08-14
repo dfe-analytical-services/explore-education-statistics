@@ -174,9 +174,8 @@ describe('PreReleaseMethodologyPage', () => {
     });
 
     const contentAccordion = screen.getAllByTestId('accordion')[0];
-    const contentAccordionSections = within(contentAccordion).getAllByTestId(
-      'accordionSection',
-    );
+    const contentAccordionSections =
+      within(contentAccordion).getAllByTestId('accordionSection');
 
     expect(contentAccordionSections).toHaveLength(2);
 
@@ -216,9 +215,8 @@ describe('PreReleaseMethodologyPage', () => {
     });
 
     const annexAccordion = screen.getAllByTestId('accordion')[1];
-    const annexAccordionSections = within(annexAccordion).getAllByTestId(
-      'accordionSection',
-    );
+    const annexAccordionSections =
+      within(annexAccordion).getAllByTestId('accordionSection');
 
     expect(
       screen.getByRole('heading', { name: 'Annexes' }),

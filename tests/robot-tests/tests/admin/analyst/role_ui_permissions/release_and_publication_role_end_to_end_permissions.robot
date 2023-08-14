@@ -40,7 +40,14 @@ Check publication owner can update methodology summary
     ...    ${PUBLICATION_NAME} - Updated methodology
 
 Check publication owner cannot approve methodology for publication
-    user cannot see the edit status controls for methodology
+    user clicks link    Sign off
+    user waits until page does not contain loading spinner
+    user clicks button    Edit status
+
+    user waits until h2 is visible    Edit methodology status
+    user checks element is enabled    id:methodologyStatusForm-status-Draft
+    user checks element is enabled    id:methodologyStatusForm-status-HigherLevelReview
+    user checks element is disabled    id:methodologyStatusForm-status-Approved
 
 Check publication owner can upload subject file
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
@@ -153,7 +160,19 @@ Swap the publication owner role for release approver to test approving the metho
 Check release approver can approve methodology for publication
     user changes to analyst1
     user navigates to methodology    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} - Updated methodology
-    approve methodology from methodology view
+
+    user clicks link    Sign off
+    user waits until page does not contain loading spinner
+    user clicks button    Edit status
+
+    user waits until h2 is visible    Edit methodology status
+    user checks element is enabled    id:methodologyStatusForm-status-Draft
+    user checks element is enabled    id:methodologyStatusForm-status-HigherLevelReview
+    user checks element is enabled    id:methodologyStatusForm-status-Approved
+
+    user clicks button    Cancel
+    user waits until h2 is not visible    Edit methodology status
+    user changes methodology status to Approved
 
 Swap the release approver role for publication owner to test removing the approved methodology
     user changes to bau1

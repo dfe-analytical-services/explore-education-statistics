@@ -49,12 +49,10 @@ const DataFileReplacementPlan = ({
 }: Props) => {
   const [isSubmitting, toggleSubmitting] = useToggle(false);
 
-  const [deleteDataBlock, setDeleteDataBlock] = useState<
-    DataBlockReplacementPlan
-  >();
-  const [deleteFootnote, setDeleteFootnote] = useState<
-    FootnoteReplacementPlan
-  >();
+  const [deleteDataBlock, setDeleteDataBlock] =
+    useState<DataBlockReplacementPlan>();
+  const [deleteFootnote, setDeleteFootnote] =
+    useState<FootnoteReplacementPlan>();
 
   const isMounted = useMountedRef();
 

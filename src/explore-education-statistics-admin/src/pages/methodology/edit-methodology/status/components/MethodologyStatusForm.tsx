@@ -14,6 +14,7 @@ import Yup from '@common/validation/yup';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import { Formik } from 'formik';
 import React from 'react';
+import { MethodologyStatusPermissions } from '@admin/services/permissionService';
 
 export interface FormValues {
   status: MethodologyApprovalStatus;
@@ -25,6 +26,7 @@ export interface FormValues {
 interface Props {
   isPublished?: string;
   methodology: MethodologyVersion;
+  statusPermissions?: MethodologyStatusPermissions;
   unpublishedReleases: IdTitlePair[];
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
@@ -33,6 +35,7 @@ interface Props {
 const MethodologyStatusForm = ({
   isPublished,
   methodology,
+  statusPermissions,
   unpublishedReleases,
   onCancel,
   onSubmit,
@@ -78,22 +81,27 @@ const MethodologyStatusForm = ({
                 {
                   label: 'In draft',
                   value: 'Draft',
+                  disabled: !statusPermissions?.canMarkDraft,
+                },
+                {
+                  label: 'Ready for higher review (this will notify approvers)',
+                  value: 'HigherLevelReview',
+                  disabled: !statusPermissions?.canMarkHigherLevelReview,
                 },
                 {
                   label: 'Approved for publication',
                   value: 'Approved',
-                  conditional: (
-                    <FormFieldTextArea<FormValues>
-                      name="latestInternalReleaseNote"
-                      className="govuk-!-width-one-half"
-                      label="Internal note"
-                      hint="Please include any relevant information"
-                      rows={2}
-                    />
-                  ),
+                  disabled: !statusPermissions?.canMarkApproved,
                 },
               ]}
               order={[]}
+            />
+            <FormFieldTextArea<FormValues>
+              name="latestInternalReleaseNote"
+              className="govuk-!-width-one-half"
+              label="Internal note"
+              hint="Please include any relevant information"
+              rows={2}
             />
             {form.values.status === 'Approved' && (
               <FormFieldRadioGroup<FormValues>

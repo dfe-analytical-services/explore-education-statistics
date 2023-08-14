@@ -201,46 +201,45 @@ const PrototypeTableToolWizard = ({
     });
   };
 
-  const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
-    locationIds,
-  }) => {
-    // const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-    //   locationIds,
-    //   subjectId: state.query.subjectId,
-    // });
-    const nextSubjectMeta = timePeriodSubjectMeta;
+  const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler =
+    async ({ locationIds }) => {
+      // const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+      //   locationIds,
+      //   subjectId: state.query.subjectId,
+      // });
+      const nextSubjectMeta = timePeriodSubjectMeta;
 
-    const { timePeriod } = state.query;
+      const { timePeriod } = state.query;
 
-    // Check if selected time period is in the time period options so can reset it if not.
-    const hasStartTimePeriod = nextSubjectMeta.timePeriod.options.some(
-      option =>
-        option.code === timePeriod?.startCode &&
-        option.year === timePeriod.startYear,
-    );
-    const hasEndTimePeriod = nextSubjectMeta.timePeriod.options.some(
-      option =>
-        option.code === timePeriod?.endCode &&
-        option.year === timePeriod.endYear,
-    );
+      // Check if selected time period is in the time period options so can reset it if not.
+      const hasStartTimePeriod = nextSubjectMeta.timePeriod.options.some(
+        option =>
+          option.code === timePeriod?.startCode &&
+          option.year === timePeriod.startYear,
+      );
+      const hasEndTimePeriod = nextSubjectMeta.timePeriod.options.some(
+        option =>
+          option.code === timePeriod?.endCode &&
+          option.year === timePeriod.endYear,
+      );
 
-    updateState(draft => {
-      draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
+      updateState(draft => {
+        draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
-      draft.query.locationIds = locationIds;
+        draft.query.locationIds = locationIds;
 
-      if (timePeriod && hasStartTimePeriod && hasEndTimePeriod) {
-        draft.query.timePeriod = {
-          startYear: hasStartTimePeriod ? timePeriod.startYear : 0,
-          startCode: hasStartTimePeriod ? timePeriod.startCode : '',
-          endYear: hasEndTimePeriod ? timePeriod.endYear : 0,
-          endCode: hasEndTimePeriod ? timePeriod.endCode : '',
-        };
-      } else {
-        draft.query.timePeriod = undefined;
-      }
-    });
-  };
+        if (timePeriod && hasStartTimePeriod && hasEndTimePeriod) {
+          draft.query.timePeriod = {
+            startYear: hasStartTimePeriod ? timePeriod.startYear : 0,
+            startCode: hasStartTimePeriod ? timePeriod.startCode : '',
+            endYear: hasEndTimePeriod ? timePeriod.endYear : 0,
+            endCode: hasEndTimePeriod ? timePeriod.endCode : '',
+          };
+        } else {
+          draft.query.timePeriod = undefined;
+        }
+      });
+    };
 
   const handleTimePeriodStepBack = async () => {
     // const { subjectId, locationIds } = state.query;
@@ -256,56 +255,57 @@ const PrototypeTableToolWizard = ({
     });
   };
 
-  const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
-    const [startYear, startCode] = parseYearCodeTuple(values.start);
-    const [endYear, endCode] = parseYearCodeTuple(values.end);
+  const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler =
+    async values => {
+      const [startYear, startCode] = parseYearCodeTuple(values.start);
+      const [endYear, endCode] = parseYearCodeTuple(values.end);
 
-    // const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-    //   locationIds: state.query.locationIds,
-    //   subjectId: state.query.subjectId,
-    //   timePeriod: {
-    //     startYear,
-    //     startCode,
-    //     endYear,
-    //     endCode,
-    //   },
-    // });
+      // const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+      //   locationIds: state.query.locationIds,
+      //   subjectId: state.query.subjectId,
+      //   timePeriod: {
+      //     startYear,
+      //     startCode,
+      //     endYear,
+      //     endCode,
+      //   },
+      // });
 
-    const nextSubjectMeta = filtersAndIndicatorsSubjectMeta;
+      const nextSubjectMeta = filtersAndIndicatorsSubjectMeta;
 
-    const indicatorValues = new Set(
-      Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
-        indicator.options.map(option => option.value),
-      ),
-    );
-    const filteredIndicators = state.query.indicators.filter(indicator =>
-      indicatorValues.has(indicator),
-    );
-
-    const filterValues = new Set(
-      Object.values(nextSubjectMeta.filters).flatMap(filterGroup =>
-        Object.values(filterGroup.options).flatMap(filter =>
-          filter.options.map(option => option.value),
+      const indicatorValues = new Set(
+        Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
+          indicator.options.map(option => option.value),
         ),
-      ),
-    );
-    const filteredFilters = state.query.filters.filter(filter =>
-      filterValues.has(filter),
-    );
+      );
+      const filteredIndicators = state.query.indicators.filter(indicator =>
+        indicatorValues.has(indicator),
+      );
 
-    updateState(draft => {
-      draft.subjectMeta.indicators = nextSubjectMeta.indicators;
-      draft.subjectMeta.filters = nextSubjectMeta.filters;
-      draft.query.indicators = filteredIndicators;
-      draft.query.filters = filteredFilters;
-      draft.query.timePeriod = {
-        startYear,
-        startCode,
-        endYear,
-        endCode,
-      };
-    });
-  };
+      const filterValues = new Set(
+        Object.values(nextSubjectMeta.filters).flatMap(filterGroup =>
+          Object.values(filterGroup.options).flatMap(filter =>
+            filter.options.map(option => option.value),
+          ),
+        ),
+      );
+      const filteredFilters = state.query.filters.filter(filter =>
+        filterValues.has(filter),
+      );
+
+      updateState(draft => {
+        draft.subjectMeta.indicators = nextSubjectMeta.indicators;
+        draft.subjectMeta.filters = nextSubjectMeta.filters;
+        draft.query.indicators = filteredIndicators;
+        draft.query.filters = filteredFilters;
+        draft.query.timePeriod = {
+          startYear,
+          startCode,
+          endYear,
+          endCode,
+        };
+      });
+    };
 
   const handleFiltersStepBack = async () => {
     // const { subjectId, locationIds, timePeriod } = state.query;

@@ -17,10 +17,8 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const { editingMode } = useEditingContext();
 
-  const {
-    attachContentSectionBlock,
-    deleteContentSectionBlock,
-  } = useReleaseContentActions();
+  const { attachContentSectionBlock, deleteContentSectionBlock } =
+    useReleaseContentActions();
 
   if (editingMode !== 'edit') {
     return null;

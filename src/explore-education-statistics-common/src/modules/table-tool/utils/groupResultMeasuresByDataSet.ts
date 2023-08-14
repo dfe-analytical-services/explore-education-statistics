@@ -34,13 +34,8 @@ export default function groupResultMeasuresByDataSet(
   results: TableDataResult[],
 ): MeasuresGroupedByDataSet {
   return results.reduce<MeasuresGroupedByDataSet>((acc, result) => {
-    const {
-      geographicLevel,
-      filters,
-      timePeriod,
-      locationId,
-      measures,
-    } = result;
+    const { geographicLevel, filters, timePeriod, locationId, measures } =
+      result;
 
     const path = getIndicatorPath({
       filters,

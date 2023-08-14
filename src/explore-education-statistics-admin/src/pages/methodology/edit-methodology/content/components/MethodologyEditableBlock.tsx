@@ -28,10 +28,8 @@ const MethodologyEditableBlock = ({
 
   const [isEditing, toggleEditing] = useToggle(false);
 
-  const {
-    handleImageUpload,
-    handleImageUploadCancel,
-  } = useMethodologyImageUpload(methodologyId);
+  const { handleImageUpload, handleImageUploadCancel } =
+    useMethodologyImageUpload(methodologyId);
 
   const transformImageAttributes = useMethodologyImageAttributeTransformer({
     methodologyId,

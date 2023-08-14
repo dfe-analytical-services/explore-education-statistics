@@ -21,19 +21,18 @@ const PreReleaseMethodologyPage = ({
 }: RouteComponentProps<PreReleaseMethodologyRouteParams>) => {
   const { methodologyId, publicationId, releaseId } = match.params;
 
-  const { value, isLoading } = useAsyncHandledRetry<
-    MethodologyContextState
-  >(async () => {
-    const methodology = await methodologyContentService.getMethodologyContent(
-      methodologyId,
-    );
+  const { value, isLoading } =
+    useAsyncHandledRetry<MethodologyContextState>(async () => {
+      const methodology = await methodologyContentService.getMethodologyContent(
+        methodologyId,
+      );
 
-    return {
-      methodology,
-      canUpdateMethodology: false,
-      isPreRelease: true,
-    };
-  }, [methodologyId]);
+      return {
+        methodology,
+        canUpdateMethodology: false,
+        isPreRelease: true,
+      };
+    }, [methodologyId]);
 
   return (
     <div className="govuk-width-container">

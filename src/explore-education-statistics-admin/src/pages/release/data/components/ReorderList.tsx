@@ -44,8 +44,8 @@ const getChildItems = (
     | FormattedOption
     | FormattedIndicators,
 ): {
-  childOptions: (FormattedOption | FormattedGroup)[] | undefined;
-  parentGroupId?: string | undefined;
+  childOptions?: (FormattedOption | FormattedGroup)[];
+  parentGroupId?: string;
 } => {
   if ('groups' in option && option.groups.length > 1) {
     return { childOptions: option.groups };

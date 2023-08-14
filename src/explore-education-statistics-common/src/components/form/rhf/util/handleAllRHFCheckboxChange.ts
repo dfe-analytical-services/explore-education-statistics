@@ -19,7 +19,7 @@ interface Props<TFormValues extends FieldValues> {
 }
 
 export default function handleAllRHFCheckboxChange<
-  TFormValues extends FieldValues
+  TFormValues extends FieldValues,
 >({
   checked,
   name,

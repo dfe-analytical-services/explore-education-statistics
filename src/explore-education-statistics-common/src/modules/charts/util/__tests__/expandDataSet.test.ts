@@ -125,9 +125,9 @@ describe('expandDataSet', () => {
       },
     };
 
-    expect(expandDataSet(dataSet, testFullTable.subjectMeta)).toEqual<
-      ExpandedDataSet
-    >({
+    expect(
+      expandDataSet(dataSet, testFullTable.subjectMeta),
+    ).toEqual<ExpandedDataSet>({
       filters: [
         new CategoryFilter({
           label: 'Ethnicity Major Asian Total',

@@ -23,7 +23,7 @@ export default function useReleasePublishingStatus({
   refreshPeriod = 10000,
   releaseId,
 }: Options): {
-  currentStatus: ReleaseStageStatuses | undefined;
+  currentStatus?: ReleaseStageStatuses;
   currentStatusDetail: StatusDetail;
 } {
   const [currentStatus, setCurrentStatus] = useState<ReleaseStageStatuses>();

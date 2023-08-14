@@ -36,7 +36,9 @@
   &[aria-pressed='true'] {
     background-color: govuk-colour('light-blue');
     border-color: transparent;
-    box-shadow: 0 0, 0 4px $govuk-focus-text-colour;
+    box-shadow:
+      0 0,
+      0 4px $govuk-focus-text-colour;
     color: #fff;
   }
 

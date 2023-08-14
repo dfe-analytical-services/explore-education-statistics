@@ -37,9 +37,8 @@ export default function FeaturedTablesTable({
   onSaveOrder,
 }: Props) {
   const [isReordering, toggleIsReordering] = useToggle(false);
-  const [currentFeaturedTables, setCurrentFeaturedTables] = useState(
-    featuredTables,
-  );
+  const [currentFeaturedTables, setCurrentFeaturedTables] =
+    useState(featuredTables);
 
   useEffect(() => {
     setCurrentFeaturedTables(featuredTables);

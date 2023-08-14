@@ -26,10 +26,7 @@ const ReleaseDataFilePage = ({
     params: { publicationId, releaseId, fileId },
   },
 }: RouteComponentProps<ReleaseDataFileRouteParams>) => {
-  const {
-    value: dataFile,
-    isLoading: dataFileLoading,
-  } = useAsyncHandledRetry(
+  const { value: dataFile, isLoading: dataFileLoading } = useAsyncHandledRetry(
     () => releaseDataFileService.getDataFile(releaseId, fileId),
     [releaseId, fileId],
   );

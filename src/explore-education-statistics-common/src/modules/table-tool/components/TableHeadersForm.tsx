@@ -107,7 +107,8 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
       return;
     }
 
-    const destinationId = destination.droppableId as keyof TableHeadersFormValues;
+    const destinationId =
+      destination.droppableId as keyof TableHeadersFormValues;
     const sourceId = source.droppableId as keyof TableHeadersFormValues;
 
     // Moving group within its axis

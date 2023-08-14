@@ -111,24 +111,21 @@ const ReleaseContentPage = ({
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { releaseId } = match.params;
 
-  const { value, isLoading } = useAsyncRetry<
-    ReleaseContentContextState
-  >(async () => {
-    const {
-      release,
-      unattachedDataBlocks,
-    } = await releaseContentService.getContent(releaseId);
+  const { value, isLoading } =
+    useAsyncRetry<ReleaseContentContextState>(async () => {
+      const { release, unattachedDataBlocks } =
+        await releaseContentService.getContent(releaseId);
 
-    const canUpdateRelease = await permissionService.canUpdateRelease(
-      releaseId,
-    );
+      const canUpdateRelease = await permissionService.canUpdateRelease(
+        releaseId,
+      );
 
-    return {
-      release,
-      unattachedDataBlocks,
-      canUpdateRelease,
-    };
-  }, [releaseId]);
+      return {
+        release,
+        unattachedDataBlocks,
+        canUpdateRelease,
+      };
+    }, [releaseId]);
 
   return (
     <LoadingSpinner loading={isLoading}>

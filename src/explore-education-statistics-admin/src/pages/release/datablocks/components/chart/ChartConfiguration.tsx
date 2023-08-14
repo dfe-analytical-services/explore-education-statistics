@@ -79,11 +79,8 @@ const ChartConfiguration = ({
   onChange,
   onSubmit,
 }: Props) => {
-  const {
-    hasSubmitted,
-    updateForm,
-    submitForms,
-  } = useChartBuilderFormsContext();
+  const { hasSubmitted, updateForm, submitForms } =
+    useChartBuilderFormsContext();
 
   const dataLabelPositionOptions = useMemo(() => {
     const options =

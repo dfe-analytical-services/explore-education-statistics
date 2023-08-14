@@ -30,15 +30,18 @@ const PreReleaseMethodologiesPage = ({
   const { publicationId, releaseId } = match.params;
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [externalMethodology, methodologyVersions] = await Promise.all([
+    const [externalMethodology, latestMethodologyVersions] = await Promise.all([
       publicationService.getExternalMethodology(publicationId),
-      methodologyService.listMethodologyVersions(publicationId),
+      methodologyService.listLatestMethodologyVersions(publicationId),
     ]);
 
     return {
       externalMethodology,
-      methodologyVersions: methodologyVersions.filter(
-        methodology => methodology.status !== 'Draft' || methodology.amendment,
+      methodologyVersions: latestMethodologyVersions.filter(
+        // Include amendments as previous version may be published and available for prerelease
+        methodologyVersion =>
+          methodologyVersion.status === 'Approved' ||
+          methodologyVersion.amendment,
       ),
     };
   }, [publicationId]);
@@ -63,7 +66,10 @@ const PreReleaseMethodologiesPage = ({
                           publicationId,
                           releaseId,
                           methodologyId:
-                            methodology.status === 'Draft' &&
+                            // If latest methodology version is unapproved, it will
+                            // be an unpublished amendment. So we link to previous
+                            // version which will be published
+                            methodology.status !== 'Approved' &&
                             methodology.previousVersionId
                               ? methodology.previousVersionId
                               : methodology.id,
@@ -78,9 +84,13 @@ const PreReleaseMethodologiesPage = ({
                       {methodology.status === 'Approved' &&
                         !methodology.published && <Tag>Approved</Tag>}
 
-                      {((methodology.amendment &&
-                        methodology.status === 'Draft') ||
-                        methodology.published) && <Tag>Published</Tag>}
+                      {
+                        // If latest version is unapproved amendment,
+                        // we link to previous version above, and that will be published
+                        ((methodology.amendment &&
+                          methodology.status !== 'Approved') ||
+                          methodology.published) && <Tag>Published</Tag>
+                      }
 
                       {methodology.amendment &&
                         methodology.status === 'Approved' && (

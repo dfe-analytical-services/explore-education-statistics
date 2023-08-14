@@ -123,8 +123,7 @@ describe('EditableEmbedBlock', () => {
         order: 0,
         title: 'Dashboard title-edited',
         type: 'EmbedBlockLink',
-        url:
-          'https://department-for-education.shinyapps.io/test-dashboard-edited',
+        url: 'https://department-for-education.shinyapps.io/test-dashboard-edited',
       });
     });
   });

@@ -169,8 +169,7 @@ export default function ChartDataGroupingForm({
           {
             label: 'Quantiles',
             value: 'Quantiles',
-            hint:
-              'Data is grouped so that each group has a similar number of data points.',
+            hint: 'Data is grouped so that each group has a similar number of data points.',
             conditional: (
               <FormFieldNumberInput<FormValues>
                 name="numberOfGroupsQuantiles"

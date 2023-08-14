@@ -60,6 +60,8 @@ public static class PermissionsUtils
                 await userService.CheckCanUpdateMethodologyVersion(methodologyVersion).IsRight(),
             CanApproveMethodology =
                 await userService.CheckCanApproveMethodologyVersion(methodologyVersion).IsRight(),
+            CanSubmitMethodologyForHigherReview =
+                await userService.CheckCanSubmitMethodologyForHigherReview(methodologyVersion).IsRight(),
             CanMarkMethodologyAsDraft =
                 await userService.CheckCanMarkMethodologyVersionAsDraft(methodologyVersion).IsRight(),
             CanMakeAmendmentOfMethodology =

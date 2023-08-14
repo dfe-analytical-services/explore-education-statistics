@@ -166,26 +166,29 @@ export const testTableWithMissingTimePeriod: FullTable = {
   },
 };
 
-export const testTableWithOneLevelOfRowAndColHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [indicator1],
-  rowGroups: [[location1, location2]],
-};
+export const testTableWithOneLevelOfRowAndColHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [indicator1],
+    rowGroups: [[location1, location2]],
+  };
 
-export const testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1],
-  columnGroups: [],
-  rows: [location1, location2],
-  rowGroups: [[indicator1]],
-};
+export const testTableWithTwoLevelsOfRowAndOneLevelOfColHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1],
+    columnGroups: [],
+    rows: [location1, location2],
+    rowGroups: [[indicator1]],
+  };
 
-export const testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig: TableHeadersConfig = {
-  columns: [location1, location2],
-  columnGroups: [[timePeriod1]],
-  rows: [indicator1],
-  rowGroups: [],
-};
+export const testTableWithOneLevelOfRowsAndTwoLevelsOfColHeadersConfig: TableHeadersConfig =
+  {
+    columns: [location1, location2],
+    columnGroups: [[timePeriod1]],
+    rows: [indicator1],
+    rowGroups: [],
+  };
 
 export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
   subjectMeta: testSubjectMeta1,
@@ -273,12 +276,13 @@ export const testTableWithTwoLevelsOfRowAndColHeaders: FullTable = {
   ],
 };
 
-export const testTableWithTwoLevelsOfRowAndColHeadersConfig: TableHeadersConfig = {
-  columnGroups: [[location1, location2]],
-  rowGroups: [[category2GroupDefaultFilter1, category2GroupDefaultFilter2]],
-  columns: [timePeriod1, timePeriod2],
-  rows: [indicator1, indicator2],
-};
+export const testTableWithTwoLevelsOfRowAndColHeadersConfig: TableHeadersConfig =
+  {
+    columnGroups: [[location1, location2]],
+    rowGroups: [[category2GroupDefaultFilter1, category2GroupDefaultFilter2]],
+    columns: [timePeriod1, timePeriod2],
+    rows: [indicator1, indicator2],
+  };
 
 export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
   subjectMeta: {
@@ -623,12 +627,13 @@ export const testTableWithThreeLevelsOfRowAndColHeaders: FullTable = {
   ],
 };
 
-export const testTableWithThreeLevelsOfRowAndColHeadersConfig: TableHeadersConfig = {
-  columns: [timePeriod1, timePeriod2],
-  columnGroups: [
-    [category2GroupDefaultFilter1, category2GroupDefaultFilter2],
-    [category1Group1Filter2, category1Group1Filter3],
-  ],
-  rows: [indicator1, indicator2],
-  rowGroups: [[location1, location2, location3, location4]],
-};
+export const testTableWithThreeLevelsOfRowAndColHeadersConfig: TableHeadersConfig =
+  {
+    columns: [timePeriod1, timePeriod2],
+    columnGroups: [
+      [category2GroupDefaultFilter1, category2GroupDefaultFilter2],
+      [category1Group1Filter2, category1Group1Filter3],
+    ],
+    rows: [indicator1, indicator2],
+    rowGroups: [[location1, location2, location3, location4]],
+  };

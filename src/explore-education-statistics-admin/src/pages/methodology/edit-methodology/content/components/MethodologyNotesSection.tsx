@@ -34,9 +34,8 @@ interface EditFormValues {
 const MethodologyNotesSection = ({ methodology }: Props) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
-  const [deletedMethodologyNoteId, setDeletedMethodologyNoteId] = useState<
-    string
-  >('');
+  const [deletedMethodologyNoteId, setDeletedMethodologyNoteId] =
+    useState<string>('');
   const [selectedMethodologyNote, setSelectedMethodologyNote] = useState<
     MethodologyNote | undefined
   >();
