@@ -1,5 +1,8 @@
 import csv
+import sys
 from enum import Enum
+
+csv.field_size_limit(sys.maxsize)
 
 releases_by_url = {}
 
@@ -26,7 +29,6 @@ class DataBlockRow:
         min_content_section_position,
         content_block_position,
         min_content_block_position,
-        highlight_name,
         subject_id,
         chart_title,
         chart_type,
@@ -35,7 +37,6 @@ class DataBlockRow:
         self.chart_type = chart_type
         self.chart_title = chart_title
         self.subject_id = subject_id.lower()
-        self.highlight_name = highlight_name
         self.content_section_type = content_section_type
         self.content_section_position = (
             int(content_section_position) + 1 - int(min_content_section_position)
@@ -55,7 +56,6 @@ class DataBlockRow:
         self.content_section_heading = content_section_heading
         self.has_table_config = True
         self.has_chart_config = chart_type is not None
-
         if self.content_section_type is None:
             self.type = DataBlockType.FAST_TRACK
         elif self.content_section_type == "KeyStatisticsSecondary":
@@ -132,7 +132,6 @@ def generate_releases(data_blocks_csv_filepath):
                     read_cell(row[12]),
                     read_cell(row[13]),
                     read_cell(row[14]),
-                    read_cell(row[15]),
                 )
             )
 

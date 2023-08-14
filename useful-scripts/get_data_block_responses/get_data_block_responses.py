@@ -18,6 +18,7 @@ FROM ContentBlock
 JOIN ReleaseContentBlocks ON ContentBlock.Id = ReleaseContentBlocks.ContentBlockId
 JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
 LEFT JOIN KeyStatisticsDataBlock ON ContentBlock.Id = KeyStatisticsDataBlock.DataBlockId
+LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
 WHERE ContentBlock.Type = 'DataBlock'
   AND Releases.Published IS NOT NULL
   AND Releases.SoftDeleted = 0
@@ -27,8 +28,8 @@ WHERE ContentBlock.Type = 'DataBlock'
     -- Include DataBlocks that are Key Statistics
     OR KeyStatisticsDataBlock.DataBlockId IS NOT NULL
     -- Include DataBlocks that are Featured Tables
-    OR (DataBlock_HighlightName IS NOT NULL
-        AND DataBlock_HighlightName <> ''))
+    OR FeaturedTables.DataBlockId IS NOT NULL
+    )
   -- Include only DataBlocks that are from the latest published Release
   AND NOT EXISTS(
     SELECT 1
@@ -161,7 +162,7 @@ for datablock in datablocks:
     block_id = datablock[0]
     release_id = datablock[1]
     subject_id = datablock[2]
-    query_dict = json.loads(datablock[3])
+    query_dict = json.loads(datablock[3])  # TODO Wrap in try/catch so can see line in CSV that it fails on?
 
     if args.stage == "table":
         url = f"{data_api_url}/tablebuilder/release/{release_id}"
