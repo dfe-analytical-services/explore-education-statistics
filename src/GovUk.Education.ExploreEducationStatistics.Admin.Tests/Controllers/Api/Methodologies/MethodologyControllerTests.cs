@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -245,15 +246,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             result.AssertNoContent();
         }
 
+        [Fact]
+        public async void ListMethodologyVersionsForApproval()
+        {
+            var userId = Guid.NewGuid();
+            var methodologyVersions = ListOf(new MethodologyVersionViewModel
+            {
+                Id = Guid.NewGuid()
+            });
+            
+            var userService = new Mock<IUserService>(Strict);
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+
+            userService
+                .Setup(s => s.GetUserId())
+                .Returns(userId);
+            
+            methodologyService
+                .Setup(s => s.ListMethodologyVersionsForApproval(userId))
+                .ReturnsAsync(methodologyVersions);
+
+            var controller = SetupMethodologyController(
+                methodologyService.Object,
+                userService: userService.Object);
+
+            var result = await controller.ListMethodologyVersionsForApproval();
+            VerifyAllMocks(userService, methodologyService);
+
+            result.AssertOkResult(methodologyVersions);
+        }
+
         private static MethodologyController SetupMethodologyController(
             IMethodologyService? methodologyService = null,
-            IMethodologyAmendmentService? methodologyAmendmentService = null
-        )
+            IMethodologyAmendmentService? methodologyAmendmentService = null,
+            IUserService? userService = null)
         {
             return new(
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict)
-            );
+                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict),
+                userService ?? Mock.Of<IUserService>(Strict));
         }
     }
 }
