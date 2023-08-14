@@ -443,6 +443,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesForApproval(Guid userId)
+        {
+            var directReleasesWithApprovalRole = await _context
+                .UserReleaseRoles
+                .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
+                .Select(role => role.ReleaseId)
+                .ToListAsync();
+            
+            var indirectReleasesWithApprovalRole = await _context
+                .UserPublicationRoles
+                .Include(role => role.Publication)
+                .ThenInclude(publication => publication.Releases)
+                .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
+                .Select(role => role.Publication)
+                .SelectMany(publication => publication.Releases.Select(release => release.Id))
+                .ToListAsync();
+
+            var releaseIdsForApproval = directReleasesWithApprovalRole
+                .Concat(indirectReleasesWithApprovalRole)
+                .Distinct();
+
+            var releasesForApproval = await _context
+                .Releases
+                .Where(release => 
+                    release.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
+                    && releaseIdsForApproval.Contains(release.Id))
+                .ToListAsync();
+
+            return releasesForApproval
+                .Select(release => {
+                    var viewModel = _mapper.Map<ReleaseViewModel>(release);
+                    // TODO DW - need any permissions adding?
+                    return viewModel;
+                })
+                .ToList();
+        }
+
         public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases()
         {
             return await _userService
