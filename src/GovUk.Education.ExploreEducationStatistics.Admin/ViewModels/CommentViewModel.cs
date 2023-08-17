@@ -1,16 +1,17 @@
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class CommentViewModel
+    public record CommentViewModel
     {
-        public Guid Id { get; set; }
-        public string Content { get; set; }
-        public DateTime Created { get; set; }
-        public User CreatedBy { get; set; }
-        public DateTime? Updated { get; set; }
-        public DateTime? Resolved { get; set; }
-        public User ResolvedBy { get; set; }
+        public Guid Id { get; init; }
+        public string Content { get; init; } = string.Empty;
+        public DateTime Created { get; init; }
+        public User CreatedBy { get; init; } = null!;
+        public DateTime? Updated { get; init; }
+        public DateTime? Resolved { get; init; }
+        public User ResolvedBy { get; init; } = null!;
     }
 }

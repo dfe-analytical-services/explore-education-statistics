@@ -10,7 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         PartialDateNotValid,
 
         // Content
-        ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
