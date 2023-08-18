@@ -54,11 +54,11 @@ public class ReleaseRepository : IReleaseRepository
     public async Task<bool> IsLatestPublishedVersionOfRelease(Guid releaseId)
     {
         var release = await _contentDbContext.Releases
-            .SingleAsync(r => r.Id == releaseId);
+            .FirstAsync(r => r.Id == releaseId);
 
         var publication = await _contentDbContext.Publications
             .Include(p => p.Releases)
-            .SingleAsync(p => p.Id == release.PublicationId);
+            .FirstAsync(p => p.Id == release.PublicationId);
 
         return publication.IsLatestPublishedVersionOfRelease(release);
     }

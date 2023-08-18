@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
+using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces.IReleaseRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -15,9 +16,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public ViewSubjectDataAuthorizationHandler(
             ContentDbContext contentDbContext,
+            IReleaseRepository releaseRepository,
             IPreReleaseService preReleaseService,
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) : base(
-            new ViewSubjectDataForPublishedReleasesAuthorizationHandler(contentDbContext),
+            new ViewSubjectDataForPublishedReleasesAuthorizationHandler(releaseRepository),
             new SubjectBelongsToViewableReleaseAuthorizationHandler(
                 contentDbContext,
                 preReleaseService,
