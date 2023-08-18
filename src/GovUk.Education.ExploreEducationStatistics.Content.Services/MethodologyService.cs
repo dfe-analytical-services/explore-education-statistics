@@ -5,8 +5,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -19,54 +17,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
     public class MethodologyService : IMethodologyService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
 
         public MethodologyService(ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
             IMethodologyVersionRepository methodologyVersionRepository)
         {
             _contentDbContext = contentDbContext;
-            _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _methodologyVersionRepository = methodologyVersionRepository;
         }
 
-        public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug)
+        public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestVersionViewModelBySlug(string slug)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Methodology>(
-                    query => query
-                        .Where(mp => mp.Slug == slug))
-                .OnSuccess<ActionResult, Methodology, MethodologyVersionViewModel>(async methodology =>
-                {
-                    var latestPublishedVersion =
-                        await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id);
-                    
-                    if (latestPublishedVersion == null)
-                    {
-                        return new NotFoundResult();
-                    }
+            var methodologyVersion =
+                await _methodologyVersionRepository.GetLatestPublishedVersionBySlug(slug);
 
-                    await _contentDbContext
-                        .Entry(latestPublishedVersion)
-                        .Collection(m => m.Notes)
-                        .LoadAsync();
-                    
-                    await _contentDbContext
-                        .Entry(latestPublishedVersion)
-                        .Reference(m => m.MethodologyContent)
-                        .LoadAsync();
+            if (methodologyVersion == null)
+            {
+                return new NotFoundResult();
+            }
 
-                    var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
-                    
-                    viewModel.Publications =
-                        await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
+            await _contentDbContext
+                .Entry(methodologyVersion)
+                .Collection(m => m.Notes)
+                .LoadAsync();
 
-                    return viewModel;
-                });
+            await _contentDbContext
+                .Entry(methodologyVersion)
+                .Reference(m => m.MethodologyContent)
+                .LoadAsync();
+
+            var viewModel = _mapper.Map<MethodologyVersionViewModel>(methodologyVersion);
+
+            viewModel.Publications =
+                await GetPublishedPublicationsForMethodology(methodologyVersion.MethodologyId);
+
+            return viewModel;
         }
 
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree()

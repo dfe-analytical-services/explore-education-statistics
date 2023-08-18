@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug("test-slug"))
+            methodologyService.Setup(mock => mock.GetLatestVersionViewModelBySlug("test-slug"))
                 .ReturnsAsync(new MethodologyVersionViewModel
                 {
                     Id = methodologyId
@@ -40,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.GetLatestMethodologyBySlug(It.IsAny<string>()))
+            methodologyService.Setup(mock => mock.GetLatestVersionViewModelBySlug(It.IsAny<string>()))
                 .ReturnsAsync(new NotFoundResult());
 
             var controller = new MethodologyController(methodologyService.Object);

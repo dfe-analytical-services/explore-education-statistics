@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("methodologies/{slug}")]
         public async Task<ActionResult<MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug)
         {
-            return await _methodologyService.GetLatestMethodologyBySlug(slug)
+            return await _methodologyService.GetLatestVersionViewModelBySlug(slug)
                 .HandleFailuresOrOk();
         }
     }

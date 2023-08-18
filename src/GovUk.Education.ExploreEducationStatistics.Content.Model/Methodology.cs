@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string OwningPublicationTitle { get; set; }
 
         [Required]
-        public string Slug { get; set; }
+        public string OwningPublicationSlug { get; set; }
 
         public List<MethodologyVersion> Versions { get; set; } = new();
 

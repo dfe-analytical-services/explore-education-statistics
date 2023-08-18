@@ -960,9 +960,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 methodologyVersionRepository
-                    .Setup(s => s.PublicationTitleChanged(
+                    .Setup(s => s.PublicationTitleOrSlugChanged(
                         publication.Id,
-                        publication.Slug,
                         "New title",
                         "new-title"))
                     .Returns(Task.CompletedTask);
@@ -1089,9 +1088,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Expect the title to change but not the slug, as the Publication is already published.
                 methodologyVersionRepository
-                    .Setup(s => s.PublicationTitleChanged(
+                    .Setup(s => s.PublicationTitleOrSlugChanged(
                         publication.Id,
-                        publication.Slug,
                         "New title",
                         "old-title"))
                     .Returns(Task.CompletedTask);

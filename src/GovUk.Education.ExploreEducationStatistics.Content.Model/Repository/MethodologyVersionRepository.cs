@@ -35,8 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 PublishingStrategy = Immediately,
                 Methodology = new Methodology
                 {
-                    Slug = publication.Slug,
                     OwningPublicationTitle = publication.Title,
+                    OwningPublicationSlug = publication.Slug,
                     Publications = new List<PublicationMethodology>
                     {
                         new()
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                             Owner = true,
                             PublicationId = publicationId
                         }
-                    }
+                    },
                 },
                 Created = DateTime.UtcNow,
                 CreatedById = createdByUserId
@@ -111,26 +111,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return await methodology.Versions.FirstOrDefaultAsync(IsPubliclyAccessible);
         }
 
+        public async Task<MethodologyVersion?> GetLatestPublishedVersionBySlug(string slug) // @MarkFix needs unit tests
+        {
+            var methodologyVersions = _contentDbContext
+                .MethodologyVersions
+                // EF cannot translate mv.Slug into SQL, so we have to do this
+                .Where(mv => mv.AlternativeSlug == slug
+                             || (mv.AlternativeSlug == null && mv.Methodology.OwningPublicationSlug == slug))
+                .ToList();
+
+            return await methodologyVersions
+                .ToAsyncEnumerable()
+                .WhereAwait(async mv =>
+                    await IsPubliclyAccessible(mv))
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<bool> IsPubliclyAccessible(Guid methodologyVersionId)
         {
             var methodologyVersion = await _contentDbContext.MethodologyVersions
                 .FindAsync(methodologyVersionId);
 
+            if (methodologyVersion == null)
+            {
+                return false;
+            }
+
             return await IsPubliclyAccessible(methodologyVersion);
         }
 
         // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
-        // where appropriate.  Methodologies always keep track of their owning Publication's title for
-        // optimisation purposes, but Methodology.Slug is used for the actual Slug for all of its Methodology
-        // Versions.  It's therefore important to keep it up-to-date with changes to its owning Publication's Slug too, 
-        // but only if none of its Versions are yet publicly accessible.
-        public async Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle,
+        // where appropriate.  Methodologies always keep track of their owning Publication's title/slug for
+        // optimisation purposes. It's therefore important to keep it up-to-date with changes to its owning Publication.
+        public async Task PublicationTitleOrSlugChanged(Guid publicationId, string updatedTitle,
             string updatedSlug)
         {
-            var slugChanged = originalSlug != updatedSlug;
-
-            // If the Publication Title changed, also change the OwningPublicationTitles of any Methodologies
-            // that are owned by this Publication
             var ownedMethodologies = await _contentDbContext
                 .PublicationMethodologies
                 .Include(m => m.Methodology)
@@ -141,15 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             await ownedMethodologies
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async methodology =>
-            {
-                methodology.OwningPublicationTitle = updatedTitle;
-
-                if (slugChanged && methodology.Slug == originalSlug &&
-                    !await IsPubliclyAccessible(methodology))
                 {
-                    methodology.Slug = updatedSlug;
-                }
-            });
+                    methodology.OwningPublicationTitle = updatedTitle;
+                    methodology.OwningPublicationSlug = updatedSlug; // @MarkFix yes?
+                });
 
             _contentDbContext.Methodologies.UpdateRange(ownedMethodologies);
             await _contentDbContext.SaveChangesAsync();
@@ -173,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return false;
         }
 
-        private async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion)
+        public async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion)
         {
             // A version that's not approved can't be publicly accessible
             if (!methodologyVersion.Approved)

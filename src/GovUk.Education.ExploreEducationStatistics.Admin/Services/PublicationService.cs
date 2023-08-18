@@ -210,8 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (originalTitle != publication.Title)
                     {
-                        await _methodologyVersionRepository.PublicationTitleChanged(publicationId,
-                            originalSlug,
+                        await _methodologyVersionRepository.PublicationTitleOrSlugChanged(publicationId,
                             publication.Title,
                             publication.Slug);
                     }

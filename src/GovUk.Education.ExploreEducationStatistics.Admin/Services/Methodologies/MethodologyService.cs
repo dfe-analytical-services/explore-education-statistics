@@ -283,19 +283,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
-            if (methodologyVersionToUpdate.Title == request.Title)
+            var newSlug = NamingUtils.SlugFromTitle(request.Title);
+
+            if (methodologyVersionToUpdate.Title == request.Title
+                && methodologyVersionToUpdate.Slug == newSlug)
             {
                 // Details unchanged
                 return methodologyVersionToUpdate;
             }
 
+
             return await _userService.CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
-                // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
-                // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
-                // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
-                // unlikely scenario, it's entirely possible.
-                .OnSuccessDo(methodologyVersion =>
-                    ValidateMethodologySlugUniqueForUpdate(methodologyVersion, request.Slug))
+                .OnSuccessDo(_ =>
+                    ValidateMethodologySlugUnused(newSlug))
                 .OnSuccess(async methodologyVersion =>
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;
@@ -306,15 +306,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             request.Title != methodologyVersion.Methodology.OwningPublicationTitle
                                 ? request.Title
                                 : null;
+                    }
 
-                        // If we're updating a Methodology that is not an Amendment, it's not yet publicly
-                        // visible and so its Slug can be updated.  At the point that a Methodology is publicly
-                        // visible and the only means of updating it is via Amendments, we will no longer allow its
-                        // Slug to change even though its AlternativeTitle can.
-                        if (!methodologyVersion.Amendment)
-                        {
-                            methodologyVersion.Methodology.Slug = request.Slug;
-                        }
+                    if (newSlug != methodologyVersion.Slug)
+                    {
+                        methodologyVersion.AlternativeSlug =
+                            newSlug != methodologyVersion.Methodology.OwningPublicationSlug
+                                ? newSlug
+                                : null;
                     }
 
                     await _context.SaveChangesAsync();
@@ -432,13 +431,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return new IdTitleViewModel(publication.Id, publication.Title);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(
-            MethodologyVersion methodologyVersion, string slug)
+        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUnused(string slug)
         {
-            if (await _context
-                    .Methodologies
-                    .AsQueryable()
-                    .AnyAsync(p => p.Slug == slug && p.Id != methodologyVersion.MethodologyId))
+            var methodologyVersion =
+                await _methodologyVersionRepository.GetLatestPublishedVersionBySlug(slug);
+
+            if (methodologyVersion != null)
             {
                 return ValidationActionResult(SlugNotUnique);
             }

@@ -76,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
         public virtual DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public virtual DbSet<Update> Update { get; set; }
+        public virtual DbSet<MethodologyRedirect> MethodologyRedirects { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
         public virtual DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
@@ -466,6 +467,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<ReleaseContentBlock>()
                 .HasKey(item => new {item.ReleaseId, item.ContentBlockId});
+
+            modelBuilder.Entity<MethodologyRedirect>()
+                .HasKey(mr => new { mr.MethodologyVersionId, mr.Slug });
 
             modelBuilder.Entity<User>();
 

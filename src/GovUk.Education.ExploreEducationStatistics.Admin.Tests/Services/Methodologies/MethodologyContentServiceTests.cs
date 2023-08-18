@@ -27,8 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
                 OwningPublicationTitle = "Methodology title",
+                OwningPublicationSlug = "methodology-slug",
                 Versions = new List<MethodologyVersion>
                 {
                     new()
@@ -38,7 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         PublishingStrategy = Immediately,
                         Status = MethodologyApprovalStatus.Approved,
                         Published = DateTime.UtcNow,
-                        AlternativeTitle = "Alternative title"
+                        AlternativeTitle = "Alternative title",
+                        AlternativeSlug = "alternative-slug",
                     }
                 }
             };
@@ -59,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var result = (await service.GetContent(methodologyVersion.Id)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, result.Id);
-                Assert.Equal(methodology.Slug, result.Slug);
+                Assert.Equal(methodologyVersion.Slug, result.Slug);
                 Assert.Equal(methodologyVersion.Title, result.Title);
                 Assert.Equal(methodologyVersion.Status, result.Status);
                 Assert.Equal(methodologyVersion.Published, result.Published);
@@ -74,8 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
                 OwningPublicationTitle = "Methodology title",
+                OwningPublicationSlug = "methodology-slug",
                 Versions = new List<MethodologyVersion>
                 {
                     new()
@@ -191,8 +192,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
                 OwningPublicationTitle = "Methodology title",
+                OwningPublicationSlug = "methodology-slug",
                 Versions = new List<MethodologyVersion>
                 {
                     new()

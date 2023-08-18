@@ -29,8 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
-                OwningPublicationTitle = "Methodology title",
+                OwningPublicationSlug = "publication-slug",
+                OwningPublicationTitle = "Publication title",
                 Versions = new List<MethodologyVersion>
                 {
                     new()
@@ -39,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Published = DateTime.UtcNow,
                         Status = Approved,
                         AlternativeTitle = "Alternative title",
+                        AlternativeSlug = "alternative-slug",
                     }
                 }
             };
@@ -69,7 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
+            methodologyVersionRepository.Setup(mock =>
+                    mock.GetLatestPublishedVersionBySlug(methodology.Versions[0].Slug))
                 .ReturnsAsync(methodology.Versions[0]);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -79,14 +81,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
+                var result = (await service.GetLatestVersionViewModelBySlug(
+                    methodology.Versions[0].Slug)).AssertRight();
 
                 VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal(methodology.Versions[0].Id, result.Id);
                 Assert.Equal(methodology.Versions[0].Published, result.Published);
-                Assert.Equal(methodology.Slug, result.Slug);
                 Assert.Equal("Alternative title", result.Title);
+                Assert.Equal("alternative-slug", result.Slug);
                 Assert.Empty(result.Annexes);
                 Assert.Empty(result.Content);
                 Assert.Empty(result.Notes);
@@ -103,6 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var methodology = new Methodology
             {
+                OwningPublicationSlug = "slug",
                 Versions = new List<MethodologyVersion>
                 {
                     new()
@@ -157,7 +161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
+            methodologyVersionRepository.Setup(mock =>
+                    mock.GetLatestPublishedVersionBySlug(methodology.Versions[0].Slug))
                 .ReturnsAsync(methodology.Versions[0]);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -167,7 +172,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
+                var result = (await service.GetLatestVersionViewModelBySlug(
+                    methodology.Versions[0].Slug)).AssertRight();
 
                 VerifyAllMocks(methodologyVersionRepository);
 
@@ -183,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
+                OwningPublicationSlug = "methodology-slug",
                 OwningPublicationTitle = "Methodology title",
                 Versions = new List<MethodologyVersion>
                 {
@@ -259,7 +265,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
+            methodologyVersionRepository.Setup(mock => 
+                    mock.GetLatestPublishedVersionBySlug(methodology.Versions[0].Slug))
                 .ReturnsAsync(methodology.Versions[0]);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -269,7 +276,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
+                var result = (await service.GetLatestVersionViewModelBySlug(
+                    methodology.Versions[0].Slug)).AssertRight();
 
                 VerifyAllMocks(methodologyVersionRepository);
 
@@ -309,8 +317,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
                 OwningPublicationTitle = "Methodology title",
+                OwningPublicationSlug = "methodology-slug",
                 Versions = new List<MethodologyVersion>
                 {
                     new()
@@ -356,7 +364,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
+            methodologyVersionRepository.Setup(mock =>
+                    mock.GetLatestPublishedVersionBySlug(methodology.Versions[0].Slug))
                 .ReturnsAsync(methodology.Versions[0]);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -366,7 +375,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
+                var result = (await service.GetLatestVersionViewModelBySlug(
+                    methodology.OwningPublicationSlug)).AssertRight();
 
                 VerifyAllMocks(methodologyVersionRepository);
 
@@ -392,8 +402,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
-                OwningPublicationTitle = "Methodology title"
+                OwningPublicationTitle = "Methodology title",
+                OwningPublicationSlug = "methodology-slug",
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -406,7 +416,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
+            methodologyVersionRepository.Setup(mock =>
+                    mock.GetLatestPublishedVersionBySlug(methodology.OwningPublicationSlug))
                 .ReturnsAsync((MethodologyVersion?) null);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -414,7 +425,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = await service.GetLatestMethodologyBySlug(methodology.Slug);
+                var result = await service.GetLatestVersionViewModelBySlug(
+                    methodology.OwningPublicationSlug);
 
                 VerifyAllMocks(methodologyVersionRepository);
 
@@ -425,11 +437,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetLatestMethodologyBySlug_SlugNotFound()
         {
-            // Set up a methodology with a different slug to make sure it's not returned
+            // Methodology with a different slug to make sure it's not returned
             var methodology = new Methodology
             {
-                Slug = "some-other-slug",
-                OwningPublicationTitle = "Methodology title"
+                OwningPublicationTitle = "Publication title",
+                OwningPublicationSlug = "publication-slug",
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -442,14 +454,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            // Expect no call to get the latest published version since no methodology will be found
+            methodologyVersionRepository.Setup(mock =>
+                    mock.GetLatestPublishedVersionBySlug("methodology-slug"))
+                .ReturnsAsync((MethodologyVersion?) null);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = await service.GetLatestMethodologyBySlug("methodology-slug");
+                var result = await service.GetLatestVersionViewModelBySlug("methodology-slug");
 
                 VerifyAllMocks(methodologyVersionRepository);
 
@@ -489,7 +503,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Version = 0,
                     Methodology = new Methodology
                     {
-                        Slug = "methodology-1-slug",
+                        OwningPublicationSlug = "methodology-1-slug",
                     }
                 },
                 new MethodologyVersion
@@ -503,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Version = 0,
                     Methodology = new Methodology
                     {
-                        Slug = "methodology-2-slug"
+                        OwningPublicationSlug = "methodology-2-slug"
                     }
                 });
 
@@ -699,13 +713,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IMapper? mapper = null)
         {
             return new(
                 contentDbContext,
-                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 mapper ?? MapperUtils.MapperForProfile<MappingProfiles>(),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict)
             );

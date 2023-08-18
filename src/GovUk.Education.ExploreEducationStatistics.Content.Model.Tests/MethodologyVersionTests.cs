@@ -164,11 +164,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             {
                 Methodology = new Methodology
                 {
-                    Slug = "owning-publication-slug"
-                }
+                    OwningPublicationSlug = "owning-publication-slug",
+                },
             };
 
-            Assert.Equal(methodology.Methodology.Slug, methodology.Slug);
+            Assert.Equal(methodology.Methodology.OwningPublicationSlug, methodology.Slug);
+        }
+
+        [Fact]
+        public void GetSlug_Alternative()
+        {
+            var methodology = new MethodologyVersion
+            {
+                AlternativeSlug = "alternative-slug",
+                Methodology = new Methodology
+                {
+                    OwningPublicationSlug = "owning-publication-slug",
+                },
+            };
+
+            Assert.Equal(methodology.AlternativeSlug, methodology.Slug);
         }
 
         [Fact]

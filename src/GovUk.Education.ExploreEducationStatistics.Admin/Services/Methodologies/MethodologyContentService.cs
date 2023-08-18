@@ -58,8 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .CheckEntityExists<MethodologyVersion>(methodologyVersionId, q => q
                     .Include(version => version.Notes)
                     .Include(version => version.MethodologyContent)
-                    // Load the Methodology so that Slug can be provided
-                    .Include(m => m.Methodology))
+                    .Include(m => m.Methodology)) // For Slug
                 .OnSuccess(CheckCanViewMethodology)
                 .OnSuccess(_mapper.Map<ManageMethodologyContentViewModel>);
         }
