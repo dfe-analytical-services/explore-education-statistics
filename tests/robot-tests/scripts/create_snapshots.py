@@ -346,7 +346,7 @@ if __name__ == "__main__":
     if not args.visual:
         chrome_options.add_argument("--headless")
 
-    get_webdriver("latest")
+    get_webdriver()
 
     driver = webdriver.Chrome(options=chrome_options)
 

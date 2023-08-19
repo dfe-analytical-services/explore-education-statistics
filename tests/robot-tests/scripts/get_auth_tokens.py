@@ -133,7 +133,7 @@ def get_identity_info(
     using_existing_driver = driver is not None
 
     if not driver:
-        get_webdriver("latest")
+        get_webdriver()
 
     chrome_options = webdriver.ChromeOptions()
     chrome_options.add_argument("--no-sandbox")
