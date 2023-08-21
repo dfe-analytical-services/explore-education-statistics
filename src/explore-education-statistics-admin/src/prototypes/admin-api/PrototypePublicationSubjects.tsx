@@ -6,6 +6,8 @@ import PrototypeAddPublicationSubject from './components/PrototypeAddPublication
 import PrototypeEditPublicationSubjectTitle from './components/PrototypeEditPublicationSubjectTitle';
 import PrototypeEditPublicationSubject from './components/PrototypeEditPublicationSubject';
 import { PrototypeNextSubjectContextProvider } from './contexts/PrototypeNextSubjectContext';
+import PrototypeNotificationCreate from './components/PrototypeNotificationCreate';
+import PrototypeAPIDataSetPreview from './components/PrototypeAPIDataSetPreview';
 
 export interface PublicationSubject {
   title: string;
@@ -57,11 +59,18 @@ export const subjectsForRelease2: PrototypeSubject[] = [
   },
 ];
 
+export interface PrototypeNotification {
+  subjectId: string;
+  summary: string;
+  channels: string[];
+}
+
 const PrototypePublicationSubjects = () => {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const params: any = useParams();
 
   const [publishedReleases] = useStorageItem<string[]>('publishedReleases', []);
+
   const currentRelease = params.id ?? '2021-22';
   const isCurrentReleasePublished = publishedReleases?.includes(currentRelease);
 
@@ -73,10 +82,22 @@ const PrototypePublicationSubjects = () => {
     PublicationSubject[]
   >(savedPublicationSubjects ?? []);
 
+  const [savedNotifications, setSavedNotifications] = useStorageItem<
+    PrototypeNotification[]
+  >('notifications', []);
+
+  const [notifications, setNotifications] = useState<PrototypeNotification[]>(
+    savedNotifications ?? [],
+  );
+
   // update local storage if they change
   useEffect(() => {
     setSavedPublicationSubjects(publicationSubjects);
   }, [publicationSubjects, setSavedPublicationSubjects]);
+
+  useEffect(() => {
+    setSavedNotifications(notifications);
+  }, [notifications, setSavedNotifications]);
 
   const [subjectToEdit, setSubjectToEdit] = useState<
     PublicationSubject | undefined
@@ -86,8 +107,37 @@ const PrototypePublicationSubjects = () => {
     PublicationSubject | undefined
   >(undefined);
 
+  const [createNotification, setCreateNotification] = useState<
+    PrototypeSubject | undefined
+  >(undefined);
+
+  const [previewPublicPage, setPreviewPublicPage] =
+    useState<PrototypeSubject>();
+
   const subjects =
     currentRelease === '2021-22' ? subjectsForRelease1 : subjectsForRelease2;
+
+  if (previewPublicPage) {
+    return (
+      <PrototypeAPIDataSetPreview
+        publicationSubject={previewPublicPage}
+        onClose={() => setPreviewPublicPage(undefined)}
+      />
+    );
+  }
+
+  if (createNotification) {
+    return (
+      <PrototypeNotificationCreate
+        publicationSubject={createNotification}
+        onClose={() => setCreateNotification(undefined)}
+        onSubmit={notification => {
+          setNotifications([...notifications, notification]);
+          setCreateNotification(undefined);
+        }}
+      />
+    );
+  }
 
   if (subjectToEdit) {
     return (
@@ -163,8 +213,11 @@ const PrototypePublicationSubjects = () => {
       />
       <PrototypePublicationSubjectList
         isCurrentReleasePublished={isCurrentReleasePublished}
+        notifications={notifications}
         publicationSubjects={publicationSubjects}
+        onCreateNotification={setCreateNotification}
         onEditSubject={setSubjectToChange}
+        onTogglePreview={setPreviewPublicPage}
       />
     </PrototypeNextSubjectContextProvider>
   );

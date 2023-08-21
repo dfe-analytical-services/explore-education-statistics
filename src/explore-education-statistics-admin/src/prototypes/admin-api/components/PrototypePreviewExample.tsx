@@ -52,7 +52,6 @@ const date = `${today.getDate() < 10 ? '0' : ''} ${today.getDate()}  ${
 const PrototypePreviewExample = ({ initialVersion }: Props) => {
   const [tokenTerms, setTokenTerms] = useState(false);
   const [showToken, setShowToken] = useState(false);
-  const [changelog] = useStorageItem<Changelog>('changelog');
   const [deleteToken, setDeleteToken] = useState(false);
 
   return (
@@ -243,38 +242,6 @@ const PrototypePreviewExample = ({ initialVersion }: Props) => {
           </table>
           <a href="#">View next 10 entries</a>
         </>
-      </TabsSection>
-
-      <TabsSection title="Changelog">
-        <>
-          {initialVersion && (
-            <div className="govuk-width-container govuk-!-margin-0">
-              <h5 className="govuk-heading-m">Changelog</h5>
-              <p>
-                This is the initial version of the API data set, changes will
-                only appear on this page when future versions of this data set
-                are published.
-              </p>
-            </div>
-          )}
-          {!initialVersion && changelog && (
-            <ChangelogExample changelog={changelog} />
-          )}
-        </>
-      </TabsSection>
-      <TabsSection title="Notifications">
-        <div style={{ height: '1200px' }}>
-          <h5 className="govuk-heading-m">
-            Public notification of upcoming API changes
-          </h5>
-          <div className="govuk-width-container govuk-!-margin-0">
-            <p>
-              If you wish to publish a notification of upcoming changes
-              describing the changes in this data set please complete the form
-              below
-            </p>
-          </div>
-        </div>
       </TabsSection>
     </Tabs>
   );

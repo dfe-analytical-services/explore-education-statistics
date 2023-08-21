@@ -15,6 +15,11 @@ const ReleaseDataPage = () => {
     'publishedReleases',
     [],
   );
+
+  const [, setSavedNotifications] = useStorageItem<string[]>(
+    'notifications',
+    [],
+  );
   const [, setChangelog] = useStorageItem<Changelog | undefined>('changelog');
 
   return (
@@ -25,6 +30,7 @@ const ReleaseDataPage = () => {
         onClick={() => {
           setSavedPublicationSubjects([]);
           setPublishedReleases([]);
+          setSavedNotifications([]);
           setChangelog(undefined);
           history.push('/prototypes/admin-api/data/2021-22#subjects');
         }}
