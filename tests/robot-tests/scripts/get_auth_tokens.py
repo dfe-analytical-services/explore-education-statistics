@@ -6,7 +6,6 @@ from typing import Union
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 from .get_webdriver import get_webdriver
 
@@ -131,7 +130,6 @@ def get_identity_cookie(driver) -> str:
 def get_identity_info(
     identity_provider, url, email, password, first_name="Bau1", last_name="EESADMIN", driver=None
 ) -> Union[str, str]:
-
     using_existing_driver = driver is not None
 
     if not driver:
@@ -144,7 +142,7 @@ def get_identity_info(
     chrome_options.add_argument("--ignore-certificate-errors")
     chrome_options.add_argument("--disable-logging")
     chrome_options.add_argument("--log-level=\3")
-    driver = webdriver.Chrome(options=chrome_options, desired_capabilities=DesiredCapabilities.CHROME)
+    driver = webdriver.Chrome(options=chrome_options)
 
     if identity_provider == "KEYCLOAK":
         try:

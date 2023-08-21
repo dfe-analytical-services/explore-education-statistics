@@ -10,11 +10,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -37,7 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 new HtmlBlock
                                 {
                                     Created = new DateTime(2001, 1, 1),
-                                    Comments = AsList(new Comment {Content = "Existing comment"})
+                                    Comments = AsList(new Comment
+                                    {
+                                        Content = "Existing comment"
+                                    })
                                 }
                             )
                         }
@@ -60,7 +61,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     release.Id,
                     release.Content[0].ContentSection.Id,
                     release.Content[0].ContentSection.Content[0].Id,
-                    new CommentSaveRequest {Content = "New comment"});
+                    new CommentSaveRequest
+                    {
+                        Content = "New comment"
+                    });
 
                 var viewModel = result.AssertRight();
                 Assert.Equal("New comment", viewModel.Content);
@@ -87,10 +91,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseId: Guid.NewGuid(),
                     contentSectionId: Guid.NewGuid(),
                     contentBlockId: Guid.NewGuid(),
-                    new CommentSaveRequest {Content = "New comment"});
+                    new CommentSaveRequest
+                    {
+                        Content = "New comment"
+                    });
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<NotFoundResult>(actionResult);
+                result.AssertNotFound();
             }
         }
 
@@ -106,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext())
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupCommentService(contentDbContext: contentDbContext);
 
@@ -114,10 +120,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseId: release.Id,
                     contentSectionId: Guid.NewGuid(),
                     contentBlockId: Guid.NewGuid(),
-                    new CommentSaveRequest {Content = "New comment"});
+                    new CommentSaveRequest
+                    {
+                        Content = "New comment"
+                    });
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<NotFoundResult>(actionResult);
+                result.AssertNotFound();
             }
         }
 
@@ -154,9 +162,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseId: release.Id,
                     contentSectionId: release.Content[0].ContentSection.Id,
                     contentBlockId: Guid.NewGuid(),
-                    new CommentSaveRequest {Content = "New comment"});
+                    new CommentSaveRequest
+                    {
+                        Content = "New comment"
+                    });
 
-                result.AssertBadRequest(ContentBlockNotFound);
+                result.AssertNotFound();
             }
         }
 
@@ -281,15 +292,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task SetResolved_NoComment()
         {
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext())
             {
                 var service = SetupCommentService(contentDbContext: contentDbContext);
                 var result = await service.SetResolved(Guid.NewGuid(), resolve: true);
-                var actionResult = result.AssertLeft();
-                Assert.IsType<NotFoundResult>(actionResult);
+                result.AssertNotFound();
             }
-
         }
 
         [Fact]
@@ -332,7 +340,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentDbContext: contentDbContext,
                     userId: userId);
                 var result = await service.UpdateComment(comment.Id,
-                    new CommentSaveRequest {Content = "Existing comment updated"});
+                    new CommentSaveRequest
+                    {
+                        Content = "Existing comment updated"
+                    });
 
                 var viewModel = result.AssertRight();
                 Assert.Equal("Existing comment updated", viewModel.Content);
@@ -357,15 +368,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateComment_NoComment()
         {
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext())
             {
                 var service = SetupCommentService(contentDbContext: contentDbContext);
                 var result = await service.UpdateComment(Guid.NewGuid(),
-                    new CommentSaveRequest {Content = "Existing comment updated"});
+                    new CommentSaveRequest
+                    {
+                        Content = "Existing comment updated"
+                    });
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<NotFoundResult>(actionResult);
+                result.AssertNotFound();
             }
         }
 
@@ -435,14 +447,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteComment_NoComment()
         {
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext())
             {
                 var service = SetupCommentService(contentDbContext);
                 var result = await service.DeleteComment(Guid.NewGuid());
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<NotFoundResult>(actionResult);
+                result.AssertNotFound();
             }
         }
 

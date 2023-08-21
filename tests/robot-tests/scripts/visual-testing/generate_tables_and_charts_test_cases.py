@@ -2,6 +2,9 @@ import argparse
 import csv
 import os
 import shutil
+import sys
+
+csv.field_size_limit(sys.maxsize)
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Generate test cases for visual testing of tables and charts")
@@ -32,7 +35,6 @@ if __name__ == "__main__":
     with open(
         f"{robot_tests_folder}/visually_check_tables_and_charts.template.robot", "r", encoding="utf-8-sig"
     ) as robot_template_file:
-
         test_template = robot_template_file.read()
 
         header, template_and_footer = test_template.split("{{test_case_template}}")

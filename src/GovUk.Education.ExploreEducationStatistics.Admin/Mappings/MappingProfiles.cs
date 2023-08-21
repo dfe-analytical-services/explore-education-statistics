@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                             ? new User
                             {
 #pragma warning disable 612
-                                FirstName = comment.LegacyCreatedBy,
+                                FirstName = comment.LegacyCreatedBy ?? "",
 #pragma warning restore 612
                                 LastName = ""
                             }

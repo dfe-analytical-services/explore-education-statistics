@@ -335,56 +335,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<File>()
-                .Property(f => f.ContentType)
-                .HasMaxLength(255);
-
-            modelBuilder.Entity<File>()
-                .Property(b => b.Type)
-                .HasConversion(new EnumToStringConverter<FileType>());
-
-            modelBuilder.Entity<File>()
-                .HasOne(b => b.Replacing)
-                .WithOne()
-                .HasForeignKey<File>(b => b.ReplacingId)
-                .IsRequired(false);
-
-            modelBuilder.Entity<File>()
-                .HasOne(b => b.ReplacedBy)
-                .WithOne()
-                .HasForeignKey<File>(b => b.ReplacedById)
-                .IsRequired(false);
-
-            modelBuilder.Entity<File>()
-                .Property(comment => comment.Created)
-                .HasConversion(
-                    v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            modelBuilder.Entity<File>(entity =>
+            {
+                entity.Property(e => e.ContentType)
+                    .HasMaxLength(255);
+                entity.Property(e => e.Type)
+                    .HasConversion(new EnumToStringConverter<FileType>())
+                    .HasMaxLength(25);
+                entity.HasIndex(e => e.Type);
+                entity.HasOne(b => b.Replacing)
+                    .WithOne()
+                    .HasForeignKey<File>(b => b.ReplacingId)
+                    .IsRequired(false);
+                entity.HasOne(b => b.ReplacedBy)
+                    .WithOne()
+                    .HasForeignKey<File>(b => b.ReplacedById)
+                    .IsRequired(false);
+                entity.Property(e => e.Created)
+                    .HasConversion(
+                        v => v,
+                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            });
 
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.PreviousVersion)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<ContentBlock>()
-                .ToTable("ContentBlock")
-                .HasDiscriminator<string>("Type");
+            modelBuilder.Entity<ContentBlock>(entity =>
+            {
+                entity.ToTable("ContentBlock")
+                    .HasDiscriminator<string>("Type");
+                entity.Property("Type")
+                    .HasMaxLength(25);
+                entity.HasIndex("Type");
+                entity.Property(e => e.Created)
+                    .HasConversion(
+                        v => v,
+                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+                entity.Property(e => e.Locked)
+                    .HasConversion(
+                        v => v,
+                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            });
 
-            modelBuilder.Entity<ContentBlock>()
-                .Property(block => block.Created)
-                .HasConversion(
-                    v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-
-            modelBuilder.Entity<ContentBlock>()
-                .Property(comment => comment.Locked)
-                .HasConversion(
-                    v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-
-            modelBuilder.Entity<ContentSection>()
-                .Property(b => b.Type)
-                .HasConversion(new EnumToStringConverter<ContentSectionType>());
+            modelBuilder.Entity<ContentSection>(entity =>
+            {
+                entity.Property(e => e.Type)
+                    .HasConversion(new EnumToStringConverter<ContentSectionType>())
+                    .HasMaxLength(25);
+                entity.HasIndex(e => e.Type);
+            });
 
             modelBuilder.Entity<Release>()
                 .Property(release => release.NextReleaseDate)
