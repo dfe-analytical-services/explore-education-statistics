@@ -27,8 +27,7 @@ export const MethodologyContentPageInternal = () => {
   const { methodology, canUpdateMethodology, isPreRelease } =
     useMethodologyContentState();
 
-  const canUpdateContent =
-    !isPreRelease && canUpdateMethodology && methodology.status === 'Draft';
+  const canUpdateContent = !isPreRelease && canUpdateMethodology;
 
   return (
     <EditingContextProvider editingMode={canUpdateContent ? 'edit' : 'preview'}>
