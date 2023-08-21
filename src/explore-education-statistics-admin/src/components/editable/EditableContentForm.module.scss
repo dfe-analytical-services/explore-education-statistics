@@ -25,4 +25,11 @@
 .form {
   margin-left: $dfe-comments-width;
   width: 100%;
+
+  // stylelint-disable-next-line selector-no-qualifying-type
+  img:not([alt]),
+  img[alt=''] {
+    border: 4px solid $govuk-error-colour;
+    padding: 4px;
+  }
 }
