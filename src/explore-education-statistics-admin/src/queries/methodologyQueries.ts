@@ -8,6 +8,10 @@ const methodologyQueries = createQueryKeys('methodology', {
       queryFn: () => methodologyService.getMethodologyStatuses(methodologyId),
     };
   },
+  listMethodologiesForApproval: {
+    queryKey: null,
+    queryFn: () => methodologyService.listMethodologiesForApproval(),
+  },
 });
 
 export default methodologyQueries;

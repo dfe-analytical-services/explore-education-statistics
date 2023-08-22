@@ -1,5 +1,6 @@
 import client from '@admin/services/utils/service';
 import { IdTitlePair } from '@admin/services/types/common';
+import { Release } from '@admin/services/releaseService';
 
 export type MethodologyApprovalStatus =
   | 'Draft'
@@ -87,6 +88,10 @@ const methodologyService = {
     publicationId: string,
   ): Promise<MethodologyVersionSummary[]> {
     return client.get(`/publication/${publicationId}/methodologies`);
+  },
+
+  listMethodologiesForApproval(): Promise<MethodologyVersion[]> {
+    return client.get('/methodology/approvals');
   },
 
   createMethodologyAmendment(
