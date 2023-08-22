@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
@@ -17,18 +18,30 @@ public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> 
 {
     protected override IHostBuilder CreateHostBuilder()
     {
-        return Host.CreateDefaultBuilder()
-        .ConfigureLogging(
-            builder =>
+        return Host
+            .CreateDefaultBuilder()
+            .ConfigureLogging(
+                builder =>
+                {
+                    builder
+                        .AddFilter<ConsoleLoggerProvider>("Default", LogLevel.Warning)
+                        .AddFilter<ConsoleLoggerProvider>("Microsoft", LogLevel.Warning);
+                }
+            )
+            .ConfigureWebHostDefaults(builder =>
             {
                 builder
-                    .AddFilter<ConsoleLoggerProvider>("Default", LogLevel.Warning)
-                    .AddFilter<ConsoleLoggerProvider>("Microsoft", LogLevel.Warning);
-            }
-        )
-        .ConfigureWebHostDefaults(builder =>
-        {
-            builder.UseStartup<TStartup>().UseTestServer();
-        });
+                    .UseStartup<TStartup>()
+                    .UseEnvironment("Development")
+                    .UseTestServer();
+            })
+            .ConfigureAppConfiguration(config =>
+            {
+                config.AddConfiguration(new ConfigurationBuilder()
+                    .AddJsonFile("appsettings.json", optional: true)
+                    .AddJsonFile("appsettings.Development.json", optional: true)
+                    .AddJsonFile("integration-test-settings.json", optional: true)
+                    .Build());
+            });
     }
 }
