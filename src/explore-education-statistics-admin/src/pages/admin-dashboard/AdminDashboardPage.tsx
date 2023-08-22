@@ -8,157 +8,50 @@ import PublicationsTab from '@admin/pages/admin-dashboard/components/Publication
 import ScheduledReleasesTab from '@admin/pages/admin-dashboard/components/ScheduledReleasesTab';
 import releaseQueries from '@admin/queries/releaseQueries';
 import loginService from '@admin/services/loginService';
-import { MethodologyVersion } from '@admin/services/methodologyService';
-import { Release } from '@admin/services/releaseService';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
 import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-
-const testMethodologies: MethodologyVersion[] = [
-  {
-    id: 'c8c911e3-39c1-452b-801f-25bb79d1deb7',
-    methodologyId: 'b8bd000c-f9d8-4319-a2b3-6bc18675e5ac',
-    owningPublication: {
-      id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
-      title: 'Permanent and fixed-period exclusions in England',
-    },
-    otherPublications: [],
-    published: '2018-08-25T00:00:00',
-    publishingStrategy: 'Immediately',
-    slug: 'permanent-and-fixed-period-exclusions-in-england',
-    status: 'Approved',
-    title: 'Pupil exclusion statistics: methodology',
-    amendment: false,
-  },
-];
-
-const testReleases: Release[] = [
-  {
-    id: 'test-id',
-    title: 'Academic year 2016/17',
-    slug: '2024-25',
-    publicationId: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
-    publicationTitle: 'Permanent and fixed-period exclusions in England',
-    publicationSummary: '',
-    publicationSlug: 'pub-slug',
-    year: 2024,
-    yearTitle: '2024/25',
-    nextReleaseDate: {
-      year: '2200',
-      month: '1',
-      day: '',
-    },
-    live: false,
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic year',
-    },
-    preReleaseAccessList: '<p>Test public access list</p>',
-    preReleaseUsersOrInvitesAdded: false,
-    previousVersionId: 'f',
-    latestRelease: false,
-    type: 'NationalStatistics',
-    contact: {
-      teamName: 'UI test team name',
-      teamEmail: 'ui_test@test.com',
-      contactName: 'UI test contact name',
-      contactTelNo: '1234 1234',
-    },
-    approvalStatus: 'Approved',
-    notifySubscribers: false,
-    latestInternalReleaseNote: 'Approved by UI tests',
-    amendment: false,
-    permissions: {
-      canAddPrereleaseUsers: true,
-      canViewRelease: true,
-      canUpdateRelease: true,
-      canDeleteRelease: false,
-      canMakeAmendmentOfRelease: false,
-    },
-    updatePublishedDate: false,
-  },
-  {
-    id: '86d868cf-ff4b-4325-ef26-08d93c9b5089',
-    title: 'Academic year 2024/25',
-    slug: '2024-25',
-    publicationId: '959bd40c-4685-46ff-396d-08d93c9b5159',
-    publicationTitle:
-      'UI tests - Publication and Release UI Permissions Publication Owner',
-    publicationSummary: '',
-    publicationSlug:
-      'ui-tests-publication-and-release-ui-permissions-publication-owner',
-    year: 2024,
-    yearTitle: '2024/25',
-    nextReleaseDate: {
-      year: '2200',
-      month: '1',
-      day: '',
-    },
-    publishScheduled: '2048-11-16',
-    live: false,
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic year',
-    },
-    preReleaseAccessList: '<p>Test public access list</p>',
-    preReleaseUsersOrInvitesAdded: false,
-    previousVersionId: 'f',
-    latestRelease: false,
-    type: 'NationalStatistics',
-    contact: {
-      teamName: 'UI test team name',
-      teamEmail: 'ui_test@test.com',
-      contactName: 'UI test contact name',
-      contactTelNo: '1234 1234',
-    },
-    approvalStatus: 'Approved',
-    notifySubscribers: false,
-    latestInternalReleaseNote: 'Approved by UI tests',
-    amendment: false,
-    permissions: {
-      canAddPrereleaseUsers: true,
-      canViewRelease: true,
-      canUpdateRelease: true,
-      canDeleteRelease: false,
-      canMakeAmendmentOfRelease: false,
-    },
-    updatePublishedDate: false,
-  },
-];
+import methodologyQueries from '@admin/queries/methodologyQueries';
 
 const AdminDashboardPage = () => {
-  // TO DO EES-4448 replace with real permission
-  const isApprover = true;
   const { user } = useAuthContext();
   const isBauUser = user?.permissions.isBauUser ?? false;
+  const isApprover = user?.permissions.isApprover ?? false;
 
   const {
     data: draftReleases = [],
     isLoading: isLoadingDraftReleases,
     refetch: reloadDraftReleases,
   } = useQuery(releaseQueries.listDraftReleases);
+
   const {
     data: scheduledReleases = [],
     isLoading: isLoadingScheduledReleases,
   } = useQuery(releaseQueries.listScheduledReleases);
 
-  // TO DO EES-4448 fetch approvals data here and remove test data
-  // const {
-  //   data: methodologyApprovals = [],
-  //   isLoading: isLoadingMethodologyApprovals,
-  // } = useQuery(TBC);
-  // const {
-  //   data: releaseApprovals = [],
-  //   isLoading: isLoadingReleaseApprovals,
-  // } = useQuery(TBC);
-  const methodologyApprovals = testMethodologies;
-  const releaseApprovals = testReleases;
-  const isLoadingApprovals = false;
+  const { data: releaseApprovals = [], isLoading: isLoadingReleaseApprovals } =
+    useQuery({
+      ...releaseQueries.listReleasesForApproval,
+      enabled: isApprover,
+    });
 
-  const totalApprovals = methodologyApprovals.length + releaseApprovals.length;
+  const {
+    data: methodologyApprovals = [],
+    isLoading: isLoadingMethodologyApprovals,
+  } = useQuery({
+    ...methodologyQueries.listMethodologiesForApproval,
+    enabled: isApprover,
+  });
+
+  const isLoadingApprovals =
+    isLoadingReleaseApprovals || isLoadingMethodologyApprovals;
+
+  const totalApprovals =
+    !isLoadingApprovals &&
+    methodologyApprovals.length + releaseApprovals.length;
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -243,7 +136,7 @@ const AdminDashboardPage = () => {
             lazy
             id="approvals"
             data-testid="publication-approvals"
-            title={`My approvals (${totalApprovals})`}
+            title={`Your approvals (${totalApprovals})`}
           >
             <ApprovalsTab
               isLoading={isLoadingApprovals}

@@ -228,12 +228,16 @@ const releaseService = {
     return client.delete(`/release/${releaseId}`);
   },
 
-  getDraftReleases(): Promise<Release[]> {
+  listDraftReleases(): Promise<Release[]> {
     return client.get('/releases/draft');
   },
 
-  getScheduledReleases(): Promise<Release[]> {
+  listScheduledReleases(): Promise<Release[]> {
     return client.get('/releases/scheduled');
+  },
+
+  listReleasesForApproval(): Promise<Release[]> {
+    return client.get('/releases/approvals');
   },
 
   getReleasePublicationStatus(

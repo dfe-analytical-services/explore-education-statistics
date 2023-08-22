@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -422,20 +422,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
                 .Select(role => role.PublicationId);
 
-            var methodologiesToApprove = _context
+            var methodologiesToApprove = await _context
                     .MethodologyVersions
                     .Include(methodologyVersion => methodologyVersion.Methodology)
                     .ThenInclude(methodology => methodology.Publications)
-                    .ToList()
                     .Where(methodologyVersion =>
                         methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
                         && methodologyVersion.Methodology.Publications.Any(
                             publicationMethodology =>
                                 publicationMethodology.Owner
                                 && publicationIdsForApprover.Contains(publicationMethodology.PublicationId)))
-                // .ToListAsync();
-                ;
-            return methodologiesToApprove.Select(_mapper.Map<MethodologyVersionViewModel>).ToList();
+                    .ToListAsync();
+            
+            return (await methodologiesToApprove
+                .SelectAsync(BuildMethodologyVersionViewModel))
+                .ToList();
         }
 
         private async Task<Either<ActionResult, Unit>> DeleteVersion(MethodologyVersion methodologyVersion,
