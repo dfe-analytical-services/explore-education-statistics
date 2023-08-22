@@ -1,0 +1,8 @@
+{
+  "OpenIdConnect": {
+    "ClientId": "ees-admin-client",
+    "ClientSecret": "eaa4cc70-e80b-4a7e-a20f-2856d97f470d",
+    "Authority": "http://ees.local:5030/auth/realms/ees-realm",
+    "RequireHttpsMetadata": false
+  }
+}
