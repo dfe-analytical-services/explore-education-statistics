@@ -466,17 +466,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var releasesForApproval = await _context
                 .Releases
+                .Include(release => release.Publication)
                 .Where(release => 
                     release.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
                     && releaseIdsForApproval.Contains(release.Id))
                 .ToListAsync();
 
             return releasesForApproval
-                .Select(release => {
-                    var viewModel = _mapper.Map<ReleaseViewModel>(release);
-                    // TODO DW - need any permissions adding?
-                    return viewModel;
-                })
+                .Select(_mapper.Map<ReleaseViewModel>)
                 .ToList();
         }
 

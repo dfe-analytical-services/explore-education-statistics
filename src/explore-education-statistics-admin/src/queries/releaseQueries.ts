@@ -4,11 +4,15 @@ import releaseService from '@admin/services/releaseService';
 const releaseQueries = createQueryKeys('release', {
   listDraftReleases: {
     queryKey: null,
-    queryFn: () => releaseService.getDraftReleases(),
+    queryFn: () => releaseService.listDraftReleases(),
   },
   listScheduledReleases: {
     queryKey: null,
-    queryFn: () => releaseService.getScheduledReleases(),
+    queryFn: () => releaseService.listScheduledReleases(),
+  },
+  listReleasesForApproval: {
+    queryKey: null,
+    queryFn: () => releaseService.listReleasesForApproval(),
   },
 });
 
