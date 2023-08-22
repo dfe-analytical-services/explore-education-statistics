@@ -32,6 +32,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         $"appsettings.{Environment.GetEnvironmentVariable("BootstrapUsersConfiguration")}.json", 
                         optional: true, 
                         reloadOnChange: true);
+
+                    builder.AddJsonFile(
+                        "appsettings.Local.json",
+                        optional: true,
+                        reloadOnChange: true);
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {

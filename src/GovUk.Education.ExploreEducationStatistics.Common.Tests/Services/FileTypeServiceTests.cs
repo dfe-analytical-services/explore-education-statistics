@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -6,6 +7,7 @@ using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -31,32 +33,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
     
     public class FileTypeServiceTests
     {
-        // ideally this would be detected as application/msword, but this is close enough
-        private static readonly FileInfo Doc = new FileInfo("test.doc", "application/CDFV2");
+        private static readonly FileInfo Doc = new("test.doc", "application/msword");
         
-        private static readonly FileInfo Docx = new FileInfo("test.docx", 
+        private static readonly FileInfo Docx = new("test.docx",
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document");
         
-        private static readonly FileInfo Ods = new FileInfo("test.ods", 
+        private static readonly FileInfo Ods = new("test.ods",
             "application/vnd.oasis.opendocument.spreadsheet");
         
-        private static readonly FileInfo Odt = new FileInfo("test.odt", 
+        private static readonly FileInfo Odt = new("test.odt",
             "application/vnd.oasis.opendocument.text");
         
-        // ideally this would be detected as application/msexcel or application/vnd.ms-excel, but this is close enough
-        private static readonly FileInfo Xls = new FileInfo("test.xls", "application/CDFV2");
-        private static readonly FileInfo Xlsx = new FileInfo("test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        private static readonly FileInfo Xlsx2 = new FileInfo("test2.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        private static readonly FileInfo Csv = new FileInfo("test.csv", "application/csv");
-        private static readonly FileInfo Txt = new FileInfo("test.txt", "text/plain");
-        private static readonly FileInfo Pdf = new FileInfo("test.pdf", "application/pdf");
-        private static readonly FileInfo Bmp = new FileInfo("test.bmp", "image/bmp");
-        private static readonly FileInfo Gif = new FileInfo("test.gif", "image/gif");
-        private static readonly FileInfo Jpg = new FileInfo("test.jpg", "image/jpeg");
-        private static readonly FileInfo Png = new FileInfo("test.png", "image/png");
-        private static readonly FileInfo Zip = new FileInfo("test.zip", "application/x-compressed");
+        private static readonly FileInfo Xls = new("test.xls", "application/vnd.ms-excel");
+        private static readonly FileInfo Xlsx = new("test.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        private static readonly FileInfo Xlsx2 = new("test2.xlsx", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        private static readonly FileInfo Csv = new("test.csv", "text/csv");
+        private static readonly FileInfo Txt = new("test.txt", "text/plain");
+        private static readonly FileInfo Pdf = new("test.pdf", "application/pdf");
+        private static readonly FileInfo Bmp = new("test.bmp", "image/bmp");
+        private static readonly FileInfo Gif = new("test.gif", "image/gif");
+        private static readonly FileInfo Jpg = new("test.jpg", "image/jpeg");
+        private static readonly FileInfo Png = new("test.png", "image/png");
+        private static readonly FileInfo Zip = new("test.zip", "application/x-compressed");
         
-        private static readonly List<FileInfo> ImageTypes = new List<FileInfo>
+        private static readonly List<FileInfo> ImageTypes = new()
         {
             Bmp,
             Gif,
@@ -64,18 +64,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Png
         };
         
-        private static readonly List<FileInfo> CsvTypes = new List<FileInfo>
+        private static readonly List<FileInfo> CsvTypes = new()
         {
             Csv,
             Txt,
         };
         
-        private static readonly List<FileInfo> ArchiveTypes = new List<FileInfo>
+        private static readonly List<FileInfo> ArchiveTypes = new()
         {
             Zip,
         };
         
-        private static readonly List<FileInfo> AllTypes = new List<FileInfo>
+        private static readonly List<FileInfo> AllTypes = new()
         {
             Doc,
             Docx,
@@ -223,9 +223,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         
         private static void AssertMimeTypeCorrect(FileInfo fileInfo)
         {
-            var service = new FileTypeService(Mock.Of<ILogger<FileTypeService>>());
+            var service = BuildService();
 
-            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
                 "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
             
             var formFile = new Mock<IFormFile>();
@@ -242,9 +242,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private static void AssertHasMatchingMimeType(FileInfo fileInfo, List<Regex> availableMimeTypes, 
             bool expectedToSucceed)
         {
-            var service = new FileTypeService(Mock.Of<ILogger<FileTypeService>>());
+            var service = BuildService();
 
-            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+            var filePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!,
                 "Resources" + Path.DirectorySeparatorChar + fileInfo.Filename);
             
             var formFile = new Mock<IFormFile>();
@@ -255,6 +255,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             var result = service.HasMatchingMimeType(formFile.Object, availableMimeTypes).Result;
             
             Assert.Equal(expectedToSucceed, result);
+        }
+
+        private static IConfiguration DefaultConfiguration()
+        {
+            return new ConfigurationBuilder().Build();
+        }
+
+        private static FileTypeService BuildService(IConfiguration? configuration = null)
+        {
+            return new FileTypeService(
+                Mock.Of<ILogger<FileTypeService>>(),
+                configuration ?? DefaultConfiguration()
+            );
         }
     }
 }

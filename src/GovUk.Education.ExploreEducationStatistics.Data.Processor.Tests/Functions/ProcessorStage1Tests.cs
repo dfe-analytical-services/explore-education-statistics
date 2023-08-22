@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services;
 using Microsoft.Azure.WebJobs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -133,7 +134,7 @@ public class ProcessorStage1Tests
         var validatorService = new ValidatorService(
             Mock.Of<ILogger<ValidatorService>>(),
             privateBlobStorageService.Object,
-            new FileTypeService(Mock.Of<ILogger<FileTypeService>>()),
+            new FileTypeService(Mock.Of<ILogger<FileTypeService>>(), new ConfigurationBuilder().Build()),
             dataImportService);
 
         var processorService = BuildProcessorService(
