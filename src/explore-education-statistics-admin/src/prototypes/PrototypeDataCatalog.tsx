@@ -20,7 +20,7 @@ const PrototypeDataCatalogue = () => {
   const urlDataType = params.get('dataType');
 
   const [fullList] = useState(true);
-  const [listCompact, setListCompact] = useState(false);
+  const [listCompact, setListCompact] = useState(true);
   const [searchQuery] = useState('');
   const [selectedTheme, setSelectedTheme] = useState(
     urlTheme === 'fe' ? 'Further education' : 'All themes',
@@ -155,245 +155,316 @@ const PrototypeDataCatalogue = () => {
         </div>
         <hr />
 
-        <div className="govuk-grid-row">
-          <div className="govuk-grid-column-one-third">
-            <div
-              className="govuk-form-group govuk-!-margin-bottom-6"
-              style={{ position: 'relative' }}
-            >
-              <h2 className="govuk-label-wrapper">
-                <label className="govuk-label govuk-label--s" htmlFor="search">
-                  Search
-                </label>
-              </h2>
-              <input
-                type="search"
-                id="search"
-                className="govuk-input"
-                value=""
-              />
-            </div>
-            <div
-              className="govuk-form-group govuk-!-margin-bottom-6"
-              style={{ position: 'relative' }}
-            >
-              <h2 className="govuk-label-wrapper">
-                <label className="govuk-label govuk-label--s" htmlFor="theme">
-                  Theme
-                </label>
-              </h2>
-              <select
-                className="govuk-select"
-                id="theme"
-                onBlur={_ => {}}
-                /* eslint-disable-next-line */
-                onChange={e => {
-                  params.delete('theme');
-                  setSelectedTheme(e.target.value);
-                  setSelectedPublication('All publications');
-                }}
-              >
-                <option value={selectedTheme} selected>
-                  {selectedTheme}
-                </option>
-                <option value="All themes">All themes</option>
-                <option value="Children's social care">
-                  Children's social care
-                </option>
-                <option value="COVID-19">COVID-19</option>
-                <option value="Destination of pupils and students">
-                  Destination of pupils and students
-                </option>
-                <option value="Early years">Early years</option>
-                <option value="Finance and funding">Finance and funding</option>
-                <option value="Further education">Further education</option>
-                <option value="Higher education">Higher education</option>
-                <option value="Pupils and schools">Pupils and schools</option>
-                <option value="School and college outcomes and performance">
-                  School and college outcomes and performance
-                </option>
-                <option value="Teachers and school workforce">
-                  Teachers and school workforce
-                </option>
-                <option value="UK education and training statistics">
-                  UK education and training statistics
-                </option>
-              </select>
-            </div>
-            <div
-              className="govuk-form-group govuk-!-margin-bottom-6"
-              style={{ position: 'relative' }}
-            >
-              <h2 className="govuk-label-wrapper">
-                <label
-                  className="govuk-label govuk-label--s"
-                  htmlFor="pubilication"
-                >
-                  Publication
-                </label>
-              </h2>
+        <div className="dfe-flex dfe-flex-wrap">
+          <div className={styles.stickyWidthOneThird}>
+            <div className={styles.stickyLinksContainer}>
+              <form action="#" className="govuk-form">
+                <fieldset className="govuk-fieldset">
+                  <legend className="govuk-fieldset__legend govuk-fieldset__legend--m">
+                    Filter data sets
+                  </legend>
+                  <div
+                    className="govuk-form-group govuk-!-margin-bottom-6"
+                    style={{ position: 'relative' }}
+                  >
+                    <h2 className="govuk-label-wrapper">
+                      <label
+                        className="govuk-label govuk-label--s"
+                        htmlFor="search"
+                      >
+                        Search
+                      </label>
+                    </h2>
+                    <input
+                      type="search"
+                      id="search"
+                      className="govuk-input"
+                      value=""
+                    />
+                  </div>
+                  <div
+                    className="govuk-form-group govuk-!-margin-bottom-6"
+                    style={{ position: 'relative' }}
+                  >
+                    <h2 className="govuk-label-wrapper">
+                      <label
+                        className="govuk-label govuk-label--s"
+                        htmlFor="theme"
+                      >
+                        Theme
+                      </label>
+                    </h2>
+                    <select
+                      className="govuk-select"
+                      id="theme"
+                      onBlur={_ => {}}
+                      /* eslint-disable-next-line */
+                      onChange={e => {
+                        params.delete('theme');
+                        setSelectedTheme(e.target.value);
+                        setSelectedPublication('All publications');
+                      }}
+                    >
+                      <option value={selectedTheme} selected>
+                        {selectedTheme}
+                      </option>
+                      <option value="All themes">All themes</option>
+                      <option value="Children's social care">
+                        Children's social care
+                      </option>
+                      <option value="COVID-19">COVID-19</option>
+                      <option value="Destination of pupils and students">
+                        Destination of pupils and students
+                      </option>
+                      <option value="Early years">Early years</option>
+                      <option value="Finance and funding">
+                        Finance and funding
+                      </option>
+                      <option value="Further education">
+                        Further education
+                      </option>
+                      <option value="Higher education">Higher education</option>
+                      <option value="Pupils and schools">
+                        Pupils and schools
+                      </option>
+                      <option value="School and college outcomes and performance">
+                        School and college outcomes and performance
+                      </option>
+                      <option value="Teachers and school workforce">
+                        Teachers and school workforce
+                      </option>
+                      <option value="UK education and training statistics">
+                        UK education and training statistics
+                      </option>
+                    </select>
+                  </div>
+                  <div
+                    className="govuk-form-group govuk-!-margin-bottom-6"
+                    style={{ position: 'relative' }}
+                  >
+                    <h2 className="govuk-label-wrapper">
+                      <label
+                        className="govuk-label govuk-label--s"
+                        htmlFor="pubilication"
+                      >
+                        Publication
+                      </label>
+                    </h2>
 
-              <select
-                className="govuk-select"
-                id="publication"
-                onBlur={_ => {}}
-                /* eslint-disable-next-line */
-                onChange={e => {
-                  setSelectedPublication(e.target.value);
-                  setTotalResults(32);
-                }}
-                /* eslint-disable-next-line react/jsx-props-no-spreading */
-                {...(selectedTheme !== 'Further education' && {
-                  disabled: true,
-                })}
-              >
-                <option value={selectedPublication} selected>
-                  {selectedPublication}
-                </option>
-                <option value="All publications">All publications</option>
-                <option value="Apprenticeships and traineeships">
-                  Apprenticeships and traineeships
-                </option>
-                <option value="Apprenticeships in England by industry characteristics">
-                  Apprenticeships in England by industry characteristics
-                </option>
-                <option value="Career pathways: post-16 qualifications held by employees">
-                  Career pathways: post-16 qualifications held by employees
-                </option>
-                <option
-                  value="Detailed destinations of 16 to 18 year olds in Further
+                    <select
+                      className="govuk-select"
+                      id="publication"
+                      onBlur={_ => {}}
+                      /* eslint-disable-next-line */
+                      onChange={e => {
+                        setSelectedPublication(e.target.value);
+                        setTotalResults(32);
+                      }}
+                      /* eslint-disable-next-line react/jsx-props-no-spreading */
+                      {...(selectedTheme !== 'Further education' && {
+                        disabled: true,
+                      })}
+                    >
+                      <option value={selectedPublication} selected>
+                        {selectedPublication}
+                      </option>
+                      <option value="All publications">All publications</option>
+                      <option value="Apprenticeships and traineeships">
+                        Apprenticeships and traineeships
+                      </option>
+                      <option value="Apprenticeships in England by industry characteristics">
+                        Apprenticeships in England by industry characteristics
+                      </option>
+                      <option value="Career pathways: post-16 qualifications held by employees">
+                        Career pathways: post-16 qualifications held by
+                        employees
+                      </option>
+                      <option
+                        value="Detailed destinations of 16 to 18 year olds in Further
                   Education"
-                >
-                  Detailed destinations of 16 to 18 year olds in Further
-                  Education
-                </option>
-                <option
-                  value="FE learners going into employment and learning destinations by
+                      >
+                        Detailed destinations of 16 to 18 year olds in Further
+                        Education
+                      </option>
+                      <option
+                        value="FE learners going into employment and learning destinations by
                   local authority district"
-                >
-                  FE learners going into employment and learning destinations by
-                  local authority district
-                </option>
-                <option value="Further education and skills">
-                  Further education and skills
-                </option>
-                <option value="Further education: outcome-based success measures">
-                  Further education: outcome-based success measures
-                </option>
-                <option value="Further education skills index">
-                  Further education skills index
-                </option>
-                <option value="Skills Bootcamps outcomes">
-                  Skills Bootcamps outcomes
-                </option>
-                <option value="Skills Bootcamps starts">
-                  Skills Bootcamps starts
-                </option>
-              </select>
-            </div>
+                      >
+                        FE learners going into employment and learning
+                        destinations by local authority district
+                      </option>
+                      <option value="Further education and skills">
+                        Further education and skills
+                      </option>
+                      <option value="Further education: outcome-based success measures">
+                        Further education: outcome-based success measures
+                      </option>
+                      <option value="Further education skills index">
+                        Further education skills index
+                      </option>
+                      <option value="Skills Bootcamps outcomes">
+                        Skills Bootcamps outcomes
+                      </option>
+                      <option value="Skills Bootcamps starts">
+                        Skills Bootcamps starts
+                      </option>
+                    </select>
+                  </div>
 
-            {selectedPublication === 'Apprenticeships and traineeships' && (
-              <div
-                className="govuk-form-group govuk-!-margin-bottom-6"
-                style={{ position: 'relative' }}
-              >
-                <h2 className="govuk-label-wrapper">
-                  <label
-                    className="govuk-label govuk-label--s"
-                    htmlFor="pubilication"
-                  >
-                    Related release
-                  </label>
-                </h2>
-                <select
-                  className="govuk-select"
-                  id="release"
-                  /* eslint-disable-next-line react/jsx-props-no-spreading */
-                  {...(selectedPublication !==
-                    'Apprenticeships and traineeships' && { disabled: true })}
-                  onBlur={_ => {}}
-                  // eslint-disable-next-line jsx-a11y/no-onchange
-                  onChange={e => {
-                    setSelectedRelease(e.target.value);
-                  }}
-                >
-                  <option
-                    value={selectedRelease}
-                    selected={selectedRelease !== ''}
-                  >
-                    {selectedRelease}
-                  </option>
-                  <option value="Academic year 2020/21">
-                    Academic year 2020/21
-                  </option>
-                  <option value="Academic year 2019/20">
-                    Academic year 2019/20
-                  </option>
-                  <option value="Academic year 2019/20">
-                    Academic year 2018/19
-                  </option>
-                </select>
+                  {selectedPublication ===
+                    'Apprenticeships and traineeships' && (
+                    <div
+                      className="govuk-form-group govuk-!-margin-bottom-6"
+                      style={{ position: 'relative' }}
+                    >
+                      <h2 className="govuk-label-wrapper">
+                        <label
+                          className="govuk-label govuk-label--s"
+                          htmlFor="pubilication"
+                        >
+                          Related release
+                        </label>
+                      </h2>
+                      <select
+                        className="govuk-select"
+                        id="release"
+                        /* eslint-disable-next-line react/jsx-props-no-spreading */
+                        {...(selectedPublication !==
+                          'Apprenticeships and traineeships' && {
+                          disabled: true,
+                        })}
+                        onBlur={_ => {}}
+                        // eslint-disable-next-line jsx-a11y/no-onchange
+                        onChange={e => {
+                          setSelectedRelease(e.target.value);
+                        }}
+                      >
+                        <option
+                          value={selectedRelease}
+                          selected={selectedRelease !== ''}
+                        >
+                          {selectedRelease}
+                        </option>
+                        <option value="Academic year 2020/21">
+                          Academic year 2020/21
+                        </option>
+                        <option value="Academic year 2019/20">
+                          Academic year 2019/20
+                        </option>
+                        <option value="Academic year 2019/20">
+                          Academic year 2018/19
+                        </option>
+                      </select>
+                    </div>
+                  )}
+                  <div className="govuk-!-margin-top-3">
+                    <a
+                      href="#"
+                      onClick={e => {
+                        params.delete('theme');
+                        params.delete('publication');
+                        setSelectedTheme('All themes');
+                        setSelectedPublication('All publications');
+                        e.preventDefault();
+                      }}
+                    >
+                      Clear filters
+                    </a>
+                  </div>
+                </fieldset>
+              </form>
+
+              <hr />
+              <div className="govuk-radios govuk-radios--small">
+                <fieldset className="govuk-fieldset govuk-!-margin-top-6">
+                  <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
+                    Type of data
+                  </legend>
+                  <div className="govuk-radios__item">
+                    <input
+                      type="radio"
+                      className="govuk-radios__input"
+                      name="filetype"
+                      id="filetype-2"
+                      value="csv"
+                      checked={dataType === 'csv'}
+                      onChange={e => {
+                        setDataType(e.target.value);
+                      }}
+                    />
+                    <label
+                      className="govuk-label govuk-radios__label"
+                      htmlFor="filetype-2"
+                    >
+                      Data downloads (CSV)
+                    </label>
+                  </div>
+                  <div className="govuk-radios__item">
+                    <input
+                      type="radio"
+                      className="govuk-radios__input"
+                      name="filetype"
+                      id="filetype-1"
+                      value="api"
+                      checked={dataType === 'api'}
+                      onChange={e => {
+                        setDataType(e.target.value);
+                      }}
+                    />
+                    <label
+                      className="govuk-label govuk-radios__label"
+                      htmlFor="filetype-1"
+                    >
+                      API data sets
+                    </label>
+                  </div>
+                </fieldset>
               </div>
-            )}
-
-            <hr />
-            <div className="govuk-radios govuk-radios--small">
-              <fieldset className="govuk-fieldset govuk-!-margin-top-6">
-                <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
-                  Type of data
-                </legend>
-                <div className="govuk-radios__item">
-                  <input
-                    type="radio"
-                    className="govuk-radios__input"
-                    name="filetype"
-                    id="filetype-2"
-                    value="csv"
-                    checked={dataType === 'csv'}
-                    onChange={e => {
-                      setDataType(e.target.value);
-                    }}
-                  />
-                  <label
-                    className="govuk-label govuk-radios__label"
-                    htmlFor="filetype-2"
-                  >
-                    Data downloads (CSV)
-                  </label>
-                </div>
-                <div className="govuk-radios__item">
-                  <input
-                    type="radio"
-                    className="govuk-radios__input"
-                    name="filetype"
-                    id="filetype-1"
-                    value="api"
-                    checked={dataType === 'api'}
-                    onChange={e => {
-                      setDataType(e.target.value);
-                    }}
-                  />
-                  <label
-                    className="govuk-label govuk-radios__label"
-                    htmlFor="filetype-1"
-                  >
-                    API data sets
-                  </label>
-                </div>
-              </fieldset>
-              <div className="govuk-!-margin-top-3">
-                <a
-                  href="#"
-                  onClick={e => {
-                    params.delete('theme');
-                    params.delete('publication');
-                    setSelectedTheme('All themes');
-                    setSelectedPublication('All publications');
-                    e.preventDefault();
-                  }}
-                >
-                  Clear all filters
-                </a>
+              <hr />
+              <div className="govuk-radios govuk-radios--small">
+                <fieldset className="govuk-fieldset govuk-!-margin-top-6">
+                  <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
+                    Display results
+                  </legend>
+                  <div className="govuk-radios__item">
+                    <input
+                      type="radio"
+                      className="govuk-radios__input"
+                      name="resultType"
+                      id="resultType-1"
+                      value="compact"
+                      checked={listCompact}
+                      onChange={() => {
+                        setListCompact(true);
+                      }}
+                    />
+                    <label
+                      className="govuk-label govuk-radios__label"
+                      htmlFor="resultType-1"
+                    >
+                      Show compact list
+                    </label>
+                  </div>
+                  <div className="govuk-radios__item">
+                    <input
+                      type="radio"
+                      className="govuk-radios__input"
+                      name="resultType"
+                      id="resultType-2"
+                      value="full"
+                      checked={!listCompact}
+                      onChange={() => {
+                        setListCompact(false);
+                      }}
+                    />
+                    <label
+                      className="govuk-label govuk-radios__label"
+                      htmlFor="resultType-2"
+                    >
+                      Show full details
+                    </label>
+                  </div>
+                </fieldset>
               </div>
             </div>
           </div>
@@ -470,26 +541,49 @@ const PrototypeDataCatalogue = () => {
                 <h2 className="govuk-!-margin-bottom-0">
                   {selectedPublication}
                 </h2>
-                <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-                  <h3 className="govuk-heading-m govuk-!-margin-bottom-3">
-                    {dataType === 'csv'
-                      ? '32 data downloads (CSV)'
-                      : '12 API data sets'}
-                  </h3>
-                </div>
-                <div className="govuk-!-margin-top-3">
-                  <a
-                    href="#"
-                    onClick={e => {
-                      setSelectedTheme('Further education');
-                      setSelectedPublication('All publications');
-                      e.preventDefault();
-                    }}
+                <h3 className="govuk-heading-m govuk-!-margin-bottom-3">
+                  {dataType === 'csv'
+                    ? `32 data downloads (CSV)`
+                    : `12 API data sets`}
+                </h3>
+                <p>
+                  <span className="govuk-tag">National statistics</span>{' '}
+                  {selectedRelease === latestRelease && (
+                    <span className="govuk-tag">latest data</span>
+                  )}
+                  {selectedRelease !== latestRelease && (
+                    <span className="govuk-tag govuk-tag--orange">
+                      Not the latest data
+                    </span>
+                  )}
+                  <Link
+                    to="./releaseData#exploreData"
+                    className="govuk-!-margin-left-3"
                   >
-                    Show all further education data sets
-                  </a>
-                </div>
-                <hr />
+                    View this publication
+                  </Link>
+                </p>
+                {selectedRelease !== latestRelease && (
+                  <p className="govuk-!-margin-top-3">
+                    <a
+                      href="#"
+                      onClick={_ => {
+                        setSelectedRelease(latestRelease);
+                      }}
+                    >
+                      View the latest data: {latestRelease}
+                    </a>
+                  </p>
+                )}
+                {dataType === 'csv' && (
+                  <>
+                    <hr />
+                    <Button className="govuk-!-margin-bottom-0">
+                      Download all 32 datasets (.zip)
+                    </Button>
+                  </>
+                )}
+                {/* 
                 <SummaryList noBorder>
                   <SummaryListItem term="Type">
                     <span className="govuk-tag">National statistics</span>{' '}
@@ -541,6 +635,7 @@ const PrototypeDataCatalogue = () => {
                     </ul>
                   </SummaryListItem>
                 </SummaryList>
+                */}
                 {/* <dl>
                   <div className="dfe-flex">
                     <dt style={{ flexBasis: '200px' }}>Type</dt>

@@ -467,6 +467,22 @@
   }
 }
 
+.stickyWidthOneQuarter {
+  width: 25%;
+  border: 1px solid red;
+  @include govuk-media-query($until: tablet) {
+    flex: 1 0 100%;
+  }
+}
+
+.stickyWidthOneThird {
+  width: 33.333%;
+  padding-right: 2rem;
+  @include govuk-media-query($until: tablet) {
+    flex: 1 0 100%;
+  }
+}
+
 .stickyLinksContainer {
   top: 1rem;
 
@@ -483,6 +499,10 @@
   margin-right: 1rem;
   max-width: 250px;
   padding-right: 1rem;
+
+  @include govuk-media-query($until: tablet) {
+    flex-basis: 1 1 100%;
+  }
 }
 
 .releaseContainer {

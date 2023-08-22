@@ -122,201 +122,195 @@ const PrototypeHomepage = () => {
 
           <hr className="govuk-!-margin-top-6" />
 
-          <div className="govuk-grid-row">
-            <div className={styles.stickyLinksContainer}>
-              <div>
-                <div
-                  className={classNames(
-                    'govuk-grid-column-one-quarter',
-                    styles.stickyLinksContainer,
+          <div className="dfe-flex dfe-flex-wrap ">
+            <div className={styles.stickyWidthOneQuarter}>
+              <div className={classNames(styles.stickyLinksContainer)}>
+                <div className={classNames(styles.stickyLinks)}>
+                  <h2 className="govuk-heading-m">Contents</h2>
+
+                  <ul className="govuk-list  govuk-list--spaced" id="pageNav">
+                    <li>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                          {
+                            'govuk-!-font-weight-bold':
+                              sectionSelected === 'dataSummary',
+                          },
+                        )}
+                        href={sectionShowAll ? '#dataSummary' : '#'}
+                        onClick={_ => {
+                          setSectionSelected('dataSummary');
+                        }}
+                      >
+                        Data set summary
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                          {
+                            'govuk-!-font-weight-bold':
+                              sectionSelected === 'dataPreview',
+                          },
+                        )}
+                        href={sectionShowAll ? '#dataPreview' : '#'}
+                        onClick={_ => {
+                          setSectionSelected('dataPreview');
+                        }}
+                      >
+                        Data preview
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                          {
+                            'govuk-!-font-weight-bold':
+                              sectionSelected === 'changelog',
+                          },
+                        )}
+                        href={sectionShowAll ? '#changelog' : '#'}
+                        onClick={_ => {
+                          setSectionSelected('changelog');
+                        }}
+                      >
+                        Changelog
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                          {
+                            'govuk-!-font-weight-bold':
+                              sectionSelected === 'versionHistory',
+                          },
+                        )}
+                        href={sectionShowAll ? '#versionHistory' : '#'}
+                        onClick={_ => {
+                          setSectionSelected('versionHistory');
+                        }}
+                      >
+                        Version history
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                          {
+                            'govuk-!-font-weight-bold':
+                              sectionSelected === 'endPoints',
+                          },
+                        )}
+                        href={sectionShowAll ? '#endPoints' : '#'}
+                        onClick={_ => {
+                          setSectionSelected('endPoints');
+                        }}
+                      >
+                        API endpoints quick start
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                          {
+                            'govuk-!-font-weight-bold':
+                              sectionSelected === 'download',
+                          },
+                        )}
+                        href={sectionShowAll ? '#download' : '#'}
+                        onClick={_ => {
+                          setSectionSelected('download');
+                        }}
+                      >
+                        Download data or create tables
+                      </a>
+                    </li>
+                  </ul>
+
+                  <h3 className="govuk-heading-s">Help and guidance</h3>
+                  <ul className="govuk-list govuk-list--spaced">
+                    <li>
+                      <Link
+                        to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                      >
+                        API documentation
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="./releaseData"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                      >
+                        View related release
+                      </Link>
+                    </li>
+                  </ul>
+                  <h3 className="govuk-heading-s">Page view</h3>
+                  <ul className="govuk-list">
+                    <li>
+                      <a
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                        href="#"
+                        onClick={e => {
+                          e.preventDefault();
+                          setSectionShowAll(!sectionShowAll);
+                        }}
+                      >
+                        {sectionShowAll
+                          ? 'Show as individual sections'
+                          : 'Show all sections on page'}
+                      </a>
+                    </li>
+                  </ul>
+
+                  {sectionShowAll && (
+                    <>
+                      <hr />
+                      <a href="#">
+                        <svg
+                          role="presentation"
+                          focusable="false"
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="13"
+                          height="17"
+                          viewBox="0 0 13 17"
+                          className="govuk-!-margin-right-1"
+                        >
+                          <path
+                            fill="currentColor"
+                            d="M6.5 0L0 6.5 1.4 8l4-4v12.7h2V4l4.3 4L13 6.4z"
+                          />
+                        </svg>
+                        Back to top
+                      </a>
+                    </>
                   )}
-                >
-                  <div className={classNames(styles.stickyLinks)}>
-                    <h2 className="govuk-heading-m">Contents</h2>
-
-                    <ul className="govuk-list  govuk-list--spaced" id="pageNav">
-                      <li>
-                        <a
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                            {
-                              'govuk-!-font-weight-bold':
-                                sectionSelected === 'dataSummary',
-                            },
-                          )}
-                          href={sectionShowAll ? '#dataSummary' : '#'}
-                          onClick={_ => {
-                            setSectionSelected('dataSummary');
-                          }}
-                        >
-                          Data set summary
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                            {
-                              'govuk-!-font-weight-bold':
-                                sectionSelected === 'dataPreview',
-                            },
-                          )}
-                          href={sectionShowAll ? '#dataPreview' : '#'}
-                          onClick={_ => {
-                            setSectionSelected('dataPreview');
-                          }}
-                        >
-                          Data preview
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                            {
-                              'govuk-!-font-weight-bold':
-                                sectionSelected === 'changelog',
-                            },
-                          )}
-                          href={sectionShowAll ? '#changelog' : '#'}
-                          onClick={_ => {
-                            setSectionSelected('changelog');
-                          }}
-                        >
-                          Changelog
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                            {
-                              'govuk-!-font-weight-bold':
-                                sectionSelected === 'versionHistory',
-                            },
-                          )}
-                          href={sectionShowAll ? '#versionHistory' : '#'}
-                          onClick={_ => {
-                            setSectionSelected('versionHistory');
-                          }}
-                        >
-                          Version history
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                            {
-                              'govuk-!-font-weight-bold':
-                                sectionSelected === 'endPoints',
-                            },
-                          )}
-                          href={sectionShowAll ? '#endPoints' : '#'}
-                          onClick={_ => {
-                            setSectionSelected('endPoints');
-                          }}
-                        >
-                          API endpoints quick start
-                        </a>
-                      </li>
-                      <li>
-                        <a
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                            {
-                              'govuk-!-font-weight-bold':
-                                sectionSelected === 'download',
-                            },
-                          )}
-                          href={sectionShowAll ? '#download' : '#'}
-                          onClick={_ => {
-                            setSectionSelected('download');
-                          }}
-                        >
-                          Download data or create tables
-                        </a>
-                      </li>
-                    </ul>
-
-                    <h3 className="govuk-heading-s">Help and guidance</h3>
-                    <ul className="govuk-list govuk-list--spaced">
-                      <li>
-                        <Link
-                          to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                          )}
-                        >
-                          API documentation
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          to="./releaseData"
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                          )}
-                        >
-                          View related release
-                        </Link>
-                      </li>
-                    </ul>
-                    <h3 className="govuk-heading-s">Page view</h3>
-                    <ul className="govuk-list">
-                      <li>
-                        <a
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            styles.prototypeLinkNoUnderline,
-                          )}
-                          href="#"
-                          onClick={e => {
-                            e.preventDefault();
-                            setSectionShowAll(!sectionShowAll);
-                          }}
-                        >
-                          {sectionShowAll
-                            ? 'Show as individual sections'
-                            : 'Show all sections on page'}
-                        </a>
-                      </li>
-                    </ul>
-
-                    {sectionShowAll && (
-                      <>
-                        <hr />
-                        <a href="#">
-                          <svg
-                            role="presentation"
-                            focusable="false"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="13"
-                            height="17"
-                            viewBox="0 0 13 17"
-                            className="govuk-!-margin-right-1"
-                          >
-                            <path
-                              fill="currentColor"
-                              d="M6.5 0L0 6.5 1.4 8l4-4v12.7h2V4l4.3 4L13 6.4z"
-                            />
-                          </svg>
-                          Back to top
-                        </a>
-                      </>
-                    )}
-                  </div>
                 </div>
               </div>
             </div>
+
             <div className="govuk-grid-column-three-quarters" ref={contentRef}>
               {(sectionShowAll || sectionSelected === 'dataSummary') && (
                 <section id="dataSummary" className={styles.sectionScroll}>
