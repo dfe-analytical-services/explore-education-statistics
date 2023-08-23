@@ -126,8 +126,32 @@ const PrototypeHomepage = () => {
             <div className={styles.stickyWidthOneQuarter}>
               <div className={classNames(styles.stickyLinksContainer)}>
                 <div className={classNames(styles.stickyLinks)}>
-                  <h2 className="govuk-heading-m">Contents</h2>
-
+                  <h3 className="govuk-heading-s">Help and guidance</h3>
+                  <ul className="govuk-list govuk-list--spaced">
+                    <li>
+                      <Link
+                        to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                      >
+                        API documentation
+                      </Link>
+                    </li>
+                    <li>
+                      <Link
+                        to="./releaseData"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                      >
+                        View related release
+                      </Link>
+                    </li>
+                  </ul>
+                  <h3 className="govuk-heading-s">On this page</h3>
                   <ul className="govuk-list  govuk-list--spaced" id="pageNav">
                     <li>
                       <a
@@ -239,31 +263,7 @@ const PrototypeHomepage = () => {
                     </li>
                   </ul>
 
-                  <h3 className="govuk-heading-s">Help and guidance</h3>
-                  <ul className="govuk-list govuk-list--spaced">
-                    <li>
-                      <Link
-                        to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
-                        className={classNames(
-                          'govuk-link--no-visited-state',
-                          styles.prototypeLinkNoUnderline,
-                        )}
-                      >
-                        API documentation
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="./releaseData"
-                        className={classNames(
-                          'govuk-link--no-visited-state',
-                          styles.prototypeLinkNoUnderline,
-                        )}
-                      >
-                        View related release
-                      </Link>
-                    </li>
-                  </ul>
+                  {/*
                   <h3 className="govuk-heading-s">Page view</h3>
                   <ul className="govuk-list">
                     <li>
@@ -283,8 +283,8 @@ const PrototypeHomepage = () => {
                           : 'Show all sections on page'}
                       </a>
                     </li>
-                  </ul>
-
+                  </ul>      
+                  */}
                   {sectionShowAll && (
                     <>
                       <hr />

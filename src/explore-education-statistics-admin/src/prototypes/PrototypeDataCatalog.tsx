@@ -18,9 +18,12 @@ const PrototypeDataCatalogue = () => {
   const urlPublication = params.get('publication');
   const urlSource = params.get('source');
   const urlDataType = params.get('dataType');
+  const urlCompactList = params.get('compactList');
 
   const [fullList] = useState(true);
-  const [listCompact, setListCompact] = useState(true);
+  const [listCompact, setListCompact] = useState(
+    !urlCompactList || urlCompactList === 'true',
+  );
   const [searchQuery] = useState('');
   const [selectedTheme, setSelectedTheme] = useState(
     urlTheme === 'fe' ? 'Further education' : 'All themes',
@@ -345,6 +348,9 @@ const PrototypeDataCatalogue = () => {
                         >
                           {selectedRelease}
                         </option>
+                        <option value="Academic year 2021/22">
+                          Academic year 2021/22
+                        </option>
                         <option value="Academic year 2020/21">
                           Academic year 2020/21
                         </option>
@@ -358,16 +364,7 @@ const PrototypeDataCatalogue = () => {
                     </div>
                   )}
                   <div className="govuk-!-margin-top-3">
-                    <a
-                      href="#"
-                      onClick={e => {
-                        params.delete('theme');
-                        params.delete('publication');
-                        setSelectedTheme('All themes');
-                        setSelectedPublication('All publications');
-                        e.preventDefault();
-                      }}
-                    >
+                    <a href={`?theme=&publication=&dataType=${dataType}`}>
                       Clear filters
                     </a>
                   </div>
@@ -420,11 +417,11 @@ const PrototypeDataCatalogue = () => {
                   </div>
                 </fieldset>
               </div>
-              <hr />
+
               <div className="govuk-radios govuk-radios--small">
                 <fieldset className="govuk-fieldset govuk-!-margin-top-6">
                   <legend className="govuk-heading-s govuk-!-margin-bottom-0 ">
-                    Display results
+                    Result display
                   </legend>
                   <div className="govuk-radios__item">
                     <input
@@ -474,47 +471,41 @@ const PrototypeDataCatalogue = () => {
               <div role="region" aria-live="polite" aria-atomic="true">
                 {selectedPublication === 'All publications' &&
                   selectedTheme === 'All themes' && (
-                    <>
-                      <h2 className="govuk-!-margin-bottom-0">All themes </h2>
-                      <h3 className="govuk-!-margin-bottom-0">
-                        {dataType === 'csv'
-                          ? '500 data downloads (CSV)'
-                          : '120 API data sets'}
-                      </h3>
-                    </>
+                    <h2 className="govuk-!-margin-bottom-0">
+                      {dataType === 'csv'
+                        ? '500 data downloads (CSV)'
+                        : '120 API data sets'}
+                    </h2>
                   )}
 
                 {selectedPublication === 'All publications' &&
                   selectedTheme === 'Further education' && (
-                    <>
-                      <h2 className="govuk-!-margin-bottom-0">
-                        {selectedTheme}
-                      </h2>
-                      <h3 className="govuk-!-margin-bottom-0">
-                        {dataType === 'csv'
-                          ? '90 data downloads (CSV)'
-                          : '30 API data sets'}
-                      </h3>
-                    </>
+                    <h2 className="govuk-!-margin-bottom-3">
+                      {dataType === 'csv'
+                        ? '90 data downloads (CSV)'
+                        : '30 API data sets'}
+                    </h2>
                   )}
 
-                <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
-                  {selectedPublication === 'All publications' &&
-                    selectedTheme === 'Further education' && (
-                      <div className="govuk-!-margin-top-3">
-                        <a
-                          href="#"
-                          onClick={e => {
-                            setSelectedTheme('All themes');
-                            setSelectedPublication('All publications');
-                            e.preventDefault();
-                          }}
-                        >
-                          Show all themes
-                        </a>
-                      </div>
-                    )}
-                </div>
+                {selectedTheme && selectedTheme !== 'All themes' && (
+                  <span className={styles.prototypeFilterTag}>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        // setSelectedTheme('All themes');
+                        /* eslint-disable-next-line */
+                        location.href = `?theme=All themes&publication=&dataType=${dataType}&compactList=${listCompact}`;
+                      }}
+                    >
+                      ✕{' '}
+                      <span className="govuk-visually-hidden">
+                        Clear theme{' '}
+                      </span>
+                      {selectedTheme}
+                    </Button>
+                  </span>
+                )}
+
                 <p className="govuk-visually-hidden">
                   Sorted by newest publications
                 </p>
@@ -538,36 +529,74 @@ const PrototypeDataCatalogue = () => {
             </span>
             {selectedPublication !== 'All publications' && (
               <>
-                <h2 className="govuk-!-margin-bottom-0">
-                  {selectedPublication}
-                </h2>
-                <h3 className="govuk-heading-m govuk-!-margin-bottom-3">
+                <h2 className="govuk-!-margin-bottom-3">
                   {dataType === 'csv'
                     ? `32 data downloads (CSV)`
                     : `12 API data sets`}
-                </h3>
-                <p>
-                  <span className="govuk-tag">National statistics</span>{' '}
-                  {selectedRelease === latestRelease && (
-                    <span className="govuk-tag">latest data</span>
-                  )}
-                  {selectedRelease !== latestRelease && (
-                    <span className="govuk-tag govuk-tag--orange">
-                      Not the latest data
+                </h2>
+                {selectedTheme && selectedTheme !== 'All themes' && (
+                  <span className={styles.prototypeFilterTag}>
+                    <Button
+                      variant="secondary"
+                      onClick={() => {
+                        // setSelectedTheme('All themes');
+                        /* eslint-disable-next-line */
+                        location.href = `?theme=&publication=&dataType=${dataType}&compactList=${listCompact}`;
+                      }}
+                    >
+                      ✕{' '}
+                      <span className="govuk-visually-hidden">
+                        Clear theme{' '}
+                      </span>
+                      {selectedTheme}
+                    </Button>
+                  </span>
+                )}
+                {selectedPublication &&
+                  selectedPublication !== 'All publications' && (
+                    <span className={styles.prototypeFilterTag}>
+                      <Button
+                        variant="secondary"
+                        onClick={() => {
+                          // setSelectedPublication('All publications');
+                          /* eslint-disable-next-line */
+                          location.href = `?theme=fe&publication=&dataType=${dataType}&compactList=${listCompact}`;
+                        }}
+                      >
+                        ✕{' '}
+                        <span className="govuk-visually-hidden">
+                          Clear theme{' '}
+                        </span>
+                        {selectedPublication}
+                      </Button>
                     </span>
                   )}
-                  <Link
-                    to="./releaseData#exploreData"
-                    className="govuk-!-margin-left-3"
-                  >
-                    View this publication
-                  </Link>
+                <p className="govuk-!-margin-top-4 dfe-flex dfe-justify-content--space-between">
+                  <div>
+                    <span className="govuk-tag">National statistics</span>{' '}
+                    {selectedRelease === latestRelease && (
+                      <span className="govuk-tag">latest data</span>
+                    )}
+                    {selectedRelease !== latestRelease && (
+                      <span className="govuk-tag govuk-tag--orange">
+                        Not the latest data
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <Link
+                      to="./releaseData#exploreData"
+                      className="govuk-!-margin-left-3"
+                    >
+                      View this publication
+                    </Link>
+                  </div>
                 </p>
                 {selectedRelease !== latestRelease && (
                   <p className="govuk-!-margin-top-3">
                     <a
                       href="#"
-                      onClick={_ => {
+                      onClick={() => {
                         setSelectedRelease(latestRelease);
                       }}
                     >
@@ -576,12 +605,9 @@ const PrototypeDataCatalogue = () => {
                   </p>
                 )}
                 {dataType === 'csv' && (
-                  <>
-                    <hr />
-                    <Button className="govuk-!-margin-bottom-0">
-                      Download all 32 datasets (.zip)
-                    </Button>
-                  </>
+                  <Button className="govuk-!-margin-bottom-3 govuk-!-margin-top-3">
+                    Download all 32 datasets (.zip)
+                  </Button>
                 )}
                 {/* 
                 <SummaryList noBorder>
@@ -630,7 +656,7 @@ const PrototypeDataCatalogue = () => {
                       <li>
                         <Link to="./releaseData#exploreData">
                           View this release
-                        </Link>
+                        </Link2
                       </li>
                     </ul>
                   </SummaryListItem>
@@ -658,9 +684,11 @@ const PrototypeDataCatalogue = () => {
                   </div>
             </dl> */}{' '}
                 <hr />
-                <h2 className="govuk-!-heading-m govuk-heading-m">
-                  View and download individual datasets
-                </h2>
+                {dataType === 'csv' && (
+                  <h2 className="govuk-!-heading-m govuk-heading-m">
+                    Download individual data sets from this publication
+                  </h2>
+                )}
                 <div className="govuk-!-margin-top-0 dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                   <div>
                     <PrototypeSortFilters
@@ -700,8 +728,7 @@ const PrototypeDataCatalogue = () => {
               selectedTheme === 'All themes' &&
               fullList && (
                 <>
-                  <hr />
-                  <div className="govuk-!-margin-top-0 dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+                  <div className="govuk-!-margin-top-6 dfe-flex dfe-justify-content--space-between dfe-align-items--center">
                     <div>
                       <PrototypeSortFilters
                         sortOrder={selectedSortOrder}
