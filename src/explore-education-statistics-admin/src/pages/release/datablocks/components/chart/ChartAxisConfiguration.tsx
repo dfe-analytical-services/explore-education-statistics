@@ -533,19 +533,8 @@ const ChartAxisConfiguration = ({
               dataSetCategories={dataSetCategories}
               lines={form.values.referenceLines ?? []}
               minorAxisDomain={minorAxisDomain}
-              onAddLine={line => {
-                form.setFieldValue('referenceLines', [
-                  ...(form.values.referenceLines ?? []),
-                  line,
-                ]);
-              }}
-              onRemoveLine={line => {
-                form.setFieldValue(
-                  'referenceLines',
-                  form.values.referenceLines?.filter(
-                    refLine => !isEqual(refLine, line),
-                  ),
-                );
+              onChange={updatedReferenceLines => {
+                form.setFieldValue('referenceLines', updatedReferenceLines);
               }}
             />
           )}

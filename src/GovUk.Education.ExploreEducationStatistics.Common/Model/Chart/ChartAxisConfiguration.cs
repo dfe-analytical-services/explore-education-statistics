@@ -72,6 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         [JsonConverter(typeof(StringEnumConverter))]
         public AxisReferenceLineStyle? Style;
 
+        public int? LabelWidth;
+
         public int? OtherAxisPosition;
 
         public string? OtherAxisStart;
