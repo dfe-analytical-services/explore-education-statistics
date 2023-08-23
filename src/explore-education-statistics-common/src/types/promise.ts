@@ -1,3 +1,3 @@
-export interface CancellablePromise<T> extends Promise<T> {
-  cancel(): void;
+export class CancellablePromise<T> extends Promise<T> {
+  cancel(): void {}
 }

@@ -1,25 +1,38 @@
 import { CancellablePromise } from '@common/types/promise';
 import Axios, {
-  AxiosError,
   AxiosInstance,
   AxiosPromise,
   AxiosRequestConfig,
+  CustomParamsSerializer,
 } from 'axios';
+import qs from 'qs';
 
-export type AxiosErrorHandler = (error: AxiosError) => void;
+const defaultParamsSerializer: CustomParamsSerializer = params =>
+  qs.stringify(params, { arrayFormat: 'comma' });
 
-class Client {
+export interface ClientOptions {
+  baseURL?: string;
+  paramsSerializer?: CustomParamsSerializer;
+}
+
+export default class Client {
   public readonly axios: AxiosInstance;
 
-  public constructor(axios: AxiosInstance) {
-    this.axios = axios;
+  public constructor({
+    baseURL,
+    paramsSerializer = defaultParamsSerializer,
+  }: ClientOptions) {
+    this.axios = Axios.create({
+      baseURL,
+      paramsSerializer,
+    });
   }
 
   public get<T = unknown>(
     url: string,
     config?: AxiosRequestConfig,
   ): CancellablePromise<T> {
-    return Client.handlePromise(this.axios.get(url, config));
+    return this.handlePromise(this.axios.get(url, config));
   }
 
   public post<T = unknown>(
@@ -27,7 +40,7 @@ class Client {
     data?: unknown,
     config?: AxiosRequestConfig,
   ): CancellablePromise<T> {
-    return Client.handlePromise(this.axios.post(url, data, config));
+    return this.handlePromise(this.axios.post(url, data, config));
   }
 
   public put<T = unknown>(
@@ -35,7 +48,7 @@ class Client {
     data?: unknown,
     config?: AxiosRequestConfig,
   ): CancellablePromise<T> {
-    return Client.handlePromise(this.axios.put(url, data, config));
+    return this.handlePromise(this.axios.put(url, data, config));
   }
 
   public patch<T = unknown>(
@@ -43,19 +56,17 @@ class Client {
     data?: unknown,
     config?: AxiosRequestConfig,
   ): CancellablePromise<T> {
-    return Client.handlePromise(this.axios.patch(url, data, config));
+    return this.handlePromise(this.axios.patch(url, data, config));
   }
 
   public delete<T = unknown>(
     url: string,
     config?: AxiosRequestConfig,
   ): CancellablePromise<T> {
-    return Client.handlePromise(this.axios.delete(url, config));
+    return this.handlePromise(this.axios.delete(url, config));
   }
 
-  private static handlePromise<T>(
-    promise: AxiosPromise<T>,
-  ): CancellablePromise<T> {
+  private handlePromise<T>(promise: AxiosPromise<T>): CancellablePromise<T> {
     const cancelToken = Axios.CancelToken.source();
 
     const cancellablePromise = promise.then(
@@ -67,5 +78,3 @@ class Client {
     return cancellablePromise;
   }
 }
-
-export default Client;
