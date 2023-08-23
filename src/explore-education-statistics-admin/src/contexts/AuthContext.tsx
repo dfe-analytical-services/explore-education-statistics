@@ -26,6 +26,7 @@ const defaultPermissions: GlobalPermissions = {
   canAccessAnalystPages: false,
   canAccessAllImports: false,
   canManageAllTaxonomy: false,
+  isApprover: false,
   isBauUser: false,
 };
 
