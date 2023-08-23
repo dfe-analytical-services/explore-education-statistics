@@ -49,9 +49,9 @@ const AdminDashboardPage = () => {
   const isLoadingApprovals =
     isLoadingReleaseApprovals || isLoadingMethodologyApprovals;
 
-  const totalApprovals =
-    !isLoadingApprovals &&
-    methodologyApprovals.length + releaseApprovals.length;
+  const totalApprovals = !isLoadingApprovals
+    ? methodologyApprovals.length + releaseApprovals.length
+    : 0;
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
