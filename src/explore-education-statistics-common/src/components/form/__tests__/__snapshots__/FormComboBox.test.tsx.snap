@@ -11,7 +11,7 @@ exports[`FormComboBox renders with no options by default 1`] = `
   </label>
   <input type="text"
          role="combobox"
-         class="searchInput govuk-input"
+         class="govuk-input searchInput"
          id="test-combobox-input"
          aria-autocomplete="list"
          aria-haspopup="listbox"
@@ -33,7 +33,7 @@ exports[`FormComboBox renders with options in correct order when input changes 1
   </label>
   <input type="text"
          role="combobox"
-         class="searchInput govuk-input"
+         class="govuk-input searchInput"
          id="test-combobox-input"
          aria-autocomplete="list"
          aria-haspopup="listbox"

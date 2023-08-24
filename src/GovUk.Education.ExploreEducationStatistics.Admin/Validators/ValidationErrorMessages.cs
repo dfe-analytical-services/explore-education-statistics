@@ -10,7 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         PartialDateNotValid,
 
         // Content
-        ContentBlockNotFound,
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
         IncorrectContentBlockTypeForAttach,
@@ -33,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UserAlreadyHasReleaseRoles,
 
         // Methodology
-        MethodologyMustBeDraft,
         MethodologyCannotDependOnPublishedRelease,
         MethodologyCannotDependOnRelease,
         CannotAdoptMethodologyAlreadyLinkedToPublication,

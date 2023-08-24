@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -15,10 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -40,25 +37,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             _mapper = mapper;
         }
 
-        public Task<Either<ActionResult, List<CommentViewModel>>> GetComments(
-            Guid releaseId, Guid contentSectionId, Guid contentBlockId
-        )
+        public async Task<Either<ActionResult, List<CommentViewModel>>> GetComments(Guid releaseId,
+            Guid contentSectionId,
+            Guid contentBlockId)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(tuple =>
-                {
-                    var (_, section) = tuple;
-
-                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (contentBlock == null)
+            return await CheckContentBlockExists(releaseId, contentSectionId, contentBlockId)
+                .OnSuccess(async () =>
                     {
-                        return NotFound<List<CommentViewModel>>();
-                    }
+                        var comments = await _context.Comment
+                            .AsNoTracking()
+                            .Include(comment => comment.CreatedBy)
+                            .Include(comment => comment.ResolvedBy)
+                            .Where(comment => comment.ContentBlockId == contentBlockId)
+                            .ToListAsync();
 
-                    return _mapper.Map<List<CommentViewModel>>(contentBlock.Comments);
-                }
-            );
+                        return _mapper.Map<List<CommentViewModel>>(comments);
+                    }
+                );
         }
 
         public Task<Either<ActionResult, CommentViewModel>> AddComment(Guid releaseId,
@@ -66,33 +61,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid contentBlockId,
             CommentSaveRequest saveRequest)
         {
-            return CheckContentSectionExists(releaseId, contentSectionId)
-                .OnSuccess(CheckCanUpdateRelease)
-                .OnSuccess(async tuple =>
-                {
-                    var (_, section) = tuple;
-
-                    var contentBlock = section.Content.Find(block => block.Id == contentBlockId);
-
-                    if (contentBlock == null)
+            return _persistenceHelper.CheckEntityExists<Release>(releaseId)
+                .OnSuccessDo(_userService.CheckCanUpdateRelease)
+                .OnSuccessDo(() => CheckContentBlockExists(releaseId, contentSectionId, contentBlockId))
+                .OnSuccess(async () =>
                     {
-                        return ValidationResult<CommentViewModel>(ContentBlockNotFound);
+                        var saved = await _context.Comment.AddAsync(new Comment
+                        {
+                            ContentBlockId = contentBlockId,
+                            Content = saveRequest.Content,
+                            CreatedById = _userService.GetUserId()
+                        });
+                        await _context.SaveChangesAsync();
+
+                        return await GetComment(saved.Entity.Id);
                     }
-
-                    var comment = new Comment
-                    {
-                        Id = new Guid(),
-                        ContentBlockId = contentBlockId,
-                        Content = saveRequest.Content,
-                        Created = DateTime.UtcNow,
-                        CreatedById = _userService.GetUserId()
-                    };
-
-                    await _context.Comment.AddAsync(comment);
-                    await _context.SaveChangesAsync();
-                    return await GetCommentAsync(comment.Id);
-                }
-            );
+                );
         }
 
         public Task<Either<ActionResult, CommentViewModel>> SetResolved(Guid commentId, bool resolve)
@@ -102,10 +86,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccess(async comment =>
                 {
                     _context.Comment.Update(comment);
-                    comment.Resolved = resolve ? DateTime.UtcNow : (DateTime?)null;
-                    comment.ResolvedById = resolve ? _userService.GetUserId() : (Guid?)null;
+                    comment.Resolved = resolve ? DateTime.UtcNow : null;
+                    comment.ResolvedById = resolve ? _userService.GetUserId() : null;
                     await _context.SaveChangesAsync();
-                    return await GetCommentAsync(comment.Id);
+                    return await GetComment(comment.Id);
                 });
         }
 
@@ -118,9 +102,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     {
                         _context.Comment.Update(comment);
                         comment.Content = saveRequest.Content;
-                        comment.Updated = DateTime.UtcNow;
                         await _context.SaveChangesAsync();
-                        return await GetCommentAsync(comment.Id);
+                        return await GetComment(comment.Id);
                     }
                 );
         }
@@ -138,59 +121,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 );
         }
 
-        private Task<Either<ActionResult, CommentViewModel>> GetCommentAsync(Guid commentId)
+        private async Task<Either<ActionResult, Unit>> CheckContentBlockExists(
+            Guid releaseId,
+            Guid contentSectionId,
+            Guid contentBlockId)
         {
-            return _persistenceHelper.CheckEntityExists<Comment>(commentId, queryable =>
-                    queryable
-                        .Include(comment => comment.CreatedBy)
-                        .Include(comment => comment.ResolvedBy))
+            if (await _context.ContentBlocks
+                    .AnyAsync(cb =>
+                        cb.Id == contentBlockId &&
+                        cb.ContentSection!.Id == contentSectionId &&
+                        cb.ContentSection!.Release.ReleaseId == releaseId))
+            {
+                return Unit.Instance;
+            }
+
+            return new NotFoundResult();
+        }
+
+        private async Task<Either<ActionResult, CommentViewModel>> GetComment(Guid commentId)
+        {
+            return await _context.Comment
+                .AsNoTracking()
+                .Include(c => c.CreatedBy)
+                .Include(c => c.ResolvedBy)
+                .FirstOrNotFoundAsync(comment => comment.Id == commentId)
                 .OnSuccess(comment => _mapper.Map<CommentViewModel>(comment));
-        }
-
-        private static IQueryable<Release> HydrateContentSectionsAndBlocks(IQueryable<Release> releases)
-        {
-            return releases
-                .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.Comments)
-                    .ThenInclude(comment => comment.CreatedBy)
-                .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
-                    .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.Comments)
-                    .ThenInclude(comment => comment.ResolvedBy);
-        }
-
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(
-            Guid releaseId, Guid contentSectionId)
-        {
-            return _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(release =>
-                {
-                    var section = release
-                        .Content
-                        .Select(join => join.ContentSection)
-                        .ToList()
-                        .Find(contentSection => contentSection.Id == contentSectionId);
-
-                    if (section == null)
-                    {
-                        return new NotFoundResult();
-                    }
-
-                    return new Either<ActionResult, Tuple<Release, ContentSection>>(
-                        TupleOf(release, section));
-                });
-        }
-
-        private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckCanUpdateRelease(
-            Tuple<Release, ContentSection> tuple)
-        {
-            return _userService
-                .CheckCanUpdateRelease(tuple.Item1)
-                .OnSuccess(_ => tuple);
         }
     }
 }

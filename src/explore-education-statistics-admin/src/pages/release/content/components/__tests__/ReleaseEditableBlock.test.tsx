@@ -26,6 +26,7 @@ import React, { ReactNode } from 'react';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 jest.mock('@admin/services/releaseContentService');
+jest.mock('@admin/services/dataBlockService');
 
 const releaseContentService = _releaseContentService as jest.Mocked<
   typeof _releaseContentService
@@ -115,22 +116,22 @@ describe('ReleaseEditableBlock', () => {
       />,
     );
 
-    expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 1')).toHaveAttribute(
       'src',
       '/api/releases/release-1/images/some-image-id',
     );
-    expect(screen.getByRole('img', { name: 'Test image 1' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 1')).toHaveAttribute(
       'srcset',
       '/api/releases/release-1/images/some-image-id-100 100w, ' +
         '/api/releases/release-1/images/some-image-id-200 200w, ' +
         '/api/releases/release-1/images/some-image-id-300 300w',
     );
 
-    expect(screen.getByRole('img', { name: 'Test image 2' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 2')).toHaveAttribute(
       'src',
       'https://test/some-image-url.jpg',
     );
-    expect(screen.getByRole('img', { name: 'Test image 2' })).toHaveAttribute(
+    expect(screen.getByAltText('Test image 2')).toHaveAttribute(
       'srcset',
       image2SrcSet,
     );
@@ -337,8 +338,6 @@ describe('ReleaseEditableBlock', () => {
     expect(
       screen.getByRole('button', { name: 'Remove block' }),
     ).not.toBeDisabled();
-
-    jest.useRealTimers();
   });
 
   test('renders locked state when already locked by other user', () => {
@@ -476,8 +475,9 @@ describe('ReleaseEditableBlock', () => {
   test('renders unlocked state when current user is idle for too long', async () => {
     mockDate.set('2022-02-16T12:00:00Z');
 
-    jest.useFakeTimers();
-
+    jest.useFakeTimers({
+      doNotFake: ['Date'],
+    });
     jest
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
@@ -546,8 +546,6 @@ describe('ReleaseEditableBlock', () => {
     expect(
       screen.queryByRole('button', { name: 'Save & close' }),
     ).not.toBeInTheDocument();
-
-    jest.useRealTimers();
   });
 
   test('re-renders locked state when other user renews their lock', async () => {
@@ -557,9 +555,8 @@ describe('ReleaseEditableBlock', () => {
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
 
-    let onContentBlockLocked: (
-      event: ReleaseContentBlockLockEvent,
-    ) => void = noop;
+    let onContentBlockLocked: (event: ReleaseContentBlockLockEvent) => void =
+      noop;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ContentBlockLocked') {
@@ -638,7 +635,9 @@ describe('ReleaseEditableBlock', () => {
     // Lock is about to expire
     mockDate.set('2022-02-16T12:09:00Z');
 
-    jest.useFakeTimers();
+    jest.useFakeTimers({
+      doNotFake: ['Date'],
+    });
 
     jest
       .spyOn(connectionMock, 'state', 'get')
@@ -719,8 +718,6 @@ describe('ReleaseEditableBlock', () => {
     expect(
       screen.getByRole('button', { name: 'Save & close' }),
     ).toBeInTheDocument();
-
-    jest.useRealTimers();
   });
 
   test('renders locked state when other user starts editing', async () => {
@@ -728,9 +725,8 @@ describe('ReleaseEditableBlock', () => {
       .spyOn(connectionMock, 'state', 'get')
       .mockReturnValue(HubConnectionState.Connected);
 
-    let onContentBlockLocked: (
-      event: ReleaseContentBlockLockEvent,
-    ) => void = noop;
+    let onContentBlockLocked: (event: ReleaseContentBlockLockEvent) => void =
+      noop;
 
     connectionMock.on.mockImplementation((methodName, callback) => {
       if (methodName === 'ContentBlockLocked') {

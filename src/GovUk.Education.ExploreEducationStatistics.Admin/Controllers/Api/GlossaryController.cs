@@ -1,4 +1,5 @@
 #nullable enable
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -16,6 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IGlossaryService glossaryService)
         {
             _glossaryService = glossaryService;
+        }
+
+        [HttpGet("glossary-entries")]
+        public async Task<List<GlossaryCategoryViewModel>> GetGlossary()
+        {
+            return await _glossaryService.GetGlossary();
         }
 
         [HttpGet("glossary-entries/{slug}")]

@@ -4,6 +4,7 @@ import AccordionSection, {
   accordionSectionClasses,
   AccordionSectionProps,
 } from '@common/components/AccordionSection';
+import classNames from 'classnames';
 import React, { createElement, ReactNode, useMemo } from 'react';
 
 export interface DraggableAccordionSectionProps {
@@ -43,8 +44,7 @@ const ReorderableAccordionSection = (
 
   return (
     <DraggableItem
-      draggableClassName={styles.draggable}
-      dragHandleClassName={styles.dragHandle}
+      className={classNames({ [styles.draggableItem]: isReordering })}
       id={id}
       index={index}
       isReordering={isReordering}

@@ -65,13 +65,11 @@ const DataBlockDetailsForm = ({
         isHighlight: Yup.boolean(),
         highlightName: Yup.string().when('isHighlight', {
           is: true,
-          then: Yup.string().trim().required('Enter a featured table name'),
+          then: s => s.trim().required('Enter a featured table name'),
         }),
         highlightDescription: Yup.string().when('isHighlight', {
           is: true,
-          then: Yup.string()
-            .trim()
-            .required('Enter a featured table description'),
+          then: s => s.required('Enter a featured table description'),
         }),
         heading: Yup.string().required('Enter a table title'),
         source: Yup.string(),

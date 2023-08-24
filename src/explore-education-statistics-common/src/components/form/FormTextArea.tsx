@@ -51,9 +51,9 @@ const FormTextArea = ({
       <FormLabel id={id} label={label} hideLabel={hideLabel} />
 
       {hint && (
-        <span id={`${id}-hint`} className="govuk-hint">
+        <div id={`${id}-hint`} className="govuk-hint">
           {hint}
-        </span>
+        </div>
       )}
 
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
@@ -92,7 +92,7 @@ const FormTextArea = ({
       <div className="govuk-character-count">
         <FormGroup>{textArea}</FormGroup>
 
-        <span
+        <div
           aria-live="polite"
           className={classNames('govuk-character-count__message', {
             'govuk-hint': remaining >= 0,
@@ -107,7 +107,7 @@ const FormTextArea = ({
             : `You have ${Math.abs(remaining)} character${
                 remaining !== -1 ? 's' : ''
               } too many`}
-        </span>
+        </div>
       </div>
     );
   }

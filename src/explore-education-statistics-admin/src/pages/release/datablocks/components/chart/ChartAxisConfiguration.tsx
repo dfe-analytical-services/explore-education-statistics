@@ -71,11 +71,8 @@ const ChartAxisConfiguration = ({
 }: Props) => {
   const { capabilities } = definition;
 
-  const {
-    hasSubmitted,
-    updateForm,
-    submitForms,
-  } = useChartBuilderFormsContext();
+  const { hasSubmitted, updateForm, submitForms } =
+    useChartBuilderFormsContext();
 
   const axisDefinition = definition.axes[type];
   const axisConfiguration = axesConfiguration[type];
@@ -211,7 +208,7 @@ const ChartAxisConfiguration = ({
   );
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
-    let schema: ObjectSchema<FormValues> = Yup.object({
+    let schema = Yup.object<FormValues>({
       size: Yup.number().positive('Size of axis must be positive'),
       tickConfig: Yup.string().oneOf<TickConfig>(
         ['default', 'startEnd', 'custom'],
@@ -219,9 +216,11 @@ const ChartAxisConfiguration = ({
       ),
       tickSpacing: Yup.number().when('tickConfig', {
         is: 'custom',
-        then: Yup.number()
-          .required('Enter tick spacing')
-          .positive('Tick spacing must be positive'),
+        then: s =>
+          s
+            .required('Enter tick spacing')
+            .positive('Tick spacing must be positive'),
+        otherwise: s => s.notRequired(),
       }),
       max: Yup.number(),
       min: Yup.number(),
@@ -379,14 +378,12 @@ const ChartAxisConfiguration = ({
                     name="visible"
                     label="Show axis"
                     conditional={
-                      <>
-                        <FormFieldTextInput<AxisConfiguration>
-                          label="Displayed unit"
-                          name="unit"
-                          hint="Leave blank to set default from metadata"
-                          width={10}
-                        />
-                      </>
+                      <FormFieldTextInput<AxisConfiguration>
+                        label="Displayed unit"
+                        name="unit"
+                        hint="Leave blank to set default from metadata"
+                        width={10}
+                      />
                     }
                   />
                 )}
@@ -429,12 +426,12 @@ const ChartAxisConfiguration = ({
             <div className="govuk-grid-column-one-half govuk-!-margin-bottom-6">
               {validationSchema.fields.sortAsc && (
                 <FormFieldset id="sort" legend="Sorting" legendSize="s">
-                  {/* <FormFieldSelect<AxisConfiguration>*/}
-                  {/*  id={`${id}-sortBy`}*/}
-                  {/*  name="sortBy"*/}
-                  {/*  label="Sort data by"*/}
-                  {/*  options={sortOptions}*/}
-                  {/* />*/}
+                  {/* <FormFieldSelect<AxisConfiguration> */}
+                  {/*  id={`${id}-sortBy`} */}
+                  {/*  name="sortBy" */}
+                  {/*  label="Sort data by" */}
+                  {/*  options={sortOptions} */}
+                  {/* /> */}
                   <FormFieldCheckbox<AxisConfiguration>
                     name="sortAsc"
                     label="Sort ascending"

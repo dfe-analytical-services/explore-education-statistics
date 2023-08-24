@@ -29,6 +29,7 @@ import Yup from '@common/validation/yup';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
+import { ObjectSchema } from 'yup';
 
 export interface FormValues {
   indicators: string[];
@@ -44,7 +45,7 @@ const TableQueryErrorCodes = [
   'RequestCancelled',
 ] as const;
 
-export type TableQueryErrorCode = typeof TableQueryErrorCodes[number];
+export type TableQueryErrorCode = (typeof TableQueryErrorCodes)[number];
 
 interface Props extends InjectedWizardProps {
   initialValues?: {
@@ -165,28 +166,25 @@ const FiltersForm = ({
     'order',
   );
 
-  const validationSchema = useMemo(
-    () =>
-      Yup.object<FormValues>({
-        indicators: Yup.array()
-          .of(Yup.string())
-          .required('Select at least one option from indicators'),
-        filters: Yup.object(
-          mapValues(subjectMeta.filters, filter =>
-            Yup.array()
-              .typeError(
-                `Select at least one option from ${filter.legend.toLowerCase()}`,
-              )
-              .of(Yup.string())
-              .min(
-                1,
-                `Select at least one option from ${filter.legend.toLowerCase()}`,
-              ),
-          ),
-        ),
-      }),
-    [subjectMeta.filters],
-  );
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      indicators: Yup.array()
+        .required('Select at least one option from indicators')
+        .of(Yup.string().defined())
+        .min(1, 'Select at least one option from indicators'),
+      filters: Yup.object(
+        mapValues(subjectMeta.filters, filter => {
+          const label = filter.legend.toLowerCase();
+
+          return Yup.array()
+            .required(`Select at least one option from ${label}`)
+            .typeError(`Select at least one option from ${label}`)
+            .of(Yup.string().defined())
+            .min(1, `Select at least one option from ${label}`);
+        }),
+      ),
+    });
+  }, [subjectMeta.filters]);
 
   const filtersIncludeTotal = Object.values(subjectMeta.filters).some(
     filter => filter.totalValue,
@@ -208,7 +206,6 @@ const FiltersForm = ({
             <RHFForm id={formId} showSubmitError onSubmit={handleSubmitForm}>
               {tableQueryError && formState.submitCount > 0 && (
                 <TableQueryError
-                  id={`${formId}-tableQueryError`}
                   errorCode={tableQueryError}
                   releaseId={selectedPublication?.selectedRelease.id}
                   showDownloadOption={showTableQueryErrorDownload}

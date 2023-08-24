@@ -15,16 +15,12 @@ const PrototypePublicationReleaseList = () => {
   const [showReleases, setShowReleases] = useState(true);
   const [showDraft, setShowDraft] = useState(true);
   const [showHelpStatusModal, toggleHelpStatusModal] = useToggle(false);
-  const [
-    showHelpStatusPublishedModal,
-    toggleHelpStatusPublishedModal,
-  ] = useToggle(false);
-  const [showScheduledStatusModal, toggleScheduledStatusModal] = useToggle(
-    false,
-  );
-  const [showScheduledStagesModal, toggleScheduledStagesModal] = useToggle(
-    false,
-  );
+  const [showHelpStatusPublishedModal, toggleHelpStatusPublishedModal] =
+    useToggle(false);
+  const [showScheduledStatusModal, toggleScheduledStatusModal] =
+    useToggle(false);
+  const [showScheduledStagesModal, toggleScheduledStagesModal] =
+    useToggle(false);
   const [showReleaseIssuesModal, toggleReleaseIssuesModal] = useToggle(false);
 
   return (
@@ -38,7 +34,7 @@ const PrototypePublicationReleaseList = () => {
           </p>
         </div>
         {showReleases && (
-          <div className="govuk-grid-column-one-quarter dfe-align--right">
+          <div className="govuk-grid-column-one-quarter govuk-!-text-align-right">
             <Button>Create new release</Button>
           </div>
         )}
@@ -50,7 +46,7 @@ const PrototypePublicationReleaseList = () => {
               No releases created in this publication
             </WarningMessage>
           </div>
-          <div className="govuk-grid-column-one-quarter dfe-align--right govuk-!-margin-top-3">
+          <div className="govuk-grid-column-one-quarter govuk-!-text-align-right govuk-!-margin-top-3">
             <Button>Create new release</Button>
           </div>
         </div>
@@ -170,122 +166,120 @@ const PrototypePublicationReleaseList = () => {
           )}
 
           {showDraft && (
-            <>
-              <div style={{ width: '100%', overflow: 'auto' }}>
-                <table className="govuk-table govuk-!-margin-bottom-9">
-                  <caption className="govuk-table__caption--m">
-                    Draft releases
-                  </caption>
-                  <thead className="govuk-table__head">
-                    <tr className="govuk-table__row">
-                      <th style={{ width: '38%' }}>Release period</th>
-                      <th style={{ width: '15%' }}>
-                        State
-                        <a
-                          href="#"
-                          className="govuk-!-margin-left-1"
-                          onClick={() => {
-                            toggleHelpStatusModal(true);
-                          }}
-                        >
-                          <InfoIcon description="What is status?" />
-                        </a>
-                      </th>
-                      <th style={{ width: '9%' }}>
-                        Errors
-                        <a
-                          href="#"
-                          className="govuk-!-margin-left-1"
-                          onClick={() => {
-                            toggleReleaseIssuesModal(true);
-                          }}
-                        >
-                          <InfoIcon description="What is status?" />
-                        </a>
-                      </th>
-                      <th style={{ width: '10%' }}>
-                        Warnings
-                        <a
-                          href="#"
-                          className="govuk-!-margin-left-1"
-                          onClick={() => {
-                            toggleReleaseIssuesModal(true);
-                          }}
-                        >
-                          <InfoIcon description="What is status?" />
-                        </a>
-                      </th>
-                      <th style={{ width: '20%' }}>
-                        Unresolved comments
-                        <a
-                          href="#"
-                          className="govuk-!-margin-left-1"
-                          onClick={() => {
-                            toggleReleaseIssuesModal(true);
-                          }}
-                        >
-                          <InfoIcon description="What is status?" />
-                        </a>
-                      </th>
-                      <th className="govuk-table__cell--numeric">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td>Academic year 2021/22 (Not live)</td>
-                      <td>
-                        <Tag>Draft</Tag>
-                      </td>
-                      <td>3</td>
-                      <td>3</td>
-                      <td>3</td>
-                      <td className="govuk-table__cell--numeric">
-                        <Link to="/prototypes/admin-release-summary">
-                          Edit{' '}
-                          <span className="govuk-visually-hidden">
-                            Academic year 2021/22
-                          </span>
-                        </Link>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Academic year 2020/21 (Not live)</td>
-                      <td>
-                        <Tag>in review</Tag>
-                      </td>
-                      <td>0</td>
-                      <td>1</td>
-                      <td>0</td>
-                      <td className="govuk-table__cell--numeric">
-                        <Link to="/prototypes/admin-release-summary">
-                          Edit{' '}
-                          <span className="govuk-visually-hidden">
-                            Academic year 2020/21 (Not live)
-                          </span>
-                        </Link>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td>Academic year 2019/20 (Not live)</td>
-                      <td>
-                        <Tag>Amendment</Tag>
-                      </td>
-                      <td>0</td>
-                      <td>1</td>
-                      <td>0</td>
-                      <td className="govuk-table__cell--numeric">
-                        <Link to="/prototypes/admin-release-summary">
-                          Edit{' '}
-                          <span className="govuk-visually-hidden">
-                            Academic year 2020/21 (Not live)
-                          </span>
-                        </Link>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </>
+            <div style={{ width: '100%', overflow: 'auto' }}>
+              <table className="govuk-table govuk-!-margin-bottom-9">
+                <caption className="govuk-table__caption--m">
+                  Draft releases
+                </caption>
+                <thead className="govuk-table__head">
+                  <tr className="govuk-table__row">
+                    <th style={{ width: '38%' }}>Release period</th>
+                    <th style={{ width: '15%' }}>
+                      State
+                      <a
+                        href="#"
+                        className="govuk-!-margin-left-1"
+                        onClick={() => {
+                          toggleHelpStatusModal(true);
+                        }}
+                      >
+                        <InfoIcon description="What is status?" />
+                      </a>
+                    </th>
+                    <th style={{ width: '9%' }}>
+                      Errors
+                      <a
+                        href="#"
+                        className="govuk-!-margin-left-1"
+                        onClick={() => {
+                          toggleReleaseIssuesModal(true);
+                        }}
+                      >
+                        <InfoIcon description="What is status?" />
+                      </a>
+                    </th>
+                    <th style={{ width: '10%' }}>
+                      Warnings
+                      <a
+                        href="#"
+                        className="govuk-!-margin-left-1"
+                        onClick={() => {
+                          toggleReleaseIssuesModal(true);
+                        }}
+                      >
+                        <InfoIcon description="What is status?" />
+                      </a>
+                    </th>
+                    <th style={{ width: '20%' }}>
+                      Unresolved comments
+                      <a
+                        href="#"
+                        className="govuk-!-margin-left-1"
+                        onClick={() => {
+                          toggleReleaseIssuesModal(true);
+                        }}
+                      >
+                        <InfoIcon description="What is status?" />
+                      </a>
+                    </th>
+                    <th className="govuk-table__cell--numeric">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Academic year 2021/22 (Not live)</td>
+                    <td>
+                      <Tag>Draft</Tag>
+                    </td>
+                    <td>3</td>
+                    <td>3</td>
+                    <td>3</td>
+                    <td className="govuk-table__cell--numeric">
+                      <Link to="/prototypes/admin-release-summary">
+                        Edit{' '}
+                        <span className="govuk-visually-hidden">
+                          Academic year 2021/22
+                        </span>
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Academic year 2020/21 (Not live)</td>
+                    <td>
+                      <Tag>in review</Tag>
+                    </td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td className="govuk-table__cell--numeric">
+                      <Link to="/prototypes/admin-release-summary">
+                        Edit{' '}
+                        <span className="govuk-visually-hidden">
+                          Academic year 2020/21 (Not live)
+                        </span>
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Academic year 2019/20 (Not live)</td>
+                    <td>
+                      <Tag>Amendment</Tag>
+                    </td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td className="govuk-table__cell--numeric">
+                      <Link to="/prototypes/admin-release-summary">
+                        Edit{' '}
+                        <span className="govuk-visually-hidden">
+                          Academic year 2020/21 (Not live)
+                        </span>
+                      </Link>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           )}
 
           <Modal
@@ -357,7 +351,7 @@ const PrototypePublicationReleaseList = () => {
                   <th
                     style={{ width: '120px' }}
                     colSpan={2}
-                    className="dfe-align--centre"
+                    className="govuk-!-text-align-centre"
                   >
                     Actions
                   </th>
@@ -530,7 +524,7 @@ const PrototypePublicationReleaseList = () => {
           </div>
         </>
       )}
-      <div className="dfe-align--right govuk-!-margin-top-9">
+      <div className="govuk-!-text-align-right govuk-!-margin-top-9">
         <ul className="govuk-list">
           <li>
             {showScheduled ? (

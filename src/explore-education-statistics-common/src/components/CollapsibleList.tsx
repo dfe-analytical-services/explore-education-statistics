@@ -66,7 +66,7 @@ const CollapsibleList = ({
         <ButtonText
           ariaControls={id}
           ariaExpanded={!collapsed}
-          className="dfe-hide-print govuk-!-margin-bottom-4"
+          className="govuk-!-display-none-print govuk-!-margin-bottom-4"
           onClick={toggleCollapsed}
         >
           {collapsed

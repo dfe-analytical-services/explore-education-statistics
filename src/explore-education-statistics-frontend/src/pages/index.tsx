@@ -12,7 +12,6 @@ function HomePage() {
             <h2 className="govuk-!-margin-bottom-0">
               Find statistics and data
             </h2>
-
             <p className="govuk-!-margin-top-2">
               Browse statistical summaries and download associated data to help
               you understand and analyse our range of statistics.

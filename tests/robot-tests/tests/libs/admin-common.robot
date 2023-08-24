@@ -485,7 +485,7 @@ user deletes subject file
     [Arguments]    ${SUBJECT_NAME}
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user opens accordion section    ${SUBJECT_NAME}
-    user scrolls to accordion section content    ${SUBJECT_NAME}
+    user scrolls to accordion section    ${SUBJECT_NAME}
     ${accordion}=    user gets accordion section content element    ${SUBJECT_NAME}
     ${button}=    user gets button element    Delete files    ${accordion}
     user clicks element    ${button}
@@ -659,7 +659,6 @@ user changes methodology status to Approved
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks summary list contains    Status    Approved
-    user checks summary list contains    Internal note    Approved by UI tests
     IF    ${is_publishing_strategy_with_release} is ${TRUE}
         user checks summary list contains    When to publish    With a specific release
         user checks summary list contains    Publish with release    ${with_release}

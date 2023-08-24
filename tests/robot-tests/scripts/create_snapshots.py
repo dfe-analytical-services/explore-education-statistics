@@ -303,15 +303,15 @@ if __name__ == "__main__":
         required=False,
     )
 
-    ap.add_argument(
+    group = ap.add_mutually_exclusive_group(required=True)
+    group.add_argument(
         "--validate",
         dest="validate",
         action="store_true",
         help="Compares the latest snapshots to the existing versions and does not write any snapshot files",
         required=False,
     )
-
-    ap.add_argument(
+    group.add_argument(
         "--ci",
         dest="ci",
         action="store_true",
@@ -346,7 +346,7 @@ if __name__ == "__main__":
     if not args.visual:
         chrome_options.add_argument("--headless")
 
-    get_webdriver("latest")
+    get_webdriver()
 
     driver = webdriver.Chrome(options=chrome_options)
 

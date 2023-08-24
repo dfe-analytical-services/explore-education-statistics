@@ -687,7 +687,6 @@ Validate featured table has footnotes
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
 Go to release page
-    user opens accordion section    Related information
     user clicks link    ${PUBLICATION_NAME}, ${RELEASE_2_NAME}
 
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}

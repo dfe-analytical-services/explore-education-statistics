@@ -26,6 +26,7 @@ interface Props<TFormValues extends FieldValues> {
   submitId?: string;
   showErrorSummary?: boolean;
   showSubmitError?: boolean;
+  visuallyHiddenErrorSummary?: boolean;
   onSubmit: (values: TFormValues) => Promise<void>;
 }
 
@@ -52,6 +53,7 @@ export default function RHFForm<TFormValues extends FieldValues>({
   submitId = `${id}-submit`,
   showErrorSummary = true,
   showSubmitError = false,
+  visuallyHiddenErrorSummary = false,
   onSubmit,
 }: Props<TFormValues>) {
   const isMounted = useMountedRef();
@@ -151,8 +153,8 @@ export default function RHFForm<TFormValues extends FieldValues>({
         {showErrorSummary && (
           <ErrorSummary
             errors={allErrors}
-            id={`${id}-summary`}
-            focusOnError={hasSummaryFocus}
+            focusOnError={hasSummaryFocus && !visuallyHiddenErrorSummary}
+            visuallyHidden={visuallyHiddenErrorSummary}
             onFocus={toggleSummaryFocus.off}
           />
         )}

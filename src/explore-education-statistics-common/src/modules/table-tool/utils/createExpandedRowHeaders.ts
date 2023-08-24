@@ -78,9 +78,7 @@ export default function createExpandedRowHeaders(
   }, []);
 }
 
-function getRowHeadersInfo(
-  rowHeaders: Header[],
-): {
+function getRowHeadersInfo(rowHeaders: Header[]): {
   maxDepth: number;
   collapsibleLevels: boolean[];
 } {

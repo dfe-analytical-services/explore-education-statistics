@@ -54,9 +54,10 @@ const PreReleaseUserAccessForm = ({
     isLoading,
     error,
     setState: setUsers,
-  } = useAsyncRetry(() => preReleaseUserService.getUsers(releaseId), [
-    releaseId,
-  ]);
+  } = useAsyncRetry(
+    () => preReleaseUserService.getUsers(releaseId),
+    [releaseId],
+  );
 
   const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
 
@@ -220,7 +221,7 @@ const PreReleaseUserAccessForm = ({
                   <td>{user.email}</td>
 
                   {!isReleaseLive && (
-                    <td className="dfe-align--right">
+                    <td className="govuk-!-text-align-right">
                       <ButtonText
                         disabled={isRemoving}
                         onClick={async () => {

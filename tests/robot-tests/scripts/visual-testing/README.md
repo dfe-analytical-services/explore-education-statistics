@@ -60,7 +60,6 @@ SELECT ContentBlock.Id                                      AS ContentBlockId,
     FROM ContentBlock cb 
     WHERE cb.ContentSectionId = ContentBlock.ContentSectionId
   )                                                    AS MinContentBlockOrder,
-  DataBlock_HighlightName                              AS HighlightName,
   JSON_VALUE([DataBlock_Query], '$.SubjectId')			AS SubjectId,
   JSON_VALUE([DataBlock_Charts], '$[0].Title')         AS ChartTitle,
   JSON_VALUE([DataBlock_Charts], '$[0].Type')          AS ChartType,
@@ -70,15 +69,16 @@ JOIN ReleaseContentBlocks ON ContentBlock.Id = ReleaseContentBlocks.ContentBlock
 JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
 JOIN Publications ON Publications.Id = Releases.PublicationId 
 LEFT JOIN ContentSections ON ContentSections.Id = ContentSectionId
+LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
 WHERE ContentBlock.Type = 'DataBlock'
   AND Releases.Published IS NOT NULL
   AND Releases.SoftDeleted = 0
   AND (
-    -- Include DataBlocks that are linked to Content Sections
-    ContentSectionId IS NOT NULL
-    -- Include DataBlocks that are used for Featured Tables
-    OR (DataBlock_HighlightName IS NOT NULL
-        AND DataBlock_HighlightName <> ''))
+  -- Include DataBlocks that are linked to Content Sections
+  ContentSectionId IS NOT NULL
+  -- Include DataBlocks that are used for Featured Tables
+  OR FeaturedTables.DataBlockId IS NOT NULL
+  )
   -- Include only DataBlocks that are from the latest published Release
   AND NOT EXISTS(
     SELECT 1
@@ -257,7 +257,5 @@ pipenv run python run_tests.py -f tests/visual_testing/visually_check_permalinks
 ```
 
 ## Who should I talk to?
-
-Luke Howsam  
 Mark Youngman
 Duncan Watson

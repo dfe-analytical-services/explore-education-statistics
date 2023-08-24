@@ -36,12 +36,10 @@ const emptyReleaseNote: ReleaseNote = {
 const ReleaseNotesSection = ({ release }: Props) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
-  const [deletedReleaseNote, setDeletedReleaseNote] = useState<ReleaseNote>(
-    emptyReleaseNote,
-  );
-  const [selectedReleaseNote, setSelectedReleaseNote] = useState<ReleaseNote>(
-    emptyReleaseNote,
-  );
+  const [deletedReleaseNote, setDeletedReleaseNote] =
+    useState<ReleaseNote>(emptyReleaseNote);
+  const [selectedReleaseNote, setSelectedReleaseNote] =
+    useState<ReleaseNote>(emptyReleaseNote);
   const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>(
     release.updates,
   );

@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "6.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Content")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("ContentBlockId")
@@ -114,7 +115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.Property<DateTime?>("Updated")
                         .HasColumnType("datetime2");
@@ -124,6 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("ContentSectionId");
 
                     b.HasIndex("LockedById");
+
+                    b.HasIndex("Type");
 
                     b.ToTable("ContentBlock", (string)null);
 
@@ -147,9 +151,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Type");
 
                     b.ToTable("ContentSections");
                 });
@@ -349,7 +356,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(25)
+                        .HasColumnType("nvarchar(25)");
 
                     b.HasKey("Id");
 
@@ -364,6 +372,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasFilter("[ReplacingId] IS NOT NULL");
 
                     b.HasIndex("SourceId");
+
+                    b.HasIndex("Type");
 
                     b.ToTable("Files");
                 });
@@ -672,24 +682,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("CountFilterItems")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountFootnotes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountIndicators")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountLocations")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountObservations")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CountTimePeriods")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
 
@@ -697,16 +689,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Legacy")
-                        .HasColumnType("bit");
-
-                    b.Property<long?>("LegacyContentLength")
-                        .HasColumnType("bigint");
-
-                    b.Property<bool?>("LegacyHasConfigurationHeaders")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("LegacyHasSnapshot")
+                    b.Property<bool>("MigratedFromLegacy")
                         .HasColumnType("bit");
 
                     b.Property<string>("PublicationTitle")

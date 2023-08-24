@@ -6,7 +6,8 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
-import { MethodologyVersion } from 'src/services/methodologyService';
+import { MethodologyVersion } from '@admin/services/methodologyService';
+import { MethodologyStatusPermissions } from '@admin/services/permissionService';
 
 describe('MethodologyStatusForm', () => {
   const testUnpublishedReleases: IdTitlePair[] = [
@@ -20,6 +21,12 @@ describe('MethodologyStatusForm', () => {
     },
   ];
 
+  const statusPermissions: MethodologyStatusPermissions = {
+    canMarkDraft: true,
+    canMarkHigherLevelReview: true,
+    canMarkApproved: true,
+  };
+
   test('renders the form with draft initial values', () => {
     render(
       <MethodologyStatusForm
@@ -31,6 +38,7 @@ describe('MethodologyStatusForm', () => {
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
+        statusPermissions={statusPermissions}
       />,
     );
 
@@ -40,21 +48,65 @@ describe('MethodologyStatusForm', () => {
     const statusGroup = within(screen.getByRole('group', { name: 'Status' }));
     const statuses = statusGroup.getAllByRole('radio');
 
-    expect(statuses).toHaveLength(2);
+    expect(statuses).toHaveLength(3);
     expect(statuses[0]).toHaveAttribute('value', 'Draft');
     expect(statuses[0]).toBeEnabled();
     expect(statuses[0]).toBeChecked();
     expect(statuses[0]).toEqual(statusGroup.getByLabelText('In draft'));
 
-    expect(statuses[1]).toHaveAttribute('value', 'Approved');
+    expect(statuses[1]).toHaveAttribute('value', 'HigherLevelReview');
     expect(statuses[1]).toBeEnabled();
     expect(statuses[1]).toEqual(
+      statusGroup.getByLabelText(
+        'Ready for higher review (this will notify approvers)',
+      ),
+    );
+
+    expect(statuses[2]).toHaveAttribute('value', 'Approved');
+    expect(statuses[2]).toBeEnabled();
+    expect(statuses[2]).toEqual(
       statusGroup.getByLabelText('Approved for publication'),
     );
 
     expect(
       screen.queryByRole('group', { name: 'When to publish' }),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders the form with disabled approval status radios', () => {
+    render(
+      <MethodologyStatusForm
+        methodology={
+          {
+            status: 'Draft',
+          } as MethodologyVersion
+        }
+        unpublishedReleases={testUnpublishedReleases}
+        onCancel={noop}
+        onSubmit={noop}
+        statusPermissions={{
+          canMarkDraft: false,
+          canMarkHigherLevelReview: false,
+          canMarkApproved: false,
+        }}
+      />,
+    );
+
+    expect(screen.getByText('Edit methodology status')).toBeInTheDocument();
+    expect(screen.getByText('Status')).toBeInTheDocument();
+
+    const statusGroup = within(screen.getByRole('group', { name: 'Status' }));
+    const statuses = statusGroup.getAllByRole('radio');
+
+    expect(statuses).toHaveLength(3);
+    expect(statuses[0]).toHaveAttribute('value', 'Draft');
+    expect(statuses[0]).toBeDisabled();
+
+    expect(statuses[1]).toHaveAttribute('value', 'HigherLevelReview');
+    expect(statuses[1]).toBeDisabled();
+
+    expect(statuses[2]).toHaveAttribute('value', 'Approved');
+    expect(statuses[2]).toBeDisabled();
   });
 
   test('renders the form with approved status initial values', () => {
@@ -69,6 +121,7 @@ describe('MethodologyStatusForm', () => {
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
+        statusPermissions={statusPermissions}
       />,
     );
 
@@ -99,6 +152,7 @@ describe('MethodologyStatusForm', () => {
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
+        statusPermissions={statusPermissions}
       />,
     );
 
@@ -145,6 +199,7 @@ describe('MethodologyStatusForm', () => {
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
+        statusPermissions={statusPermissions}
       />,
     );
 
@@ -173,6 +228,7 @@ describe('MethodologyStatusForm', () => {
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={noop}
+        statusPermissions={statusPermissions}
       />,
     );
 
@@ -201,6 +257,7 @@ describe('MethodologyStatusForm', () => {
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={handleSubmit}
+        statusPermissions={statusPermissions}
       />,
     );
 
@@ -233,6 +290,7 @@ describe('MethodologyStatusForm', () => {
         unpublishedReleases={testUnpublishedReleases}
         onCancel={noop}
         onSubmit={handleSubmit}
+        statusPermissions={statusPermissions}
       />,
     );
 

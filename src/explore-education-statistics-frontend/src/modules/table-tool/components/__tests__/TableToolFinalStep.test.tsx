@@ -57,53 +57,44 @@ describe('TableToolFinalStep', () => {
     ).toBeInTheDocument();
 
     // test that the related information is rendered correctly
-    const relatedInfoRevealButton = screen.getByRole('button', {
-      name: 'Related information',
-    });
+    expect(
+      screen.getByRole('heading', {
+        name: 'Related information',
+      }),
+    ).toBeInTheDocument();
 
-    expect(relatedInfoRevealButton).toBeInTheDocument();
-
-    userEvent.click(relatedInfoRevealButton);
-
-    await waitFor(() => {
-      expect(
-        screen.queryByRole('link', {
-          name: 'Test publication, Latest Release Title',
-        }),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByRole('radio', {
-          name: 'Table in ODS format (spreadsheet, with title and footnotes)',
-        }),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByRole('radio', {
-          name: 'Table in CSV format (flat file, with location codes)',
-        }),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByRole('button', {
-          name: 'Download table',
-        }),
-      ).toBeInTheDocument();
-    });
+    expect(
+      screen.queryByRole('link', {
+        name: 'Test publication, Latest Release Title',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('radio', {
+        name: 'Table in ODS format (spreadsheet, with title and footnotes)',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('radio', {
+        name: 'Table in CSV format (flat file, with location codes)',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Download table',
+      }),
+    ).toBeInTheDocument();
 
     // test that contact us section is rendered correctly
-    const contactUsRevealButton = screen.getByRole('button', {
-      name: 'Contact us',
-    });
-    expect(contactUsRevealButton).toBeInTheDocument();
-
-    userEvent.click(contactUsRevealButton);
-
     await waitFor(() => {
-      expect(screen.queryByText('The team name')).toBeInTheDocument();
-      expect(
-        screen.queryByRole('link', {
-          name: 'team@name.com',
-        }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Contact us')).toBeInTheDocument();
     });
+
+    expect(screen.queryByText('The team name')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', {
+        name: 'team@name.com',
+      }),
+    ).toBeInTheDocument();
   });
 
   test('shows and hides table header reordering controls successfully', async () => {
@@ -154,20 +145,14 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
-    const relatedInfoRevealButton = screen.getByRole('button', {
-      name: 'Related information',
-    });
-
-    userEvent.click(relatedInfoRevealButton);
-
-    await waitFor(() => {
-      const viewReleaseLink = screen.getByRole('link', {
+    expect(
+      screen.getByRole('link', {
         name: 'Test publication, Selected Release Title',
-      }) as HTMLAnchorElement;
-      expect(viewReleaseLink.href).toEqual(
-        'http://localhost/find-statistics/test-publication/selected-release-slug',
-      );
-    });
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/test-publication/selected-release-slug',
+    );
   });
 
   test(`renders the 'View the release for this data' URL with only the Publication slug, if the selected Release is the latest Release for that Publication`, async () => {
@@ -184,21 +169,11 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
-    const relatedInfoRevealButton = screen.getByRole('button', {
-      name: 'Related information',
-    });
-
-    userEvent.click(relatedInfoRevealButton);
-
-    await waitFor(() => {
-      const viewReleaseLink = screen.getByRole('link', {
+    expect(
+      screen.getByRole('link', {
         name: 'Test publication, Latest Release Title',
-      }) as HTMLAnchorElement;
-
-      expect(viewReleaseLink.href).toEqual(
-        'http://localhost/find-statistics/test-publication',
-      );
-    });
+      }),
+    ).toHaveAttribute('href', '/find-statistics/test-publication');
   });
 
   test('renders the Table Tool final step correctly when this is the latest data', async () => {
@@ -245,31 +220,20 @@ describe('TableToolFinalStep', () => {
       screen.queryByText('This data is not from the latest release'),
     ).toBeInTheDocument();
 
-    const latestDataLink = screen.queryByTestId(
-      'View latest data link',
-    ) as HTMLAnchorElement;
-    expect(latestDataLink).toBeInTheDocument();
-    expect(latestDataLink.href).toEqual(
-      'http://localhost/find-statistics/test-publication',
-    );
-    expect(latestDataLink.text).toContain('View latest data');
-    expect(latestDataLink.text).toContain('Latest Release Title');
+    expect(
+      screen.getByRole('link', {
+        name: 'View latest data: Latest Release Title',
+      }),
+    ).toHaveAttribute('href', '/find-statistics/test-publication');
 
-    const relatedInfoRevealButton = screen.getByRole('button', {
-      name: 'Related information',
-    });
-
-    userEvent.click(relatedInfoRevealButton);
-
-    await waitFor(() => {
-      const viewReleaseLink = screen.getByRole('link', {
+    expect(
+      screen.getByRole('link', {
         name: 'Test publication, Selected Release Title',
-      }) as HTMLAnchorElement;
-
-      expect(viewReleaseLink.href).toEqual(
-        'http://localhost/find-statistics/test-publication/selected-release-slug',
-      );
-    });
+      }),
+    ).toHaveAttribute(
+      'href',
+      '/find-statistics/test-publication/selected-release-slug',
+    );
   });
 
   test('renders the methodology link correctly', async () => {
@@ -286,19 +250,15 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
-    const relatedInfoRevealButton = screen.getByRole('button', {
-      name: 'Related information',
-    });
-
-    userEvent.click(relatedInfoRevealButton);
-
     await waitFor(() => {
-      const methodologyLink = screen.getByRole('link', {
-        name: 'methodology title',
-      }) as HTMLAnchorElement;
-
-      expect(methodologyLink.href).toEqual('http://localhost/methodology/m1');
+      expect(screen.getByText('methodology title')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', {
+        name: 'methodology title',
+      }),
+    ).toHaveAttribute('href', '/methodology/m1');
   });
 
   test('renders the external methodology link correctly', async () => {
@@ -327,18 +287,14 @@ describe('TableToolFinalStep', () => {
       />,
     );
 
-    const relatedInfoRevealButton = screen.getByRole('button', {
-      name: 'Related information',
-    });
-
-    userEvent.click(relatedInfoRevealButton);
-
     await waitFor(() => {
-      const methodologyLink = screen.getByRole('link', {
-        name: 'An external methodology',
-      }) as HTMLAnchorElement;
-
-      expect(methodologyLink.href).toEqual('http://somewhere.com/');
+      expect(screen.getByText('An external methodology')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', {
+        name: 'An external methodology',
+      }),
+    ).toHaveAttribute('href', 'http://somewhere.com');
   });
 });

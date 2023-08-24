@@ -190,8 +190,8 @@ const ReleaseDataUploadsSection = ({
           }}
           errorMappings={errorMappings}
           onSubmit={handleSubmit}
-          validationSchema={baseSchema =>
-            baseSchema.shape({
+          validationSchema={baseSchema => {
+            return baseSchema.shape({
               subjectTitle: Yup.string()
                 .trim()
                 .required('Enter a subject title')
@@ -210,8 +210,8 @@ const ReleaseDataUploadsSection = ({
                     );
                   },
                 }),
-            })
-          }
+            });
+          }}
           beforeFields={
             <FormFieldTextInput<FormValues>
               name="subjectTitle"
@@ -281,13 +281,14 @@ const ReleaseDataUploadsSection = ({
                               </Link>
                               <Link
                                 className="govuk-!-margin-right-4"
-                                to={generatePath<
-                                  ReleaseDataFileReplaceRouteParams
-                                >(releaseDataFileReplaceRoute.path, {
-                                  publicationId,
-                                  releaseId,
-                                  fileId: dataFile.id,
-                                })}
+                                to={generatePath<ReleaseDataFileReplaceRouteParams>(
+                                  releaseDataFileReplaceRoute.path,
+                                  {
+                                    publicationId,
+                                    releaseId,
+                                    fileId: dataFile.id,
+                                  },
+                                )}
                               >
                                 Replace data
                               </Link>

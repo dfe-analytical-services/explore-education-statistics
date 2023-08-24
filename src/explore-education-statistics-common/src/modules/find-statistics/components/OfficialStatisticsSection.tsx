@@ -2,6 +2,7 @@ import React from 'react';
 
 const OfficialStatisticsSection = () => (
   <>
+    <h3>Official statistics</h3>
     <p>
       These are Official Statistics and have been produced in line with the{' '}
       <a href="https://code.statisticsauthority.gov.uk/the-code/">

@@ -23,6 +23,7 @@ def run_tests_pipeline():
         raise Exception(f"Invalid environment provided: {args.env}. Valid environments: {valid_environments}")
 
     subprocess.check_call(["google-chrome-stable", "--version"])
+    subprocess.check_call(["python", "--version"])
     subprocess.check_call("python -m pip install --upgrade pip", shell=True)
     subprocess.check_call("pip install pipenv", shell=True)
     subprocess.check_call("pipenv install", shell=True)

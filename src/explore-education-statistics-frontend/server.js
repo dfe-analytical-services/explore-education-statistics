@@ -1,7 +1,16 @@
 require('core-js/features/array/flat-map');
 require('core-js/features/array/flat');
 
+const next = require('next');
+const path = require('path');
+const { loadEnvConfig } = require('@next/env');
 const appInsights = require('applicationinsights');
+const express = require('express');
+const basicAuth = require('express-basic-auth');
+const helmet = require('helmet');
+const referrerPolicy = require('referrer-policy');
+
+loadEnvConfig(__dirname);
 
 if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
   appInsights
@@ -17,55 +26,42 @@ if (process.env.APPINSIGHTS_INSTRUMENTATIONKEY) {
     .start();
 }
 
-const basicAuth = require('express-basic-auth');
-const express = require('express');
-const helmet = require('helmet');
-const nextApp = require('next');
-const { loadEnvConfig } = require('@next/env');
-const path = require('path');
-const referrerPolicy = require('referrer-policy');
+const cspConnectSrc = [
+  "'self'",
+  process.env.CONTENT_API_BASE_URL.replace('/api', ''),
+  process.env.DATA_API_BASE_URL.replace('/api', ''),
+  process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
+  'https://*.googletagmanager.com',
+  'https://*.google-analytics.com',
+  'https://*.analytics.google.com',
+  'https://dc.services.visualstudio.com/v2/track',
+];
 
-loadEnvConfig(__dirname);
+const cspScriptSrc = [
+  "'self'",
+  'https://*.googletagmanager.com',
+  'https://*.google-analytics.com/',
+  'https://*.analytics.google.com',
+  "'unsafe-inline'",
+  "'unsafe-eval'",
+];
 
-const app = nextApp({
-  dev: process.env.NODE_ENV !== 'production',
-  dir: './src',
-});
-
+const port = process.env.PORT || 3000;
+const dev = process.env.NODE_ENV !== 'production';
+const app = next({ dev });
 const handleRequest = app.getRequestHandler();
 
-async function startServer(port = process.env.PORT || 3000) {
+async function startServer() {
   try {
     await app.prepare();
-  } catch (err) {
-    console.error(err);
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.error(e);
     process.exit(1);
   }
 
-  const cspConnectSrc = [
-    "'self'",
-    process.env.CONTENT_API_BASE_URL.replace('/api', ''),
-    process.env.DATA_API_BASE_URL.replace('/api', ''),
-    process.env.NOTIFICATION_API_BASE_URL.replace('/api', ''),
-    'https://*.googletagmanager.com',
-    'https://*.google-analytics.com',
-    'https://*.analytics.google.com',
-    'https://dc.services.visualstudio.com/v2/track',
-  ];
-
-  const cspScriptSrc = [
-    "'self'",
-    'https://*.googletagmanager.com',
-    'https://*.google-analytics.com/',
-    'https://*.analytics.google.com',
-    "'unsafe-inline'",
-    "'unsafe-eval'",
-  ];
-
   const server = express();
 
-  // Use Helmet for configuration of headers and disable express powered by header
-  server.disable('x-powered-by');
   server.use(
     helmet({
       contentSecurityPolicy: {
@@ -102,6 +98,7 @@ async function startServer(port = process.env.PORT || 3000) {
       '/_next/static',
       express.static(path.resolve(__dirname, 'src/.next/static')),
     );
+
     server.use(
       basicAuth({
         users: {
@@ -111,7 +108,6 @@ async function startServer(port = process.env.PORT || 3000) {
       }),
     );
   }
-
   server.get('*', (req, res) => handleRequest(req, res));
   server.post('*', (req, res) => handleRequest(req, res));
 
@@ -119,16 +115,15 @@ async function startServer(port = process.env.PORT || 3000) {
     if (err) {
       throw err;
     }
-
-    console.log(`Server started on port ${port}`);
+    // eslint-disable-next-line no-console
+    console.log(`Server started on http://localhost:${port}`);
   });
 }
 
-startServer().catch(err => {
-  if (appInsights.defaultClient) {
-    appInsights.defaultClient.trackException({ exception: err });
-  }
+startServer().catch(e => {
+  appInsights.defaultClient?.trackException({ exception: e });
 
-  console.error(err);
+  // eslint-disable-next-line no-console
+  console.error(e);
   process.exit(1);
 });

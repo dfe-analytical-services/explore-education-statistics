@@ -31,6 +31,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React, { useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
+import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
 
 interface Model {
   externalMethodology?: ExternalMethodology;
@@ -45,7 +46,7 @@ const PublicationMethodologiesPage = () => {
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [externalMethodology, methodologyVersions] = await Promise.all([
       publicationService.getExternalMethodology(publication.id),
-      methodologyService.listMethodologyVersions(publication.id),
+      methodologyService.listLatestMethodologyVersions(publication.id),
     ]);
 
     return {
@@ -60,18 +61,12 @@ const PublicationMethodologiesPage = () => {
     amendment: boolean;
   }>();
   const [dropMethodologyId, setDropMethodologyId] = useState<string>();
-  const [
-    removingExternalMethodology,
-    toggleRemovingExternalMethodology,
-  ] = useToggle(false);
-  const [
-    showMethodologyTypeGuidance,
-    toggleMethodologyTypeGuidance,
-  ] = useToggle(false);
-  const [
-    showMethodologyStatusGuidance,
-    toggleMethodologyStatusGuidance,
-  ] = useToggle(false);
+  const [removingExternalMethodology, toggleRemovingExternalMethodology] =
+    useToggle(false);
+  const [showMethodologyTypeGuidance, toggleMethodologyTypeGuidance] =
+    useToggle(false);
+  const [showMethodologyStatusGuidance, toggleMethodologyStatusGuidance] =
+    useToggle(false);
 
   const handleRemoveExternalMethodology = async () => {
     if (!publication) {
@@ -104,9 +99,8 @@ const PublicationMethodologiesPage = () => {
             <Button
               className="govuk-!-margin-bottom-0"
               onClick={async () => {
-                const {
-                  id: methodologyId,
-                } = await methodologyService.createMethodology(publication.id);
+                const { id: methodologyId } =
+                  await methodologyService.createMethodology(publication.id);
 
                 history.push(
                   generatePath<MethodologyRouteParams>(
@@ -125,228 +119,226 @@ const PublicationMethodologiesPage = () => {
       </div>
 
       {methodologyVersions.length > 0 || externalMethodology ? (
-        <>
-          <table className="dfe-hide-empty-cells" data-testid="methodologies">
-            <caption className="govuk-table__caption--m">
-              Methodologies associated to this publication
-            </caption>
-            <thead>
-              <tr>
-                <th>Methodology</th>
-                <th>
-                  Type{' '}
-                  <ButtonText onClick={toggleMethodologyTypeGuidance.on}>
-                    <InfoIcon description="Guidance on methodology types" />
-                  </ButtonText>
-                </th>
-                <th>
-                  Status{' '}
-                  <ButtonText onClick={toggleMethodologyStatusGuidance.on}>
-                    <InfoIcon description="Guidance on methodology statuses" />
-                  </ButtonText>
-                </th>
-                <th>Published date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {methodologyVersions.map(methodology => {
-                const canEdit =
-                  methodology.permissions.canApproveMethodology ||
-                  methodology.permissions.canMarkMethodologyAsDraft ||
-                  methodology.permissions.canUpdateMethodology;
+        <table className="dfe-hide-empty-cells" data-testid="methodologies">
+          <caption className="govuk-table__caption--m">
+            Methodologies associated to this publication
+          </caption>
+          <thead>
+            <tr>
+              <th>Methodology</th>
+              <th>
+                Type{' '}
+                <ButtonText onClick={toggleMethodologyTypeGuidance.on}>
+                  <InfoIcon description="Guidance on methodology types" />
+                </ButtonText>
+              </th>
+              <th>
+                Status{' '}
+                <ButtonText onClick={toggleMethodologyStatusGuidance.on}>
+                  <InfoIcon description="Guidance on methodology statuses" />
+                </ButtonText>
+              </th>
+              <th>Published date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {methodologyVersions.map(methodology => {
+              const canEdit =
+                methodology.permissions.canApproveMethodology ||
+                methodology.permissions.canSubmitMethodologyForHigherReview ||
+                methodology.permissions.canMarkMethodologyAsDraft ||
+                methodology.permissions.canUpdateMethodology;
 
-                return (
-                  <tr key={methodology.id}>
-                    <td>{methodology.title}</td>
-                    <td>{methodology.owned ? 'Owned' : 'Adopted'}</td>
-                    <td>
-                      <Tag
-                        colour={
-                          methodology.status === 'Approved' &&
-                          methodology.published
-                            ? 'green'
-                            : undefined
-                        }
-                      >
-                        {`${
-                          methodology.status === 'Approved' &&
-                          methodology.published
-                            ? 'Published'
-                            : methodology.status
-                        }${methodology.amendment ? ' Amendment' : ''}`}
-                      </Tag>
-                    </td>
-                    <td>
-                      {methodology.published ? (
-                        <FormattedDate>{methodology.published}</FormattedDate>
-                      ) : (
-                        'Not yet published'
+              return (
+                <tr key={methodology.id}>
+                  <td>{methodology.title}</td>
+                  <td>{methodology.owned ? 'Owned' : 'Adopted'}</td>
+                  <td>
+                    <Tag
+                      colour={
+                        methodology.status === 'Approved' &&
+                        methodology.published
+                          ? 'green'
+                          : undefined
+                      }
+                    >
+                      {`${
+                        methodology.status === 'Approved' &&
+                        methodology.published
+                          ? 'Published'
+                          : getMethodologyApprovalStatusLabel(
+                              methodology.status,
+                            )
+                      }${methodology.amendment ? ' Amendment' : ''}`}
+                    </Tag>
+                  </td>
+                  <td>
+                    {methodology.published ? (
+                      <FormattedDate>{methodology.published}</FormattedDate>
+                    ) : (
+                      'Not yet published'
+                    )}
+                  </td>
+
+                  <td>
+                    <Link
+                      className="govuk-!-margin-right-4 dfe-inline-block"
+                      data-testid={canEdit ? 'edit' : 'view'}
+                      to={generatePath<MethodologyRouteParams>(
+                        methodologySummaryRoute.path,
+                        {
+                          methodologyId: methodology.id,
+                        },
                       )}
-                    </td>
+                      unvisited
+                    >
+                      {canEdit ? 'Edit' : 'View'}
+                      <VisuallyHidden>{` ${methodology.title}`}</VisuallyHidden>
+                    </Link>
 
-                    <td>
-                      <Link
-                        className="govuk-!-margin-right-4 dfe-inline-block"
-                        data-testid={canEdit ? 'edit' : 'view'}
-                        to={generatePath<MethodologyRouteParams>(
-                          methodologySummaryRoute.path,
-                          {
-                            methodologyId: methodology.id,
-                          },
-                        )}
-                        unvisited
-                      >
-                        {canEdit ? 'Edit' : 'View'}
-                        <VisuallyHidden>
-                          {` ${methodology.title}`}
-                        </VisuallyHidden>
-                      </Link>
+                    {methodology.owned && (
+                      <>
+                        {methodology.amendment &&
+                          methodology.previousVersionId && (
+                            <Link
+                              className="govuk-!-margin-right-4 dfe-inline-block"
+                              data-testid="view-existing-version"
+                              to={generatePath<MethodologyRouteParams>(
+                                methodologySummaryRoute.path,
+                                {
+                                  methodologyId: methodology.previousVersionId,
+                                },
+                              )}
+                              unvisited
+                            >
+                              View existing version
+                              <VisuallyHidden>
+                                {` for ${methodology.title}`}
+                              </VisuallyHidden>
+                            </Link>
+                          )}
 
-                      {methodology.owned && (
-                        <>
-                          {methodology.amendment &&
-                            methodology.previousVersionId && (
-                              <Link
-                                className="govuk-!-margin-right-4 dfe-inline-block"
-                                data-testid="view-existing-version"
-                                to={generatePath<MethodologyRouteParams>(
-                                  methodologySummaryRoute.path,
-                                  {
-                                    methodologyId:
-                                      methodology.previousVersionId,
-                                  },
-                                )}
-                                unvisited
-                              >
-                                View existing version
+                        {!methodology.amendment &&
+                          methodology.permissions
+                            .canMakeAmendmentOfMethodology && (
+                            <ButtonText
+                              data-testid="amend"
+                              onClick={() =>
+                                setAmendMethodologyId(methodology.id)
+                              }
+                            >
+                              Amend
+                              <VisuallyHidden>
+                                {` ${methodology.title}`}
+                              </VisuallyHidden>
+                            </ButtonText>
+                          )}
+
+                        {methodology.permissions.canDeleteMethodology && (
+                          <ButtonText
+                            data-testid={
+                              methodology.amendment
+                                ? 'cancel-amendment'
+                                : 'delete-draft'
+                            }
+                            variant="warning"
+                            onClick={() =>
+                              setDeleteMethodologyDetails({
+                                methodologyId: methodology.id,
+                                amendment: methodology.amendment,
+                              })
+                            }
+                          >
+                            {methodology.amendment ? (
+                              <>
+                                Cancel amendment
                                 <VisuallyHidden>
                                   {` for ${methodology.title}`}
                                 </VisuallyHidden>
-                              </Link>
-                            )}
-
-                          {!methodology.amendment &&
-                            methodology.permissions
-                              .canMakeAmendmentOfMethodology && (
-                              <ButtonText
-                                data-testid="amend"
-                                onClick={() =>
-                                  setAmendMethodologyId(methodology.id)
-                                }
-                              >
-                                Amend
+                              </>
+                            ) : (
+                              <>
+                                Delete draft
                                 <VisuallyHidden>
                                   {` ${methodology.title}`}
                                 </VisuallyHidden>
-                              </ButtonText>
+                              </>
                             )}
-
-                          {methodology.permissions.canDeleteMethodology && (
-                            <ButtonText
-                              data-testid={
-                                methodology.amendment
-                                  ? 'cancel-amendment'
-                                  : 'delete-draft'
-                              }
-                              variant="warning"
-                              onClick={() =>
-                                setDeleteMethodologyDetails({
-                                  methodologyId: methodology.id,
-                                  amendment: methodology.amendment,
-                                })
-                              }
-                            >
-                              {methodology.amendment ? (
-                                <>
-                                  Cancel amendment
-                                  <VisuallyHidden>
-                                    {` for ${methodology.title}`}
-                                  </VisuallyHidden>
-                                </>
-                              ) : (
-                                <>
-                                  Delete draft
-                                  <VisuallyHidden>
-                                    {` ${methodology.title}`}
-                                  </VisuallyHidden>
-                                </>
-                              )}
-                            </ButtonText>
-                          )}
-                        </>
-                      )}
-
-                      {methodology.permissions.canRemoveMethodologyLink && (
-                        <ButtonText
-                          variant="warning"
-                          onClick={() => {
-                            setDropMethodologyId(methodology.methodologyId);
-                          }}
-                        >
-                          Remove
-                          <VisuallyHidden>
-                            {` ${methodology.title}`}
-                          </VisuallyHidden>
-                        </ButtonText>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-              {externalMethodology && (
-                <tr>
-                  <td>{externalMethodology.title}</td>
-                  <td>External</td>
-                  <td />
-                  <td />
-                  <td>
-                    {permissions.canManageExternalMethodology && (
-                      <Link
-                        className="govuk-!-margin-right-4"
-                        to={generatePath<PublicationRouteParams>(
-                          publicationExternalMethodologyRoute.path,
-                          {
-                            publicationId: publication.id,
-                          },
+                          </ButtonText>
                         )}
-                        unvisited
-                      >
-                        Edit
-                        <VisuallyHidden>
-                          {` ${externalMethodology.title}`}
-                        </VisuallyHidden>
-                      </Link>
+                      </>
                     )}
 
-                    <Link
-                      className="govuk-!-margin-right-4"
-                      to={externalMethodology.url}
-                      unvisited
-                    >
-                      View
-                      <VisuallyHidden>
-                        {` ${externalMethodology.title}`}
-                      </VisuallyHidden>
-                    </Link>
-
-                    {permissions.canManageExternalMethodology && (
+                    {methodology.permissions.canRemoveMethodologyLink && (
                       <ButtonText
                         variant="warning"
-                        onClick={toggleRemovingExternalMethodology.on}
+                        onClick={() => {
+                          setDropMethodologyId(methodology.methodologyId);
+                        }}
                       >
                         Remove
                         <VisuallyHidden>
-                          {` ${externalMethodology.title}`}
+                          {` ${methodology.title}`}
                         </VisuallyHidden>
                       </ButtonText>
                     )}
                   </td>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        </>
+              );
+            })}
+            {externalMethodology && (
+              <tr>
+                <td>{externalMethodology.title}</td>
+                <td>External</td>
+                <td />
+                <td />
+                <td>
+                  {permissions.canManageExternalMethodology && (
+                    <Link
+                      className="govuk-!-margin-right-4"
+                      to={generatePath<PublicationRouteParams>(
+                        publicationExternalMethodologyRoute.path,
+                        {
+                          publicationId: publication.id,
+                        },
+                      )}
+                      unvisited
+                    >
+                      Edit
+                      <VisuallyHidden>
+                        {` ${externalMethodology.title}`}
+                      </VisuallyHidden>
+                    </Link>
+                  )}
+
+                  <Link
+                    className="govuk-!-margin-right-4"
+                    to={externalMethodology.url}
+                    unvisited
+                  >
+                    View
+                    <VisuallyHidden>
+                      {` ${externalMethodology.title}`}
+                    </VisuallyHidden>
+                  </Link>
+
+                  {permissions.canManageExternalMethodology && (
+                    <ButtonText
+                      variant="warning"
+                      onClick={toggleRemovingExternalMethodology.on}
+                    >
+                      Remove
+                      <VisuallyHidden>
+                        {` ${externalMethodology.title}`}
+                      </VisuallyHidden>
+                    </ButtonText>
+                  )}
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       ) : (
         <p>There are no methodologies for this publication yet.</p>
       )}
@@ -398,9 +390,10 @@ const PublicationMethodologiesPage = () => {
           open
           title="Confirm you want to amend this published methodology"
           onConfirm={async () => {
-            const amendment = await methodologyService.createMethodologyAmendment(
-              amendMethodologyId,
-            );
+            const amendment =
+              await methodologyService.createMethodologyAmendment(
+                amendMethodologyId,
+              );
             history.push(
               generatePath<MethodologyRouteParams>(
                 methodologySummaryRoute.path,

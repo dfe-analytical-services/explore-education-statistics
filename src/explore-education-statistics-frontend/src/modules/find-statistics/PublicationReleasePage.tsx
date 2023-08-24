@@ -34,6 +34,7 @@ import React from 'react';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import ScrollableContainer from '@common/components/ScrollableContainer';
 import WarningMessage from '@common/components/WarningMessage';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -90,7 +91,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <div>
               {!release.publication.isSuperseded && !release.latestRelease && (
                 <Link
-                  className="dfe-print-hidden dfe-block govuk-!-margin-bottom-3"
+                  className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
                   unvisited
                   to={`/find-statistics/${release.publication.slug}`}
                 >
@@ -173,7 +174,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
             <SummaryListItem term="Receive updates">
               <Link
-                className="dfe-print-hidden govuk-!-font-weight-bold"
+                className="govuk-!-display-none-print govuk-!-font-weight-bold"
                 unvisited
                 to={`/subscriptions?slug=${release.publication.slug}`}
                 data-testid={`subscription-${release.publication.slug}`}
@@ -571,23 +572,21 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const {
-    publication: publicationSlug,
-    release: releaseSlug,
-  } = query as Dictionary<string>;
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const { publication: publicationSlug, release: releaseSlug } =
+      query as Dictionary<string>;
 
-  const release = await (releaseSlug
-    ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
-    : publicationService.getLatestPublicationRelease(publicationSlug));
+    const release = await (releaseSlug
+      ? publicationService.getPublicationRelease(publicationSlug, releaseSlug)
+      : publicationService.getLatestPublicationRelease(publicationSlug));
 
-  return {
-    props: {
-      release,
-    },
-  };
-};
+    return {
+      props: {
+        release,
+      },
+    };
+  },
+);
 
 export default PublicationReleasePage;

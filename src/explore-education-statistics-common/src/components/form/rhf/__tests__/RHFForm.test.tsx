@@ -18,7 +18,7 @@ describe('Form', () => {
           lastName: Yup.string().required('Last name is required'),
         })}
       >
-        <RHFForm id="test-form" onSubmit={Promise.resolve}>
+        <RHFForm id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -53,7 +53,7 @@ describe('Form', () => {
           lastName: Yup.string().required('Last name is required'),
         })}
       >
-        <RHFForm id="test-form" onSubmit={Promise.resolve}>
+        <RHFForm id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -86,7 +86,7 @@ describe('Form', () => {
           }),
         })}
       >
-        <RHFForm id="test-form" onSubmit={Promise.resolve}>
+        <RHFForm id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -119,7 +119,7 @@ describe('Form', () => {
           }),
         })}
       >
-        <RHFForm id="test-form" onSubmit={Promise.resolve}>
+        <RHFForm id="test-form" onSubmit={jest.fn()}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -147,7 +147,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
       >
         <RHFForm id="test-form" onSubmit={handleSubmitForm}>
@@ -171,7 +171,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().defined(),
         })}
       >
         <RHFForm
@@ -293,7 +293,7 @@ describe('Form', () => {
           firstName: 'Firstname',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
@@ -339,11 +339,11 @@ describe('Form', () => {
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
             <input
               id="test-form-firstName"
               // eslint-disable-next-line react/jsx-props-no-spreading
@@ -361,7 +361,7 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
   });
 
   test('does not re-focus error summary when changing input', async () => {
@@ -371,11 +371,11 @@ describe('Form', () => {
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
             <label htmlFor="firstName">First name</label>
             <input
               id="firstName"
@@ -394,7 +394,7 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
 
     const input = screen.getByLabelText('First name');
 
@@ -410,7 +410,7 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).not.toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
   });
 
   test('re-focuses error summary on re-submit', async () => {
@@ -420,11 +420,11 @@ describe('Form', () => {
           firstName: '',
         }}
         validationSchema={Yup.object({
-          firstName: Yup.string().required(),
+          firstName: Yup.string().required('First name is required'),
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={Promise.resolve}>
+          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
             <label htmlFor="firstName">First name</label>
             <input
               id="firstName"
@@ -443,10 +443,10 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
 
     screen.getByLabelText('First name').focus();
-    expect(screen.getByRole('alert')).not.toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).not.toHaveFocus();
 
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
@@ -454,6 +454,6 @@ describe('Form', () => {
       expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
 
-    expect(screen.getByRole('alert')).toHaveFocus();
+    expect(screen.getByTestId('errorSummary')).toHaveFocus();
   });
 });

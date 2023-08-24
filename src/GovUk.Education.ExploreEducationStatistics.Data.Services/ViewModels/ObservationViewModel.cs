@@ -19,10 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public Guid LocationId { get; set; }
 
-        // Legacy Location field that exists in table results of historical Permalinks
-        // TODO EES-3755 Remove after Permalink snapshot work is complete
-        public LocationViewModel? Location { get; set; }
-
         public Dictionary<Guid, string> Measures { get; set; } = new();
 
         public string TimePeriod { get; set; } = string.Empty;

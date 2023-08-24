@@ -98,7 +98,7 @@ Create table
     [Documentation]    EES-615
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
-    user waits until element contains    testid:dataTableCaption
+    user waits until element contains    css:[data-testid="dataTableCaption"]
     ...    Admission Numbers for 'UI test subject' in Barnsley, Birmingham, Camden, Greenwich, Nailsea Youngwood and 1 other location between 2005 and 2018
 
 Validate table rows
@@ -281,7 +281,7 @@ Embed data block into release content
 
 Check footnote is displayed in content Tab
     user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
-    user scrolls to accordion section content    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user scrolls to accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
 
     user waits until page contains element    testid:Data block - ${DATABLOCK_NAME}
     user scrolls to element    testid:Data block - ${DATABLOCK_NAME}
@@ -475,6 +475,8 @@ Configure line chart data sets
 
     user clicks link    Legend
     user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
+
+    user clicks element    id:chartBuilderPreview
 
 Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview

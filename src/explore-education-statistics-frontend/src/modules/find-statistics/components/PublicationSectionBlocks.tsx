@@ -57,7 +57,7 @@ const PublicationSectionBlocks = ({
                   });
                 }}
                 additionalTabContent={
-                  <div className="dfe-print-hidden">
+                  <div className="govuk-!-display-none-print">
                     <h3 className="govuk-heading-m">
                       Explore and edit this data online
                       <VisuallyHidden>{` for ${block.heading}`}</VisuallyHidden>

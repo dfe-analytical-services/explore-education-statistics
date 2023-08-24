@@ -61,15 +61,14 @@ describe('MethodologyPage', () => {
   test('renders the methodology content', () => {
     render(<MethodologyPage data={testMethodology} />);
     const contentAccordion = screen.getAllByTestId('accordion')[0];
-    const contentAccordionSections = within(contentAccordion).getAllByTestId(
-      'accordionSection',
-    );
+    const contentAccordionSections =
+      within(contentAccordion).getAllByTestId('accordionSection');
 
     expect(contentAccordionSections).toHaveLength(2);
 
     expect(
       within(contentAccordionSections[0]).getByRole('button', {
-        name: 'Section 1',
+        name: /Section 1/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -81,7 +80,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(contentAccordionSections[1]).getByRole('button', {
-        name: 'Section 2',
+        name: /Section 2/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -95,9 +94,8 @@ describe('MethodologyPage', () => {
   test('renders the methodology annexes', () => {
     render(<MethodologyPage data={testMethodology} />);
     const annexAccordion = screen.getAllByTestId('accordion')[1];
-    const annexAccordionSections = within(annexAccordion).getAllByTestId(
-      'accordionSection',
-    );
+    const annexAccordionSections =
+      within(annexAccordion).getAllByTestId('accordionSection');
 
     expect(
       screen.getByRole('heading', { name: 'Annexes' }),
@@ -107,7 +105,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(annexAccordionSections[0]).getByRole('button', {
-        name: 'Annex 1',
+        name: /Annex 1/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -119,7 +117,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(annexAccordionSections[1]).getByRole('button', {
-        name: 'Annex 2',
+        name: /Annex 2/,
       }),
     ).toBeInTheDocument();
     expect(
@@ -131,7 +129,7 @@ describe('MethodologyPage', () => {
 
     expect(
       within(annexAccordionSections[2]).getByRole('button', {
-        name: 'Annex 3',
+        name: /Annex 3/,
       }),
     ).toBeInTheDocument();
     expect(

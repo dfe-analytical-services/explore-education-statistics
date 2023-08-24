@@ -23,24 +23,21 @@ export const preReleaseContentRoute: ReleaseRouteProps = {
 };
 
 export const preReleaseMethodologiesRoute: ReleaseRouteProps = {
-  path:
-    '/publication/:publicationId/release/:releaseId/prerelease/methodologies',
+  path: '/publication/:publicationId/release/:releaseId/prerelease/methodologies',
   title: 'Methodologies',
   component: PreReleaseMethodologiesPage,
   exact: true,
 };
 
 export const preReleaseMethodologyRoute: ReleaseRouteProps = {
-  path:
-    '/publication/:publicationId/release/:releaseId/prerelease/methodologies/:methodologyId',
+  path: '/publication/:publicationId/release/:releaseId/prerelease/methodologies/:methodologyId',
   title: 'Methodology',
   component: PreReleaseMethodologyPage,
   exact: true,
 };
 
 export const preReleaseTableToolRoute: ReleaseRouteProps = {
-  path:
-    '/publication/:publicationId/release/:releaseId/prerelease/table-tool/:dataBlockId?',
+  path: '/publication/:publicationId/release/:releaseId/prerelease/table-tool/:dataBlockId?',
   title: 'Table tool',
   component: PreReleaseTableToolPage,
   exact: true,

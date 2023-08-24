@@ -13,11 +13,8 @@ import { generatePath, RouteComponentProps } from 'react-router';
 const MethodologySummaryEditPage = ({
   history,
 }: RouteComponentProps<MethodologyRouteParams>) => {
-  const {
-    methodologyId,
-    methodology,
-    onMethodologyChange,
-  } = useMethodologyContext();
+  const { methodologyId, methodology, onMethodologyChange } =
+    useMethodologyContext();
 
   const handleSubmit = async ({ title }: MethodologySummaryFormValues) => {
     if (!methodology) {

@@ -23,8 +23,7 @@ const PrototypeRelease = () => {
         breadcrumbs={[
           {
             name: 'Childrens social care',
-            link:
-              'https://explore-education-statistics.service.gov.uk/find-statistics#themes-1',
+            link: 'https://explore-education-statistics.service.gov.uk/find-statistics#themes-1',
           },
           {
             name: 'Children looked after in England including adoptions',
@@ -104,7 +103,7 @@ const PrototypeRelease = () => {
                     <a
                       data-testid="subscription-children-looked-after-in-england-including-adoptions"
                       href="/subscriptions?slug=children-looked-after-in-england-including-adoptions"
-                      className="govuk-link govuk-link--no-visited-state dfe-print-hidden"
+                      className="govuk-link govuk-link--no-visited-state govuk-!-display-none-print"
                     >
                       Sign up for email alerts
                     </a>

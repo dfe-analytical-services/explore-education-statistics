@@ -52,7 +52,7 @@ const DataBlockSelectForm = ({
   };
 
   return (
-    <form className="dfe-align--left" id={id}>
+    <form className="govuk-!-text-align-left" id={id}>
       <FormSelect
         className="govuk-!-margin-right-1"
         id={`${id}-selectedDataBlock`}

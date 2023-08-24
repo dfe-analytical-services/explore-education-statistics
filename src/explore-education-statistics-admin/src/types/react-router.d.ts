@@ -4,6 +4,6 @@ declare module 'react-router' {
   export function generatePath<
     Params extends {
       [paramName: string]: string | number | boolean | undefined;
-    }
+    },
   >(pattern: string, params: Params): string;
 }

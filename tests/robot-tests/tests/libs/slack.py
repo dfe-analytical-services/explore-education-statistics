@@ -1,3 +1,4 @@
+import datetime
 import json
 import os
 import shutil
@@ -80,14 +81,14 @@ class SlackService:
         if self._tests_failed():
             client = WebClient(token=slack_bot_token)
 
-            shutil.make_archive("UI-test-report", "zip", PATH)
+            date = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
+
+            report_name = f"UI-test-report-{suite.replace('tests/', '')}-{env}-{date}.zip"
+
+            shutil.make_archive(report_name.replace(".zip", ""), "zip", PATH)
             try:
-                client.files_upload(
-                    channels="#build",
-                    file="UI-test-report.zip",
-                    title="test-report.zip",
-                )
+                client.files_upload(channels="#build", file=report_name, title=report_name)
             except SlackApiError as e:
                 logger.error(f"Error uploading test report: {e}")
-            os.remove("UI-test-report.zip")
+            os.remove(report_name)
             logger.info("Sent UI test report to #build")

@@ -13,6 +13,7 @@ import classNames from 'classnames';
 import { Formik } from 'formik';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useState } from 'react';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 import styles from './SubscriptionPage.module.scss';
 
 interface FormValues {
@@ -135,23 +136,25 @@ const SubscriptionPage: NextPage<Props> = ({
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const { slug, unsubscribed = '', verified = '' } = query as Dictionary<
-    string
-  >;
-
-  const data = await publicationService.getPublicationTitle(slug as string);
-
-  return {
-    props: {
-      data,
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const {
       slug,
-      unsubscribed,
-      verified,
-    },
-  };
-};
+      unsubscribed = '',
+      verified = '',
+    } = query as Dictionary<string>;
+
+    const data = await publicationService.getPublicationTitle(slug as string);
+
+    return {
+      props: {
+        data,
+        slug,
+        unsubscribed,
+        verified,
+      },
+    };
+  },
+);
 
 export default SubscriptionPage;

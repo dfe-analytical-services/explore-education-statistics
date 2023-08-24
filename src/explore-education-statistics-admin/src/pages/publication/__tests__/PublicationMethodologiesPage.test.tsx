@@ -15,7 +15,7 @@ import React from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
-import produce from 'immer';
+import { produce } from 'immer';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/publicationService');
@@ -29,18 +29,20 @@ const publicationService = _publicationService as jest.Mocked<
 
 describe('PublicationMethodologiesPage', () => {
   const noMethodologyPermissions = {
-    canApproveMethodology: false,
     canUpdateMethodology: false,
     canDeleteMethodology: false,
     canMakeAmendmentOfMethodology: false,
+    canApproveMethodology: false,
+    canSubmitMethodologyForHigherReview: false,
     canMarkMethodologyAsDraft: false,
     canRemoveMethodologyLink: false,
   };
   const testDraftMethodologyPermissions = {
-    canApproveMethodology: true,
     canUpdateMethodology: true,
     canDeleteMethodology: true,
     canMakeAmendmentOfMethodology: false,
+    canApproveMethodology: true,
+    canSubmitMethodologyForHigherReview: true,
     canMarkMethodologyAsDraft: true,
     canRemoveMethodologyLink: false,
   };
@@ -91,7 +93,7 @@ describe('PublicationMethodologiesPage', () => {
   });
 
   test('renders the methodologies page correctly with methodologies', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([
       testMethodology1,
       testMethodology2,
     ]);
@@ -127,7 +129,7 @@ describe('PublicationMethodologiesPage', () => {
   });
 
   test('renders the methodologies page correctly with no methodologies', async () => {
-    methodologyService.listMethodologyVersions.mockResolvedValue([]);
+    methodologyService.listLatestMethodologyVersions.mockResolvedValue([]);
     publicationService.getExternalMethodology.mockResolvedValue(undefined);
     renderPage();
 
@@ -155,7 +157,7 @@ describe('PublicationMethodologiesPage', () => {
         status: 'Draft',
       };
 
-      methodologyService.listMethodologyVersions.mockResolvedValue([]);
+      methodologyService.listLatestMethodologyVersions.mockResolvedValue([]);
       publicationService.getExternalMethodology.mockResolvedValue(undefined);
       methodologyService.createMethodology.mockResolvedValue(
         createdMethodology,
@@ -194,7 +196,7 @@ describe('PublicationMethodologiesPage', () => {
     });
 
     test('does not render the Create Methodology button if the user does not have permission to create one', async () => {
-      methodologyService.listMethodologyVersions.mockResolvedValue([]);
+      methodologyService.listLatestMethodologyVersions.mockResolvedValue([]);
       publicationService.getExternalMethodology.mockResolvedValue(undefined);
       renderPage(
         produce(testPublication, draft => {
@@ -215,7 +217,7 @@ describe('PublicationMethodologiesPage', () => {
   describe('owned methodology', () => {
     describe('draft', () => {
       test('renders a draft owned methodology correctly', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -239,7 +241,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the view link is shown when a user does not have permission to edit the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
             draft.permissions = noMethodologyPermissions;
           }),
@@ -268,10 +270,11 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can approve the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
             draft.permissions.canUpdateMethodology = false;
             draft.permissions.canMarkMethodologyAsDraft = false;
+            draft.permissions.canSubmitMethodologyForHigherReview = false;
             draft.permissions.canApproveMethodology = true;
           }),
         ]);
@@ -298,10 +301,11 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can mark the methodology as draft', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
             draft.permissions.canUpdateMethodology = false;
             draft.permissions.canMarkMethodologyAsDraft = true;
+            draft.permissions.canSubmitMethodologyForHigherReview = false;
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
@@ -328,10 +332,11 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can update the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
             draft.permissions.canUpdateMethodology = true;
             draft.permissions.canMarkMethodologyAsDraft = false;
+            draft.permissions.canSubmitMethodologyForHigherReview = false;
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
@@ -358,7 +363,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the delete draft button is shown when a user can delete the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -379,7 +384,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the delete draft button is not shown when a user does not have permission to delete the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Draft, draft => {
             draft.permissions.canDeleteMethodology = false;
           }),
@@ -404,7 +409,7 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('deleting a draft methodology', () => {
       test('shows the confirm modal when clicking the delete button', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -442,7 +447,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to delete the Methodology when the confirm button is clicked', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1Draft,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -475,7 +480,7 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('approved', () => {
       test('renders an approved owned methodology correctly', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -501,7 +506,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('shows the published tag and the date if the methodology has been published', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -521,7 +526,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('shows the approved tag if the methodology has not been published', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1, draft => {
             delete draft.published;
           }),
@@ -543,7 +548,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the amend methodology button is shown if user has permission', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1, draft => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
@@ -567,7 +572,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the amend methodology button is not shown if user does not have permission', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -591,7 +596,7 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('amendments', () => {
       test('renders an amendment correctly', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1Amendment,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -623,7 +628,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the cancel amendment button is shown when a user can delete the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Amendment, draft => {
             draft.permissions.canDeleteMethodology = true;
           }),
@@ -646,7 +651,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the cancel amendment button is not shown when a user does not have permission to delete the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Amendment, draft => {
             draft.permissions.canDeleteMethodology = false;
           }),
@@ -672,7 +677,7 @@ describe('PublicationMethodologiesPage', () => {
     describe('amending a methodology', () => {
       test('shows the confirm modal when clicking the amend button', async () => {
         renderPage();
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1, draft => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
@@ -720,7 +725,7 @@ describe('PublicationMethodologiesPage', () => {
         methodologyService.createMethodologyAmendment.mockImplementation(() =>
           Promise.resolve(createdAmendment),
         );
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1, draft => {
             draft.permissions.canMakeAmendmentOfMethodology = true;
           }),
@@ -761,7 +766,7 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('cancelling an amendment', () => {
       test('shows the confirm modal when clicking the cancel amendment button', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Amendment, draft => {
             draft.permissions.canDeleteMethodology = true;
           }),
@@ -798,7 +803,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to cancel the amendment when the confirm button is clicked', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology1Amendment, draft => {
             draft.permissions.canDeleteMethodology = true;
           }),
@@ -836,7 +841,7 @@ describe('PublicationMethodologiesPage', () => {
   describe('adopted methodology', () => {
     describe('draft', () => {
       test('renders a draft adopted methodology correctly', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology2Draft,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -866,7 +871,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the view link is shown when a user does not have permission to edit the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
             draft.permissions = noMethodologyPermissions;
           }),
@@ -895,10 +900,11 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can approve the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
             draft.permissions.canUpdateMethodology = false;
             draft.permissions.canMarkMethodologyAsDraft = false;
+            draft.permissions.canSubmitMethodologyForHigherReview = false;
             draft.permissions.canApproveMethodology = true;
           }),
         ]);
@@ -925,10 +931,11 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can mark the methodology as draft', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
             draft.permissions.canUpdateMethodology = false;
             draft.permissions.canMarkMethodologyAsDraft = true;
+            draft.permissions.canSubmitMethodologyForHigherReview = false;
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
@@ -955,10 +962,11 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the edit link is shown when a user can update the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
             draft.permissions.canUpdateMethodology = true;
             draft.permissions.canMarkMethodologyAsDraft = false;
+            draft.permissions.canSubmitMethodologyForHigherReview = false;
             draft.permissions.canApproveMethodology = false;
           }),
         ]);
@@ -985,7 +993,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the remove button is shown when a user can drop the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
@@ -1008,7 +1016,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the remove button is not shown when a user does not have permission to drop the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology2Draft, draft => {
             draft.permissions.canRemoveMethodologyLink = false;
           }),
@@ -1033,7 +1041,7 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('approved', () => {
       test('renders an approved adopted methodology correctly', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1,
           testMethodology2,
         ]);
@@ -1070,7 +1078,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the remove button is shown when a user can drop the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1,
           produce(testMethodology2, draft => {
             draft.permissions.canRemoveMethodologyLink = true;
@@ -1094,7 +1102,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('the remove button is not shown when a user does not have permission to drop the methodology', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology1,
           produce(testMethodology2, draft => {
             draft.permissions.canRemoveMethodologyLink = false;
@@ -1120,7 +1128,7 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('amendments', () => {
       test('renders an amendment correctly', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           testMethodology2Amendment,
         ]);
         publicationService.getExternalMethodology.mockResolvedValue(undefined);
@@ -1160,7 +1168,7 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('removing an adopted methodology', () => {
       test('shows the confirm modal when clicking the remove button', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology2, draft => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
@@ -1193,7 +1201,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to remove the adopted Methodology when the confirm button is clicked', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([
           produce(testMethodology2, draft => {
             draft.permissions.canRemoveMethodologyLink = true;
           }),
@@ -1231,7 +1239,7 @@ describe('PublicationMethodologiesPage', () => {
       url: 'http://test.com',
     };
     test('renders an external methodology correctly', async () => {
-      methodologyService.listMethodologyVersions.mockResolvedValue([
+      methodologyService.listLatestMethodologyVersions.mockResolvedValue([
         testMethodology1,
         testMethodology2,
       ]);
@@ -1259,7 +1267,7 @@ describe('PublicationMethodologiesPage', () => {
     });
 
     test('renders the table when there is only an external methodology', async () => {
-      methodologyService.listMethodologyVersions.mockResolvedValue([]);
+      methodologyService.listLatestMethodologyVersions.mockResolvedValue([]);
       publicationService.getExternalMethodology.mockResolvedValue(
         testExternalMethodology,
       );
@@ -1286,7 +1294,7 @@ describe('PublicationMethodologiesPage', () => {
     });
 
     test('shows the edit and delete buttons if have permission to manage external methodologies', async () => {
-      methodologyService.listMethodologyVersions.mockResolvedValue([
+      methodologyService.listLatestMethodologyVersions.mockResolvedValue([
         testMethodology1,
         testMethodology2,
       ]);
@@ -1317,7 +1325,7 @@ describe('PublicationMethodologiesPage', () => {
     });
 
     test('does not show the edit and delete buttons if do not have permission to manage external methodologies', async () => {
-      methodologyService.listMethodologyVersions.mockResolvedValue([
+      methodologyService.listLatestMethodologyVersions.mockResolvedValue([
         testMethodology1,
         testMethodology2,
       ]);
@@ -1355,7 +1363,7 @@ describe('PublicationMethodologiesPage', () => {
 
     describe('removing an external methodology', () => {
       test('shows the confirm modal when clicking the remove button', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([]);
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([]);
         publicationService.getExternalMethodology.mockResolvedValue(
           testExternalMethodology,
         );
@@ -1395,7 +1403,7 @@ describe('PublicationMethodologiesPage', () => {
       });
 
       test('calls the service to delete the Methodology when the confirm button is clicked', async () => {
-        methodologyService.listMethodologyVersions.mockResolvedValue([]);
+        methodologyService.listLatestMethodologyVersions.mockResolvedValue([]);
         publicationService.getExternalMethodology.mockResolvedValue(
           testExternalMethodology,
         );

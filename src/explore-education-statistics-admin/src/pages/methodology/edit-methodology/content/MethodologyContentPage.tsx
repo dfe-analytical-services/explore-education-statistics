@@ -24,14 +24,10 @@ import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 export const MethodologyContentPageInternal = () => {
-  const {
-    methodology,
-    canUpdateMethodology,
-    isPreRelease,
-  } = useMethodologyContentState();
+  const { methodology, canUpdateMethodology, isPreRelease } =
+    useMethodologyContentState();
 
-  const canUpdateContent =
-    !isPreRelease && canUpdateMethodology && methodology.status === 'Draft';
+  const canUpdateContent = !isPreRelease && canUpdateMethodology;
 
   return (
     <EditingContextProvider editingMode={canUpdateContent ? 'edit' : 'preview'}>
@@ -108,21 +104,20 @@ const MethodologyContentPage = ({
 }: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
-  const { value, isLoading } = useAsyncHandledRetry<
-    MethodologyContextState
-  >(async () => {
-    const methodology = await methodologyContentService.getMethodologyContent(
-      methodologyId,
-    );
-    const canUpdateMethodology = await permissionService.canUpdateMethodology(
-      methodologyId,
-    );
+  const { value, isLoading } =
+    useAsyncHandledRetry<MethodologyContextState>(async () => {
+      const methodology = await methodologyContentService.getMethodologyContent(
+        methodologyId,
+      );
+      const canUpdateMethodology = await permissionService.canUpdateMethodology(
+        methodologyId,
+      );
 
-    return {
-      methodology,
-      canUpdateMethodology,
-    };
-  }, [methodologyId]);
+      return {
+        methodology,
+        canUpdateMethodology,
+      };
+    }, [methodologyId]);
 
   return (
     <LoadingSpinner loading={isLoading}>

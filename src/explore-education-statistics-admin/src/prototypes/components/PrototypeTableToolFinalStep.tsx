@@ -31,9 +31,8 @@ const TableToolFinalStep = ({
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const hasTableError = false;
-  const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersConfig
-  >();
+  const [currentTableHeaders, setCurrentTableHeaders] =
+    useState<TableHeadersConfig>();
   const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
 
   const tableHeadersFormId = 'tableHeaderForm';
@@ -91,7 +90,7 @@ const TableToolFinalStep = ({
                 </div>
 
                 <Link
-                  className="dfe-print-hidden"
+                  className="govuk-!-display-none-print"
                   unvisited
                   to={`/find-statistics/${selectedPublication.slug}`}
                   // testId="View latest data link"

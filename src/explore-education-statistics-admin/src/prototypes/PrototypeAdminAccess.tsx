@@ -60,7 +60,7 @@ const PrototypeManagePublication = () => {
               </select>
             </form>
           </div>
-          <div className="govuk-grid-column-one-quarter dfe-align--right">
+          <div className="govuk-grid-column-one-quarter govuk-!-text-align-right">
             <h4>Other options</h4>
             <ul className="govuk-list">
               <li>

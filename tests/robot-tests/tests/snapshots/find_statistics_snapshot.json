@@ -23,14 +23,14 @@
   {
     "publication_summary": "Appeals submitted by parents against their child not getting an offer to a preferred primary or secondary school for the start of the academic year.",
     "publication_title": "Admission appeals in England",
-    "published": "18 Aug 2022",
+    "published": "17 Aug 2023",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
   },
   {
     "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships and traineeships",
-    "published": "20 Jul 2023",
+    "published": "10 Aug 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -72,7 +72,7 @@
   {
     "publication_summary": "",
     "publication_title": "Childcare and early years survey of parents",
-    "published": "25 Aug 2022",
+    "published": "27 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Early years"
   },
@@ -196,7 +196,7 @@
     "theme": "Pupils and schools"
   },
   {
-    "publication_summary": "Official statistics on vacancies, skills gaps and training, from the Employer Skills Survey 2019.",
+    "publication_summary": "Official statistics on vacancies, skills gaps and training, from the Employer Skills Survey.",
     "publication_title": "Employer Skills Survey",
     "published": "30 Mar 2023",
     "release_type": "Official statistics",
@@ -261,7 +261,7 @@
   {
     "publication_summary": "Annual national, regional and provider level statistics on outcomes of teacher trainees in England (qualified teacher status rates and employment rates).",
     "publication_title": "Initial teacher training performance profiles",
-    "published": "28 Jul 2022",
+    "published": "27 Jul 2023",
     "release_type": "Official statistics",
     "theme": "Teachers and school workforce"
   },
@@ -387,7 +387,7 @@
   {
     "publication_summary": "Experimental statistics for the National Tutoring Programme. England only.",
     "publication_title": "National Tutoring Programme",
-    "published": "15 Dec 2022",
+    "published": "27 Jul 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },
@@ -469,9 +469,9 @@
     "theme": "Destination of pupils and students"
   },
   {
-    "publication_summary": "",
+    "publication_summary": "Provisional T Level outcomes for students completing T Levels, as reported to the Department for Education through the manage T Level results service.",
     "publication_title": "Provisional T Level results",
-    "published": "18 Aug 2022",
+    "published": "17 Aug 2023",
     "release_type": "Ad hoc statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -499,8 +499,15 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "13 Jul 2023",
+    "published": "10 Aug 2023",
     "release_type": "Experimental statistics",
+    "theme": "Pupils and schools"
+  },
+  {
+    "publication_summary": "",
+    "publication_title": "Pupil yield from housing developments",
+    "published": "9 Aug 2023",
+    "release_type": "Management information",
     "theme": "Pupils and schools"
   },
   {

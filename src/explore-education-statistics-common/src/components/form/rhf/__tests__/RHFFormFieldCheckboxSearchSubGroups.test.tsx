@@ -713,7 +713,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             test: [],
           }}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           <RHFForm id="testForm" onSubmit={Promise.resolve}>
@@ -753,7 +753,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             test: ['1'],
           }}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           <RHFForm id="testForm" onSubmit={Promise.resolve}>
@@ -806,7 +806,7 @@ describe('FormFieldCheckboxSearchSubGroups', () => {
             test: ['1'],
           }}
           validationSchema={Yup.object({
-            test: Yup.array().required('Select at least one option'),
+            test: Yup.array().min(1, 'Select at least one option'),
           })}
         >
           <RHFForm id="testForm" onSubmit={Promise.resolve}>

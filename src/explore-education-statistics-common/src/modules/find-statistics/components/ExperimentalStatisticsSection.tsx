@@ -2,6 +2,7 @@ import React from 'react';
 
 const ExperimentalStatisticsSection = () => (
   <>
+    <h3>Experimental statistics</h3>
     <p>
       These statistics are experimental statistics undergoing evaluation. They
       have been developed under the guidance of the Head of Profession for

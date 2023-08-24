@@ -14,11 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
@@ -38,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Status = Approved,
+                        Status = MethodologyApprovalStatus.Approved,
                         Published = DateTime.UtcNow,
                         AlternativeTitle = "Alternative title"
                     }
@@ -136,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         },
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Status = Approved,
+                        Status = MethodologyApprovalStatus.Approved,
                         AlternativeTitle = "Alternative title"
                     }
                 }
@@ -202,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         PreviousVersionId = null,
                         PublishingStrategy = Immediately,
-                        Status = Approved,
+                        Status = MethodologyApprovalStatus.Approved,
                         AlternativeTitle = "Alternative title"
                     }
                 }
@@ -466,11 +464,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task AddContentSection_Draft()
+        public async Task AddContentSection()
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Status = Draft,
+                Status = MethodologyApprovalStatus.Draft
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -487,9 +485,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     new ContentSectionAddRequest(),
                     MethodologyContentService.ContentListType.Content);
 
-                Assert.True(result.IsRight);
-                Assert.Empty(result.Right.Content);
-                Assert.Equal(0, result.Right.Order);
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel.Content);
+                Assert.Equal("New section", viewModel.Heading);
+                Assert.Equal(0, viewModel.Order);
+            }
+        }
+
+        [Fact]
+        public async Task AddContentSection_HigherLevelReview()
+        {
+            var methodologyVersion = new MethodologyVersion
+            {
+                Status = MethodologyApprovalStatus.HigherLevelReview,
+            };
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
+                var result = await methodologyContentService.AddContentSection(
+                    methodologyVersion.Id,
+                    new ContentSectionAddRequest(),
+                    MethodologyContentService.ContentListType.Content);
+
+                result.AssertRight();
             }
         }
 
@@ -498,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Status = Approved,
+                Status = MethodologyApprovalStatus.Approved
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -515,7 +541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     new ContentSectionAddRequest(),
                     MethodologyContentService.ContentListType.Content);
 
-                result.AssertBadRequest(MethodologyMustBeDraft);
+                result.AssertForbidden();
             }
         }
 

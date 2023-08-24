@@ -84,7 +84,7 @@ const TableToolFinalStep = ({
                 </div>
 
                 <Link
-                  className="dfe-print-hidden"
+                  className="govuk-!-display-none-print"
                   unvisited
                   to={`/find-statistics/${selectedPublication.slug}`}
                   testId="View latest data link"

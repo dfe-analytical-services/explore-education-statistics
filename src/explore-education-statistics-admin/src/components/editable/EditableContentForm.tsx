@@ -1,7 +1,7 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import { Element } from '@admin/types/ckeditor';
+import { Element, Node } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -11,6 +11,7 @@ import CommentsList from '@admin/components/comments/CommentsList';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
@@ -64,6 +65,7 @@ const EditableContentForm = ({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
+  const [showAltTextMessage, toggleAltTextMessage] = useToggle(false);
 
   useIdleTimer({
     element: containerRef.current ?? document,
@@ -76,30 +78,32 @@ const EditableContentForm = ({
     onIdle,
   });
 
-  const validateElements = useCallback((elements: Element[]) => {
-    let error: string | undefined;
+  const validateElements = useCallback(
+    (elements: Element[]) => {
+      const hasInvalidImage = elements.some(
+        element =>
+          isInvalidImage(element) ||
+          Array.from(element.getChildren()).some(child =>
+            isInvalidImage(child),
+          ),
+      );
 
-    elements.some(element => {
-      if (element.name === 'image' && !element.getAttribute('alt')) {
-        error = 'All images must have alternative (alt) text';
-        return true;
-      }
+      toggleAltTextMessage(hasInvalidImage);
 
-      return false;
-    });
-
-    return error;
-  }, []);
-
-  const [
-    { isLoading: isAutoSaving, error: autoSaveError },
-    handleAutoSave,
-  ] = useAsyncCallback(
-    async (nextContent: string) => {
-      await onAutoSave?.(nextContent);
+      return hasInvalidImage
+        ? 'All images must have alternative text'
+        : undefined;
     },
-    [onAutoSave],
+    [toggleAltTextMessage],
   );
+
+  const [{ isLoading: isAutoSaving, error: autoSaveError }, handleAutoSave] =
+    useAsyncCallback(
+      async (nextContent: string) => {
+        await onAutoSave?.(nextContent);
+      },
+      [onAutoSave],
+    );
 
   const handleSubmit = useCallback(
     async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
@@ -141,7 +145,6 @@ const EditableContentForm = ({
           initialValues={{
             content,
           }}
-          validateOnChange={false}
           validationSchema={Yup.object({
             content: Yup.string().required('Enter content'),
           })}
@@ -151,7 +154,8 @@ const EditableContentForm = ({
             const isSaving = form.isSubmitting || isAutoSaving;
 
             return (
-              <Form id={`${id}-form`}>
+              <Form id={`${id}-form`} visuallyHiddenErrorSummary>
+                {showAltTextMessage && <AltTextWarningMessage />}
                 <FormFieldEditor<FormValues>
                   allowComments={allowComments}
                   error={autoSaveError ? 'Could not save content' : undefined}
@@ -195,3 +199,27 @@ const EditableContentForm = ({
   );
 };
 export default EditableContentForm;
+
+function isInvalidImage(element: Node) {
+  return (
+    (element.name === 'imageBlock' || element.name === 'imageInline') &&
+    !element.getAttribute('alt')
+  );
+}
+
+export function AltTextWarningMessage() {
+  return (
+    <WarningMessage>
+      Alternative text must be added for images, for guidance see{' '}
+      <a
+        href="https://www.w3.org/WAI/tutorials/images/tips/"
+        rel="noopener noreferrer"
+        target="_blank"
+      >
+        W3C tips on writing alternative text
+      </a>
+      . <br />
+      Images without alternative text are outlined in red.
+    </WarningMessage>
+  );
+}

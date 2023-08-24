@@ -629,16 +629,14 @@ export const themes: Theme[] = [
             id: 'f51895df-c682-45e6-b23e-3138ddbfdaeb',
             title:
               'Outcomes for children in need, including children looked after by local authorities in England',
-            slug:
-              'outcomes-for-children-in-need-including-children-looked-after-by-local-authorities-in-england',
+            slug: 'outcomes-for-children-in-need-including-children-looked-after-by-local-authorities-in-england',
             isSuperseded: false,
           },
           {
             id: 'ea42de23-80c0-4609-89fe-91df00c4f249',
             title:
               'Outcomes of children in need, including looked after children',
-            slug:
-              'outcomes-of-children-in-need-including-looked-after-children',
+            slug: 'outcomes-of-children-in-need-including-looked-after-children',
             isSuperseded: false,
           },
         ],
@@ -686,8 +684,7 @@ export const themes: Theme[] = [
             id: '036e2c36-7c48-4a29-8419-a3939be9e173',
             title:
               'Attendance in education and early years settings during the coronavirus (COVID-19) pandemic',
-            slug:
-              'attendance-in-education-and-early-years-settings-during-the-coronavirus-covid-19-outbreak',
+            slug: 'attendance-in-education-and-early-years-settings-during-the-coronavirus-covid-19-outbreak',
             isSuperseded: false,
           },
         ],
@@ -714,8 +711,7 @@ export const themes: Theme[] = [
             id: '359958a5-b28a-4ab3-508a-08d88f97dffc',
             title:
               'Coronavirus (COVID-19) Reporting in Higher Education Providers',
-            slug:
-              'coronavirus-covid-19-reporting-in-higher-education-providers',
+            slug: 'coronavirus-covid-19-reporting-in-higher-education-providers',
             isSuperseded: false,
           },
         ],
@@ -975,8 +971,7 @@ export const themes: Theme[] = [
             id: '1aa10012-ee64-4ece-f4b1-08d8b7d3c33b',
             title:
               'FE learners going into employment and learning destinations by local authority district',
-            slug:
-              'fe-learners-going-into-employment-and-learning-destinations-by-local-authority-district',
+            slug: 'fe-learners-going-into-employment-and-learning-destinations-by-local-authority-district',
             isSuperseded: false,
           },
           {
@@ -1010,8 +1005,7 @@ export const themes: Theme[] = [
             id: '04b59c44-bfb8-4d7d-841d-08d9a365444f',
             title:
               'UK revenue from education related exports and transnational education activity',
-            slug:
-              'uk-revenue-from-education-related-exports-and-transnational-education-activity',
+            slug: 'uk-revenue-from-education-related-exports-and-transnational-education-activity',
             isSuperseded: false,
           },
         ],
@@ -1271,8 +1265,7 @@ export const themes: Theme[] = [
             id: '30874b87-483a-427e-8916-43cf9020d9a1',
             title:
               'Special educational needs: analysis and summary of data sources',
-            slug:
-              'special-educational-needs-analysis-and-summary-of-data-sources',
+            slug: 'special-educational-needs-analysis-and-summary-of-data-sources',
             isSuperseded: false,
           },
         ],

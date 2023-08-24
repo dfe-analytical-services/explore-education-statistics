@@ -136,27 +136,31 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
       }}
       onSubmit={handleSubmit}
       validationSchema={() => {
-        const baseSchema = Yup.object<DataFileUploadFormValues>({
-          uploadType: Yup.mixed<
-            DataFileUploadFormValues['uploadType']
-          >().oneOf(['csv', 'zip']),
+        const baseSchema: ObjectSchema<DataFileUploadFormValues> = Yup.object({
+          uploadType: Yup.string().oneOf(['csv', 'zip']).defined(),
           dataFile: Yup.file().when('uploadType', {
             is: 'csv',
-            then: Yup.file()
-              .required('Choose a data file')
-              .minSize(0, 'Choose a data file that is not empty'),
+            then: s =>
+              s
+                .required('Choose a data file')
+                .minSize(0, 'Choose a data file that is not empty'),
+            otherwise: s => s.nullable(),
           }),
           metadataFile: Yup.file().when('uploadType', {
             is: 'csv',
-            then: Yup.file()
-              .required('Choose a metadata file')
-              .minSize(0, 'Choose a metadata file that is not empty'),
+            then: s =>
+              s
+                .required('Choose a metadata file')
+                .minSize(0, 'Choose a metadata file that is not empty'),
+            otherwise: s => s.nullable(),
           }),
           zipFile: Yup.file().when('uploadType', {
             is: 'zip',
-            then: Yup.file()
-              .required('Choose a zip file')
-              .minSize(0, 'Choose a ZIP file that is not empty'),
+            then: s =>
+              s
+                .required('Choose a zip file')
+                .minSize(0, 'Choose a ZIP file that is not empty'),
+            otherwise: s => s.nullable(),
           }),
         });
 
@@ -164,71 +168,69 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
       }}
     >
       {form => (
-        <>
-          <Form id={id}>
-            <div style={{ position: 'relative' }}>
-              {form.isSubmitting && (
-                <LoadingSpinner text="Uploading files" overlay />
-              )}
+        <Form id={id}>
+          <div style={{ position: 'relative' }}>
+            {form.isSubmitting && (
+              <LoadingSpinner text="Uploading files" overlay />
+            )}
 
-              {beforeFields}
+            {beforeFields}
 
-              <FormFieldRadioGroup<DataFileUploadFormValues>
-                name="uploadType"
-                legend="Choose upload method"
-                options={[
-                  {
-                    label: 'CSV files',
-                    value: 'csv',
-                    conditional: (
-                      <>
-                        <FormFieldFileInput<DataFileUploadFormValues>
-                          name="dataFile"
-                          label="Upload data file"
-                          accept=".csv"
-                        />
-
-                        <FormFieldFileInput<DataFileUploadFormValues>
-                          name="metadataFile"
-                          label="Upload metadata file"
-                          accept=".csv"
-                        />
-                      </>
-                    ),
-                  },
-                  {
-                    label: 'ZIP file',
-                    hint: 'Recommended for larger data files',
-                    value: 'zip',
-                    conditional: (
+            <FormFieldRadioGroup<DataFileUploadFormValues>
+              name="uploadType"
+              legend="Choose upload method"
+              options={[
+                {
+                  label: 'CSV files',
+                  value: 'csv',
+                  conditional: (
+                    <>
                       <FormFieldFileInput<DataFileUploadFormValues>
-                        hint="Must contain both the data and metadata CSV files"
-                        name="zipFile"
-                        label="Upload ZIP file"
-                        accept=".zip"
+                        name="dataFile"
+                        label="Upload data file"
+                        accept=".csv"
                       />
-                    ),
-                  },
-                ]}
-              />
 
-              <ButtonGroup>
-                <Button type="submit" disabled={form.isSubmitting}>
-                  {submitText}
-                </Button>
+                      <FormFieldFileInput<DataFileUploadFormValues>
+                        name="metadataFile"
+                        label="Upload metadata file"
+                        accept=".csv"
+                      />
+                    </>
+                  ),
+                },
+                {
+                  label: 'ZIP file',
+                  hint: 'Recommended for larger data files',
+                  value: 'zip',
+                  conditional: (
+                    <FormFieldFileInput<DataFileUploadFormValues>
+                      hint="Must contain both the data and metadata CSV files"
+                      name="zipFile"
+                      label="Upload ZIP file"
+                      accept=".zip"
+                    />
+                  ),
+                },
+              ]}
+            />
 
-                <ButtonText
-                  disabled={form.isSubmitting}
-                  onClick={() => {
-                    form.resetForm();
-                  }}
-                >
-                  Cancel
-                </ButtonText>
-              </ButtonGroup>
-            </div>
-          </Form>
-        </>
+            <ButtonGroup>
+              <Button type="submit" disabled={form.isSubmitting}>
+                {submitText}
+              </Button>
+
+              <ButtonText
+                disabled={form.isSubmitting}
+                onClick={() => {
+                  form.resetForm();
+                }}
+              >
+                Cancel
+              </ButtonText>
+            </ButtonGroup>
+          </div>
+        </Form>
       )}
     </Formik>
   );

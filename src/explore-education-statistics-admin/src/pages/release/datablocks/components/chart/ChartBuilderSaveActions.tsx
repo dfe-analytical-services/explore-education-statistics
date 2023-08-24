@@ -36,7 +36,6 @@ const ChartBuilderSaveActions = ({
     <>
       <ErrorSummary
         title="Cannot save chart"
-        id={`${formId}-errorSummary`}
         errors={
           showSubmitError
             ? Object.values(forms)
@@ -57,9 +56,8 @@ const ChartBuilderSaveActions = ({
           if (tab) {
             tab.click();
 
-            const tabs = document.querySelector<HTMLDivElement>(
-              '#chartBuilder-tabs',
-            );
+            const tabs =
+              document.querySelector<HTMLDivElement>('#chartBuilder-tabs');
 
             if (tabs) {
               tabs.scrollIntoView({

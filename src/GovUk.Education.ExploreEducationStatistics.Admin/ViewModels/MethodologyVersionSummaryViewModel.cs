@@ -32,6 +32,7 @@ public record MethodologyVersionSummaryViewModel
         public bool CanDeleteMethodology { get; set; }
         public bool CanUpdateMethodology { get; set; }
         public bool CanApproveMethodology { get; set; }
+        public bool CanSubmitMethodologyForHigherReview { get; set; }
         public bool CanMarkMethodologyAsDraft { get; set; }
         public bool CanMakeAmendmentOfMethodology { get; set; }
         public bool CanRemoveMethodologyLink { get; set; }

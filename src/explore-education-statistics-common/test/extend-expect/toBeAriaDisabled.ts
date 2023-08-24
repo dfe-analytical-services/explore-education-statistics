@@ -1,5 +1,5 @@
 import { checkHtmlElement } from '@testing-library/jest-dom/dist/utils';
-import { matcherHint, printReceived } from 'jest-matcher-utils/build';
+import { matcherHint, printReceived } from 'jest-matcher-utils';
 
 const toBeAriaDisabled: jest.CustomMatcher = function toHaveScrolledIntoView(
   element: HTMLElement,

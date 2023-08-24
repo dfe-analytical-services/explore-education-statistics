@@ -13,7 +13,7 @@ const PrintThisPage = ({ className, onClick }: Props) => {
     <div
       className={classNames(
         className,
-        'dfe-print-hidden',
+        'govuk-!-display-none-print',
         styles.printContainer,
         styles.mobileHidden,
       )}

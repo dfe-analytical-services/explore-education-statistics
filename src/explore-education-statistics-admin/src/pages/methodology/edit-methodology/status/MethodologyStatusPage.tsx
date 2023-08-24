@@ -2,13 +2,10 @@ import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import methodologyService, {
   MethodologyApprovalStatus,
-  MethodologyStatus,
 } from '@admin/services/methodologyService';
-import permissionService from '@admin/services/permissionService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import { useMethodologyContext } from '@admin/pages/methodology/contexts/MethodologyContext';
@@ -20,6 +17,7 @@ import UrlContainer from '@common/components/UrlContainer';
 import FormattedDate from '@common/components/FormattedDate';
 import { useQuery } from '@tanstack/react-query';
 import methodologyQueries from '@admin/queries/methodologyQueries';
+import permissionQueries from '@admin/queries/permissionQueries';
 
 interface FormValues {
   status: MethodologyApprovalStatus;
@@ -30,6 +28,7 @@ interface FormValues {
 
 const statusMap: Dictionary<string> = {
   Draft: 'In Draft',
+  HigherLevelReview: 'Awaiting higher review',
   Approved: 'Approved',
 };
 
@@ -44,28 +43,16 @@ const MethodologyStatusPage = () => {
 
   const [isEditing, toggleForm] = useToggle(false);
 
-  const {
-    data: methodologyStatuses,
-    refetch: refreshMethodologyStatuses,
-  } = useQuery(
-    methodologyQueries.getMethodologyStatuses(currentMethodology.id),
-  );
+  const { data: methodologyStatuses, refetch: refreshMethodologyStatuses } =
+    useQuery(methodologyQueries.getMethodologyStatuses(currentMethodology.id));
 
   const {
-    value: permissions,
-    retry: refreshPermissions,
+    data: permissions,
+    refetch: refreshPermissions,
     isLoading,
-  } = useAsyncRetry(async () => {
-    const [canApprove, canMarkAsDraft] = await Promise.all([
-      permissionService.canApproveMethodology(methodologyId),
-      permissionService.canMarkMethodologyAsDraft(methodologyId),
-    ]);
-
-    return {
-      canApprove,
-      canMarkAsDraft,
-    };
-  }, [methodologyId]);
+  } = useQuery(
+    permissionQueries.getMethodologyApprovalPermissions(currentMethodology.id),
+  );
 
   const handleSubmit = async ({
     latestInternalReleaseNote,
@@ -91,150 +78,149 @@ const MethodologyStatusPage = () => {
 
     onMethodologyChange(nextSummary);
 
-    refreshPermissions();
+    await refreshPermissions();
     await refreshMethodologyStatuses();
 
     toggleForm.off();
   };
 
-  const isEditable = permissions?.canApprove || permissions?.canMarkAsDraft;
+  const isEditable =
+    permissions?.canMarkApproved ||
+    permissions?.canMarkHigherLevelReview ||
+    permissions?.canMarkDraft;
 
   return (
-    <>
-      <LoadingSpinner loading={isLoading}>
-        {currentMethodology ? (
-          <>
-            {!isEditing ? (
-              <>
-                <h2>Sign off</h2>
+    <LoadingSpinner loading={isLoading}>
+      {currentMethodology ? (
+        <>
+          {!isEditing ? (
+            <>
+              <h2>Sign off</h2>
 
-                <p>
-                  The <strong>public methodology</strong> will be accessible at:
-                </p>
+              <p>
+                The <strong>public methodology</strong> will be accessible at:
+              </p>
 
-                <p>
-                  <UrlContainer
-                    data-testid="public-methodology-url"
-                    url={`${PublicAppUrl}/methodology/${currentMethodology.slug}`}
-                  />
-                </p>
+              <p>
+                <UrlContainer
+                  data-testid="public-methodology-url"
+                  url={`${PublicAppUrl}/methodology/${currentMethodology.slug}`}
+                />
+              </p>
 
-                <SummaryList>
-                  <SummaryListItem term="Status">
-                    <StatusBlock text={statusMap[currentMethodology.status]} />
-                  </SummaryListItem>
-                  {currentMethodology.status === 'Approved' && (
-                    <>
-                      <SummaryListItem term="Internal note">
-                        {currentMethodology.internalReleaseNote}
-                      </SummaryListItem>
-                      <SummaryListItem term="When to publish">
-                        {currentMethodology.publishingStrategy === 'WithRelease'
-                          ? 'With a specific release'
-                          : currentMethodology.publishingStrategy}
-                      </SummaryListItem>
-                      {currentMethodology.publishingStrategy ===
-                        'WithRelease' && (
-                        <SummaryListItem term="Publish with release">
-                          {currentMethodology.scheduledWithRelease?.title}
-                        </SummaryListItem>
-                      )}
-                    </>
-                  )}
-                  <SummaryListItem term="Owning publication">
-                    {currentMethodology.owningPublication.title}
-                  </SummaryListItem>
-                  {currentMethodology.otherPublications &&
-                    currentMethodology.otherPublications.length > 0 && (
-                      <SummaryListItem term="Other publications">
-                        <ul className="govuk-!-margin-top-0">
-                          {currentMethodology.otherPublications?.map(
-                            publication => (
-                              <li
-                                key={publication.id}
-                                data-testid="other-publication-item"
-                              >
-                                {publication.title}
-                              </li>
-                            ),
-                          )}
-                        </ul>
+              <SummaryList>
+                <SummaryListItem term="Status">
+                  <StatusBlock text={statusMap[currentMethodology.status]} />
+                </SummaryListItem>
+                {currentMethodology.status === 'Approved' && (
+                  <>
+                    <SummaryListItem term="When to publish">
+                      {currentMethodology.publishingStrategy === 'WithRelease'
+                        ? 'With a specific release'
+                        : currentMethodology.publishingStrategy}
+                    </SummaryListItem>
+                    {currentMethodology.publishingStrategy ===
+                      'WithRelease' && (
+                      <SummaryListItem term="Publish with release">
+                        {currentMethodology.scheduledWithRelease?.title}
                       </SummaryListItem>
                     )}
-                </SummaryList>
-
-                {isEditable && (
-                  <Button
-                    className="govuk-!-margin-top-2"
-                    onClick={toggleForm.on}
-                  >
-                    Edit status
-                  </Button>
-                )}
-
-                {methodologyStatuses && methodologyStatuses.length > 0 && (
-                  <>
-                    <h3>Methodology status history</h3>
-                    <LoadingSpinner
-                      loading={!methodologyStatuses}
-                      text="Loading methodology status history"
-                    >
-                      <table data-testid="methodology-status-history">
-                        <thead>
-                          <tr>
-                            <th scope="col">Date</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Internal note</th>
-                            <th scope="col">Methodology version</th>
-                            <th scope="col">By user</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {methodologyStatuses.map(status => (
-                            <tr key={status.methodologyStatusId}>
-                              <td>
-                                {status.created ? (
-                                  <FormattedDate format="d MMMM yyyy HH:mm">
-                                    {status.created}
-                                  </FormattedDate>
-                                ) : (
-                                  'Not available'
-                                )}
-                              </td>
-                              <td>{status.approvalStatus}</td>
-                              <td>{status.internalReleaseNote}</td>
-                              <td>{`${status.methodologyVersion + 1}`}</td>{' '}
-                              {/* +1 because version starts from 0 in DB */}
-                              <td>
-                                {status.createdByEmail ? (
-                                  <a href={`mailto:${status.createdByEmail}`}>
-                                    {status.createdByEmail}
-                                  </a>
-                                ) : (
-                                  'Not available'
-                                )}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </LoadingSpinner>
                   </>
                 )}
-              </>
-            ) : (
-              <MethodologyStatusEditPage
-                methodology={currentMethodology}
-                onCancel={toggleForm.off}
-                onSubmit={handleSubmit}
-              />
-            )}
-          </>
-        ) : (
-          <WarningMessage>Could not load methodology status</WarningMessage>
-        )}
-      </LoadingSpinner>
-    </>
+                <SummaryListItem term="Owning publication">
+                  {currentMethodology.owningPublication.title}
+                </SummaryListItem>
+                {currentMethodology.otherPublications &&
+                  currentMethodology.otherPublications.length > 0 && (
+                    <SummaryListItem term="Other publications">
+                      <ul className="govuk-!-margin-top-0">
+                        {currentMethodology.otherPublications?.map(
+                          publication => (
+                            <li
+                              key={publication.id}
+                              data-testid="other-publication-item"
+                            >
+                              {publication.title}
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    </SummaryListItem>
+                  )}
+              </SummaryList>
+
+              {isEditable && (
+                <Button
+                  className="govuk-!-margin-top-2"
+                  onClick={toggleForm.on}
+                >
+                  Edit status
+                </Button>
+              )}
+
+              {methodologyStatuses && methodologyStatuses.length > 0 && (
+                <>
+                  <h3>Methodology status history</h3>
+                  <LoadingSpinner
+                    loading={!methodologyStatuses}
+                    text="Loading methodology status history"
+                  >
+                    <table data-testid="methodology-status-history">
+                      <thead>
+                        <tr>
+                          <th scope="col">Date</th>
+                          <th scope="col">Status</th>
+                          <th scope="col">Internal note</th>
+                          <th scope="col">Methodology version</th>
+                          <th scope="col">By user</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {methodologyStatuses.map(status => (
+                          <tr key={status.methodologyStatusId}>
+                            <td>
+                              {status.created ? (
+                                <FormattedDate format="d MMMM yyyy HH:mm">
+                                  {status.created}
+                                </FormattedDate>
+                              ) : (
+                                'Not available'
+                              )}
+                            </td>
+                            <td>{status.approvalStatus}</td>
+                            <td>{status.internalReleaseNote}</td>
+                            <td>{`${status.methodologyVersion + 1}`}</td>{' '}
+                            {/* +1 because version starts from 0 in DB */}
+                            <td>
+                              {status.createdByEmail ? (
+                                <a href={`mailto:${status.createdByEmail}`}>
+                                  {status.createdByEmail}
+                                </a>
+                              ) : (
+                                'Not available'
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </LoadingSpinner>
+                </>
+              )}
+            </>
+          ) : (
+            <MethodologyStatusEditPage
+              methodology={currentMethodology}
+              statusPermissions={permissions}
+              onCancel={toggleForm.off}
+              onSubmit={handleSubmit}
+            />
+          )}
+        </>
+      ) : (
+        <WarningMessage>Could not load methodology status</WarningMessage>
+      )}
+    </LoadingSpinner>
   );
 };
 

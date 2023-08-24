@@ -44,21 +44,21 @@ const PrototypeSelectedRole = ({
             </option>
           ))}
         </>
-          </select>*/}
+          </select> */}
 
       {/* <div className="govuk-checkboxes">
         <div className="govuk-checkboxes__item">
           <input type="checkbox" className="govuk-checkboxes__input" name='role' id={`role-${roleId}`} checked={selectedRole} />
           <label htmlFor={`role-${roleId}`} className="govuk-label govuk-checkboxes__label">Grant access</label>
         </div>
-        </div>*/}
+        </div> */}
 
       <p
         className={classNames(
           'govuk-!-margin-0',
           'govuk-tag',
           'dfe-flex-basis--45',
-          'dfe-align--centre',
+          'govuk-!-text-align-centre',
           roleType ? 'govuk-tag--grey' : 'govuk-tag--red',
         )}
       >
@@ -111,7 +111,7 @@ const PrototypeSelectedRole = ({
         >
           Set role
         </button>
-        )}*/}
+        )} */}
       <ModalConfirm
         open={showRoleModal}
         title={`Change access for ${name}`}

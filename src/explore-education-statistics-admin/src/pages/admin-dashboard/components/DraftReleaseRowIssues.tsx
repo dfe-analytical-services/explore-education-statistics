@@ -11,13 +11,11 @@ interface Props {
 }
 
 const DraftReleaseRowIssues = ({ releaseId }: Props) => {
-  const {
-    value: checklist,
-    isLoading: isLoadingChecklist,
-  } = useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
+  const { value: checklist, isLoading: isLoadingChecklist } =
+    useAsyncHandledRetry(() => releaseService.getReleaseChecklist(releaseId));
 
   const totalIssues = checklist
-    ? checklist?.errors?.length + checklist?.warnings.length
+    ? checklist.errors.length + checklist.warnings.length
     : 0;
 
   return (

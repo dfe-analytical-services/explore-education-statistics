@@ -16,6 +16,7 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import React from 'react';
+
 import { generatePath, RouteComponentProps, withRouter } from 'react-router';
 
 export interface FormValues extends ReleaseSummaryFormValues {
@@ -126,15 +127,17 @@ const ReleaseCreatePage = ({
             timePeriodCoverageStartYear: '',
             templateReleaseId: '',
             releaseType: undefined,
-          } as FormValues)
+          }) as FormValues
         }
-        validationSchema={baseRules =>
-          baseRules.shape({
-            templateReleaseId: model?.templateRelease
-              ? Yup.string().required('Choose a template')
-              : Yup.string(),
-          })
-        }
+        validationSchema={baseSchema => {
+          return model?.templateRelease
+            ? baseSchema.concat(
+                Yup.object<FormValues>().shape({
+                  templateReleaseId: Yup.string(),
+                }),
+              )
+            : baseSchema;
+        }}
         onSubmit={handleSubmit}
         onCancel={handleCancel}
         additionalFields={

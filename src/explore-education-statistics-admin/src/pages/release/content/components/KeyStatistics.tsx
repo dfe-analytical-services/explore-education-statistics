@@ -28,7 +28,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
 
   const [isReordering, toggleReordering] = useToggle(false);
 
-  const ReorderKeyStatisticsButton = () => {
+  const reorderKeyStatisticsButton = () => {
     return !isReordering ? (
       <Button variant="secondary" onClick={toggleReordering.on}>
         Reorder<span className="govuk-visually-hidden"> key statistics</span>
@@ -67,7 +67,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
         <>
           <AddKeyStatistics release={release} />
           <hr />
-          {keyStatistics.length > 1 && <ReorderKeyStatisticsButton />}
+          {keyStatistics.length > 1 && reorderKeyStatisticsButton()}
         </>
       )}
       <DragDropContext onDragEnd={handleDragEnd}>
@@ -94,7 +94,7 @@ const KeyStatistics = ({ release, isEditing }: KeyStatisticsProps) => {
                         ref={draggableProvided.innerRef}
                         className={classNames({
                           [styles.draggable]: isReordering,
-                          [keyStatStyles.column]: !isReordering,
+                          [keyStatStyles.wrapper]: !isReordering,
                           [styles.isDragging]: snapshot.isDragging,
                         })}
                         data-testid="keyStat"

@@ -24,13 +24,11 @@ interface Props {
 }
 
 const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
-  const {
-    value: subjects,
-    isLoading: isLoadingSubjects,
-  } = useAsyncHandledRetry(
-    () => tableBuilderService.listReleaseSubjects(releaseId),
-    [releaseId],
-  );
+  const { value: subjects, isLoading: isLoadingSubjects } =
+    useAsyncHandledRetry(
+      () => tableBuilderService.listReleaseSubjects(releaseId),
+      [releaseId],
+    );
   const [reorderingFilters, setReorderingFilters] = useState<Subject>();
   const [reorderingIndicators, setReorderingIndicators] = useState<Subject>();
 
@@ -99,7 +97,7 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
                             <td className="govuk-!-width-two-thirds">
                               {subject.name}
                             </td>
-                            <td className="dfe-align--right">
+                            <td className="govuk-!-text-align-right">
                               <Button
                                 className="govuk-!-margin-bottom-0 govuk-!-margin-right-2"
                                 onClick={() => setReorderingFilters(subject)}

@@ -42,6 +42,10 @@ describe('ReleaseFileUploadsSection', () => {
     },
   ];
 
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
   function renderPage() {
     return render(
       <MemoryRouter>
@@ -72,7 +76,7 @@ describe('ReleaseFileUploadsSection', () => {
     const section1 = within(sections[0]);
 
     expect(
-      section1.getByRole('button', { name: 'Test file 1' }),
+      section1.getByRole('button', { name: /Test file 1/ }),
     ).toBeInTheDocument();
 
     expect(section1.getByTestId('Title')).toHaveTextContent('Test file 1');
@@ -89,7 +93,7 @@ describe('ReleaseFileUploadsSection', () => {
     const section2 = within(sections[1]);
 
     expect(
-      section2.getByRole('button', { name: 'Test file 2' }),
+      section2.getByRole('button', { name: /Test file 2/ }),
     ).toBeInTheDocument();
 
     expect(section2.getByTestId('Title')).toHaveTextContent('Test file 2');
@@ -201,15 +205,15 @@ describe('ReleaseFileUploadsSection', () => {
         expect(releaseAncillaryFileService.deleteFile).toHaveBeenCalledWith<
           Parameters<typeof releaseAncillaryFileService.deleteFile>
         >('release-1', 'file-2');
+
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
       });
 
       const updatedSections = screen.getAllByTestId('accordionSection');
 
-      expect(updatedSections).toHaveLength(1);
-
       expect(
         within(updatedSections[0]).getByRole('button', {
-          name: 'Test file 1',
+          name: /Test file 1/,
         }),
       ).toBeInTheDocument();
     });
@@ -231,13 +235,19 @@ describe('ReleaseFileUploadsSection', () => {
       });
       userEvent.tab();
 
-      await waitFor(() => {
-        expect(
-          screen.getByText('Choose a file', {
-            selector: '#ancillaryFileForm-file-error',
-          }),
-        ).toBeInTheDocument();
-      });
+      await waitFor(
+        () => {
+          expect(
+            screen.getByText('Choose a file', {
+              selector: '#ancillaryFileForm-file-error',
+            }),
+          ).toBeInTheDocument();
+        },
+        {
+          timeout: 10000,
+          interval: 100,
+        },
+      );
     });
 
     test('shows validation message when `file` uploaded is an empty file', async () => {
@@ -371,6 +381,8 @@ describe('ReleaseFileUploadsSection', () => {
           summary: 'Test summary 3',
           file,
         });
+
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(3);
       });
 
       const sections = screen.getAllByTestId('accordionSection');
@@ -380,19 +392,19 @@ describe('ReleaseFileUploadsSection', () => {
       const section1 = within(sections[0]);
 
       expect(
-        section1.getByRole('button', { name: 'Test file 1' }),
+        section1.getByRole('button', { name: /Test file 1/ }),
       ).toBeInTheDocument();
 
       const section2 = within(sections[1]);
 
       expect(
-        section2.getByRole('button', { name: 'Test file 2' }),
+        section2.getByRole('button', { name: /Test file 2/ }),
       ).toBeInTheDocument();
 
       const section3 = within(sections[2]);
 
       expect(
-        section3.getByRole('button', { name: 'Test file 3' }),
+        section3.getByRole('button', { name: /Test file 3/ }),
       ).toBeInTheDocument();
 
       expect(section3.getByTestId('Title')).toHaveTextContent('Test file 3');

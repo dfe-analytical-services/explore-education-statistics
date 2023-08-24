@@ -20,6 +20,7 @@
     "airbnb",
     "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "plugin:jsx-a11y/recommended",
     "plugin:import/typescript",
     "prettier",
@@ -27,6 +28,7 @@
   ],
   "rules": {
     "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/default-param-last": "error",
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/no-empty-function": "off",
     "@typescript-eslint/no-shadow": "error",
@@ -34,14 +36,23 @@
       "warn",
       { "argsIgnorePattern": "^_$" }
     ],
+    "@typescript-eslint/no-useless-constructor": "error",
     "@typescript-eslint/triple-slash-reference": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
     "class-methods-use-this": "off",
+    "default-param-last": "off",
     "import/extensions": "off",
     "import/no-cycle": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "import/no-unresolved": "off",
     "react/forbid-prop-types": "off",
+    "react/function-component-definition": "off",
+    "react/no-unstable-nested-components": [
+      "error",
+      {
+        "allowAsProps": true
+      }
+    ],
     "react/no-unescaped-entities": [
       "error",
       {
@@ -64,60 +75,21 @@
       }
     ],
     "react/jsx-curly-newline": "off",
+    "react/jsx-no-useless-fragment": ["error", { "allowExpressions":  true}],
     "react/jsx-one-expression-per-line": "off",
-    "react/jsx-props-no-spreading": ["error", {
-      "html": "enforce",
-      "custom": "ignore"
-    }],
-    "react/jsx-wrap-multilines": ["error", { "prop": "ignore" }],
-    "react/require-default-props": "off",
-    "react/sort-comp": [
+    "react/jsx-props-no-spreading": [
       "error",
       {
-        "order": [
-          "displayName",
-          "propTypes",
-          "contextTypes",
-          "childContextTypes",
-          "mixins",
-          "defaultProps",
-          "static-variables",
-          "static-methods",
-          "state",
-          "instance-variables",
-          "lifecycle",
-          "static-methods",
-          "getters",
-          "setters",
-          "/^(get|set)(?!(InitialState$|DefaultProps$|ChildContext$)).+$/",
-          "instance-methods",
-          "everything-else",
-          "/^on.+$/",
-          "rendering"
-        ],
-        "groups": {
-          "lifecycle": [
-            "constructor",
-            "getDefaultProps",
-            "getInitialState",
-            "getChildContext",
-            "componentWillMount",
-            "componentDidMount",
-            "componentWillReceiveProps",
-            "shouldComponentUpdate",
-            "componentWillUpdate",
-            "componentDidUpdate",
-            "componentWillUnmount"
-          ],
-          "rendering": ["/^render.+$/", "render"]
-        }
+        "html": "enforce",
+        "custom": "ignore"
       }
     ],
+    "react/jsx-wrap-multilines": ["error", { "prop": "ignore" }],
+    "react/react-in-jsx-scope": "off",
+    "react/require-default-props": "off",
     "react/state-in-constructor": "off",
     "react/static-property-placement": ["error", "static public field"],
     "react/prop-types": "off",
-    "react-hooks/rules-of-hooks": "error",
-    "react-hooks/exhaustive-deps": "warn",
     "jsx-a11y/anchor-is-valid": "off",
     "jsx-a11y/label-has-associated-control": [
       "error",
@@ -126,23 +98,48 @@
       }
     ],
     "no-console": "warn",
-    "no-param-reassign": ["error", {
-      "props": true,
-      "ignorePropertyModificationsFor": ["draft", "acc"]
-    }],
+    "no-param-reassign": [
+      "error",
+      {
+        "props": true,
+        "ignorePropertyModificationsFor": ["draft", "acc"]
+      }
+    ],
+    "no-promise-executor-return": "off",
+    "no-restricted-exports": [
+      "error",
+      {
+        "restrictDefaultExports": {
+          "defaultFrom": false
+        }
+      }
+    ],
     "no-shadow": "off",
+    "no-unreachable": "error",
     "no-use-before-define": "off",
-    "no-useless-constructor": "off",
-    "spaced-comment": ["warn", "always", { "markers": ["/"] }]
+    "no-useless-constructor": "off"
   },
   "overrides": [
     {
       "files": ["**/*.js"],
       "rules": {
+        "@typescript-eslint/explicit-module-boundary-types": "off",
         "@typescript-eslint/no-var-requires": "off",
         "global-require": "off",
         "import/no-dynamic-require": "off",
         "no-console": "off"
+      }
+    },
+    {
+      "files": ["src/explore-education-statistics-frontend/**/*.{tsx,ts}"],
+      "settings": {
+        "next": {
+          "rootDir": "src/explore-education-statistics-frontend"
+        }
+      },
+      "extends": ["plugin:@next/next/recommended"],
+      "rules": {
+        "@next/next/no-img-element": "off"
       }
     }
   ]

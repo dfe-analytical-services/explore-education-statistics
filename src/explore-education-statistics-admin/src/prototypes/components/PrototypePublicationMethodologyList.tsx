@@ -38,7 +38,7 @@ const PrototypePublicationMethodologyList = () => {
               No releases created in this publication
             </WarningMessage>
           </div>
-          <div className="govuk-grid-column-one-quarter dfe-align--right govuk-!-margin-top-3">
+          <div className="govuk-grid-column-one-quarter govuk-!-text-align-right govuk-!-margin-top-3">
             <Button>Create new methodology</Button>
           </div>
         </div>
@@ -89,10 +89,10 @@ const PrototypePublicationMethodologyList = () => {
                   <Tag>Approved</Tag>
                 </td>
                 <td>Not yet published</td>
-                <td className="dfe-align--left">
+                <td className="govuk-!-text-align-left">
                   <a href="#">Amend</a>
                 </td>
-                <td className="dfe-align--centre">
+                <td className="govuk-!-text-align-centre">
                   <a href="#">View</a>
                 </td>
                 <td />
@@ -104,13 +104,13 @@ const PrototypePublicationMethodologyList = () => {
                   <Tag colour="green">Published</Tag>
                 </td>
                 <td>28 March 2021</td>
-                <td className="dfe-align--left">
+                <td className="govuk-!-text-align-left">
                   <a href="#">Amend</a>
                 </td>
-                <td className="dfe-align--centre">
+                <td className="govuk-!-text-align-centre">
                   <a href="#">View</a>
                 </td>
-                <td className="dfe-align--right">
+                <td className="govuk-!-text-align-right">
                   <a href="#" style={dfeLinkWarning}>
                     Remove
                   </a>
@@ -176,7 +176,7 @@ const PrototypePublicationMethodologyList = () => {
         This is a methodology that is owned by another publication
       </p>
 
-      <div className="dfe-align--right govuk-!-margin-top-9">
+      <div className="govuk-!-text-align-right govuk-!-margin-top-9">
         <ul className="govuk-list">
           <li>
             {showMethodology ? (

@@ -20,12 +20,12 @@ public class GlossaryCacheService : IGlossaryCacheService
     [BlobCache(typeof(GlossaryCacheKey), ServiceName = "public")]
     public Task<List<GlossaryCategoryViewModel>> GetGlossary()
     {
-        return _glossaryService.GetAllGlossaryEntries();
+        return _glossaryService.GetGlossary();
     }
 
     [BlobCache(typeof(GlossaryCacheKey), forceUpdate: true, ServiceName = "public")]
     public Task<List<GlossaryCategoryViewModel>> UpdateGlossary()
     {
-        return _glossaryService.GetAllGlossaryEntries();
+        return _glossaryService.GetGlossary();
     }
 }

@@ -132,7 +132,7 @@ const ChartDataGroupingsConfiguration = ({
                 <tr>
                   <th>Data set</th>
                   <th>Groupings</th>
-                  <th className="dfe-align--right">Actions</th>
+                  <th className="govuk-!-text-align-right">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,7 +157,7 @@ const ChartDataGroupingsConfiguration = ({
                               dataSetConfig.dataGrouping.type
                             ].toLowerCase()}`}
                       </td>
-                      <td className="dfe-align--right">
+                      <td className="govuk-!-text-align-right">
                         <ButtonText
                           onClick={() =>
                             setEditDataSetConfig({ dataSetConfig, unit })

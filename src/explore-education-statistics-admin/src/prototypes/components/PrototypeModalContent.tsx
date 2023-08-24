@@ -90,17 +90,14 @@ const PrototypeModalContent = ({ contentType }: Props) => {
         </>
       )}
       {contentType === 'helpPublishedModal' && (
-        <>
-          <SummaryList>
-            <SummaryListItem term={publishedTag}>
-              This is a published release that is current live and is availble
-              for public view. If you need to make any changes to the text or
-              data in a live a release you can select the 'Amend' option, this
-              will allow you to re-publish the chosen release with the new
-              amendments
-            </SummaryListItem>
-          </SummaryList>
-        </>
+        <SummaryList>
+          <SummaryListItem term={publishedTag}>
+            This is a published release that is current live and is availble for
+            public view. If you need to make any changes to the text or data in
+            a live a release you can select the 'Amend' option, this will allow
+            you to re-publish the chosen release with the new amendments
+          </SummaryListItem>
+        </SummaryList>
       )}
       {contentType === 'scheduledStatusModal' && (
         <>

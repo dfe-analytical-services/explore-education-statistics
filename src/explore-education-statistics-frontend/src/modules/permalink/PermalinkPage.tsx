@@ -14,6 +14,7 @@ import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef } from 'react';
 import { Dictionary } from '@common/types';
 import DataTableCaption from '@common/modules/table-tool/components/DataTableCaption';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
 
 const captionId = 'dataTableCaption';
 const footnotesId = 'dataTableFootnotes';
@@ -93,7 +94,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         />
       </div>
 
-      <div className="dfe-hide-print">
+      <div className="govuk-!-display-none-print">
         <DownloadTable
           fileName={`permalink-${data.id}`}
           footnotes={footnotes}
@@ -129,18 +130,18 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
   );
 };
 
-export const getServerSideProps: GetServerSideProps<Props> = async ({
-  query,
-}) => {
-  const { permalink } = query as Dictionary<string>;
+export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
+  async ({ query }) => {
+    const { permalink } = query as Dictionary<string>;
 
-  const data = await permalinkSnapshotService.getPermalink(permalink);
+    const data = await permalinkSnapshotService.getPermalink(permalink);
 
-  return {
-    props: {
-      data,
-    },
-  };
-};
+    return {
+      props: {
+        data,
+      },
+    };
+  },
+);
 
 export default PermalinkPage;

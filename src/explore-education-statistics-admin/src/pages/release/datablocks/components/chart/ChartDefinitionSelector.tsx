@@ -51,7 +51,7 @@ const ChartDefinitionSelector = ({
           ))}
       </div>
 
-      <div className="dfe-align--right">
+      <div className="govuk-!-text-align-right">
         <ButtonText
           aria-pressed={selectedChartDefinition === infographicBlockDefinition}
           className="govuk-body-s"

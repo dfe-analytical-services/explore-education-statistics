@@ -1,7 +1,6 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
 import '../styles/_all.scss';
-
 import {
   ApplicationInsightsContextProvider,
   useApplicationInsights,
@@ -10,18 +9,18 @@ import useMounted from '@common/hooks/useMounted';
 import { contentApi, dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
-import loadEnv from '@frontend/loadEnv';
 import notificationApi from '@frontend/services/clients/notificationApi';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import { parseCookies } from 'nookies';
 import React, { useEffect, useState } from 'react';
 import {
   Hydrate,
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
+import loadEnv from '@frontend/loadEnv';
+import { parseCookies } from 'nookies';
 
 loadEnv();
 
@@ -46,9 +45,9 @@ const ApplicationInsightsTracking = () => {
   return null;
 };
 
-interface Props extends AppProps {
+type Props = AppProps<{ dehydratedState: unknown }> & {
   cookies: Dictionary<string>;
-}
+};
 
 const App = ({ Component, pageProps, cookies }: Props) => {
   const router = useRouter();
@@ -97,6 +96,8 @@ const App = ({ Component, pageProps, cookies }: Props) => {
   );
 };
 
+export default App;
+
 App.getInitialProps = async (appContext: AppContext) => {
   const appProps = await NextApp.getInitialProps(appContext);
 
@@ -107,5 +108,3 @@ App.getInitialProps = async (appContext: AppContext) => {
     cookies: parseCookies(appContext.ctx),
   };
 };
-
-export default App;

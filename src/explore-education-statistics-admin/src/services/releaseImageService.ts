@@ -2,6 +2,7 @@ import client from '@admin/services/utils/service';
 import { ImageUploadResult } from '@admin/types/ckeditor';
 import { ImageProgressHandler } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import { CancellablePromise } from '@common/types/promise';
+import { AxiosProgressEvent } from 'axios';
 
 const releaseImageService = {
   upload(
@@ -13,8 +14,8 @@ const releaseImageService = {
     data.append('file', file);
 
     return client.post(`/releases/${releaseId}/images`, data, {
-      onUploadProgress(event: ProgressEvent) {
-        onProgress?.(event.loaded, event.total);
+      onUploadProgress(event: AxiosProgressEvent) {
+        onProgress?.(event.loaded, event.total ?? 0);
       },
     });
   },

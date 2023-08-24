@@ -22,12 +22,8 @@ interface Props {
 }
 
 const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
-  const {
-    value: checklist,
-    isLoading: isLoadingChecklist,
-  } = useAsyncHandledRetry(() =>
-    releaseService.getReleaseChecklist(release.id),
-  );
+  const { value: checklist, isLoading: isLoadingChecklist } =
+    useAsyncHandledRetry(() => releaseService.getReleaseChecklist(release.id));
 
   return (
     <tr>
@@ -51,7 +47,7 @@ const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
       </td>
       <td>
         <Link
-          className="govuk-!-margin-right-4 dfe-inline-block"
+          className="govuk-!-margin-right-4 govuk-!-display-inline-block"
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId,
             releaseId: release.id,
@@ -63,7 +59,7 @@ const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
 
         {release.amendment && release.previousVersionId && (
           <Link
-            className="govuk-!-margin-right-4 dfe-inline-block"
+            className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
               publicationId,
               releaseId: release.previousVersionId,
