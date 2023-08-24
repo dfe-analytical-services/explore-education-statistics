@@ -54,6 +54,11 @@ const PrototypeDataCatalogue = () => {
     return themes.find(theme => theme.id === themeId);
   };
 
+  const themeSelect = document.getElementById('theme') as HTMLSelectElement;
+  const publicationSelect = document.getElementById(
+    'publication',
+  ) as HTMLSelectElement;
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const spliceIntoChunks = (arr: any[], chunkSize: number) => {
     const res = [];
@@ -492,9 +497,10 @@ const PrototypeDataCatalogue = () => {
                     <Button
                       variant="secondary"
                       onClick={() => {
-                        // setSelectedTheme('All themes');
-                        /* eslint-disable-next-line */
-                        location.href = `?theme=All themes&publication=&dataType=${dataType}&compactList=${listCompact}`;
+                        setSelectedTheme('All themes');
+                        setSelectedPublication('All publications');
+                        themeSelect.selectedIndex = 1;
+                        publicationSelect.selectedIndex = 1;
                       }}
                     >
                       ✕{' '}
@@ -539,9 +545,10 @@ const PrototypeDataCatalogue = () => {
                     <Button
                       variant="secondary"
                       onClick={() => {
-                        // setSelectedTheme('All themes');
-                        /* eslint-disable-next-line */
-                        location.href = `?theme=&publication=&dataType=${dataType}&compactList=${listCompact}`;
+                        setSelectedTheme('All themes');
+                        setSelectedPublication('All publications');
+                        themeSelect.selectedIndex = 1;
+                        publicationSelect.selectedIndex = 1;
                       }}
                     >
                       ✕{' '}
@@ -558,14 +565,13 @@ const PrototypeDataCatalogue = () => {
                       <Button
                         variant="secondary"
                         onClick={() => {
-                          // setSelectedPublication('All publications');
-                          /* eslint-disable-next-line */
-                          location.href = `?theme=fe&publication=&dataType=${dataType}&compactList=${listCompact}`;
+                          setSelectedPublication('All publications');
+                          publicationSelect.selectedIndex = 1;
                         }}
                       >
                         ✕{' '}
                         <span className="govuk-visually-hidden">
-                          Clear theme{' '}
+                          Clear publication{' '}
                         </span>
                         {selectedPublication}
                       </Button>
