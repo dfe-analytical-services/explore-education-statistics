@@ -369,7 +369,16 @@ const PrototypeDataCatalogue = () => {
                     </div>
                   )}
                   <div className="govuk-!-margin-top-3">
-                    <a href={`?theme=&publication=&dataType=${dataType}`}>
+                    <a
+                      href="#"
+                      onClick={e => {
+                        e.preventDefault();
+                        setSelectedTheme('All themes');
+                        setSelectedPublication('All publications');
+                        themeSelect.selectedIndex = 1;
+                        publicationSelect.selectedIndex = 1;
+                      }}
+                    >
                       Clear filters
                     </a>
                   </div>

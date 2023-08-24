@@ -1,5 +1,6 @@
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import PrototypePrevNextNav from '@admin/prototypes/components/PrototypePrevNextNav';
+import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useRef, useState } from 'react';
 import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
@@ -43,7 +44,7 @@ const PrototypeHomepage = () => {
       >
         <>
           <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
+            <div className="govuk-grid-column-two-thirds">
               <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">
                 <span className="govuk-caption-xl">Data catalogue v5</span>{' '}
                 Apprenticeship Achievement Rates Detailed Series {dataType}
@@ -118,6 +119,34 @@ const PrototypeHomepage = () => {
                 </div>
               )}
             </div>
+            <div className="govuk-grid-column-one-third">
+              <RelatedInformation heading="Related information">
+                <ul className="govuk-list">
+                  <li>
+                    <Link
+                      to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                      className={classNames(
+                        'govuk-link--no-visited-state',
+                        styles.prototypeLinkNoUnderline,
+                      )}
+                    >
+                      API documentation
+                    </Link>
+                  </li>
+                  <li>
+                    <Link
+                      to="./releaseData"
+                      className={classNames(
+                        'govuk-link--no-visited-state',
+                        styles.prototypeLinkNoUnderline,
+                      )}
+                    >
+                      View related release
+                    </Link>
+                  </li>
+                </ul>
+              </RelatedInformation>
+            </div>
           </div>
 
           <hr className="govuk-!-margin-top-6" />
@@ -137,17 +166,6 @@ const PrototypeHomepage = () => {
                         )}
                       >
                         API documentation
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="./releaseData"
-                        className={classNames(
-                          'govuk-link--no-visited-state',
-                          styles.prototypeLinkNoUnderline,
-                        )}
-                      >
-                        View related release
                       </Link>
                     </li>
                   </ul>
@@ -398,7 +416,13 @@ const PrototypeHomepage = () => {
               )}
 
               {(sectionShowAll || sectionSelected === 'dataPreview') && (
-                <section id="dataPreview" className={styles.sectionScroll}>
+                <section
+                  id="dataPreview"
+                  className={classNames(
+                    styles.sectionScroll,
+                    'govuk-!-margin-bottom-9',
+                  )}
+                >
                   <h2 className="govuk-heading-l" id="dataPreview">
                     Data preview
                   </h2>
@@ -564,6 +588,7 @@ const PrototypeHomepage = () => {
                       </tbody>
                     </table>
                   </div>
+                  {/* 
                   <div className="govuk-!-margin-bottom-6 govuk-!-margin-top-6">
                     <a
                       href="#"
@@ -577,6 +602,7 @@ const PrototypeHomepage = () => {
                         : 'View preview as full screen'}
                     </a>
                   </div>
+                  */}
 
                   {!sectionShowAll && (
                     <PrototypePrevNextNav
@@ -587,7 +613,6 @@ const PrototypeHomepage = () => {
                       prevTitle="Data set summary"
                     />
                   )}
-                  {sectionShowAll && <hr className="govuk-!-margin-bottom-9" />}
                 </section>
               )}
               {(sectionShowAll || sectionSelected === 'changelog') && (
