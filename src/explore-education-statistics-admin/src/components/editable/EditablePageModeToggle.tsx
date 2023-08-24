@@ -47,7 +47,12 @@ const EditablePageModeToggle = ({
         aria-expanded={isOpen}
       >
         Set page view
-        <span className="govuk-accordion__icon" aria-hidden />
+        <span
+          className={classNames('govuk-accordion-nav__chevron', {
+            'govuk-accordion-nav__chevron--down': isOpen,
+          })}
+          aria-hidden
+        />
       </button>
       <div aria-labelledby="pageViewToggleButton" className={styles.content}>
         <FormRadioGroup
