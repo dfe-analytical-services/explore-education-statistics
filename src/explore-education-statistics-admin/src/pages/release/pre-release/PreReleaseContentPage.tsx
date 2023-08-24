@@ -33,7 +33,7 @@ const PreReleaseContentPage = ({
               title={content.release.publication.title}
             />
 
-            <ReleaseContent />
+            <ReleaseContent isPreRelease />
           </ReleaseContentProvider>
         )}
       </LoadingSpinner>

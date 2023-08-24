@@ -1,5 +1,4 @@
 import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
-import { MethodologyApprovalStatus } from '@admin/services/methodologyService';
 import { MethodologyNote } from '@admin/services/methodologyNoteService';
 import {
   ContentBlockPostModel,
@@ -9,6 +8,7 @@ import {
 import client from '@admin/services/utils/service';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
+import { MethodologyApprovalStatus } from '@common/services/types/methodology';
 
 type ContentSectionViewModel = ContentSection<EditableContentBlock>;
 

@@ -42,6 +42,7 @@ export const testPublication: Publication = {
       id: 'caa8e56f-41d2-4129-a5c3-53b051134bd7',
       slug: 'pupil-absence-in-schools-in-england',
       title: 'Pupil absence statistics: methodology',
+      status: 'Approved',
     },
   ],
   supersededById: 'superseding-publication-id',

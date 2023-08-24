@@ -1,7 +1,6 @@
 import {
   MethodologyVersion,
   MethodologyPublishingStrategy,
-  MethodologyApprovalStatus,
 } from '@admin/services/methodologyService';
 import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
@@ -15,6 +14,7 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import { Formik } from 'formik';
 import React from 'react';
 import { MethodologyStatusPermissions } from '@admin/services/permissionService';
+import { MethodologyApprovalStatus } from '@common/services/types/methodology';
 
 export interface FormValues {
   status: MethodologyApprovalStatus;

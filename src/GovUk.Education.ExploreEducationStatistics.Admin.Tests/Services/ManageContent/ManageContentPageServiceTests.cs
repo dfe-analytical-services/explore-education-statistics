@@ -137,16 +137,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 }
             };
 
-            var methodologies = AsList(
+            var methodologyVersions = AsList(
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    AlternativeTitle = "Methodology 1 title"
+                    AlternativeTitle = "Methodology 1 title",
+                    Methodology = new Methodology(),
                 },
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    AlternativeTitle = "Methodology 2 title"
+                    AlternativeTitle = "Methodology 2 title",
+                    Methodology = new Methodology(),
                 }
             );
 
@@ -220,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             methodologyVersionRepository.Setup(mock =>
                     mock.GetLatestVersionByPublication(publication.Id))
-                .ReturnsAsync(methodologies);
+                .ReturnsAsync(methodologyVersions);
 
             releaseFileService.Setup(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data))
@@ -344,9 +346,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Academic year 2019/20", contentPublicationReleases[0].Title);
 
                 Assert.Equal(2, contentPublication.Methodologies.Count);
-                Assert.Equal(methodologies[0].Id, contentPublication.Methodologies[0].Id);
+                Assert.Equal(methodologyVersions[0].Id, contentPublication.Methodologies[0].Id);
                 Assert.Equal("Methodology 1 title", contentPublication.Methodologies[0].Title);
-                Assert.Equal(methodologies[1].Id, contentPublication.Methodologies[1].Id);
+                Assert.Equal(methodologyVersions[1].Id, contentPublication.Methodologies[1].Id);
                 Assert.Equal("Methodology 2 title", contentPublication.Methodologies[1].Title);
             }
 

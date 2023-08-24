@@ -288,6 +288,7 @@ export const testPublicationRelease: Release = {
         id: 'm1',
         title: 'methodology title',
         slug: 'm1',
+        status: 'Approved',
       },
     ],
   },

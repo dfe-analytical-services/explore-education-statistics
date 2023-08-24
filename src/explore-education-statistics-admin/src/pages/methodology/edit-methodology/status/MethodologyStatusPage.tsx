@@ -1,8 +1,6 @@
 import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import methodologyService, {
-  MethodologyApprovalStatus,
-} from '@admin/services/methodologyService';
+import methodologyService from '@admin/services/methodologyService';
 import Button from '@common/components/Button';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -18,6 +16,7 @@ import FormattedDate from '@common/components/FormattedDate';
 import { useQuery } from '@tanstack/react-query';
 import methodologyQueries from '@admin/queries/methodologyQueries';
 import permissionQueries from '@admin/queries/permissionQueries';
+import { MethodologyApprovalStatus } from '@common/services/types/methodology';
 
 interface FormValues {
   status: MethodologyApprovalStatus;

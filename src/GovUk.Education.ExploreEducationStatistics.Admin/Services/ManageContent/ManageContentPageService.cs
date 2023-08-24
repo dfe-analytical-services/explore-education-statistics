@@ -66,8 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
                     releaseViewModel.DownloadFiles = files.ToList();
-                    releaseViewModel.Publication.Methodologies =
-                        _mapper.Map<List<IdTitleViewModel>>(methodologies);
+                    releaseViewModel.Publication.Methodologies = _mapper
+                        .Map<List<Content.Services.ViewModels.MethodologyVersionSummaryViewModel>>(methodologies);
 
                     // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
                     // own Boundary Level selection

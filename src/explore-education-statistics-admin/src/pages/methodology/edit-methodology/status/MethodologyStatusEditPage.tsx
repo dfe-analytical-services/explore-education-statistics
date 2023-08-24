@@ -1,6 +1,5 @@
 import methodologyService, {
   MethodologyVersion,
-  MethodologyApprovalStatus,
 } from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -8,6 +7,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodologyStatusForm';
 import React from 'react';
 import { MethodologyStatusPermissions } from '@admin/services/permissionService';
+import { MethodologyApprovalStatus } from '@common/services/types/methodology';
 
 interface FormValues {
   status: MethodologyApprovalStatus;

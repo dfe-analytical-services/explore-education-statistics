@@ -1,5 +1,8 @@
 ﻿#nullable enable
 using System;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
@@ -10,5 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public string Slug { get; set; } = string.Empty;
 
         public string Title { get; set; } = string.Empty;
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public MethodologyApprovalStatus Status { get; set; }
     }
 }

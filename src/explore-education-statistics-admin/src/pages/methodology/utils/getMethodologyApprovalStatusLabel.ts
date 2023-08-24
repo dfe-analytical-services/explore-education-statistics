@@ -1,4 +1,4 @@
-import { MethodologyApprovalStatus } from '@admin/services/methodologyService';
+import { MethodologyApprovalStatus } from '@common/services/types/methodology';
 
 export default function getMethodologyApprovalStatusLabel(
   approvalStatus: MethodologyApprovalStatus,

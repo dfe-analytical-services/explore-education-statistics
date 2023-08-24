@@ -40,6 +40,7 @@ export const testEditableRelease: EditableRelease = {
         id: '8807af2b-d9a7-4efa-a376-08d7b451a98e',
         title: 'First methodology',
         slug: 'my-pub-methodology',
+        status: 'Approved',
       },
     ],
   },

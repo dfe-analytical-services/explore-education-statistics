@@ -36,7 +36,11 @@ interface MethodologyLink {
   url: string;
 }
 
-const ReleaseContent = () => {
+interface Props {
+  isPreRelease?: boolean;
+}
+
+const ReleaseContent = ({ isPreRelease }: Props) => {
   const config = useConfig();
   const location = useLocation();
   const { editingMode, unsavedBlocks, unsavedCommentDeletions } =
@@ -87,11 +91,15 @@ const ReleaseContent = () => {
   const { publication } = release;
 
   const allMethodologies = useMemo<MethodologyLink[]>(() => {
-    const methodologies = publication.methodologies.map(methodology => ({
-      key: methodology.id,
-      title: methodology.title,
-      url: `/methodology/${methodology.id}/summary`,
-    }));
+    const methodologies = publication.methodologies
+      .filter(methodology => methodology.status === 'Approved')
+      .map(methodology => ({
+        key: methodology.id,
+        title: methodology.title,
+        url: isPreRelease
+          ? `/publication/${publication.id}/release/${release.id}/prerelease/methodologies/${methodology.id}`
+          : `/methodology/${methodology.id}/summary`,
+      }));
 
     if (publication.externalMethodology) {
       methodologies.push({
@@ -102,7 +110,13 @@ const ReleaseContent = () => {
     }
 
     return methodologies;
-  }, [publication.externalMethodology, publication.methodologies]);
+  }, [
+    publication.id,
+    publication.externalMethodology,
+    publication.methodologies,
+    release.id,
+    isPreRelease,
+  ]);
 
   const hasAllFilesButton = release.downloadFiles.some(
     file =>
