@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .ToList();
         }
 
-        public async Task<MethodologyVersion?> GetLatestPublishedVersion(Guid methodologyId)
+        public async Task<MethodologyVersion?> GetLatestPublishedVersion(Guid methodologyId) // @MarkFix remove?
         {
             var methodology = await _contentDbContext.Methodologies
                 .AsQueryable()

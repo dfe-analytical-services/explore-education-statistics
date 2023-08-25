@@ -93,7 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
-                .OnSuccess(() => _methodologyVersionRepository
+                .OnSuccess(publication => ValidateMethodologySlugUnused(publication.Slug)) // @MarkFix if this fails, user cannot currently set a custom slug! They're forced to change the
+                .OnSuccess(_ => _methodologyVersionRepository
                     .CreateMethodologyForPublication(publicationId, _userService.GetUserId())
                 )
                 .OnSuccess(BuildMethodologyVersionViewModel);

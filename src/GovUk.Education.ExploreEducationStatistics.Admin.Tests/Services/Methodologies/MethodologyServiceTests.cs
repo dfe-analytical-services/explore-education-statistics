@@ -277,7 +277,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var publication = new Publication
             {
-                Title = "Test publication"
+                Title = "Test publication",
+                Slug = "test-publication",
             };
 
             var createdMethodology = new MethodologyVersion
@@ -287,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     Id = Guid.NewGuid(),
                     OwningPublicationTitle = publication.Title,
-                    OwningPublicationSlug = "test-publication",
+                    OwningPublicationSlug = publication.Slug,
                     Publications = new List<PublicationMethodology>
                     {
                         new()
@@ -295,9 +296,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             Owner = true,
                             Publication = publication
                         }
-                    }
+                    },
                 },
-                Status = Draft
+                Status = Draft,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -317,11 +318,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
                     .ReturnsAsync(createdMethodology);
 
+                methodologyVersionRepository
+                    .Setup(s => s.GetLatestPublishedVersionBySlug(publication.Slug))
+                    .ReturnsAsync((MethodologyVersion?)null);
+
                 var service = SetupMethodologyService(
                     contentDbContext: context,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var viewModel = (await service.CreateMethodology(publication.Id)).AssertRight();
+                var result = await service.CreateMethodology(publication.Id);
+                var viewModel = result.AssertRight();
+
                 VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal(createdMethodology.Id, viewModel.Id);
