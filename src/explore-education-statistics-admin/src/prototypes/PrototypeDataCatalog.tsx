@@ -586,6 +586,7 @@ const PrototypeDataCatalogue = () => {
                       </Button>
                     </span>
                   )}
+                <hr />
                 <p className="govuk-!-margin-top-4 dfe-flex dfe-justify-content--space-between">
                   <div>
                     <span className="govuk-tag">National statistics</span>{' '}
