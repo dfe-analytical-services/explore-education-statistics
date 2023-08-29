@@ -151,26 +151,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Include(m => m.Methodology)
                 .Where(m => m.PublicationId == publicationId && m.Owner)
                 .Select(m => m.Methodology)
-                .ToListAsync();
+                .ToListAsync(); // @MarkFix Can be Single?
 
-            await ownedMethodologies
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async methodology =>
+            ownedMethodologies
+                .ForEach(methodology =>
                 {
                     methodology.OwningPublicationTitle = updatedTitle;
-                    methodology.OwningPublicationSlug = updatedSlug; // @MarkFix yes?
+
+                    if (methodology.OwningPublicationSlug != updatedSlug)
+                    {
+                        var oldSlug = methodology.OwningPublicationSlug;
+                        methodology.OwningPublicationSlug = updatedSlug;
+                        if (methodology.LatestPublishedVersionId != null)
+                        {
+                            // @MarkFix creates new methodology redirect,
+                            // but what should the MethodologyVersionId be?
+                            // Should we have a MethodologyId on the redirect as well?
+                            _contentDbContext.Entry(methodology)
+                                .Reference(m => m.LatestPublishedVersion)
+                                .LoadAsync();
+
+                            await _contentDbContext.MethodologyRedirects.AddAsync(
+                                new MethodologyRedirect(oldSlug, methodology.LatestPublishedVersionId))
+                        }
+                    }
                 });
 
             _contentDbContext.Methodologies.UpdateRange(ownedMethodologies);
             await _contentDbContext.SaveChangesAsync();
         }
 
-        private async Task<bool> IsPubliclyAccessible(Methodology methodology)
+        public async Task<bool> IsPubliclyAccessible(Methodology methodology)
         {
             await _contentDbContext
                 .Entry(methodology)
                 .Collection(mp => mp.Versions)
                 .LoadAsync();
+
+            var latestVersion = methodology.Versions.Where(mv => mv.Version ==
 
             foreach (var version in methodology.Versions)
             {
@@ -260,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Collection(mp => mp.Versions)
                 .LoadAsync();
 
-            // TODO EES-2672 SingleOrDefault here is susceptible to bug EES-2672 which is allowing multiple amendments
+            // TODO EES-2672 SingleOrDefault here is susceptible to bug EES-2672 which is allowing multiple amendments // @MarkFix ticket gone
             // of the same version to be created. If there is a next version there should only be one.
             return methodologyVersion.Methodology.Versions.SingleOrDefault(mv =>
                 mv.PreviousVersionId == methodologyVersion.Id);

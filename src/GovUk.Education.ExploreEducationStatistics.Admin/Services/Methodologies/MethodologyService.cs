@@ -212,6 +212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(id, q =>
                     q.Include(m => m.Methodology))
+                // NOTE: Permissions checks nested within UpdateStatus and UpdateDetails
                 .OnSuccess(methodologyVersion => UpdateStatus(methodologyVersion, request))
                 .OnSuccess(methodologyVersion => UpdateDetails(methodologyVersion, request))
                 .OnSuccess(BuildMethodologyVersionViewModel);
@@ -311,6 +312,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     if (newSlug != methodologyVersion.Slug)
                     {
+                        await _context
+                            .Entry(methodologyVersion)
+                            .Reference(mv => mv.Methodology)
+                            .LoadAsync();
+
+                        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Methodology))
+                        {
+                            var methodologyRedirect = new MethodologyRedirect
+                            {
+                                Slug = methodologyVersion.Slug,
+                                MethodologyVersionId = methodologyVersion.Id,
+                            };
+                            await _context.MethodologyRedirects.AddAsync(methodologyRedirect);
+                        }
+
                         methodologyVersion.AlternativeSlug =
                             newSlug != methodologyVersion.Methodology.OwningPublicationSlug
                                 ? newSlug
@@ -348,6 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .OnSuccessVoid(async () =>
                         {
                             _context.Methodologies.Remove(methodology);
+                            // @MarkFix remove associated MethodologyRedirects here?
                             await _context.SaveChangesAsync();
                         });
                 });
@@ -440,6 +457,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             if (methodologyVersion != null)
             {
                 return ValidationActionResult(SlugNotUnique);
+            }
+
+            var redirects = await _context.MethodologyRedirects
+                .Include(mr => mr.MethodologyVersion.Methodology)
+                .Where(mr => mr.Slug == slug)
+                .ToListAsync();
+
+            var activeRedirects = await redirects
+                .ToAsyncEnumerable()
+                .WhereAwait(async mr => await _methodologyVersionRepository
+                    .IsPubliclyAccessible(mr.MethodologyVersion.Methodology))
+                .ToListAsync();
+
+            if (activeRedirects.Count > 0)
+            {
+                return ValidationActionResult(SlugUsedByRedirect);
             }
 
             return Unit.Instance;

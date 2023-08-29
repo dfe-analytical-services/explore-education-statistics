@@ -208,7 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    if (originalTitle != publication.Title)
+                    if (originalTitle != publication.Title
+                        || originalSlug != publication.Slug)
                     {
                         await _methodologyVersionRepository.PublicationTitleOrSlugChanged(publicationId,
                             publication.Title,

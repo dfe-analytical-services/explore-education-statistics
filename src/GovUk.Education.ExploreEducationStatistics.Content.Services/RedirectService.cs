@@ -19,13 +19,18 @@ public class RedirectService : IRedirectService
         _contentDbContext = contentDbContext;
     }
 
+    // @MarkFix Keep Methodology.Slug column in case the whole thing goes wrong
+
     public async Task<Either<ActionResult, RedirectsViewModel>> List()
     {
         var methodologyRedirects = await _contentDbContext.MethodologyRedirects
-            .Where(mr => mr.MethodologyVersion.Methodology.OwningPublication().Publication.LatestPublishedRelease !=
-                         null)
+            .Where(mr => mr.MethodologyVersion.Methodology.LatestPublishedVersionId != null // @MarkFix if it's not published, then no redirects should exist?
+                                            && mr.MethodologyVersion.Version <= mr.MethodologyVersion.Methodology.LatestPublishedVersion.Version)
+            // @MarkFix <= because we need to include redirects created when an inherited publication slug is changed
+            // or the migrated redirects - and these redirects use LatestPublishedVersionId
             .Select(mr => new MethodologyRedirectViewModel(
-                mr.Slug, mr.MethodologyVersion.Slug))
+                mr.Slug, mr.MethodologyVersion.Methodology.LatestPublishedVersion.Slug)) // @MarkFix
+            .Distinct() // @MarkFix yes?
             .ToListAsync();
 
         return new RedirectsViewModel(methodologyRedirects);

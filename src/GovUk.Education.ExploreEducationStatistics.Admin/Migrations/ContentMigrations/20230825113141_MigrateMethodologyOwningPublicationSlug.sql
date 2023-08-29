@@ -8,6 +8,8 @@
 -- So if a methodology has a custom slug, but uses the owning publication's title, we change the slug to use the owning
 -- publication's slug. We then create redirects so we don't break existing links that use the old custom slug.
 
+-- @MarkFix create a migration endpoint instead of using all this SQL?
+
 -- If OwningPublicationSlug is different to the owning publication's slug,
 -- it is an AlternativeSlug
 UPDATE [dbo].[MethodologyVersions]
@@ -16,11 +18,16 @@ FROM [dbo].[MethodologyVersions] MV
 JOIN [dbo].[Methodologies] M ON MV.MethodologyId = M.Id
 JOIN [dbo].[PublicationMethodologies] PM ON PM.MethodologyId = M.Id
 JOIN [dbo].[Publications] P ON P.Id = PM.PublicationId
+JOIN [dbo].[MethodologyVersions] LPV ON M.LatestPublishedVersionId = LPV.Id
 WHERE PM.Owner = 1
+AND (  -- @MarkFix Yes?
+    M.LatestPublishedVersionId = MV.Id
+    OR LPV.Version < MV.Version -- i.e. is draft amendment of latest published version - I think? @MarkFix
+    )
 AND P.Slug != M.OwningPublicationSlug
 -- If there is no AlternativeTitle set, we don't want to set the
 -- AlternativeSlug - we want to use the owning publication's slug.
--- But by not setting AlternativeSlug, we're changing the slug
+-- But by not setting AlternativeSlug, however, we're changing the slug
 AND MV.AlternativeTitle IS NOT NULL;
 
 -- Since we're changing the slug if there is no AlternativeTitle set,
@@ -34,6 +41,9 @@ JOIN [dbo].[Methodologies] M ON MV.MethodologyId = M.Id
 JOIN [dbo].[PublicationMethodologies] PM ON PM.MethodologyId = M.Id
 JOIN [dbo].[Publications] P ON P.Id = PM.PublicationId
 WHERE PM.Owner = 1
+-- We can only have changed a currently published methodology's slug, therefore only need
+-- to create a redirect for that case.
+AND M.LatestPublishedVersionId = MV.Id
 AND P.Slug != M.OwningPublicationSlug
 AND MV.AlternativeTitle IS NULL;
 
@@ -45,6 +55,7 @@ JOIN [dbo].[Methodologies] M ON MV.MethodologyId = M.Id
 JOIN [dbo].[PublicationMethodologies] PM ON PM.MethodologyId = M.Id
 JOIN [dbo].[Publications] P ON P.Id = PM.PublicationId
 WHERE PM.Owner = 1
+--AND M.LatestPublishedVersionId = MV.Id  -- @MarkFix not in this case?
 AND P.Slug != M.OwningPublicationSlug
 
 /* Queries to check migration has run correctly

@@ -23,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
         Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion);
 
+        Task<bool> IsPubliclyAccessible(Methodology methodology);
+
         Task PublicationTitleOrSlugChanged(Guid publicationId, string updatedTitle, string updatedSlug);
     }
 }
