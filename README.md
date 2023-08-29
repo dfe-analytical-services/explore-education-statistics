@@ -8,18 +8,18 @@ The project is primarily composed of two areas:
 
 ### Public frontend (for general public users)
 
-- **UI**
+- **UI** - `src/explore-education-statistics-frontend`
   - NextJS React app
   - Depends on:
     - Content API
     - Data API
     - Notifier
 
-- **Content API**
+- **Content API** - `src/GovUk.Education.ExploreEducationStatistics.Content.Api`
   - Depends on:
     - Publisher - to generate its cache
 
-- **Data API**
+- **Data API** - `src/GovUk.Education.ExploreEducationStatistics.Data.Api`
   - Depends on:
     - SQLServer `statistics` database (known as `public-statistics` in non-local environments)
 
@@ -28,12 +28,12 @@ The project is primarily composed of two areas:
 
 ### Admin (for admins and analysts)
 
-- **UI**
+- **UI** - `src/explore-education-statistics-admin`
   - CRA React app
   - Depends on:
     - Admin API
 
-- **Admin API**
+- **Admin API** - `src/GovUk.Education.ExploreEducationStatistics.Admin`
   - Depends on:
     - SQLServer `content` database
     - SQLServer `statistics` database
@@ -41,14 +41,14 @@ The project is primarily composed of two areas:
     - Notifier
     - Data Processor
 
-- **Publisher**
+- **Publisher** - `src/GovUk.Education.ExploreEducationStatistics.Publisher`
   - Azure function for publishing admin content to the public frontend
 
-- **Notifier**
+- **Notifier** - `src/GovUk.Education.ExploreEducationStatistics.Notifier`
   - Azure function for sending notifications
 
-- **Data Processor**
-  - Azure function for handling dataset imports into the admin. Also referred to as the "importer".
+- **Data Processor** - `src/GovUk.Education.ExploreEducationStatistics.Data.Processor`
+  - Azure function for handling dataset imports into the admin. Also referred to as the 'importer' or just 'processor'.
 
 ## Getting started
 
@@ -119,7 +119,7 @@ potentially happen on Mac (but this needs to be confirmed).
 This could result in the following projects failing to work correctly:
 
 - Admin (unlikely to have an issue, but still mentioned in case)
-- Processor (will error during file validation)
+- Data Processor (will error during file validation)
 
 To fix this, you need to create an `appsettings.Local.json` file in the relevant project e.g.
 
