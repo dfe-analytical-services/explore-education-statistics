@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
     public partial class EES3993AlterStoredProcRebuildIndexes : Migration
     {
         private const string PreviousRebuildIndexesMigrationId = InitialCreate_Custom.MigrationId;
-        private const string MigrationId = "20230302161732";
+        internal const string MigrationId = "20230302161732";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {

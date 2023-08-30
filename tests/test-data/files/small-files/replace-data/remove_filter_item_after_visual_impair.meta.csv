@@ -1,0 +1,6 @@
+col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
+pupil_sen_status,Filter,SEN provision,,,,EHC plan/Statement of SEN or SEN support/School Action/School Action plus,
+primary_need,Filter,Primary type of need,,,,"(ASD, HI, VI…)",
+number_of_pupils,Indicator,Headcount,Number of pupils,,0,,
+pupil_gender_boys,Indicator,Boys,Gender,,0,,
+pupil_gender_girls,Indicator,Girls,Gender,,0,,

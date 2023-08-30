@@ -1,0 +1,228 @@
+time_period,time_identifier,geographic_level,country_code,country_name,pupil_sen_status,number_of_pupils,pupil_gender_boys,pupil_gender_girls
+201920,Academic year,National,E92000001,England,No SEN,7037528,3392763,3644764
+201920,Academic year,National,E92000001,England,No SEN,7037528,3392763,3644764
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,67867,51442,16425
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,17173,8605,8568
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,211563,125442,86121
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,2647,1783,864
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,45932,28290,17642
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,23417,13463,9954
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,916,566,350
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,40333,24879,15454
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,3001,1859,1142
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,194111,135307,58804
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,145878,84324,61554
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,236960,163885,73075
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,999420,645159,354261
+201920,Academic year,National,E92000001,England,SEN No Statement or EHC,9622,5314,4308
+201920,Academic year,National,E92000001,England,Statement or EHC,82847,68002,14845
+201920,Academic year,National,E92000001,England,Statement or EHC,6027,3337,2690
+201920,Academic year,National,E92000001,England,Statement or EHC,1,1,0
+201920,Academic year,National,E92000001,England,Statement or EHC,29592,18922,10670
+201920,Academic year,National,E92000001,England,Statement or EHC,965,578,387
+201920,Academic year,National,E92000001,England,Statement or EHC,7069,4572,2497
+201920,Academic year,National,E92000001,England,Statement or EHC,13371,7748,5623
+201920,Academic year,National,E92000001,England,Statement or EHC,10003,5759,4244
+201920,Academic year,National,E92000001,England,Statement or EHC,30593,20029,10564
+201920,Academic year,National,E92000001,England,Statement or EHC,39189,32498,6691
+201920,Academic year,National,E92000001,England,Statement or EHC,9947,6826,3121
+201920,Academic year,National,E92000001,England,Statement or EHC,42589,31359,11230
+201920,Academic year,National,E92000001,England,Statement or EHC,275604,201544,74060
+201920,Academic year,National,E92000001,England,Statement or EHC,3411,1913,1498
+201920,Academic year,National,E92000001,England,Total,150714,119444,31270
+201920,Academic year,National,E92000001,England,Total,23200,11942,11258
+201920,Academic year,National,E92000001,England,Total,7037529,3392764,3644764
+201920,Academic year,National,E92000001,England,Total,241155,144364,96791
+201920,Academic year,National,E92000001,England,Total,3612,2361,1251
+201920,Academic year,National,E92000001,England,Total,53001,32862,20139
+201920,Academic year,National,E92000001,England,Total,36788,21211,15577
+201920,Academic year,National,E92000001,England,Total,10919,6325,4594
+201920,Academic year,National,E92000001,England,Total,40333,24879,15454
+201920,Academic year,National,E92000001,England,Total,33594,21888,11706
+201920,Academic year,National,E92000001,England,Total,233300,167805,65495
+201920,Academic year,National,E92000001,England,Total,155825,91150,64675
+201920,Academic year,National,E92000001,England,Total,279549,195244,84305
+201920,Academic year,National,E92000001,England,Total,8312552,4239466,4073085
+201920,Academic year,National,E92000001,England,Total,13033,7227,5806
+201819,Academic year,National,E92000001,England,No SEN,7010535,3384780,3625754
+201819,Academic year,National,E92000001,England,No SEN,1,1,0
+201819,Academic year,National,E92000001,England,No SEN,7010536,3384781,3625754
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,60048,46445,13603
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,16591,8327,8264
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,1,1,0
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,218501,130552,87949
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,2473,1698,775
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,46393,28601,17792
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,22852,13210,9642
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,975,607,368
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,40246,24920,15326
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,3118,1968,1150
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,181944,128411,53533
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,142559,83749,58810
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,227756,158204,69552
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,972841,631854,340987
+201819,Academic year,National,E92000001,England,SEN No Statement or EHC,9384,5161,4223
+201819,Academic year,National,E92000001,England,Statement or EHC,73450,60821,12629
+201819,Academic year,National,E92000001,England,Statement or EHC,5873,3242,2631
+201819,Academic year,National,E92000001,England,Statement or EHC,1,1,0
+201819,Academic year,National,E92000001,England,Statement or EHC,29100,18611,10489
+201819,Academic year,National,E92000001,England,Statement or EHC,915,534,381
+201819,Academic year,National,E92000001,England,Statement or EHC,6766,4337,2429
+201819,Academic year,National,E92000001,England,Statement or EHC,13094,7609,5485
+201819,Academic year,National,E92000001,England,Statement or EHC,9878,5658,4220
+201819,Academic year,National,E92000001,England,Statement or EHC,29921,19507,10414
+201819,Academic year,National,E92000001,England,Statement or EHC,34922,29301,5621
+201819,Academic year,National,E92000001,England,Statement or EHC,9080,6275,2805
+201819,Academic year,National,E92000001,England,Statement or EHC,38070,27928,10142
+201819,Academic year,National,E92000001,England,Statement or EHC,254455,185724,68731
+201819,Academic year,National,E92000001,England,Statement or EHC,3385,1900,1485
+201819,Academic year,National,E92000001,England,Total,133498,107266,26232
+201819,Academic year,National,E92000001,England,Total,22464,11569,10895
+201819,Academic year,National,E92000001,England,Total,7010537,3384782,3625754
+201819,Academic year,National,E92000001,England,Total,247601,149163,98438
+201819,Academic year,National,E92000001,England,Total,3388,2232,1156
+201819,Academic year,National,E92000001,England,Total,53159,32938,20221
+201819,Academic year,National,E92000001,England,Total,35946,20819,15127
+201819,Academic year,National,E92000001,England,Total,10853,6265,4588
+201819,Academic year,National,E92000001,England,Total,40246,24920,15326
+201819,Academic year,National,E92000001,England,Total,33040,21476,11564
+201819,Academic year,National,E92000001,England,Total,216866,157712,59154
+201819,Academic year,National,E92000001,England,Total,151639,90024,61615
+201819,Academic year,National,E92000001,England,Total,265826,186132,79694
+201819,Academic year,National,E92000001,England,Total,8237832,4202359,4035472
+201819,Academic year,National,E92000001,England,Total,12769,7061,5708
+201718,Academic year,National,E92000001,England,No SEN,6964972,3366770,3598202
+201718,Academic year,National,E92000001,England,No SEN,6964972,3366770,3598202
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,54269,42651,11618
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,15985,8057,7928
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,224910,135020,89890
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,2286,1556,730
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,47695,29315,18380
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,22256,12936,9320
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,1001,632,369
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,39272,24225,15047
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,3297,2098,1199
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,173115,123496,49619
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,139907,83599,56308
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,216679,150519,66160
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,949750,619105,330645
+201718,Academic year,National,E92000001,England,SEN No Statement or EHC,9078,5001,4077
+201718,Academic year,National,E92000001,England,Statement or EHC,66723,55678,11045
+201718,Academic year,National,E92000001,England,Statement or EHC,5886,3240,2646
+201718,Academic year,National,E92000001,England,Statement or EHC,1,1,0
+201718,Academic year,National,E92000001,England,Statement or EHC,28341,18188,10153
+201718,Academic year,National,E92000001,England,Statement or EHC,753,442,311
+201718,Academic year,National,E92000001,England,Statement or EHC,6163,3962,2201
+201718,Academic year,National,E92000001,England,Statement or EHC,12827,7433,5394
+201718,Academic year,National,E92000001,England,Statement or EHC,10072,5687,4385
+201718,Academic year,National,E92000001,England,Statement or EHC,29532,19257,10275
+201718,Academic year,National,E92000001,England,Statement or EHC,31308,26598,4710
+201718,Academic year,National,E92000001,England,Statement or EHC,8290,5834,2456
+201718,Academic year,National,E92000001,England,Statement or EHC,34415,25156,9259
+201718,Academic year,National,E92000001,England,Statement or EHC,237601,173304,64297
+201718,Academic year,National,E92000001,England,Statement or EHC,3290,1828,1462
+201718,Academic year,National,E92000001,England,Total,120992,98329,22663
+201718,Academic year,National,E92000001,England,Total,21871,11297,10574
+201718,Academic year,National,E92000001,England,Total,6964973,3366771,3598202
+201718,Academic year,National,E92000001,England,Total,253251,153208,100043
+201718,Academic year,National,E92000001,England,Total,3039,1998,1041
+201718,Academic year,National,E92000001,England,Total,53858,33277,20581
+201718,Academic year,National,E92000001,England,Total,35083,20369,14714
+201718,Academic year,National,E92000001,England,Total,11073,6319,4754
+201718,Academic year,National,E92000001,England,Total,39272,24225,15047
+201718,Academic year,National,E92000001,England,Total,32829,21355,11474
+201718,Academic year,National,E92000001,England,Total,204423,150094,54329
+201718,Academic year,National,E92000001,England,Total,148197,89433,58764
+201718,Academic year,National,E92000001,England,Total,251094,175675,75419
+201718,Academic year,National,E92000001,England,Total,8152323,4159179,3993144
+201718,Academic year,National,E92000001,England,Total,12368,6829,5539
+201617,Academic year,National,E92000001,England,No SEN,6922226,3348290,3573936
+201617,Academic year,National,E92000001,England,No SEN,6922226,3348290,3573936
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,48200,38426,9774
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,15302,7705,7597
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,231796,139893,91903
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,2053,1387,666
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,49080,30127,18953
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,21211,12406,8805
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,1039,637,402
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,41437,25504,15933
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,3322,2144,1178
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,167670,120043,47627
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,138876,84090,54786
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,205643,142900,62743
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,934348,610144,324204
+201617,Academic year,National,E92000001,England,SEN No Statement or EHC,8719,4882,3837
+201617,Academic year,National,E92000001,England,Statement or EHC,61137,51434,9703
+201617,Academic year,National,E92000001,England,Statement or EHC,5997,3343,2654
+201617,Academic year,National,E92000001,England,Statement or EHC,28663,18467,10196
+201617,Academic year,National,E92000001,England,Statement or EHC,688,402,286
+201617,Academic year,National,E92000001,England,Statement or EHC,5801,3723,2078
+201617,Academic year,National,E92000001,England,Statement or EHC,12782,7389,5393
+201617,Academic year,National,E92000001,England,Statement or EHC,10045,5662,4383
+201617,Academic year,National,E92000001,England,Statement or EHC,370,287,83
+201617,Academic year,National,E92000001,England,Statement or EHC,29158,18924,10234
+201617,Academic year,National,E92000001,England,Statement or EHC,29139,25010,4129
+201617,Academic year,National,E92000001,England,Statement or EHC,8480,6081,2399
+201617,Academic year,National,E92000001,England,Statement or EHC,32439,23768,8671
+201617,Academic year,National,E92000001,England,Statement or EHC,227954,166290,61664
+201617,Academic year,National,E92000001,England,Statement or EHC,3255,1800,1455
+201617,Academic year,National,E92000001,England,Total,109337,89860,19477
+201617,Academic year,National,E92000001,England,Total,21299,11048,10251
+201617,Academic year,National,E92000001,England,Total,6922226,3348290,3573936
+201617,Academic year,National,E92000001,England,Total,260459,158360,102099
+201617,Academic year,National,E92000001,England,Total,2741,1789,952
+201617,Academic year,National,E92000001,England,Total,54881,33850,21031
+201617,Academic year,National,E92000001,England,Total,33993,19795,14198
+201617,Academic year,National,E92000001,England,Total,11084,6299,4785
+201617,Academic year,National,E92000001,England,Total,41807,25791,16016
+201617,Academic year,National,E92000001,England,Total,32480,21068,11412
+201617,Academic year,National,E92000001,England,Total,196809,145053,51756
+201617,Academic year,National,E92000001,England,Total,147356,90171,57185
+201617,Academic year,National,E92000001,England,Total,238082,166668,71414
+201617,Academic year,National,E92000001,England,Total,8084528,4124724,3959804
+201617,Academic year,National,E92000001,England,Total,11974,6682,5292
+201516,Academic year,National,E92000001,England,No SEN,6824895,3301069,3523826
+201516,Academic year,National,E92000001,England,No SEN,6824895,3301069,3523826
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,43327,35097,8230
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,14654,7345,7309
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,244539,147582,96957
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,1692,1146,546
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,50413,30599,19814
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,20212,11875,8337
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,1012,618,394
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,36385,22181,14204
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,3381,2187,1194
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,166347,118818,47529
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,142550,87283,55267
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,194200,134749,59451
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,927037,604110,322927
+201516,Academic year,National,E92000001,England,SEN No Statement or EHC,8325,4630,3695
+201516,Academic year,National,E92000001,England,Statement or EHC,57474,48527,8947
+201516,Academic year,National,E92000001,England,Statement or EHC,5956,3304,2652
+201516,Academic year,National,E92000001,England,Statement or EHC,29741,19295,10446
+201516,Academic year,National,E92000001,England,Statement or EHC,634,359,275
+201516,Academic year,National,E92000001,England,Statement or EHC,5277,3376,1901
+201516,Academic year,National,E92000001,England,Statement or EHC,12914,7424,5490
+201516,Academic year,National,E92000001,England,Statement or EHC,9984,5637,4347
+201516,Academic year,National,E92000001,England,Statement or EHC,282,235,47
+201516,Academic year,National,E92000001,England,Statement or EHC,29036,18853,10183
+201516,Academic year,National,E92000001,England,Statement or EHC,28344,24509,3835
+201516,Academic year,National,E92000001,England,Statement or EHC,9009,6512,2497
+201516,Academic year,National,E92000001,England,Statement or EHC,31045,22711,8334
+201516,Academic year,National,E92000001,England,Statement or EHC,223039,162594,60445
+201516,Academic year,National,E92000001,England,Statement or EHC,3343,1852,1491
+201516,Academic year,National,E92000001,England,Total,100801,83624,17177
+201516,Academic year,National,E92000001,England,Total,20610,10649,9961
+201516,Academic year,National,E92000001,England,Total,6824895,3301069,3523826
+201516,Academic year,National,E92000001,England,Total,274280,166877,107403
+201516,Academic year,National,E92000001,England,Total,2326,1505,821
+201516,Academic year,National,E92000001,England,Total,55690,33975,21715
+201516,Academic year,National,E92000001,England,Total,33126,19299,13827
+201516,Academic year,National,E92000001,England,Total,10996,6255,4741
+201516,Academic year,National,E92000001,England,Total,36667,22416,14251
+201516,Academic year,National,E92000001,England,Total,32417,21040,11377
+201516,Academic year,National,E92000001,England,Total,194691,143327,51364
+201516,Academic year,National,E92000001,England,Total,151559,93795,57764
+201516,Academic year,National,E92000001,England,Total,225245,157460,67785
+201516,Academic year,National,E92000001,England,Total,7974971,4067773,3907198
+201516,Academic year,National,E92000001,England,Total,11668,6482,5186

@@ -70,9 +70,29 @@ Update the Methodology Content
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology content section 1    1
     ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds image to accordion section text block    Methodology content section 1    1    test-infographic.png
+
+    user checks accordion section contains x blocks    Methodology content section 1    1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+Verify that validation prevents adding an image without alt text
+    user adds image without alt text to accordion section text block    Methodology content section 1    1
+    ...    test-infographic.png    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+    user checks page contains    All images must have alternative text
+
+    user clicks element    xpath://img
+    user clicks element    xpath://button[span[.="Change image text alternative"]]
+    user enters text into element    label:Text alternative    Alt text for the uploaded content image
+    user clicks element    css:button.ck-button-save
+
+    user checks accordion section text block contains image with alt text    Methodology content section 1    1
     ...    Alt text for the uploaded content image    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
+    user clicks button    Save
+
+    user checks page does not contain    All images must have alternative text
+
+Add Methodology Annexes
     user creates new content section    1    Methodology annex section 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology annex section 1
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
@@ -81,10 +101,6 @@ Update the Methodology Content
     user adds image to accordion section text block    Methodology annex section 1    1    dfe-logo.jpg
     ...    Alt text for the uploaded annex image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
-    user checks accordion section contains x blocks    Methodology content section 1    1
-    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user checks accordion section text block contains image with alt text    Methodology content section 1    1
-    ...    Alt text for the uploaded content image    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user checks accordion section contains x blocks    Methodology annex section 1    1
     ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user checks accordion section text block contains image with alt text    Methodology annex section 1    1

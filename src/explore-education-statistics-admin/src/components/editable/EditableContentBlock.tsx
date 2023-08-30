@@ -1,7 +1,9 @@
 import EditableBlockLockedMessage from '@admin/components/editable/EditableBlockLockedMessage';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
-import EditableContentForm from '@admin/components/editable/EditableContentForm';
+import EditableContentForm, {
+  AltTextWarningMessage,
+} from '@admin/components/editable/EditableContentForm';
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';
 import glossaryService from '@admin/services/glossaryService';
 import { UserDetails } from '@admin/services/types/user';
@@ -13,6 +15,7 @@ import toHtml from '@admin/utils/markdown/toHtml';
 import Button from '@common/components/Button';
 import ContentHtml from '@common/components/ContentHtml';
 import Tooltip from '@common/components/Tooltip';
+import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import sanitizeHtml, {
   defaultSanitizeOptions,
@@ -21,7 +24,7 @@ import sanitizeHtml, {
 } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
 import mapValues from 'lodash/mapValues';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 interface EditableContentBlockProps {
   actionThrottle?: number;
@@ -79,6 +82,8 @@ const EditableContentBlock = ({
   onSubmit,
 }: EditableContentBlockProps) => {
   const { comments } = useCommentsContext();
+  const [showAltTextMessage, toggleAltTextMessage] = useToggle(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   const content = useMemo(
     () => (useMarkdown ? toHtml(value) : value),
@@ -119,6 +124,17 @@ const EditableContentBlock = ({
       },
     };
   }, [comments, transformImageAttributes]);
+
+  // Check content for images without alt text.
+  useEffect(() => {
+    if (content && !isEditing) {
+      const hasInvalidImage = !!contentRef.current?.querySelector(
+        'img:not([alt]), img[alt=""]',
+      );
+
+      toggleAltTextMessage(hasInvalidImage);
+    }
+  }, [content, isEditing, toggleAltTextMessage]);
 
   if (isEditing && !lockedBy) {
     return (
@@ -174,6 +190,8 @@ const EditableContentBlock = ({
         </div>
       )}
 
+      {showAltTextMessage && <AltTextWarningMessage />}
+
       {locked && lockedBy && (
         <EditableBlockLockedMessage locked={locked} lockedBy={lockedBy} />
       )}
@@ -196,7 +214,7 @@ const EditableContentBlock = ({
               ref={ref}
               onClick={isEditable ? onEditing : undefined}
             >
-              <div inert="">
+              <div inert="" ref={contentRef}>
                 <ContentHtml
                   getGlossaryEntry={glossaryService.getEntry}
                   html={content || '<p>This section is empty</p>'}

@@ -364,10 +364,34 @@ user adds image to accordion section text block
     user waits until parent contains element    ${block}
     ...    xpath://img[starts-with(@src, "/api/") and @alt="${alt_text}"]
 
-    # Workaround to remove the eager "All images must have alternative (alt) text" validation error that persists
+    # Workaround to remove the eager "All images must have alternative text" validation error that persists
     # even after setting the alt text
     user presses keys    TAB
     user presses keys    SHIFT+TAB
+
+    user clicks button    Save    ${block}
+
+user adds image without alt text to accordion section text block
+    [Arguments]
+    ...    ${section_name}
+    ...    ${block_num}
+    ...    ${filename}=test-infographic.png
+    ...    ${parent}=[data-testid="accordion"]
+
+    ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
+
+    # If we don't do this, `Insert paragraph after block` circle button on image doesn't appear
+    user presses keys    ${\n}
+    user presses keys    ARROW_UP
+
+    choose file
+    ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
+    ...    ${FILES_DIR}${filename}
+    user clicks element    xpath://div[@title="Insert paragraph after block"]
+
+    # wait for the API to save the image and for the src attribute to be updated before continuing
+    user waits until parent contains element    ${block}
+    ...    xpath://img[starts-with(@src, "/api/")]
 
     user clicks button    Save    ${block}
 

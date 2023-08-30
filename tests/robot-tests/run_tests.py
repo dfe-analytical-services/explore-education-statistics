@@ -196,7 +196,7 @@ if args.expiredinvite_pass:
     os.environ["EXPIRED_INVITE_USER_PASSWORD"] = args.expiredinvite_pass
 
 # Install chromedriver and add it to PATH
-get_webdriver(args.chromedriver_version or "latest")
+get_webdriver(args.chromedriver_version or None)
 
 output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
 
