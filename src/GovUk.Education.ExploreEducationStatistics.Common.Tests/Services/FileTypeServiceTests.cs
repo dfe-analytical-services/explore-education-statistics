@@ -54,6 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         private static readonly FileInfo Gif = new("test.gif", "image/gif");
         private static readonly FileInfo Jpg = new("test.jpg", "image/jpeg");
         private static readonly FileInfo Png = new("test.png", "image/png");
+        private static readonly FileInfo Svg = new("test.svg", "image/svg+xml");
+        private static readonly FileInfo SvgNoXml = new("test-no-xml.svg", "image/svg+xml");
         private static readonly FileInfo Zip = new("test.zip", "application/x-compressed");
         
         private static readonly List<FileInfo> ImageTypes = new()
@@ -171,7 +173,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
         {
             AssertMimeTypeCorrect(Png);
         }
-        
+
+        [Fact]
+        public void GetMimeType_Svg()
+        {
+            AssertMimeTypeCorrect(Svg);
+        }
+
+        [Fact]
+        public void GetMimeType_Svg_NoXml()
+        {
+            AssertMimeTypeCorrect(SvgNoXml);
+        }
+
         [Fact]
         public void GetMimeType_Txt()
         {
