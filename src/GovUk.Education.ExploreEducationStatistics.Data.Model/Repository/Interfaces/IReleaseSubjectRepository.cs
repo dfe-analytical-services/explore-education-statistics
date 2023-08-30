@@ -6,9 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 
 public interface IReleaseSubjectRepository
 {
-    Task SoftDeleteAllReleaseSubjects(Guid releaseId);
+    Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = true);
 
-    Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId);
-
-    Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false);
+    Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = true);
 }

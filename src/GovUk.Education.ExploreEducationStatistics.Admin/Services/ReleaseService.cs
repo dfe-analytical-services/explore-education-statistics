@@ -240,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    await _releaseSubjectRepository.SoftDeleteAllReleaseSubjects(releaseId);
+                    await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseId: releaseId);
                 });
         }
 
@@ -559,8 +559,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(deletePlan => _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan))
                 .OnSuccessVoid(async deletePlan =>
                 {
-                    await _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId, deletePlan.SubjectId);
-                    await _cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseId, deletePlan.SubjectId));
+                    await _releaseSubjectRepository.DeleteReleaseSubject(releaseId: releaseId,
+                        subjectId: deletePlan.SubjectId);
+                    await _cacheService.DeleteItemAsync(new PrivateSubjectMetaCacheKey(releaseId: releaseId,
+                        subjectId: deletePlan.SubjectId));
                 })
                 .OnSuccess(() => _releaseDataFileService.Delete(releaseId, fileId));
         }
