@@ -123,6 +123,7 @@ const ChartLegendConfiguration = ({
 
     const dataSetCategoryConfigs = getDataSetCategoryConfigs({
       dataSetCategories,
+      groupByFilterGroups: axisMajor.groupByFilterGroups,
       legendItems: legendItems.current,
       meta,
     });

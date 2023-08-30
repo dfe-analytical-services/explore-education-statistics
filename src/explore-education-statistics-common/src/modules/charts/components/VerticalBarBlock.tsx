@@ -20,6 +20,7 @@ import {
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
 import getCategoryLabel from '@common/modules/charts/util/getCategoryLabel';
 import getMinorAxisDecimalPlaces from '@common/modules/charts/util/getMinorAxisDecimalPlaces';
+import formatPretty from '@common/utils/number/formatPretty';
 import parseNumber from '@common/utils/number/parseNumber';
 import getUnit from '@common/modules/charts/util/getUnit';
 import getMinorAxisSize from '@common/modules/charts/util/getMinorAxisSize';
@@ -35,7 +36,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import formatPretty from '@common/utils/number/formatPretty';
+import groupBy from 'lodash/groupBy';
 
 export interface VerticalBarProps extends StackedBarProps {
   legend: LegendConfiguration;
@@ -47,16 +48,16 @@ export interface VerticalBarProps extends StackedBarProps {
 
 const VerticalBarBlock = ({
   alt,
-  data,
-  meta,
-  height,
-  width,
-  barThickness,
   axes,
-  stacked,
-  legend,
+  barThickness,
+  data,
+  height,
   includeNonNumericData,
+  legend,
+  meta,
   showDataLabels,
+  stacked,
+  width,
 }: VerticalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
   if (
@@ -72,11 +73,20 @@ const VerticalBarBlock = ({
   const dataSetCategories: DataSetCategory[] = createDataSetCategories({
     axisConfiguration: axes.major,
     data,
-    meta,
     includeNonNumericData,
+    meta,
   });
 
-  const chartData = dataSetCategories.map(toChartData);
+  const groupedDataSetCategories = groupBy(
+    dataSetCategories,
+    dataSetCategory => dataSetCategory.filter.group,
+  );
+
+  const chartData = axes.major.groupByFilterGroups
+    ? Object.entries(groupedDataSetCategories).map(([groupKey, group]) =>
+        Object.assign({}, ...group.map(toChartData), { name: groupKey }),
+      )
+    : dataSetCategories.map(toChartData);
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);

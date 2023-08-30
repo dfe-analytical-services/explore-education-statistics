@@ -37,6 +37,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import groupBy from 'lodash/groupBy';
 
 const defaultLabelTextColour = '#0B0C0C';
 
@@ -56,6 +57,7 @@ const HorizontalBarBlock = ({
   barThickness,
   width,
   stacked = false,
+
   axes,
   legend,
   includeNonNumericData,
@@ -82,7 +84,16 @@ const HorizontalBarBlock = ({
     includeNonNumericData,
   });
 
-  const chartData = dataSetCategories.map(toChartData);
+  const groupedDataSetCategories = groupBy(
+    dataSetCategories,
+    dataSetCategory => dataSetCategory.filter.group,
+  );
+
+  const chartData = axes.major.groupByFilterGroups
+    ? Object.entries(groupedDataSetCategories).map(([groupKey, group]) =>
+        Object.assign({}, ...group.map(toChartData), { name: groupKey }),
+      )
+    : dataSetCategories.map(toChartData);
 
   const minorDomainTicks = getMinorAxisDomainTicks(chartData, axes.minor);
   const majorDomainTicks = getMajorAxisDomainTicks(chartData, axes.major);
