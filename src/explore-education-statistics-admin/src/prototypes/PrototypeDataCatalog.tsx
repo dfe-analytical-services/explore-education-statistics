@@ -375,8 +375,12 @@ const PrototypeDataCatalogue = () => {
                         e.preventDefault();
                         setSelectedTheme('All themes');
                         setSelectedPublication('All publications');
-                        themeSelect.selectedIndex = 1;
-                        publicationSelect.selectedIndex = 1;
+                        if (themeSelect) {
+                          themeSelect.selectedIndex = 1;
+                        }
+                        if (publicationSelect) {
+                          publicationSelect.selectedIndex = 1;
+                        }
                       }}
                     >
                       Clear filters
@@ -508,15 +512,29 @@ const PrototypeDataCatalogue = () => {
                       onClick={() => {
                         setSelectedTheme('All themes');
                         setSelectedPublication('All publications');
-                        themeSelect.selectedIndex = 1;
-                        publicationSelect.selectedIndex = 1;
+                        if (themeSelect) {
+                          themeSelect.selectedIndex = 1;
+                        }
+                        if (publicationSelect) {
+                          publicationSelect.selectedIndex = 1;
+                        }
                       }}
                     >
-                      ✕{' '}
-                      <span className="govuk-visually-hidden">
-                        Clear theme{' '}
-                      </span>
-                      {selectedTheme}
+                      <div className="dfe-flex dfe-align-items--center ">
+                        <div>✕ </div>
+                        <div className="govuk-!-margin-left-1 govuk-!-text-align-left">
+                          <span className="govuk-visually-hidden">
+                            Clear theme{' '}
+                          </span>
+                          <div
+                            className="govuk-body-xs govuk-!-margin-0"
+                            style={{ fontSize: '0.8rem' }}
+                          >
+                            THEME
+                          </div>
+                          <div>{selectedTheme}</div>
+                        </div>
+                      </div>
                     </Button>
                   </span>
                 )}
@@ -556,15 +574,29 @@ const PrototypeDataCatalogue = () => {
                       onClick={() => {
                         setSelectedTheme('All themes');
                         setSelectedPublication('All publications');
-                        themeSelect.selectedIndex = 1;
-                        publicationSelect.selectedIndex = 1;
+                        if (themeSelect) {
+                          themeSelect.selectedIndex = 1;
+                        }
+                        if (publicationSelect) {
+                          publicationSelect.selectedIndex = 1;
+                        }
                       }}
                     >
-                      ✕{' '}
-                      <span className="govuk-visually-hidden">
-                        Clear theme{' '}
-                      </span>
-                      {selectedTheme}
+                      <div className="dfe-flex dfe-align-items--center ">
+                        <div>✕ </div>
+                        <div className="govuk-!-margin-left-1 govuk-!-text-align-left">
+                          <span className="govuk-visually-hidden">
+                            Clear theme{' '}
+                          </span>
+                          <div
+                            className="govuk-body-xs govuk-!-margin-0"
+                            style={{ fontSize: '0.8rem' }}
+                          >
+                            THEME
+                          </div>
+                          <div>{selectedTheme}</div>
+                        </div>
+                      </div>
                     </Button>
                   </span>
                 )}
@@ -575,14 +607,26 @@ const PrototypeDataCatalogue = () => {
                         variant="secondary"
                         onClick={() => {
                           setSelectedPublication('All publications');
-                          publicationSelect.selectedIndex = 1;
+                          if (publicationSelect) {
+                            publicationSelect.selectedIndex = 1;
+                          }
                         }}
                       >
-                        ✕{' '}
-                        <span className="govuk-visually-hidden">
-                          Clear publication{' '}
-                        </span>
-                        {selectedPublication}
+                        <div className="dfe-flex dfe-align-items--center ">
+                          <div>✕ </div>
+                          <div className="govuk-!-margin-left-1 govuk-!-text-align-left">
+                            <span className="govuk-visually-hidden">
+                              Clear publication{' '}
+                            </span>
+                            <div
+                              className="govuk-body-xs govuk-!-margin-0"
+                              style={{ fontSize: '0.8rem' }}
+                            >
+                              PUBLICATION
+                            </div>
+                            <div>{selectedPublication}</div>
+                          </div>
+                        </div>
                       </Button>
                     </span>
                   )}
