@@ -108,15 +108,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Collection(m => m.Versions)
                 .LoadAsync();
 
-            return await methodology.Versions.FirstOrDefaultAsync(IsPubliclyAccessible);
+            return methodology.Versions.SingleOrDefault(mv =>
+                methodology.LatestPublishedVersionId == mv.Id);
         }
 
-        public async Task<bool> IsPubliclyAccessible(Guid methodologyVersionId)
+        public async Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion)
         {
-            var methodologyVersion = await _contentDbContext.MethodologyVersions
-                .FindAsync(methodologyVersionId);
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(mv => mv.Methodology)
+                .LoadAsync();
 
-            return await IsPubliclyAccessible(methodologyVersion);
+            return methodologyVersion.Id == methodologyVersion.Methodology.LatestPublishedVersionId;
+        }
+
+        public async Task SetAsLatestPublishedVersion(MethodologyVersion methodologyVersion)
+        {
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(mv => mv.Methodology)
+                .LoadAsync();
+
+            methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
+            await _contentDbContext.SaveChangesAsync();
         }
 
         // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
@@ -138,42 +150,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Select(m => m.Methodology)
                 .ToListAsync();
 
-            await ownedMethodologies
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async methodology =>
-            {
-                methodology.OwningPublicationTitle = updatedTitle;
-
-                if (slugChanged && methodology.Slug == originalSlug &&
-                    !await IsPubliclyAccessible(methodology))
+            ownedMethodologies
+                .ForEach(methodology =>
                 {
-                    methodology.Slug = updatedSlug;
-                }
-            });
+                    methodology.OwningPublicationTitle = updatedTitle;
+
+                    if (slugChanged && methodology.Slug == originalSlug &&
+                        methodology.LatestPublishedVersionId == null)
+                    {
+                        methodology.Slug = updatedSlug;
+                    }
+                });
 
             _contentDbContext.Methodologies.UpdateRange(ownedMethodologies);
             await _contentDbContext.SaveChangesAsync();
         }
 
-        private async Task<bool> IsPubliclyAccessible(Methodology methodology)
-        {
-            await _contentDbContext
-                .Entry(methodology)
-                .Collection(mp => mp.Versions)
-                .LoadAsync();
-
-            foreach (var version in methodology.Versions)
-            {
-                if (await IsPubliclyAccessible(version))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        private async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion)
+        public async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion) // @MarkFix rename?
         {
             // A version that's not approved can't be publicly accessible
             if (!methodologyVersion.Approved)
@@ -181,13 +174,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 return false;
             }
 
-            // If this version is not the latest it can still be publicly accessible,
-            // i.e. when the next version is draft or it's approved for publishing with a release that's not live yet.
-            // If the next version exists and is approved for publishing immediately or approved with a release that's live
-            // then this version can't be publicly accessible.
+            // A methodology with a newer published version cannot be publicly accessible
             var nextVersion = await GetNextVersion(methodologyVersion);
             if (nextVersion?.Approved == true)
             {
+                // If the next version is scheduled for immediate publishing, we don't need to check if an
+                // associated publication is published: the previous version won't be published in either case.
                 if (nextVersion.ScheduledForPublishingImmediately ||
                     await IsVersionScheduledForPublishingWithPublishedRelease(nextVersion))
                 {

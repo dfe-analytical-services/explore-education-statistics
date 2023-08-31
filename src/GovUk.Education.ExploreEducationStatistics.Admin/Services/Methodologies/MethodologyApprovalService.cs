@@ -99,9 +99,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         methodologyVersion.Updated = DateTime.UtcNow;
 
-                        var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id);
+                        // NOTE: We cannot rely on Methodology.LatestPublishedVersionId as it may now be incorrect -
+                        // we may be approving and publishing this methodologyVersion, making it the new latest
+                        // published version.
+                        var isToBePublished = await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion);
 
-                        if (isPubliclyAccessible)
+                        if (isToBePublished)
                         {
                             methodologyVersion.Published = DateTime.UtcNow;
                             methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
@@ -120,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         await _context.SaveChangesAsync();
 
-                        if (isPubliclyAccessible)
+                        if (isToBePublished)
                         {
                             // Update the 'All Methodologies' cache item
                             await _methodologyCacheService.UpdateSummariesTree();

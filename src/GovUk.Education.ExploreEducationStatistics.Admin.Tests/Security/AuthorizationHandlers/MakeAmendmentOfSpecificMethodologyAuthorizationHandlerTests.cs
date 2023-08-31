@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             Id = Guid.NewGuid(),
             PublishingStrategy = Immediately,
-            MethodologyId = Guid.NewGuid()
+            MethodologyId = Guid.NewGuid(),
         };
 
         private static readonly Publication OwningPublication = new()
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         userPublicationRoleRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                    methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                         .ReturnsAsync(true);
 
                     // Only the MakeAmendmentsOfAllMethodologies claim alongside the publicly-accessible Methodology
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task UserWithCorrectClaimCannotCreateAmendmentOfPrivateMethodology()
+            public async Task UserWithCorrectClaimCannotCreateAmendmentOfNonLatestMethodologyVersion()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         userPublicationRoleRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                    methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                         .ReturnsAsync(false);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             userPublicationRoleRepository
                             ) = CreateHandlerAndDependencies();
 
-                        methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                        methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                             .ReturnsAsync(true);
 
                         methodologyRepository.Setup(s =>
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                     .ReturnsAsync(true);
 
                 methodologyRepository.Setup(s =>
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     methodologyVersionRepository,
                     userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(MethodologyVersion))
                     .ReturnsAsync(false);
 
                 var user = CreateClaimsPrincipal(UserId);

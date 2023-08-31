@@ -1,16 +1,14 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Services.DataBlockMigrationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 
@@ -30,28 +28,47 @@ public class MethodologyMigrationController : ControllerBase
         _methodologyVersionRepository = methodologyVersionRepository;
     }
 
-    [HttpPatch("migration/set-latestpublishedversionid")]
-    public async Task<ActionResult<List<MapMigrationResult>>> MigrateMethodologyLatestPublishedVersionId(
+    public class MethodologyMigrationResult
+    {
+        public Guid MethodologyId { get; set; }
+        public Guid? LatestMethodologyVersionId { get; set; }
+    }
+
+    [HttpPatch("migration/set-latest-published-version-ids")]
+    public async Task<ActionResult<List<MethodologyMigrationResult>>> MigrateMethodologiesLatestPublishedVersionId(
         [FromQuery] bool dryRun = true)
     {
         var allMethodologies = _context.Methodologies
             .Include(m => m.Versions)
             .ToList();
 
+        var results = new List<MethodologyMigrationResult>();
+
         foreach (var methodology in allMethodologies)
         {
             var latestPublicMethodologyVersion = await methodology.Versions
                 .ToAsyncEnumerable()
-                .WhereAwait(async mv => await _methodologyVersionRepository.IsPubliclyAccessible(mv.Id))
+                .WhereAwait(async mv => await _methodologyVersionRepository.IsPubliclyAccessible(mv))
                 .SingleOrDefaultAsync();
 
             if (latestPublicMethodologyVersion != null)
             {
                 methodology.LatestPublishedVersionId = latestPublicMethodologyVersion.Id;
             }
+
+            var migrationResult = new MethodologyMigrationResult
+            {
+                MethodologyId = methodology.Id,
+                LatestMethodologyVersionId = latestPublicMethodologyVersion?.Id,
+            };
+            results.Add(migrationResult);
         }
 
-        await _context.SaveChangesAsync();
+        if (!dryRun)
+        {
+            await _context.SaveChangesAsync();
+        }
+
+        return results;
     }
 }
-

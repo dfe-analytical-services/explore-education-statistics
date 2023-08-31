@@ -23,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? LatestPublishedVersionId { get; set; }
 
+        //public MethodologyVersion? LatestPublishedVersion { get; set; } // @MarkFix redo migration
+
         public PublicationMethodology OwningPublication()
         {
             if (Publications.IsNullOrEmpty())

@@ -18,16 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificMethodologyAuthorizationHandler :
         AuthorizationHandler<UpdateSpecificMethodologyRequirement, MethodologyVersion>
     {
-        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyRepository _methodologyRepository;
         private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
         public UpdateSpecificMethodologyAuthorizationHandler(
-            IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyRepository methodologyRepository,
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
-            _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyRepository = methodologyRepository;
             _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
@@ -39,12 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             // An Approved Methodology cannot be updated.  Instead, it should firstly be unapproved if permissions
             // allow and then updated.
             if (methodologyVersion.Approved)
-            {
-                return;
-            }
-
-            // If the Methodology is already public, it cannot be updated.
-            if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
             {
                 return;
             }

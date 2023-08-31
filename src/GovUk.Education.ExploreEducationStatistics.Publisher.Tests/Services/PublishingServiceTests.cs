@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -172,6 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
                 .ReturnsAsync(AsList(methodologyVersion));
@@ -202,12 +204,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             releaseService.Setup(mock => mock.Get(release.Id))
                 .ReturnsAsync(release);
 
+            methodologyVersionRepository.Setup(mock =>
+                    mock.SetAsLatestPublishedVersion(methodologyVersion))
+                .Returns(Task.CompletedTask);
+
             var service = BuildPublishingService(
                 methodologyService: methodologyService.Object,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 privateBlobStorageService: privateBlobStorageService.Object,
                 publicationRepository: publicationRepository.Object,
-                releaseService: releaseService.Object);
+                releaseService: releaseService.Object,
+                methodologyVersionRepository: methodologyVersionRepository.Object);
 
             await service.PublishMethodologyFilesIfApplicableForRelease(release.Id);
 
@@ -289,6 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
             methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
                 .ReturnsAsync(ListOf(methodologyVersion));
@@ -320,12 +328,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             releaseService.Setup(mock => mock.Get(release.Id))
                 .ReturnsAsync(release);
 
+            methodologyVersionRepository.Setup(mock => mock.SetAsLatestPublishedVersion(methodologyVersion))
+                .Returns(Task.CompletedTask);
+
             var service = BuildPublishingService(
                 methodologyService: methodologyService.Object,
                 publicBlobStorageService: publicBlobStorageService.Object,
                 privateBlobStorageService: privateBlobStorageService.Object,
                 publicationRepository: publicationRepository.Object,
-                releaseService: releaseService.Object);
+                releaseService: releaseService.Object,
+                methodologyVersionRepository: methodologyVersionRepository.Object);
 
             await service.PublishMethodologyFilesIfApplicableForRelease(release.Id);
 
@@ -413,6 +425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             IMethodologyService? methodologyService = null,
             IPublicationRepository? publicationRepository = null,
             IReleaseService? releaseService = null,
+            IMethodologyVersionRepository? methodologyVersionRepository = null,
             ILogger<PublishingService>? logger = null,
             IConfiguration? configuration = null)
         {
@@ -422,6 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 methodologyService ?? Mock.Of<IMethodologyService>(MockBehavior.Strict),
                 publicationRepository ?? Mock.Of<IPublicationRepository>(MockBehavior.Strict),
                 releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
+                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict),
                 logger ?? Mock.Of<ILogger<PublishingService>>(),
                 configuration ?? DefaultConfigurationMock().Object
             );
