@@ -104,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         if (isPubliclyAccessible)
                         {
                             methodologyVersion.Published = DateTime.UtcNow;
+                            methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
 
                             await _publishingService.PublishMethodologyFiles(methodologyVersion.Id);
                         }
@@ -138,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             var owningPublicationId = await _context.PublicationMethodologies
                 .Where(pm => pm.MethodologyId == methodologyVersion.MethodologyId
-                && pm.Owner)
+                             && pm.Owner)
                 .Select(pm => pm.PublicationId)
                 .SingleAsync();
 
