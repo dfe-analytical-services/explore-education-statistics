@@ -319,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             releaseDataFileService.Setup(service => service.Delete(release.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectRepository.Setup(service => service.SoftDeleteReleaseSubject(release.Id, subject.Id))
+            releaseSubjectRepository.Setup(service => service.DeleteReleaseSubject(release.Id, subject.Id, true))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -481,7 +481,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(service =>
-                    service.SoftDeleteReleaseSubject(release.Id, It.IsIn(subject.Id, replacementSubject.Id)))
+                    service.DeleteReleaseSubject(release.Id, It.IsIn(subject.Id, replacementSubject.Id), true))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -519,8 +519,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 releaseSubjectRepository.Verify(
-                    mock => mock.SoftDeleteReleaseSubject(release.Id,
-                        It.IsIn(subject.Id, replacementSubject.Id)), Times.Exactly(2));
+                    mock => mock.DeleteReleaseSubject(release.Id,
+                        It.IsIn(subject.Id, replacementSubject.Id), true),
+                    Times.Exactly(2));
 
                 result.AssertRight();
             }
@@ -1017,7 +1018,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var latestIdTitleViewModel = result.AssertRight();
 
                 Assert.NotNull(latestIdTitleViewModel);
-                Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel!.Id);
+                Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel.Id);
                 Assert.Equal("Calendar year 2022", latestIdTitleViewModel.Title);
             }
         }
@@ -1214,7 +1215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mock.DeleteAll(release.Id, false)).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
-                mock.SoftDeleteAllReleaseSubjects(release.Id)).Returns(Task.CompletedTask);
+                mock.DeleteAllReleaseSubjects(release.Id, true)).Returns(Task.CompletedTask);
 
             cacheService
                 .Setup(mock => mock.DeleteCacheFolderAsync(
