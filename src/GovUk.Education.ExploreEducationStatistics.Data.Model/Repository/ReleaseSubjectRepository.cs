@@ -24,51 +24,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             _subjectDeleter = subjectDeleter ?? new SubjectDeleter();
         }
 
-        public async Task SoftDeleteAllReleaseSubjects(Guid releaseId)
+        public async Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = true)
         {
-            await DeleteAllReleaseSubjects(releaseId, true);
-        }
-
-        public async Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId)
-        {
-            await DeleteReleaseSubject(releaseId, subjectId, true);
-        }
-
-        public async Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false)
-        {
-            var subjectIds = await _statisticsDbContext.ReleaseSubject
-                .Include(rs => rs.Subject)
+            await _statisticsDbContext.ReleaseSubject
                 .Where(rs => rs.ReleaseId == releaseId)
                 .Select(rs => rs.SubjectId)
-                .ToListAsync();
-
-            foreach (var id in subjectIds)
-            {
-                await DeleteReleaseSubject(releaseId, id, softDeleteOrphanedSubjects);
-            }
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async subjectId =>
+                {
+                    await DeleteReleaseSubject(releaseId: releaseId,
+                        subjectId: subjectId,
+                        softDeleteOrphanedSubject: softDeleteOrphanedSubjects);
+                });
         }
 
-        public async Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = false)
+        public async Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = true)
         {
-            var releaseSubject = await _statisticsDbContext
-                .ReleaseSubject
-                .Include(rs => rs.Subject)
+            await DeleteReleaseSubjectIfExists(releaseId: releaseId, subjectId: subjectId);
+            await _footnoteRepository.DeleteFootnotesBySubject(releaseId: releaseId, subjectId: subjectId);
+            await DeleteSubjectIfOrphaned(subjectId: subjectId, softDeleteOrphanedSubject);
+        }
+
+        private async Task DeleteReleaseSubjectIfExists(Guid releaseId, Guid subjectId)
+        {
+            var releaseSubject = await _statisticsDbContext.ReleaseSubject
                 .FirstOrDefaultAsync(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId);
-
-            await DeleteReleaseSubjectIfExists(releaseSubject);
-            await _footnoteRepository.DeleteFootnotesBySubject(releaseId, subjectId);
-
-            if (releaseSubject?.Subject != null)
-            {
-                await DeleteSubjectIfOrphaned(releaseSubject.Subject, softDeleteOrphanedSubject);
-            }
-        }
-
-        private async Task DeleteReleaseSubjectIfExists(ReleaseSubject? releaseSubject)
-        {
             if (releaseSubject != null)
             {
-                _statisticsDbContext.ReleaseSubject.Remove(releaseSubject);
+                _statisticsDbContext.Remove(releaseSubject);
                 // Immediately save context as we will need to re-check
                 // how many ReleaseSubjects are attached to the Subject
                 // later when determining if the Subject has been orphaned.
@@ -76,41 +59,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             }
         }
 
-        private async Task DeleteSubjectIfOrphaned(Subject subject, bool isSoftDelete)
+        private async Task DeleteSubjectIfOrphaned(Guid subjectId, bool softDelete)
         {
-            if (!IsSubjectOrphaned(subject))
+            if (await _statisticsDbContext.ReleaseSubject.AnyAsync(rs => rs.SubjectId == subjectId))
             {
                 return;
             }
 
-            if (isSoftDelete)
+            if (softDelete)
             {
-                subject.SoftDeleted = true;
-                _statisticsDbContext.Subject.Update(subject);
+                var subject = await _statisticsDbContext.Subject.FirstOrDefaultAsync(s => s.Id == subjectId);
+                if (subject != null)
+                {
+                    _statisticsDbContext.Subject.Update(subject);
+                    subject.SoftDeleted = true;
+                }
             }
             else
             {
-                _subjectDeleter.Delete(subject, _statisticsDbContext);
+                _subjectDeleter.Delete(subjectId, _statisticsDbContext);
             }
 
             await _statisticsDbContext.SaveChangesAsync();
-        }
-
-        private bool IsSubjectOrphaned(Subject subject)
-        {
-            return _statisticsDbContext.ReleaseSubject.Count(rs => rs.SubjectId == subject.Id) == 0;
         }
 
         // Separate this into a separate class
         // for ease of mocking in tests.
         public class SubjectDeleter
         {
-            public virtual void Delete(Subject subject, StatisticsDbContext context)
+            public virtual void Delete(Guid subjectId, StatisticsDbContext context)
             {
                 // Use raw delete as EF can't correctly figure out how to cascade the delete, whilst the database can.
                 // N.B. This delete will be slow if there are a large number of observations but this is only
                 // executed by the tests when the topic is torn down so ensure files used are < 1000 rows.
-                context.Subject.FromSqlInterpolated($"DELETE Subject WHERE Id = {subject.Id}");
+                context.Subject.FromSqlInterpolated($"DELETE Subject WHERE Id = {subjectId}");
             }
         }
     }

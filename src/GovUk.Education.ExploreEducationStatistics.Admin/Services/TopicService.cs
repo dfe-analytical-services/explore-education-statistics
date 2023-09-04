@@ -282,7 +282,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (statsRelease != null)
             {
-                await _releaseSubjectRepository.DeleteAllReleaseSubjects(statsRelease.Id);
+                await _releaseSubjectRepository.DeleteAllReleaseSubjects(releaseId: statsRelease.Id,
+                    softDeleteOrphanedSubjects: false);
                 _statisticsContext.Release.Remove(statsRelease);
                 await _statisticsContext.SaveChangesAsync();
             }

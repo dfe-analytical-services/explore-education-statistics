@@ -10,7 +10,7 @@ const ContactUsSection = ({
 }) => {
   return (
     <>
-      <h3>Contact us</h3>
+      <h3 id="contact-us">Contact us</h3>
       <p>
         If you have a specific enquiry about {publicationTitle} statistics and
         data:
