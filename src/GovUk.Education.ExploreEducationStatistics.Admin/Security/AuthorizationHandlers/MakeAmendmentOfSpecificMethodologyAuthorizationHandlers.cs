@@ -35,14 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             MakeAmendmentOfSpecificMethodologyRequirement requirement,
             MethodologyVersion methodologyVersion)
         {
-            // Amendments can only be created from Methodologies that are already publicly-accessible.
-            if (!await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion))
+            if (!await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
             {
                 return;
             }
 
-            // Any user with the "MakeAmendmentsOfAllMethodologies" Claim can create an amendment of a
-            // publicly-accessible Methodology.
             if (SecurityUtils.HasClaim(context.User, MakeAmendmentsOfAllMethodologies))
             {
                 context.Succeed(requirement);
@@ -52,8 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var owningPublication =
                 await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
             
-            // If the user is a Publication Owner of the Publication that owns this Methodology, they can create 
-            // an Amendment of this Methodology.
             if (await _authorizationHandlerResourceRoleService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),

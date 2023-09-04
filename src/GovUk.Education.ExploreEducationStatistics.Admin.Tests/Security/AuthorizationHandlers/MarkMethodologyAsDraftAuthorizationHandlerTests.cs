@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ClaimsTests
         {
             [Fact]
-            public async Task NoClaimsAllowMarkingPubliclyAccessibleMethodologyAsDraft()
+            public async Task NoClaimsAllowMarkingLatestPublishedMethodologyVersionAsDraft()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         _,
                         _) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                    methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                         .ReturnsAsync(true);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -70,13 +70,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(methodologyVersionRepository);
 
-                    // No claims should allow a publicly accessible Methodology to be marked as draft
                     Assert.False(authContext.HasSucceeded);
                 });
             }
 
             [Fact]
-            public async Task UserWithCorrectClaimCanMarkNonPubliclyAccessibleMethodologyAsDraft()
+            public async Task UserWithCorrectClaimCanMarkNonLatestPublishedMethodologyVersionAsDraft()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -89,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                    methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                         .ReturnsAsync(false);
 
                     // Only the MarkAllMethodologiesDraft claim should allow a non publicly accessible Methodology to
@@ -145,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                            mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(mock =>
@@ -202,7 +201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(ApprovedMethodologyVersion))
+                            mock.IsLatestPublishedVersion(ApprovedMethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(mock =>
@@ -265,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                    methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(s =>
@@ -326,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(ApprovedMethodologyVersion))
+                            mock.IsLatestPublishedVersion(ApprovedMethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(mock =>
@@ -380,7 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     publicationRepository
                     ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(s =>
@@ -404,7 +403,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userReleaseRoleRepository);
 
-                // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
                 Assert.False(authContext.HasSucceeded);
             }
 
@@ -420,7 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     publicationRepository
                     ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(s =>
@@ -448,7 +446,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     userPublicationRoleRepository,
                     publicationRepository);
 
-                // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
                 Assert.False(authContext.HasSucceeded);
             }
         }

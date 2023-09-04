@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
                 .OnSuccess(() => _methodologyVersionRepository
-                    .CreateMethodologyForPublication(publicationId, _userService.GetUserId())
+                    .CreateMethodologyVersionForPublication(publicationId, _userService.GetUserId())
                 )
                 .OnSuccess(BuildMethodologyVersionViewModel);
         }

@@ -38,8 +38,9 @@ public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : Authorizat
         MarkMethodologyAsHigherLevelReviewRequirement requirement,
         MethodologyVersion methodologyVersion)
     {
-        // If the Methodology is already public, it cannot be marked for higher level review
-        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion))
+        // @MarkFix cover case where older version that was previously published - shouldn't be possible to change?
+
+        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
         }

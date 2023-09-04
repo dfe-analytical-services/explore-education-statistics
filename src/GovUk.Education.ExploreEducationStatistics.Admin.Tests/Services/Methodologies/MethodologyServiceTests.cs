@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 };
 
                 methodologyVersionRepository
-                    .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
+                    .Setup(s => s.CreateMethodologyVersionForPublication(publication.Id, UserId))
                     .ReturnsAsync(createdMethodology);
 
                 context.Attach(createdMethodology);

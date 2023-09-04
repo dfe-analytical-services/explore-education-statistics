@@ -36,9 +36,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
         MarkMethodologyAsApprovedRequirement requirement,
         MethodologyVersion methodologyVersion)
     {
-        // If the Methodology is already public, it cannot be approved
-        // An approved Methodology that isn't public can be approved to change attributes associated with approval
-        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion))
+        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
         }
@@ -52,8 +50,6 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
         var owningPublication =
             await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
-        // If the user is a Publication Approver that owns this Methodology, they can approve it.
-        // Additionally, if they're an Approver for Releases on the owning Publication, they can approve it.
         if (await _authorizationHandlerResourceRoleService
                 .HasRolesOnPublicationOrLatestRelease(
                     context.User.GetUserId(),

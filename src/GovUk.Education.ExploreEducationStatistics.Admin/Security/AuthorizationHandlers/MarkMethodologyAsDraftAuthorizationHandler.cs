@@ -38,8 +38,9 @@ public class MarkMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
         MarkMethodologyAsDraftRequirement requirement,
         MethodologyVersion methodologyVersion)
     {
-        // If the Methodology is already public, it cannot be marked as draft
-        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion))
+        // @MarkFix cover case where older version that was previously published - shouldn't be possible to change?
+
+        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
         }
