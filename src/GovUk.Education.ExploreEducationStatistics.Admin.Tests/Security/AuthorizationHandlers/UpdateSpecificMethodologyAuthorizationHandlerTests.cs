@@ -51,7 +51,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var (
                         handler,
                         _,
-                        methodologyVersionRepository,
                         _,
                         _,
                         _) = CreateHandlerAndDependencies();
@@ -63,39 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     await handler.HandleAsync(authContext);
                     
-                    VerifyAllMocks(methodologyVersionRepository);
-
-                    // No claims should allow an Approved Methodology to be updated
-                    Assert.False(authContext.HasSucceeded);
-                });
-            }
-
-            [Fact]
-            public async Task NoClaimsAllowUpdatingPubliclyAccessibleMethodology()
-            {
-                await ForEachSecurityClaimAsync(async claim =>
-                {
-                    var (
-                        handler,
-                        _,
-                        methodologyVersionRepository,
-                        _,
-                        _,
-                        _) = CreateHandlerAndDependencies();
-
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
-                        .ReturnsAsync(true);
-
-                    var user = CreateClaimsPrincipal(UserId, claim);
-                    var authContext =
-                        CreateAuthorizationHandlerContext<UpdateSpecificMethodologyRequirement, MethodologyVersion>
-                            (user, MethodologyVersion);
-
-                    await handler.HandleAsync(authContext);
-                    
-                    VerifyAllMocks(methodologyVersionRepository);
-
-                    // No claims should allow a publicly accessible Methodology to be updated
                     Assert.False(authContext.HasSucceeded);
                 });
             }
@@ -108,16 +74,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var (
                         handler,
                         methodologyRepository,
-                        methodologyVersionRepository,
                         userPublicationRoleRepository,
                         _,
                         publicationRepository) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
-                        .ReturnsAsync(false);
-
-                    // Only the UpdateAllMethodologies claim should allow a non publicly accessible Methodology
-                    // to be updated.
                     var expectedToPassByClaimAlone = claim == UpdateAllMethodologies;
 
                     if (!expectedToPassByClaimAlone)
@@ -144,8 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     
                     VerifyAllMocks(
                         methodologyRepository, 
-                        methodologyVersionRepository,
-                        userPublicationRoleRepository, 
+                        userPublicationRoleRepository,
                         publicationRepository);
 
                     Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
@@ -163,14 +122,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var (
                         handler,
                         methodologyRepository,
-                        methodologyVersionRepository,
                         userPublicationRoleRepository,
                         _,
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
-
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
-                        .ReturnsAsync(false);
 
                     methodologyRepository.Setup(s =>
                             s.GetOwningPublication(MethodologyVersion.MethodologyId))
@@ -198,8 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     
                     VerifyAllMocks(
                         methodologyRepository, 
-                        methodologyVersionRepository,
-                        userPublicationRoleRepository, 
+                        userPublicationRoleRepository,
                         publicationRepository);
 
                     // As the user has Publication Owner role on the owning Publication of this Methodology, they are
@@ -226,14 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     var (
                         handler,
                         methodologyRepository,
-                        methodologyVersionRepository,
                         userPublicationRoleRepository,
                         userReleaseRoleRepository,
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
-
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
-                        .ReturnsAsync(false);
 
                     methodologyRepository.Setup(s =>
                             s.GetOwningPublication(MethodologyVersion.MethodologyId))
@@ -261,7 +211,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     // as they are strict
                     VerifyAllMocks(
                         methodologyRepository,
-                        methodologyVersionRepository,
                         userPublicationRoleRepository,
                         userReleaseRoleRepository,
                         publicationRepository);
@@ -283,14 +232,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (
                     handler,
                     methodologyRepository,
-                    methodologyVersionRepository,
                     userPublicationRoleRepository,
                     userReleaseRoleRepository,
                     publicationRepository
                     ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
-                    .ReturnsAsync(false);
 
                 methodologyRepository.Setup(s =>
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
@@ -317,7 +262,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 
                 VerifyAllMocks(
                     methodologyRepository,
-                    methodologyVersionRepository,
                     userPublicationRoleRepository,
                     userReleaseRoleRepository,
                     publicationRepository);
@@ -332,14 +276,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 var (
                     handler,
                     methodologyRepository,
-                    methodologyVersionRepository,
                     userPublicationRoleRepository,
                     _,
                     publicationRepository
                     ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
-                    .ReturnsAsync(false);
 
                 methodologyRepository.Setup(s =>
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
@@ -362,7 +302,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 
                 VerifyAllMocks(
                     methodologyRepository,
-                    methodologyVersionRepository,
                     userPublicationRoleRepository,
                     publicationRepository);
 
@@ -374,7 +313,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static (
             UpdateSpecificMethodologyAuthorizationHandler,
             Mock<IMethodologyRepository>,
-            Mock<IMethodologyVersionRepository>,
             Mock<IUserPublicationRoleRepository>,
             Mock<IUserReleaseRoleRepository>,
             Mock<IPublicationRepository>
@@ -382,13 +320,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             CreateHandlerAndDependencies()
         {
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
             var handler = new UpdateSpecificMethodologyAuthorizationHandler(
-                methodologyVersionRepository.Object,
                 methodologyRepository.Object,
                 new AuthorizationHandlerResourceRoleService(
                     userReleaseRoleRepository.Object,
@@ -399,7 +335,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return (
                 handler,
                 methodologyRepository,
-                methodologyVersionRepository,
                 userPublicationRoleRepository,
                 userReleaseRoleRepository,
                 publicationRepository

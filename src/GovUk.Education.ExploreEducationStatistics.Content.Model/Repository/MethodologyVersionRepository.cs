@@ -111,14 +111,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return await methodology.Versions.FirstOrDefaultAsync(IsPubliclyAccessible);
         }
 
-        public async Task<bool> IsPubliclyAccessible(Guid methodologyVersionId)
-        {
-            var methodologyVersion = await _contentDbContext.MethodologyVersions
-                .FindAsync(methodologyVersionId);
-
-            return await IsPubliclyAccessible(methodologyVersion);
-        }
-
         // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
         // where appropriate.  Methodologies always keep track of their owning Publication's title for
         // optimisation purposes, but Methodology.Slug is used for the actual Slug for all of its Methodology
@@ -173,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return false;
         }
 
-        private async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion)
+        public async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion)
         {
             // A version that's not approved can't be publicly accessible
             if (!methodologyVersion.Approved)

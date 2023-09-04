@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         _,
                         _) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion))
                         .ReturnsAsync(true);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(methodologyVersion))
                         .ReturnsAsync(false);
 
                     // Only the ApproveAllMethodologies claim should allow approving a Methodology
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(methodologyVersion))
                         .ReturnsAsync(false);
 
                     // Only the ApproveAllMethodologies claim should allow approving a Methodology
@@ -205,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository
@@ -268,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         publicationRepository
                         ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository
@@ -323,7 +323,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     publicationRepository
                     ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository
@@ -372,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     publicationRepository
                     ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository

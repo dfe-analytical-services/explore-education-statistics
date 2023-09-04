@@ -38,14 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.SaveChangesAsync();
             }
 
-            Guid methodologyId;
+            Guid methodologyVersionId;
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
                 var methodology = await service.CreateMethodologyForPublication(publication.Id, userId);
                 await contentDbContext.SaveChangesAsync();
-                methodologyId = methodology.Id;
+                methodologyVersionId = methodology.Id;
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     .Include(m => m.Methodology)
                     .ThenInclude(p => p.Publications)
                     .ThenInclude(p => p.Publication)
-                    .SingleAsync(m => m.Id == methodologyId);
+                    .SingleAsync(m => m.Id == methodologyVersionId);
 
                 var savedPublication = await contentDbContext.Publications.SingleAsync(p => p.Id == publication.Id);
 
@@ -905,7 +905,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.True(await service.IsPubliclyAccessible(methodologyVersion.Id));
+                await contentDbContext.Entry(methodologyVersion)
+                    .ReloadAsync();
+
+                Assert.True(await service.IsPubliclyAccessible(methodologyVersion));
             }
         }
 
@@ -950,7 +953,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.True(await service.IsPubliclyAccessible(methodologyVersion.Id));
+                await contentDbContext.Entry(methodologyVersion)
+                    .ReloadAsync();
+
+                Assert.True(await service.IsPubliclyAccessible(methodologyVersion));
             }
         }
 
@@ -987,7 +993,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(methodologyVersion.Id));
+                Assert.False(await service.IsPubliclyAccessible(methodologyVersion));
             }
         }
 
@@ -1032,7 +1038,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(methodologyVersion.Id));
+                Assert.False(await service.IsPubliclyAccessible(methodologyVersion));
             }
         }
 
@@ -1076,7 +1082,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(methodologyVersion.Id));
+                await contentDbContext.Entry(methodologyVersion)
+                    .ReloadAsync();
+
+                Assert.False(await service.IsPubliclyAccessible(methodologyVersion));
             }
         }
 
@@ -1134,9 +1143,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(previousVersion.Id));
-                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion.Id));
-                Assert.False(await service.IsPubliclyAccessible(latestDraftVersion.Id));
+                await contentDbContext.Entry(previousVersion)
+                    .ReloadAsync();
+                await contentDbContext.Entry(latestPublishedVersion)
+                    .ReloadAsync();
+                await contentDbContext.Entry(latestDraftVersion)
+                    .ReloadAsync();
+
+                Assert.False(await service.IsPubliclyAccessible(previousVersion));
+                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion));
+                Assert.False(await service.IsPubliclyAccessible(latestDraftVersion));
             }
         }
 
@@ -1202,9 +1218,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(previousVersion.Id));
-                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion.Id));
-                Assert.False(await service.IsPubliclyAccessible(latestApprovedVersion.Id));
+                await contentDbContext.Entry(previousVersion)
+                    .ReloadAsync();
+                await contentDbContext.Entry(latestPublishedVersion)
+                    .ReloadAsync();
+                await contentDbContext.Entry(latestApprovedVersion)
+                    .ReloadAsync();
+
+                Assert.False(await service.IsPubliclyAccessible(previousVersion));
+                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion));
+                Assert.False(await service.IsPubliclyAccessible(latestApprovedVersion));
             }
         }
 
@@ -1272,9 +1295,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(previousVersion.Id));
-                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion.Id));
-                Assert.False(await service.IsPubliclyAccessible(latestDraftVersion.Id));
+                await contentDbContext.Entry(previousVersion)
+                    .ReloadAsync();
+                await contentDbContext.Entry(latestPublishedVersion)
+                    .ReloadAsync();
+                await contentDbContext.Entry(latestDraftVersion)
+                    .ReloadAsync();
+
+                Assert.False(await service.IsPubliclyAccessible(previousVersion));
+                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion));
+                Assert.False(await service.IsPubliclyAccessible(latestDraftVersion));
             }
         }
 
@@ -1347,9 +1377,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(previousVersion.Id));
-                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion.Id));
-                Assert.False(await service.IsPubliclyAccessible(latestApprovedVersion.Id));
+                await contentDbContext.Entry(previousVersion)
+                    .ReloadAsync();
+                await contentDbContext.Entry(latestPublishedVersion)
+                    .ReloadAsync();
+                await contentDbContext.Entry(latestApprovedVersion)
+                    .ReloadAsync();
+
+                Assert.False(await service.IsPubliclyAccessible(previousVersion));
+                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion));
+                Assert.False(await service.IsPubliclyAccessible(latestApprovedVersion));
             }
         }
 
@@ -1387,7 +1424,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(methodologyVersion.Id));
+                await contentDbContext.Entry(methodologyVersion)
+                    .ReloadAsync();
+
+                Assert.False(await service.IsPubliclyAccessible(methodologyVersion));
             }
         }
 
@@ -1426,7 +1466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
                 await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    service.IsPubliclyAccessible(methodologyVersion.Id));
+                    service.IsPubliclyAccessible(methodologyVersion));
             }
         }
 
