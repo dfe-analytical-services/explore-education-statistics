@@ -17,6 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
         Task<List<MethodologyVersion>> GetLatestPublishedVersionByPublication(Guid publicationId);
 
+        Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion);
+
+        Task SetAsLatestPublishedVersion(MethodologyVersion methodologyVersion);
+
         Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion);
 
         Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle, string updatedSlug);

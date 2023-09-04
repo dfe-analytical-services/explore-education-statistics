@@ -111,6 +111,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return await methodology.Versions.FirstOrDefaultAsync(IsPubliclyAccessible);
         }
 
+        public async Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion)
+        {
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(mv => mv.Methodology)
+                .LoadAsync();
+
+            return methodologyVersion.Id == methodologyVersion.Methodology.LatestPublishedVersionId;
+        }
+
+        public async Task SetAsLatestPublishedVersion(MethodologyVersion methodologyVersion)
+        {
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(mv => mv.Methodology)
+                .LoadAsync();
+
+            methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
+            await _contentDbContext.SaveChangesAsync();
+        }
+
         // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
         // where appropriate.  Methodologies always keep track of their owning Publication's title for
         // optimisation purposes, but Methodology.Slug is used for the actual Slug for all of its Methodology
@@ -133,15 +152,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             await ownedMethodologies
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async methodology =>
-            {
-                methodology.OwningPublicationTitle = updatedTitle;
-
-                if (slugChanged && methodology.Slug == originalSlug &&
-                    !await IsPubliclyAccessible(methodology))
                 {
-                    methodology.Slug = updatedSlug;
-                }
-            });
+                    methodology.OwningPublicationTitle = updatedTitle;
+
+                    if (slugChanged && methodology.Slug == originalSlug &&
+                        !await IsPubliclyAccessible(methodology))
+                    {
+                        methodology.Slug = updatedSlug;
+                    }
+                });
 
             _contentDbContext.Methodologies.UpdateRange(ownedMethodologies);
             await _contentDbContext.SaveChangesAsync();

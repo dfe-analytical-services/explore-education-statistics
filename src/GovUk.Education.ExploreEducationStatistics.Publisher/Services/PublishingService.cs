@@ -24,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseService _releaseService;
+        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly ILogger<PublishingService> _logger;
 
         public PublishingService(
@@ -32,6 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IMethodologyService methodologyService,
             IPublicationRepository publicationRepository,
             IReleaseService releaseService,
+            IMethodologyVersionRepository methodologyVersionRepository,
             ILogger<PublishingService> logger,
             IConfiguration configuration)
         {
@@ -41,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
             _publicationRepository = publicationRepository;
             _releaseService = releaseService;
+            _methodologyVersionRepository = methodologyVersionRepository;
             _logger = logger;
         }
 
@@ -69,7 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 // Publish the files of the latest methodologies of this release that
                 // aren't already accessible but depended on this release being published,
-                // since those methodologies will be published for the first time with this release
+                // since those methodologies will be published for the first time with this release.
+                // Also update the methodology's LatestPublishedVersionId if appropriate
                 var release = await _releaseService.Get(releaseId);
                 var firstRelease = !await _publicationRepository.IsPublished(release.PublicationId);
                 foreach (var methodologyVersion in methodologyVersions)
@@ -90,6 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                         if (firstReleaseAndMethodologyScheduledImmediately ||
                             methodologyScheduledWithThisRelease)
                         {
+                            await _methodologyVersionRepository.SetAsLatestPublishedVersion(methodologyVersion);
                             await PublishMethodologyFiles(methodologyVersion);
                         }
                     }
