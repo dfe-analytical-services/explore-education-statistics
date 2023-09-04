@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {
                     try
                     {
-                        await _publishingService.PublishMethodologyFilesIfApplicableForRelease(releaseStatus.ReleaseId);
+                        await _publishingService.PublishMethodologyVersionIfApplicableForRelease(releaseStatus.ReleaseId);
                         await _publishingService.PublishReleaseFiles(releaseStatus.ReleaseId);
                         return true;
                     }

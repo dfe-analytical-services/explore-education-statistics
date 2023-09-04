@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             _methodologyRepository = methodologyRepository;
         }
 
-        public async Task<MethodologyVersion> CreateMethodologyVersionForPublication(Guid publicationId, Guid createdByUserId)
+        public async Task<MethodologyVersion> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId)
         {
             var publication = await _contentDbContext
                 .Publications

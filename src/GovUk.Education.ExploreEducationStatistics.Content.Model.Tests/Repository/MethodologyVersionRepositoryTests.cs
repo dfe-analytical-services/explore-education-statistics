@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
     public class MethodologyVersionRepositoryTests
     {
         [Fact]
-        public async Task CreateMethodologyVersionForPublication()
+        public async Task CreateMethodologyForPublication()
         {
             var publication = new Publication
             {
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
-                var methodologyVersion = await service.CreateMethodologyVersionForPublication(publication.Id, userId);
+                var methodologyVersion = await service.CreateMethodologyForPublication(publication.Id, userId);
                 await contentDbContext.SaveChangesAsync();
                 methodologyVersionId = methodologyVersion.Id;
             }

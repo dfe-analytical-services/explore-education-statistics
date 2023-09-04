@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await PublishMethodologyFiles(methodology);
         }
 
-        public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseId)
+        public async Task PublishMethodologyVersionIfApplicableForRelease(Guid releaseId)
         {
             var methodologyVersions = await _methodologyService.GetLatestByRelease(releaseId);
 

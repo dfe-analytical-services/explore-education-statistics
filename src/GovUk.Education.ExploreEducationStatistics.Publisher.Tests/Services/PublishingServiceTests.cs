@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task PublishMethodologyFilesIfApplicableForRelease_ReleaseHasNoRelatedMethodologies()
+        public async Task PublishMethodologyVersionIfApplicableForRelease_ReleaseHasNoRelatedMethodologies()
         {
             var releaseId = Guid.NewGuid();
 
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 publicationRepository: publicationRepository.Object,
                 releaseService: releaseService.Object);
 
-            await service.PublishMethodologyFilesIfApplicableForRelease(releaseId);
+            await service.PublishMethodologyVersionIfApplicableForRelease(releaseId);
 
             MockUtils.VerifyAllMocks(methodologyService,
                 publicBlobStorageService,
@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task PublishMethodologyFilesIfApplicableForRelease_ReleaseHasDraftMethodology()
+        public async Task PublishMethodologyVersionIfApplicableForRelease_ReleaseHasDraftMethodology()
         {
             var release = new Release
             {
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 publicationRepository: publicationRepository.Object,
                 releaseService: releaseService.Object);
 
-            await service.PublishMethodologyFilesIfApplicableForRelease(release.Id);
+            await service.PublishMethodologyVersionIfApplicableForRelease(release.Id);
 
             MockUtils.VerifyAllMocks(methodologyService,
                 publicBlobStorageService,
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task PublishMethodologyFilesIfApplicableForRelease_ReleaseHasMethodologyScheduledWithThisRelease()
+        public async Task PublishMethodologyVersionIfApplicableForRelease_ReleaseHasMethodologyScheduledWithThisRelease()
         {
             var release = new Release
             {
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 releaseService: releaseService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object);
 
-            await service.PublishMethodologyFilesIfApplicableForRelease(release.Id);
+            await service.PublishMethodologyVersionIfApplicableForRelease(release.Id);
 
             MockUtils.VerifyAllMocks(methodologyService,
                 publicBlobStorageService,
@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task PublishMethodologyFilesIfApplicableForRelease_ReleaseHasMethodologyScheduledWithOtherRelease()
+        public async Task PublishMethodologyVersionIfApplicableForRelease_ReleaseHasMethodologyScheduledWithOtherRelease()
         {
             var release = new Release
             {
@@ -264,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 publicationRepository: publicationRepository.Object,
                 releaseService: releaseService.Object);
 
-            await service.PublishMethodologyFilesIfApplicableForRelease(release.Id);
+            await service.PublishMethodologyVersionIfApplicableForRelease(release.Id);
 
             MockUtils.VerifyAllMocks(methodologyService,
                 publicBlobStorageService,
@@ -275,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         [Fact]
         public async Task
-            PublishMethodologyFilesIfApplicableForRelease_FirstPublicReleaseHasMethodologyScheduledImmediately()
+            PublishMethodologyVersionIfApplicableForRelease_FirstPublicReleaseHasMethodologyScheduledImmediately()
         {
             var release = new Release
             {
@@ -339,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 releaseService: releaseService.Object,
                 methodologyVersionRepository: methodologyVersionRepository.Object);
 
-            await service.PublishMethodologyFilesIfApplicableForRelease(release.Id);
+            await service.PublishMethodologyVersionIfApplicableForRelease(release.Id);
 
             MockUtils.VerifyAllMocks(methodologyService,
                 publicBlobStorageService,
@@ -350,7 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
         [Fact]
         public async Task
-            PublishMethodologyFilesIfApplicableForRelease_NotFirstPublicReleaseHasMethodologyScheduledImmediately()
+            PublishMethodologyVersionIfApplicableForRelease_NotFirstPublicReleaseHasMethodologyScheduledImmediately()
         {
             var release = new Release
             {
@@ -390,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 publicationRepository: publicationRepository.Object,
                 releaseService: releaseService.Object);
 
-            await service.PublishMethodologyFilesIfApplicableForRelease(release.Id);
+            await service.PublishMethodologyVersionIfApplicableForRelease(release.Id);
 
             MockUtils.VerifyAllMocks(methodologyService,
                 publicBlobStorageService,

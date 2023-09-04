@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task PublishMethodologyFiles(Guid methodologyId);
 
-        Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseId);
+        Task PublishMethodologyVersionIfApplicableForRelease(Guid releaseId);
 
         Task PublishReleaseFiles(Guid releaseId);
     }

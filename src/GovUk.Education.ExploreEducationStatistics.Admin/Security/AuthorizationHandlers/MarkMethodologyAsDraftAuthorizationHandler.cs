@@ -38,8 +38,6 @@ public class MarkMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
         MarkMethodologyAsDraftRequirement requirement,
         MethodologyVersion methodologyVersion)
     {
-        // @MarkFix cover case where older version that was previously published - shouldn't be possible to change?
-
         if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
