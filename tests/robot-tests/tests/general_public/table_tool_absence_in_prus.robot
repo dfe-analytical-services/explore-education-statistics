@@ -82,7 +82,7 @@ Unselect England as a location
 
     # Workaround to avoid error summary stealing focus when closing dropdown
     user sets focus to element    id:locationFiltersForm-submit
-    user waits until h2 is visible    There is a problem
+    user waits until page contains    Select at least one location
 
     user closes details dropdown    National
 

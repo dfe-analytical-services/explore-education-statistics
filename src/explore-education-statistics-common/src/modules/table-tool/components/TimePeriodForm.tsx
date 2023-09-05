@@ -1,5 +1,8 @@
-import { Form, FormFieldSelect, FormFieldset } from '@common/components/form';
+import { FormFieldset } from '@common/components/form';
 import { SelectOption } from '@common/components/form/FormSelect';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
@@ -9,8 +12,8 @@ import {
   TimePeriodQuery,
 } from '@common/services/tableBuilderService';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import React, { useMemo } from 'react';
+import { ObjectSchema } from 'yup';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
@@ -21,8 +24,6 @@ interface FormValues {
 }
 
 export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
-
-const formId = 'timePeriodForm';
 
 interface Props extends InjectedWizardProps {
   initialValues?: Partial<TimePeriodQuery>;
@@ -38,18 +39,20 @@ const TimePeriodForm = ({
 }: Props) => {
   const { isActive, goToNextStep } = stepProps;
 
-  const timePeriodOptions: SelectOption[] = [
-    {
-      label: 'Please select',
-      value: '',
-    },
-    ...options.map(option => {
-      return {
-        label: option.label,
-        value: `${option.year}_${option.code}`,
-      };
-    }),
-  ];
+  const timePeriodOptions: SelectOption[] = useMemo(() => {
+    return [
+      {
+        label: 'Please select',
+        value: '',
+      },
+      ...options.map(option => {
+        return {
+          label: option.label,
+          value: `${option.year}_${option.code}`,
+        };
+      }),
+    ];
+  }, [options]);
 
   const getOptionLabel = (optionValue: string) => {
     const matchingOption = timePeriodOptions.find(
@@ -69,7 +72,7 @@ const TimePeriodForm = ({
     return `${getOptionLabel(startValue)} to ${getOptionLabel(endValue)}`;
   };
 
-  const formInitialValues = useMemo(() => {
+  const initialFormValues = useMemo(() => {
     const { startYear, startCode, endYear, endCode } = initialValues;
 
     const defaultTimePeriod =
@@ -92,119 +95,133 @@ const TimePeriodForm = ({
     </WizardStepHeading>
   );
 
+  const handleSubmit = async (values: FormValues) => {
+    await goToNextStep(async () => {
+      await onSubmit(values);
+    });
+  };
+
+  const validationSchema: ObjectSchema<FormValues> = useMemo(() => {
+    return Yup.object({
+      start: Yup.string()
+        .required('Start date required')
+        .test(
+          'lessThanOrEqual',
+          'Start date must be before or same as end date',
+          function lessThanOrEqual(value: string) {
+            if (!value) {
+              return true;
+            }
+
+            // eslint-disable-next-line react/no-this-in-sfc
+            const end: string = this.resolve(Yup.ref('end'));
+
+            if (!end) {
+              return true;
+            }
+
+            const startIndex = timePeriodOptions.findIndex(
+              option => option.value === value,
+            );
+            const endIndex = timePeriodOptions.findIndex(
+              option => option.value === end,
+            );
+
+            return startIndex <= endIndex;
+          },
+        ),
+      end: Yup.string()
+        .required('End date required')
+        .test(
+          'moreThanOrEqual',
+          'End date must be after or same as start date',
+          function moreThanOrEqual(value: string) {
+            if (!value) {
+              return true;
+            }
+
+            // eslint-disable-next-line react/no-this-in-sfc
+            const start: string = this.resolve(Yup.ref('start'));
+
+            if (!start) {
+              return true;
+            }
+
+            const endIndex = timePeriodOptions.findIndex(
+              option => option.value === value,
+            );
+            const startIndex = timePeriodOptions.findIndex(
+              option => option.value === start,
+            );
+
+            return endIndex >= startIndex;
+          },
+        ),
+    });
+  }, [timePeriodOptions]);
+
   return (
-    <Formik<FormValues>
+    <FormProvider
       enableReinitialize
-      initialValues={formInitialValues}
-      validateOnBlur={false}
-      validationSchema={Yup.object<FormValues>({
-        start: Yup.string()
-          .required('Start date required')
-          .test(
-            'lessThanOrEqual',
-            'Start date must be before or same as end date',
-            function lessThanOrEqual(value: string) {
-              if (!value) {
-                return true;
-              }
-
-              // eslint-disable-next-line react/no-this-in-sfc
-              const end: string = this.resolve(Yup.ref('end'));
-
-              if (!end) {
-                return true;
-              }
-
-              const startIndex = timePeriodOptions.findIndex(
-                option => option.value === value,
-              );
-              const endIndex = timePeriodOptions.findIndex(
-                option => option.value === end,
-              );
-
-              return startIndex <= endIndex;
-            },
-          ),
-        end: Yup.string()
-          .required('End date required')
-          .test(
-            'moreThanOrEqual',
-            'End date must be after or same as start date',
-            function moreThanOrEqual(value: string) {
-              if (!value) {
-                return true;
-              }
-
-              // eslint-disable-next-line react/no-this-in-sfc
-              const start: string = this.resolve(Yup.ref('start'));
-
-              if (!start) {
-                return true;
-              }
-
-              const endIndex = timePeriodOptions.findIndex(
-                option => option.value === value,
-              );
-              const startIndex = timePeriodOptions.findIndex(
-                option => option.value === start,
-              );
-
-              return endIndex >= startIndex;
-            },
-          ),
-      })}
-      onSubmit={async values => {
-        await goToNextStep(async () => {
-          await onSubmit(values);
-        });
-      }}
+      initialValues={initialFormValues}
+      validationSchema={validationSchema}
     >
-      {form => {
-        return isActive ? (
-          <Form id={formId} showSubmitError>
-            <FormFieldset
-              id="timePeriod"
-              hint={options.length === 1 && 'Only one time period available.'}
-              legend={stepHeading}
+      {({ formState, getValues, reset }) => {
+        if (isActive) {
+          return (
+            <RHFForm
+              id="timePeriodForm"
+              showSubmitError
+              onSubmit={handleSubmit}
             >
-              <FormFieldSelect
-                name="start"
-                label="Start date"
-                disabled={form.isSubmitting}
-                options={timePeriodOptions}
-                order={[]}
-              />
-              <FormFieldSelect
-                name="end"
-                label="End date"
-                disabled={form.isSubmitting}
-                options={timePeriodOptions}
-                order={[]}
-              />
-            </FormFieldset>
+              <FormFieldset
+                id="timePeriod"
+                hint={options.length === 1 && 'Only one time period available.'}
+                legend={stepHeading}
+              >
+                <RHFFormFieldSelect<FormValues>
+                  name="start"
+                  label="Start date"
+                  disabled={formState.isSubmitting}
+                  options={timePeriodOptions}
+                  order={RHFFormFieldSelect.unordered}
+                />
+                <RHFFormFieldSelect<FormValues>
+                  name="end"
+                  label="End date"
+                  disabled={formState.isSubmitting}
+                  options={timePeriodOptions}
+                  order={RHFFormFieldSelect.unordered}
+                />
+              </FormFieldset>
 
-            <WizardStepFormActions
-              {...stepProps}
-              isSubmitting={form.isSubmitting}
-            />
-          </Form>
-        ) : (
+              <WizardStepFormActions
+                {...stepProps}
+                isSubmitting={formState.isSubmitting}
+              />
+            </RHFForm>
+          );
+        }
+
+        const values = getValues();
+
+        return (
           <WizardStepSummary {...stepProps} goToButtonText="Edit time period">
             {stepHeading}
 
             <SummaryList noBorder>
               <SummaryListItem term="Time period">
-                {form.values.start &&
-                  form.values.end &&
-                  getDisplayTimePeriod(form.values.start, form.values.end)}
+                {values.start &&
+                  values.end &&
+                  getDisplayTimePeriod(values.start, values.end)}
               </SummaryListItem>
             </SummaryList>
 
-            <ResetFormOnPreviousStep {...stepProps} onReset={form.resetForm} />
+            <ResetFormOnPreviousStep {...stepProps} onReset={reset} />
           </WizardStepSummary>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

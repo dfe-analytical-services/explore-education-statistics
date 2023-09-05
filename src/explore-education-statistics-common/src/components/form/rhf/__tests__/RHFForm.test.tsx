@@ -139,7 +139,7 @@ describe('Form', () => {
   });
 
   test('calls `onSubmit` handler when form is submitted successfully', async () => {
-    const handleSubmitForm = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <FormProvider
@@ -150,7 +150,7 @@ describe('Form', () => {
           firstName: Yup.string().defined(),
         })}
       >
-        <RHFForm id="test-form" onSubmit={handleSubmitForm}>
+        <RHFForm id="test-form" onSubmit={handleSubmit}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -160,7 +160,7 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(handleSubmitForm).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
     });
   });
 

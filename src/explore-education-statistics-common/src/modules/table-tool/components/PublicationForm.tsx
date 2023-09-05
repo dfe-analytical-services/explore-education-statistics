@@ -1,11 +1,11 @@
 import {
-  Form,
-  FormFieldRadioGroup,
   FormFieldset,
   FormGroup,
-  FormRadioGroup,
   FormTextSearchInput,
 } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
 import InsetText from '@common/components/InsetText';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -20,11 +20,12 @@ import WizardStepFormActions from '@common/modules/table-tool/components/WizardS
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import styles from '@common/modules/table-tool/components/PublicationForm.module.scss';
 import orderBy from 'lodash/orderBy';
-import { Formik } from 'formik';
 import React, { ReactNode, useMemo, useState } from 'react';
+import { ObjectSchema } from 'yup';
 
-export interface PublicationFormValues {
+interface FormValues {
   publicationId: string;
+  themeId?: string;
 }
 
 export type PublicationFormSubmitHandler = (values: {
@@ -34,7 +35,7 @@ export type PublicationFormSubmitHandler = (values: {
 const formId = 'publicationForm';
 
 interface Props extends InjectedWizardProps {
-  initialValues?: PublicationFormValues;
+  initialValues?: FormValues;
   themes: Theme[];
   onSubmit: PublicationFormSubmitHandler;
   renderSummaryAfter?: ReactNode;
@@ -43,6 +44,7 @@ interface Props extends InjectedWizardProps {
 const PublicationForm = ({
   initialValues = {
     publicationId: '',
+    themeId: '',
   },
   themes,
   onSubmit,
@@ -93,35 +95,38 @@ const PublicationForm = ({
     </WizardStepHeading>
   );
 
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      publicationId: Yup.string().required('Choose publication'),
+      themeId: Yup.string(),
+    });
+  }, []);
+
+  const handleSubmit = async ({ publicationId }: FormValues) => {
+    const publication = publications.find(p => p.id === publicationId);
+
+    if (!publication) {
+      throw new Error('Selected publication not found');
+    }
+
+    await goToNextStep(async () => {
+      await onSubmit({ publication });
+    });
+  };
+
   if (!themes.length) {
     return <p>No publications found</p>;
   }
 
   return (
-    <Formik<PublicationFormValues>
-      enableReinitialize
+    <FormProvider
       initialValues={initialValues}
-      validateOnBlur={false}
-      validateOnChange={false}
-      validationSchema={Yup.object<PublicationFormValues>({
-        publicationId: Yup.string().required('Choose publication'),
-      })}
-      onSubmit={async ({ publicationId }) => {
-        const publication = publications.find(p => p.id === publicationId);
-
-        if (!publication) {
-          throw new Error('Selected publication not found');
-        }
-
-        await goToNextStep(async () => {
-          await onSubmit({ publication });
-        });
-      }}
+      validationSchema={validationSchema}
     >
-      {form => {
+      {({ formState, getValues, resetField }) => {
         if (isActive) {
           return (
-            <Form {...form} id={formId} showSubmitError>
+            <RHFForm id={formId} onSubmit={handleSubmit}>
               <FormFieldset id="publicationForm" legend={stepHeading}>
                 <p>Search or select a theme to find publications</p>
                 <FormGroup className="govuk-!-margin-bottom-3">
@@ -132,9 +137,8 @@ const PublicationForm = ({
                     onChange={event => {
                       setSearchTerm(event.target.value);
                       setSelectedThemeId('');
-                      if (!event.target.value) {
-                        form.setFieldValue('publicationId', '');
-                      }
+                      resetField('themeId');
+                      resetField('publicationId');
                     }}
                     onKeyPress={event => {
                       if (event.key === 'Enter') {
@@ -159,28 +163,24 @@ const PublicationForm = ({
                 <p>or</p>
 
                 <div className={styles.optionsContainer}>
-                  <FormRadioGroup
-                    id={`${formId}-themes`}
+                  <RHFFormFieldRadioGroup<FormValues>
                     legend="Select a theme"
                     legendSize="s"
                     name="themeId"
                     small
-                    options={themes.map(theme => {
-                      return {
-                        label: theme.title,
-                        value: theme.id,
-                      };
-                    })}
-                    value={selectedThemeId}
+                    options={themes.map(theme => ({
+                      label: theme.title,
+                      value: theme.id,
+                    }))}
                     onChange={e => {
                       setSelectedThemeId(e.target.value);
-                      form.setFieldValue('publicationId', '');
+                      resetField('publicationId');
                       setSearchTerm('');
                     }}
                   />
 
                   <div className={styles.publicationsList}>
-                    <FormFieldRadioGroup
+                    <RHFFormFieldRadioGroup<FormValues>
                       id="publications"
                       legend={
                         <>
@@ -202,16 +202,14 @@ const PublicationForm = ({
                       name="publicationId"
                       small
                       options={orderBy(publications, 'title').map(
-                        publication => {
-                          return {
-                            hint: searchTerm
-                              ? getThemeForPublication(publication.id)
-                              : '',
-                            hintSmall: true,
-                            label: publication.title,
-                            value: publication.id,
-                          };
-                        },
+                        publication => ({
+                          hint: searchTerm
+                            ? getThemeForPublication(publication.id)
+                            : '',
+                          hintSmall: true,
+                          label: publication.title,
+                          value: publication.id,
+                        }),
                       )}
                     />
 
@@ -227,15 +225,17 @@ const PublicationForm = ({
                     <div className="govuk-!-margin-top-6">
                       <WizardStepFormActions
                         {...stepProps}
-                        isSubmitting={form.isSubmitting}
+                        isSubmitting={formState.isSubmitting}
                       />
                     </div>
                   </div>
                 </div>
               </FormFieldset>
-            </Form>
+            </RHFForm>
           );
         }
+
+        const values = getValues();
 
         return (
           <>
@@ -247,7 +247,7 @@ const PublicationForm = ({
 
               <SummaryList noBorder>
                 <SummaryListItem term="Publication">
-                  {getSelectedPublication(form.values.publicationId)?.title}
+                  {getSelectedPublication(values.publicationId)?.title}
                 </SummaryListItem>
               </SummaryList>
             </WizardStepSummary>
@@ -256,7 +256,7 @@ const PublicationForm = ({
           </>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 
