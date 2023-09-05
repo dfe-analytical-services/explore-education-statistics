@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ClaimTests
         {
             [Fact]
-            public async Task UserWithCorrectClaimCanCreateAmendmentOfPubliclyAccessibleMethodology()
+            public async Task UserWithCorrectClaimCanCreateAmendmentOfLatestPublishedMethodologyVersion()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(MethodologyVersion))
+                            mock.IsLatestPublishedVersion(MethodologyVersion))
                         .ReturnsAsync(true);
 
                     // Only the MakeAmendmentsOfAllMethodologies claim alongside the publicly-accessible Methodology
@@ -86,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task UserWithCorrectClaimCannotCreateAmendmentOfPrivateMethodology()
+            public async Task UserWithCorrectClaimCannotCreateAmendmentIfNotLatestPublishedMethodologyVersion()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -98,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(MethodologyVersion))
+                            mock.IsLatestPublishedVersion(MethodologyVersion))
                         .ReturnsAsync(false);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             [Fact]
             public async Task
-                UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfPubliclyAccessibleMethodologyOwnedByPublication()
+                UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfLatestPublishedMethodologyVersionOwnedByPublication()
             {
                 await GetEnumValues<PublicationRole>()
                     .ToAsyncEnumerable()
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             ) = CreateHandlerAndDependencies();
 
                         methodologyVersionRepository.Setup(mock =>
-                                mock.IsPubliclyAccessible(MethodologyVersion))
+                                mock.IsLatestPublishedVersion(MethodologyVersion))
                             .ReturnsAsync(true);
 
                         methodologyRepository.Setup(s =>
@@ -158,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             [Fact]
             public async Task
-                UserWithoutLinkedPublicationOwnerRoleCannotCreateAmendmentOfPubliclyAccessibleMethodology()
+                UserWithoutLinkedPublicationOwnerRoleCannotCreateAmendmentOfLatestPublishedMethodologyVersion()
             {
                 var (
                     handler,
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(MethodologyVersion))
+                        mock.IsLatestPublishedVersion(MethodologyVersion))
                     .ReturnsAsync(true);
 
                 methodologyRepository.Setup(s =>
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task UserWithLinkedPublicationOwnerRoleCannotCreateAmendmentOfPrivateMethodology()
+            public async Task UserWithLinkedPublicationOwnerRoleCannotCreateAmendmentIfNotLatestPublishedMethodologyVersion()
             {
                 var (
                     handler,
@@ -200,7 +200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(MethodologyVersion))
+                        mock.IsLatestPublishedVersion(MethodologyVersion))
                     .ReturnsAsync(false);
 
                 var user = CreateClaimsPrincipal(UserId);

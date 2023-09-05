@@ -38,7 +38,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
     {
         // If the Methodology is already public, it cannot be approved
         // An approved Methodology that isn't public can be approved to change attributes associated with approval
-        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion))
+        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
         }

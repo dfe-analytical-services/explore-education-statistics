@@ -38,7 +38,7 @@ public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : Authorizat
         MarkMethodologyAsHigherLevelReviewRequirement requirement,
         MethodologyVersion methodologyVersion)
     {
-        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion))
+        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
         }

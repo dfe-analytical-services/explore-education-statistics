@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ClaimsTests
         {
             [Fact]
-            public async Task NoClaimsAllowMarkingPubliclyAccessibleMethodologyAsDraft()
+            public async Task NoClaimsAllowMarkingLatestPublishedMethodologyVersionAsDraft()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         _) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                            mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                         .ReturnsAsync(true);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task UserWithCorrectClaimCanMarkNonPubliclyAccessibleMethodologyAsDraft()
+            public async Task UserWithCorrectClaimCanMarkNonLatestPublishedMethodologyVersionAsDraft()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -91,7 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                            mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                         .ReturnsAsync(false);
 
                     // Only the MarkAllMethodologiesDraft claim should allow a non publicly accessible Methodology to
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                            mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(mock =>
@@ -204,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(ApprovedMethodologyVersion))
+                            mock.IsLatestPublishedVersion(ApprovedMethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(mock =>
@@ -268,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                            mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(s =>
@@ -329,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(ApprovedMethodologyVersion))
+                            mock.IsLatestPublishedVersion(ApprovedMethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository.Setup(mock =>
@@ -384,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                        mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(s =>
@@ -425,7 +425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(HigherReviewMethodologyVersion))
+                        mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(s =>

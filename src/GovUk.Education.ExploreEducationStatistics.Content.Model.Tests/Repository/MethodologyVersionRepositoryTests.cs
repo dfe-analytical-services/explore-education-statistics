@@ -343,6 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             var methodology = new Methodology
             {
+                LatestPublishedVersion = latestPublishedVersion,
                 Versions = ListOf(previousVersion, latestPublishedVersion, latestDraftVersion)
             };
 
@@ -542,6 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             var methodology1 = new Methodology
             {
+                LatestPublishedVersionId = Guid.Parse("926750dc-b079-4acb-a6a2-71b550920e81"),
                 Versions = ListOf(
                     new MethodologyVersion
                     {
@@ -572,6 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             var methodology2 = new Methodology
             {
+                LatestPublishedVersionId = Guid.Parse("2d6632b9-2480-4c34-b298-123064b6f04e"),
                 Versions = ListOf(
                     new MethodologyVersion
                     {
@@ -1689,6 +1692,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                var methodologyVersionId = Guid.NewGuid();
                 var publicationMethodology = new PublicationMethodology
                 {
                     Publication = new Publication
@@ -1699,8 +1703,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     Owner = true,
                     Methodology = new Methodology
                     {
+                        LatestPublishedVersionId = Guid.NewGuid(),
                         Versions = ListOf(new MethodologyVersion
                         {
+                            Id = methodologyVersionId,
                             Status = Approved,
                             PublishingStrategy = Immediately,
                         }),

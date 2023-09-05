@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ClaimsTests
         {
             [Fact]
-            public async Task NoClaimsAllowApprovingPubliclyAccessibleMethodology()
+            public async Task NoClaimsAllowApprovingLatestPublishedMethodologyVersion()
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         _) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(MethodologyVersion))
+                            mock.IsLatestPublishedVersion(MethodologyVersion))
                         .ReturnsAsync(true);
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task UserWithCorrectClaimCanApproveNonPubliclyAccessibleDraftMethodology()
+            public async Task UserWithCorrectClaimCanApproveNonLatestPublishedDraftMethodologyVersion()
             {
                 var methodologyVersion = new MethodologyVersion
                 {
@@ -90,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(methodologyVersion))
+                            mock.IsLatestPublishedVersion(methodologyVersion))
                         .ReturnsAsync(false);
 
                     // Only the ApproveAllMethodologies claim should allow approving a Methodology
@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task UserWithCorrectClaimCanApproveNonPubliclyAccessibleApprovedMethodology()
+            public async Task UserWithCorrectClaimCanApproveNonLatestPublishedApprovedMethodologyVersion()
             {
                 var methodologyVersion = new MethodologyVersion
                 {
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(methodologyVersion))
+                            mock.IsLatestPublishedVersion(methodologyVersion))
                         .ReturnsAsync(false);
 
                     // Only the ApproveAllMethodologies claim should allow approving a Methodology
@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(MethodologyVersion))
+                            mock.IsLatestPublishedVersion(MethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository
@@ -273,7 +273,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     methodologyVersionRepository.Setup(mock =>
-                            mock.IsPubliclyAccessible(MethodologyVersion))
+                            mock.IsLatestPublishedVersion(MethodologyVersion))
                         .ReturnsAsync(false);
 
                     methodologyRepository
@@ -329,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(MethodologyVersion))
+                        mock.IsLatestPublishedVersion(MethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository
@@ -379,7 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(MethodologyVersion))
+                        mock.IsLatestPublishedVersion(MethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository
