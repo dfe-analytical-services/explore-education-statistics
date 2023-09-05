@@ -385,6 +385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var methodology = new Methodology
             {
+                LatestPublishedVersionId = null,
                 Versions = ListOf(
                     new MethodologyVersion
                     {
@@ -431,6 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         {
             var methodology = new Methodology
             {
+                LatestPublishedVersionId = null,
                 Versions = new List<MethodologyVersion>()
             };
 
@@ -467,20 +469,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task GetLatestPublishedVersion_PublicationIsNotPublished()
+        public async Task GetLatestPublishedVersion_MethodologyHasNoLatestPublishedVersion()
         {
-            var nonLivePublication = new Publication
-            {
-                LatestPublishedRelease = null
-            };
-
             var methodology = new Methodology
             {
+                LatestPublishedVersionId = null,
                 Versions = ListOf(
                     new MethodologyVersion
                     {
                         PublishingStrategy = Immediately,
-                        Status = Approved
+                        Status = Approved,
                     }
                 )
             };
@@ -493,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.PublicationMethodologies.AddAsync(
                     new PublicationMethodology
                     {
-                        Publication = nonLivePublication,
+                        PublicationId = Guid.NewGuid(),
                         Methodology = methodology
                     });
                 await contentDbContext.SaveChangesAsync();
@@ -649,60 +647,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task GetLatestPublishedVersionByPublication_PublicationIsNotPublished()
-        {
-            var nonLivePublication = new Publication
-            {
-                LatestPublishedRelease = null
-            };
-
-            var methodology = new Methodology
-            {
-                Versions = ListOf(
-                    new MethodologyVersion
-                    {
-                        PublishingStrategy = Immediately,
-                        Status = Approved,
-                    }
-                )
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddAsync(nonLivePublication);
-                await contentDbContext.Methodologies.AddRangeAsync(methodology);
-                await contentDbContext.PublicationMethodologies.AddAsync(
-                    new PublicationMethodology
-                    {
-                        Publication = nonLivePublication,
-                        Methodology = methodology
-                    });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                contentDbContext.AttachRange(methodology);
-
-                var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                    methodologyRepository: methodologyRepository.Object);
-
-                methodologyRepository.Setup(mock => mock.GetByPublication(nonLivePublication.Id))
-                    .ReturnsAsync(ListOf(methodology));
-
-                var result = await service.GetLatestPublishedVersionByPublication(nonLivePublication.Id);
-
-                VerifyAllMocks(methodologyRepository);
-
-                Assert.Empty(result);
-            }
-        }
-
-        [Fact]
         public async Task GetLatestPublishedVersionByPublication_MethodologyHasNoPublishedVersions()
         {
             var publication = new Publication
@@ -723,6 +667,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             var methodology2 = new Methodology
             {
+                LatestPublishedVersionId = null,
                 Versions = ListOf(
                     new MethodologyVersion
                     {
@@ -784,6 +729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             var methodology = new Methodology
             {
+                LatestPublishedVersionId = null,
                 Versions = new List<MethodologyVersion>()
             };
 
@@ -1732,10 +1678,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     .Include(m => m.Methodology)
                     .SingleAsync(m => m.PublicationId == publicationId);
 
-                // The Methodology that was attached to the updated Publication was publicly available, as it was linked
-                // to a Publication that was "Live" and was set to be published "Immediately", and so its Slug does
-                // not update.
                 Assert.Equal("New Title", publicationMethodology.Methodology.OwningPublicationTitle);
+                // The Methodology has LatestPublishedVersionId set - i.e. is live - and so its Slug does not update.
                 Assert.Equal("original-slug", publicationMethodology.Methodology.Slug);
             }
         }
