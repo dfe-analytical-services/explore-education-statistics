@@ -17,16 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class DeleteSpecificMethodologyAuthorizationHandler
         : AuthorizationHandler<DeleteSpecificMethodologyRequirement, MethodologyVersion>
     {
-        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyRepository _methodologyRepository;
         private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
         public DeleteSpecificMethodologyAuthorizationHandler(
-            IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyRepository methodologyRepository,
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
-            _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyRepository = methodologyRepository;
             _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
@@ -36,12 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             DeleteSpecificMethodologyRequirement requirement,
             MethodologyVersion methodologyVersion)
         {
-            // If the Methodology is already public, it cannot be deleted.
-            if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
-            {
-                return;
-            }
-
             if (methodologyVersion.Status == Approved)
             {
                 return;
