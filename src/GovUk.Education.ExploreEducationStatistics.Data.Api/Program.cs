@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.ApplicationInsights;
@@ -20,6 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.ConfigureKestrel(serverOptions => { serverOptions.AddServerHeader = false; });
+                })
+                .ConfigureAppConfiguration((_, builder) =>
+                {
+                    builder.AddJsonFile(
+                        "appsettings.Local.json",
+                        optional: true,
+                        reloadOnChange: true);
                 })
                 .ConfigureLogging(builder =>
                 {

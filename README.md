@@ -8,18 +8,18 @@ The project is primarily composed of two areas:
 
 ### Public frontend (for general public users)
 
-- **UI**
+- **UI** - `src/explore-education-statistics-frontend`
   - NextJS React app
   - Depends on:
     - Content API
     - Data API
     - Notifier
 
-- **Content API**
+- **Content API** - `src/GovUk.Education.ExploreEducationStatistics.Content.Api`
   - Depends on:
     - Publisher - to generate its cache
 
-- **Data API**
+- **Data API** - `src/GovUk.Education.ExploreEducationStatistics.Data.Api`
   - Depends on:
     - SQLServer `statistics` database (known as `public-statistics` in non-local environments)
 
@@ -28,12 +28,12 @@ The project is primarily composed of two areas:
 
 ### Admin (for admins and analysts)
 
-- **UI**
+- **UI** - `src/explore-education-statistics-admin`
   - CRA React app
   - Depends on:
     - Admin API
 
-- **Admin API**
+- **Admin API** - `src/GovUk.Education.ExploreEducationStatistics.Admin`
   - Depends on:
     - SQLServer `content` database
     - SQLServer `statistics` database
@@ -41,89 +41,100 @@ The project is primarily composed of two areas:
     - Notifier
     - Data Processor
 
-- **Publisher**
+- **Publisher** - `src/GovUk.Education.ExploreEducationStatistics.Publisher`
   - Azure function for publishing admin content to the public frontend
 
-- **Notifier**
+- **Notifier** - `src/GovUk.Education.ExploreEducationStatistics.Notifier`
   - Azure function for sending notifications
 
-- **Data Processor**
-  - Azure function for handling dataset imports into the admin. Also referred to as the "importer".
+- **Data Processor** - `src/GovUk.Education.ExploreEducationStatistics.Data.Processor`
+  - Azure function for handling dataset imports into the admin. Also referred to as the 'importer' or just 'processor'.
 
 ## Getting started
 
 ### Requirements
 
-You will need the following groups of dependencies to run the project successfully:
+You will need the following groups of dependencies to run the project successfully.
 
-1. To run applications in this service you will require the following:
+To run applications in this service you will require the following:
 
    - [NodeJS v18+](https://nodejs.org/)
    - [.NET Core v6.0](https://dotnet.microsoft.com/download/dotnet-core/6.0)
    - [Azure Functions Core Tools v4+](https://github.com/Azure/azure-functions-core-tools)
    
-2. To run the databases:
+To run the databases:
    - [Docker and Docker Compose](https://docs.docker.com/) - see [Setting up the database](#setting-up-the-database-and-storage-emulator)
 
-3. To emulate Azure storage services (blobs, tables and queues) you will require one of the following 
-   options.
-   - [Azurite for Docker and Docker Compose](https://docs.docker.com/) - recommended approach. See [Setting up the storage emulator](#setting-up-the-database-and-storage-emulator)
+To emulate Azure storage services (blobs, tables and queues) you will require one of the following options.
+   - [Azurite for Docker and Docker Compose](https://docs.docker.com/) - recommended, see [Setting up the storage emulator](#setting-up-the-database-and-storage-emulator)
+   - Alternatively, if opting to not use Storage Explorer at all, you could create your own Storage
+     Account on Azure and amend your storage connection strings to point to this.
+     - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/)
+     - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
 
-     - Alternatively, if opting to not use Storage Explorer at all, you could create your own Storage
-       Account on Azure and amend your storage connection strings to point to this.
-       - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/)
-       - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
+### Setup libmagic (Linux and Mac only)
 
+#### Linux only 
 
-4. Setup libmagic (Linux and Mac only)
+Add symlinks to `libmagic-1`:
 
-**Linux only** 
+```sh
+cd /usr/lib/x86_64-linux-gnu/
+sudo ln -s libmagic.so.1.0.0 libmagic-1.so
+sudo ln -s libmagic.so.1.0.0 libmagic-1.so.1
+```
 
-  Add symlinks to libmagic-1:
+See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
 
-   ```sh
-   cd /usr/lib/x86_64-linux-gnu/
-   sudo ln -s libmagic.so.1.0.0 libmagic-1.so
-   sudo ln -s libmagic.so.1.0.0 libmagic-1.so.1
-   ```
+#### Mac only
 
-   See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
-   
-   Use correct version of `magic.mgc` file (Ubuntu 22.04 or later only):
+Install and link `libmagic`:
 
-   If you're using Ubuntu 22.04 or later you'll need to place an updated [magic.mgc](https://github.com/hey-red/Mime/blob/master/src/Mime/content/magic.mgc) file in `src/GovUk.Education.ExploreEducationStatistics.Common/libs` due to an issue with mismatched versions of `libmagic` and `magic.mgc`. You will then need to rebuild the project to ensure the new file is copied to the output directory.
+```sh
+brew install libmagic
+brew link libmagic
+env ARCHFLAGS="-arch x86_64" sudo gem install ruby-filemagic -- --with-magic-include=/usr/local/include --with-magic-lib=/usr/local/lib/
+```
 
-**Mac only**
+Download and link the `dylib` magic file.
 
-   Install and link libmagic:
+Depending on the arch of your machine, you will need to download a different dylib file dependent 
+on the architecture of your machine. You can find the correct file [in the runtimes section](https://github.com/hey-red/Mime/tree/master/src/Mime/runtimes) 
+of the library.
 
-    ```sh
-    brew install libmagic
-    brew link libmagic
-    env ARCHFLAGS="-arch x86_64" sudo gem install ruby-filemagic -- --with-magic-include=/usr/local/include --with-magic-lib=/usr/local/lib/
-    ```
+Download this file and place it somewhere where you won't accidentally delete it. Then link it to 
+the correct location:
 
+```sh
+sudo ln -s /Users/${whoami}/path/to/folder/libmagic-1.dylib /usr/local/liblibmagic-1
+sudo ln -s /Users/${whoami}/path/to/folder/libmagic-1.dylib /usr/local/lib/liblibmagic-1
+```
 
-  Download and link the `dylib` magic file.
+### Fix `magic.mgc` file version mismatches (Linux and maybe Mac only)
 
-    Depending on the arch of your machine, you will need to download a different dylib file dependent on the arch of your machine. You can find the correct file [in the runtimes section](https://github.com/hey-red/Mime/tree/master/src/Mime/runtimes) of the library
+If you're using Ubuntu 22.04, or later you'll most likely be using a `libmagic-1` binary that isn't
+synchronized correctly with the `magic.mgc` file distributed with the builds. A similar thing may 
+potentially happen on Mac (but this needs to be confirmed).
 
-    Download this file and place it somewhere where you won't accidentally delete it. Then link it to the correct location:
+This could result in the following projects failing to work correctly:
 
-    ```sh
-    sudo ln -s /Users/${whoami}/path/to/folder/libmagic-1.dylib /usr/local/liblibmagic-1
-    sudo ln -s /Users/${whoami}/path/to/folder/libmagic-1.dylib /usr/local/lib/liblibmagic-1
-    ```
+- Admin (unlikely to have an issue, but still mentioned in case)
+- Data Processor (will error during file validation)
 
-  Upgrade version of `Mime` in `src/GovUk.Education.ExploreEducationStatistics.Common`
+To fix this, you need to create an `appsettings.Local.json` file in the relevant project e.g.
 
-  You'll need to upgrade the version of Mime to `3.4.0` in order for it to work with the new version of `libmagic`. You can do this by editing the `Mime` dependency in the `src/GovUk.Education.ExploreEducationStatistics.Common/` cs proj file:
+```
+touch src/GovUk.Education.ExploreEducationStatistics.Data.Processor/appsettings.Local.json
+```
 
-  ```sh
-    <PackageReference Include="Mime" Version="3.4.0" />
-  ```
+Then ensure it has the following:
 
-  you'll then need to rebuild the project to ensure changes take effect.
+```json
+{
+  "MagicFilePath": "/usr/lib/file/magic.mgc"
+}
+```
+The above should work for Ubuntu, but you can change this path to whatever you want on your filesystem.
 
 ### Install PNPM via corepack
 

@@ -77,6 +77,7 @@ remote-profile
 
 .DS_Store
 
+src/GovUk.Education.ExploreEducationStatistics.*/appsettings.Local.json
 src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json
 
 ## IdentityServer Developer Signing key
