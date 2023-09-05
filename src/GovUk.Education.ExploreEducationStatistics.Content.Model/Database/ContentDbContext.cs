@@ -134,6 +134,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
+            modelBuilder.Entity<Methodology>()
+                .HasOne(m => m.LatestPublishedVersion)
+                .WithOne()
+                .HasForeignKey<Methodology>(m => m.LatestPublishedVersionId)
+                .IsRequired(false);
+
             modelBuilder.Entity<MethodologyVersionContent>().ToTable("MethodologyVersions");
             modelBuilder.Entity<MethodologyVersionContent>().Property<Guid>("MethodologyVersionId");
             modelBuilder.Entity<MethodologyVersionContent>().HasKey("MethodologyVersionId");
