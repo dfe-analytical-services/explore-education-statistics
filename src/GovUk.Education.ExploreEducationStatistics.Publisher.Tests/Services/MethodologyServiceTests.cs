@@ -226,12 +226,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             MockUtils.VerifyAllMocks(methodologyVersionRepository);
         }
 
-        private static MethodologyService SetupMethodologyService(ContentDbContext contentDbContext,
-            IMethodologyVersionRepository? methodologyVersionRepository = null)
+        private static MethodologyService SetupMethodologyService(
+            ContentDbContext contentDbContext,
+            IMethodologyVersionRepository? methodologyVersionRepository = null,
+            IPublicationRepository? publicationRepository = null)
         {
             return new(
                 contentDbContext,
-                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict));
+                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict),
+                publicationRepository ?? Mock.Of<IPublicationRepository>(MockBehavior.Strict));
         }
     }
 }

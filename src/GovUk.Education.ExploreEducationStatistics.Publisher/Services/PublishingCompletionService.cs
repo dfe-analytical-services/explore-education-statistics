@@ -96,6 +96,30 @@ public class PublishingCompletionService : IPublishingCompletionService
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(_publicationRepository.UpdateLatestPublishedRelease);
 
+        // Update Methodology.LatestPublishedVersionId if required
+        await releaseIdsToUpdate
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async releaseId =>
+            {
+                var methodologyVersions = await _methodologyService.GetLatestByRelease(releaseId);
+
+                if (!methodologyVersions.Any())
+                {
+                    return;
+                }
+
+                var release = await _releaseService.Get(releaseId);
+                foreach (var methodologyVersion in methodologyVersions)
+                {
+                    if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
+                    {
+                        await _methodologyService.SetAsLatestPublishedVersion(methodologyVersion);
+                        // @MarkFix can also update published dates here?
+                    }
+                }
+            });
+
+
         // Set the published date on any methodologies used by these publications that are now publicly accessible
         // as a result of releases being published
         await directlyRelatedPublicationIds
