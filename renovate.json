@@ -57,6 +57,11 @@
       "enabled": false
     },
     {
+      "matchDatasources": ["dotnet-version"],
+      "groupName": ".NET version",
+      "enabled": false
+    },
+    {
       "packageNames": ["node"],
       "enabled": false
     },
