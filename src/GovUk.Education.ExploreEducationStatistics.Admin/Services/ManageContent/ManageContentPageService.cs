@@ -62,12 +62,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     var (release, unattachedDataBlocks, files) = releaseBlocksAndFiles;
 
-                    var methodologies = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
+                    var methodologyVersions = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
+
+                    var approvedMethodologyVersions = await methodologyVersions
+                        .ToAsyncEnumerable()
+                        .Where(mv => mv.Approved)
+                        .ToListAsync();
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
-                        _mapper.Map<List<IdTitleViewModel>>(methodologies);
+                        _mapper.Map<List<IdTitleViewModel>>(approvedMethodologyVersions);
 
                     // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
                     // own Boundary Level selection
