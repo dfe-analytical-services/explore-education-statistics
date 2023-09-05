@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _context.MethodologyVersions.FindAsync(methodologyVersionId);
         }
 
-        public async Task<List<MethodologyVersion>> GetLatestByRelease(Guid releaseId)
+        public async Task<List<MethodologyVersion>> GetLatestByRelease(Guid releaseId) // @MarkFix could accept a Release here
         {
             var release = await _context.Releases.FindAsync(releaseId);
             return await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
@@ -62,13 +62,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task SetAsLatestPublishedVersion(MethodologyVersion methodologyVersion)
+        public async Task Publish(MethodologyVersion methodologyVersion)
         {
+            // NOTE: Methodology files are published separately
+
             await _context.Entry(methodologyVersion)
                 .Reference(mv => mv.Methodology)
                 .LoadAsync();
 
             methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
+            methodologyVersion.Published = DateTime.UtcNow;
+
             await _context.SaveChangesAsync();
         }
 

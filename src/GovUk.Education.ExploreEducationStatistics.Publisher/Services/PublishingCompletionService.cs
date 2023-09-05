@@ -112,19 +112,10 @@ public class PublishingCompletionService : IPublishingCompletionService
                 {
                     if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
                     {
-                        await _methodologyService.SetAsLatestPublishedVersion(methodologyVersion);
-                        // @MarkFix can also update published date here?
+                        await _methodologyService.Publish(methodologyVersion);
                     }
                 }
-
             });
-
-        // Set the published date on any methodologies used by these publications that are now publicly accessible
-        // as a result of releases being published
-        await directlyRelatedPublicationIds
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(publicationId =>
-                _methodologyService.SetPublishedDatesIfApplicable(publicationId));
 
         // Update the cached publication and any cached superseded publications.
         // If this is the first live release of the publication, the superseding is now enforced
