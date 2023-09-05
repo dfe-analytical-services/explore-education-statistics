@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -74,29 +73,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         [Fact]
         public async Task PublishMethodologyFilesIfApplicableForRelease_ReleaseHasNoRelatedMethodologies()
         {
-            var releaseId = Guid.NewGuid();
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+            };
 
             var methodologyService = new Mock<IMethodologyService>(MockBehavior.Strict);
-            var publicBlobStorageService = new Mock<IPublicBlobStorageService>(MockBehavior.Strict);
-            var privateBlobStorageService = new Mock<IPrivateBlobStorageService>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            methodologyService.Setup(mock => mock.GetLatestByRelease(releaseId))
+            methodologyService.Setup(mock => mock.GetLatestVersionByRelease(release))
                 .ReturnsAsync(new List<MethodologyVersion>());
+
+            releaseService.Setup(mock => mock.Get(release.Id))
+                .ReturnsAsync(release);
 
             // No other invocations on the services expected because the release has no related methodologies
 
             var service = BuildPublishingService(methodologyService: methodologyService.Object,
-                publicBlobStorageService: publicBlobStorageService.Object,
-                privateBlobStorageService: privateBlobStorageService.Object,
                 releaseService: releaseService.Object);
 
-            await service.PublishMethodologyFilesIfApplicableForRelease(releaseId);
+            await service.PublishMethodologyFilesIfApplicableForRelease(release.Id);
 
-            MockUtils.VerifyAllMocks(methodologyService,
-                publicBlobStorageService,
-                privateBlobStorageService,
-                releaseService);
+            MockUtils.VerifyAllMocks(methodologyService, releaseService);
         }
 
         [Fact]
@@ -123,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             methodologyService.Setup(mock => mock.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
                 .ReturnsAsync(false);
 
-            methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
+            methodologyService.Setup(mock => mock.GetLatestVersionByRelease(release))
                 .ReturnsAsync(ListOf(methodologyVersion));
 
             releaseService.Setup(mock => mock.Get(release.Id))
@@ -169,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             methodologyService.Setup(mock => mock.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
                 .ReturnsAsync(true);
 
-            methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
+            methodologyService.Setup(mock => mock.GetLatestVersionByRelease(release))
                 .ReturnsAsync(AsList(methodologyVersion));
 
             methodologyService.Setup(mock => mock.GetFiles(methodologyVersion.Id, Image))
@@ -234,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             methodologyService.Setup(mock => mock.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
                 .ReturnsAsync(false);
 
-            methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
+            methodologyService.Setup(mock => mock.GetLatestVersionByRelease(release))
                 .ReturnsAsync(ListOf(methodologyVersion));
 
             releaseService.Setup(mock => mock.Get(release.Id))
@@ -280,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             methodologyService.Setup(mock => mock.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
                 .ReturnsAsync(true);
 
-            methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
+            methodologyService.Setup(mock => mock.GetLatestVersionByRelease(release))
                 .ReturnsAsync(ListOf(methodologyVersion));
 
             methodologyService.Setup(mock => mock.GetFiles(methodologyVersion.Id, Image))
@@ -346,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             methodologyService.Setup(mock => mock.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
                 .ReturnsAsync(false);
 
-            methodologyService.Setup(mock => mock.GetLatestByRelease(release.Id))
+            methodologyService.Setup(mock => mock.GetLatestVersionByRelease(release))
                 .ReturnsAsync(ListOf(methodologyVersion));
 
             releaseService.Setup(mock => mock.Get(release.Id))

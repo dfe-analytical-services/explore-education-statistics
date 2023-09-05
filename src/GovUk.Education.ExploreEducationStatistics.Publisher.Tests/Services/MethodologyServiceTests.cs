@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository.Object);
 
-                var result = await service.GetLatestByRelease(release.Id);
+                var result = await service.GetLatestVersionByRelease(release);
 
                 Assert.Equal(methodologies, result);
             }

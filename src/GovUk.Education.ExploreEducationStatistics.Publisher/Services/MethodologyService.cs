@@ -33,9 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return await _context.MethodologyVersions.FindAsync(methodologyVersionId);
         }
 
-        public async Task<List<MethodologyVersion>> GetLatestByRelease(Guid releaseId) // @MarkFix could accept a Release here
+        public async Task<List<MethodologyVersion>> GetLatestVersionByRelease(Release release)
         {
-            var release = await _context.Releases.FindAsync(releaseId);
             return await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
         }
 

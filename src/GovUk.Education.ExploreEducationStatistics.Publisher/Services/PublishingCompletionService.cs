@@ -100,14 +100,15 @@ public class PublishingCompletionService : IPublishingCompletionService
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async releaseId =>
             {
-                var methodologyVersions = await _methodologyService.GetLatestByRelease(releaseId);
+                var release = await _releaseService.Get(releaseId);
+                var methodologyVersions =
+                    await _methodologyService.GetLatestVersionByRelease(release);
 
                 if (!methodologyVersions.Any())
                 {
                     return;
                 }
 
-                var release = await _releaseService.Get(releaseId);
                 foreach (var methodologyVersion in methodologyVersions)
                 {
                     if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))

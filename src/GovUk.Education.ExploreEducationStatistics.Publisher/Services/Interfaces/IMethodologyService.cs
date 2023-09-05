@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
     {
         Task<MethodologyVersion> Get(Guid methodologyVersionId);
 
-        Task<List<MethodologyVersion>> GetLatestByRelease(Guid releaseId);
+        Task<List<MethodologyVersion>> GetLatestVersionByRelease(Release release);
 
         Task<List<File>> GetFiles(Guid methodologyVersionId, params FileType[] types);
 

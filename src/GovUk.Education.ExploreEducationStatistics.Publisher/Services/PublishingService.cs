@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -60,14 +59,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseId)
         {
-            var methodologyVersions = await _methodologyService.GetLatestByRelease(releaseId);
+            var release = await _releaseService.Get(releaseId);
+            var methodologyVersions = await _methodologyService.GetLatestVersionByRelease(release);
 
             if (!methodologyVersions.Any())
             {
                 return;
             }
 
-            var release = await _releaseService.Get(releaseId);
             foreach (var methodologyVersion in methodologyVersions)
             {
                 if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
