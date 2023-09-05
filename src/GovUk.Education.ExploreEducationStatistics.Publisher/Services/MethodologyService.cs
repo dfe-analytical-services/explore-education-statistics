@@ -16,12 +16,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _context;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
+        private readonly IPublicationRepository _publicationRepository;
 
-        public MethodologyService(ContentDbContext context,
-            IMethodologyVersionRepository methodologyVersionRepository)
+        public MethodologyService(
+            ContentDbContext context,
+            IMethodologyVersionRepository methodologyVersionRepository,
+            IPublicationRepository publicationRepository)
         {
             _context = context;
             _methodologyVersionRepository = methodologyVersionRepository;
+            _publicationRepository = publicationRepository;
         }
 
         public async Task<MethodologyVersion> Get(Guid methodologyVersionId)
@@ -51,11 +55,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
 
             _context.MethodologyVersions.UpdateRange(methodologyVersions);
-            methodologyVersions.ForEach(methodology =>
+            methodologyVersions.ForEach(methodologyVersion =>
             {
-                methodology.Published ??= DateTime.UtcNow;
+                methodologyVersion.Published ??= DateTime.UtcNow;
             });
             await _context.SaveChangesAsync();
+        }
+
+        public async Task SetAsLatestPublishedVersion(MethodologyVersion methodologyVersion)
+        {
+            await _context.Entry(methodologyVersion)
+                .Reference(mv => mv.Methodology)
+                .LoadAsync();
+
+            methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<bool> IsBeingPublishedAlongsideRelease(MethodologyVersion methodologyVersion, Release release)
+        {
+            if (!methodologyVersion.Approved)
+            {
+                return false;
+            }
+
+            var firstRelease = !await _publicationRepository.IsPublished(release.PublicationId);
+
+            var firstReleaseAndMethodologyScheduledImmediately =
+                firstRelease &&
+                methodologyVersion.ScheduledForPublishingImmediately;
+
+            var methodologyScheduledWithThisRelease =
+                methodologyVersion.ScheduledForPublishingWithRelease
+                && methodologyVersion.ScheduledWithReleaseId == release.Id;
+
+            return firstReleaseAndMethodologyScheduledImmediately ||
+                   methodologyScheduledWithThisRelease;
         }
     }
 }

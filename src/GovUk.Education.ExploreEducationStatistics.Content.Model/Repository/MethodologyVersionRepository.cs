@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .AsQueryable()
                 .SingleAsync(p => p.Id == publicationId);
 
-            var methodology = (await _contentDbContext.MethodologyVersions.AddAsync(new MethodologyVersion
+            var methodologyVersion = (await _contentDbContext.MethodologyVersions.AddAsync(new MethodologyVersion
             {
                 PublishingStrategy = Immediately,
                 Methodology = new Methodology
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             })).Entity;
 
             await _contentDbContext.SaveChangesAsync();
-            return methodology;
+            return methodologyVersion;
         }
 
         public async Task<MethodologyVersion> GetLatestVersion(Guid methodologyId)
@@ -102,13 +102,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .ToList();
         }
 
-        private async Task<MethodologyVersion?> GetLatestPublishedByMethodology(Methodology methodology)
+        private async Task<MethodologyVersion?> GetLatestPublishedByMethodology(Methodology methodology) // @MarkFix rename version
         {
             await _contentDbContext.Entry(methodology)
                 .Collection(m => m.Versions)
                 .LoadAsync();
 
-            return await methodology.Versions.FirstOrDefaultAsync(IsPubliclyAccessible);
+            return await methodology.Versions.FirstOrDefaultAsync(IsPubliclyAccessible); // @MarkFix Single?
         }
 
         // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
@@ -163,6 +163,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             }
 
             return false;
+        }
+
+        public async Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion) // @MarkFix correct place?
+        {
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(mv => mv.Methodology)
+                .LoadAsync();
+
+            return methodologyVersion.Id == methodologyVersion.Methodology.LatestPublishedVersionId;
         }
 
         public async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion)

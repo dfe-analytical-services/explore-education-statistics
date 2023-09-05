@@ -72,7 +72,6 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(methodologyVersionRepository);
 
-                // No claims should allow a publicly accessible Methodology to be marked as draft
                 Assert.False(authContext.HasSucceeded);
             });
         }
@@ -95,8 +94,6 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         mock.IsPubliclyAccessible(DraftMethodologyVersion))
                     .ReturnsAsync(false);
 
-                // Only the SubmitAllMethodologiesToHigherReview claim should allow a non publicly accessible
-                // Methodology to be marked as draft
                 var expectedToPassByClaimAlone = claim == SubmitAllMethodologiesToHigherReview;
 
                 if (!expectedToPassByClaimAlone)
@@ -409,7 +406,6 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
             await handler.HandleAsync(authContext);
             VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userReleaseRoleRepository);
 
-            // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
             Assert.False(authContext.HasSucceeded);
         }
 
@@ -453,7 +449,6 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                 userPublicationRoleRepository,
                 publicationRepository);
 
-            // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
             Assert.False(authContext.HasSucceeded);
         }
     }
