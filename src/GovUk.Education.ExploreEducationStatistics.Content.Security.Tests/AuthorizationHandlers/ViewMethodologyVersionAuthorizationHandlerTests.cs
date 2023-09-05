@@ -27,7 +27,7 @@ public class ViewMethodologyVersionAuthorizationHandlerTests
             methodologyVersionRepository
             ) = CreateHandlerAndDependencies();
 
-        methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(_methodologyVersion.Id))
+        methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(_methodologyVersion))
             .ReturnsAsync(true);
 
         var authContext =
@@ -48,7 +48,7 @@ public class ViewMethodologyVersionAuthorizationHandlerTests
             methodologyVersionRepository
             ) = CreateHandlerAndDependencies();
 
-        methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(_methodologyVersion.Id))
+        methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(_methodologyVersion))
             .ReturnsAsync(false);
 
         var authContext =

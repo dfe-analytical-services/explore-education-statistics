@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         methodologyVersion.Updated = DateTime.UtcNow;
 
-                        var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id);
+                        var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion);
 
                         if (isPubliclyAccessible)
                         {

@@ -60,7 +60,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     _) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock => 
-                        mock.IsPubliclyAccessible(DraftMethodologyVersion.Id))
+                        mock.IsPubliclyAccessible(DraftMethodologyVersion))
                     .ReturnsAsync(true);
 
                 var user = CreateClaimsPrincipal(UserId, claim);
@@ -92,7 +92,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock => 
-                        mock.IsPubliclyAccessible(DraftMethodologyVersion.Id))
+                        mock.IsPubliclyAccessible(DraftMethodologyVersion))
                     .ReturnsAsync(false);
 
                 // Only the SubmitAllMethodologiesToHigherReview claim should allow a non publicly accessible
@@ -149,7 +149,8 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     publicationRepository
                     ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(DraftMethodologyVersion.Id))
+                methodologyVersionRepository.Setup(mock =>
+                        mock.IsPubliclyAccessible(DraftMethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(mock =>
@@ -206,7 +207,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(ApprovedMethodologyVersion.Id))
+                        mock.IsPubliclyAccessible(ApprovedMethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(mock =>
@@ -269,7 +270,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     publicationRepository
                     ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(DraftMethodologyVersion.Id))
+                methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(DraftMethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(s =>
@@ -330,7 +331,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
-                        mock.IsPubliclyAccessible(ApprovedMethodologyVersion.Id))
+                        mock.IsPubliclyAccessible(ApprovedMethodologyVersion))
                     .ReturnsAsync(false);
 
                 methodologyRepository.Setup(mock =>
@@ -384,7 +385,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                 publicationRepository
                 ) = CreateHandlerAndDependencies();
 
-            methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(DraftMethodologyVersion.Id))
+            methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(DraftMethodologyVersion))
                 .ReturnsAsync(false);
 
             methodologyRepository.Setup(s =>
@@ -424,7 +425,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                 publicationRepository
                 ) = CreateHandlerAndDependencies();
 
-            methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(DraftMethodologyVersion.Id))
+            methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(DraftMethodologyVersion))
                 .ReturnsAsync(false);
 
             methodologyRepository.Setup(s =>
