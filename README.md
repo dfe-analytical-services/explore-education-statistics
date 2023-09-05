@@ -539,19 +539,19 @@ buildable state (rather than be completely broken).
 
 ### Migrations
 
-The backend c# projects use code first migrations to generate the application's database schema.
-The entity framework tool will need to be installed as follows:
+The backend c# projects use code first migrations to generate the application's database schema. 
+The migration tool is installed by running:
 
-```
-dotnet tool install -g dotnet-ef --version 6.0.2
+```sh
+dotnet tool restore
 ```
 
 #### Content DB migrations
 
 To generate a migration for the content db:
 
-```
-cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
+```sh
+cd src/GovUk.Education.ExploreEducationStatistics.Admin
 dotnet ef migrations add EES1234_MigrationNameHere --context ContentDbContext --output-dir Migrations/ContentMigrations -v
 ```
 
@@ -559,8 +559,8 @@ dotnet ef migrations add EES1234_MigrationNameHere --context ContentDbContext --
 
 To generate a migration for the statistics db:
 
-```
-cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Data.Api
+```sh
+cd src/GovUk.Education.ExploreEducationStatistics.Data.Api
 dotnet ef migrations add EES1234_MigrationNameHere --context StatisticsDbContext --project ../GovUk.Education.ExploreEducationStatistics.Data.Model -v
 ```
 
@@ -568,8 +568,8 @@ dotnet ef migrations add EES1234_MigrationNameHere --context StatisticsDbContext
 
 To generate a migration for the UsersAndRolesDbContext:
 
-```
-cd explore-education-statistics\src\GovUk.Education.ExploreEducationStatistics.Admin
+```sh
+cd src/GovUk.Education.ExploreEducationStatistics.Admin
 dotnet ef migrations add EES1234_MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
 ```
 
