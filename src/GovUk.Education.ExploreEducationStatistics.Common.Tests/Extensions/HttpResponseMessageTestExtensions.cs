@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Net.Http;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Xunit;
@@ -31,6 +32,13 @@ public static class HttpResponseMessageTestExtensions
     public static T AssertOk<T>(this HttpResponseMessage message, T expectedBody)
     {
         Assert.Equal(OK, message.StatusCode);
+        return message.AssertBodyEqualTo(expectedBody);
+    }
+
+    public static T AssertCreated<T>(this HttpResponseMessage message, T expectedBody, string expectedLocation)
+    {
+        Assert.Equal(Created, message.StatusCode);
+        Assert.Equal(new Uri(expectedLocation), message.Headers.Location);
         return message.AssertBodyEqualTo(expectedBody);
     }
 
