@@ -32,4 +32,18 @@
       <CopyToPublishDirectory>Never</CopyToPublishDirectory>
     </None>
   </ItemGroup>
+
+  <!-- Copy files that function build strips out that should normally be included  -->
+  <Target Name="CopyFilesAfterBuild" AfterTargets="_GenerateFunctionsPostBuild">
+    <ItemGroup>
+      <NativeLibs Include="$(OutDir)runtimes\**\libmagic-1.so" />
+      <NativeLibs Include="$(OutDir)runtimes\**\libmagic-1.dylib" />
+      <NativeLibs Include="$(OutDir)runtimes\**\libmagic-1.dll" />
+      <NativeLibs Include="$(OutDir)runtimes\**\libgnurx-0.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(NativeLibs)" DestinationFolder="$(OutDir)bin\runtimes\%(RecursiveDir)" />
+
+    <!-- Doesn't matter which runtime the magic.mgc file comes from, they're all the same -->
+    <Copy SourceFiles="$(OutDir)runtimes\win-x64\native\magic.mgc" DestinationFolder="$(OutDir)bin" />
+  </Target>
 </Project>
