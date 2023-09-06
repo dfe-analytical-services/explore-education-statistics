@@ -50,18 +50,18 @@ const permalinkSnapshotService = {
   createPermalink(permalink: CreatePermalink): Promise<PermalinkSnapshot> {
     const { releaseId } = permalink.query;
     return releaseId
-      ? dataApi.post(`/permalink-snapshot/release/${releaseId}`, permalink)
-      : dataApi.post(`/permalink-snapshot`, permalink);
+      ? dataApi.post(`/permalink/release/${releaseId}`, permalink)
+      : dataApi.post('/permalink', permalink);
   },
   async getPermalink(id: string): Promise<PermalinkSnapshot> {
-    return dataApi.get(`/permalink-snapshot/${id}`, {
+    return dataApi.get(`/permalink/${id}`, {
       headers: {
         Accept: 'application/json',
       },
     });
   },
   async getPermalinkCsv(id: string): Promise<Blob> {
-    return dataApi.get(`/permalink-snapshot/${id}`, {
+    return dataApi.get(`/permalink/${id}`, {
       headers: {
         Accept: 'text/csv',
       },

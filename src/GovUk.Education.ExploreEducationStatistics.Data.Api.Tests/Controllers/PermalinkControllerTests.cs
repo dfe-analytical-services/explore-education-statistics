@@ -51,12 +51,12 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.PostAsync(
-            requestUri: "/api/permalink-snapshot",
+            requestUri: "/api/permalink",
             content: new JsonNetContent(createRequest));
 
         MockUtils.VerifyAllMocks(permalinkService);
 
-        response.AssertCreated(expectedResult, $"http://localhost/api/permalink-snapshot/{expectedResult.Id}");
+        response.AssertCreated(expectedResult, $"http://localhost/api/permalink/{expectedResult.Id}");
     }
 
     [Fact]
@@ -80,12 +80,12 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.PostAsync(
-            requestUri: $"/api/permalink-snapshot/release/{releaseId}",
+            requestUri: $"/api/permalink/release/{releaseId}",
             content: new JsonNetContent(createRequest));
 
         MockUtils.VerifyAllMocks(permalinkService);
 
-        response.AssertCreated(expectedResult, $"http://localhost/api/permalink-snapshot/{expectedResult.Id}");
+        response.AssertCreated(expectedResult, $"http://localhost/api/permalink/{expectedResult.Id}");
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.GetAsync(
-            uri: $"/api/permalink-snapshot/{permalinkId}",
+            uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
                 { HeaderNames.Accept, "application/json" }
@@ -134,7 +134,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.GetAsync(
-            uri: $"/api/permalink-snapshot/{permalinkId}",
+            uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
                 { HeaderNames.Accept, "application/json" }
@@ -164,7 +164,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.GetAsync(
-            uri: $"/api/permalink-snapshot/{permalinkId}",
+            uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
                 { HeaderNames.Accept, ContentTypes.Csv }
@@ -192,7 +192,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.GetAsync(
-            uri: $"/api/permalink-snapshot/{permalinkId}",
+            uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
                 { HeaderNames.Accept, ContentTypes.Csv }
@@ -209,7 +209,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     {
         var client = SetupApp().CreateClient();
 
-        var response = await client.GetAsync("/api/permalink-snapshot/not-a-guid");
+        var response = await client.GetAsync("/api/permalink/not-a-guid");
 
         response.AssertNotFound();
     }

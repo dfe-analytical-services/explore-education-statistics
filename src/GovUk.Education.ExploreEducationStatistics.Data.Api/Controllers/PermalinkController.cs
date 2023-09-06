@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _permalinkService = permalinkService;
         }
 
-        [HttpGet("permalink-snapshot/{permalinkId:guid}")]
+        [HttpGet("permalink/{permalinkId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json", "text/csv")]
@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             await result.ExecuteResultAsync(ControllerContext);
         }
 
-        [HttpPost("permalink-snapshot")]
+        [HttpPost("permalink")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PermalinkViewModel>> CreatePermalink(
@@ -73,7 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 }, permalink));
         }
 
-        [HttpPost("permalink-snapshot/release/{releaseId:guid}")]
+        [HttpPost("permalink/release/{releaseId:guid}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PermalinkViewModel>> CreatePermalink(
