@@ -72,70 +72,6 @@ To emulate Azure storage services (blobs, tables and queues) you will require on
      - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/)
      - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
 
-### Setup libmagic (Linux and Mac only)
-
-#### Linux only 
-
-Add symlinks to `libmagic-1`:
-
-```sh
-cd /usr/lib/x86_64-linux-gnu/
-sudo ln -s libmagic.so.1.0.0 libmagic-1.so
-sudo ln -s libmagic.so.1.0.0 libmagic-1.so.1
-```
-
-See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
-
-#### Mac only
-
-Install and link `libmagic`:
-
-```sh
-brew install libmagic
-brew link libmagic
-env ARCHFLAGS="-arch x86_64" sudo gem install ruby-filemagic -- --with-magic-include=/usr/local/include --with-magic-lib=/usr/local/lib/
-```
-
-Download and link the `dylib` magic file.
-
-Depending on the arch of your machine, you will need to download a different dylib file dependent 
-on the architecture of your machine. You can find the correct file [in the runtimes section](https://github.com/hey-red/Mime/tree/master/src/Mime/runtimes) 
-of the library.
-
-Download this file and place it somewhere where you won't accidentally delete it. Then link it to 
-the correct location:
-
-```sh
-sudo ln -s /Users/${whoami}/path/to/folder/libmagic-1.dylib /usr/local/liblibmagic-1
-sudo ln -s /Users/${whoami}/path/to/folder/libmagic-1.dylib /usr/local/lib/liblibmagic-1
-```
-
-### Fix `magic.mgc` file version mismatches (Linux and maybe Mac only)
-
-If you're using Ubuntu 22.04, or later you'll most likely be using a `libmagic-1` binary that isn't
-synchronized correctly with the `magic.mgc` file distributed with the builds. A similar thing may 
-potentially happen on Mac (but this needs to be confirmed).
-
-This could result in the following projects failing to work correctly:
-
-- Admin (unlikely to have an issue, but still mentioned in case)
-- Data Processor (will error during file validation)
-
-To fix this, you need to create an `appsettings.Local.json` file in the relevant project e.g.
-
-```
-touch src/GovUk.Education.ExploreEducationStatistics.Data.Processor/appsettings.Local.json
-```
-
-Then ensure it has the following:
-
-```json
-{
-  "MagicFilePath": "/usr/lib/file/magic.mgc"
-}
-```
-The above should work for Ubuntu, but you can change this path to whatever you want on your filesystem.
-
 ### Install PNPM via corepack
 
 We use [PNPM](https://pnpm.io/) and [PNPM workspaces](https://pnpm.io/workspaces) to manage our dependencies. PNPM is a drop in replacement for [NPM](https://www.npmjs.com/) which has several advantages over it's predecessor. You can read more about the benefits of PNPM [here](https://pnpm.io/motivation). This is installed & managed via [corepack](https://github.com/nodejs/corepack).
@@ -616,6 +552,28 @@ period before the scheduled Publisher Functions run. For this, we provide 2 Func
 publishing process for any staged Releases and makes them live.
 
 See the [Publisher Functions README](src/GovUk.Education.ExploreEducationStatistics.Publisher/README.md) for more information.
+
+### Customise `magic.mgc` version for file validation
+
+In some cases, it may be useful to change the version of the `magic.mgc` file that is used for 
+file validation in a project.
+
+You can create an `appsettings.Local.json` file in the relevant project e.g.
+
+```
+touch src/GovUk.Education.ExploreEducationStatistics.Data.Processor/appsettings.Local.json
+```
+
+Then ensure it has the following:
+
+```json
+{
+  "MagicFilePath": "/usr/lib/file/magic.mgc"
+}
+```
+
+The above example uses the default `magic.mgc` used by Ubuntu, but you can change this path to 
+whatever you want on your filesystem.
 
 ### Robot Tests
 
