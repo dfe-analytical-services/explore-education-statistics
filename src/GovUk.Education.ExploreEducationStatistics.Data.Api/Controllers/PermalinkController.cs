@@ -72,21 +72,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     permalinkId = permalink.Id
                 }, permalink));
         }
-
-        [HttpPost("permalink/release/{releaseId:guid}")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<PermalinkViewModel>> CreatePermalink(
-            Guid releaseId,
-            [FromBody] PermalinkCreateRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return await _permalinkService
-                .CreatePermalink(releaseId, request, cancellationToken)
-                .HandleFailuresOr(permalink => CreatedAtAction(nameof(GetPermalink), new
-                {
-                    permalinkId = permalink.Id
-                }, permalink));
-        }
     }
 }

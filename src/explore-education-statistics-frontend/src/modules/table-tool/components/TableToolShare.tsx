@@ -4,12 +4,11 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import UrlContainer from '@common/components/UrlContainer';
-import useToggle from '@common/hooks/useToggle';
 import ErrorMessage from '@common/components/ErrorMessage';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import logger from '@common/services/logger';
-import permalinkSnapshotService from '@common/services/permalinkSnapshotService';
+import permalinkService from '@common/services/permalinkService';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import React, { useEffect, useState } from 'react';
@@ -25,8 +24,8 @@ interface Props {
 const TableToolShare = ({ tableHeaders, query }: Props) => {
   const [permalinkUrl, setPermalinkUrl] = useState('');
   const [permalinkLoading, setPermalinkLoading] = useState<boolean>(false);
+  const [permalinkError, setPermalinkError] = useState<string>();
   const [screenReaderMessage, setScreenReaderMessage] = useState('');
-  const [permalinkError, togglePermalinkError] = useToggle(false);
 
   useEffect(() => {
     setPermalinkUrl('');
@@ -36,10 +35,13 @@ const TableToolShare = ({ tableHeaders, query }: Props) => {
     if (!tableHeaders) {
       return;
     }
+    setPermalinkError(undefined);
     setPermalinkLoading(true);
 
+    const { releaseId } = query;
     try {
-      const { id } = await permalinkSnapshotService.createPermalink({
+      const { id } = await permalinkService.createPermalink({
+        releaseId,
         query,
         configuration: {
           tableHeaders: mapUnmappedTableHeaders(tableHeaders),
@@ -47,15 +49,15 @@ const TableToolShare = ({ tableHeaders, query }: Props) => {
       });
 
       setPermalinkUrl(`${process.env.PUBLIC_URL}data-tables/permalink/${id}`);
-      setPermalinkLoading(false);
 
       setScreenReaderMessage(`Shareable link generated. ${linkInstructions}`);
     } catch (err) {
       logger.error(err);
-      togglePermalinkError();
-      setScreenReaderMessage(
-        `Error: There was a problem generating the share link.`,
-      );
+      const errorMessage = 'There was a problem generating the share link.';
+
+      setPermalinkError(errorMessage);
+      setScreenReaderMessage(`Error: ${errorMessage}`);
+    } finally {
       setPermalinkLoading(false);
     }
   };
@@ -78,9 +80,7 @@ const TableToolShare = ({ tableHeaders, query }: Props) => {
             text="Generating shareable link"
           >
             {permalinkError ? (
-              <ErrorMessage>
-                There was a problem generating the share link.
-              </ErrorMessage>
+              <ErrorMessage>{permalinkError}</ErrorMessage>
             ) : (
               <ButtonText onClick={handlePermalinkClick}>
                 Generate shareable link

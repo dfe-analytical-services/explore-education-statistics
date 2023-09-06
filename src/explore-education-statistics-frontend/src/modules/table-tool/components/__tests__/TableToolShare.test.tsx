@@ -4,18 +4,18 @@ import {
   testTableHeaders,
   testQuery,
 } from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
-import _permalinkSnapshotService, {
+import _permalinkService, {
   PermalinkSnapshot,
-} from '@common/services/permalinkSnapshotService';
+} from '@common/services/permalinkService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 
-jest.mock('@common/services/permalinkSnapshotService');
+jest.mock('@common/services/permalinkService');
 
-const permalinkSnapshotService = _permalinkSnapshotService as jest.Mocked<
-  typeof _permalinkSnapshotService
+const permalinkService = _permalinkService as jest.Mocked<
+  typeof _permalinkService
 >;
 
 const tableQuery: ReleaseTableDataQuery = {
@@ -36,7 +36,7 @@ describe('TableToolShare', () => {
   });
 
   test('shows the share link when the button is clicked', async () => {
-    permalinkSnapshotService.createPermalink.mockResolvedValue({
+    permalinkService.createPermalink.mockResolvedValue({
       id: 'permalink-id',
     } as PermalinkSnapshot);
     render(
@@ -50,9 +50,10 @@ describe('TableToolShare', () => {
     );
 
     await waitFor(() => {
-      expect(permalinkSnapshotService.createPermalink).toHaveBeenCalledWith<
-        Parameters<typeof permalinkSnapshotService.createPermalink>
+      expect(permalinkService.createPermalink).toHaveBeenCalledWith<
+        Parameters<typeof permalinkService.createPermalink>
       >({
+        releaseId: 'release-1',
         query: tableQuery,
         configuration: {
           tableHeaders: mapUnmappedTableHeaders(testTableHeaders),
@@ -90,7 +91,7 @@ describe('TableToolShare', () => {
   });
 
   test('copies the link to the clipboard when the copy button is clicked', async () => {
-    permalinkSnapshotService.createPermalink.mockResolvedValue({
+    permalinkService.createPermalink.mockResolvedValue({
       id: 'permalink-id',
     } as PermalinkSnapshot);
 

@@ -1,6 +1,6 @@
 import { TableJson } from '@common/modules/table-tool/utils/mapTableToJson';
 import { dataApi } from '@common/services/api';
-import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
+import { TableDataQuery } from '@common/services/tableBuilderService';
 import { Footnote } from '@common/services/types/footnotes';
 
 export type TableHeader =
@@ -40,18 +40,16 @@ export interface PermalinkSnapshot {
 }
 
 interface CreatePermalink {
-  query: ReleaseTableDataQuery;
+  releaseId?: string;
+  query: TableDataQuery;
   configuration: {
     tableHeaders: UnmappedTableHeadersConfig;
   };
 }
 
-const permalinkSnapshotService = {
+const permalinkService = {
   createPermalink(permalink: CreatePermalink): Promise<PermalinkSnapshot> {
-    const { releaseId } = permalink.query;
-    return releaseId
-      ? dataApi.post(`/permalink/release/${releaseId}`, permalink)
-      : dataApi.post('/permalink', permalink);
+    return dataApi.post('/permalink', permalink);
   },
   async getPermalink(id: string): Promise<PermalinkSnapshot> {
     return dataApi.get(`/permalink/${id}`, {
@@ -70,4 +68,4 @@ const permalinkSnapshotService = {
   },
 };
 
-export default permalinkSnapshotService;
+export default permalinkService;

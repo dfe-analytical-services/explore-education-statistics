@@ -60,35 +60,6 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     }
 
     [Fact]
-    public async Task CreatePermalink_WithReleaseId()
-    {
-        var releaseId = Guid.NewGuid();
-        var createRequest = new PermalinkCreateRequest();
-        var expectedResult = new PermalinkViewModel
-        {
-            Id = Guid.NewGuid()
-        };
-
-        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
-
-        permalinkService
-            .Setup(s => s.CreatePermalink(releaseId, It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest)),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedResult);
-
-        var client = SetupApp(permalinkService: permalinkService.Object)
-            .CreateClient();
-
-        var response = await client.PostAsync(
-            requestUri: $"/api/permalink/release/{releaseId}",
-            content: new JsonNetContent(createRequest));
-
-        MockUtils.VerifyAllMocks(permalinkService);
-
-        response.AssertCreated(expectedResult, $"http://localhost/api/permalink/{expectedResult.Id}");
-    }
-
-    [Fact]
     public async Task GetPermalink()
     {
         var permalinkId = Guid.NewGuid();

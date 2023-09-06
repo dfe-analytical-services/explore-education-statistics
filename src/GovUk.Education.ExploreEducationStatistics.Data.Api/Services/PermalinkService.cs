@@ -86,75 +86,69 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
             CancellationToken cancellationToken = default)
         {
-            return await _subjectRepository.FindPublicationIdForSubject(request.Query.SubjectId)
-                .OrNotFound()
-                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
-                .OnSuccess(release => CreatePermalink(release.Id, request, cancellationToken));
-        }
-
-        public async Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(Guid releaseId,
-            PermalinkCreateRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return await _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
-                .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
+            return await (request.ReleaseId ?? await FindLatestPublishedReleaseId(request.Query.SubjectId))
+                .OnSuccess(releaseId =>
                 {
-                    var frontendTableTask = _frontendService.CreateTable(
-                        tableResult,
-                        request.Configuration,
-                        cancellationToken
-                    );
+                    return _tableBuilderService.Query(releaseId, request.Query, cancellationToken)
+                        .OnSuccess<ActionResult, TableBuilderResultViewModel, PermalinkViewModel>(async tableResult =>
+                        {
+                            var frontendTableTask = _frontendService.CreateTable(
+                                tableResult,
+                                request.Configuration,
+                                cancellationToken
+                            );
 
-                    var csvMetaTask = _permalinkCsvMetaService.GetCsvMeta(
-                        request.Query.SubjectId,
-                        tableResult.SubjectMeta,
-                        cancellationToken
-                    );
+                            var csvMetaTask = _permalinkCsvMetaService.GetCsvMeta(
+                                request.Query.SubjectId,
+                                tableResult.SubjectMeta,
+                                cancellationToken
+                            );
 
-                    await Task.WhenAll(frontendTableTask, csvMetaTask);
+                            await Task.WhenAll(frontendTableTask, csvMetaTask);
 
-                    var frontendTableResult = frontendTableTask.Result;
-                    var csvMetaResult = csvMetaTask.Result;
+                            var frontendTableResult = frontendTableTask.Result;
+                            var csvMetaResult = csvMetaTask.Result;
 
-                    if (frontendTableResult.IsLeft)
-                    {
-                        return frontendTableResult.Left;
-                    }
+                            if (frontendTableResult.IsLeft)
+                            {
+                                return frontendTableResult.Left;
+                            }
 
-                    if (csvMetaResult.IsLeft)
-                    {
-                        return csvMetaResult.Left;
-                    }
+                            if (csvMetaResult.IsLeft)
+                            {
+                                return csvMetaResult.Left;
+                            }
 
-                    var table = frontendTableResult.Right;
-                    var csvMeta = csvMetaResult.Right;
+                            var table = frontendTableResult.Right;
+                            var csvMeta = csvMetaResult.Right;
 
-                    var subjectMeta = tableResult.SubjectMeta;
+                            var subjectMeta = tableResult.SubjectMeta;
 
-                    // To avoid the frontend processing and returning the footnotes unnecessarily,
-                    // create a new view model with the footnotes added directly
-                    var tableWithFootnotes = table with
-                    {
-                        Footnotes = subjectMeta.Footnotes
-                    };
+                            // To avoid the frontend processing and returning the footnotes unnecessarily,
+                            // create a new view model with the footnotes added directly
+                            var tableWithFootnotes = table with
+                            {
+                                Footnotes = subjectMeta.Footnotes
+                            };
 
-                    var permalink = new Permalink
-                    {
-                        ReleaseId = releaseId,
-                        SubjectId = request.Query.SubjectId,
-                        PublicationTitle = subjectMeta.PublicationName,
-                        DataSetTitle = subjectMeta.SubjectName,
-                    };
-                    _contentDbContext.Permalinks.Add(permalink);
+                            var permalink = new Permalink
+                            {
+                                ReleaseId = releaseId,
+                                SubjectId = request.Query.SubjectId,
+                                PublicationTitle = subjectMeta.PublicationName,
+                                DataSetTitle = subjectMeta.SubjectName,
+                            };
+                            _contentDbContext.Permalinks.Add(permalink);
 
-                    await UploadSnapshot(permalink: permalink,
-                        observations: tableResult.Results.ToList(),
-                        csvMeta: csvMeta,
-                        table: tableWithFootnotes,
-                        cancellationToken: cancellationToken);
+                            await UploadSnapshot(permalink: permalink,
+                                observations: tableResult.Results.ToList(),
+                                csvMeta: csvMeta,
+                                table: tableWithFootnotes,
+                                cancellationToken: cancellationToken);
 
-                    await _contentDbContext.SaveChangesAsync(cancellationToken);
-                    return await BuildViewModel(permalink, tableWithFootnotes);
+                            await _contentDbContext.SaveChangesAsync(cancellationToken);
+                            return await BuildViewModel(permalink, tableWithFootnotes);
+                        });
                 });
         }
 
@@ -304,6 +298,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 Status = status,
                 Table = table
             };
+        }
+
+        private async Task<Either<ActionResult, Guid>> FindLatestPublishedReleaseId(Guid subjectId)
+        {
+            return await _subjectRepository.FindPublicationIdForSubject(subjectId)
+                .OrNotFound()
+                .OnSuccess(publicationId => _releaseRepository.GetLatestPublishedRelease(publicationId))
+                .OnSuccess(release => release.Id);
         }
 
         private async Task<PermalinkStatus> GetPermalinkStatus(Guid subjectId)
