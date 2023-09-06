@@ -75,7 +75,7 @@ const AdminDashboardPage = () => {
           </p>
 
           {isApprover && totalApprovals > 0 && (
-            <WarningMessage>
+            <WarningMessage testId="outstanding-approvals-warning">
               You have outstanding <Link to="#approvals">approvals</Link>
             </WarningMessage>
           )}
