@@ -1,4 +1,5 @@
 import TableToolShare from '@frontend/modules/table-tool/components/TableToolShare';
+import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import {
   testTableHeaders,
   testQuery,
@@ -9,6 +10,7 @@ import _permalinkSnapshotService, {
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 
 jest.mock('@common/services/permalinkSnapshotService');
 
@@ -16,10 +18,15 @@ const permalinkSnapshotService = _permalinkSnapshotService as jest.Mocked<
   typeof _permalinkSnapshotService
 >;
 
+const tableQuery: ReleaseTableDataQuery = {
+  releaseId: 'release-1',
+  ...testQuery,
+};
+
 describe('TableToolShare', () => {
   test('renders the generate button', () => {
     render(
-      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
+      <TableToolShare query={tableQuery} tableHeaders={testTableHeaders} />,
     );
 
     expect(screen.getByText('Save table')).toBeInTheDocument();
@@ -33,7 +40,7 @@ describe('TableToolShare', () => {
       id: 'permalink-id',
     } as PermalinkSnapshot);
     render(
-      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
+      <TableToolShare query={tableQuery} tableHeaders={testTableHeaders} />,
     );
 
     userEvent.click(
@@ -41,6 +48,17 @@ describe('TableToolShare', () => {
         name: 'Generate shareable link',
       }),
     );
+
+    await waitFor(() => {
+      expect(permalinkSnapshotService.createPermalink).toHaveBeenCalledWith<
+        Parameters<typeof permalinkSnapshotService.createPermalink>
+      >({
+        query: tableQuery,
+        configuration: {
+          tableHeaders: mapUnmappedTableHeaders(testTableHeaders),
+        },
+      });
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Generated share link')).toBeInTheDocument();
@@ -77,7 +95,7 @@ describe('TableToolShare', () => {
     } as PermalinkSnapshot);
 
     render(
-      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
+      <TableToolShare query={tableQuery} tableHeaders={testTableHeaders} />,
     );
 
     userEvent.click(

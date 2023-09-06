@@ -7,7 +7,7 @@ import UrlContainer from '@common/components/UrlContainer';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import permalinkSnapshotService from '@common/services/permalinkSnapshotService';
-import { TableDataQuery } from '@common/services/tableBuilderService';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import React, { useEffect, useState } from 'react';
 
@@ -16,7 +16,7 @@ const linkInstructions =
 
 interface Props {
   tableHeaders?: TableHeadersConfig;
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
 }
 
 const TableToolShare = ({ tableHeaders, query }: Props) => {
