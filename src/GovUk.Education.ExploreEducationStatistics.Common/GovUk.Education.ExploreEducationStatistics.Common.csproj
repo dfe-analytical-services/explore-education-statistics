@@ -35,15 +35,4 @@
         <PackageReference Include="Thinktecture.EntityFrameworkCore.BulkOperations" Version="4.5.1" />
         <PackageReference Include="ZstdSharp.Port" Version="0.7.2" />
     </ItemGroup>
-
-    <ItemGroup>
-        <Content Include="libs\magic.mgc">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-          <Link>bin\magic.mgc</Link>
-        </Content>
-        <Content Include="libs\libmagic-1.dylib">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-          <Link>bin\libmagic-1.dylib</Link>
-        </Content>
-    </ItemGroup>
 </Project>
