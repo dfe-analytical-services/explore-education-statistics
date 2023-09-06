@@ -12,13 +12,13 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import publicationService from '@common/services/publicationService';
 import Link from '@frontend/components/Link';
 import tableBuilderService, {
-  TableDataQuery,
+  ReleaseTableDataQuery,
 } from '@common/services/tableBuilderService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { memo, ReactNode, useRef } from 'react';
 
 interface TableToolFinalStepProps {
-  query: TableDataQuery;
+  query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   selectedPublication: SelectedPublication;

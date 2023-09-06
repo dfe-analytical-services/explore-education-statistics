@@ -48,17 +48,10 @@ interface CreatePermalink {
 
 const permalinkSnapshotService = {
   createPermalink(permalink: CreatePermalink): Promise<PermalinkSnapshot> {
-    const {
-      query: { releaseId, ...query },
-      configuration,
-    } = permalink;
-    const data = {
-      query,
-      configuration,
-    };
+    const { releaseId } = permalink.query;
     return releaseId
-      ? dataApi.post(`/permalink-snapshot/release/${releaseId}`, data)
-      : dataApi.post(`/permalink-snapshot`, data);
+      ? dataApi.post(`/permalink-snapshot/release/${releaseId}`, permalink)
+      : dataApi.post(`/permalink-snapshot`, permalink);
   },
   async getPermalink(id: string): Promise<PermalinkSnapshot> {
     return dataApi.get(`/permalink-snapshot/${id}`, {
