@@ -74,7 +74,7 @@ export default function ApprovalsTable({
   }
 
   return (
-    <table>
+    <table data-testid="your-approvals">
       <thead>
         <tr>
           <th>Publication / Page</th>

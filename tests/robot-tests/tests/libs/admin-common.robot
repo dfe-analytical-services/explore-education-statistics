@@ -671,6 +671,17 @@ user changes methodology status to Draft
     user waits until h2 is visible    Sign off
     user checks page contains tag    In Draft
 
+user changes methodology status to Higher level review
+    user clicks link    Sign off
+    user waits until h2 is visible    Sign off
+
+    user clicks button    Edit status
+    user clicks element    id:methodologyStatusForm-status-HigherLevelReview
+    user clicks button    Update status
+    user waits until h2 is visible    Sign off
+    #user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review
+    user checks page contains tag    In Review
+
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user gives publication access to analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
