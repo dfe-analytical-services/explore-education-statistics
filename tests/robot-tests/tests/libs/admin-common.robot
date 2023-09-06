@@ -633,7 +633,13 @@ user waits for scheduled release to be published immediately
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user verifies release summary
-    [Arguments]    ${PUBLICATION_NAME}    ${PUBLICATION_SUMMARY}    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${LEAD_STATISTICIAN}    ${RELEASE_TYPE}
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${PUBLICATION_SUMMARY}
+    ...    ${TIME_PERIOD}
+    ...    ${RELEASE_PERIOD}
+    ...    ${LEAD_STATISTICIAN}
+    ...    ${RELEASE_TYPE}
     user waits until h2 is visible    Release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
     user checks summary list contains    Publication summary    ${PUBLICATION_SUMMARY}
@@ -675,6 +681,17 @@ user changes methodology status to Draft
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks page contains tag    In Draft
+
+user changes methodology status to Higher level review
+    user clicks link    Sign off
+    user waits until h2 is visible    Sign off
+
+    user clicks button    Edit status
+    user clicks element    id:methodologyStatusForm-status-HigherLevelReview
+    user clicks button    Update status
+    user waits until h2 is visible    Sign off
+    #user waits until element is visible    id:CurrentReleaseStatus-Awaiting higher review
+    user checks page contains tag    In Review
 
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
@@ -733,7 +750,11 @@ user gives release access to analyst
     ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
 
 user removes release access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${ROLE}
+    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     ${table}=    user gets testid element    releaseAccessTable
     ${row}=    get child element    ${table}
