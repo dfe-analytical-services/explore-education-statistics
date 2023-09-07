@@ -40,25 +40,26 @@ export interface PermalinkSnapshot {
 }
 
 interface CreatePermalink {
+  releaseId?: string;
   query: TableDataQuery;
   configuration: {
     tableHeaders: UnmappedTableHeadersConfig;
   };
 }
 
-const permalinkSnapshotService = {
-  createPermalink(query: CreatePermalink): Promise<PermalinkSnapshot> {
-    return dataApi.post(`/permalink-snapshot`, query);
+const permalinkService = {
+  createPermalink(permalink: CreatePermalink): Promise<PermalinkSnapshot> {
+    return dataApi.post('/permalink', permalink);
   },
   async getPermalink(id: string): Promise<PermalinkSnapshot> {
-    return dataApi.get(`/permalink-snapshot/${id}`, {
+    return dataApi.get(`/permalink/${id}`, {
       headers: {
         Accept: 'application/json',
       },
     });
   },
   async getPermalinkCsv(id: string): Promise<Blob> {
-    return dataApi.get(`/permalink-snapshot/${id}`, {
+    return dataApi.get(`/permalink/${id}`, {
       headers: {
         Accept: 'text/csv',
       },
@@ -67,4 +68,4 @@ const permalinkSnapshotService = {
   },
 };
 
-export default permalinkSnapshotService;
+export default permalinkService;

@@ -1,9 +1,9 @@
 import FormattedDate from '@common/components/FormattedDate';
 import WarningMessage from '@common/components/WarningMessage';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
-import permalinkSnapshotService, {
+import permalinkService, {
   PermalinkSnapshot,
-} from '@common/services/permalinkSnapshotService';
+} from '@common/services/permalinkService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
@@ -102,9 +102,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           headingTag="h2"
           tableRef={tableRef}
           tableTitle={caption}
-          onCsvDownload={() =>
-            permalinkSnapshotService.getPermalinkCsv(data.id)
-          }
+          onCsvDownload={() => permalinkService.getPermalinkCsv(data.id)}
           onSubmit={fileFormat =>
             logEvent({
               category: 'Permalink page',
@@ -134,7 +132,7 @@ export const getServerSideProps: GetServerSideProps<Props> = withAxiosHandler(
   async ({ query }) => {
     const { permalink } = query as Dictionary<string>;
 
-    const data = await permalinkSnapshotService.getPermalink(permalink);
+    const data = await permalinkService.getPermalink(permalink);
 
     return {
       props: {
