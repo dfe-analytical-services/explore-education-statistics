@@ -82,11 +82,10 @@ Check Content Block Table
     ${accordion}=    user opens accordion section with id    content-${content_block.content_section_position}
     ...    id:content
     user scrolls to element    ${accordion}
-    user scrolls to the top of the page
-    user scrolls to the bottom of the page
-    user scrolls to the top of the page
-    user scrolls to the bottom of the page
+    user scrolls down    1080
+    user scrolls to element    ${accordion}
 
+    user waits until page contains element    id:dataBlock-${content_block.content_block_id}    3
     ${data_block}=    get child element    ${accordion}    id:dataBlock-${content_block.content_block_id}
 
     IF    ${content_block.has_chart_config}
