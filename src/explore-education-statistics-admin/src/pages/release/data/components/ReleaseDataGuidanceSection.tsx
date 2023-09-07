@@ -16,6 +16,7 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import ReleaseDataGuidanceDataFile from '@common/modules/release/components/ReleaseDataGuidanceDataFile';
 import minDelay from '@common/utils/minDelay';
+import sanitizeHtml from '@common/utils/sanitizeHtml';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import toPath from 'lodash/toPath';
@@ -61,11 +62,33 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
 
   const handleSubmit = useFormSubmit<DataGuidanceFormValues>(
     async (values, helpers) => {
+      const sanitizedValues = {
+        ...values,
+        subjects: values.subjects.map(value => {
+          return {
+            ...value,
+            content: sanitizeHtml(value.content, {
+              allowedTags: [
+                'p',
+                'strong',
+                'em',
+                'i',
+                'a',
+                'ul',
+                'ol',
+                'li',
+                'br',
+              ],
+            }),
+          };
+        }),
+      };
+
       await minDelay(async () => {
         const updatedGuidance =
           await releaseDataGuidanceService.updateDataGuidance(
             releaseId,
-            values,
+            sanitizedValues,
           );
 
         setDataGuidance({ value: updatedGuidance });
