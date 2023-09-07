@@ -29,6 +29,7 @@ import useToggle from '@common/hooks/useToggle';
 import useMountedRef from '@common/hooks/useMountedRef';
 import React, { useMemo, useState } from 'react';
 import { generatePath } from 'react-router';
+import sanitizeHtml from '@common/utils/sanitizeHtml';
 
 interface Props {
   publicationId: string;
@@ -280,7 +281,7 @@ const DataFileReplacementPlan = ({
             return (
               <Details
                 key={footnote.id}
-                summary={footnote.content}
+                summary={sanitizeHtml(footnote.content, { allowedTags: [] })}
                 summaryAfter={
                   <Tag
                     className="govuk-!-margin-left-2"

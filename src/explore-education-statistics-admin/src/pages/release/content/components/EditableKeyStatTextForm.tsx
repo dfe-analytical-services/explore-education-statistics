@@ -1,5 +1,8 @@
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import { toolbarConfigs } from '@admin/config/ckEditorConfig';
+import {
+  pluginsConfigSimple,
+  toolbarConfigSimple,
+} from '@admin/config/ckEditorConfig';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';
 import Button from '@common/components/Button';
@@ -108,7 +111,8 @@ export default function EditableKeyStatTextForm({
 
             <FormFieldEditor<KeyStatTextFormValues>
               name="guidanceText"
-              toolbarConfig={toolbarConfigs.simple}
+              includePlugins={pluginsConfigSimple}
+              toolbarConfig={toolbarConfigSimple}
               label="Guidance text"
             />
 

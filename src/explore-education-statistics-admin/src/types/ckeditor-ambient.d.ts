@@ -7,10 +7,15 @@
 // we can actually import) should go here.
 
 declare module 'explore-education-statistics-ckeditor' {
-  import { EditorClass, EditorConfig } from '@admin/types/ckeditor';
+  import {
+    EditorClass,
+    EditorConfig,
+    PluginClass,
+  } from '@admin/types/ckeditor';
 
   // https://ckeditor.com/docs/ckeditor5/latest/api/module_editor-classic_classiceditor-ClassicEditor.html
   interface CustomEditor extends EditorClass {
+    builtinPlugins?: PluginClass[];
     new (
       element: string | HTMLElement,
       config: EditorConfig,

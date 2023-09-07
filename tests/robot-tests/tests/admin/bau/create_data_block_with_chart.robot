@@ -297,7 +297,7 @@ Update footnote
     user waits until h2 is visible    Footnotes
     user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_1}
     user waits until h2 is visible    Edit footnote
-    user enters text into element    label:Footnote    ${FOOTNOTE_UPDATED}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_UPDATED}
     user clicks button    Save footnote
     user waits until page contains    ${FOOTNOTE_UPDATED}
     user checks page does not contain    ${FOOTNOTE_1}

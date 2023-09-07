@@ -7,6 +7,8 @@ import {
   Editor as EditorType,
   Element,
   GlossaryPlugin,
+  PluginName,
+  ToolbarOption,
 } from '@admin/types/ckeditor';
 import { defaultAllowedHeadings } from '@admin/config/ckEditorConfig';
 import useCKEditorConfig from '@admin/hooks/useCKEditorConfig';
@@ -43,9 +45,10 @@ export interface FormEditorProps {
   hideLabel?: boolean;
   hint?: string;
   id: string;
+  includePlugins?: ReadonlySet<PluginName> | Set<PluginName>;
   label: string;
   testId?: string;
-  toolbarConfig?: string[];
+  toolbarConfig?: ReadonlyArray<ToolbarOption> | Array<ToolbarOption>;
   value: string;
   onAutoSave?: (values: string) => void;
   onBlur?: () => void;
@@ -66,6 +69,7 @@ const FormEditor = ({
   hideLabel,
   hint,
   id,
+  includePlugins,
   label,
   testId,
   toolbarConfig,
@@ -91,6 +95,7 @@ const FormEditor = ({
     allowComments,
     allowedHeadings,
     editorInstance,
+    includePlugins,
     toolbarConfig,
     onAutoSave,
     onCancelComment,
@@ -208,8 +213,14 @@ const FormEditor = ({
       );
 
       editorInstance.current = editor;
-      commentsPlugin.current = editor.plugins.get<CommentsPlugin>('Comments');
-      glossaryPlugin.current = editor.plugins.get<GlossaryPlugin>('Glossary');
+
+      if (editor.plugins.has<CommentsPlugin>('Comments')) {
+        commentsPlugin.current = editor.plugins.get<CommentsPlugin>('Comments');
+      }
+
+      if (editor.plugins.has<GlossaryPlugin>('Glossary')) {
+        glossaryPlugin.current = editor.plugins.get<GlossaryPlugin>('Glossary');
+      }
 
       setMarkersOrder(getMarkersOrder([...editor.model.markers]));
     },
