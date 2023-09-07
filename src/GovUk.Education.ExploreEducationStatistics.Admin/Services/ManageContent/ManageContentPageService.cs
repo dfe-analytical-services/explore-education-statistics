@@ -64,10 +64,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     var methodologyVersions = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
 
-                    var approvedMethodologyVersions = await methodologyVersions
-                        .ToAsyncEnumerable()
+                    var approvedMethodologyVersions = methodologyVersions
                         .Where(mv => mv.Approved)
-                        .ToListAsync();
+                        .ToList();
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
                     releaseViewModel.DownloadFiles = files.ToList();
