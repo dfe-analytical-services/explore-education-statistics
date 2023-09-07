@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _permalinkService = permalinkService;
         }
 
-        [HttpGet("permalink-snapshot/{permalinkId:guid}")]
+        [HttpGet("permalink/{permalinkId:guid}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Produces("application/json", "text/csv")]
@@ -58,27 +58,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             await result.ExecuteResultAsync(ControllerContext);
         }
 
-        [HttpPost("permalink-snapshot")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpPost("permalink")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<PermalinkViewModel>> CreatePermalink(
             [FromBody] PermalinkCreateRequest request,
             CancellationToken cancellationToken = default)
         {
             return await _permalinkService
                 .CreatePermalink(request, cancellationToken)
-                .HandleFailuresOrOk();
-        }
-
-        [HttpPost("permalink-snapshot/release/{releaseId:guid}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<PermalinkViewModel>> CreatePermalink(
-            Guid releaseId,
-            [FromBody] PermalinkCreateRequest request,
-            CancellationToken cancellationToken = default)
-        {
-            return await _permalinkService
-                .CreatePermalink(releaseId, request, cancellationToken)
-                .HandleFailuresOrOk();
+                .HandleFailuresOr(permalink => CreatedAtAction(nameof(GetPermalink), new
+                {
+                    permalinkId = permalink.Id
+                }, permalink));
         }
     }
 }

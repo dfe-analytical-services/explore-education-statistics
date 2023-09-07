@@ -10,7 +10,7 @@ import {
   testDataNoFiltersTableHeadersConfig,
 } from '@common/modules/table-tool/components/__tests__/__data__/timePeriodDataTable.data';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkSnapshotService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import {
   ReleaseTableDataQuery,
   TableDataResponse,
