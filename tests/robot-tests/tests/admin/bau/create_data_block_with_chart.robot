@@ -478,6 +478,12 @@ Configure line chart data sets
 
     user clicks element    id:chartBuilderPreview
 
+Add reference line
+    user clicks link    X Axis (major axis)
+    user chooses select option    id:chartAxisConfiguration-major-referenceLines-position    2005
+    user enters text into element    id:chartAxisConfiguration-major-referenceLines-label    Reference line 1
+    user clicks button    Add line
+
 Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview
 
@@ -514,6 +520,19 @@ Validate basic line chart preview
     user checks chart tooltip label contains    id:chartBuilderPreview    2016
     user checks chart tooltip item contains    id:chartBuilderPreview    1
     ...    Admission Numbers (Nailsea Youngwood): 4,198
+
+    user checks element contains    id:chartBuilderPreview    Reference line 1
+
+Edit reference line
+    user clicks link    X Axis (major axis)
+    user clicks button containing text    Edit    testId:referenceLines
+    user enters text into element    id:chartAxisConfiguration-major-referenceLines-label    Edited reference line
+    user clicks button    Save    testId:referenceLines
+    user checks element contains    id:chartBuilderPreview    Edited reference line
+
+Remove reference line
+    user clicks button containing text    Remove    testId:referenceLines
+    user waits until parent does not contain element    id:chartBuilderPreview    Edited reference line
 
 Save chart and validate marked as 'Has chart' in data blocks list
     user clicks link    Chart configuration
