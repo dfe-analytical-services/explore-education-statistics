@@ -87,6 +87,7 @@ Check Content Block Table
     user scrolls to the top of the page
     user scrolls to the bottom of the page
 
+    user waits until page contains element    id:dataBlock-${content_block.content_block_id}
     ${data_block}=    get child element    ${accordion}    id:dataBlock-${content_block.content_block_id}
 
     IF    ${content_block.has_chart_config}
