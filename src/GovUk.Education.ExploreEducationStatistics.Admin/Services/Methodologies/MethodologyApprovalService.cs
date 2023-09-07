@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         // We cannot rely on Methodology.LatestPublishedVersionId, as it may now be incorrect,
                         // if we are approving and publishing this methodology version.
-                        var isToBePublished = await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion);
+                        var isToBePublished = await _methodologyVersionRepository.IsToBePublished(methodologyVersion);
 
                         if (isToBePublished)
                         {

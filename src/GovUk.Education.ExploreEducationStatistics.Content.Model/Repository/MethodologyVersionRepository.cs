@@ -157,7 +157,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return methodologyVersion.Id == methodologyVersion.Methodology.LatestPublishedVersionId;
         }
 
-        public async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion)
+        // TODO: Move IsToBePublished to MethodologyApprovalService and change to private after MethodologyMigrationController has been removed
+        public async Task<bool> IsToBePublished(MethodologyVersion methodologyVersion)
         {
             // A version that's not approved can't be publicly accessible
             if (!methodologyVersion.Approved)
@@ -165,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 return false;
             }
 
-            // A methodology with a newer published version cannot be live
+            // A methodology version with a newer published version cannot be live
             var nextVersion = await GetNextVersion(methodologyVersion);
             if (nextVersion?.Approved == true)
             {

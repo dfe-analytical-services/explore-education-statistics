@@ -10,6 +10,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
+// !!!!!
+// TODO: Move `MethodologyVersionRepository#IsToBePublished` `MethodologyApprovalService` and change to be private after removing this controller
+// !!!!!
+
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
 {
     [Route("api")]
@@ -48,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             {
                 var latestPublishedMethodologyVersion = await methodology.Versions
                     .ToAsyncEnumerable()
-                    .WhereAwait(async mv => await _methodologyVersionRepository.IsPubliclyAccessible(mv))
+                    .WhereAwait(async mv => await _methodologyVersionRepository.IsToBePublished(mv))
                     .SingleOrDefaultAsync();
 
                 methodology.LatestPublishedVersionId = latestPublishedMethodologyVersion?.Id;

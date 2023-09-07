@@ -822,7 +822,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task IsPubliclyAccessible_ApprovedAndPublishedImmediately()
+        public async Task IsToBePublished_ApprovedAndPublishedImmediately()
         {
             var methodologyVersion = new MethodologyVersion
             {
@@ -857,12 +857,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Entry(methodologyVersion)
                     .ReloadAsync();
 
-                Assert.True(await service.IsPubliclyAccessible(methodologyVersion));
+                Assert.True(await service.IsToBePublished(methodologyVersion));
             }
         }
 
         [Fact]
-        public async Task IsPubliclyAccessible_ApprovedAndScheduledWithLiveRelease()
+        public async Task IsToBePublished_ApprovedAndScheduledWithLiveRelease()
         {
             var liveRelease = new Release
             {
@@ -905,12 +905,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Entry(methodologyVersion)
                     .ReloadAsync();
 
-                Assert.True(await service.IsPubliclyAccessible(methodologyVersion));
+                Assert.True(await service.IsToBePublished(methodologyVersion));
             }
         }
 
         [Fact]
-        public async Task IsPubliclyAccessible_PublishedImmediatelyButNotApprovedIsNotAccessible()
+        public async Task IsToBePublished_PublishedImmediatelyButNotApprovedIsNotAccessible()
         {
             var methodologyVersion = new MethodologyVersion
             {
@@ -942,12 +942,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(methodologyVersion));
+                Assert.False(await service.IsToBePublished(methodologyVersion));
             }
         }
 
         [Fact]
-        public async Task IsPubliclyAccessible_ScheduledWithLiveReleaseButNotApprovedIsNotAccessible()
+        public async Task IsToBePublished_ScheduledWithLiveReleaseButNotApprovedIsNotAccessible()
         {
             var liveRelease = new Release
             {
@@ -987,12 +987,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
-                Assert.False(await service.IsPubliclyAccessible(methodologyVersion));
+                Assert.False(await service.IsToBePublished(methodologyVersion));
             }
         }
 
         [Fact]
-        public async Task IsPubliclyAccessible_ApprovedButScheduledWithNonLiveReleaseIsNotAccessible()
+        public async Task IsToBePublished_ApprovedButScheduledWithNonLiveReleaseIsNotAccessible()
         {
             var nonLiveRelease = new Release
             {
@@ -1034,12 +1034,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Entry(methodologyVersion)
                     .ReloadAsync();
 
-                Assert.False(await service.IsPubliclyAccessible(methodologyVersion));
+                Assert.False(await service.IsToBePublished(methodologyVersion));
             }
         }
 
         [Fact]
-        public async Task IsPubliclyAccessible_ApprovedAndPublishedImmediatelyIsAccessibleIfNextVersionIsDraft()
+        public async Task IsToBePublished_ApprovedAndPublishedImmediatelyIsAccessibleIfNextVersionIsDraft()
         {
             var previousVersion = new MethodologyVersion
             {
@@ -1099,15 +1099,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Entry(latestDraftVersion)
                     .ReloadAsync();
 
-                Assert.False(await service.IsPubliclyAccessible(previousVersion));
-                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion));
-                Assert.False(await service.IsPubliclyAccessible(latestDraftVersion));
+                Assert.False(await service.IsToBePublished(previousVersion));
+                Assert.True(await service.IsToBePublished(latestPublishedVersion));
+                Assert.False(await service.IsToBePublished(latestDraftVersion));
             }
         }
 
         [Fact]
         public async Task
-            IsPubliclyAccessible_ApprovedAndPublishedImmediatelyIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
+            IsToBePublished_ApprovedAndPublishedImmediatelyIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
         {
             var nonLiveRelease = new Release
             {
@@ -1174,14 +1174,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Entry(latestApprovedVersion)
                     .ReloadAsync();
 
-                Assert.False(await service.IsPubliclyAccessible(previousVersion));
-                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion));
-                Assert.False(await service.IsPubliclyAccessible(latestApprovedVersion));
+                Assert.False(await service.IsToBePublished(previousVersion));
+                Assert.True(await service.IsToBePublished(latestPublishedVersion));
+                Assert.False(await service.IsToBePublished(latestApprovedVersion));
             }
         }
 
         [Fact]
-        public async Task IsPubliclyAccessible_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsDraft()
+        public async Task IsToBePublished_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsDraft()
         {
             var liveRelease = new Release
             {
@@ -1251,15 +1251,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Entry(latestDraftVersion)
                     .ReloadAsync();
 
-                Assert.False(await service.IsPubliclyAccessible(previousVersion));
-                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion));
-                Assert.False(await service.IsPubliclyAccessible(latestDraftVersion));
+                Assert.False(await service.IsToBePublished(previousVersion));
+                Assert.True(await service.IsToBePublished(latestPublishedVersion));
+                Assert.False(await service.IsToBePublished(latestDraftVersion));
             }
         }
 
         [Fact]
         public async Task
-            IsPubliclyAccessible_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
+            IsToBePublished_ApprovedAndScheduledWithLiveReleaseIsAccessibleIfNextVersionIsScheduledWithNonLiveRelease()
         {
             var liveRelease = new Release
             {
@@ -1333,15 +1333,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Entry(latestApprovedVersion)
                     .ReloadAsync();
 
-                Assert.False(await service.IsPubliclyAccessible(previousVersion));
-                Assert.True(await service.IsPubliclyAccessible(latestPublishedVersion));
-                Assert.False(await service.IsPubliclyAccessible(latestApprovedVersion));
+                Assert.False(await service.IsToBePublished(previousVersion));
+                Assert.True(await service.IsToBePublished(latestPublishedVersion));
+                Assert.False(await service.IsToBePublished(latestApprovedVersion));
             }
         }
 
         [Fact]
         public async Task
-            IsPubliclyAccessible_ApprovedAndPublishedImmediatelyButPublicationNotPublishedIsNotAccessible()
+            IsToBePublished_ApprovedAndPublishedImmediatelyButPublicationNotPublishedIsNotAccessible()
         {
             var methodologyVersion = new MethodologyVersion
             {
@@ -1376,12 +1376,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Entry(methodologyVersion)
                     .ReloadAsync();
 
-                Assert.False(await service.IsPubliclyAccessible(methodologyVersion));
+                Assert.False(await service.IsToBePublished(methodologyVersion));
             }
         }
 
         [Fact]
-        public async Task IsPubliclyAccessible_ScheduledWithReleaseNotFoundIsNotAccessible()
+        public async Task IsToBePublished_ScheduledWithReleaseNotFoundIsNotAccessible()
         {
             var methodologyVersion = new MethodologyVersion
             {
@@ -1415,7 +1415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 var service = BuildMethodologyVersionRepository(contentDbContext);
 
                 await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    service.IsPubliclyAccessible(methodologyVersion));
+                    service.IsToBePublished(methodologyVersion));
             }
         }
 

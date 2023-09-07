@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 });
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(Unit.Instance);
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -299,7 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -375,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -457,7 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -588,7 +588,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -673,7 +673,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(true);
 
@@ -780,7 +780,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -871,7 +871,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -1171,7 +1171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
@@ -1272,7 +1272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(It.Is<MethodologyVersion>(mv =>
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
                         mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
