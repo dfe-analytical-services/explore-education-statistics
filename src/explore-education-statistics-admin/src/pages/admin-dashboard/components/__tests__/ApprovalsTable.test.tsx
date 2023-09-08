@@ -177,7 +177,9 @@ describe('ApprovalsTable', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('There are no pages awaiting your approval.'),
+        screen.getByText(
+          'There are no releases or methodologies awaiting your approval.',
+        ),
       ).toBeInTheDocument();
     });
   });
