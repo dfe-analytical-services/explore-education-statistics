@@ -33,4 +33,13 @@ public static class WebApplicationFactoryExtensions
     {
         return app.WithWebHostBuilder(builder => builder.AddTestData(testData));
     }
+    
+    public static WebApplicationFactory<TEntrypoint> RegisterControllers<TEntrypoint, TStartup>(
+        this WebApplicationFactory<TEntrypoint> app
+    )
+        where TEntrypoint : class
+        where TStartup : class
+    {
+        return app.ConfigureServices(services => services.RegisterControllers<TStartup>());
+    }
 }

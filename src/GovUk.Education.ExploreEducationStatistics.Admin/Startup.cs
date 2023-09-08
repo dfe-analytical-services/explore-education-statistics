@@ -118,7 +118,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         private readonly List<string> _adminUrlAndAliases;
 
-        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+        private readonly bool _applyDatabaseMigrations;
+
+        private readonly bool _configureSpa;
+
+        public Startup(
+            IConfiguration configuration,
+            IHostEnvironment hostEnvironment,
+            bool applyDatabaseMigrations = true,
+            bool configureSpa = true)
         {
             Configuration = configuration;
             HostEnvironment = hostEnvironment;
@@ -128,6 +136,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 _adminUrlAndAliases.AddRange(DevelopmentAdminUrlAliases);
             }
+
+            _applyDatabaseMigrations = applyDatabaseMigrations;
+            _configureSpa = configureSpa;
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -158,7 +169,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddControllers(
                     options => { options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")); }
                 )
-                .AddApplicationPart(typeof(Startup).Assembly)
                 .AddControllersAsServices();
 
             services.AddHttpContextAccessor();
@@ -189,9 +199,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Database contexts
              */
 
-            services.AddDbContext<UsersAndRolesDbContext>(options => GetUsersAndRolesDbContext(options));
-            services.AddDbContext<ContentDbContext>(options => GetContentDbContext(options));
-            services.AddDbContext<StatisticsDbContext>(options => GetStatisticsDbContext(options));
+            services.AddDbContext<UsersAndRolesDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                                .EnableCustomRetryOnFailure()
+                    )
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+            );
+
+            services.AddDbContext<ContentDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly(typeof(Startup).Assembly.FullName)
+                                .EnableCustomRetryOnFailure()
+                    )
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+            );
+
+            services.AddDbContext<StatisticsDbContext>(options =>
+                options
+                    .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
+                        providerOptions =>
+                            providerOptions
+                                .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
+                                .AddBulkOperationSupport()
+                                .EnableCustomRetryOnFailure()
+                    )
+                    .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
+            );
 
             /*
              * Auth / IdentityServer
@@ -384,6 +424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Services
              */
 
+            var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
             var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
@@ -567,12 +608,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
 
-            services.AddSingleton(GetPrivateBlobStorageService);
-            services.AddSingleton(GetPublicBlobStorageService);
+            services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
+            services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
 
-            services.AddTransient<ITableStorageService>(_ => GetTableStorageService());
-            services.AddTransient<IStorageQueueService>(_ => GetStorageQueueService());
-            
+            services.AddTransient<ITableStorageService, TableStorageService>(_ =>
+                new TableStorageService(
+                    coreStorageConnectionString,
+                    new StorageInstanceCreationUtil()));
+            services.AddTransient<IStorageQueueService, StorageQueueService>(_ =>
+                new StorageQueueService(
+                    coreStorageConnectionString,
+                    new StorageInstanceCreationUtil()));
             services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
@@ -636,69 +682,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
         }
 
-        protected virtual IPrivateBlobStorageService GetPrivateBlobStorageService(IServiceProvider services)
-        {
-            return new PrivateBlobStorageService(
-                services.GetRequiredService<ILogger<PrivateBlobStorageService>>(), Configuration);
-        }
-        
-        protected virtual IPublicBlobStorageService GetPublicBlobStorageService(IServiceProvider services)
-        {
-            return new PublicBlobStorageService(
-                services.GetRequiredService<ILogger<PublicBlobStorageService>>(), Configuration);
-        }
-
-        protected virtual IStorageQueueService GetStorageQueueService()
-        {
-            return new StorageQueueService(
-                GetCoreStorageConnectionString(),
-                new StorageInstanceCreationUtil());
-        }
-
-        protected virtual ITableStorageService GetTableStorageService()
-        {
-            return new TableStorageService(
-                GetCoreStorageConnectionString(),
-                new StorageInstanceCreationUtil());
-        }
-
-        protected virtual DbContextOptionsBuilder GetStatisticsDbContext(DbContextOptionsBuilder options)
-        {
-            return options
-                .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                    providerOptions =>
-                        providerOptions
-                            .MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model")
-                            .AddBulkOperationSupport()
-                            .EnableCustomRetryOnFailure()
-                )
-                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment());
-        }
-
-        protected virtual DbContextOptionsBuilder GetContentDbContext(DbContextOptionsBuilder options)
-        {
-            return options
-                .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                    providerOptions =>
-                        providerOptions
-                            .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                            .EnableCustomRetryOnFailure()
-                )
-                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment());
-        }
-
-        protected virtual DbContextOptionsBuilder GetUsersAndRolesDbContext(DbContextOptionsBuilder options)
-        {
-            return options
-                .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                    providerOptions =>
-                        providerOptions
-                            .MigrationsAssembly(typeof(Startup).Assembly.FullName)
-                            .EnableCustomRetryOnFailure()
-                )
-                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment());
-        }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
@@ -707,17 +690,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
             var privateCacheService = new BlobCacheService(
-                provider.GetRequiredService<IPrivateBlobStorageService>(),
+                new PrivateBlobStorageService(
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                    Configuration),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()
             );
             var publicCacheService = new BlobCacheService(
-                provider.GetRequiredService<IPublicBlobStorageService>(),
+                new PublicBlobStorageService(
+                    provider.GetRequiredService<ILogger<IBlobStorageService>>(),
+                    Configuration),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()
             );
             BlobCacheAttribute.AddService("default", privateCacheService);
             BlobCacheAttribute.AddService("public", publicCacheService);
 
-            UpdateDatabase(app, env);
+            if (_applyDatabaseMigrations)
+            {
+                UpdateDatabase(app, env);
+            }
 
             if (env.IsDevelopment())
             {
@@ -815,43 +805,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     template: "{controller}/{action=Index}/{id?}");
             });
 
-            ConfigureDevelopmentSpaServer(app, env);
-        }
-
-        protected virtual void ConfigureDevelopmentSpaServer(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            app.UseSpa(spa =>
+            if (_configureSpa)
             {
-                if (env.IsDevelopment())
+                app.UseSpa(spa =>
                 {
-                    spa.Options.SourcePath = "../explore-education-statistics-admin";
-                    spa.UseReactDevelopmentServer("start");
-                }
-            });
-
-            app.ServerFeatures.Get<IServerAddressesFeature>()
-                ?.Addresses
-                .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
+                    if (env.IsDevelopment())
+                    {
+                        spa.Options.SourcePath = "../explore-education-statistics-admin";
+                        spa.UseReactDevelopmentServer("start");
+                    }
+                });
+            }
         }
 
-        protected virtual void UpdateDatabase(IApplicationBuilder app, IWebHostEnvironment env)
+        private void UpdateDatabase(IApplicationBuilder app, IWebHostEnvironment env)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                        .CreateScope())
             {
-                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetRequiredService<StatisticsDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
 
-                using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetRequiredService<UsersAndRolesDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
 
-                using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetRequiredService<ContentDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
@@ -877,11 +861,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             {
                 migration.Apply();
             }
-        }
-
-        private string GetCoreStorageConnectionString()
-        {
-            return Configuration.GetValue<string>("CoreStorage");
         }
     }
 }
