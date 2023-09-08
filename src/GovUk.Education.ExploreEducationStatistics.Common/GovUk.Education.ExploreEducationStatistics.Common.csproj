@@ -14,7 +14,6 @@
         <PackageReference Include="CsvHelper" Version="30.0.1" />
         <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.21" />
         <!-- TODO EES-4202 DataMovement depends on deprecated Microsoft.Azure.Storage.Blob SDK v11 -->

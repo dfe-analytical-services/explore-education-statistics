@@ -47,7 +47,6 @@
     <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
     <PackageReference Include="JWT" Version="7.3.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.21.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.WebApiCompatShim" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="6.0.21" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.21" />
