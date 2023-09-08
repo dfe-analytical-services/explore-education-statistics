@@ -10,6 +10,7 @@
   "python": {
     "enabled": false
   },
+  "ignoreDeps": ["Mime-Detective"],
   "vulnerabilityAlerts": {
     "groupName": "renovate",
     "dependencyDashboardApproval": false,
@@ -59,14 +60,6 @@
     {
       "matchDatasources": ["dotnet-version"],
       "groupName": ".NET version",
-      "enabled": false
-    },
-    {
-      "packageNames": ["node"],
-      "enabled": false
-    },
-    {
-      "matchPackagePatterns": ["^@ckeditor/", "Mime", "Mime-Detective"],
       "enabled": false
     }
   ]
