@@ -191,6 +191,6 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
 
     private WebApplicationFactory<TestStartup> SetupApp()
     {
-        return _testApp.ResetDbContexts();
+        return _testApp.Initialise();
     }
 }
