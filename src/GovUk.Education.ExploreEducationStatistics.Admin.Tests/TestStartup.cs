@@ -21,16 +21,15 @@ using Microsoft.Extensions.Options;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests;
 
 /// <summary>
-/// Generic test application startup for use in integration tests.
+/// Test application Startup for use in Admin integration tests.
 ///
 /// This startup inherits from the real production <see cref="Startup"/> process to make available as realistic a
 /// set of services as possible, but mocks out services that interact with Azure services and registers in-memory
 /// DbContexts in place of the real DbContexts. It also suppresses the applying of migrations to the DbContexts,
 /// which is not compatible with in-memory databases.
 ///
-/// Additionally this startup configuration does not attempt to start
-/// up the SPA, which requires NPM and needs a more involved and lengthy startup process that is not useful for
-/// integration tests.
+/// Additionally this startup configuration does not attempt to start up the SPA, which requires NPM and needs a
+/// more involved and lengthy startup process that is not useful for integration tests.
 /// </summary>
 /// <remarks>
 /// Use in combination with <see cref="TestApplicationFactory{TStartup}"/>
@@ -52,6 +51,12 @@ public class TestStartup : Startup
 
 public static class TestStartupExtensions
 {
+    /// <summary>
+    /// Call this method when using this TestStartup to replace DbContexts with in-memory equivalents and services
+    /// which have external dependencies with mocks.
+    /// </summary>
+    /// <param name="testApp"></param>
+    /// <returns></returns>
     public static WebApplicationFactory<TestStartup> Initialise(
         this WebApplicationFactory<TestStartup> testApp)
     {
@@ -85,6 +90,15 @@ public static class TestStartupExtensions
             .ResetStatisticsDbContext();
     }
     
+    /// <summary>
+    /// This method adds an authenticated User in the form of a ClaimsPrincipal to the HttpContext.
+    ///
+    /// This User will subsequently be available for the Identity Framework as well as our own UserService, and any
+    /// other production code that looks up the User from the currect HttpContext.
+    /// </summary>
+    /// <param name="testApp"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
     public static WebApplicationFactory<TestStartup> SetUser(
         this WebApplicationFactory<TestStartup> testApp, 
         ClaimsPrincipal? user = null)

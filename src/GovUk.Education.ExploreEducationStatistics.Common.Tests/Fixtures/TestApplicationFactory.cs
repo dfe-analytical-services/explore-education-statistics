@@ -40,7 +40,8 @@ public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> 
                 config.AddConfiguration(new ConfigurationBuilder()
                     .AddJsonFile("appsettings.json", optional: true)
                     .AddJsonFile("appsettings.Development.json", optional: true)
-                    .AddJsonFile("integration-test-settings.json", optional: true)
+                    .AddJsonFile("appsettings.Local.json", optional: true)
+                    .AddJsonFile("appsettings.IntegrationTests.json", optional: true)
                     .Build());
             });
     }
