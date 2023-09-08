@@ -61,6 +61,19 @@
       "matchDatasources": ["dotnet-version"],
       "groupName": ".NET version",
       "enabled": false
+    },
+    {
+      "matchDatasources": ["nuget"],
+      "matchPackagePrefixes": [
+        "dotnet-ef",
+        "Microsoft.AspNetCore",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Extensions",
+        "Thinktecture.EntityFrameworkCore",
+        "Microsoft.VisualStudio.Web.CodeGeneration.Design"
+      ],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
     }
   ]
 }
