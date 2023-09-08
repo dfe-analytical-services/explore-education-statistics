@@ -70,7 +70,9 @@ export default function ApprovalsTable({
   );
 
   if (!Object.keys(allApprovalsByPublication).length) {
-    return <p>There are no pages awaiting your approval.</p>;
+    return (
+      <p>There are no releases or methodologies awaiting your approval.</p>
+    );
   }
 
   return (
