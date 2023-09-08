@@ -21,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
@@ -282,9 +281,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             ITableBuilderService? tableBuilderService = null)
         {
             return _testApp
-                .ResetDbContexts()
+                .Initialise()
                 .ConfigureServices(services => services
-                    .AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
+                    .ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
         }
     }
 }
