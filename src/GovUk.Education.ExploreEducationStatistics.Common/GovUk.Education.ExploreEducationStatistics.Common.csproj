@@ -16,21 +16,21 @@
         <PackageReference Include="Microsoft.ApplicationInsights" Version="2.21.0" />
         <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.20" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.21" />
         <!-- TODO EES-4202 DataMovement depends on deprecated Microsoft.Azure.Storage.Blob SDK v11 -->
         <PackageReference Include="Microsoft.Azure.Storage.DataMovement" Version="2.0.4" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.20" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.20" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.21" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.21" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
         <PackageReference Include="Namotion.Reflection" Version="2.1.2" />
-        <PackageReference Include="NCrontab.Signed" Version="3.3.2" />
+        <PackageReference Include="NCrontab.Signed" Version="3.3.3" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
         <PackageReference Include="System.Linq.Async" Version="5.1.0" />
         <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-        <PackageReference Include="Mime" Version="3.5.1" />
+        <PackageReference Include="Mime" Version="3.5.2" />
         <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />
         <PackageReference Include="Thinktecture.EntityFrameworkCore.BulkOperations" Version="4.5.1" />
         <PackageReference Include="ZstdSharp.Port" Version="0.7.2" />

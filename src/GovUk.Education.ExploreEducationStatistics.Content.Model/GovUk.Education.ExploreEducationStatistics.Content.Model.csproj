@@ -7,7 +7,7 @@
     <ItemGroup>
         <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
         <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.20" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.21" />
         <PackageReference Include="System.Linq.Async" Version="5.1.0" />
     </ItemGroup>
 
