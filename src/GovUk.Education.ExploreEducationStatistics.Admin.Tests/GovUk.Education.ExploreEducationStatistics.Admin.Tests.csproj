@@ -41,8 +41,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="integration-test-settings.json" />
-    <Content Include="integration-test-settings.json">
+    <Content Include="appsettings.IntegrationTests.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

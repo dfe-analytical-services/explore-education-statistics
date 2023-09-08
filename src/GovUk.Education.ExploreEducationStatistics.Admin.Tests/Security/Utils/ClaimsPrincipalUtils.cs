@@ -38,10 +38,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
             return CreateClaimsPrincipal(
                 Guid.NewGuid(),
                 RoleClaim(Analyst),
-                    SecurityClaim(ApplicationAccessGranted),
-                    SecurityClaim(AnalystPagesAccessGranted),
-                    SecurityClaim(PrereleasePagesAccessGranted),
-                    SecurityClaim(CanViewPrereleaseContacts));
+                SecurityClaim(ApplicationAccessGranted),
+                SecurityClaim(AnalystPagesAccessGranted),
+                SecurityClaim(PrereleasePagesAccessGranted),
+                SecurityClaim(CanViewPrereleaseContacts));
         }
         
         public static ClaimsPrincipal PreReleaseUser()
@@ -62,10 +62,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
         {
             var identity = new ClaimsIdentity(
-                new List<Claim>(), 
-                "TestAuthenticationType", 
-                JwtClaimTypes.Name, 
-                JwtClaimTypes.Role);
+                claims: new List<Claim>(), 
+                authenticationType: "TestAuthenticationType", 
+                nameType: JwtClaimTypes.Name, 
+                roleType: JwtClaimTypes.Role);
             
             identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
             identity.AddClaims(additionalClaims);

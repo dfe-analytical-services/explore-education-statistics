@@ -8,8 +8,15 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 
+/// <summary>
+/// This class contains a number of extension methods for IServiceCollection that are useful when setting up
+/// integration tests that require a customised Startup class.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// This method replaces a DcContext that has been registered in Startup with an in-memory equivalent.
+    /// </summary>
     public static IServiceCollection ReplaceDbContext<TDbContext>(this IServiceCollection services)
         where TDbContext : DbContext
     {
@@ -25,6 +32,10 @@ public static class ServiceCollectionExtensions
                 .UseInMemoryDatabase(nameof(TDbContext), builder => builder.EnableNullChecks(false)));
     }
     
+    /// <summary>
+    /// This method replaces a service that has been registered in Startup with a new implementation. The same
+    /// lifecycle that was registered in Startup will be used to register the new service.
+    /// </summary>
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services, 
         TService replacement)
@@ -47,6 +58,10 @@ public static class ServiceCollectionExtensions
         };
     }
     
+    /// <summary>
+    /// This method replaces a service that has been registered in Startup with a Strict Mock. The same
+    /// lifecycle that was registered in Startup will be used to register the new service.
+    /// </summary>
     public static IServiceCollection ReplaceService<TService>(
         this IServiceCollection services)
         where TService : class
@@ -54,13 +69,16 @@ public static class ServiceCollectionExtensions
         return services.ReplaceService(Mock.Of<TService>(Strict));
     }
     
+    /// <summary>
+    /// This method registers all Controllers found in the <see cref="TStartup"/> class's assembly.
+    /// </summary>
     public static IServiceCollection RegisterControllers<TStartup>(
         this IServiceCollection services)
         where TStartup : class
     {
-        services.AddControllers(
-                options => { options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")); }
-            )
+        services
+            .AddControllers(options => 
+                options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")))
             .AddApplicationPart(typeof(TStartup).Assembly)
             .AddControllersAsServices();
 
