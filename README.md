@@ -95,9 +95,12 @@ This will install the package manager version specified in the `package.json` fi
 pnpm -v
 ```
 
-### Adding the local site domain to hosts file
+### Optional - Adding the local site domain to hosts file
 
-Add the following to your `hosts` file:
+You can skip this step if you prefer to use http://localhost.
+
+If you would like to use a 'nicer' URL instead of http://localhost, you can change your `hosts` file 
+with the following entry (or similar):
 
 ```
 127.0.0.1    ees.local
@@ -111,7 +114,6 @@ Add the following to your `hosts` file:
      cd src
      docker-compose up -d db data-storage
      ```
-
 
 2. Add the following to your `hosts` file:
 
@@ -200,16 +202,28 @@ Keycloak equivalent as a template as to how the configuration in the file should
 
 #### Using Keycloak
 
-1. Start up Keycloak:
+The Keycloak Docker container can be started by one of the following methods:
+
+1. Indirectly by starting the admin via the `start` script:
+
+   ```bash
+   pnpm start admin
+   ```
+   
+   This will start the Keycloak container before the admin starts if you haven't created a
+   custom `appsettings.Idp.json` file (see earlier).
+   
+2. Directly via the `start` script:
 
    ```bash
    pnpm start idp
    ```
 
-2. Start up the Admin:
+3. Directly via Docker Compose:
 
    ```bash
-   pnpm start admin
+   src
+   docker-compose up idp
    ```
 
 All the standard seed data users can be supported with Keycloak, and use their standard email addresses and the
@@ -222,7 +236,7 @@ The standard accounts used day to day are:
   * analyst - username `analyst` and password `password`
   * analyst2 - username `analyst2` and password `password`
 
-The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with username `admin` and password
+The [Keycloak Admin login](http://localhost:5030/auth/admin/) is available with username `admin` and password
 `admin`. From here, users and OpenID Connect settings can be administered.
 
 ##### Adding additional users to Keycloak manually
@@ -232,11 +246,16 @@ Additional seed data users can be added to Keycloak by manually adding new entri
 `credentials` Ids. If copying and pasting from an existing user record in the array, the new user password will be
 "password" also.
 
-After this, existing Keycloak Docker containers will need to be rebuilt in order to pick up the new user list. To
-do this, run:
+After this, existing Keycloak Docker containers will need to be rebuilt in order to pick up the new user list. 
+
+To do this, you can run one of the following:
 
 ```bash
-cd src/
+# Using start script
+pnpm start idp --rebuild-docker
+
+# Using Docker
+cd src
 docker-compose up --build --force-recreate idp
 ```
 
@@ -293,34 +312,40 @@ BootstrapUsers=Idp
 
 A good way of running applications/functions is directly through an IDE like [Rider](https://www.jetbrains.com/rider/).
 
-Alternatively, you can use our `run` script. This is a simple wrapper around the various CLI 
-commands you need to run the applications. 
+Alternatively, you can use our `start` script. This is a simple wrapper around the various CLI 
+commands you need to start the applications. 
 
-We've aliased the `run.js` script for convenience in the root package.json (as `pnpm start`).
+This can be most easily accessed via from the root package.json as `pnpm start`.
 
 You will need to ensure you have all the project dependencies as specified in [Requirements](#requirements).
 
+The script provides additional information about its usage by adding the `--help` flag:
+
+```bash
+pnpm start --help
+```
+
 Examples:
 
-- To run the public frontend backend APIs:
+- To start the public frontend backend APIs:
 
   ```bash
   pnpm start data content
   ```
 
-- To run the public frontend:
+- To start the public frontend:
 
    ```bash
    pnpm start frontend
    ```
 
-- To run the admin (front and backend):
+- To start the admin (front and backend):
 
   ```bash
   pnpm start admin
   ```
 
-- To run other services:
+- To start other services:
 
   ```bash
   pnpm start publisher processor
@@ -329,7 +354,27 @@ Examples:
 The frontend applications can be accessed via:
 
 - `http://localhost:3000` for the public frontend
-- `http://localhost:5021` for the admin frontend
+- `https://localhost:5021` for the admin frontend
+
+### Aliasing the start script
+
+A nice and convenient way to access the start script from anywhere on your machine is to create a 
+custom function in your `.bashrc`, `.zshrc` or similar.
+
+This function would look like the following (change to your liking):
+
+```sh
+function ees()
+{
+    (cd your-ees-directory && pnpm start &*)
+}
+```
+
+You would then be able to use this like:
+
+```sh
+ees content data
+```
 
 ## Frontend development
 
