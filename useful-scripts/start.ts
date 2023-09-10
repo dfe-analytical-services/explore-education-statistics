@@ -400,7 +400,7 @@ async function startService(service: ServiceName): Promise<void> {
   logService(service, logColours.info('Starting service...'));
 
   const serviceProcess = $({
-    cwd: path.join(projectRoot, schema.type === 'docker' ? 'src' : schema.root),
+    cwd: path.join(projectRoot, schema.type === 'docker' ? '' : schema.root),
     env,
     shell: true,
     cleanup: false,
