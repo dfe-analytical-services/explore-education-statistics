@@ -63,6 +63,11 @@
       "enabled": false
     },
     {
+      "matchDatasources": ["node-version"],
+      "groupName": "Node version",
+      "enabled": false
+    },
+    {
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
         "dotnet-ef",
