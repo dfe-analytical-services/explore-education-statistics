@@ -40,7 +40,7 @@
   <ItemGroup>
     <PackageReference Include="AspectInjector" Version="2.8.2" PrivateAssets="all" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.21" PrivateAssets="all" />
-    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <!-- TODO remove AutoMapper.Extensions.Microsoft.DependencyInjection with AutoMapper v13 -->
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="GovukNotify" Version="6.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.52" />
