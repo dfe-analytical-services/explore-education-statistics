@@ -63,7 +63,6 @@
       "enabled": false
     },
     {
-      "matchDatasources": ["node-version"],
       "matchPackageNames": ["node"],
       "groupName": "Node version",
       "enabled": false
