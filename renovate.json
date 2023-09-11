@@ -74,6 +74,18 @@
       ],
       "matchUpdateTypes": ["major"],
       "enabled": false
+    },
+    {
+      "description": "Restrict AutoMapper due to incompatibility with IdentityServer4.EntityFramework.Storage",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AutoMapper"],
+      "allowedVersions": "<=9.0.0"
+    },
+    {
+      "description": "Restrict AutoMapper.Extensions.Microsoft.DependencyInjection to correspond with AutoMapper version",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AutoMapper.Extensions.Microsoft.DependencyInjection"],
+      "allowedVersions": "<=7.0.0"
     }
   ]
 }
