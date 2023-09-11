@@ -74,9 +74,18 @@ To emulate Azure storage services (blobs, tables and queues) you will require on
 
 ### Install PNPM via corepack
 
-We use [PNPM](https://pnpm.io/) and [PNPM workspaces](https://pnpm.io/workspaces) to manage our dependencies. PNPM is a drop in replacement for [NPM](https://www.npmjs.com/) which has several advantages over it's predecessor. You can read more about the benefits of PNPM [here](https://pnpm.io/motivation). This is installed & managed via [corepack](https://github.com/nodejs/corepack).
+We use [PNPM](https://pnpm.io/) and [PNPM workspaces](https://pnpm.io/workspaces) to manage our dependencies. PNPM is a drop in replacement 
+for [NPM](https://www.npmjs.com/) which has several advantages over its predecessor. You can read more about the benefits 
+of PNPM [here](https://pnpm.io/motivation). This is installed & managed via [corepack](https://github.com/nodejs/corepack).
 
-Corepack is a tool installed as part of your Node.js installation that allows you to install and manage multiple package manager versions in your environment based on per-project configuration (via the `packageManager` field in `package.json`). We use corepack to ensure that everyone is using the same version of PNPM to avoid any issues when people are using different versions of PNPM. In order to configure corepack to use PNPM, run the following command:
+Corepack is a tool installed as part of your Node.js installation that allows you to install and 
+manage multiple package manager versions in your environment based on per-project configuration 
+(via the `packageManager` field in `package.json`). 
+
+We use corepack to ensure that everyone is using the same version of PNPM to avoid any issues when 
+people are using different versions of PNPM. 
+
+In order to install Corepack and the right version of PNPM, run the following command:
 
 ```bash
 corepack enable
@@ -89,13 +98,22 @@ PNPM_VERSION=$(node -e "console.log(require('./package.json').engines.pnpm)")
 curl -fsSL https://get.pnpm.io/install.sh | env PNPM_VERSION=$PNPM_VERSION sh -
 ```
 
-This will install the package manager version specified in the `package.json` file. You can check that this has been installed by running:
+This will install the package manager version specified in the `package.json` file. You can check
+that this has been installed by running:
 
 ```bash
 pnpm -v
 ```
 
-### Optional - Adding the local site domain to hosts file
+### Install PNPM dependencies
+
+Install the project's PNPM dependencies by simply running:
+
+```sh
+pnpm i
+```
+
+### Optional - Add the local site domain to hosts file
 
 You can skip this step if you prefer to use http://localhost.
 
@@ -106,89 +124,97 @@ with the following entry (or similar):
 127.0.0.1    ees.local
 ```
 
-### Setting up the database and storage emulator
+### Set up the database and storage emulator hosts
 
-1. Start the database and storage emulator:
+Firstly, you'll need to add the following to your `hosts` file:
 
-     ```bash
-     cd src
-     docker-compose up -d db data-storage
-     ```
-
-2. Add the following to your `hosts` file:
-
-   ```
-   127.0.0.1    db
-   127.0.0.1    data-storage
-   ```
+```
+127.0.0.1    db
+127.0.0.1    data-storage
+```
    
-   On unix based machines this is located in `/etc/hosts`. On Windows this is located in `C:\Windows\System32\drivers\etc\hosts`.
-   
-#### Use a pre-built development database
+- On Unix this is located in `/etc/hosts`. 
+- On Windows this is located in `C:\Windows\System32\drivers\etc\hosts`.
 
-We regularly create new development databases that are uploaded Google Drive. Ask a team member if you need to request access.
+### Set up your database
 
-These are already bootstrapped with seed data to run tests and start the project. This is the **recommended** way of running the project.
+There are two options for setting up your database:
 
-This data will need to be loaded into SQL Server:
+#### Option 1 - Use a pre-built development database
 
-- Using Docker - copy the `ees-mssql` directory into the project's `data` directory. You **must** 
-  give all OS users appropriate access to this directory.
-  - In Linux:
-    - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
-      `ees-mssql` folder in the unencrypted location can then be symlinked in to the `data` folder
-      using `ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql`.
-    - The Docker container user needs ownership fo the ees-mssql folder. Run  
-    `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
-     permissions.
+We regularly create new development databases that are uploaded Google Drive. Ask a team member if 
+you need to access.
+
+These are already bootstrapped with seed data to run tests and start the project. This is the 
+**recommended** way of running the project.
+
+This data will need to be loaded into SQL Server by copying the `ees-mssql` directory into the 
+project's `data` directory. You **must** give all OS users appropriate access to this directory.
+
+In Linux:
+  - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
+    `ees-mssql` folder in the unencrypted location can then be symlinked in to the `data` folder
+    using `ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql`.
+  - The Docker container user needs ownership fo the ees-mssql folder. Run  
+  `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
+   permissions.
 
 
-#### Use a bare database
+All the data in the `data/ees-mssql` directory will be mounted and loaded when the SQL Server Docker
+container starts. This cna be 
+
+#### Option 2 - Use a bare database
 
 The service can be started against a set of non-existent database. If no pre-existing `content` or 
 `statistics` databases yet exist on the target SQL Server instance:
 
-1. Create empty `content` and `statistics` databases.
-2. Perform a one-off creation of database logins and users.  Using Azure Data Studio or similar, 
+1. Start the SQL Server Docker container:
+
+   ```
+   docker-compose up -d db
+   ```
+
+2. Create empty `content` and `statistics` databases.
+3. Perform a one-off creation of database logins and users. Using Azure Data Studio or similar, 
    connect to these new databases and run:
-      ```sql
-      -- Against the `master` database
-      CREATE Login [adminapp] WITH PASSWORD = 'Your_Password123';
-      CREATE Login [importer] WITH PASSWORD = 'Your_Password123';
-      CREATE Login [publisher] WITH PASSWORD = 'Your_Password123';
-      CREATE Login [content] WITH PASSWORD = 'Your_Password123';
-      CREATE Login [data] WITH PASSWORD = 'Your_Password123';
-      
-      -- Against the `content` database
-      CREATE USER [adminapp] FROM LOGIN [adminapp];
-      ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
-      ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
-      ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
-      ALTER ROLE [db_securityadmin] add member [adminapp];
-      GRANT ALTER ANY USER TO [adminapp];
-      
-      -- Against the `statistics` database
-      CREATE USER [adminapp] FROM LOGIN [adminapp];
-      ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
-      ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
-      ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
-      ALTER ROLE [db_securityadmin] add member [adminapp];
-      GRANT ALTER ANY USER TO [adminapp];
-      GRANT EXECUTE ON TYPE::IdListGuidType TO [adminapp];
-      GRANT EXECUTE ON OBJECT::FilteredFootnotes TO [adminapp];
-      GRANT SELECT ON OBJECT::geojson TO [adminapp];
-      ```
-   This will create contained users for the `content` and `statistics` databases as well as allowing the `adminapp` user  
-   to manage the permissions of the contained users.
-3. Start the Admin project and this will configure the contained users' permissions via database migrations. The other 
-   projects will then be able to be started, using their own contained users to connect to the databases. 
+   ```sql
+   -- Against the `master` database
+   CREATE Login [adminapp] WITH PASSWORD = 'Your_Password123';
+   CREATE Login [importer] WITH PASSWORD = 'Your_Password123';
+   CREATE Login [publisher] WITH PASSWORD = 'Your_Password123';
+   CREATE Login [content] WITH PASSWORD = 'Your_Password123';
+   CREATE Login [data] WITH PASSWORD = 'Your_Password123';
+   
+   -- Against the `content` database
+   CREATE USER [adminapp] FROM LOGIN [adminapp];
+   ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
+   ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
+   ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
+   ALTER ROLE [db_securityadmin] add member [adminapp];
+   GRANT ALTER ANY USER TO [adminapp];
+   
+   -- Against the `statistics` database
+   CREATE USER [adminapp] FROM LOGIN [adminapp];
+   ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
+   ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
+   ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
+   ALTER ROLE [db_securityadmin] add member [adminapp];
+   GRANT ALTER ANY USER TO [adminapp];
+   GRANT EXECUTE ON TYPE::IdListGuidType TO [adminapp];
+   GRANT EXECUTE ON OBJECT::FilteredFootnotes TO [adminapp];
+   GRANT SELECT ON OBJECT::geojson TO [adminapp];
+   ```
+   This will create contained users for the `content` and `statistics` databases as well as allowing 
+   the `adminapp` user  to manage the permissions of the contained users.
+4. Start the Admin project and this will configure the contained users' permissions via database migrations. 
+   The other projects will then be able to be started, using their own contained users to connect to the databases. 
 
 ### Setting up an Identity Provider (IdP)
 
 The project uses an OpenID Connect Identity Provider (IdP) to allow login to the Admin service.
 
-> For team members, Azure AD configuration is available alongside other project passwords with the title `Azure AD IdP 
-configuration`. Place the contents of this into [appsettings.Idp.json](
+> For team members, Azure AD configuration is available alongside other project passwords with the title 
+> `Azure AD IdP configuration`. Place the contents of this into [appsettings.Idp.json](
 src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json) and start Admin normally.
 
 An out-of-the-box IdP is provided for ease of setup which runs [Keycloak](https://www.keycloak.org/) in a Docker container 
@@ -255,7 +281,6 @@ To do this, you can run one of the following:
 pnpm start idp --rebuild-docker
 
 # Using Docker
-cd src
 docker-compose up --build --force-recreate idp
 ```
 
@@ -444,7 +469,6 @@ When adding new NPM dependencies, be aware that we need to be careful about wher
 To install new dependencies, you will need to use PNPM to do this, with the following steps:
 
 1. Directly add dependencies to any required `package.json` file(s).
-
 2. Run the following:
 
 ```bash
