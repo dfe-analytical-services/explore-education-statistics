@@ -68,6 +68,7 @@
       "enabled": false
     },
     {
+      "description": "Packages which need major versions to be in sync with the EF Core version or the .NET version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
         "dotnet-ef",
@@ -75,7 +76,8 @@
         "Microsoft.EntityFrameworkCore",
         "Microsoft.Extensions",
         "Thinktecture.EntityFrameworkCore",
-        "Microsoft.VisualStudio.Web.CodeGeneration.Design"
+        "Microsoft.VisualStudio.Web.CodeGeneration.Design",
+        "MockQueryable.Moq"
       ],
       "matchUpdateTypes": ["major"],
       "enabled": false
