@@ -49,12 +49,12 @@
     },
     {
       "matchDatasources": ["pypi"],
-      "groupName": "python dependencies",
+      "groupName": "Python dependencies",
       "enabled": false
     },
     {
       "matchDatasources": ["docker"],
-      "groupName": "docker image updates",
+      "groupName": "Docker image updates",
       "enabled": false
     },
     {
@@ -64,6 +64,7 @@
     },
     {
       "matchDatasources": ["node-version"],
+      "matchPackageNames": ["node"],
       "groupName": "Node version",
       "enabled": false
     },
