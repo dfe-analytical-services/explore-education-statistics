@@ -82,20 +82,6 @@ public class PublishingCompletionService : IPublishingCompletionService
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(releaseId => _releaseService.SetPublishedDate(releaseId, DateTime.UtcNow));
 
-        var publicationSlugs = prePublishingStagesComplete
-            .Select(status => status.PublicationSlug)
-            .Distinct();
-
-        var directlyRelatedPublicationIds = await _contentDbContext
-            .Publications
-            .Where(p => publicationSlugs.Contains(p.Slug))
-            .Select(p => p.Id)
-            .ToListAsync();
-
-        await directlyRelatedPublicationIds
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(_publicationRepository.UpdateLatestPublishedRelease);
-
         await releaseIdsToUpdate
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(async releaseId =>
@@ -111,12 +97,27 @@ public class PublishingCompletionService : IPublishingCompletionService
 
                 foreach (var methodologyVersion in methodologyVersions)
                 {
+                    // WARN: This must be called before PublicationRepository#UpdateLatestPublishedRelease
                     if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
                     {
                         await _methodologyService.Publish(methodologyVersion);
                     }
                 }
             });
+
+        var publicationSlugs = prePublishingStagesComplete
+            .Select(status => status.PublicationSlug)
+            .Distinct();
+
+        var directlyRelatedPublicationIds = await _contentDbContext
+            .Publications
+            .Where(p => publicationSlugs.Contains(p.Slug))
+            .Select(p => p.Id)
+            .ToListAsync();
+
+        await directlyRelatedPublicationIds
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(_publicationRepository.UpdateLatestPublishedRelease);
 
         // Update the cached publication and any cached superseded publications.
         // If this is the first live release of the publication, the superseding is now enforced

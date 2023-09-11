@@ -62,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     var (release, unattachedDataBlocks, files) = releaseBlocksAndFiles;
 
-                    var methodologyVersions = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
+                    var methodologyVersions = await _methodologyVersionRepository
+                        .GetLatestVersionByPublication(release.PublicationId);
 
                     var approvedMethodologyVersions = methodologyVersions
                         .Where(mv => mv.Approved)

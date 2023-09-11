@@ -65,7 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
         public async Task<List<MethodologyVersion>> GetLatestVersionByPublication(Guid publicationId)
         {
-            // First check the publication exists
             var publication = await _contentDbContext.Publications
                 .AsQueryable()
                 .SingleAsync(p => p.Id == publicationId);
