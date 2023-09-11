@@ -7,7 +7,7 @@ import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { AuthContextProvider } from '@admin/contexts/AuthContext';
 import { ConfigContextProvider } from '@admin/contexts/ConfigContext';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
-import routes from '@admin/routes/routes';
+// import routes from '@admin/routes/routes';
 import {
   ApplicationInsightsContextProvider,
   useApplicationInsights,
@@ -22,9 +22,9 @@ import { LastLocationContextProvider } from './contexts/LastLocationContext';
 
 const queryClient = new QueryClient();
 
-const PrototypeIndexPage = lazy(
-  () => import('@admin/prototypes/PrototypeIndexPage'),
-);
+// const PrototypeIndexPage = lazy(
+//   () => import('@admin/prototypes/PrototypeIndexPage'),
+// );
 
 function ApplicationInsightsTracking() {
   const appInsights = useApplicationInsights();
@@ -57,7 +57,7 @@ function PrototypesEntry() {
   return (
     <Suspense fallback={<ServiceProblemsPage />}>
       <Switch>
-        <Route exact path="/prototypes" component={PrototypeIndexPage} />
+        {/*<Route exact path="/prototypes" component={PrototypeIndexPage} />*/}
         {prototypeRoutes?.map(route => (
           <Route key={route.path} exact={route.exact ?? true} {...route} />
         ))}
@@ -67,6 +67,7 @@ function PrototypesEntry() {
 }
 
 function App() {
+  console.log('I am here');
   return (
     <ConfigContextProvider>
       {config => (
@@ -86,17 +87,17 @@ function App() {
                         ),
                       )}
 
-                      {Object.entries(routes).map(([key, route]) => (
-                        <ProtectedRoute key={key} {...route} />
-                      ))}
+                      {/*{Object.entries(routes).map(([key, route]) => (*/}
+                      {/*  <ProtectedRoute key={key} {...route} />*/}
+                      {/*))}*/}
 
-                      {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
-                      {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
-                      <ProtectedRoute
-                        path="/prototypes"
-                        protectionAction={user => user.permissions.isBauUser}
-                        component={PrototypesEntry}
-                      />
+                      {/*/!* Prototype pages are protected by default. To open them up change the ProtectedRoute to: *!/*/}
+                      {/*/!* <Route path="/prototypes" component={PrototypesEntry} /> *!/*/}
+                      {/*<ProtectedRoute*/}
+                      {/*  path="/prototypes"*/}
+                      {/*  protectionAction={user => user.permissions.isBauUser}*/}
+                      {/*  component={PrototypesEntry}*/}
+                      {/*/>*/}
 
                       <ProtectedRoute
                         path="*"

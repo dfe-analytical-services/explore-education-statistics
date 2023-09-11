@@ -67,12 +67,12 @@ const PageFooter = ({ wide }: Props) => {
               , except where otherwise stated
             </span>
 
-            {process.env.REACT_APP_BUILD_NUMBER && (
+            {process.env.VITE_BUILD_NUMBER && (
               <p
                 aria-hidden
                 className="govuk-!-margin-top-3 govuk-!-font-size-14"
               >
-                Build: {process.env.REACT_APP_BUILD_NUMBER}
+                Build: {process.env.VITE_BUILD_NUMBER}
               </p>
             )}
           </div>

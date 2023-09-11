@@ -23,7 +23,7 @@ import Modal from '@common/components/Modal';
 import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
-import Editor from 'explore-education-statistics-ckeditor';
+// import Editor from 'explore-education-statistics-ckeditor';
 import React, {
   MutableRefObject,
   useCallback,
@@ -310,15 +310,15 @@ const FormEditor = ({
         >
           {process.env.NODE_ENV !== 'test' ? (
             <>
-              <CKEditor
-                editor={Editor}
-                config={config}
-                data={value}
-                onChange={handleChange}
-                onFocus={toggleFocused.on}
-                onBlur={handleBlur}
-                onReady={handleReady}
-              />
+              {/*<CKEditor*/}
+              {/*  editor={Editor}*/}
+              {/*  config={config}*/}
+              {/*  data={value}*/}
+              {/*  onChange={handleChange}*/}
+              {/*  onFocus={toggleFocused.on}*/}
+              {/*  onBlur={handleBlur}*/}
+              {/*  onReady={handleReady}*/}
+              {/*/>*/}
               <Modal
                 className="govuk-!-width-one-third"
                 title="Insert glossary link"

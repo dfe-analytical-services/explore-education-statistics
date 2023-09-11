@@ -795,6 +795,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 if (env.IsDevelopment())
                 {
                     spa.Options.SourcePath = "../explore-education-statistics-admin";
+                    spa.Options.DevServerPort = 3001;
                     spa.UseReactDevelopmentServer("start");
                 }
             });

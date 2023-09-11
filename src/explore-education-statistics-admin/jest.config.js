@@ -1,7 +1,6 @@
 /** @type {import('jest').Config} */
 const config = {
   collectCoverageFrom: ['src/**/*.{js,jsx,ts,tsx}', '!src/**/*.d.ts'],
-  setupFiles: ['react-app-polyfill/jsdom'],
   verbose: true,
   setupFilesAfterEnv: ['<rootDir>/test/setupTests.js'],
   testMatch: [
@@ -14,9 +13,9 @@ const config = {
   },
   transform: {
     '^.+\\.(t|j)sx?$': 'babel-jest',
-    '^.+\\.css$': '<rootDir>/config/jest/cssTransform.js',
+    '^.+\\.css$': 'explore-education-statistics-common/test/cssTransform.js',
     '^(?!.*\\.(js|jsx|ts|tsx|css|json)$)':
-      '<rootDir>/config/jest/fileTransform.js',
+      'explore-education-statistics-common/test/fileTransform.js',
   },
   transformIgnorePatterns: [
     '[/\\\\]node_modules[/\\\\].+\\.(js|jsx|ts|tsx)$',

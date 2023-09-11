@@ -20,7 +20,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import classNames from 'classnames';
 import { Formik, FormikHelpers } from 'formik';
 import React, { useCallback, useRef } from 'react';
-import { useIdleTimer } from 'react-idle-timer';
+import { useIdleTimer } from 'react-idle-timer/modern';
 
 interface FormValues {
   content: string;

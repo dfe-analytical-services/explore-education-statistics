@@ -1,14 +1,21 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "target": "ES2021",
+    "lib": ["ES2021", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "isolatedModules": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "useDefineForClassFields": true,
     "baseUrl": ".",
     "paths": {
-      "@admin/*": ["../explore-education-statistics-admin/src/*"],
-      "@admin-test/*": ["../explore-education-statistics-admin/test/*"],
+      "@admin/*": ["./src/*"],
+      "@admin-test/*": ["./test/*"],
       "@common/*": ["../explore-education-statistics-common/src/*"],
       "@common-test/*": ["../explore-education-statistics-common/test/*"]
-    },
-    "sourceMap": true
+    }
   },
   "include": [
     "src",
@@ -17,5 +24,8 @@
   "exclude": [
     "build",
     "node_modules"
+  ],
+  "references": [
+    { "path": "./tsconfig.node.json" }
   ]
 }

@@ -9,7 +9,7 @@ import FormCheckboxGroup, {
 import FormFieldset, {
   FormFieldsetProps,
 } from '@common/components/form/FormFieldset';
-import styles from '@common/components/form/FormCheckboxSearchSubGroups.module.scss';
+import styles from '@common/components/form/FormCheckboxSearchGroup.module.scss';
 import FormTextSearchInput from '@common/components/form//FormTextSearchInput';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useMounted from '@common/hooks/useMounted';
