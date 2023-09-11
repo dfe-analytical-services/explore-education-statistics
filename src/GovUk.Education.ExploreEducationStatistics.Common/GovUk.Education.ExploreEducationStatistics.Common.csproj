@@ -22,12 +22,12 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.21" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.21" />
         <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="6.0.0" />
-        <PackageReference Include="Namotion.Reflection" Version="2.1.2" />
+        <PackageReference Include="Namotion.Reflection" Version="3.0.0" />
         <PackageReference Include="NCrontab.Signed" Version="3.3.3" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
-        <PackageReference Include="System.Linq.Async" Version="5.1.0" />
+        <PackageReference Include="System.Linq.Async" Version="6.0.1" />
         <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
         <PackageReference Include="Mime" Version="3.5.2" />
         <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />

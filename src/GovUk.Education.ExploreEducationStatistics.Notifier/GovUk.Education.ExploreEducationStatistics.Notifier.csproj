@@ -7,12 +7,12 @@
   <ItemGroup>
     <PackageReference Include="GovukNotify" Version="6.1.0" />
     <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
-    <PackageReference Include="JWT" Version="7.3.1" />
+    <PackageReference Include="JWT" Version="10.1.0" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.2.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.32.3" />
-    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="6.32.3" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.0.0" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup>
     <FunctionsPreservedDependencies Include="Microsoft.IdentityModel.Logging.dll" />
