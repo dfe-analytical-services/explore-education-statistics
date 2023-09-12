@@ -68,16 +68,11 @@
       "enabled": false
     },
     {
-      "description": "Packages which need major versions to be in sync with the EF Core version or the .NET version",
+      "description": "Packages which have major version updates incompatible with the .NET version",
       "matchDatasources": ["nuget"],
       "matchPackagePrefixes": [
-        "dotnet-ef",
         "Microsoft.AspNetCore",
-        "Microsoft.EntityFrameworkCore",
-        "Microsoft.Extensions",
-        "Thinktecture.EntityFrameworkCore",
-        "Microsoft.VisualStudio.Web.CodeGeneration.Design",
-        "MockQueryable.Moq"
+        "Microsoft.Extensions.Logging.AzureAppServices"
       ],
       "matchUpdateTypes": ["major"],
       "enabled": false

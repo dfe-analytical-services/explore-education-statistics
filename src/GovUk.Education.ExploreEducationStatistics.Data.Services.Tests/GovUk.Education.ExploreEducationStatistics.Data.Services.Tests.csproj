@@ -9,8 +9,8 @@
 
     <ItemGroup>
         <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.21" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.21" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="7.0.10" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.7.2" />
         <PackageReference Include="Moq" Version="4.20.69" />
         <PackageReference Include="MSTest.TestFramework" Version="3.1.1" />
