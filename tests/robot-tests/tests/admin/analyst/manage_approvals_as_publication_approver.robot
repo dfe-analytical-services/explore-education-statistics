@@ -21,7 +21,7 @@ ${SUBJECT_NAME}         UI test subject
 
 *** Test Cases ***
 Create new publication and release via API
-    ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     Set suite variable    ${PUBLICATION_ID}
     user gives analyst publication approver access    ${PUBLICATION_NAME}
     user creates test release via api    ${PUBLICATION_ID}    AY    2026
@@ -52,10 +52,36 @@ Check Analyst can see correct tabs
     user checks element should contain    id:approvals-tab    Your approvals
     user checks element should contain    id:scheduled-releases-tab    Approved scheduled releases
 
-Validate if Your approvals page is correct
+Validate if Your approvals tab is correct
     user clicks link    approvals
     user waits until h2 is visible    Your approvals
     user waits until page contains    Here you can view any releases or methodologies awaiting approval.
     user checks table column heading contains    1    1    Publication / Page    testid:your-approvals
     user checks table column heading contains    1    2    Page type    testid:your-approvals
     user checks table column heading contains    1    3    Actions    testid:your-approvals
+
+    # Check for release and methodology
+    user checks page contains element    testid:release-${RELEASE_NAME}
+    # Methodology title is inherited from publication
+    user checks page contains element    testid:methodology-${PUBLICATION_NAME} - ${PUBLICATION_NAME}
+
+Check that release link takes user to the correct release
+    ${RELEASE_ROW}=    get webelement    testid:release-${RELEASE_NAME}
+    user clicks link by visible text    Review this page    ${RELEASE_ROW}
+
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until page contains title caption    Edit release for Academic year 2026/27
+    user checks page contains tag    In Review
+
+Check that Your approvals tab methodology link takes user to the correct methodology
+    user navigates to admin dashboard
+
+    user clicks link    approvals
+    user waits until h2 is visible    Your approvals
+
+    ${METHODOLOGY_ROW}=    get webelement    testid:methodology-${PUBLICATION_NAME} - ${PUBLICATION_NAME}
+    user clicks link by visible text    Review this page    ${METHODOLOGY_ROW}
+
+    user waits until h1 is visible    ${PUBLICATION_NAME}
+    user waits until page contains title caption    Edit methodology
+    user checks page contains tag    In Review
