@@ -17,7 +17,7 @@ public static class MethodologyGeneratorExtensions
     public static InstanceSetters<Methodology> SetDefaults(this InstanceSetters<Methodology> setters)
         => setters
             .SetDefault(p => p.Id)
-            .SetDefault(p => p.Slug);
+            .SetDefault(p => p.OwningPublicationSlug);
     
     public static Generator<Methodology> WithOwningPublication(
         this Generator<Methodology> generator,

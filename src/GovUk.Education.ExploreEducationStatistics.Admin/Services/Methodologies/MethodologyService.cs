@@ -245,6 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyVersion>(id, q =>
                     q.Include(m => m.Methodology))
+                // NOTE: Permission checks nested within UpdateStatus and UpdateDetails
                 .OnSuccess(methodologyVersion => UpdateStatus(methodologyVersion, request))
                 .OnSuccess(methodologyVersion => UpdateDetails(methodologyVersion, request))
                 .OnSuccess(BuildMethodologyVersionViewModel);
@@ -319,36 +320,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             MethodologyVersion methodologyVersionToUpdate,
             MethodologyUpdateRequest request)
         {
-            if (methodologyVersionToUpdate.Title == request.Title)
+            var newSlug = SlugFromTitle(request.Title);
+
+            var titleChanged = methodologyVersionToUpdate.Title != request.Title;
+            var slugChanged = methodologyVersionToUpdate.Slug != newSlug;
+
+            if (!titleChanged && !slugChanged)
             {
                 // Details unchanged
                 return methodologyVersionToUpdate;
             }
 
-            var newSlug = SlugFromTitle(request.Title);
-
             return await _userService.CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
                 .OnSuccessDo(async _ => await ValidateMethodologySlug(
-                            newSlug, oldSlug: methodologyVersionToUpdate.Methodology.Slug))
+                    newSlug, oldSlug: methodologyVersionToUpdate.Methodology.Slug))
                 .OnSuccess(async methodologyVersion =>
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;
 
-                    if (request.Title != methodologyVersion.Title)
+                    if (titleChanged)
                     {
                         methodologyVersion.AlternativeTitle =
                             request.Title != methodologyVersion.Methodology.OwningPublicationTitle
                                 ? request.Title
                                 : null;
+                    }
 
-                        // If we're updating a Methodology that is not an Amendment, it's not yet publicly
-                        // visible and so its Slug can be updated.  At the point that a Methodology is publicly
-                        // visible and the only means of updating it is via Amendments, we will no longer allow its
-                        // Slug to change even though its AlternativeTitle can.
-                        if (!methodologyVersion.Amendment)
+                    if (slugChanged)
+                    {
+                        var methodology = methodologyVersion.Methodology;
+                        await _context.Entry(methodology)
+                            .Collection(m => m.Versions)
+                            .LoadAsync();
+
+                        // Only unpublished versions need a redirect to be created, as users cannot
+                        // update a published methodology version's AlternateSlug
+                        if (methodologyVersion.Id == methodology.LatestVersion().Id
+                            // If an unpublished version already has a redirect, that means it's slug been updated
+                            // previously. And so it doesn't need a new redirect, as the hypothetical redirect's
+                            // fromSlug would have never have been live. We only need to create one redirect from the
+                            // methodology's current slug for the unpublished amendment, as that is the only slug that
+                            // has been live.
+                            && !await _context.MethodologyRedirects.AnyAsync(mr =>
+                                mr.MethodologyVersionId == methodologyVersion.Id))
+
                         {
-                            methodologyVersion.Methodology.Slug = newSlug;
+                            var methodologyRedirect = new MethodologyRedirect
+                            {
+                                MethodologyVersionId = methodologyVersion.Id,
+                                Slug = methodologyVersion.Slug,
+                            };
+                            await _context.MethodologyRedirects.AddAsync(methodologyRedirect);
                         }
+
+                        methodologyVersion.AlternativeSlug =
+                            newSlug != methodologyVersion.Methodology.OwningPublicationSlug
+                                ? newSlug
+                                : null;
                     }
 
                     await _context.SaveChangesAsync();
@@ -476,7 +504,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(() => _methodologyImageService.DeleteAll(methodologyVersion.Id, forceDelete))
                 .OnSuccessVoid(async () =>
                 {
+                    _context.MethodologyRedirects.RemoveRange(
+                        _context.MethodologyRedirects
+                            .Where(mr => mr.MethodologyVersionId == methodologyVersion.Id));
+
                     _context.MethodologyVersions.Remove(methodologyVersion);
+
                     await _context.SaveChangesAsync();
                 });
         }
@@ -525,6 +558,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             if (methodologyVersion != null)
             {
                 return ValidationActionResult(SlugNotUnique);
+            }
+
+            var redirectExists = await _context.MethodologyRedirects
+                .Where(mr => mr.Slug == newSlug)
+                .AnyAsync();
+
+            // @MarkFix but what happens if the redirect belongs to the same methodology? Then we can allow it?
+            if (redirectExists)
+            {
+                return ValidationActionResult(SlugUsedByRedirect);
             }
 
             return Unit.Instance;

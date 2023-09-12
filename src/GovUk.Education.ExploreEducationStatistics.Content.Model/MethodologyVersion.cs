@@ -29,7 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string? AlternativeTitle { get; set; }
 
-        public string Slug => Methodology.Slug;
+        public string Slug => AlternativeSlug ?? Methodology.OwningPublicationSlug;
+
+        public string? AlternativeSlug { get; set; }
 
         public MethodologyApprovalStatus Status { get; set; }
 
@@ -142,5 +144,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
     }
 }
-
-

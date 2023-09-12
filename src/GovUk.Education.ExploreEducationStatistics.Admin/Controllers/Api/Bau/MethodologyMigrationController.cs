@@ -11,10 +11,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
-// !!!!!
-// TODO: Move `MethodologyVersionRepository#IsToBePublished` `MethodologyApprovalService` and change to be private after removing this controller
-// !!!!!
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
 {
     [Route("api")]
@@ -42,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             public Guid? LatestMethodologyVersionId { get; set; }
         }
 
+        // TODO: Remove EES-4627
         [HttpPatch("migration/set-methodology-latest-published-version-ids")]
         public async Task<ActionResult<List<MethodologyMigrationResult>>> MigrateMethodologyLatestPublishedVersionIds(
             [FromQuery] bool dryRun = true)

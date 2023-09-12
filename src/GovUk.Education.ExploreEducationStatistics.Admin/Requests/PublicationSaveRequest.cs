@@ -14,6 +14,8 @@ public record PublicationSaveRequest
 
         [Required] public Guid TopicId { get; set; }
 
+        // @MarkFix if you update a publication title, it doesn't even attempt to update slug
+        // and maybe the methodology slug should change now?
         private string _slug = Empty;
 
         public string Slug

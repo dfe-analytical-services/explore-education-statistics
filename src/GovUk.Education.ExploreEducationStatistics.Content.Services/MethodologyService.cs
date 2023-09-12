@@ -39,12 +39,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(
                     query => query
-                        .Where(mp => mp.Slug == slug))
+                        .Include(m => m.LatestPublishedVersion)
+                        .Where(m =>
+                            m.LatestPublishedVersion != null
+                            && slug == (m.LatestPublishedVersion.AlternativeSlug ?? m.OwningPublicationSlug))) // slug == mv.Slug doesn't translate
                 .OnSuccess<ActionResult, Methodology, MethodologyVersionViewModel>(async methodology =>
                 {
-                    var latestPublishedVersion =
-                        await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id);
-                    
+                    var latestPublishedVersion = methodology.LatestPublishedVersion;
+
                     if (latestPublishedVersion == null)
                     {
                         return new NotFoundResult();
