@@ -176,7 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var warnings = new List<ReleaseChecklistIssue>();
 
-            var methodologies = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
+            var methodologies = await _methodologyVersionRepository
+                .GetLatestVersionByPublication(release.PublicationId);
+
             if (!methodologies.Any())
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoMethodology));
