@@ -1,7 +1,6 @@
 version: "3"
 services:
   data-storage:
-    container_name: ees-storage
     image: mcr.microsoft.com/azure-storage/azurite:3.24.0
     ports:
       - "10000:10000"
@@ -10,15 +9,13 @@ services:
     volumes:
       - data-storage-data:/data
   db:
-    container_name: ees-mssql
     build:
-      context: ./mssql-server
-      dockerfile: Dockerfile-mssql-server
+      context: ./docker/mssql-server
     ports:
       - "1433:1433"
     volumes:
-      - ../data/ees-mssql:/var/opt/mssql/data
-      - ../data/sql-scripts:/scripts/
+      - ./data/ees-mssql:/var/opt/mssql/data
+      - ./data/sql-scripts:/scripts/
     environment:
       SA_PASSWORD: "Your_Password123"
       ACCEPT_EULA: "Y"
@@ -39,10 +36,9 @@ services:
   idp:
     container_name: ees-idp
     build:
-      context: ./keycloak
-      dockerfile: Dockerfile-Keycloak
+      context: ./docker/keycloak
     ports:
-      - 5030:8080
+      - "5030:8080"
 
 volumes:
   data-storage-data:

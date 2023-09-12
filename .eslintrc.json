@@ -131,6 +131,18 @@
       }
     },
     {
+      "files": ["useful-scripts/*.ts", "useful-scripts/*/**.ts"],
+      "rules": {
+        "no-console": "off",
+        "no-underscore-dangle": [
+          "error",
+          {
+            "allow": ["__dirname", "__filename"]
+          }
+        ]
+      }
+    },
+    {
       "files": ["src/explore-education-statistics-frontend/**/*.{tsx,ts}"],
       "settings": {
         "next": {

@@ -1,9 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
 using AutoMapper;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
@@ -14,7 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -265,11 +265,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             app.UseMvc();
             app.UseHealthChecks("/api/health");
 
-            var serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
-            foreach (var address in serverAddressesFeature.Addresses)
-            {
-                Console.WriteLine($"Server listening on address: {address}");
-            }
+            app.ServerFeatures.Get<IServerAddressesFeature>()
+                ?.Addresses
+                .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
         }
 
         private record PublicAppOptions

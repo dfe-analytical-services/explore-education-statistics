@@ -46,8 +46,6 @@ src/explore-education-statistics-frontend/*.xml
 **/*/chromedriver
 **/*/jwt
 **/coverage
-/useful-scripts/get_data_block_responses/*.csv
-/useful-scripts/get_data_block_responses/results*
 /tests/robot-tests/scripts/permalink_snapshots/invalid-permalinks.csv
 /tests/robot-tests/scripts/permalink_snapshots/prod-permalinks.csv
 /tests/robot-tests/scripts/permalink_snapshots/checked-permalinks.csv
@@ -59,6 +57,12 @@ src/explore-education-statistics-frontend/*.xml
 /tests/performance-tests/dist
 /tests/performance-tests/big-files
 /tests/performance-tests/*.html
+
+## Scripts
+
+useful-scripts/*.lock
+useful-scripts/get_data_block_responses/*.csv
+useful-scripts/get_data_block_responses/results*
 
 ## Data API Seed CSV data
 
@@ -79,6 +83,7 @@ remote-profile
 
 src/GovUk.Education.ExploreEducationStatistics.*/appsettings.Local.json
 src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.IdpBootstrapUsers.json
 
 ## IdentityServer Developer Signing key
 **/*/tempkey.rsa

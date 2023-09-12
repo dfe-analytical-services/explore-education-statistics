@@ -1,20 +1,27 @@
 {
   "name": "explore-education-statistics",
   "private": true,
+  "type": "module",
   "packageManager": "pnpm@8.6.7",
   "engines": {
     "node": "18.17.0",
     "pnpm": "8.6.7"
   },
   "devDependencies": {
+    "@commander-js/extra-typings": "^11.0.0",
     "@next/eslint-plugin-next": "^12.3.4",
     "@types/jest": "^29.5.3",
+    "@types/lodash": "^4.14.195",
+    "@types/node": "^18.17.5",
+    "@types/signal-exit": "^3.0.1",
+    "@types/split2": "^4.2.0",
     "@typescript-eslint/eslint-plugin": "^5.61.0",
     "@typescript-eslint/parser": "^5.61.0",
     "caniuse-lite": "^1.0.30001314",
-    "chalk": "^4.1.0",
+    "chalk": "^5.3.0",
     "check-node-version": "^4.2.1",
-    "cross-spawn": "^7.0.3",
+    "commander": "^11.0.0",
+    "cross-process-lock": "^2.1.1",
     "eslint": "^8.43.0",
     "eslint-config-airbnb": "^19.0.4",
     "eslint-config-next": "^12.3.4",
@@ -24,13 +31,18 @@
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^4.6.0",
+    "execa": "^8.0.1",
     "husky": "^8.0.3",
     "lint-staged": "^13.2.3",
+    "lodash": "^4.17.21",
     "prettier": "^3.0.1",
-    "scramjet": "^4.35.1",
+    "signal-exit": "^4.1.0",
+    "split2": "^4.2.0",
     "stylelint": "^15.10.2",
     "stylelint-config-sass-guidelines": "^10.0.0",
     "stylelint-prettier": "^4.0.2",
+    "tree-kill": "^1.2.2",
+    "ts-node": "^10.9.1",
     "typescript": "^5.1.6"
   },
   "scripts": {
@@ -50,14 +62,12 @@
     "lint": "pnpm lint:js && pnpm lint:style",
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx src tests/performance-tests/src useful-scripts",
     "lint:style": "stylelint src/**/*.{scss,css}",
-    "start": "node useful-scripts/run.js",
-    "start:azure": "cd \"C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\Storage Emulator\" && c:AzureStorageEmulator.exe start -inprocess",
+    "start": "ts-node useful-scripts/start.ts",
     "test": "pnpm -r --no-bail test",
     "test:snapshot": "pnpm -r --no-bail test:snapshot",
     "test:ci": "pnpm -r --no-bail --aggregate-output --reporter=append-only test:ci",
     "test:coverage": "pnpm -r --no-bail test:coverage",
-    "tsc": "pnpm -r --aggregate-output --reporter=append-only --no-bail tsc",
-    "install:azure-tools": "pnpm install -g azure-functions-core-tools@4 --unsafe-perm true"
+    "tsc": "pnpm -r --aggregate-output --reporter=append-only --no-bail tsc"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
