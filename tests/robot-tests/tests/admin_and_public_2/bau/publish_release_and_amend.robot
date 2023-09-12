@@ -54,7 +54,7 @@ Add data guidance
     user clicks button    Save guidance
 
 Add ancillary file
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
     user enters text into element    label:Title    Test ancillary file 1
@@ -554,7 +554,7 @@ Confirm amendment has footnotes
 
 Add ancillary file to amendment
     user clicks link    Data and files
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
     user enters text into element    label:Title    Test ancillary file 2
