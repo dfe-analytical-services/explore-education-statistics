@@ -1,4 +1,3 @@
-import { CancellablePromise } from '@common/types/promise';
 import Axios, {
   AxiosInstance,
   AxiosPromise,
@@ -31,7 +30,7 @@ export default class Client {
   public get<T = unknown>(
     url: string,
     config?: AxiosRequestConfig,
-  ): CancellablePromise<T> {
+  ): Promise<T> {
     return this.handlePromise(this.axios.get(url, config));
   }
 
@@ -39,7 +38,7 @@ export default class Client {
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig,
-  ): CancellablePromise<T> {
+  ): Promise<T> {
     return this.handlePromise(this.axios.post(url, data, config));
   }
 
@@ -47,7 +46,7 @@ export default class Client {
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig,
-  ): CancellablePromise<T> {
+  ): Promise<T> {
     return this.handlePromise(this.axios.put(url, data, config));
   }
 
@@ -55,26 +54,20 @@ export default class Client {
     url: string,
     data?: unknown,
     config?: AxiosRequestConfig,
-  ): CancellablePromise<T> {
+  ): Promise<T> {
     return this.handlePromise(this.axios.patch(url, data, config));
   }
 
   public delete<T = unknown>(
     url: string,
     config?: AxiosRequestConfig,
-  ): CancellablePromise<T> {
+  ): Promise<T> {
     return this.handlePromise(this.axios.delete(url, config));
   }
 
-  private handlePromise<T>(promise: AxiosPromise<T>): CancellablePromise<T> {
-    const cancelToken = Axios.CancelToken.source();
+  private async handlePromise<T>(promise: AxiosPromise<T>): Promise<T> {
+    const { data } = await promise;
 
-    const cancellablePromise = promise.then(
-      ({ data }) => data,
-    ) as CancellablePromise<T>;
-
-    cancellablePromise.cancel = cancelToken.cancel;
-
-    return cancellablePromise;
+    return data;
   }
 }
