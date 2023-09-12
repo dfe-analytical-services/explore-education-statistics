@@ -114,45 +114,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("tablebuilder/fast-track/{dataBlockId:guid}")]
-        public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockId)
+        [HttpGet("tablebuilder/fast-track/{fastTrackId:guid}")]
+        public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid fastTrackId)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<ReleaseContentBlock>(q =>
-                    q.Include(block => block.Release)
-                        .ThenInclude(release => release.Publication)
-                        .Include(block => block.ContentBlock)
-                        .Where(block => block.ContentBlockId == dataBlockId))
-                .OnSuccess(async block =>
-                    // Check the data block is for the latest published version of the release
-                    await _releaseRepository.IsLatestPublishedVersionOfRelease(block.ReleaseId)
-                        ? block
-                        : new Either<ActionResult, ReleaseContentBlock>(new NotFoundResult()))
-                .OnSuccessCombineWith(
-                    block => _releaseRepository.GetLatestPublishedRelease(block.Release.PublicationId))
-                .OnSuccessCombineWith(tuple =>
-                {
-                    var block = tuple.Item1;
-                    return GetDataBlockTableResult(new CacheableDataBlock(block));
-                })
-                .OnSuccess(tuple =>
-                {
-                    var (block, latestRelease, tableResult) = tuple;
-                    return BuildFastTrackViewModel(block, tableResult, latestRelease);
-                })
+                .CheckEntityExists<FastTrackVersion>(fastTracks => fastTracks
+                    .Include(fastTrackVersion => fastTrackVersion.Release)
+                    .Include(fastTrackVersion => fastTrackVersion.DataBlock)
+                    .Where(fastTrackVersion => fastTrackVersion.FastTrackId  == fastTrackId))
+                .OnSuccessCombineWith(fastTrackVersion => GetDataBlockTableResult(new CacheableFastTrack(fastTrackVersion)))
+                .OnSuccess(fastTrackVersion => BuildFastTrackViewModel(
+                    fastTrackVersion, tableResult, latestRelease))
                 .HandleFailuresOrOk();
         }
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
-            CacheableDataBlock cacheable)
+            CacheableFastTrack cacheable)
         {
             // TODO EES-3363 The CacheableDataBlock parameter type exists to provide the Release and Publication slugs
             // required in the cache key.
             // In future we should change the storage path for public cached items to use a directory structure
             // of Release id's so that we don't need to lookup the Release and Publication to use the slugs.
             return _dataBlockService.GetDataBlockTableResult(releaseId: cacheable.ReleaseId,
-                dataBlockId: cacheable.DataBlockId);
+                dataBlockId: cacheable.FastTrackId);
         }
 
         private static FastTrackViewModel BuildFastTrackViewModel(
@@ -181,12 +166,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             };
         }
 
-        private async Task<Either<ActionResult, CacheableDataBlock>> GetCacheableDataBlock(Guid releaseId,
+        private async Task<Either<ActionResult, CacheableFastTrack>> GetCacheableDataBlock(Guid releaseId,
             Guid dataBlockId)
         {
             return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId,
                     q => q.Include(release => release.Publication))
-                .OnSuccess(release => new CacheableDataBlock(dataBlockId, release));
+                .OnSuccess(release => new CacheableFastTrack(dataBlockId, release));
         }
     }
 }

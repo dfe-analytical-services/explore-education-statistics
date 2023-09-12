@@ -5,42 +5,37 @@ using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 
-public record CacheableDataBlock
+public record CacheableFastTrack
 {
-    public Guid DataBlockId { get; }
+    // TODO DW - caches will need to be rebuilt
+    public Guid FastTrackId { get; }
     private Release Release { get; }
 
-    public CacheableDataBlock(Guid dataBlockId, Release release)
+    public CacheableFastTrack(Guid fastTrackId, Release release)
     {
         if (release.Publication == null)
         {
             throw new ArgumentException("Publication must be hydrated");
         }
 
-        DataBlockId = dataBlockId;
+        FastTrackId = fastTrackId;
         Release = release;
     }
 
-    public CacheableDataBlock(ReleaseContentBlock releaseContentBlock)
+    public CacheableFastTrack(FastTrackVersion fastTrackVersion)
     {
-        if (releaseContentBlock.ContentBlock is not DataBlock)
-        {
-            throw new ArgumentException(
-                $"ContentBlock must be of type DataBlock. Found {releaseContentBlock.ContentBlock?.GetType().Name ?? "null"}.");
-        }
-
-        if (releaseContentBlock.Release == null)
+        if (fastTrackVersion.Release == null)
         {
             throw new ArgumentException("Release must be hydrated");
         }
 
-        if (releaseContentBlock.Release.Publication == null)
+        if (fastTrackVersion.Release.Publication == null)
         {
             throw new ArgumentException("Publication must be hydrated");
         }
 
-        DataBlockId = releaseContentBlock.ContentBlockId;
-        Release = releaseContentBlock.Release;
+        FastTrackId = fastTrackVersion.FastTrackId;
+        Release = fastTrackVersion.Release;
     }
 
     public Guid ReleaseId => Release.Id;

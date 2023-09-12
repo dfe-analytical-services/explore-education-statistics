@@ -63,6 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<KeyStatisticDataBlock> KeyStatisticsDataBlock { get; set; }
         public virtual DbSet<KeyStatisticText> KeyStatisticsText { get; set; }
         public virtual DbSet<DataBlock> DataBlocks { get; set; }
+        public virtual DbSet<FastTrack> FastTracks { get; set; }
+        public virtual DbSet<FastTrackVersion> FastTrackVersions { get; set; }
         public virtual DbSet<DataImport> DataImports { get; set; }
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
         public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }

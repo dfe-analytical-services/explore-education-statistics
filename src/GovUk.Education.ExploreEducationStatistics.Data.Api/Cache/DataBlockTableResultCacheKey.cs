@@ -10,13 +10,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
     {
         private string PublicationSlug { get; }
         private string ReleaseSlug { get; }
+        // TODO DW - will this now become FastTrackId?
         private Guid DataBlockId { get; }
 
-        public DataBlockTableResultCacheKey(CacheableDataBlock cacheable)
+        public DataBlockTableResultCacheKey(CacheableFastTrack cacheable)
         {
             PublicationSlug = cacheable.PublicationSlug;
             ReleaseSlug = cacheable.ReleaseSlug;
-            DataBlockId = cacheable.DataBlockId;
+            DataBlockId = cacheable.FastTrackId;
         }
 
         public DataBlockTableResultCacheKey(string publicationSlug, string releaseSlug, Guid dataBlockId)
