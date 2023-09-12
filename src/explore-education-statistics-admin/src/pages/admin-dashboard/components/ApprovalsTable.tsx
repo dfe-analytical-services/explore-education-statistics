@@ -115,7 +115,10 @@ function PublicationRow({
         </th>
       </tr>
       {releases?.map(release => (
-        <tr key={release.id}>
+        <tr
+          key={release.id}
+          data-testid={`release-${publication} - ${release.title}`}
+        >
           <td>{release.title}</td>
           <td>Release</td>
           <td>
@@ -132,7 +135,10 @@ function PublicationRow({
         </tr>
       ))}
       {methodologies?.map(methodology => (
-        <tr key={methodology.id}>
+        <tr
+          key={methodology.id}
+          data-testid={`methodology-${publication} - ${methodology.title}`}
+        >
           <td>{methodology.title}</td>
           <td>Methodology</td>
           <td>
