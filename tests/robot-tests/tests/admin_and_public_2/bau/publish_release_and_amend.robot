@@ -30,8 +30,7 @@ Go to "Release summary" page
 
 Verify release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user waits until h2 is visible    Release summary
-    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
+    user verifies release summary    Financial year    3000-01    National statistics
 
 Upload subject
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
@@ -454,11 +453,8 @@ Change the Release type
     user clicks radio    Experimental statistics
     user clicks button    Update release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} summary
-    ...    Financial year
+    user verifies release summary    Financial year
     ...    3000-01
-    ...    UI test contact name
     ...    Experimental statistics
 
 Navigate to data replacement page
