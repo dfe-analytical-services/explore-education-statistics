@@ -45,7 +45,7 @@ type ServiceSchema = {
     }
   | {
       type: 'docker';
-      service: string;
+      service: DockerService;
     }
   | {
       type: 'command';
@@ -197,6 +197,9 @@ Start services without first starting any Docker services:
 
 Start Docker services directly:
   $ start db dataStorage
+
+Restart Docker services:
+  $ start db dataStorage --restart-docker  
 `,
   )
   .addArgument(
@@ -204,6 +207,7 @@ Start Docker services directly:
       Object.keys(serviceSchemas) as ServiceName[],
     ),
   )
+  .addOption(new Option('--restart-docker', 'Restart any Docker containers'))
   .addOption(new Option('--rebuild-docker', 'Rebuild any Docker containers'))
   .addOption(new Option('--skip-clean', 'Skip clean steps where possible'))
   .addOption(new Option('--skip-build', 'Skip build steps where possible'))
@@ -247,16 +251,13 @@ async function startDockerServices() {
     return;
   }
 
-  const dockerServicesToStart = servicesToStart
-    .filter(service => serviceSchemas[service].type !== 'docker')
-    .reduce<Set<DockerService>>((acc, service) => {
+  const dockerServicesToStart = servicesToStart.reduce<Set<DockerService>>(
+    (acc, service) => {
       const serviceSchema = serviceSchemas[service];
 
       if (serviceSchema.type === 'docker') {
-        return acc;
-      }
-
-      if ('dockerServices' in serviceSchema) {
+        acc.add(serviceSchema.service);
+      } else if ('dockerServices' in serviceSchema) {
         const { dockerServices } = serviceSchema;
 
         const services =
@@ -268,9 +269,22 @@ async function startDockerServices() {
       }
 
       return acc;
-    }, new Set());
+    },
+    new Set(),
+  );
 
   if (dockerServicesToStart.size > 0) {
+    const $$ = $({
+      cwd: projectRoot,
+      stdio: 'inherit',
+    });
+
+    if (programOpts.restartDocker) {
+      logInfo('Stopping Docker services...');
+
+      await $$`docker-compose stop ${[...dockerServicesToStart]}`;
+    }
+
     logInfo('Starting Docker services...');
 
     const args = ['-d'];
@@ -279,10 +293,7 @@ async function startDockerServices() {
       args.push('--build', '--force-recreate');
     }
 
-    await $({
-      cwd: path.join(projectRoot, 'src'),
-      stdio: 'inherit',
-    })`docker-compose up ${[...args, ...dockerServicesToStart]}`;
+    await $$`docker-compose up ${[...args, ...dockerServicesToStart]}`;
 
     await delay(1000);
   }
@@ -355,8 +366,8 @@ async function startService(service: ServiceName): Promise<void> {
       break;
     }
     case 'docker': {
-      command = 'docker-compose up';
-      args = ['--no-log-prefix'];
+      command = 'docker-compose logs';
+      args = ['-f', '--no-log-prefix'];
 
       if (programOpts.rebuildDocker) {
         args.push('--build', '--force-recreate');
@@ -411,12 +422,22 @@ async function startService(service: ServiceName): Promise<void> {
   return new Promise<void>(resolve => {
     let isReady = false;
 
+    const startNextService = async () => {
+      isReady = true;
+      await unlock?.();
+      resolve();
+    };
+
+    if (!lockUntilReady) {
+      startNextService();
+    }
+
     serviceProcess.stdout
       .pipe(
         tagServiceStream(service, line => {
           if (!isReady && checkReady?.(line)) {
-            unlock?.().then(resolve);
-            isReady = true;
+            // Don't need to await this
+            startNextService();
           }
 
           return line;
@@ -433,8 +454,7 @@ async function startService(service: ServiceName): Promise<void> {
 
       if (!isReady) {
         // Let the next service run
-        await unlock?.();
-        resolve();
+        await startNextService();
         return;
       }
 
