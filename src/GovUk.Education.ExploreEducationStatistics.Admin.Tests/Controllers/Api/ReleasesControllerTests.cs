@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -339,29 +338,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ListReleasesForApproval()
         {
-            var userId = Guid.NewGuid();
             var releases = ListOf(new ReleaseViewModel
             {
                 Id = Guid.NewGuid()
             });
             
-            var userService = new Mock<IUserService>(Strict);
             var releaseService = new Mock<IReleaseService>(Strict);
 
-            userService
-                .Setup(s => s.GetUserId())
-                .Returns(userId);
-            
             releaseService
-                .Setup(s => s.ListReleasesForApproval(userId))
+                .Setup(s => s.ListUsersReleasesForApproval())
                 .ReturnsAsync(releases);
 
             var controller = BuildController(
-                userService: userService.Object, 
                 releaseService: releaseService.Object);
 
-            var result = await controller.ListReleasesForApproval();
-            VerifyAllMocks(userService, releaseService);
+            var result = await controller.ListUsersReleasesForApproval();
+            VerifyAllMocks(releaseService);
 
             result.AssertOkResult(releases);
         }
@@ -382,8 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             IReleaseDataFileService? releaseDataFileService = null,
             IReleasePublishingStatusService? releaseStatusService = null,
             IReleaseChecklistService? releaseChecklistService = null,
-            IDataImportService? importService = null,
-            IUserService? userService = null)
+            IDataImportService? importService = null)
         {
             return new ReleasesController(
                 releaseService ?? Mock.Of<IReleaseService>(Strict),
@@ -391,8 +382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
                 releaseStatusService ?? Mock.Of<IReleasePublishingStatusService>(Strict),
                 releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
-                importService ?? Mock.Of<IDataImportService>(Strict),
-                userService ?? Mock.Of<IUserService>(Strict));
+                importService ?? Mock.Of<IDataImportService>(Strict));
         }
     }
 }

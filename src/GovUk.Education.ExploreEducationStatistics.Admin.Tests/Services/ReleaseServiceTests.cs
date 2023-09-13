@@ -34,8 +34,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Map
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static Moq.MockBehavior;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -45,7 +43,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServiceTests
     {
-        private static readonly Guid UserId = Guid.NewGuid();
+        private static readonly User User = new()
+        {
+            Id = Guid.NewGuid()
+        };
 
         [Fact]
         public async Task CreateReleaseNoTemplate()
@@ -82,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2018/19", result.YearTitle);
                 Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
-                Assert.Equal(Draft, result.ApprovalStatus);
+                Assert.Equal(ReleaseApprovalStatus.Draft, result.ApprovalStatus);
 
                 Assert.False(result.Amendment);
                 Assert.False(result.LatestRelease); // Most recent - but not published yet.
@@ -102,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2018, actual.Year);
                 Assert.Equal(TimeIdentifier.AcademicYear, actual.TimePeriodCoverage);
                 Assert.Equal(ReleaseType.OfficialStatistics, actual.Type);
-                Assert.Equal(Draft, actual.ApprovalStatus);
+                Assert.Equal(ReleaseApprovalStatus.Draft, actual.ApprovalStatus);
                 Assert.Equal(0, actual.Version);
 
                 Assert.Null(actual.PreviousVersionId);
@@ -267,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ApprovalStatus = Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var subject = new Subject
@@ -357,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ApprovalStatus = Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var subject = new Subject
@@ -407,7 +408,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ApprovalStatus = Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var subject = new Subject
@@ -536,7 +537,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                ApprovalStatus = Draft
+                ApprovalStatus = ReleaseApprovalStatus.Draft
             };
 
             var subject = new Subject
@@ -1145,7 +1146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyScheduledWithRelease = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = WithRelease,
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
                 ScheduledWithReleaseId = release.Id,
                 Methodology = new Methodology
                 {
@@ -1158,7 +1159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyScheduledWithAnotherRelease = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = WithRelease,
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
                 ScheduledWithReleaseId = Guid.NewGuid(),
                 Methodology = new Methodology
                 {
@@ -1168,7 +1169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userReleaseRole = new UserReleaseRole
             {
-                UserId = UserId,
+                UserId = User.Id,
                 Release = release
             };
 
@@ -1646,16 +1647,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        public class ListReleasesForApproval
+        public class ListUsersReleasesForApproval
         {
             private readonly DataFixture _fixture = new();
         
             [Fact]
-            public async Task ListReleasesForApproval_UserHasApproverRoleOnRelease()
+            public async Task ListUsersReleasesForApproval_UserHasApproverRoleOnRelease()
             {
                 var contextId = Guid.NewGuid().ToString();
 
-                var user = new User();
                 var otherUser = new User();
                 
                 var publications = _fixture
@@ -1663,29 +1663,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithReleases(_ => _fixture
                         .DefaultRelease()
                         .WithApprovalStatuses(ListOf(
-                            Draft, 
-                            HigherLevelReview, 
-                            Approved))
+                            ReleaseApprovalStatus.Draft, 
+                            ReleaseApprovalStatus.HigherLevelReview, 
+                            ReleaseApprovalStatus.Approved))
                         .GenerateList())
                     .GenerateList(4);
 
                 var contributorReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(ReleaseRole.Contributor)
                     .WithReleases(publications[0].Releases)
                     .GenerateList();
                 
                 var approverReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(ReleaseRole.Approver)
                     .WithReleases(publications[1].Releases)
                     .GenerateList();
                 
                 var prereleaseReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(ReleaseRole.PrereleaseViewer)
                     .WithReleases(publications[2].Releases)
                     .GenerateList();
@@ -1713,8 +1713,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var service = BuildReleaseService(context);
 
-                    var result = await service
-                        .ListReleasesForApproval(user.Id);
+                    var result = await service.ListUsersReleasesForApproval();
 
                     var viewModels = result.AssertRight();
                     
@@ -1732,11 +1731,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
             
             [Fact]
-            public async Task ListReleasesForApproval_UserHasApproverRoleOnPublications()
+            public async Task ListUsersReleasesForApproval_UserHasApproverRoleOnPublications()
             {
                 var contextId = Guid.NewGuid().ToString();
 
-                var user = new User();
                 var otherUser = new User();
                 
                 var publications = _fixture
@@ -1744,23 +1742,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithReleases(_ => _fixture
                         .DefaultRelease()
                         .WithApprovalStatuses(ListOf(
-                            Draft, 
-                            HigherLevelReview, 
-                            Approved, 
-                            HigherLevelReview))
+                            ReleaseApprovalStatus.Draft, 
+                            ReleaseApprovalStatus.HigherLevelReview, 
+                            ReleaseApprovalStatus.Approved, 
+                            ReleaseApprovalStatus.HigherLevelReview))
                         .GenerateList())
                     .GenerateList(3);
 
                 var ownerPublicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(PublicationRole.Owner)
                     .WithPublication(publications[0])
                     .Generate();
                 
                 var approverPublicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(PublicationRole.Approver)
                     .WithPublication(publications[1])
                     .Generate();
@@ -1797,8 +1795,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var service = BuildReleaseService(context);
 
-                    var result = await service
-                        .ListReleasesForApproval(user.Id);
+                    var result = await service.ListUsersReleasesForApproval();
 
                     var viewModels = result.AssertRight();
                     
@@ -1811,33 +1808,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
             
             [Fact]
-            public async Task ListReleasesForApproval_MixOfApproverReleaseAndPublicationRoles()
+            public async Task ListUsersReleasesForApproval_MixOfApproverReleaseAndPublicationRoles()
             {
                 var contextId = Guid.NewGuid().ToString();
 
-                var user = new User();
-                
                 var publications = _fixture
                     .DefaultPublication()
                     .WithReleases(_ => _fixture
                         .DefaultRelease()
                         .WithApprovalStatuses(ListOf(
-                            Draft, 
-                            HigherLevelReview, 
-                            Approved))
+                            ReleaseApprovalStatus.Draft, 
+                            ReleaseApprovalStatus.HigherLevelReview, 
+                            ReleaseApprovalStatus.Approved))
                         .GenerateList())
                     .GenerateList(3);
 
                 var approverPublicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(PublicationRole.Approver)
                     .WithPublication(publications[0])
                     .Generate();
                 
                 var approverReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(ReleaseRole.Approver)
                     .WithReleases(publications[1].Releases)
                     .GenerateList();
@@ -1857,8 +1852,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var service = BuildReleaseService(context);
 
-                    var result = await service
-                        .ListReleasesForApproval(user.Id);
+                    var result = await service.ListUsersReleasesForApproval();
 
                     var viewModels = result.AssertRight();
                     
@@ -1872,30 +1866,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }            
             
             [Fact]
-            public async Task ListReleasesForApproval_UserHasApproverRoleOnPublicationsAndApproverRoleOnRelease()
+            public async Task ListUsersReleasesForApproval_UserHasApproverRoleOnPublicationsAndApproverRoleOnRelease()
             {
                 var contextId = Guid.NewGuid().ToString();
 
-                var user = new User();
-                
                 var publication = _fixture
                     .DefaultPublication()
                     .WithReleases(_ => _fixture
                         .DefaultRelease()
-                        .WithApprovalStatus(HigherLevelReview)
+                        .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
                         .Generate(1))
                     .Generate();
                 
                 var approverReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(ReleaseRole.Approver)
                     .WithReleases(publication.Releases)
                     .GenerateList();
 
                 var approverPublicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
-                    .WithUser(user)
+                    .WithUser(User)
                     .WithRole(PublicationRole.Approver)
                     .WithPublication(publication)
                     .Generate();
@@ -1912,7 +1904,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var service = BuildReleaseService(context);
 
-                    var result = await service.ListReleasesForApproval(user.Id);
+                    var result = await service.ListUsersReleasesForApproval();
 
                     var viewModels = result.AssertRight();
                     
@@ -1944,7 +1936,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService
                 .Setup(s => s.GetUserId())
-                .Returns(UserId);
+                .Returns(User.Id);
 
             return new ReleaseService(
                 contentDbContext,

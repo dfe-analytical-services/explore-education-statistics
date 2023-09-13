@@ -1,6 +1,5 @@
 import client from '@admin/services/utils/service';
 import { IdTitlePair } from '@admin/services/types/common';
-import { Release } from '@admin/services/releaseService';
 
 export type MethodologyApprovalStatus =
   | 'Draft'

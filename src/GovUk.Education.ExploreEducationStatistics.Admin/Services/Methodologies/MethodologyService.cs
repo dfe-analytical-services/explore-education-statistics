@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 if (loadedMethodology.ScheduledWithRelease != null)
                 {
                     await _context.Entry(loadedMethodology.ScheduledWithRelease)
-                        .Reference(r => r!.Publication)
+                        .Reference(r => r.Publication)
                         .LoadAsync();
 
                     var title =
@@ -400,8 +400,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        public async Task<Either<ActionResult, List<MethodologyVersionViewModel>>> ListMethodologyVersionsForApproval(Guid userId)
+        public async Task<Either<ActionResult, List<MethodologyVersionViewModel>>> ListUsersMethodologyVersionsForApproval()
         {
+            var userId = _userService.GetUserId();
+            
             var publicationIdsForApprover = _context
                 .UserPublicationRoles
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
@@ -409,8 +411,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             var methodologiesToApprove = await _context
                     .MethodologyVersions
-                    .Include(methodologyVersion => methodologyVersion.Methodology)
-                    .ThenInclude(methodology => methodology.Publications)
                     .Where(methodologyVersion =>
                         methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
                         && methodologyVersion.Methodology.Publications.Any(
