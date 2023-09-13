@@ -391,7 +391,7 @@ This function would look like the following (change to your liking):
 ```sh
 function ees()
 {
-    (cd your-ees-directory && pnpm start &*)
+    (cd your-ees-directory && pnpm start $*)
 }
 ```
 
