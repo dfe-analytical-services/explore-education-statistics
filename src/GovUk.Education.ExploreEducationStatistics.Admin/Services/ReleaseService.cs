@@ -443,8 +443,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesForApproval(Guid userId)
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListUsersReleasesForApproval()
         {
+            var userId = _userService.GetUserId();
+
             var directReleasesWithApprovalRole = await _context
                 .UserReleaseRoles
                 .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
@@ -453,8 +455,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             
             var indirectReleasesWithApprovalRole = await _context
                 .UserPublicationRoles
-                .Include(role => role.Publication)
-                .ThenInclude(publication => publication.Releases)
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
                 .Select(role => role.Publication)
                 .SelectMany(publication => publication.Releases.Select(release => release.Id))
@@ -472,9 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && releaseIdsForApproval.Contains(release.Id))
                 .ToListAsync();
 
-            return releasesForApproval
-                .Select(_mapper.Map<ReleaseViewModel>)
-                .ToList();
+            return _mapper.Map<List<ReleaseViewModel>>(releasesForApproval);
         }
 
         public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases()

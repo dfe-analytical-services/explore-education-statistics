@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -28,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IReleaseChecklistService _releaseChecklistService;
         private readonly IDataImportService _dataImportService;
-        private readonly IUserService _userService;
 
         public ReleasesController(
             IReleaseService releaseService,
@@ -36,8 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseDataFileService releaseDataFileService,
             IReleasePublishingStatusService releasePublishingStatusService,
             IReleaseChecklistService releaseChecklistService,
-            IDataImportService dataImportService, 
-            IUserService userService)
+            IDataImportService dataImportService)
         {
             _releaseService = releaseService;
             _releaseApprovalService = releaseApprovalService;
@@ -45,7 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _releasePublishingStatusService = releasePublishingStatusService;
             _releaseChecklistService = releaseChecklistService;
             _dataImportService = dataImportService;
-            _userService = userService;
         }
 
         [HttpPost("publications/{publicationId:guid}/releases")]
@@ -211,10 +207,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/approvals")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> ListReleasesForApproval()
+        public async Task<ActionResult<List<ReleaseViewModel>>> ListUsersReleasesForApproval()
         {
             return await _releaseService
-                .ListReleasesForApproval(_userService.GetUserId())
+                .ListUsersReleasesForApproval()
                 .HandleFailuresOrOk();
         }
 
@@ -263,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _dataImportService
                 .CancelImport(releaseId, fileId)
-                .HandleFailuresOr(result => new AcceptedResult());
+                .HandleFailuresOr(_ => new AcceptedResult());
         }
 
         [HttpGet("releases/{releaseId:guid}/stage-status")]
