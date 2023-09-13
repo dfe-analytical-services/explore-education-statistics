@@ -249,7 +249,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async void ListMethodologyVersionsForApproval()
         {
-            var userId = Guid.NewGuid();
             var methodologyVersions = ListOf(new MethodologyVersionViewModel
             {
                 Id = Guid.NewGuid()
@@ -258,17 +257,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var userService = new Mock<IUserService>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
-            userService
-                .Setup(s => s.GetUserId())
-                .Returns(userId);
-            
             methodologyService
-                .Setup(s => s.ListMethodologyVersionsForApproval(userId))
+                .Setup(s => s.ListUsersMethodologyVersionsForApproval())
                 .ReturnsAsync(methodologyVersions);
 
             var controller = SetupMethodologyController(
-                methodologyService.Object,
-                userService: userService.Object);
+                methodologyService.Object);
 
             var result = await controller.ListMethodologyVersionsForApproval();
             VerifyAllMocks(userService, methodologyService);
@@ -278,13 +272,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
         private static MethodologyController SetupMethodologyController(
             IMethodologyService? methodologyService = null,
-            IMethodologyAmendmentService? methodologyAmendmentService = null,
-            IUserService? userService = null)
+            IMethodologyAmendmentService? methodologyAmendmentService = null)
         {
             return new(
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict),
-                userService ?? Mock.Of<IUserService>(Strict));
+                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict));
         }
     }
 }

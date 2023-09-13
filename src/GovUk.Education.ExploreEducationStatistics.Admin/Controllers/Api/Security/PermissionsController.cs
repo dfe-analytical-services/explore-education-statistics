@@ -48,6 +48,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         public async Task<ActionResult<GlobalPermissionsViewModel>> GetGlobalPermissions()
         {
             var isBauUser = await _userService.CheckIsBauUser().IsRight();
+
+            // Note that we are deliberately not giving BAU Users the Approver permission, as we would
+            // not expect a user with that role to be the target of specific Release or Publication
+            // roles.  If they were to be given Approver permissions, we would therefore assume that they
+            // should have Approver access to ALL Methodologies and Releases that are awaiting approval,
+            // which would potentially be overwhelming. 
+            var isApprover = !isBauUser && (await IsReleaseApprover() || await IsPublicationApprover());
             
             return new GlobalPermissionsViewModel(
                 CanAccessSystem: await _userService.CheckCanAccessSystem().IsRight(),
@@ -56,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 CanAccessPrereleasePages: await _userService.CheckCanAccessPrereleasePages().IsRight(),
                 CanManageAllTaxonomy: await _userService.CheckCanManageAllTaxonomy().IsRight(),
                 IsBauUser: isBauUser,
-                IsApprover: !isBauUser && (await IsReleaseApprover() || await IsPublicationApprover()));
+                IsApprover: isApprover);
         }
 
         [HttpGet("permissions/topic/{topicId:guid}/publication/create")]
