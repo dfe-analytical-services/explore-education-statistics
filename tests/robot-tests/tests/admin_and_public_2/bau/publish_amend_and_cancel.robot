@@ -44,7 +44,7 @@ Add data guidance
     user clicks button    Save guidance
 
 Add ancillary file
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
     user enters text into element    label:Title    Test ancillary file 1
@@ -243,7 +243,7 @@ Confirm data replacement
 Edit ancillary file and replace data
     [Documentation]    EES-4315
     user clicks link    Data and files
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Uploaded files
 
     user waits until page contains accordion section    Test ancillary file 1
@@ -412,7 +412,7 @@ Verify that the Data and Files are unchanged
 
 Verify that the ancillary file is unchanged
     user clicks link    Data and files
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Uploaded files
     user waits until page contains accordion section    Test ancillary file 1
 
