@@ -107,7 +107,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             Guid releaseId,
             Guid dataBlockId)
         {
-            return await GetCacheableDataBlock(releaseId: releaseId,
+            // TODO DW - we're not actually caching the resulting "CacheableDataBlock" here (although we are its
+            // GetDataBlockTableResult)
+            return await GetCacheableDataBlock(
+                    releaseId: releaseId,
                     dataBlockId: dataBlockId)
                 .OnSuccessDo(cacheable => this.CacheWithLastModifiedAndETag(cacheable.LastModified, ApiVersion))
                 .OnSuccess(GetDataBlockTableResult)
@@ -120,11 +123,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return await _contentPersistenceHelper
                 .CheckEntityExists<FastTrackVersion>(fastTracks => fastTracks
                     .Include(fastTrackVersion => fastTrackVersion.Release)
+                    .ThenInclude(release => release.Publication)
                     .Include(fastTrackVersion => fastTrackVersion.DataBlock)
                     .Where(fastTrackVersion => fastTrackVersion.FastTrackId  == fastTrackId))
                 .OnSuccessCombineWith(fastTrackVersion => GetDataBlockTableResult(new CacheableFastTrack(fastTrackVersion)))
-                .OnSuccess(fastTrackVersion => BuildFastTrackViewModel(
-                    fastTrackVersion, tableResult, latestRelease))
+                .OnSuccessCombineWith(tuple => _releaseRepository.GetLatestPublishedRelease(tuple.Item1.Release.PublicationId))
+                .OnSuccess(tuple =>
+                {
+                    var (fastTrackVersion, tableResult, latestRelease) = tuple;
+                    return BuildFastTrackViewModel(fastTrackVersion, tableResult, latestRelease);
+                })
                 .HandleFailuresOrOk();
         }
 
@@ -136,26 +144,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             // required in the cache key.
             // In future we should change the storage path for public cached items to use a directory structure
             // of Release id's so that we don't need to lookup the Release and Publication to use the slugs.
-            return _dataBlockService.GetDataBlockTableResult(releaseId: cacheable.ReleaseId,
+            return _dataBlockService.GetDataBlockTableResult(
+                releaseId: cacheable.ReleaseId,
                 dataBlockId: cacheable.FastTrackId);
         }
 
         private static FastTrackViewModel BuildFastTrackViewModel(
-            ReleaseContentBlock releaseContentBlock,
+            FastTrackVersion fastTrackVersion,
             TableBuilderResultViewModel tableResult,
             Release latestRelease)
         {
-            if (releaseContentBlock.ContentBlock is not DataBlock dataBlock)
-            {
-                throw new ArgumentException(
-                    $"ContentBlock must be of type DataBlock. Found {releaseContentBlock.ContentBlock?.GetType().Name ?? "null"}.");
-            }
-
-            var release = releaseContentBlock.Release;
-
+            var release = fastTrackVersion.Release;
+            var dataBlock = fastTrackVersion.DataBlock;
+            
             return new FastTrackViewModel
             {
-                Id = dataBlock.Id,
+                Id = fastTrackVersion.DataBlockId,
                 Configuration = dataBlock.Table,
                 FullTable = tableResult,
                 Query = new TableBuilderQueryViewModel(release.PublicationId, dataBlock.Query),
@@ -166,7 +170,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             };
         }
 
-        private async Task<Either<ActionResult, CacheableFastTrack>> GetCacheableDataBlock(Guid releaseId,
+        private async Task<Either<ActionResult, CacheableFastTrack>> GetCacheableDataBlock(
+            Guid releaseId,
             Guid dataBlockId)
         {
             return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId,

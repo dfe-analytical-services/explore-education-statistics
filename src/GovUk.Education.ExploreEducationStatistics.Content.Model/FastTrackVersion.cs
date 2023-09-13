@@ -6,16 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class FastTrackVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
-    public FastTrackVersion(
-        FastTrack fastTrack, 
-        Release release, 
-        ContentBlock dataBlock)
-    {
-        FastTrack = fastTrack;
-        Release = release;
-        DataBlock = dataBlock;
-    }
-
     public Guid Id { get; init; }
     
     public Guid FastTrackId { get; init; }
