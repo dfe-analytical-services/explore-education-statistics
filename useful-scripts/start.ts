@@ -411,12 +411,22 @@ async function startService(service: ServiceName): Promise<void> {
   return new Promise<void>(resolve => {
     let isReady = false;
 
+    const startNextService = async () => {
+      isReady = true;
+      await unlock?.();
+      resolve();
+    };
+
+    if (!lockUntilReady) {
+      startNextService();
+    }
+
     serviceProcess.stdout
       .pipe(
         tagServiceStream(service, line => {
           if (!isReady && checkReady?.(line)) {
-            unlock?.().then(resolve);
-            isReady = true;
+            // Don't need to await this
+            startNextService();
           }
 
           return line;
@@ -433,8 +443,7 @@ async function startService(service: ServiceName): Promise<void> {
 
       if (!isReady) {
         // Let the next service run
-        await unlock?.();
-        resolve();
+        await startNextService();
         return;
       }
 
