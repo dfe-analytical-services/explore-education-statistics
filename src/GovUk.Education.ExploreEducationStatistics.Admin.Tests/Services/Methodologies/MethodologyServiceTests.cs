@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
@@ -64,21 +65,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
 
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-
             methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                 .ReturnsAsync(
                     new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
                         new List<AllMethodologiesThemeViewModel>()));
 
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+            methodologyVersionRepository.Setup(mock => mock.IsToBePublished(
+                    It.Is<Methodology>(m => m.Id == methodology.Id)))
+                .ReturnsAsync((Guid?)null);
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupMethodologyService(
                     contentDbContext: context,
-                    methodologyCacheService: methodologyCacheService.Object);
+                    methodologyCacheService: methodologyCacheService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = await service.AdoptMethodology(publication.Id, methodology.Id);
 
-                VerifyAllMocks(methodologyCacheService);
+                VerifyAllMocks(methodologyCacheService, methodologyVersionRepository);
 
                 result.AssertRight();
             }
@@ -97,6 +103,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.True(publicationMethodologies.Exists(pm => pm.MethodologyId == methodology.Id
                                                                   && pm.PublicationId == publication.Id
                                                                   && !pm.Owner));
+            }
+        }
+
+        [Fact]
+        public async Task AdoptMethodology_MethodologyRequiresPublishing()
+        {
+            var publication = new Publication();
+
+            // Setup methodology owned by a different publication
+            var methodologyVersionId = Guid.NewGuid();
+            var methodology = new Methodology
+                {
+                    LatestPublishedVersionId = null,
+                    Versions = new List<MethodologyVersion>
+                    {
+                        new()
+                        {
+                            Id = methodologyVersionId,
+                            Published = null,
+                            Status = Approved,
+                        },
+                    },
+                    Publications = new List<PublicationMethodology>
+                    {
+                        new()
+                        {
+                            Publication = new Publication(),
+                            Owner = true,
+                        },
+                    },
+                };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+            methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
+                .ReturnsAsync(
+                    new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
+                        new List<AllMethodologiesThemeViewModel>()));
+
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+            methodologyVersionRepository.Setup(mock => mock.IsToBePublished(
+                    It.Is<Methodology>(m => m.Id == methodology.Id)))
+                .ReturnsAsync(methodology.Versions[0].Id);
+
+            var publishingService = new Mock<IPublishingService>(Strict);
+            publishingService.Setup(mock => mock.PublishMethodologyFiles(methodologyVersionId))
+                .ReturnsAsync(Unit.Instance);
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context,
+                    methodologyCacheService: methodologyCacheService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    publishingService: publishingService.Object);
+
+                var result = await service.AdoptMethodology(publication.Id, methodology.Id);
+
+                VerifyAllMocks(methodologyCacheService, methodologyVersionRepository, publishingService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyVersion = await context.MethodologyVersions
+                    .Include(mv => mv.Methodology)
+                    .SingleAsync(mv => mv.Id == methodologyVersionId);
+
+                Assert.NotNull(methodologyVersion.Published);
+                Assert.Equal(methodologyVersion.Id,
+                    methodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
 
@@ -2230,6 +2316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyImageService? methodologyImageService = null,
             IMethodologyApprovalService? methodologyApprovalService = null,
             IMethodologyCacheService? methodologyCacheService = null,
+            IPublishingService? publishingService = null,
             IUserService? userService = null)
         {
             return new(
@@ -2241,6 +2328,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 methodologyApprovalService ?? Mock.Of<IMethodologyApprovalService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                publishingService ?? Mock.Of<IPublishingService>(Strict),
                 userService ?? AlwaysTrueUserService(UserId).Object);
         }
     }

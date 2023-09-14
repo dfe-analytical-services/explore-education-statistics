@@ -133,15 +133,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
             ownedMethodologies
                 .ForEach(methodology =>
-            {
-                methodology.OwningPublicationTitle = updatedTitle;
-
-                if (slugChanged && methodology.Slug == originalSlug &&
-                    methodology.LatestPublishedVersionId == null)
                 {
-                    methodology.Slug = updatedSlug;
-                }
-            });
+                    methodology.OwningPublicationTitle = updatedTitle;
+
+                    if (slugChanged && methodology.Slug == originalSlug &&
+                        methodology.LatestPublishedVersionId == null)
+                    {
+                        methodology.Slug = updatedSlug;
+                    }
+                });
 
             _contentDbContext.Methodologies.UpdateRange(ownedMethodologies);
             await _contentDbContext.SaveChangesAsync();
@@ -187,6 +187,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
             // A version scheduled for publishing with a release is only publicly accessible if that release is published
             return await IsVersionScheduledForPublishingWithPublishedRelease(methodologyVersion);
+        }
+
+        public async Task<Guid?> IsToBePublished(Methodology methodology)
+        {
+            await _contentDbContext.Entry(methodology)
+                .Collection(m => m.Versions)
+                .LoadAsync();
+
+            // TODO: Could be more efficient here? Only really need to check the latest two versions?
+            foreach (var methodologyVersion in methodology.Versions)
+            {
+                if (await IsToBePublished(methodologyVersion))
+                {
+                    return methodologyVersion.Id;
+                }
+            }
+
+            return null;
         }
 
         private async Task<bool> PublicationsHaveAtLeastOnePublishedRelease(MethodologyVersion methodologyVersion)

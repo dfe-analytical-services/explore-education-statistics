@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
@@ -35,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IMethodologyApprovalService _methodologyApprovalService;
         private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
 
         public MethodologyService(
@@ -46,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IMethodologyImageService methodologyImageService,
             IMethodologyApprovalService methodologyApprovalService,
             IMethodologyCacheService methodologyCacheService,
+            IPublishingService publishingService,
             IUserService userService)
         {
             _persistenceHelper = persistenceHelper;
@@ -56,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _methodologyImageService = methodologyImageService;
             _methodologyApprovalService = methodologyApprovalService;
             _methodologyCacheService = methodologyCacheService;
+            _publishingService = publishingService;
             _userService = userService;
         }
 
@@ -65,9 +69,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .CheckEntityExists<Publication>(publicationId, q =>
                     q.Include(p => p.Methodologies))
                 .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
-                .OnSuccessDo(_ => _persistenceHelper.CheckEntityExists<Methodology>(methodologyId))
-                .OnSuccess<ActionResult, Publication, Unit>(async publication =>
+                .OnSuccessCombineWith(_ => _persistenceHelper.CheckEntityExists<Methodology>(methodologyId))
+                .OnSuccess<ActionResult, Tuple<Publication, Methodology>, Unit>(async tuple =>
                 {
+                    var (publication, methodology) = tuple;
+
                     if (publication.Methodologies.Any(pm => pm.MethodologyId == methodologyId))
                     {
                         return ValidationActionResult(CannotAdoptMethodologyAlreadyLinkedToPublication);
@@ -78,6 +84,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         MethodologyId = methodologyId,
                         Owner = false
                     });
+
+                    // If the adopted methodology is unpublished, it may require publishing,
+                    // if the adopting publication is live
+                    var versionToBePublishedId = await _methodologyVersionRepository.IsToBePublished(methodology);
+                    if (versionToBePublishedId != null)
+                    {
+                        var versionToBePublished = _context.MethodologyVersions
+                            .Single(mv => mv.Id == versionToBePublishedId);
+                        versionToBePublished.Published = DateTime.UtcNow;
+                        versionToBePublished.Methodology.LatestPublishedVersionId = versionToBePublished.Id;
+
+                        await _publishingService.PublishMethodologyFiles(versionToBePublished.Id);
+                    }
 
                     _context.Publications.Update(publication);
                     await _context.SaveChangesAsync();
