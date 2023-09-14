@@ -29,7 +29,6 @@ const releasePermissionService = _releasePermissionService as jest.Mocked<
 const testRelease: Release = {
   amendment: false,
   approvalStatus: 'Draft',
-  contact: testContact,
   id: 'release-1',
   latestInternalReleaseNote: 'release1-release-note',
   latestRelease: true,
@@ -38,7 +37,6 @@ const testRelease: Release = {
   previousVersionId: '',
   publicationId: 'publication-1',
   publicationTitle: 'Publication 1',
-  publicationSummary: 'Publication 1 summary',
   publicationSlug: 'publication-slug-1',
   publishScheduled: '',
   slug: 'release-slug-1',

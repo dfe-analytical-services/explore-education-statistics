@@ -802,7 +802,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2035-1", viewModel.Slug);
                 Assert.Equal(publication.Id, viewModel.PublicationId);
                 Assert.Equal("Test publication", viewModel.PublicationTitle);
-                Assert.Equal("Test summary", viewModel.PublicationSummary);
                 Assert.Equal("test-publication", viewModel.PublicationSlug);
                 Assert.Equal("Latest release note - 1 day ago", viewModel.LatestInternalReleaseNote);
                 Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);

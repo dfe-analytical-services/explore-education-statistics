@@ -23,8 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string PublicationTitle { get; set; } = string.Empty;
 
-        public string PublicationSummary { get; set; } = string.Empty;
-
         public string PublicationSlug { get; set; } = string.Empty;
 
         public int Year { get; set; }
@@ -51,8 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseType Type { get; set; }
-
-        public Contact Contact { get; set; } = null!;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
