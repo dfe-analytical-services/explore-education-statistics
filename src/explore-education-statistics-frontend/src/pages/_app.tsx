@@ -1,15 +1,14 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
+import '@frontend/loadEnv';
 import '../styles/_all.scss';
 import {
   ApplicationInsightsContextProvider,
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
 import useMounted from '@common/hooks/useMounted';
-import { contentApi, dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
-import notificationApi from '@frontend/services/clients/notificationApi';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
@@ -19,10 +18,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query';
-import loadEnv from '@frontend/loadEnv';
 import { parseCookies } from 'nookies';
-
-loadEnv();
 
 const ApplicationInsightsTracking = () => {
   const appInsights = useApplicationInsights();
@@ -53,13 +49,6 @@ const App = ({ Component, pageProps, cookies }: Props) => {
   const router = useRouter();
   const { getCookie } = useCookies(cookies);
   const [queryClient] = useState(() => new QueryClient());
-
-  loadEnv();
-
-  contentApi.axios.defaults.baseURL = process.env.CONTENT_API_BASE_URL;
-  dataApi.axios.defaults.baseURL = process.env.DATA_API_BASE_URL;
-  notificationApi.axios.defaults.baseURL =
-    process.env.NOTIFICATION_API_BASE_URL;
 
   useMounted(() => {
     if (process.env.GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
@@ -100,8 +89,6 @@ export default App;
 
 App.getInitialProps = async (appContext: AppContext) => {
   const appProps = await NextApp.getInitialProps(appContext);
-
-  loadEnv();
 
   return {
     ...appProps,
