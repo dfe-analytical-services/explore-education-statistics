@@ -611,11 +611,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public static IQueryable<Release> HydrateRelease(IQueryable<Release> values)
         {
-            // Require publication / release / contact graph to be able to work out:
+            // Require publication / release graph to be able to work out:
             // If the release is the latest
-            // The contact
             return values.Include(r => r.Publication)
-                .ThenInclude(publication => publication.Contact)
                 .Include(r => r.ReleaseStatuses);
         }
 
