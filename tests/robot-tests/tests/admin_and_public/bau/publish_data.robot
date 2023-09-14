@@ -67,7 +67,6 @@ Create another release for the same publication
 Verify new release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
-    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
     user checks summary list contains    Time period    Financial year
     user checks summary list contains    Release period    3001-02
     user checks summary list contains    Release type    National statistics

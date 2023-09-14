@@ -96,8 +96,8 @@ Navigate to Absence release
     user waits until h2 is visible    Release summary
 
 Validate Analyst1 can see Absence release summary
-    user verifies release summary    Pupil absence in schools in England    ${EMPTY}    Academic year    2016/17
-    ...    Data Analyst    Official statistics
+    user verifies release summary    Academic year    2016/17
+    ...    Official statistics
 
 Validate Analyst1 can see 'Content' page
     user clicks link    Content

@@ -204,11 +204,8 @@ Change the Release type
     user clicks radio    Experimental statistics
     user clicks button    Update release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} summary
-    ...    Financial year
+    user verifies release summary    Financial year
     ...    3000-01
-    ...    UI test contact name
     ...    Experimental statistics
 
 Navigate to data replacement page
@@ -390,11 +387,8 @@ Revisit the Release after the cancellation to double check it remains unaffected
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user clicks element    xpath://*[text()="View"]    ${ROW}
     user waits until h2 is visible    Release summary
-    user verifies release summary    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} summary
-    ...    Financial year
+    user verifies release summary    Financial year
     ...    3000-01
-    ...    UI test contact name
     ...    National statistics
 
 Verify that the Data and Files are unchanged

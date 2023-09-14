@@ -35,7 +35,6 @@ import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
