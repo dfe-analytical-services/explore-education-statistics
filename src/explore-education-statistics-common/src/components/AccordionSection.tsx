@@ -160,7 +160,10 @@ function HeadingContent({
   return (
     <>
       <span className={classes.sectionHeadingText}>
-        <span className="govuk-accordion__section-heading-text-focus">
+        <span
+          id="theme-heading"
+          className={classNames('govuk-accordion__section-heading-text-focus')}
+        >
           {heading}
         </span>
       </span>

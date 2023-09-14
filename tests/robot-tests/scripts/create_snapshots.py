@@ -209,19 +209,12 @@ class SnapshotService:
         themes = []
 
         for theme_index, theme_html in enumerate(theme_sections):
-            theme = {"theme_heading": theme_html.select_one(f"#themes-{theme_index + 1}-heading").string, "topics": []}
+            theme = {"theme_heading": theme_html.select_one(f"#theme-heading").string, "methodologies": []}
 
-            topics = theme_html.select('[id^="topic-details-"]') or []
+            methodologies = theme_html.select(f"#methodology-heading") or []
 
-            for topic_html in topics:
-                topic = {"topic_heading": topic_html.select_one('[id^="topic-heading-"]').string, "methodologies": []}
-
-                methodologies = topic_html.select('[id^="methodology-heading-"]') or []
-
-                for methodology_heading in methodologies:
-                    topic["methodologies"].append(methodology_heading.string)
-
-                theme["topics"].append(topic)
+            for methodology_heading in methodologies:
+                theme["methodologies"].append(methodology_heading.string)
 
             themes.append(theme)
         return json.dumps(themes, sort_keys=True, indent=2)

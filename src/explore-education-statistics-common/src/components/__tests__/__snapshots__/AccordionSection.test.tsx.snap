@@ -16,7 +16,9 @@ exports[`AccordionSection renders correctly with required props 1`] = `
               type="button"
       >
         <span class="govuk-accordion__section-heading-text">
-          <span class="govuk-accordion__section-heading-text-focus">
+          <span id="theme-heading"
+                class="govuk-accordion__section-heading-text-focus"
+          >
             Test heading
           </span>
         </span>
@@ -66,7 +68,9 @@ exports[`AccordionSection renders with caption 1`] = `
               type="button"
       >
         <span class="govuk-accordion__section-heading-text">
-          <span class="govuk-accordion__section-heading-text-focus">
+          <span id="theme-heading"
+                class="govuk-accordion__section-heading-text-focus"
+          >
             Test heading
           </span>
         </span>
@@ -121,7 +125,9 @@ exports[`AccordionSection renders with different heading size 1`] = `
               type="button"
       >
         <span class="govuk-accordion__section-heading-text">
-          <span class="govuk-accordion__section-heading-text-focus">
+          <span id="theme-heading"
+                class="govuk-accordion__section-heading-text-focus"
+          >
             Test heading
           </span>
         </span>
