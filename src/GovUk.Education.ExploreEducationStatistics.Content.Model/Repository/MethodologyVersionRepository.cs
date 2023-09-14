@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return await IsVersionScheduledForPublishingWithPublishedRelease(methodologyVersion);
         }
 
-        public async Task<Guid?> IsToBePublished(Methodology methodology)
+        public async Task<Guid?> GetMethodologyVersionToBePublished(Methodology methodology)
         {
             await _contentDbContext.Entry(methodology)
                 .Collection(m => m.Versions)

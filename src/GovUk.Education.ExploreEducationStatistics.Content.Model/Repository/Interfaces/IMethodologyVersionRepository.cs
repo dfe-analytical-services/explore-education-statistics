@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
         Task<bool> IsToBePublished(MethodologyVersion methodologyVersion);
 
-        Task<Guid?> IsToBePublished(Methodology methodology);
+        Task<Guid?> GetMethodologyVersionToBePublished(Methodology methodology);
 
         Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle, string updatedSlug);
     }

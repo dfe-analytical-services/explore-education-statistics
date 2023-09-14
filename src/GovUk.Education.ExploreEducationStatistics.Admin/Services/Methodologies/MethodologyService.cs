@@ -87,7 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     // If the adopted methodology is unpublished, it may require publishing,
                     // if the adopting publication is live
-                    var versionToBePublishedId = await _methodologyVersionRepository.IsToBePublished(methodology);
+                    var versionToBePublishedId = await _methodologyVersionRepository
+                        .GetMethodologyVersionToBePublished(methodology);
                     if (versionToBePublishedId != null)
                     {
                         var versionToBePublished = _context.MethodologyVersions

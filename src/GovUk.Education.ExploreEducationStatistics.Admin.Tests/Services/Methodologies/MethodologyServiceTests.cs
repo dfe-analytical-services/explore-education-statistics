@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         new List<AllMethodologiesThemeViewModel>()));
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-            methodologyVersionRepository.Setup(mock => mock.IsToBePublished(
+            methodologyVersionRepository.Setup(mock => mock.GetMethodologyVersionToBePublished(
                     It.Is<Methodology>(m => m.Id == methodology.Id)))
                 .ReturnsAsync((Guid?)null);
 
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         new List<AllMethodologiesThemeViewModel>()));
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-            methodologyVersionRepository.Setup(mock => mock.IsToBePublished(
+            methodologyVersionRepository.Setup(mock => mock.GetMethodologyVersionToBePublished(
                     It.Is<Methodology>(m => m.Id == methodology.Id)))
                 .ReturnsAsync(methodology.Versions[0].Id);
 
