@@ -232,42 +232,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
             MethodologyVersion methodologyVersion)
         {
-            var loadedMethodology = _context.AssertEntityLoaded(methodologyVersion);
-            await _context.Entry(loadedMethodology)
+            var loadedMethodologyVersion = _context.AssertEntityLoaded(methodologyVersion);
+            await _context.Entry(loadedMethodologyVersion)
                 .Reference(m => m.Methodology)
                 .Query()
                 .Include(m => m.Publications)
                 .ThenInclude(p => p.Publication)
                 .LoadAsync();
 
-            var publicationLinks = loadedMethodology.Methodology.Publications;
+            var publicationLinks = loadedMethodologyVersion.Methodology.Publications;
             var owningPublication = BuildPublicationViewModel(publicationLinks.Single(pm => pm.Owner));
             var otherPublications = publicationLinks.Where(pm => !pm.Owner)
                 .Select(BuildPublicationViewModel)
                 .OrderBy(model => model.Title)
                 .ToList();
 
-            var viewModel = _mapper.Map<MethodologyVersionViewModel>(loadedMethodology);
+            var viewModel = _mapper.Map<MethodologyVersionViewModel>(loadedMethodologyVersion);
+
+            viewModel.InternalReleaseNote = await GetLatestInternalNote(loadedMethodologyVersion);
 
             viewModel.OwningPublication = owningPublication;
             viewModel.OtherPublications = otherPublications;
 
-            if (loadedMethodology.ScheduledForPublishingWithRelease)
+            if (loadedMethodologyVersion.ScheduledForPublishingWithRelease)
             {
-                await _context.Entry(loadedMethodology)
+                await _context.Entry(loadedMethodologyVersion)
                     .Reference(m => m.ScheduledWithRelease)
                     .LoadAsync();
 
-                if (loadedMethodology.ScheduledWithRelease != null)
+                if (loadedMethodologyVersion.ScheduledWithRelease != null)
                 {
-                    await _context.Entry(loadedMethodology.ScheduledWithRelease)
+                    await _context.Entry(loadedMethodologyVersion.ScheduledWithRelease)
                         .Reference(r => r!.Publication)
                         .LoadAsync();
 
                     var title =
-                        $"{loadedMethodology.ScheduledWithRelease.Publication.Title} - {loadedMethodology.ScheduledWithRelease.Title}";
+                        $"{loadedMethodologyVersion.ScheduledWithRelease.Publication.Title} - {loadedMethodologyVersion.ScheduledWithRelease.Title}";
                     viewModel.ScheduledWithRelease = new IdTitleViewModel(
-                        loadedMethodology.ScheduledWithRelease.Id,
+                        loadedMethodologyVersion.ScheduledWithRelease.Id,
                         title);
                 }
             }
@@ -423,6 +425,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     _context.MethodologyVersions.Remove(methodologyVersion);
                     await _context.SaveChangesAsync();
                 });
+        }
+
+        private async Task<string?> GetLatestInternalNote(MethodologyVersion methodologyVersion)
+        {
+            // NOTE: Gets latest internal note for this version, not for the entire methodology
+            return await _context.MethodologyStatus
+                .Where(ms => methodologyVersion.Id == ms.MethodologyVersionId)
+                .OrderByDescending(ms => ms.Created)
+                .Select(ms => ms.InternalReleaseNote)
+                .FirstOrDefaultAsync();
         }
 
         private async Task DeleteMethodologyIfOrphaned(MethodologyVersion methodologyVersion)
