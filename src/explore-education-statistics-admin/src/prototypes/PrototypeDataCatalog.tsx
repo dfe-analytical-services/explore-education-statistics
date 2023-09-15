@@ -455,7 +455,7 @@ const PrototypeDataCatalogue = () => {
                       className="govuk-label govuk-radios__label"
                       htmlFor="resultType-1"
                     >
-                      Show compact list
+                      Show compact results
                     </label>
                   </div>
                   <div className="govuk-radios__item">
@@ -474,7 +474,7 @@ const PrototypeDataCatalogue = () => {
                       className="govuk-label govuk-radios__label"
                       htmlFor="resultType-2"
                     >
-                      Show full details
+                      Show expanded results
                     </label>
                   </div>
                 </fieldset>
@@ -487,20 +487,26 @@ const PrototypeDataCatalogue = () => {
               <div role="region" aria-live="polite" aria-atomic="true">
                 {selectedPublication === 'All publications' &&
                   selectedTheme === 'All themes' && (
-                    <h2 className="govuk-!-margin-bottom-0">
-                      {dataType === 'csv'
-                        ? '500 data downloads (CSV)'
-                        : '120 API data sets'}
-                    </h2>
+                    <>
+                      <h2 className="govuk-!-margin-bottom-3">
+                        {dataType === 'csv'
+                          ? '500 data set downloads (csv)'
+                          : '120 API data sets'}
+                      </h2>
+                      <p>Page 1 of X, showing all available data sets</p>
+                    </>
                   )}
 
                 {selectedPublication === 'All publications' &&
                   selectedTheme === 'Further education' && (
-                    <h2 className="govuk-!-margin-bottom-3">
-                      {dataType === 'csv'
-                        ? '90 data downloads (CSV)'
-                        : '30 API data sets'}
-                    </h2>
+                    <>
+                      <h2 className="govuk-!-margin-bottom-3">
+                        {dataType === 'csv'
+                          ? '90 data set downloads (csv)'
+                          : '30 API data sets'}
+                      </h2>
+                      <p>Page 1 of X, filtered by:</p>
+                    </>
                   )}
 
                 {selectedTheme && selectedTheme !== 'All themes' && (
@@ -562,9 +568,10 @@ const PrototypeDataCatalogue = () => {
               <>
                 <h2 className="govuk-!-margin-bottom-3">
                   {dataType === 'csv'
-                    ? `32 data downloads (CSV)`
+                    ? `32 data set downloads (csv)`
                     : `12 API data sets`}
                 </h2>
+                <p>Page 1 of X, filtered by:</p>
                 {selectedTheme && selectedTheme !== 'All themes' && (
                   <span className={styles.prototypeFilterTag}>
                     <Button
@@ -747,7 +754,7 @@ const PrototypeDataCatalogue = () => {
                     Download individual data sets from this publication
                   </h2>
                 )}
-                <div className="govuk-!-margin-top-0 dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+                <div className="govuk-!-margin-top-6 dfe-flex dfe-justify-content--space-between dfe-align-items--bottom">
                   <div>
                     <PrototypeSortFilters
                       sortOrder={selectedSortOrder}
@@ -757,28 +764,23 @@ const PrototypeDataCatalogue = () => {
                       }}
                     />
                   </div>
-                  {listCompact && (
-                    <a
-                      href="#"
-                      onClick={e => {
-                        setListCompact(false);
-                        e.preventDefault();
+                  <div className="govuk-accordion__controls govuk-!-margin-top-5">
+                    <button
+                      type="button"
+                      className="govuk-accordion__show-all"
+                      onClick={() => {
+                        setListCompact(!listCompact);
                       }}
                     >
-                      Show full details
-                    </a>
-                  )}
-                  {!listCompact && (
-                    <a
-                      href="#"
-                      onClick={e => {
-                        setListCompact(true);
-                        e.preventDefault();
-                      }}
-                    >
-                      Show compact list
-                    </a>
-                  )}
+                      <span className="govuk-accordion__show-all-text">
+                        {`${
+                          listCompact
+                            ? 'Show expanded results'
+                            : ' Show compact results'
+                        } `}
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </>
             )}
@@ -786,7 +788,7 @@ const PrototypeDataCatalogue = () => {
               selectedTheme === 'All themes' &&
               fullList && (
                 <>
-                  <div className="govuk-!-margin-top-6 dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+                  <div className="govuk-!-margin-top-6 dfe-flex dfe-justify-content--space-between dfe-align-items--bottom">
                     <div>
                       <PrototypeSortFilters
                         sortOrder={selectedSortOrder}
@@ -796,28 +798,23 @@ const PrototypeDataCatalogue = () => {
                         }}
                       />
                     </div>
-                    {listCompact && (
-                      <a
-                        href="#"
-                        onClick={e => {
-                          setListCompact(false);
-                          e.preventDefault();
+                    <div className="govuk-accordion__controls govuk-!-margin-top-5">
+                      <button
+                        type="button"
+                        className="govuk-accordion__show-all"
+                        onClick={() => {
+                          setListCompact(!listCompact);
                         }}
                       >
-                        Show full details
-                      </a>
-                    )}
-                    {!listCompact && (
-                      <a
-                        href="#"
-                        onClick={e => {
-                          setListCompact(true);
-                          e.preventDefault();
-                        }}
-                      >
-                        Show compact list
-                      </a>
-                    )}
+                        <span className="govuk-accordion__show-all-text">
+                          {`${
+                            listCompact
+                              ? 'Show expanded results'
+                              : ' Show compact results'
+                          } `}
+                        </span>
+                      </button>
+                    </div>
                   </div>
                   <ul className="govuk-list">
                     {dataType === 'api' && (
@@ -1452,7 +1449,7 @@ const PrototypeDataCatalogue = () => {
               fullList && (
                 <>
                   <hr />
-                  <div className="govuk-!-margin-top-0 dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+                  <div className="govuk-!-margin-top-6 dfe-flex dfe-justify-content--space-between dfe-align-items--bottom">
                     <div>
                       <PrototypeSortFilters
                         sortOrder={selectedSortOrder}
@@ -1462,28 +1459,23 @@ const PrototypeDataCatalogue = () => {
                         }}
                       />
                     </div>
-                    {listCompact && (
-                      <a
-                        href="#"
-                        onClick={e => {
-                          setListCompact(false);
-                          e.preventDefault();
+                    <div className="govuk-accordion__controls govuk-!-margin-top-5">
+                      <button
+                        type="button"
+                        className="govuk-accordion__show-all"
+                        onClick={() => {
+                          setListCompact(!listCompact);
                         }}
                       >
-                        Show full details
-                      </a>
-                    )}
-                    {!listCompact && (
-                      <a
-                        href="#"
-                        onClick={e => {
-                          setListCompact(true);
-                          e.preventDefault();
-                        }}
-                      >
-                        Show compact list
-                      </a>
-                    )}
+                        <span className="govuk-accordion__show-all-text">
+                          {`${
+                            listCompact
+                              ? 'Show expanded results'
+                              : ' Show compact results'
+                          } `}
+                        </span>
+                      </button>
+                    </div>
                   </div>
                   <ul className="govuk-list">
                     <li>

@@ -47,7 +47,8 @@ const PrototypeHomepage = () => {
             <div className="govuk-grid-column-two-thirds">
               <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">
                 <span className="govuk-caption-xl">Data catalogue v5</span>{' '}
-                Apprenticeship Achievement Rates Detailed Series {dataType}
+                Apprenticeship Achievement Rates Detailed Series{' '}
+                {dataType === 'api ' ? 'API data set' : 'data set download'}
               </h1>
               <span className="govuk-tag">National statistics</span>{' '}
               {selectedRelease === latestRelease && (
@@ -120,43 +121,9 @@ const PrototypeHomepage = () => {
               )}
             </div>
             <div className="govuk-grid-column-one-third">
-              <RelatedInformation heading="Related information">
-                <ul className="govuk-list">
-                  <li>
-                    <Link
-                      to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
-                      className={classNames(
-                        'govuk-link--no-visited-state',
-                        styles.prototypeLinkNoUnderline,
-                      )}
-                    >
-                      API documentation
-                    </Link>
-                  </li>
-                  <li>
-                    <Link
-                      to="./releaseData"
-                      className={classNames(
-                        'govuk-link--no-visited-state',
-                        styles.prototypeLinkNoUnderline,
-                      )}
-                    >
-                      View related release
-                    </Link>
-                  </li>
-                </ul>
-              </RelatedInformation>
-            </div>
-          </div>
-
-          <hr className="govuk-!-margin-top-6" />
-
-          <div className="dfe-flex dfe-flex-wrap ">
-            <div className={styles.stickyWidthOneQuarter}>
-              <div className={classNames(styles.stickyLinksContainer)}>
-                <div className={classNames(styles.stickyLinks)}>
-                  <h3 className="govuk-heading-s">Help and guidance</h3>
-                  <ul className="govuk-list govuk-list--spaced">
+              {dataType === 'api' && (
+                <RelatedInformation heading="Related information">
+                  <ul className="govuk-list">
                     <li>
                       <Link
                         to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
@@ -168,7 +135,78 @@ const PrototypeHomepage = () => {
                         API documentation
                       </Link>
                     </li>
+
+                    <li>
+                      <Link
+                        to="./releaseData"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                      >
+                        View related release
+                      </Link>
+                    </li>
                   </ul>
+                </RelatedInformation>
+              )}
+              {dataType === 'csv' && (
+                <RelatedInformation heading="Quick links">
+                  <ul className="govuk-list">
+                    <li>
+                      <Link
+                        to="#"
+                        className={classNames(
+                          'govuk-button',
+                          'govuk-!-margin-bottom-3',
+                        )}
+                      >
+                        Download data set (csv, 2Mb)
+                      </Link>
+                    </li>
+
+                    <li>
+                      <Link
+                        to="./releaseData"
+                        className={classNames(
+                          'govuk-link--no-visited-state',
+                          styles.prototypeLinkNoUnderline,
+                        )}
+                      >
+                        View related release
+                      </Link>
+                    </li>
+                  </ul>
+                </RelatedInformation>
+              )}
+            </div>
+          </div>
+
+          <hr className="govuk-!-margin-top-6" />
+
+          <div className="dfe-flex dfe-flex-wrap ">
+            <div className={styles.stickyWidthOneQuarter}>
+              <div className={classNames(styles.stickyLinksContainer)}>
+                <div className={classNames(styles.stickyLinks)}>
+                  {dataType === 'api' && (
+                    <>
+                      <h3 className="govuk-heading-s">Help and guidance</h3>
+                      <ul className="govuk-list govuk-list--spaced">
+                        <li>
+                          <Link
+                            to="https://dfe-analytical-services.github.io/explore-education-statistics-api-docs/"
+                            className={classNames(
+                              'govuk-link--no-visited-state',
+                              styles.prototypeLinkNoUnderline,
+                            )}
+                          >
+                            API documentation
+                          </Link>
+                        </li>
+                      </ul>
+                    </>
+                  )}
+
                   <h3 className="govuk-heading-s">On this page</h3>
                   <ul className="govuk-list  govuk-list--spaced" id="pageNav">
                     <li>
@@ -207,24 +245,47 @@ const PrototypeHomepage = () => {
                         Data preview
                       </a>
                     </li>
-                    <li>
-                      <a
-                        className={classNames(
-                          'govuk-link--no-visited-state',
-                          styles.prototypeLinkNoUnderline,
-                          {
-                            'govuk-!-font-weight-bold':
-                              sectionSelected === 'changelog',
-                          },
-                        )}
-                        href={sectionShowAll ? '#changelog' : '#'}
-                        onClick={_ => {
-                          setSectionSelected('changelog');
-                        }}
-                      >
-                        Changelog
-                      </a>
-                    </li>
+                    {dataType === 'api' && (
+                      <>
+                        <li>
+                          <a
+                            className={classNames(
+                              'govuk-link--no-visited-state',
+                              styles.prototypeLinkNoUnderline,
+                              {
+                                'govuk-!-font-weight-bold':
+                                  sectionSelected === 'changelog',
+                              },
+                            )}
+                            href={sectionShowAll ? '#changelog' : '#'}
+                            onClick={_ => {
+                              setSectionSelected('changelog');
+                            }}
+                          >
+                            Changelog
+                          </a>
+                        </li>
+
+                        <li>
+                          <a
+                            className={classNames(
+                              'govuk-link--no-visited-state',
+                              styles.prototypeLinkNoUnderline,
+                              {
+                                'govuk-!-font-weight-bold':
+                                  sectionSelected === 'endPoints',
+                              },
+                            )}
+                            href={sectionShowAll ? '#endPoints' : '#'}
+                            onClick={_ => {
+                              setSectionSelected('endPoints');
+                            }}
+                          >
+                            API endpoints quick start
+                          </a>
+                        </li>
+                      </>
+                    )}
                     <li>
                       <a
                         className={classNames(
@@ -241,24 +302,6 @@ const PrototypeHomepage = () => {
                         }}
                       >
                         Version history
-                      </a>
-                    </li>
-                    <li>
-                      <a
-                        className={classNames(
-                          'govuk-link--no-visited-state',
-                          styles.prototypeLinkNoUnderline,
-                          {
-                            'govuk-!-font-weight-bold':
-                              sectionSelected === 'endPoints',
-                          },
-                        )}
-                        href={sectionShowAll ? '#endPoints' : '#'}
-                        onClick={_ => {
-                          setSectionSelected('endPoints');
-                        }}
-                      >
-                        API endpoints quick start
                       </a>
                     </li>
                     <li>
@@ -615,7 +658,7 @@ const PrototypeHomepage = () => {
                   )}
                 </section>
               )}
-              {(sectionShowAll || sectionSelected === 'changelog') && (
+              {dataType === 'api' && (
                 <section id="changelog" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l">Changelog</h2>
                   <h4>
@@ -725,11 +768,12 @@ const PrototypeHomepage = () => {
                   {sectionShowAll && <hr className="govuk-!-margin-bottom-9" />}
                 </section>
               )}
-              {(sectionShowAll || sectionSelected === 'versionHistory') && (
-                <section id="versionHistory" className={styles.sectionScroll}>
-                  <h2 className="govuk-heading-l" id="versionHistory">
-                    Version history
-                  </h2>
+
+              <section id="versionHistory" className={styles.sectionScroll}>
+                <h2 className="govuk-heading-l" id="versionHistory">
+                  Version history
+                </h2>
+                {dataType === 'api' && (
                   <table className="govuk-!-margin-bottom-9">
                     <caption className="govuk-visually-hidden">
                       <h3>API data set version history</h3>
@@ -797,18 +841,79 @@ const PrototypeHomepage = () => {
                       </tr>
                     </tbody>
                   </table>
-                  {!sectionShowAll && (
-                    <PrototypePrevNextNav
-                      changeSectionState={changeSectionState}
-                      nextId="endPoints"
-                      nextTitle="API endpoints quick start"
-                      prevId="changelog"
-                      prevTitle="Changelog"
-                    />
-                  )}
-                </section>
-              )}
-              {(sectionShowAll || sectionSelected === 'endPoints') && (
+                )}
+
+                {dataType === 'csv' && (
+                  <table className="govuk-!-margin-bottom-9">
+                    <caption className="govuk-visually-hidden">
+                      <h3>API data set version history</h3>
+                    </caption>
+                    <thead>
+                      <tr>
+                        <th>Related release</th>
+                        <th>Published date</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <a
+                            href="#"
+                            onClick={_ => {
+                              setSelectedRelease('Academic year 2021/22');
+                              setSectionSelected('dataSummary');
+                            }}
+                          >
+                            Academic year 2021/22
+                          </a>{' '}
+                          (Latest data)
+                        </td>
+                        <td>22 December 2022</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a
+                            href="#"
+                            onClick={_ => {
+                              setSelectedRelease('Academic year 2020/21');
+                              setSectionSelected('dataSummary');
+                            }}
+                          >
+                            Academic year 2020/21
+                          </a>
+                        </td>
+                        <td>20 December 2021</td>
+                      </tr>
+                      <tr>
+                        <td>
+                          <a
+                            href="#"
+                            onClick={_ => {
+                              setSelectedRelease('Academic year 2019/20');
+                              setSectionSelected('dataSummary');
+                            }}
+                          >
+                            Academic year 2019/20
+                          </a>
+                        </td>
+                        <td>21 December 2020</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                )}
+
+                {!sectionShowAll && (
+                  <PrototypePrevNextNav
+                    changeSectionState={changeSectionState}
+                    nextId="endPoints"
+                    nextTitle="API endpoints quick start"
+                    prevId="changelog"
+                    prevTitle="Changelog"
+                  />
+                )}
+              </section>
+
+              {dataType === 'api' && (
                 <section id="endPoints" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l">API endpoints quick start</h2>
                   <div className="govuk-inset-text">

@@ -11,11 +11,13 @@ interface Props {
 const ToggleMoreDetails = ({ children, className, listCompact }: Props) => {
   const [listCompactView, setListCompact] = useState(listCompact);
 
-  console.log(listCompactView);
-
   return (
     <>
-      <div className={classNames({ 'govuk-visually-hidden': listCompactView })}>
+      <div
+        className={classNames({
+          'govuk-visually-hidden': listCompactView,
+        })}
+      >
         {children}
       </div>
       <div className="govuk-accordion__controls govuk-!-margin-top-2">
