@@ -80,7 +80,7 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
                 <ul className="govuk-!-margin-top-0">
                   {orderBy(getMethodologiesForTopics(topics), 'title').map(
                     methodology => (
-                      <li key={methodology.id} id="methodology-heading">
+                      <li key={methodology.id}>
                         <Link to={`/methodology/${methodology.slug}`}>
                           {methodology.title}
                         </Link>

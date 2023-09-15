@@ -209,9 +209,12 @@ class SnapshotService:
         themes = []
 
         for theme_index, theme_html in enumerate(theme_sections):
-            theme = {"theme_heading": theme_html.select_one(f"#theme-heading").string, "methodologies": []}
+            theme = {
+                "theme_heading": theme_html.select_one(f"[data-testid='accordionSection-heading']").string,
+                "methodologies": [],
+            }
 
-            methodologies = theme_html.select(f"#methodology-heading") or []
+            methodologies = theme_html.select(f"li") or []
 
             for methodology_heading in methodologies:
                 theme["methodologies"].append(methodology_heading.string)

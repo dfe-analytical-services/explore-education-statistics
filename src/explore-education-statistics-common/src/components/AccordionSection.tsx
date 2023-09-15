@@ -161,8 +161,8 @@ function HeadingContent({
     <>
       <span className={classes.sectionHeadingText}>
         <span
-          id="theme-heading"
-          className={classNames('govuk-accordion__section-heading-text-focus')}
+          data-testid="accordionSection-heading"
+          className="govuk-accordion__section-heading-text-focus"
         >
           {heading}
         </span>
