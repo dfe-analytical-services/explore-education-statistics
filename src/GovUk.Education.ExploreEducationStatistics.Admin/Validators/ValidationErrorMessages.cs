@@ -32,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UserAlreadyHasReleaseRoles,
 
         // Methodology
-        MethodologyMustBeDraft,
         MethodologyCannotDependOnPublishedRelease,
         MethodologyCannotDependOnRelease,
         CannotAdoptMethodologyAlreadyLinkedToPublication,

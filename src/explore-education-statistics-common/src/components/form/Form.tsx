@@ -26,6 +26,7 @@ interface Props {
   submitId?: string;
   showErrorSummary?: boolean;
   showSubmitError?: boolean;
+  visuallyHiddenErrorSummary?: boolean;
 }
 
 /**
@@ -48,9 +49,10 @@ interface Props {
 const Form = ({
   children,
   id,
-  submitId = `${id}-submit`,
   showErrorSummary = true,
   showSubmitError = false,
+  submitId = `${id}-submit`,
+  visuallyHiddenErrorSummary = false,
 }: Props) => {
   const isMounted = useMountedRef();
 
@@ -127,7 +129,8 @@ const Form = ({
         {showErrorSummary && (
           <ErrorSummary
             errors={allErrors}
-            focusOnError={hasSummaryFocus}
+            focusOnError={hasSummaryFocus && !visuallyHiddenErrorSummary}
+            visuallyHidden={visuallyHiddenErrorSummary}
             onFocus={toggleSummaryFocus.off}
           />
         )}

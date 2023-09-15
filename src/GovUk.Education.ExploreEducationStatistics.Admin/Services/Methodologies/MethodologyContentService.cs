@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -423,9 +422,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, MethodologyVersionContent>> CheckCanUpdateMethodologyContent(
             MethodologyVersion methodologyVersion)
         {
-            if (methodologyVersion.Status != MethodologyApprovalStatus.Draft)
+            if (methodologyVersion.Status == MethodologyApprovalStatus.Approved)
             {
-                return ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft);
+                return new ForbidResult();
             }
 
             if (methodologyVersion.MethodologyContent == null)
@@ -441,9 +440,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private async Task<Either<ActionResult, Tuple<MethodologyVersionContent, ContentSection>>> CheckCanUpdateMethodologyContent(
             Tuple<MethodologyVersion, ContentSection> tuple)
         {
-            if (tuple.Item1.Status != MethodologyApprovalStatus.Draft)
+            if (tuple.Item1.Status == MethodologyApprovalStatus.Approved)
             {
-                return ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft);
+                return new ForbidResult();
             }
 
             return await _userService
