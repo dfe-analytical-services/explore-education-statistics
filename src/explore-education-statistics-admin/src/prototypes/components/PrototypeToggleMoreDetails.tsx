@@ -15,7 +15,7 @@ const ToggleMoreDetails = ({ children, className, listCompact }: Props) => {
     <>
       <div
         className={classNames({
-          'govuk-visually-hidden': listCompactView,
+          'govuk-visually-hidden': listCompactView && listCompact,
         })}
       >
         {children}
@@ -34,7 +34,9 @@ const ToggleMoreDetails = ({ children, className, listCompact }: Props) => {
             })}
           />
           <span className="govuk-accordion__show-all-text">
-            {`${listCompactView ? 'Show more' : 'Hide'} details `}
+            {`${
+              listCompactView && listCompact ? 'Show more' : 'Hide'
+            } details `}
           </span>
         </button>
       </div>
