@@ -1,10 +1,27 @@
 import Axios, {
   AxiosInstance,
-  AxiosPromise,
   AxiosRequestConfig,
+  AxiosResponse,
   CustomParamsSerializer,
+  InternalAxiosRequestConfig,
 } from 'axios';
+import omit from 'lodash/omit';
 import qs from 'qs';
+
+export type RequestConfig = Omit<AxiosRequestConfig, 'method' | 'url'>;
+
+interface ClientRequestConfig extends RequestConfig {
+  rawResponse?: false;
+}
+
+interface ClientRawResponseRequestConfig extends RequestConfig {
+  rawResponse: true;
+}
+
+export type ClientResponse<TValue> = Omit<
+  AxiosResponse<TValue>,
+  'config' | 'request'
+>;
 
 const defaultParamsSerializer: CustomParamsSerializer = params =>
   qs.stringify(params, { arrayFormat: 'comma' });
@@ -15,7 +32,7 @@ export interface ClientOptions {
 }
 
 export default class Client {
-  public readonly axios: AxiosInstance;
+  private readonly axios: AxiosInstance;
 
   public constructor({
     baseURL,
@@ -27,47 +44,128 @@ export default class Client {
     });
   }
 
-  public get<T = unknown>(
+  public get<TValue = unknown>(
     url: string,
-    config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return this.handlePromise(this.axios.get(url, config));
+    config?: ClientRequestConfig,
+  ): Promise<TValue>;
+
+  public get<TValue = unknown>(
+    url: string,
+    config: ClientRawResponseRequestConfig,
+  ): Promise<ClientResponse<TValue>>;
+
+  public get<TValue = unknown>(
+    url: string,
+    config: RequestConfig = {},
+  ): Promise<TValue> {
+    return this.request({ ...config, url, method: 'GET' });
   }
 
-  public post<T = unknown>(
-    url: string,
-    data?: unknown,
-    config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return this.handlePromise(this.axios.post(url, data, config));
-  }
-
-  public put<T = unknown>(
-    url: string,
-    data?: unknown,
-    config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return this.handlePromise(this.axios.put(url, data, config));
-  }
-
-  public patch<T = unknown>(
+  public post<TValue = unknown>(
     url: string,
     data?: unknown,
-    config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return this.handlePromise(this.axios.patch(url, data, config));
-  }
+    config?: ClientRequestConfig,
+  ): Promise<TValue>;
 
-  public delete<T = unknown>(
+  public post<TValue = unknown>(
     url: string,
-    config?: AxiosRequestConfig,
-  ): Promise<T> {
-    return this.handlePromise(this.axios.delete(url, config));
+    data: unknown,
+    config: ClientRawResponseRequestConfig,
+  ): Promise<ClientResponse<TValue>>;
+
+  public post<TValue = unknown>(
+    url: string,
+    data: unknown,
+    config: RequestConfig = {},
+  ): Promise<TValue> {
+    return this.request({ ...config, url, data, method: 'POST' });
   }
 
-  private async handlePromise<T>(promise: AxiosPromise<T>): Promise<T> {
-    const { data } = await promise;
+  public put<TValue = unknown>(
+    url: string,
+    data?: unknown,
+    config?: ClientRequestConfig,
+  ): Promise<TValue>;
 
-    return data;
+  public put<TValue = unknown>(
+    url: string,
+    data: unknown,
+    config: ClientRawResponseRequestConfig,
+  ): Promise<ClientResponse<TValue>>;
+
+  public put<TValue = unknown>(
+    url: string,
+    data: unknown,
+    config: RequestConfig = {},
+  ): Promise<TValue> {
+    return this.request({ ...config, url, data, method: 'PUT' });
+  }
+
+  public patch<TValue = unknown>(
+    url: string,
+    data?: unknown,
+    config?: ClientRequestConfig,
+  ): Promise<TValue>;
+
+  public patch<TValue = unknown>(
+    url: string,
+    data: unknown,
+    config: ClientRawResponseRequestConfig,
+  ): Promise<ClientResponse<TValue>>;
+
+  public patch<TValue = unknown>(
+    url: string,
+    data: unknown,
+    config: RequestConfig = {},
+  ): Promise<TValue> {
+    return this.request({ ...config, url, data, method: 'PATCH' });
+  }
+
+  public delete<TValue = unknown>(
+    url: string,
+    config?: ClientRequestConfig,
+  ): Promise<TValue>;
+
+  public delete<TValue = unknown>(
+    url: string,
+    config: ClientRawResponseRequestConfig,
+  ): Promise<ClientResponse<TValue>>;
+
+  public delete<TValue = unknown>(
+    url: string,
+    config: RequestConfig = {},
+  ): Promise<TValue> {
+    return this.request({ ...config, url, method: 'DELETE' });
+  }
+
+  public set baseURL(url: string) {
+    this.axios.defaults.baseURL = url;
+  }
+
+  public get baseURL(): string {
+    return this.axios.defaults.baseURL ?? '';
+  }
+
+  public addRequestInterceptor(
+    interceptor: (
+      config: InternalAxiosRequestConfig,
+    ) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>,
+  ) {
+    this.axios.interceptors.request.use(interceptor);
+  }
+
+  private async request<TValue>(
+    config: RequestConfig & {
+      url: string;
+      method: AxiosRequestConfig['method'];
+    },
+  ): Promise<TValue> {
+    const response = await this.axios(config);
+
+    if ('rawResponse' in config && config.rawResponse) {
+      return omit(response, ['config', 'request']) as TValue;
+    }
+
+    return response.data;
   }
 }
