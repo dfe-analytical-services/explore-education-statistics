@@ -612,10 +612,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
             methodologyRepository.Setup(mock =>
-                    mock.GetUnrelatedToPublication(adoptingPublication.Id))
+                    mock.GetPublishedMethodologiesUnrelatedToPublication(adoptingPublication.Id))
                 .ReturnsAsync(ListOf(methodology));
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestVersion(methodology.Id))
+            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
                 .ReturnsAsync(methodologyVersion);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -656,6 +656,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 LatestPublishedVersionId = null, // methodology is unpublished
                 Slug = "test-publication",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        InternalReleaseNote = "Test approval",
+                        Published = null,
+                        PublishingStrategy = Immediately,
+                        Status = Draft,
+                        AlternativeTitle = "Alternative title"
+                    },
+                },
             };
 
             var publication = new Publication
@@ -671,16 +682,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 }
             };
 
-            var methodologyVersion = new MethodologyVersion
-            {
-                Methodology = methodology,
-                InternalReleaseNote = "Test approval",
-                Published = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
-                AlternativeTitle = "Alternative title"
-            };
-
             var adoptingPublication = new Publication();
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -689,14 +690,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 await context.Publications.AddRangeAsync(publication, adoptingPublication);
                 await context.Methodologies.AddAsync(methodology);
-                await context.MethodologyVersions.AddAsync(methodologyVersion);
                 await context.SaveChangesAsync();
             }
 
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             methodologyRepository.Setup(mock =>
-                    mock.GetUnrelatedToPublication(adoptingPublication.Id))
-                .ReturnsAsync(ListOf(methodology));
+                    mock.GetPublishedMethodologiesUnrelatedToPublication(adoptingPublication.Id))
+                .ReturnsAsync(new List<Methodology>());
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -706,6 +706,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var result = await service.GetAdoptableMethodologies(adoptingPublication.Id);
                 var adoptableMethodologyList = result.AssertRight();
+
+                VerifyAllMocks(methodologyRepository);
 
                 Assert.Empty(adoptableMethodologyList);
             }
@@ -727,7 +729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
 
             methodologyRepository.Setup(mock =>
-                    mock.GetUnrelatedToPublication(publication.Id))
+                    mock.GetPublishedMethodologiesUnrelatedToPublication(publication.Id))
                 .ReturnsAsync(new List<Methodology>());
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))

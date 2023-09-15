@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     q.Include(p => p.Methodologies))
                 .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
                 .OnSuccessCombineWith(_ => _persistenceHelper.CheckEntityExists<Methodology>(methodologyId))
-                .OnSuccess<ActionResult, Tuple<Publication,Methodology>, Unit>(async tuple =>
+                .OnSuccess<ActionResult, Tuple<Publication, Methodology>, Unit>(async tuple =>
                 {
                     var (publication, methodology) = tuple;
 
@@ -130,13 +130,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
                 .OnSuccess(async publication =>
                 {
-                    var publishedMethodologies = (await _methodologyRepository
-                        .GetUnrelatedToPublication(publication.Id))
-                        .Where(m => m.LatestPublishedVersionId != null);
-                    var latestVersions = await publishedMethodologies
-                        .SelectAsync(methodology => _methodologyVersionRepository.GetLatestVersion(methodology.Id));
-                    return (await latestVersions
-                        .SelectAsync(BuildMethodologyVersionViewModel)).ToList();
+                    var publishedMethodologies = await _methodologyRepository
+                        .GetPublishedMethodologiesUnrelatedToPublication(publication.Id);
+                    var latestPublishedVersions = publishedMethodologies
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async methodology =>
+                            await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id))
+                        .WhereNotNull();
+                    return await latestPublishedVersions
+                        .SelectAwait(async version => await BuildMethodologyVersionViewModel(version))
+                        .ToListAsync();
                 });
         }
 

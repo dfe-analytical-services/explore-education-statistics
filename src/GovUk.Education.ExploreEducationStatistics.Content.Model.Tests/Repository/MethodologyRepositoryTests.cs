@@ -170,12 +170,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task GetUnrelatedToPublication()
+        public async Task GetPublishedMethodologiesUnrelatedToPublication()
         {
             var publication = new Publication();
 
             var methodologyOwnedByThisPublication = new Methodology
             {
+                LatestPublishedVersionId = Guid.NewGuid(),
                 Publications = new List<PublicationMethodology>
                 {
                     new()
@@ -193,6 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
             var methodologyAdoptedByThisPublication = new Methodology
             {
+                LatestPublishedVersionId = Guid.NewGuid(),
                 Publications = new List<PublicationMethodology>
                 {
                     new()
@@ -208,8 +210,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 }
             };
 
+            var unpublishedMethodologyUnrelatedToThisPublication = new Methodology
+            {
+                LatestPublishedVersionId = null,
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    },
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = false
+                    }
+                }
+            };
+
             var methodologyUnrelatedToThisPublication = new Methodology
             {
+                LatestPublishedVersionId = Guid.NewGuid(),
                 Publications = new List<PublicationMethodology>
                 {
                     new()
@@ -233,6 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 await contentDbContext.Methodologies.AddRangeAsync(
                     methodologyOwnedByThisPublication,
                     methodologyAdoptedByThisPublication,
+                    unpublishedMethodologyUnrelatedToThisPublication,
                     methodologyUnrelatedToThisPublication
                 );
 
@@ -243,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             {
                 var service = BuildMethodologyRepository(contentDbContext);
 
-                var result = await service.GetUnrelatedToPublication(publication.Id);
+                var result = await service.GetPublishedMethodologiesUnrelatedToPublication(publication.Id);
 
                 Assert.Single(result);
                 Assert.Equal(methodologyUnrelatedToThisPublication.Id, result[0].Id);
