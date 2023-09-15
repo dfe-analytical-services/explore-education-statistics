@@ -17,9 +17,21 @@ ${RELEASE_NAME}=                    Calendar year 2000
 
 
 *** Test Cases ***
-Create test data
-    user creates test publication via api    ${OWNING_PUBLICATION_NAME}
+Create owning publication release and publish
+    ${owning_publication_id}=    user creates test publication via api    ${OWNING_PUBLICATION_NAME}
+    user creates test release via api    ${owning_publication_id}    CY    2001
+    user navigates to draft release page from dashboard    ${OWNING_PUBLICATION_NAME}    Calendar year 2001
+    user navigates to content page    ${OWNING_PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+    user approves release for immediate publication
+
+Create owning publication methodology and publish
     user creates methodology for publication    ${OWNING_PUBLICATION_NAME}
+    user approves methodology for publication    ${OWNING_PUBLICATION_NAME}    ${OWNING_PUBLICATION_NAME}
+    user creates methodology amendment for publication    ${OWNING_PUBLICATION_NAME}    ${OWNING_PUBLICATION_NAME}
+
+Create adopting publication
     ${adopting_publication_id}=    user creates test publication via api    ${ADOPTING_PUBLICATION_NAME}
     user creates test release via api    ${adopting_publication_id}    CY    2000
 
