@@ -23,25 +23,52 @@ export type ClientResponse<TValue> = Omit<
   'config' | 'request'
 >;
 
+export interface RequestInterceptor {
+  onRequest: (
+    config: InternalAxiosRequestConfig,
+  ) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>;
+  onError?: (error: unknown) => unknown;
+}
+
+export interface ResponseInterceptor {
+  onResponse: (
+    response: AxiosResponse<unknown>,
+  ) => AxiosResponse<unknown> | Promise<AxiosResponse<unknown>>;
+  onError?: (error: unknown) => unknown;
+}
+
 const defaultParamsSerializer: CustomParamsSerializer = params =>
   qs.stringify(params, { arrayFormat: 'comma' });
 
 export interface ClientOptions {
   baseURL?: string;
+  requestInterceptors?: RequestInterceptor[];
+  responseInterceptors?: ResponseInterceptor[];
   paramsSerializer?: CustomParamsSerializer;
 }
 
 export default class Client {
   private readonly axios: AxiosInstance;
 
+  private readonly requestInterceptors: Map<RequestInterceptor, number> =
+    new Map();
+
+  private readonly responseInterceptors: Map<ResponseInterceptor, number> =
+    new Map();
+
   public constructor({
     baseURL,
+    requestInterceptors,
+    responseInterceptors,
     paramsSerializer = defaultParamsSerializer,
   }: ClientOptions) {
     this.axios = Axios.create({
       baseURL,
       paramsSerializer,
     });
+
+    requestInterceptors?.forEach(this.addRequestInterceptor.bind(this));
+    responseInterceptors?.forEach(this.addResponseInterceptor.bind(this));
   }
 
   public get<TValue = unknown>(
@@ -146,12 +173,44 @@ export default class Client {
     return this.axios.defaults.baseURL ?? '';
   }
 
-  public addRequestInterceptor(
-    interceptor: (
-      config: InternalAxiosRequestConfig,
-    ) => InternalAxiosRequestConfig | Promise<InternalAxiosRequestConfig>,
-  ) {
-    this.axios.interceptors.request.use(interceptor);
+  public addRequestInterceptor(interceptor: RequestInterceptor): void {
+    if (this.requestInterceptors.has(interceptor)) {
+      return;
+    }
+
+    const id = this.axios.interceptors.request.use(
+      interceptor.onRequest,
+      interceptor.onError,
+    );
+    this.requestInterceptors.set(interceptor, id);
+  }
+
+  public addResponseInterceptor(interceptor: ResponseInterceptor): void {
+    if (this.responseInterceptors.has(interceptor)) {
+      return;
+    }
+
+    const id = this.axios.interceptors.response.use(
+      interceptor.onResponse,
+      interceptor.onError,
+    );
+    this.responseInterceptors.set(interceptor, id);
+  }
+
+  public removeRequestInterceptor(interceptor: RequestInterceptor): void {
+    const id = this.requestInterceptors.get(interceptor);
+
+    if (id) {
+      this.axios.interceptors.request.eject(id);
+    }
+  }
+
+  public removeResponseInterceptor(interceptor: ResponseInterceptor): void {
+    const id = this.responseInterceptors.get(interceptor);
+
+    if (id) {
+      this.axios.interceptors.response.eject(id);
+    }
   }
 
   private async request<TValue>(

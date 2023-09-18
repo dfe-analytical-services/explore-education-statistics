@@ -6,6 +6,7 @@ import {
   ApplicationInsightsContextProvider,
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
+import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
 import useMounted from '@common/hooks/useMounted';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
@@ -76,11 +77,13 @@ const App = ({ Component, pageProps, cookies }: Props) => {
 
       <ApplicationInsightsTracking />
 
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <Component {...pageProps} />
-        </Hydrate>
-      </QueryClientProvider>
+      <NetworkActivityContextProvider>
+        <QueryClientProvider client={queryClient}>
+          <Hydrate state={pageProps.dehydratedState}>
+            <Component {...pageProps} />
+          </Hydrate>
+        </QueryClientProvider>
+      </NetworkActivityContextProvider>
     </ApplicationInsightsContextProvider>
   );
 };
