@@ -52,8 +52,11 @@ Adopt a Methodology
     ${selected_methodology_details}=    user gets details content element    More details
     ...    css:[data-testid="Radio item for ${OWNING_PUBLICATION_NAME}"]
     user checks element should contain    ${selected_methodology_details}    ${OWNING_PUBLICATION_NAME}
-    user checks element should contain    ${selected_methodology_details}    DRAFT
-    user checks element should contain    ${selected_methodology_details}    Not yet published
+    # List of adoptable methodologies shows latest published version, not latest version -
+    # that's why this is approved and not the draft amendment
+    user checks element should contain    ${selected_methodology_details}    APPROVED
+    ${methodology_published_date}=    get current datetime    %-d %B %Y
+    user checks element should contain    ${selected_methodology_details}    ${methodology_published_date}
     user clicks button    Save
     user waits until h2 is visible    Manage methodologies
 
