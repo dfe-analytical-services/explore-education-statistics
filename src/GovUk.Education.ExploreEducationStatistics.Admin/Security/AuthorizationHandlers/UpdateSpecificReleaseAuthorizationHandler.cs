@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -53,8 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
             
             var allowedPublicationRoles = release.ApprovalStatus == Approved
-                ? ListOf(Approver)
-                : ListOf(Owner, Approver);
+                ? ListOf(PublicationRole.Approver)
+                : ListOf(PublicationRole.Owner, PublicationRole.Approver);
             
             var allowedReleaseRoles = release.ApprovalStatus == Approved
                 ? ListOf(ReleaseRole.Approver)

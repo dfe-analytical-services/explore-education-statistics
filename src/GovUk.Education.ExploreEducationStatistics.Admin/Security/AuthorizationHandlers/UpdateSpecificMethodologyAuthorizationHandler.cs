@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -51,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                     .HasRolesOnPublicationOrLatestRelease(
                         context.User.GetUserId(),
                         owningPublication.Id,
-                        ListOf(Owner, Approver),
+                        ListOf(PublicationRole.Owner, PublicationRole.Approver),
                         ReleaseEditorAndApproverRoles))
             {
                 context.Succeed(requirement);

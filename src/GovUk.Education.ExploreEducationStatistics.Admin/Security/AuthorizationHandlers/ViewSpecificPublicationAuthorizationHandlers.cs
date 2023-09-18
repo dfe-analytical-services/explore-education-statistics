@@ -5,7 +5,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -82,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnPublication(
                             context.User.GetUserId(),
                             publication.Id,
-                            Owner, Approver))
+                            PublicationRole.Owner, PublicationRole.Approver))
                 {
                     context.Succeed(requirement);
                 }

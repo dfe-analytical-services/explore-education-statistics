@@ -419,11 +419,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             var userId = _userService.GetUserId();
             
-            var publicationIdsForApprover = _context
+            var directPublicationsWithApprovalRole = await _context
                 .UserPublicationRoles
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
-                .Select(role => role.PublicationId);
+                .Select(role => role.PublicationId)
+                .ToListAsync();
 
+            var indirectPublicationsWithApprovalRole = await _context
+                .UserReleaseRoles
+                .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
+                .Select(role => role.Release.PublicationId)
+                .ToListAsync();
+
+            var publicationIdsForApproval = directPublicationsWithApprovalRole
+                .Concat(indirectPublicationsWithApprovalRole)
+                .Distinct();
+                
             var methodologiesToApprove = await _context
                     .MethodologyVersions
                     .Where(methodologyVersion =>
@@ -431,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         && methodologyVersion.Methodology.Publications.Any(
                             publicationMethodology =>
                                 publicationMethodology.Owner
-                                && publicationIdsForApprover.Contains(publicationMethodology.PublicationId)))
+                                && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)))
                     .ToListAsync();
             
             return (await methodologiesToApprove
