@@ -20,9 +20,6 @@ export default function ApprovalsTab({
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <h2>Your approvals</h2>
-          <p>
-            Here you can view any releases or methodologies awaiting approval.
-          </p>
         </div>
       </div>
       <LoadingSpinner hideText loading={isLoading} text="Loading approvals">
