@@ -5,7 +5,9 @@ import { useMobileMedia } from '@common/hooks/useMedia';
 import classNames from 'classnames';
 import Link from '@admin/components/Link';
 import { releaseTypes } from '@common/services/types/releaseType';
-import PrototypeSortFilters from '@admin/prototypes/components/PrototypeSortFilters';
+import PrototypeSortFilters, {
+  PrototypeMobileSortFilters,
+} from '@admin/prototypes/components/PrototypeSortFilters';
 import styles from '@admin/prototypes/PrototypePublicPage.module.scss';
 import { publications, themes } from '@admin/prototypes/data/newThemesData';
 import orderBy from 'lodash/orderBy';
@@ -23,6 +25,7 @@ const PrototypeDataCatalogue = () => {
   const urlSource = params.get('source');
   const urlDataType = params.get('dataType');
   const urlCompactList = params.get('compactList');
+  const [showFilters, setShowFilters] = useState(false);
 
   const [fullList] = useState(true);
   const [listCompact, setListCompact] = useState(
@@ -144,8 +147,7 @@ const PrototypeDataCatalogue = () => {
           <div className="govuk-grid-column-two-thirds">
             <h1 className={classNames('govuk-heading-xl')}>Data catalogue</h1>
             <p className="govuk-body-l">
-              View and access data from by downloading CSV data <br />
-              or select available API data sets.
+              Find and download data sets with associated guidance files.
             </p>{' '}
           </div>
           <div className="govuk-grid-column-one-third">
@@ -490,7 +492,7 @@ const PrototypeDataCatalogue = () => {
                     <>
                       <h2 className="govuk-!-margin-bottom-3">
                         {dataType === 'csv'
-                          ? '500 data set downloads (csv)'
+                          ? '500 data sets'
                           : '120 API data sets'}
                       </h2>
                       <p>Page 1 of X, showing all available data sets</p>
@@ -502,7 +504,7 @@ const PrototypeDataCatalogue = () => {
                     <>
                       <h2 className="govuk-!-margin-bottom-3">
                         {dataType === 'csv'
-                          ? '90 data set downloads (csv)'
+                          ? '90 data sets'
                           : '30 API data sets'}
                       </h2>
                       <p>Page 1 of X, filtered by:</p>
@@ -567,9 +569,7 @@ const PrototypeDataCatalogue = () => {
             {selectedPublication !== 'All publications' && (
               <>
                 <h2 className="govuk-!-margin-bottom-3">
-                  {dataType === 'csv'
-                    ? `32 data set downloads (csv)`
-                    : `12 API data sets`}
+                  {dataType === 'csv' ? `32 data sets` : `12 API data sets`}
                 </h2>
                 <p>Page 1 of X, filtered by:</p>
                 {selectedTheme && selectedTheme !== 'All themes' && (
@@ -635,45 +635,6 @@ const PrototypeDataCatalogue = () => {
                       </Button>
                     </span>
                   )}
-                <hr />
-                <p className="govuk-!-margin-top-4 dfe-flex dfe-justify-content--space-between">
-                  <div>
-                    <span className="govuk-tag">National statistics</span>{' '}
-                    {selectedRelease === latestRelease && (
-                      <span className="govuk-tag">latest data</span>
-                    )}
-                    {selectedRelease !== latestRelease && (
-                      <span className="govuk-tag govuk-tag--orange">
-                        Not the latest data
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <Link
-                      to="./releaseData#exploreData"
-                      className="govuk-!-margin-left-3"
-                    >
-                      View this publication
-                    </Link>
-                  </div>
-                </p>
-                {selectedRelease !== latestRelease && (
-                  <p className="govuk-!-margin-top-3">
-                    <a
-                      href="#"
-                      onClick={() => {
-                        setSelectedRelease(latestRelease);
-                      }}
-                    >
-                      View the latest data: {latestRelease}
-                    </a>
-                  </p>
-                )}
-                {dataType === 'csv' && (
-                  <Button className="govuk-!-margin-bottom-3 govuk-!-margin-top-3">
-                    Download all 32 datasets (.zip)
-                  </Button>
-                )}
                 {/* 
                 <SummaryList noBorder>
                   <SummaryListItem term="Type">
@@ -749,12 +710,92 @@ const PrototypeDataCatalogue = () => {
                   </div>
             </dl> */}{' '}
                 <hr />
-                {dataType === 'csv' && (
-                  <h2 className="govuk-!-heading-m govuk-heading-m">
-                    Download individual data sets from this publication
-                  </h2>
+                <h2 className="govuk-!-heading-m govuk-heading-m">
+                  {selectedPublication}{' '}
+                  {dataType === 'csv' ? 'downloads' : 'API data sets'}
+                </h2>
+                <p className="govuk-!-margin-top-4 dfe-flex dfe-justify-content--space-between">
+                  <div>
+                    <span className="govuk-tag">National statistics</span>{' '}
+                    {selectedRelease === latestRelease && (
+                      <span className="govuk-tag">latest data</span>
+                    )}
+                    {selectedRelease !== latestRelease && (
+                      <span className="govuk-tag govuk-tag--orange">
+                        Not the latest data
+                      </span>
+                    )}
+                  </div>
+                  <div>
+                    <Link
+                      to="./releaseData#exploreData"
+                      className="govuk-!-margin-left-3"
+                    >
+                      View this publication
+                    </Link>
+                  </div>
+                </p>
+                {selectedRelease !== latestRelease && (
+                  <p className="govuk-!-margin-top-3">
+                    <a
+                      href="#"
+                      onClick={() => {
+                        setSelectedRelease(latestRelease);
+                      }}
+                    >
+                      View the latest data: {latestRelease}
+                    </a>
+                  </p>
                 )}
-                <div className="govuk-!-margin-top-6 dfe-flex dfe-justify-content--space-between dfe-align-items--bottom">
+                {dataType === 'csv' && (
+                  <Button className="govuk-!-margin-bottom-3 govuk-!-margin-top-3">
+                    Download all 32 data sets (ZIP)
+                  </Button>
+                )}
+                {/* 
+                <div>
+                  <PrototypeSortFilters
+                    sortOrder={selectedSortOrder}
+                    onSort={sortOrder => {
+                      setSelectedSortOrder(sortOrder);
+                      setCurrentPage(0);
+                    }}
+                  />
+                </div>
+                */}
+                <div
+                  className="govuk-accordion__controls govuk-!-margin-top-3 govuk-!-margin-bottom-0"
+                  style={{ marginLeft: '2px' }}
+                >
+                  <button
+                    type="button"
+                    className="govuk-accordion__show-all"
+                    onClick={() => {
+                      setListCompact(!listCompact);
+                    }}
+                  >
+                    <span
+                      className={classNames('govuk-accordion-nav__chevron', {
+                        'govuk-accordion-nav__chevron--down': listCompact,
+                      })}
+                    />
+                    <span className="govuk-accordion__show-all-text">
+                      {`${
+                        listCompact
+                          ? 'Show all expanded details'
+                          : 'Hide all expanded details'
+                      } `}
+                    </span>
+                  </button>
+                </div>
+              </>
+            )}
+            {selectedPublication === 'All publications' &&
+              selectedTheme === 'All themes' &&
+              fullList && (
+                <>
+                  <hr />
+
                   <div>
                     <PrototypeSortFilters
                       sortOrder={selectedSortOrder}
@@ -764,7 +805,10 @@ const PrototypeDataCatalogue = () => {
                       }}
                     />
                   </div>
-                  <div className="govuk-accordion__controls govuk-!-margin-top-5">
+                  <div
+                    className="govuk-accordion__controls govuk-!-margin-top-3 govuk-!-margin-bottom-0"
+                    style={{ marginLeft: '2px' }}
+                  >
                     <button
                       type="button"
                       className="govuk-accordion__show-all"
@@ -772,50 +816,21 @@ const PrototypeDataCatalogue = () => {
                         setListCompact(!listCompact);
                       }}
                     >
+                      <span
+                        className={classNames('govuk-accordion-nav__chevron', {
+                          'govuk-accordion-nav__chevron--down': listCompact,
+                        })}
+                      />
                       <span className="govuk-accordion__show-all-text">
                         {`${
                           listCompact
-                            ? 'Show expanded results'
-                            : ' Show compact results'
+                            ? 'Show all expanded details'
+                            : 'Hide all expanded details'
                         } `}
                       </span>
                     </button>
                   </div>
-                </div>
-              </>
-            )}
-            {selectedPublication === 'All publications' &&
-              selectedTheme === 'All themes' &&
-              fullList && (
-                <>
-                  <div className="govuk-!-margin-top-6 dfe-flex dfe-justify-content--space-between dfe-align-items--bottom">
-                    <div>
-                      <PrototypeSortFilters
-                        sortOrder={selectedSortOrder}
-                        onSort={sortOrder => {
-                          setSelectedSortOrder(sortOrder);
-                          setCurrentPage(0);
-                        }}
-                      />
-                    </div>
-                    <div className="govuk-accordion__controls govuk-!-margin-top-5">
-                      <button
-                        type="button"
-                        className="govuk-accordion__show-all"
-                        onClick={() => {
-                          setListCompact(!listCompact);
-                        }}
-                      >
-                        <span className="govuk-accordion__show-all-text">
-                          {`${
-                            listCompact
-                              ? 'Show expanded results'
-                              : ' Show compact results'
-                          } `}
-                        </span>
-                      </button>
-                    </div>
-                  </div>
+
                   <ul className="govuk-list">
                     {dataType === 'api' && (
                       <li>
@@ -940,7 +955,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 17 Kb)</a>
+                              <a href="#">Download data set (CSV, 17 KB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -995,7 +1010,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 45 Kb)</a>
+                              <a href="#">Download data set (CSV, 45 KB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1050,7 +1065,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 2 Mb)</a>
+                              <a href="#">Download data set (CSV, 2 MB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1111,7 +1126,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 1 Mb)</a>
+                              <a href="#">Download data set (CSV, 1 MB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1166,7 +1181,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 161 Kb)</a>
+                              <a href="#">Download data set (CSV, 161 KB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1223,7 +1238,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 101 Mb)</a>
+                              <a href="#">Download data set (CSV, 101 MB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1449,34 +1464,42 @@ const PrototypeDataCatalogue = () => {
               fullList && (
                 <>
                   <hr />
-                  <div className="govuk-!-margin-top-6 dfe-flex dfe-justify-content--space-between dfe-align-items--bottom">
-                    <div>
-                      <PrototypeSortFilters
-                        sortOrder={selectedSortOrder}
-                        onSort={sortOrder => {
-                          setSelectedSortOrder(sortOrder);
-                          setCurrentPage(0);
-                        }}
-                      />
-                    </div>
-                    <div className="govuk-accordion__controls govuk-!-margin-top-5">
-                      <button
-                        type="button"
-                        className="govuk-accordion__show-all"
-                        onClick={() => {
-                          setListCompact(!listCompact);
-                        }}
-                      >
-                        <span className="govuk-accordion__show-all-text">
-                          {`${
-                            listCompact
-                              ? 'Show expanded results'
-                              : ' Show compact results'
-                          } `}
-                        </span>
-                      </button>
-                    </div>
+
+                  <div>
+                    <PrototypeSortFilters
+                      sortOrder={selectedSortOrder}
+                      onSort={sortOrder => {
+                        setSelectedSortOrder(sortOrder);
+                        setCurrentPage(0);
+                      }}
+                    />
                   </div>
+                  <div
+                    className="govuk-accordion__controls govuk-!-margin-top-3 govuk-!-margin-bottom-0"
+                    style={{ marginLeft: '2px' }}
+                  >
+                    <button
+                      type="button"
+                      className="govuk-accordion__show-all"
+                      onClick={() => {
+                        setListCompact(!listCompact);
+                      }}
+                    >
+                      <span
+                        className={classNames('govuk-accordion-nav__chevron', {
+                          'govuk-accordion-nav__chevron--down': listCompact,
+                        })}
+                      />
+                      <span className="govuk-accordion__show-all-text">
+                        {`${
+                          listCompact
+                            ? 'Show all expanded details'
+                            : 'Hide all expanded details'
+                        } `}
+                      </span>
+                    </button>
+                  </div>
+
                   <ul className="govuk-list">
                     <li>
                       <hr />
@@ -1528,7 +1551,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 45 Kb)</a>
+                              <a href="#">Download data set (CSV, 45 KB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1588,7 +1611,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 84 Mb)</a>
+                              <a href="#">Download data set (CSV, 84 MB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1642,7 +1665,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 2 Mb)</a>
+                              <a href="#">Download data set (CSV, 2 MB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1702,7 +1725,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 32 Mb)</a>
+                              <a href="#">Download data set (CSV, 32 MB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1759,7 +1782,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 14 Mb)</a>
+                              <a href="#">Download data set (CSV, 14 MB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -1819,7 +1842,7 @@ const PrototypeDataCatalogue = () => {
                           </SummaryListItem>
                           {dataType === 'csv' && (
                             <SummaryListItem term="Filetype and size">
-                              <a href="#">Download (csv, 474 Kb)</a>
+                              <a href="#">Download data set (CSV, 474 KB)</a>
                             </SummaryListItem>
                           )}
                         </SummaryList>
@@ -2091,7 +2114,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 45 Kb)</a>
+                          <a href="#">Download data set (CSV, 45 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2145,7 +2168,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 28 Kb)</a>
+                          <a href="#">Download data set (CSV, 28 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2201,7 +2224,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 2 Mb)</a>
+                          <a href="#">Download data set (CSV, 2 MB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2253,7 +2276,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 9 Kb)</a>
+                          <a href="#">Download data set (CSV, 9 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2305,7 +2328,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 9 Kb)</a>
+                          <a href="#">Download data set (CSV, 9 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2362,7 +2385,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 9 Kb)</a>
+                          <a href="#">Download data set (CSV, 9 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2417,7 +2440,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 9 Kb)</a>
+                          <a href="#">Download data set (CSV, 9 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2468,7 +2491,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 9 Kb)</a>
+                          <a href="#">Download data set (CSV, 9 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2521,7 +2544,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 9 Kb)</a>
+                          <a href="#">Download data set (CSV, 9 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>
@@ -2573,7 +2596,7 @@ const PrototypeDataCatalogue = () => {
                       </SummaryListItem>
                       {dataType === 'csv' && (
                         <SummaryListItem term="Filetype and size">
-                          <a href="#">Download (csv, 9 Kb)</a>
+                          <a href="#">Download data set (CSV, 9 KB)</a>
                         </SummaryListItem>
                       )}
                     </SummaryList>

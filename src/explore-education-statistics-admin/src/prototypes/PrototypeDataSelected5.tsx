@@ -2,6 +2,7 @@ import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import PrototypePrevNextNav from '@admin/prototypes/components/PrototypePrevNextNav';
 import RelatedInformation from '@common/components/RelatedInformation';
 import React, { useRef, useState } from 'react';
+import Details from '@common/components/Details';
 import classNames from 'classnames';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
@@ -43,13 +44,12 @@ const PrototypeHomepage = () => {
         backLinkText=" Back to apprenticeships and traineeships data catalogue"
       >
         <>
+          <h1 className="govuk-heading-xl">
+            <span className="govuk-caption-xl">Data catalogue v5</span>{' '}
+            Apprenticeship Achievement Rates Detailed Series
+          </h1>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
-              <h1 className="govuk-heading-xl govuk-!-margin-bottom-3">
-                <span className="govuk-caption-xl">Data catalogue v5</span>{' '}
-                Apprenticeship Achievement Rates Detailed Series{' '}
-                {dataType === 'api ' ? 'API data set' : 'data set download'}
-              </h1>
               <span className="govuk-tag">National statistics</span>{' '}
               {selectedRelease === latestRelease && (
                 <span className="govuk-tag">latest data</span>
@@ -161,7 +161,7 @@ const PrototypeHomepage = () => {
                           'govuk-!-margin-bottom-3',
                         )}
                       >
-                        Download data set (csv, 2Mb)
+                        Download data set (CSV, 2MB)
                       </Link>
                     </li>
 
@@ -173,7 +173,7 @@ const PrototypeHomepage = () => {
                           styles.prototypeLinkNoUnderline,
                         )}
                       >
-                        View related release
+                        Create your own tables
                       </Link>
                     </li>
                   </ul>
@@ -242,7 +242,7 @@ const PrototypeHomepage = () => {
                           setSectionSelected('dataPreview');
                         }}
                       >
-                        Data preview
+                        Data set preview
                       </a>
                     </li>
                     {dataType === 'api' && (
@@ -319,7 +319,7 @@ const PrototypeHomepage = () => {
                           setSectionSelected('download');
                         }}
                       >
-                        Download data or create tables
+                        Download data set or create tables
                       </a>
                     </li>
                   </ul>
@@ -418,23 +418,17 @@ const PrototypeHomepage = () => {
                     <SummaryListItem term="Publication">
                       Apprenticeships and traineeships
                     </SummaryListItem>
+                    <SummaryListItem term="Geographic level">
+                      National
+                    </SummaryListItem>
                     <SummaryListItem term="Related release">
-                      {selectedRelease},{' '}
-                      <a href="./releaseData">
-                        view this release{' '}
-                        <span className="govuk-visually-hidden">
-                          for {selectedRelease}
-                        </span>
-                      </a>
+                      <a href="./releaseData">{selectedRelease}</a>
                     </SummaryListItem>
                     <SummaryListItem term="Published">
                       22 December 2022
                     </SummaryListItem>
-                    <SummaryListItem term="Geographic level">
-                      National
-                    </SummaryListItem>
-                    <SummaryListItem term="Time period">
-                      Academic years 2018/19 to 2020/21
+                    <SummaryListItem term="Last updated">
+                      10 January 2023
                     </SummaryListItem>
                     <SummaryListItem term="Indicators">
                       Achievement rate, Achievers, Completers, Leavers, Pass
@@ -443,6 +437,9 @@ const PrototypeHomepage = () => {
                     <SummaryListItem term="Filters">
                       Age, Level, demographic - ethnicity, gender and lldd,
                       Standard /Framework flag
+                    </SummaryListItem>
+                    <SummaryListItem term="Time period">
+                      Academic years 2018/19 to 2020/21
                     </SummaryListItem>
                   </SummaryList>
                   {!sectionShowAll && (
@@ -485,7 +482,13 @@ const PrototypeHomepage = () => {
                       {fullTable ? 'Show first row only' : 'Show more rows'}
                     </a>
                   </div>
-                  <div style={{ maxWidth: '100%', overflow: 'auto' }}>
+                  <div
+                    style={{
+                      maxWidth: '100%',
+                      overflow: 'auto',
+                      marginBottom: '2rem',
+                    }}
+                  >
                     <table className="govuk-table" style={{ width: '3500px' }}>
                       <caption
                         className="govuk-!-margin-bottom-3 govuk-visually-hidden"
@@ -646,6 +649,154 @@ const PrototypeHomepage = () => {
                     </a>
                   </div>
                   */}
+
+                  <Details summary="Variable names and descriptions">
+                    <h3 className="govuk-heading-m" id="dataPreview">
+                      Variable names and descriptions
+                    </h3>
+
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Variable name</th>
+                          <th>Variable description </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td>age</td>
+                          <td>Age Group</td>
+                        </tr>
+
+                        <tr>
+                          <td>apprenticeship_level</td>
+                          <td>Apprenticeship level</td>
+                        </tr>
+
+                        <tr>
+                          <td>demographic</td>
+                          <td>Demographic</td>
+                        </tr>
+                        <tr>
+                          <td>group</td>
+                          <td>Group</td>
+                        </tr>
+                        <tr>
+                          <td>overall_achievement_rate</td>
+                          <td>Achievement Rate</td>
+                        </tr>
+                        <tr>
+                          <td>overall_achievers</td>
+                          <td>Achievers</td>
+                        </tr>
+                        <tr>
+                          <td>overall_completers</td>
+                          <td>Completers</td>
+                        </tr>
+                        <tr>
+                          <td>overall_leavers</td>
+                          <td>Leavers</td>
+                        </tr>
+                        <tr>
+                          <td>overall_pass_rate</td>
+                          <td>Pass Rate</td>
+                        </tr>
+                        <tr>
+                          <td>overall_retention_rate</td>
+                          <td>Retention Rate</td>
+                        </tr>
+                        <tr>
+                          <td>sector_subject_area</td>
+                          <td>Subject area (tier 1)</td>
+                        </tr>
+                        <tr>
+                          <td>standard</td>
+                          <td>Standard/ Framework Flag</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </Details>
+                  <Details summary="Footnotes">
+                    <h3 className="govuk-heading-m" id="dataPreview">
+                      Footnotes
+                    </h3>
+                    <ul className="govuk-list govuk-list--number">
+                      <li>
+                        Retention rates are based on the individual aims that
+                        were successfully completed in the relevant year (the
+                        Hybrid End Year). They are calculated as the number of
+                        learning aims completed divided by the number of
+                        leavers.
+                      </li>
+                      <li>
+                        Further guidance for the Apprenticeships National
+                        Achievement Rate Tables can be found on the gov.uk
+                        website:
+                        https://www.gov.uk/government/collections/sfa-national-success-rates-tables
+                      </li>
+                      <li>
+                        Volumes are rounded to the nearest 10 and 'low'
+                        indicates a base value of fewer than 5. Where data shows
+                        'x' this indicates data is unavailable, 'z' indicates
+                        data is not applicable, and 'c' indicates data is
+                        suppressed.
+                      </li>
+                      <li>
+                        Sector Subject Area (SSA) codes are available on the
+                        qualification description page:
+                        https://www.gov.uk/government/publications/types-of-regulated-qualifications/qualification-descriptions
+                      </li>
+                      <li>
+                        Achievement rates are based on the individual
+                        apprenticeship programmes that were completed in the
+                        relevant year (Hybrid End Year). They are calculated as
+                        the number of programme aims achieved divided by the
+                        number started, excluding the programme aims of any
+                        learners that transferred onto another qualification
+                        within the same institution.
+                      </li>
+                      <li>
+                        Figures include all funded and unfunded apprenticeship
+                        programmes reported on the ILR.
+                      </li>
+                      <li>
+                        Pass rates are based on the individual aims that were
+                        successfully completed in the relevant year (the Hybrid
+                        End Year). They are calculated as the number of learning
+                        aims achieved divided by the number successfully
+                        completed.
+                      </li>
+                      <li>
+                        The data source for all tables is the apprenticeships
+                        achievement rate dataset.
+                      </li>
+                      <li>
+                        The overall achievement rate is based on the Hybrid End
+                        Year. The Hybrid End Year is the later of the
+                        Achievement Year, Expected End Year, Actual End Year or
+                        Reporting Year of a programme.
+                      </li>
+                      <li>
+                        Percentages are rounded to one decimal place and
+                        calculated on unrounded volumes. 'low' indicates a
+                        percentage below 0.5%. Where data shows 'x' this
+                        indicates data is unavailable, 'z' indicates data is not
+                        applicable, and 'c' indicates data is suppressed.
+                      </li>
+                      <li>
+                        Age, sex, learners with learning difficulties and/or
+                        disabilities and ethnicity are based upon
+                        self-declaration by the learner.
+                      </li>
+                      <li>
+                        Achievement rates are calculated according to the
+                        Apprenticeship Qualification Achievement Rate business
+                        rules. These documents are available on the gov.uk
+                        website:
+                        https://www.gov.uk/government/collections/qualification-achievement-rates-and-minimum-standards
+                      </li>
+                    </ul>
+                  </Details>
 
                   {!sectionShowAll && (
                     <PrototypePrevNextNav
@@ -992,7 +1143,7 @@ const PrototypeHomepage = () => {
               {(sectionShowAll || sectionSelected === 'download') && (
                 <section id="download" className={styles.sectionScroll}>
                   <h2 className="govuk-heading-l" id="download">
-                    Download data or create tables
+                    Download data set or create tables
                   </h2>
                   <div className={styles.prototypeCardContainer}>
                     <div
@@ -1011,11 +1162,12 @@ const PrototypeHomepage = () => {
                             'govuk-link--no-visited-state',
                           )}
                         >
-                          Download file (csv, 2 Mb)
+                          Download data set (CSV, 2 MB)
                         </a>
                       </h2>
                       <p className="govuk-body govuk-!-margin-bottom-0">
                         Individual open data file from our data catlogue
+                        including data guidance
                       </p>
                     </div>
 
@@ -1039,7 +1191,8 @@ const PrototypeHomepage = () => {
                         </a>
                       </h2>
                       <p className="govuk-body govuk-!-margin-bottom-0">
-                        Explore this dataset with our table tool
+                        Explore this data set and create your own tables with
+                        our table tool
                       </p>
                     </div>
                   </div>
