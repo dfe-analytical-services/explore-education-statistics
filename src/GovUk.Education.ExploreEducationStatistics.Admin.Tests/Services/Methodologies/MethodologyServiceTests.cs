@@ -2340,12 +2340,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
-        public class ListUsersMethodologyVersionsForApproval
+        public class ListUsersMethodologyVersionsForApprovalForPublicationRoles
         {
             private readonly DataFixture _fixture = new();
             
             [Fact]
-            public async Task ListUsersMethodologyVersionsForApproval_UserIsApproverOnOwningPublication_Included()
+            public async Task UserIsApproverOnOwningPublication_Included()
             {
                 var publication = _fixture
                     .DefaultPublication()
@@ -2391,7 +2391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
             
             [Fact]
-            public async Task ListUsersMethodologyVersionsForApproval_MethodologyVersionNotInHigherReview_NotIncluded()
+            public async Task MethodologyVersionNotInHigherReview_NotIncluded()
             {
                 var publication = _fixture
                     .DefaultPublication()
@@ -2435,7 +2435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
             
             [Fact]
-            public async Task ListUsersMethodologyVersionsForApproval_UserIsApproverButOnAdoptingPublication_NotIncluded()
+            public async Task UserIsApproverButOnAdoptingPublication_NotIncluded()
             {
                 var publication = _fixture
                     .DefaultPublication()
@@ -2476,7 +2476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
             
             [Fact]
-            public async Task ListUsersMethodologyVersionsForApproval_UserIsOnlyOwnerOnOwningPublication_NotIncluded()
+            public async Task UserIsOnlyOwnerOnOwningPublication_NotIncluded()
             {
                 var publication = _fixture
                     .DefaultPublication()
@@ -2516,7 +2516,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
             
             [Fact]
-            public async Task ListUsersMethodologyVersionsForApproval_DifferentUserIsApproverOnOwningPublication_NotIncluded()
+            public async Task DifferentUserIsApproverOnOwningPublication_NotIncluded()
             {
                 // Set up a different User as the Approver for the owning Publication.
                 var otherUser = new User();
@@ -2556,9 +2556,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Assert.Empty(result.AssertRight());
                 }
             }
-            
+
             [Fact]
-            public async Task ListUsersMethodologyVersionsForApproval_MixOfMethodologies()
+            public async Task MixOfMethodologies()
             {
                 var publications = _fixture
                     .DefaultPublication()
@@ -2566,22 +2566,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var owningPublication = publications[0];
                 var adoptingPublication = publications[1];
-                
+
                 var ownedMethodologies = _fixture
                     .DefaultMethodology()
                     .WithOwningPublication(owningPublication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatuses(ListOf(MethodologyApprovalStatus.Approved, MethodologyApprovalStatus.HigherLevelReview, MethodologyApprovalStatus.Draft))
+                        .WithApprovalStatuses(ListOf(MethodologyApprovalStatus.Approved,
+                            MethodologyApprovalStatus.HigherLevelReview, MethodologyApprovalStatus.Draft))
                         .GenerateList())
                     .GenerateList(2);
-                
+
                 var adoptedMethodologies = _fixture
                     .DefaultMethodology()
                     .WithAdoptingPublication(adoptingPublication)
                     .WithMethodologyVersions(_ => _fixture
                         .DefaultMethodologyVersion()
-                        .WithApprovalStatuses(ListOf(MethodologyApprovalStatus.Approved, MethodologyApprovalStatus.HigherLevelReview, MethodologyApprovalStatus.Draft))
+                        .WithApprovalStatuses(ListOf(MethodologyApprovalStatus.Approved,
+                            MethodologyApprovalStatus.HigherLevelReview, MethodologyApprovalStatus.Draft))
                         .GenerateList())
                     .Generate(2);
 
@@ -2620,6 +2622,312 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                     // Assert that we just get the 2 MethodologyVersions where the user is the Approver of the Owning
                     // Publication and their statuses are Higher Review.
+                    Assert.Equal(2, methodologyVersionsForApproval.Count);
+                    Assert.Equal(ownedMethodologies[0].Versions[1].Id, methodologyVersionsForApproval[0].Id);
+                    Assert.Equal(ownedMethodologies[1].Versions[1].Id, methodologyVersionsForApproval[1].Id);
+                }
+            }
+        }
+        
+        public class ListUsersMethodologyVersionsForApprovalForReleaseRoles
+        {
+            private readonly DataFixture _fixture = new();
+            
+            [Fact]
+            public async Task UserIsApproverOnOwningPublicationRelease_Included()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+                
+                var publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(ListOf(release))
+                    .Generate();
+                
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    var methodologyVersionsForApproval = result.AssertRight();
+
+                    var methodologyForApproval = Assert.Single(methodologyVersionsForApproval);
+                    Assert.Equal(methodology.Versions[0].Id, methodologyForApproval.Id);
+                    
+                    // Assert that we have a populated view model, including the owning Publication details.
+                    Assert.Equal(publication.Title, methodologyForApproval.OwningPublication.Title);
+                }
+            }
+            
+            [Fact]
+            public async Task UserIsApproverOnOwningPublicationRelease_MethodologyVersionNotInHigherReview_NotIncluded()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+                
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                // Generate 2 Methodologies that are not in Higher Review.
+                var methodologies = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .ForIndex(0, s => s.SetMethodologyVersions(_fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.Draft)
+                        .Generate(1)))
+                    .ForIndex(1, s => s.SetMethodologyVersions(_fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.Approved)
+                        .Generate(1)))
+                    .GenerateList();
+                
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodologies);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+            
+            [Fact]
+            public async Task UserIsReleaseApproverButOnAdoptingPublication_NotIncluded()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+                
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                // Create a Methodology that has only been adopted by the User's Publication.
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithAdoptingPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+                
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+            
+            [Fact]
+            public async Task UserIsOnlyContributorOnOwningPublicationRelease_NotIncluded()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+                
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                // Set up the User as a Contributor on the Methodology's Publication's Release rather than an Approver.
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Contributor)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+            
+            [Fact]
+            public async Task DifferentUserIsApproverOnOwningPublicationRelease_NotIncluded()
+            {
+                // Set up a different User as the Approver for the owning Publication.
+                var otherUser = new User();
+
+                var release = _fixture.DefaultRelease().Generate();
+                
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+                
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var releaseRoleForOtherUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(otherUser)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Contributor)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForOtherUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+
+            [Fact]
+            public async Task MixOfMethodologies()
+            {
+                var owningRelease = _fixture.DefaultRelease().Generate();
+                var adoptingRelease = _fixture.DefaultRelease().Generate();
+                
+                var owningPublication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(ListOf(owningRelease))
+                    .Generate();
+                
+                var adoptingPublication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(ListOf(adoptingRelease))
+                    .Generate();
+
+                var ownedMethodologies = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(owningPublication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatuses(ListOf(MethodologyApprovalStatus.Approved,
+                            MethodologyApprovalStatus.HigherLevelReview, MethodologyApprovalStatus.Draft))
+                        .GenerateList())
+                    .GenerateList(2);
+
+                var adoptedMethodologies = _fixture
+                    .DefaultMethodology()
+                    .WithAdoptingPublication(adoptingPublication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatuses(ListOf(MethodologyApprovalStatus.Approved,
+                            MethodologyApprovalStatus.HigherLevelReview, MethodologyApprovalStatus.Draft))
+                        .GenerateList())
+                    .Generate(2);
+
+                var releaseRolesForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .ForIndex(0, s => s
+                        .SetRelease(owningRelease)
+                        .SetRole(ReleaseRole.Approver))
+                    .ForIndex(1, s => s
+                        .SetRelease(owningRelease)
+                        .SetRole(ReleaseRole.Approver))
+                    .ForIndex(2, s => s
+                        .SetRelease(adoptingRelease)
+                        .SetRole(ReleaseRole.Approver))
+                    .ForIndex(3, s => s
+                        .SetRelease(adoptingRelease)
+                        .SetRole(ReleaseRole.Contributor))
+                    .GenerateList();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(ownedMethodologies);
+                    await context.Methodologies.AddRangeAsync(adoptedMethodologies);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRolesForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    var methodologyVersionsForApproval = result.AssertRight();
+
+                    // Assert that we just get the 2 MethodologyVersions where the user is the Approver of the Owning
+                    // Publication's Release and their statuses are Higher Review.
                     Assert.Equal(2, methodologyVersionsForApproval.Count);
                     Assert.Equal(ownedMethodologies[0].Versions[1].Id, methodologyVersionsForApproval[0].Id);
                     Assert.Equal(ownedMethodologies[1].Versions[1].Id, methodologyVersionsForApproval[1].Id);
