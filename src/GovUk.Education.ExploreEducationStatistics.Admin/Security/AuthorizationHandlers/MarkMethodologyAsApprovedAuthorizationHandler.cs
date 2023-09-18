@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
@@ -58,7 +57,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
                 .HasRolesOnPublicationOrLatestRelease(
                     context.User.GetUserId(),
                     owningPublication.Id,
-                    ListOf(Approver),
+                    ListOf(PublicationRole.Approver),
                     ListOf(ReleaseRole.Approver)))
         {
             context.Succeed(requirement);
