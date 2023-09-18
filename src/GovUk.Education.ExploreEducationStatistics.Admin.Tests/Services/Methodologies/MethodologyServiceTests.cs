@@ -816,6 +816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyVersion = methodologyVersion,
                 InternalReleaseNote = "Test approval",
+                ApprovalStatus = Approved,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();

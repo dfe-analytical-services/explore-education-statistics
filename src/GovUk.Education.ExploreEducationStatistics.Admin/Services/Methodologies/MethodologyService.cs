@@ -249,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             var viewModel = _mapper.Map<MethodologyVersionViewModel>(loadedMethodologyVersion);
 
-            viewModel.InternalReleaseNote = await GetLatestInternalNote(loadedMethodologyVersion);
+            viewModel.InternalReleaseNote = await GetLatestInternalReleaseNote(loadedMethodologyVersion.Id);
 
             viewModel.OwningPublication = owningPublication;
             viewModel.OtherPublications = otherPublications;
@@ -427,11 +427,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 });
         }
 
-        private async Task<string?> GetLatestInternalNote(MethodologyVersion methodologyVersion)
+        private async Task<string?> GetLatestInternalReleaseNote(Guid methodologyVersionId)
         {
             // NOTE: Gets latest internal note for this version, not for the entire methodology
             return await _context.MethodologyStatus
-                .Where(ms => methodologyVersion.Id == ms.MethodologyVersionId)
+                .Where(ms => methodologyVersionId == ms.MethodologyVersionId)
                 .OrderByDescending(ms => ms.Created)
                 .Select(ms => ms.InternalReleaseNote)
                 .FirstOrDefaultAsync();
