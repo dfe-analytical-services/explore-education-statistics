@@ -218,12 +218,22 @@ Approve the owned methodology and verify the warning disappears
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
 
-Adopt a Draft methodology
-    user creates test publication via api    ${ADOPTED_PUBLICATION_NAME}
+Create published methodology for adopted publication
+    ${adopted_publication_id}    user creates test publication via api    ${ADOPTED_PUBLICATION_NAME}
+    user creates test release via api    ${adopted_publication_id}    CY    2001
+    user navigates to draft release page from dashboard    ${ADOPTED_PUBLICATION_NAME}    Calendar year 2001
+    user navigates to content page    ${ADOPTED_PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Headline text block text
+    user approves release for immediate publication
+
     user creates methodology for publication    ${ADOPTED_PUBLICATION_NAME}
+    user approves methodology for publication    ${ADOPTED_PUBLICATION_NAME}    ${ADOPTED_PUBLICATION_NAME}
 
-    user waits until page contains link    ${ADOPTED_PUBLICATION_NAME}
+Create new draft amendment for methodology
+    user creates methodology amendment for publication    ${ADOPTED_PUBLICATION_NAME}    ${ADOPTED_PUBLICATION_NAME}
 
+Adopt a methodology with a draft amendment
     user navigates to methodologies on publication page    ${PUBLICATION_NAME}
 
     user clicks link    Adopt an existing methodology
@@ -231,7 +241,7 @@ Adopt a Draft methodology
     user clicks radio    ${ADOPTED_PUBLICATION_NAME}
     user clicks button    Save
 
-Check that having a Draft methodology adopted by this Release's Publication will show a checklist warning
+Check that having a draft methodology amendment adopted by this Release's Publication will show a checklist warning
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Financial year 3000-01
     user edits release status
@@ -239,7 +249,7 @@ Check that having a Draft methodology adopted by this Release's Publication will
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    A methodology for this publication is not yet approved
 
-Approve the adopted methodology and verify the warning disappears
+Approve the adopted methodology amendment and verify the warning disappears
     user approves methodology for publication    ${ADOPTED_PUBLICATION_NAME}
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Financial year 3000-01

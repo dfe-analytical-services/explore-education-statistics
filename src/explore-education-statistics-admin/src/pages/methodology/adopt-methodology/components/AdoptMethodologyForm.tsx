@@ -83,16 +83,18 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
       initialValues={{ methodologyId: '' }}
       onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({
-        methodologyId: Yup.string().required('Select a methodology to adopt'),
+        methodologyId: Yup.string().required(
+          'Select a published methodology to adopt',
+        ),
       })}
     >
       <Form id="adoptMethodologyForm">
         <FormFieldRadioSearchGroup
           id="selectMethodology"
-          legend="Select a methodology"
+          legend="Select a published methodology"
           name="methodologyId"
           options={radioOptions}
-          searchLabel="Search for a methodology"
+          searchLabel="Search for a published methodology"
         />
         <ButtonGroup>
           <Button type="submit">Save</Button>

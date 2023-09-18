@@ -219,6 +219,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return source.Where(item => item is not null)!;
         }
 
+        public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T?> source)
+            where T: class
+        {
+            return source.Where(item => item is not null)!;
+        }
+
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>
             self.Select((item, index) => (item, index));
 

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +24,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     {
         private readonly ContentDbContext _context;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
+        private readonly IMethodologyCacheService _methodologyCacheService;
 
         public MethodologyMigrationController(
             ContentDbContext context,
-            IMethodologyVersionRepository methodologyVersionRepository)
+            IMethodologyVersionRepository methodologyVersionRepository,
+            IMethodologyCacheService methodologyCacheService)
         {
             _context = context;
             _methodologyVersionRepository = methodologyVersionRepository;
+            _methodologyCacheService = methodologyCacheService;
         }
 
         public class MethodologyMigrationResult
@@ -68,6 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             if (!dryRun)
             {
                 await _context.SaveChangesAsync();
+                await _methodologyCacheService.UpdateSummariesTree();
             }
 
             return results;

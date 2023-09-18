@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             // Setup methodology owned by a different publication
             var methodology = new Methodology
             {
+                LatestPublishedVersionId = Guid.NewGuid(),
                 Publications = new List<PublicationMethodology>
                 {
                     new()
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Publication = new Publication(),
                         Owner = true
                     }
-                }
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -101,6 +102,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task AdoptMethodology_CannotAdoptUnpublishedMethodology()
+        {
+            var publication = new Publication();
+
+            // Setup methodology owned by a different publication
+            var methodology = new Methodology
+            {
+                LatestPublishedVersionId = null, // methodology is unpublished
+                Publications = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Publication = new Publication(),
+                        Owner = true
+                    }
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context);
+
+                var exception = await Assert.ThrowsAsync<ArgumentException>(() =>
+                    service.AdoptMethodology(publication.Id, methodology.Id));
+                Assert.Equal("Cannot adopt an unpublished methodology", exception.Message);
+            }
+        }
+
+        [Fact]
         public async Task AdoptMethodology_AlreadyAdoptedByPublicationFails()
         {
             var publication = new Publication();
@@ -108,6 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             // Setup methodology adopted by this publication
             var methodology = new Methodology
             {
+                LatestPublishedVersionId = Guid.NewGuid(),
                 Publications = new List<PublicationMethodology>
                 {
                     new()
@@ -167,6 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             // Setup methodology owned by this publication
             var methodology = new Methodology
             {
+                LatestPublishedVersionId = Guid.NewGuid(),
                 Publications = new List<PublicationMethodology>
                 {
                     new()
@@ -174,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Publication = publication,
                         Owner = true
                     }
-                }
+                },
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -527,7 +569,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
-                Slug = "test-publication"
+                LatestPublishedVersionId = Guid.NewGuid(),
+                Slug = "test-publication",
             };
 
             var publication = new Publication
@@ -569,10 +612,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
             methodologyRepository.Setup(mock =>
-                    mock.GetUnrelatedToPublication(adoptingPublication.Id))
+                    mock.GetPublishedMethodologiesUnrelatedToPublication(adoptingPublication.Id))
                 .ReturnsAsync(ListOf(methodology));
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestVersion(methodology.Id))
+            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
                 .ReturnsAsync(methodologyVersion);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -607,6 +650,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task GetAdoptableMethodologies_NoUnpublishedMethodologies()
+        {
+            var methodology = new Methodology
+            {
+                LatestPublishedVersionId = null, // methodology is unpublished
+                Slug = "test-publication",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        InternalReleaseNote = "Test approval",
+                        Published = null,
+                        PublishingStrategy = Immediately,
+                        Status = Draft,
+                        AlternativeTitle = "Alternative title"
+                    },
+                },
+            };
+
+            var publication = new Publication
+            {
+                Title = "Owning publication",
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Methodology = methodology,
+                        Owner = true
+                    }
+                }
+            };
+
+            var adoptingPublication = new Publication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.Publications.AddRangeAsync(publication, adoptingPublication);
+                await context.Methodologies.AddAsync(methodology);
+                await context.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+            methodologyRepository.Setup(mock =>
+                    mock.GetPublishedMethodologiesUnrelatedToPublication(adoptingPublication.Id))
+                .ReturnsAsync(new List<Methodology>());
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyService(
+                    contentDbContext: context,
+                    methodologyRepository: methodologyRepository.Object);
+
+                var result = await service.GetAdoptableMethodologies(adoptingPublication.Id);
+                var adoptableMethodologyList = result.AssertRight();
+
+                VerifyAllMocks(methodologyRepository);
+
+                Assert.Empty(adoptableMethodologyList);
+            }
+        }
+
+        [Fact]
         public async Task GetAdoptableMethodologies_NoUnrelatedMethodologies()
         {
             var publication = new Publication();
@@ -622,7 +729,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
 
             methodologyRepository.Setup(mock =>
-                    mock.GetUnrelatedToPublication(publication.Id))
+                    mock.GetPublishedMethodologiesUnrelatedToPublication(publication.Id))
                 .ReturnsAsync(new List<Methodology>());
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
