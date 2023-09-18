@@ -76,23 +76,28 @@ export default function ApprovalsTable({
   }
 
   return (
-    <table data-testid="your-approvals">
-      <thead>
-        <tr>
-          <th>Publication / Page</th>
-          <th>Page type</th>
-          <th>Actions</th>
-        </tr>
-        {orderBy(Object.keys(allApprovalsByPublication)).map(publication => (
-          <PublicationRow
-            key={publication}
-            publication={publication}
-            methodologies={allApprovalsByPublication[publication].methodologies}
-            releases={allApprovalsByPublication[publication].releases}
-          />
-        ))}
-      </thead>
-    </table>
+    <>
+      <p>Here you can view any releases or methodologies awaiting approval.</p>
+      <table data-testid="your-approvals">
+        <thead>
+          <tr>
+            <th>Publication / Page</th>
+            <th>Page type</th>
+            <th>Actions</th>
+          </tr>
+          {orderBy(Object.keys(allApprovalsByPublication)).map(publication => (
+            <PublicationRow
+              key={publication}
+              publication={publication}
+              methodologies={
+                allApprovalsByPublication[publication].methodologies
+              }
+              releases={allApprovalsByPublication[publication].releases}
+            />
+          ))}
+        </thead>
+      </table>
+    </>
   );
 }
 
