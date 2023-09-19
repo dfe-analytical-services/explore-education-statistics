@@ -1,46 +1,138 @@
 [
   {
-    "theme_heading": "Children's social care",
-    "topics": []
+    "methodologies": [
+      "Characteristics of children in need",
+      "Children accommodated in secure children's homes",
+      "Children looked after in England including adoptions",
+      "Children's social work workforce",
+      "Children's social work workforce: attrition, caseload, and agency workforce",
+      "Outcomes for children in need, including children looked after by local authorities in England",
+      "Outcomes of children in need, including looked after children",
+      "Serious incident notifications"
+    ],
+    "theme_heading": "Children's social care"
   },
   {
-    "theme_heading": "COVID-19",
-    "topics": []
+    "methodologies": [
+      "Attendance in education and early years settings during the coronavirus (COVID-19) pandemic",
+      "CO2 monitors: cumulative delivery statistics",
+      "Coronavirus (COVID-19) Reporting in Higher Education Providers",
+      "Delivery of air cleaning units",
+      "Laptops and tablets data",
+      "Vulnerable children and young people survey"
+    ],
+    "theme_heading": "COVID-19"
   },
   {
-    "theme_heading": "Destination of pupils and students",
-    "topics": []
+    "methodologies": [
+      "16-18 destination measures",
+      "Further education: outcome-based success measures",
+      "Key stage 4 destination measures",
+      "Longer term destinations",
+      "NEET age 16 to 24: methodology",
+      "Participation in education, training and NEET age 16 to 17 by local authority",
+      "Participation in education, training and employment age 16 to 18",
+      "Progression to higher education and training: methodology"
+    ],
+    "theme_heading": "Destination of pupils and students"
   },
   {
-    "theme_heading": "Early years",
-    "topics": []
+    "methodologies": [
+      "Childcare and early years provider survey",
+      "Childcare and early years survey of parents",
+      "Early years foundation stage profile results",
+      "Education provision: children under 5 years of age"
+    ],
+    "theme_heading": "Early years"
   },
   {
-    "theme_heading": "Finance and funding",
-    "topics": []
+    "methodologies": [
+      "LA and school expenditure",
+      "Planned LA and school expenditure",
+      "School finances during the Covid-19 pandemic",
+      "School funding statistics",
+      "Student loan forecasts for England"
+    ],
+    "theme_heading": "Finance and funding"
   },
   {
-    "theme_heading": "Further education",
-    "topics": []
+    "methodologies": [
+      "Apprenticeships in England by industry characteristics: methodology",
+      "Career pathways: post-16 qualifications held by employees",
+      "Detailed destinations of 16 to 18 year olds in Further Education",
+      "Further education and skills statistics: methodology",
+      "Further education skills index",
+      "Further education workforce",
+      "Skills Bootcamps outcomes",
+      "Skills Bootcamps starts"
+    ],
+    "theme_heading": "Further education"
   },
   {
-    "theme_heading": "Higher education",
-    "topics": []
+    "methodologies": [
+      "Graduate labour market statistics",
+      "Graduate outcomes (LEO)",
+      "Graduate outcomes (LEO): postgraduate outcomes",
+      "Higher-level learners in England: Methodology",
+      "LEO Graduate and Postgraduate Outcomes",
+      "LEO Graduate outcomes provider level data",
+      "Participation measures in higher education",
+      "UK revenue from education related exports and transnational education activity",
+      "Widening participation in higher education"
+    ],
+    "theme_heading": "Higher education"
   },
   {
-    "theme_heading": "Pupils and schools",
-    "topics": []
+    "methodologies": [
+      "Children missing education",
+      "Education, children\u2019s social care and offending: Descriptive statistics (technical note)",
+      "Education, health and care plans",
+      "Elective home education",
+      "Local authority school places scorecards",
+      "National Tutoring Programme Statistics Methodology",
+      "National pupil projections",
+      "Parental responsibility measures",
+      "Pupil absence statistics: methodology",
+      "Pupil attendance in schools",
+      "Pupil exclusion statistics: methodology",
+      "School admission appeals in England: methodology",
+      "School capacity",
+      "School placements for children from outside of the UK",
+      "School places sufficiency survey: methodology",
+      "Schools, pupils and their characteristics",
+      "Secondary and primary school applications and offers",
+      "Special educational needs in England",
+      "The link between absence and attainment at KS2 and KS4"
+    ],
+    "theme_heading": "Pupils and schools"
   },
   {
-    "theme_heading": "School and college outcomes and performance",
-    "topics": []
+    "methodologies": [
+      "A level and other 16 to 18 results",
+      "Key stage 1 and phonics screening check attainment",
+      "Key stage 2 attainment",
+      "Key stage 4 performance",
+      "Level 2 and 3 attainment age 16 to 25",
+      "Multi-academy trust performance measures (Key stages 2, 4 and 5)",
+      "Multiplication tables check attainment",
+      "Provisional T Level results"
+    ],
+    "theme_heading": "School and college outcomes and performance"
   },
   {
-    "theme_heading": "Teachers and school workforce",
-    "topics": []
+    "methodologies": [
+      "ECF and NPQ starts",
+      "Initial Teacher Training Census",
+      "Initial teacher training performance profiles",
+      "School workforce in England",
+      "Teacher and Leader development: ECF and NPQs"
+    ],
+    "theme_heading": "Teachers and school workforce"
   },
   {
-    "theme_heading": "UK education and training statistics",
-    "topics": []
+    "methodologies": [
+      "Education and training statistics for the UK"
+    ],
+    "theme_heading": "UK education and training statistics"
   }
 ]
