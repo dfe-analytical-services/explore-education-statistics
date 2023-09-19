@@ -148,19 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 {
                     Id = Guid.NewGuid(),
                     AlternativeTitle = "Methodology 2 title",
-                    Status = MethodologyApprovalStatus.Approved,
-                },
-                new MethodologyVersion
-                {
-                    Id = Guid.NewGuid(),
-                    AlternativeTitle = "Methodology should not appear 1",
                     Status = MethodologyApprovalStatus.Draft,
-                },
-                new MethodologyVersion
-                {
-                    Id = Guid.NewGuid(),
-                    AlternativeTitle = "Methodology should not appear 2",
-                    Status = MethodologyApprovalStatus.HigherLevelReview,
                 }
             );
 
@@ -356,6 +344,146 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(otherRelease.Id, contentPublicationReleases[0].Id);
                 Assert.Equal("2019-20", contentPublicationReleases[0].Slug);
                 Assert.Equal("Academic year 2019/20", contentPublicationReleases[0].Title);
+
+                Assert.Equal(2, contentPublication.Methodologies.Count);
+                Assert.Equal(methodologies[0].Id, contentPublication.Methodologies[0].Id);
+                Assert.Equal("Methodology 1 title", contentPublication.Methodologies[0].Title);
+                Assert.Equal(methodologies[1].Id, contentPublication.Methodologies[1].Id);
+                Assert.Equal("Methodology 2 title", contentPublication.Methodologies[1].Title);
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        }
+
+        [Fact]
+        public async Task GetManageContentPageViewModel_IsPrerelease()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact(),
+                LegacyReleases = new List<LegacyRelease>(),
+                Slug = "test-publication",
+                Title = "Publication",
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                }
+            };
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
+                PreReleaseAccessList = "Test access list",
+                Publication = publication,
+                PublishScheduled = DateTime.Parse("2020-09-08T23:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
+                Published = null,
+                ReleaseName = "2020",
+                RelatedInformation = new List<Link>(),
+                Slug = "2020-21",
+                TimePeriodCoverage = AcademicYear,
+                Type = ReleaseType.OfficialStatistics,
+                Updates = new List<Update>(),
+                KeyStatistics = new List<KeyStatistic>(),
+            };
+
+            var methodologies = AsList(
+                new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology 1 title",
+                    Status = MethodologyApprovalStatus.Approved,
+                },
+                new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology 2 title",
+                    Status = MethodologyApprovalStatus.Approved,
+                }
+            );
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.ReleaseContentSections.AddRangeAsync(
+                    new()
+                    {
+                        Release = release,
+                        ContentSection = new()
+                        {
+                            Type = ContentSectionType.Headlines
+                        }
+                    },
+                    new()
+                    {
+                        Release = release,
+                        ContentSection = new()
+                        {
+                            Type = ContentSectionType.KeyStatisticsSecondary
+                        }
+                    },
+                    new()
+                    {
+                        Release = release,
+                        ContentSection = new()
+                        {
+                            Type = ContentSectionType.ReleaseSummary
+                        }
+                    },
+                    new()
+                    {
+                        Release = release,
+                        ContentSection = new()
+                        {
+                            Type = ContentSectionType.RelatedDashboards
+                        }
+                    },
+                    new()
+                    {
+                        Release = release,
+                        ContentSection = new()
+                        {
+                            Type = ContentSectionType.Generic,
+                        }
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            dataBlockService.Setup(mock =>
+                    mock.GetUnattachedDataBlocks(release.Id))
+                .ReturnsAsync(new List<DataBlockViewModel>());
+
+            methodologyVersionRepository.Setup(mock =>
+                    mock.GetLatestPublishedVersionByPublication(publication.Id))
+                .ReturnsAsync(methodologies);
+
+            releaseFileService.Setup(mock =>
+                    mock.ListAll(release.Id, Ancillary, FileType.Data))
+                .ReturnsAsync(new List<FileInfo>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupManageContentPageService(contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await service.GetManageContentPageViewModel(
+                    release.Id, isPrerelease: true);
+
+                Assert.True(result.IsRight);
+
+                var contentRelease = result.Right.Release;
+                Assert.NotNull(contentRelease);
+
+                var contentPublication = contentRelease.Publication;
+                Assert.NotNull(contentPublication);
 
                 Assert.Equal(2, contentPublication.Methodologies.Count);
                 Assert.Equal(methodologies[0].Id, contentPublication.Methodologies[0].Id);

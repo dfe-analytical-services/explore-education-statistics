@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public async Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
-            Guid releaseId)
+            Guid releaseId, bool isPrerelease = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseQuery)
@@ -62,17 +62,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     var (release, unattachedDataBlocks, files) = releaseBlocksAndFiles;
 
-                    var methodologyVersions = await _methodologyVersionRepository
-                        .GetLatestVersionByPublication(release.PublicationId);
-
-                    var approvedMethodologyVersions = methodologyVersions
-                        .Where(mv => mv.Approved)
-                        .ToList();
+                    List<MethodologyVersion> methodologyVersions;
+                    if (isPrerelease)
+                    {
+                        methodologyVersions = await _methodologyVersionRepository
+                            .GetLatestPublishedVersionByPublication(release.PublicationId);
+                    }
+                    else
+                    {
+                        methodologyVersions = await _methodologyVersionRepository
+                            .GetLatestVersionByPublication(release.PublicationId);
+                    }
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
-                        _mapper.Map<List<IdTitleViewModel>>(approvedMethodologyVersions);
+                        _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);
 
                     // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
                     // own Boundary Level selection

@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 {
     public interface IManageContentPageService
     {
-        Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(Guid releaseId);
+        Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
+            Guid releaseId, bool isPrerelease = false);
     }
 }
