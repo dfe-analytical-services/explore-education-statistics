@@ -1,8 +1,5 @@
 import PublicationManageReleaseContributorsPage from '@admin/pages/publication/PublicationManageReleaseContributorsPage';
-import {
-  testContact,
-  testPublication,
-} from '@admin/pages/publication/__data__/testPublication';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
   publicationManageReleaseContributorsPageRoute,
