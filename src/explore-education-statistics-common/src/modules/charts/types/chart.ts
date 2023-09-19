@@ -41,6 +41,7 @@ export type BarChartDataLabelPosition = 'inside' | 'outside';
 export interface ReferenceLine {
   endPosition?: string;
   label: string;
+  labelWidth?: number;
   otherAxisEnd?: string;
   otherAxisPosition?: number;
   otherAxisStart?: string;

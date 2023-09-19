@@ -21,6 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<MethodologyVersion> Versions { get; set; } = new();
 
+        public Guid? LatestPublishedVersionId { get; set; }
+
+        public MethodologyVersion? LatestPublishedVersion { get; set; }
+
         public PublicationMethodology OwningPublication()
         {
             if (Publications.IsNullOrEmpty())

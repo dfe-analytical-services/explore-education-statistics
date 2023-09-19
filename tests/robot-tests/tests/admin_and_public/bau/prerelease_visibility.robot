@@ -24,8 +24,8 @@ Create test publication and release via API
 Verify release summary
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Calendar year    2000
-    ...    UI test contact name    National statistics
+    user verifies release summary    Calendar year    2000
+    ...    National statistics
 
 Upload subject
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv

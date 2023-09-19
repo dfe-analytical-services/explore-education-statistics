@@ -10,6 +10,7 @@
   "python": {
     "enabled": false
   },
+  "ignoreDeps": ["Mime-Detective"],
   "vulnerabilityAlerts": {
     "groupName": "renovate",
     "dependencyDashboardApproval": false,
@@ -48,21 +49,48 @@
     },
     {
       "matchDatasources": ["pypi"],
-      "groupName": "python dependencies",
+      "groupName": "Python dependencies",
       "enabled": false
     },
     {
       "matchDatasources": ["docker"],
-      "groupName": "docker image updates",
+      "groupName": "Docker image updates",
       "enabled": false
     },
     {
-      "packageNames": ["node"],
+      "matchDatasources": ["dotnet-version"],
+      "groupName": ".NET version",
       "enabled": false
     },
     {
-      "matchPackagePatterns": ["^@ckeditor/", "Mime", "Mime-Detective"],
+      "matchPackageNames": ["node"],
+      "groupName": "Node version",
       "enabled": false
+    },
+    {
+      "description": "Packages which need major versions to be in sync with the EF Core version or the .NET version",
+      "matchDatasources": ["nuget"],
+      "matchPackagePrefixes": [
+        "Microsoft.AspNetCore",
+        "Microsoft.EntityFrameworkCore",
+        "Microsoft.Extensions",
+        "Thinktecture.EntityFrameworkCore",
+        "MockQueryable.Moq"
+      ],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "Restrict AutoMapper due to incompatibility with IdentityServer4.EntityFramework.Storage",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AutoMapper"],
+      "allowedVersions": "<=9.0.0"
+    },
+    {
+      "description": "Restrict AutoMapper.Extensions.Microsoft.DependencyInjection to correspond with AutoMapper version",
+      "matchDatasources": ["nuget"],
+      "matchPackageNames": ["AutoMapper.Extensions.Microsoft.DependencyInjection"],
+      "allowedVersions": "<=7.0.0"
     }
   ]
 }

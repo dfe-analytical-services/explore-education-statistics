@@ -47,34 +47,39 @@ $border-width: 1px;
 
 .tableHead {
   td {
-    background: #fff;
+    background: govuk-colour('white');
     position: relative;
     z-index: 3;
   }
 
-  .emptyColumnHeaderCell {
-    background: govuk-colour('light-grey');
-    height: 46px;
-    z-index: 1;
+  // Uses the spacer cell to cover the left border
+  // of header cells. We can't just remove the
+  // left border on the first cell in header rows
+  // because this causes inconsistent styling when there
+  // are merged cells which span down through rows.
+  td::after {
+    background: govuk-colour('white');
+    bottom: 0;
+    content: '';
+    position: absolute;
+    right: -1px;
+    top: 0;
+    width: 1px;
   }
 
   th {
     background: govuk-colour('light-grey');
     border-bottom: 1px solid $govuk-border-colour;
-    border-right: 1px solid $govuk-border-colour;
+    border-left: 1px solid $govuk-border-colour;
     padding: govuk-spacing(2);
     position: relative;
     text-align: center;
     z-index: 2;
   }
 
-  tr:first-child:last-child th {
+  tr:only-child th {
     background: govuk-colour('white');
-    border-right: 0;
+    border-left: 0;
     text-align: right;
-  }
-
-  th:last-child {
-    border-right: 0;
   }
 }

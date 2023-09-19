@@ -519,6 +519,10 @@ user clicks button
     ${button}=    user gets button element    ${text}    ${parent}
     user clicks element    ${button}
 
+user clicks button containing text
+    [Arguments]    ${text}    ${parent}=css:body
+    user clicks element    xpath://button[contains(text(),${text})]    ${parent}
+
 user waits until page contains button
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until page contains element    xpath://button[text()="${text}"]    ${wait}

@@ -277,7 +277,7 @@ jobs:
           containerRegistry: 's101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection'
           repository: 'ees-public-frontend'
           command: 'build'
-          Dockerfile: 'docker/Dockerfile.public-frontend'
+          Dockerfile: 'docker/public-frontend/Dockerfile'
           buildContext: '$(System.DefaultWorkingDirectory)'
           tags: $(Build.BuildNumber)
           arguments: '--build-arg BUILD_BUILDNUMBER=$(Build.BuildNumber)'
@@ -291,7 +291,7 @@ jobs:
           containerRegistry: 's101d-datahub-spn-ees-dfe-gov-uk-docker-managed-service-connection'
           repository: 'ees-public-frontend'
           command: 'push'
-          Dockerfile: 'docker/Dockerfile.public-frontend'
+          Dockerfile: 'docker/public-frontend/Dockerfile'
           buildContext: '$(System.DefaultWorkingDirectory)'
           tags: $(Build.BuildNumber)
 

@@ -39,7 +39,7 @@ public class MarkMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
         MethodologyVersion methodologyVersion)
     {
         // If the Methodology is already public, it cannot be marked as draft
-        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
+        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
         }

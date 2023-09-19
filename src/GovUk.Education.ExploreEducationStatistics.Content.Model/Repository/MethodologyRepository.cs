@@ -49,11 +49,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .ToListAsync();
         }
 
-        public async Task<List<Methodology>> GetUnrelatedToPublication(Guid publicationId)
+        public async Task<List<Methodology>> GetPublishedMethodologiesUnrelatedToPublication(Guid publicationId)
         {
             return await _contentDbContext.Methodologies
                 .Include(m => m.Publications)
-                .Where(m => m.Publications.All(pm => pm.PublicationId != publicationId))
+                .Where(m =>
+                    m.Publications.All(pm => pm.PublicationId != publicationId)
+                    && m.LatestPublishedVersionId != null)
                 .ToListAsync();
         }
     }

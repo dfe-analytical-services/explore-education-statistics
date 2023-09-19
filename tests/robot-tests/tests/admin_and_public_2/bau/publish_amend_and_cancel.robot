@@ -44,7 +44,7 @@ Add data guidance
     user clicks button    Save guidance
 
 Add ancillary file
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
     user enters text into element    label:Title    Test ancillary file 1
@@ -204,11 +204,8 @@ Change the Release type
     user clicks radio    Experimental statistics
     user clicks button    Update release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} summary
-    ...    Financial year
+    user verifies release summary    Financial year
     ...    3000-01
-    ...    UI test contact name
     ...    Experimental statistics
 
 Navigate to data replacement page
@@ -243,7 +240,7 @@ Confirm data replacement
 Edit ancillary file and replace data
     [Documentation]    EES-4315
     user clicks link    Data and files
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Uploaded files
 
     user waits until page contains accordion section    Test ancillary file 1
@@ -390,11 +387,8 @@ Revisit the Release after the cancellation to double check it remains unaffected
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:publication-published-releases
     user clicks element    xpath://*[text()="View"]    ${ROW}
     user waits until h2 is visible    Release summary
-    user verifies release summary    ${PUBLICATION_NAME}
-    ...    ${PUBLICATION_NAME} summary
-    ...    Financial year
+    user verifies release summary    Financial year
     ...    3000-01
-    ...    UI test contact name
     ...    National statistics
 
 Verify that the Data and Files are unchanged
@@ -412,7 +406,7 @@ Verify that the Data and Files are unchanged
 
 Verify that the ancillary file is unchanged
     user clicks link    Data and files
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Uploaded files
     user waits until page contains accordion section    Test ancillary file 1
 

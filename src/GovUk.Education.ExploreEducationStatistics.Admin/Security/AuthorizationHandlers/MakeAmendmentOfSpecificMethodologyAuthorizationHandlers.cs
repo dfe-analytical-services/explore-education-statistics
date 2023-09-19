@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             MethodologyVersion methodologyVersion)
         {
             // Amendments can only be created from Methodologies that are already publicly-accessible.
-            if (!await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
+            if (!await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
             {
                 return;
             }

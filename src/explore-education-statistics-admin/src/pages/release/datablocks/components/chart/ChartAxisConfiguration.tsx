@@ -35,7 +35,6 @@ import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
@@ -573,19 +572,8 @@ const ChartAxisConfiguration = ({
               dataSetCategories={dataSetCategories}
               lines={form.values.referenceLines ?? []}
               minorAxisDomain={minorAxisDomain}
-              onAddLine={line => {
-                form.setFieldValue('referenceLines', [
-                  ...(form.values.referenceLines ?? []),
-                  line,
-                ]);
-              }}
-              onRemoveLine={line => {
-                form.setFieldValue(
-                  'referenceLines',
-                  form.values.referenceLines?.filter(
-                    refLine => !isEqual(refLine, line),
-                  ),
-                );
+              onChange={updatedReferenceLines => {
+                form.setFieldValue('referenceLines', updatedReferenceLines);
               }}
             />
           )}

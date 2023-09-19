@@ -17,6 +17,7 @@ interface Props
   axisType: AxisType;
   chartData: ChartData[];
   label: string;
+  labelWidth?: number;
   otherAxisDomain?: [AxisDomainItem, AxisDomainItem];
   otherAxisEnd?: string;
   otherAxisPosition?: number;
@@ -32,6 +33,7 @@ export default function createReferenceLine({
   axisDomain,
   chartData,
   label,
+  labelWidth,
   otherAxisDomain,
   otherAxisEnd,
   otherAxisPosition,
@@ -87,6 +89,7 @@ export default function createReferenceLine({
           axisType={axisType}
           chartData={chartData}
           label={label}
+          labelWidth={labelWidth}
           otherAxisDomain={otherAxisDomain}
           otherAxisPosition={otherAxisPosition}
           position={position}

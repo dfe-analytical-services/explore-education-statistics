@@ -77,11 +77,13 @@ describe('PublicationAdoptMethodologyPage', () => {
     expect(screen.getByText('Adopt a methodology')).toBeInTheDocument();
 
     await waitFor(() =>
-      expect(screen.getByText('Select a methodology')).toBeInTheDocument(),
+      expect(
+        screen.getByText('Select a published methodology'),
+      ).toBeInTheDocument(),
     );
 
     expect(
-      screen.getByLabelText('Search for a methodology'),
+      screen.getByLabelText('Search for a published methodology'),
     ).toBeInTheDocument();
 
     const radios = screen.getAllByRole('radio');
@@ -113,10 +115,12 @@ describe('PublicationAdoptMethodologyPage', () => {
       ).toBeInTheDocument(),
     );
 
-    expect(screen.queryByText('Select a methodology')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Select a published methodology'),
+    ).not.toBeInTheDocument();
 
     expect(
-      screen.queryByLabelText('Search for a methodology'),
+      screen.queryByLabelText('Search for a published methodology'),
     ).not.toBeInTheDocument();
 
     expect(screen.queryByRole('radio')).not.toBeInTheDocument();
@@ -147,7 +151,9 @@ describe('PublicationAdoptMethodologyPage', () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByText('Select a methodology')).toBeInTheDocument(),
+      expect(
+        screen.getByText('Select a published methodology'),
+      ).toBeInTheDocument(),
     );
 
     userEvent.click(screen.getByLabelText('Methodology 2'));
@@ -184,7 +190,9 @@ describe('PublicationAdoptMethodologyPage', () => {
     );
 
     await waitFor(() =>
-      expect(screen.getByText('Select a methodology')).toBeInTheDocument(),
+      expect(
+        screen.getByText('Select a published methodology'),
+      ).toBeInTheDocument(),
     );
 
     userEvent.click(screen.getByRole('button', { name: 'Cancel' }));

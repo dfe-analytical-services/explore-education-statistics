@@ -48,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                Title = "Publication",
-                Contact = new Contact(),
+                Title = "Publication"
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -151,7 +150,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                         Title = "Publication",
-                        Contact = new Contact(),
                         Releases = new List<Release>
                         {
                             new() // Template release
@@ -601,10 +599,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication
-                {
-                    Contact = new Contact(),
-                },
+                Publication = new Publication(),
                 ReleaseName = "2030",
                 PublishScheduled = DateTime.UtcNow,
                 NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
@@ -755,9 +750,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = new Guid("f7da23e2-304a-4b47-a8f5-dba28a554de9"),
                 Title = "Test publication",
-                Summary = "Test summary",
                 Slug = "test-publication",
-                Contact = new Contact(),
                 LatestPublishedRelease = release,
                 Releases =
                 {
@@ -802,7 +795,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2035-1", viewModel.Slug);
                 Assert.Equal(publication.Id, viewModel.PublicationId);
                 Assert.Equal("Test publication", viewModel.PublicationTitle);
-                Assert.Equal("Test summary", viewModel.PublicationSummary);
                 Assert.Equal("test-publication", viewModel.PublicationSlug);
                 Assert.Equal("Latest release note - 1 day ago", viewModel.LatestInternalReleaseNote);
                 Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);
@@ -833,7 +825,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Contact = new Contact(),
                 Releases =
                 {
                     release
@@ -877,7 +868,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Contact = new Contact(),
                 Releases =
                 {
                     release
@@ -915,7 +905,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                Contact = new Contact(),
                 LatestPublishedRelease = new Release
                 {
                     ReleaseName = "2022",
@@ -964,7 +953,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Contact = new Contact(),
                 Releases = new List<Release>
                 {
                     release

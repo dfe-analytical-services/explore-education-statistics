@@ -59,10 +59,12 @@ describe('AdoptMethodologyForm', () => {
       />,
     );
 
-    expect(screen.getByText('Select a methodology')).toBeInTheDocument();
+    expect(
+      screen.getByText('Select a published methodology'),
+    ).toBeInTheDocument();
 
     expect(
-      screen.getByLabelText('Search for a methodology'),
+      screen.getByLabelText('Search for a published methodology'),
     ).toBeInTheDocument();
 
     const radios = screen.getAllByRole('radio');
@@ -141,7 +143,9 @@ describe('AdoptMethodologyForm', () => {
     });
 
     expect(
-      screen.getByRole('link', { name: 'Select a methodology to adopt' }),
+      screen.getByRole('link', {
+        name: 'Select a published methodology to adopt',
+      }),
     ).toBeInTheDocument();
     expect(handleSubmit).not.toHaveBeenCalled();
   });

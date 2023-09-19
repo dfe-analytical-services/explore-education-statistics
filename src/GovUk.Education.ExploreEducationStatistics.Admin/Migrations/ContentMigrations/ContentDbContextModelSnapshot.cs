@@ -497,6 +497,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("LatestPublishedVersionId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("OwningPublicationTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -506,6 +509,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LatestPublishedVersionId")
+                        .IsUnique()
+                        .HasFilter("[LatestPublishedVersionId] IS NOT NULL");
 
                     b.ToTable("Methodologies");
                 });
@@ -1486,6 +1493,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("Publication");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", "LatestPublishedVersion")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.Methodology", "LatestPublishedVersionId");
+
+                    b.Navigation("LatestPublishedVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyFile", b =>

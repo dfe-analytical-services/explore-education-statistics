@@ -43,7 +43,7 @@ const ReleaseDataPage = () => {
         </TabsSection>
         <TabsSection
           id={releaseDataPageTabIds.fileUploads}
-          title="Ancillary file uploads"
+          title="Supporting file uploads"
         >
           <ReleaseFileUploadsSection
             publicationId={release.publicationId}

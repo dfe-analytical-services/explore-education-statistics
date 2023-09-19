@@ -1,7 +1,8 @@
 ﻿#nullable enable
 using System;
+using System.IO;
+using System.Reflection;
 using AutoMapper;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -114,6 +115,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
+        }
+
+        public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
+        {
+            var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var rootDir = Path.GetFullPath(Path.Combine(binDir!, ".."));
+
+            builder.ConfigurationBuilder
+                .AddJsonFile($"{rootDir}/appsettings.Local.json", optional: true, reloadOnChange: true);
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)

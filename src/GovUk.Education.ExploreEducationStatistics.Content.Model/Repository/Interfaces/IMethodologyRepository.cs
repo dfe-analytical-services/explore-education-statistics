@@ -13,6 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
         Task<List<Guid>> GetAllPublicationIds(Guid methodologyId);
 
-        Task<List<Methodology>> GetUnrelatedToPublication(Guid publicationId);
+        Task<List<Methodology>> GetPublishedMethodologiesUnrelatedToPublication(Guid publicationId);
     }
 }

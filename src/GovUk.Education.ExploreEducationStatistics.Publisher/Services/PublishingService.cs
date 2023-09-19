@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -22,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IPrivateBlobStorageService _privateBlobStorageService;
         private readonly IPublicBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyService _methodologyService;
-        private readonly IPublicationRepository _publicationRepository;
         private readonly IReleaseService _releaseService;
         private readonly ILogger<PublishingService> _logger;
 
@@ -30,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IPrivateBlobStorageService privateBlobStorageService,
             IPublicBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
-            IPublicationRepository publicationRepository,
             IReleaseService releaseService,
             ILogger<PublishingService> logger,
             IConfiguration configuration)
@@ -39,7 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
             _methodologyService = methodologyService;
-            _publicationRepository = publicationRepository;
             _releaseService = releaseService;
             _logger = logger;
         }
@@ -63,36 +59,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task PublishMethodologyFilesIfApplicableForRelease(Guid releaseId)
         {
-            var methodologies = await _methodologyService.GetLatestByRelease(releaseId);
+            var release = await _releaseService.Get(releaseId);
+            var methodologyVersions = await _methodologyService.GetLatestVersionByRelease(release);
 
-            if (methodologies.Any())
+            if (!methodologyVersions.Any())
             {
-                // Publish the files of the latest methodologies of this release that
-                // aren't already accessible but depended on this release being published,
-                // since those methodologies will be published for the first time with this release
-                var release = await _releaseService.Get(releaseId);
-                var firstRelease = !await _publicationRepository.IsPublished(release.PublicationId);
-                foreach (var methodology in methodologies)
+                return;
+            }
+
+            foreach (var methodologyVersion in methodologyVersions)
+            {
+                if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
                 {
-                    if (methodology.Approved)
-                    {
-                        // Include methodologies scheduled immediately that will now be accessible
-                        // because this Publication's first release is being published
-                        var firstReleaseAndMethodologyScheduledImmediately =
-                            firstRelease &&
-                            methodology.ScheduledForPublishingImmediately;
-
-                        // Include methodologies scheduled to be published with this release
-                        var methodologyScheduledWithThisRelease =
-                            methodology.ScheduledForPublishingWithRelease
-                            && methodology.ScheduledWithReleaseId == releaseId;
-
-                        if (firstReleaseAndMethodologyScheduledImmediately ||
-                            methodologyScheduledWithThisRelease)
-                        {
-                            await PublishMethodologyFiles(methodology);
-                        }
-                    }
+                    await PublishMethodologyFiles(methodologyVersion);
                 }
             }
         }

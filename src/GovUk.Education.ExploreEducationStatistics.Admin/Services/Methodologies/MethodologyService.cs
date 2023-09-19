@@ -65,9 +65,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .CheckEntityExists<Publication>(publicationId, q =>
                     q.Include(p => p.Methodologies))
                 .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
-                .OnSuccessDo(_ => _persistenceHelper.CheckEntityExists<Methodology>(methodologyId))
-                .OnSuccess<ActionResult, Publication, Unit>(async publication =>
+                .OnSuccessCombineWith(_ => _persistenceHelper.CheckEntityExists<Methodology>(methodologyId))
+                .OnSuccess<ActionResult, Tuple<Publication, Methodology>, Unit>(async tuple =>
                 {
+                    var (publication, methodology) = tuple;
+
+                    if (methodology.LatestPublishedVersionId == null)
+                    {
+                        throw new ArgumentException("Cannot adopt an unpublished methodology");
+                    }
+
                     if (publication.Methodologies.Any(pm => pm.MethodologyId == methodologyId))
                     {
                         return ValidationActionResult(CannotAdoptMethodologyAlreadyLinkedToPublication);
@@ -123,10 +130,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(_userService.CheckCanAdoptMethodologyForPublication)
                 .OnSuccess(async publication =>
                 {
-                    var methodologies = await _methodologyRepository.GetUnrelatedToPublication(publication.Id);
-                    var latestVersions = await methodologies.SelectAsync(methodology =>
-                        _methodologyVersionRepository.GetLatestVersion(methodology.Id));
-                    return (await latestVersions.SelectAsync(BuildMethodologyVersionViewModel)).ToList();
+                    var publishedMethodologies = await _methodologyRepository
+                        .GetPublishedMethodologiesUnrelatedToPublication(publication.Id);
+                    var latestPublishedVersions = publishedMethodologies
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async methodology =>
+                            await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id))
+                        .WhereNotNull();
+                    return await latestPublishedVersions
+                        .SelectAwait(async version => await BuildMethodologyVersionViewModel(version))
+                        .ToListAsync();
                 });
         }
 

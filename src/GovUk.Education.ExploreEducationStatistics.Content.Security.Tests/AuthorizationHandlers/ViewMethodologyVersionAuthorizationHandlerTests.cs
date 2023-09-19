@@ -20,14 +20,14 @@ public class ViewMethodologyVersionAuthorizationHandlerTests
     };
 
     [Fact]
-    public async Task MethodologyVersionIsPubliclyAccessible()
+    public async Task MethodologyVersionIsLatestPublishedVersion()
     {
         var (
             handler,
             methodologyVersionRepository
             ) = CreateHandlerAndDependencies();
 
-        methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(_methodologyVersion.Id))
+        methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(_methodologyVersion))
             .ReturnsAsync(true);
 
         var authContext =
@@ -41,14 +41,14 @@ public class ViewMethodologyVersionAuthorizationHandlerTests
     }
 
     [Fact]
-    public async Task MethodologyVersionIsNotPubliclyAccessible()
+    public async Task MethodologyVersionIsNotLatestPublishedVersion()
     {
         var (
             handler,
             methodologyVersionRepository
             ) = CreateHandlerAndDependencies();
 
-        methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(_methodologyVersion.Id))
+        methodologyVersionRepository.Setup(mock => mock.IsLatestPublishedVersion(_methodologyVersion))
             .ReturnsAsync(false);
 
         var authContext =

@@ -73,9 +73,37 @@ export default function ReleaseFileUploadsSection({
       <InsetText>
         <h3>Before you start</h3>
         <p>
-          Ancillary files are additional files attached to the release for users
-          to download. They will appear in the associated files list on the
-          release page and the download files page.
+          Supporting files are additional files attached to the release page for
+          users to download. These should be used sparingly and only when there
+          is no alternative. Please contact{' '}
+          <a href="mailto:explore.statistics@education.gov.uk">
+            explore.statistics@education.gov.uk
+          </a>{' '}
+          for advice if you are unsure.
+        </p>
+        <p>
+          As the publisher you are responsible for the accessibility of any
+          supporting files and ensuring that they are in line with the{' '}
+          <a
+            href="https://www.legislation.gov.uk/uksi/2018/852/contents/made"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Public Sector Bodies accessibility regulations 2018
+          </a>
+          .
+        </p>
+        <p>
+          If you are attaching a spreadsheet not in CSV format, then you must
+          review it against the{' '}
+          <a
+            href="https://analysisfunction.civilservice.gov.uk/policy-store/making-spreadsheets-accessible-a-brief-checklist-of-the-basics/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Analytical Function checklist for accessible spreadsheets
+          </a>
+          .
         </p>
       </InsetText>
 

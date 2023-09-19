@@ -81,10 +81,10 @@ Check subject appears in 'Data blocks' page
 
     user waits until page contains    Updated Absence in PRUs
 
-Navigate to 'Data and files' page - 'Ancillary file uploads' tab
+Navigate to 'Data and files' page - 'Supporting file uploads' tab
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
     user waits until page contains    No files have been uploaded
 
@@ -148,11 +148,11 @@ Validate 'Explore data and files' section
     user checks element contains button    ${other_files}    Test 1 (txt, 12 B)
     user checks element should contain    ${other_files}    Test 1 summary
 
-Navigate back to 'Ancillary file uploads' tab
+Navigate back to 'Supporting file uploads' tab
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
-    user clicks link    Ancillary file uploads
+    user clicks link    Supporting file uploads
     user waits until h2 is visible    Add file to release
 
 Change ancillary file

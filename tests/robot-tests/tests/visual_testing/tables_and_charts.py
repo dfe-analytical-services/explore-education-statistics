@@ -1,8 +1,5 @@
 import csv
-import sys
 from enum import Enum
-
-csv.field_size_limit(sys.maxsize)
 
 releases_by_url = {}
 

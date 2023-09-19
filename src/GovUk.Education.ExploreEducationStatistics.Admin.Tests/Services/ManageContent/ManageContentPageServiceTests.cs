@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var unattachedDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
+            var unattachedDataBlocks = new List<DataBlockViewModel>
             {
                 new()
             };
@@ -141,12 +141,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    AlternativeTitle = "Methodology 1 title"
+                    AlternativeTitle = "Methodology 1 title",
+                    Status = MethodologyApprovalStatus.Approved,
                 },
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    AlternativeTitle = "Methodology 2 title"
+                    AlternativeTitle = "Methodology 2 title",
+                    Status = MethodologyApprovalStatus.Approved,
+                },
+                new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology should not appear 1",
+                    Status = MethodologyApprovalStatus.Draft,
+                },
+                new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology should not appear 2",
+                    Status = MethodologyApprovalStatus.HigherLevelReview,
                 }
             );
 

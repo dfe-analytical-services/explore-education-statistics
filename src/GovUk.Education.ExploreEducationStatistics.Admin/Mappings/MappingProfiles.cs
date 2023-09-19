@@ -41,12 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.LatestRelease,
                     m => m.MapFrom(r => r.Publication.LatestPublishedReleaseId == r.Id))
-                .ForMember(dest => dest.Contact,
-                    m => m.MapFrom(r => r.Publication.Contact))
                 .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title))
-                .ForMember(dest => dest.PublicationSummary,
-                    m => m.MapFrom(r => r.Publication.Summary))
                 .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
                 .ForMember(dest => dest.PublicationSlug,
