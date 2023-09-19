@@ -178,14 +178,14 @@ user checks infographic chart contains alt
 
 user configures basic chart
     [Arguments]    ${CHART_TYPE}    ${CHART_HEIGHT}    ${CHART_WIDTH}
-    user waits for page to finish loading
+    user waits until page finishes loading
     ${CHART_TYPE_LIST}=    create list    Line    Horizontal bar    Vertical bar    Geographic
     should contain    ${CHART_TYPE_LIST}    ${CHART_TYPE}
 
     user waits until h3 is visible    Choose chart type    %{WAIT_SMALL}
     user clicks button    ${CHART_TYPE}
 
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user enters text into element    id:chartConfigurationForm-height    ${CHART_HEIGHT}
     user enters text into element    id:chartConfigurationForm-width    ${CHART_WIDTH}
 

@@ -105,7 +105,7 @@ Create data block table
 
 Create chart for data block
     user waits until page contains link    Chart
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks link    Chart
 
     user clicks button    Choose an infographic as alternative
@@ -131,8 +131,8 @@ Add free text key stat
     user checks key stat guidance    1    Guidance title    Guidance text
 
 Add three accordion sections to release
-    user waits for page to finish loading
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
+    user waits until page finishes loading
     user clicks button    Add new section
     user changes accordion section title    1    Dates data block
     user clicks button    Add new section
@@ -215,6 +215,7 @@ Edit data block
 
     user clicks button    Save data block
     user waits until page contains button    Delete this data block
+    user waits until page finishes loading
 
 Navigate to the 'Content' page
     user clicks link    Content
@@ -447,7 +448,7 @@ Return to Admin and create first amendment
 Change the Release type
     user waits until page contains link    Edit release summary
     user clicks link    Edit release summary
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user waits until h2 is visible    Edit release summary
     user checks page contains radio    Experimental statistics
     user clicks radio    Experimental statistics
@@ -611,7 +612,7 @@ Save data block for amendment
 
 Update data block chart for amendment
     user waits until page contains link    Chart    %{WAIT_SMALL}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks link    Chart
 
     user waits until page contains element    id:chartConfigurationForm-title    %{WAIT_SMALL}
@@ -624,7 +625,7 @@ Update data block chart for amendment
     user checks textarea contains    id:chartConfigurationForm-alt    Amended sample alt text
 
     user clicks button    Save chart options
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user waits until page contains element    id:chartBuilderPreview
     user checks infographic chart contains alt    id:chartBuilderPreview    Amended sample alt text
 

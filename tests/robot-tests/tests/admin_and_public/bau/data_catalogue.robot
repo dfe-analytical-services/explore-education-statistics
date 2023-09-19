@@ -112,7 +112,7 @@ Choose publication
     user clicks button    Next step
 
 Check page displays correct data
-    user waits for page to finish loading
+    user waits until page finishes loading
     user waits until h1 is visible    Browse our open data
     user checks page contains    Choose a release
     user clicks radio    ${RELEASE_NAME} 2021/22

@@ -169,4 +169,4 @@ user waits for chart to appear
     ELSE
         Fail    Unhandled chart type ${chart_type}
     END
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading

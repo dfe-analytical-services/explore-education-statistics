@@ -32,7 +32,7 @@ Upload subject
 
 Check release isn't publically visible
     user clicks link    Sign off
-    user waits for page to finish loading
+    user waits until page finishes loading
     user waits until page contains element    testid:public-release-url
     ${PUBLIC_RELEASE_LINK}=    Get Value    testid:public-release-url
     check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}

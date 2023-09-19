@@ -114,9 +114,8 @@ Approve release
 Go to public Table Tool page
     user navigates to data tables page on public frontend
 
-Select "Test Topic" publication
+Select "Test theme" publication
     environment variable should be set    TEST_THEME_NAME
-    environment variable should be set    TEST_TOPIC_NAME
     user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
