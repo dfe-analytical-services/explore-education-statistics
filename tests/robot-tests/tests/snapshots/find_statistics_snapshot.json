@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships and traineeships",
-    "published": "10 Aug 2023",
+    "published": "7 Sep 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -231,6 +231,13 @@
     "theme": "Further education"
   },
   {
+    "publication_summary": "This experimental statistics release includes characteristics and pay of the further education workforce as well as characteristics of governors in England.",
+    "publication_title": "Further education workforce",
+    "published": "31 Aug 2023",
+    "release_type": "Experimental statistics",
+    "theme": "Further education"
+  },
+  {
     "publication_summary": "Sustained employment and learning destinations, and earnings of further education learners in England. Annual statistics with demographic and other breakdowns.",
     "publication_title": "Further education: outcome-based success measures",
     "published": "24 Nov 2022",
@@ -275,7 +282,7 @@
   {
     "publication_summary": "Key stage 2 attainment statistics by pupil characteristics, school characteristics, region and local authority.",
     "publication_title": "Key stage 2 attainment",
-    "published": "6 Sep 2022",
+    "published": "12 Sep 2023",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -499,7 +506,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "10 Aug 2023",
+    "published": "7 Sep 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },
