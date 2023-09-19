@@ -54,7 +54,6 @@ const ChartDataSetsConfiguration = ({
 }: Props) => {
   const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
   const [isReordering, toggleIsReordering] = useToggle(false);
-  const [showConfirmModal, toggleConfirmModal] = useToggle(false);
 
   const indicatorOptions = useMemo(
     () => Object.values(meta.indicators),
@@ -249,12 +248,20 @@ const ChartDataSetsConfiguration = ({
                   {!isReordering && (
                     <th className="govuk-!-text-align-right">
                       {dataSets.length > 0 && (
-                        <ButtonText
-                          className="govuk-!-margin-bottom-0"
-                          onClick={toggleConfirmModal.on}
+                        <ModalConfirm
+                          title="Remove all data sets"
+                          triggerButton={
+                            <ButtonText className="govuk-!-margin-bottom-0">
+                              Remove all
+                              <VisuallyHidden> data sets</VisuallyHidden>
+                            </ButtonText>
+                          }
+                          onConfirm={() => {
+                            onChange([]);
+                          }}
                         >
-                          Remove all<VisuallyHidden> data sets</VisuallyHidden>
-                        </ButtonText>
+                          <p>Are you sure you want to remove all data sets?</p>
+                        </ModalConfirm>
                       )}
                     </th>
                   )}
@@ -342,18 +349,6 @@ const ChartDataSetsConfiguration = ({
           </Button>
         )}
       </div>
-      <ModalConfirm
-        title="Remove all data sets"
-        open={showConfirmModal}
-        onConfirm={() => {
-          onChange([]);
-          toggleConfirmModal.off();
-        }}
-        onExit={toggleConfirmModal.off}
-        onCancel={toggleConfirmModal.off}
-      >
-        <p>Are you sure you want to remove all data sets?</p>
-      </ModalConfirm>
     </>
   );
 };

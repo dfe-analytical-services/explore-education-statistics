@@ -7,19 +7,19 @@ import {
 import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import FormattedDate from '@common/components/FormattedDate';
-import InfoIcon from '@common/components/InfoIcon';
 import InsetText from '@common/components/InsetText';
+import ModalConfirm from '@common/components/ModalConfirm';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import React, { MouseEventHandler, useEffect, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { generatePath } from 'react-router';
+import { PublishedStatusGuidanceModal } from './PublicationGuidance';
 
 interface PublishedReleasesTableProps {
   focusReleaseId?: string;
   publicationId: string;
   releases: ReleaseSummaryWithPermissions[];
   onAmend: (releaseId: string) => void;
-  onGuidanceClick: MouseEventHandler<HTMLButtonElement>;
 }
 
 export default function PublicationPublishedReleasesTable({
@@ -27,7 +27,6 @@ export default function PublicationPublishedReleasesTable({
   publicationId,
   releases,
   onAmend,
-  onGuidanceClick,
 }: PublishedReleasesTableProps) {
   const rowRef = useRef<HTMLTableRowElement>(null);
 
@@ -48,10 +47,7 @@ export default function PublicationPublishedReleasesTable({
         <tr>
           <th className="govuk-!-width-one-third">Release period</th>
           <th className={styles.statusColumn}>
-            Status{' '}
-            <ButtonText onClick={onGuidanceClick}>
-              <InfoIcon description="Guidance on statuses" />
-            </ButtonText>
+            Status <PublishedStatusGuidanceModal />
           </th>
           <th>Published date</th>
           <th className={styles.actionsColumn}>Actions</th>
@@ -97,12 +93,20 @@ export default function PublicationPublishedReleasesTable({
                   </>
                 )}
                 {release.permissions.canMakeAmendmentOfRelease && (
-                  <ButtonText
-                    className="govuk-!-margin-left-4"
-                    onClick={() => onAmend(release.id)}
+                  <ModalConfirm
+                    title="Confirm you want to amend this published release"
+                    triggerButton={
+                      <ButtonText className="govuk-!-margin-left-4">
+                        Amend<VisuallyHidden> {release.title}</VisuallyHidden>
+                      </ButtonText>
+                    }
+                    onConfirm={async () => onAmend(release.id)}
                   >
-                    Amend<VisuallyHidden> {release.title}</VisuallyHidden>
-                  </ButtonText>
+                    <p>
+                      Please note, any changes made to this published release
+                      must be approved before updates can be published.
+                    </p>
+                  </ModalConfirm>
                 )}
               </td>
             </tr>

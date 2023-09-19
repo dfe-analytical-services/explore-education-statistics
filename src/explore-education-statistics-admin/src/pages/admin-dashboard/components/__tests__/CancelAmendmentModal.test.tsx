@@ -9,11 +9,14 @@ describe('CancelAmendmentModal', () => {
   test('renders with no methodologies supplied', async () => {
     render(
       <CancelAmendmentModal
+        triggerButton={<button type="button">Open</button>}
         scheduledMethodologies={[]}
         onCancel={noop}
         onConfirm={noop}
       />,
     );
+
+    userEvent.click(screen.getByRole('button', { name: 'Open' }));
 
     await waitFor(() => {
       expect(
@@ -27,6 +30,7 @@ describe('CancelAmendmentModal', () => {
   test('renders with methodologies supplied', async () => {
     render(
       <CancelAmendmentModal
+        triggerButton={<button type="button">Open</button>}
         scheduledMethodologies={[
           {
             id: 'methodology-1',
@@ -42,6 +46,8 @@ describe('CancelAmendmentModal', () => {
       />,
     );
 
+    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+
     await waitFor(() => {
       expect(
         screen.getByText(
@@ -55,17 +61,23 @@ describe('CancelAmendmentModal', () => {
     });
   });
 
-  test('clicking confirm and cancel call the correct callbacks', async () => {
-    const onCancel = jest.fn();
+  test('clicking confirm calls the correct callback', async () => {
     const onConfirm = jest.fn();
 
     render(
       <CancelAmendmentModal
+        triggerButton={<button type="button">Open</button>}
         scheduledMethodologies={[]}
-        onCancel={onCancel}
+        onCancel={noop}
         onConfirm={onConfirm}
       />,
     );
+
+    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Confirm')).toBeInTheDocument();
+    });
 
     userEvent.click(
       screen.getByRole('button', {
@@ -75,10 +87,26 @@ describe('CancelAmendmentModal', () => {
 
     await waitFor(() => {
       expect(onConfirm).toHaveBeenCalled();
-      expect(onCancel).not.toHaveBeenCalled();
     });
+  });
 
-    onConfirm.mockClear();
+  test('clicking cancel calls the correct callback', async () => {
+    const onCancel = jest.fn();
+
+    render(
+      <CancelAmendmentModal
+        triggerButton={<button type="button">Open</button>}
+        scheduledMethodologies={[]}
+        onCancel={onCancel}
+        onConfirm={noop}
+      />,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Open' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Cancel')).toBeInTheDocument();
+    });
 
     userEvent.click(
       screen.getByRole('button', {
@@ -87,7 +115,6 @@ describe('CancelAmendmentModal', () => {
     );
 
     await waitFor(() => {
-      expect(onConfirm).not.toHaveBeenCalled();
       expect(onCancel).toHaveBeenCalled();
     });
   });

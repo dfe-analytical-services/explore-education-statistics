@@ -1,17 +1,17 @@
+import ButtonText from '@common/components/ButtonText';
 import Modal from '@common/components/Modal';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import { ThemeSummary } from '@common/services/themeService';
 import React from 'react';
 
-export const ReleaseTypesModal = ({
-  open,
-  onClose,
-}: {
-  open: boolean;
-  onClose: () => void;
-}) => (
-  <Modal open={open} showClose title="Release types guidance" onExit={onClose}>
+export const ReleaseTypesModal = () => (
+  <Modal
+    className="govuk-!-width-one-half"
+    showClose
+    title="Release types guidance"
+    triggerButton={<ButtonText>What are release types?</ButtonText>}
+  >
     <p>
       This is a description list of the different types of publication we
       currently publish.
@@ -55,18 +55,14 @@ export const ReleaseTypesModal = ({
   </Modal>
 );
 
-export const ThemesModal = ({
-  open,
-  themes,
-  onClose,
-}: {
-  open: boolean;
-  themes: ThemeSummary[];
-  onClose: () => void;
-}) => (
-  <Modal open={open} showClose title="Themes guidance" onExit={onClose}>
-    <p>This is a description list of our different publication themes.</p>
-
+export const ThemesModal = ({ themes }: { themes: ThemeSummary[] }) => (
+  <Modal
+    className="govuk-!-width-one-half"
+    description="This is a description list of our different publication themes."
+    showClose
+    title="Themes guidance"
+    triggerButton={<ButtonText>What are themes?</ButtonText>}
+  >
     <SummaryList>
       {themes.map(theme => (
         <SummaryListItem key={theme.id} term={theme.title}>

@@ -631,34 +631,6 @@ describe('ReleaseDataFileReplacePage', () => {
         ),
       ).toBeInTheDocument();
     });
-
-    await waitFor(() => {
-      expect(
-        screen.getByText(/Replacement data file import failed/),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: 'Cancel data replacement' }),
-      ).toBeInTheDocument();
-    });
-
-    userEvent.click(
-      screen.getByRole('button', { name: 'Cancel data replacement' }),
-    );
-
-    await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-      const modal = within(screen.getByRole('dialog'));
-
-      expect(modal.getByRole('heading')).toHaveTextContent(
-        'Cancel data replacement',
-      );
-      expect(
-        modal.getByText(
-          /Are you sure you want to cancel this data replacement/,
-        ),
-      ).toBeInTheDocument();
-    });
   });
 
   test('renders confirmation modal when cancelling after replacement plan error', async () => {

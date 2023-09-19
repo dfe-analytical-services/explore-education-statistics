@@ -52,7 +52,6 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
 
   const { editingMode } = useEditingContext();
 
-  const [showRemoveModal, toggleRemoveModal] = useToggle(false);
   const [isEditingHeading, toggleEditingHeading] = useToggle(false);
 
   const [newHeading, setNewHeading] = useState(heading);
@@ -163,37 +162,32 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
               {headerButtons}
 
               {onRemoveSection && (
-                <>
-                  <Tooltip
-                    text={disabledRemoveSectionTooltip}
-                    enabled={!!disabledRemoveSectionTooltip}
-                  >
-                    {({ ref }) => (
-                      <Button
-                        ariaDisabled={!!disabledRemoveSectionTooltip}
-                        ref={ref}
-                        variant="warning"
-                        onClick={toggleRemoveModal.on}
-                      >
-                        Remove this section
-                      </Button>
-                    )}
-                  </Tooltip>
-
-                  <ModalConfirm
-                    title="Removing section"
-                    open={showRemoveModal}
-                    onConfirm={onRemoveSection}
-                    onExit={toggleRemoveModal.off}
-                    onCancel={toggleRemoveModal.off}
-                  >
-                    <p>
-                      Are you sure you want to remove the following section?
-                      <br />
-                      <strong>"{heading}"</strong>
-                    </p>
-                  </ModalConfirm>
-                </>
+                <Tooltip
+                  text={disabledRemoveSectionTooltip}
+                  enabled={!!disabledRemoveSectionTooltip}
+                >
+                  {({ ref }) => (
+                    <ModalConfirm
+                      title="Removing section"
+                      triggerButton={
+                        <Button
+                          ariaDisabled={!!disabledRemoveSectionTooltip}
+                          ref={ref}
+                          variant="warning"
+                        >
+                          Remove this section
+                        </Button>
+                      }
+                      onConfirm={onRemoveSection}
+                    >
+                      <p>
+                        Are you sure you want to remove the following section?
+                        <br />
+                        <strong>"{heading}"</strong>
+                      </p>
+                    </ModalConfirm>
+                  )}
+                </Tooltip>
               )}
             </ButtonGroup>
 

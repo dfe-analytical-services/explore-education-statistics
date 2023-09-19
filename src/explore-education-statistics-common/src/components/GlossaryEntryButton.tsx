@@ -38,6 +38,7 @@ export default function GlossaryEntryButton({
 
       {glossaryEntry && (
         <Modal
+          open={!!glossaryEntry}
           showClose
           title={glossaryEntry.title}
           onExit={() => setGlossaryEntry(undefined)}

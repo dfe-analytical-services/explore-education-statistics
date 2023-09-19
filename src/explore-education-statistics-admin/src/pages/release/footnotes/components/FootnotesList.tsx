@@ -16,7 +16,7 @@ import InsetText from '@common/components/InsetText';
 import ModalConfirm from '@common/components/ModalConfirm';
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { generatePath } from 'react-router';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import ContentHtml from '@common/components/ContentHtml';
@@ -42,8 +42,6 @@ const FootnotesList = ({
   onDelete,
   onReorder,
 }: Props) => {
-  const [deleteFootnote, setDeleteFootnote] = useState<Footnote>();
-
   const footnoteMetaGetters = useMemo(() => {
     return generateFootnoteMetaMap(footnoteMeta);
   }, [footnoteMeta]);
@@ -53,127 +51,115 @@ const FootnotesList = ({
   }
 
   return (
-    <>
-      <DragDropContext
-        onDragEnd={result => {
-          if (!result.destination) {
-            return;
-          }
-          const reorderedFootnotes = reorder(
-            footnotes,
-            result.source.index,
-            result.destination.index,
-          );
-          onReorder(reorderedFootnotes);
-        }}
-      >
-        <Droppable droppableId="footnotes" isDropDisabled={!isReordering}>
-          {(droppableProvided, droppableSnapshot) => (
-            <DroppableArea
-              droppableProvided={droppableProvided}
-              droppableSnapshot={droppableSnapshot}
-            >
-              {footnotes.map((footnote, index) => {
-                const { id, content } = footnote;
+    <DragDropContext
+      onDragEnd={result => {
+        if (!result.destination) {
+          return;
+        }
+        const reorderedFootnotes = reorder(
+          footnotes,
+          result.source.index,
+          result.destination.index,
+        );
+        onReorder(reorderedFootnotes);
+      }}
+    >
+      <Droppable droppableId="footnotes" isDropDisabled={!isReordering}>
+        {(droppableProvided, droppableSnapshot) => (
+          <DroppableArea
+            droppableProvided={droppableProvided}
+            droppableSnapshot={droppableSnapshot}
+          >
+            {footnotes.map((footnote, index) => {
+              const { id, content } = footnote;
 
-                return (
-                  <DraggableItem
-                    className={classNames({
-                      [styles.itemContainer]: !isReordering,
-                    })}
-                    id={id}
-                    index={index}
-                    isReordering={isReordering}
-                    key={id}
-                    testId={`Footnote - ${content}`}
-                  >
-                    <div className={styles.row}>
-                      <ContentHtml
-                        className={styles.rowContent}
-                        html={content}
-                      />
+              return (
+                <DraggableItem
+                  className={classNames({
+                    [styles.itemContainer]: !isReordering,
+                  })}
+                  id={id}
+                  index={index}
+                  isReordering={isReordering}
+                  key={id}
+                  testId={`Footnote - ${content}`}
+                >
+                  <div className={styles.row}>
+                    <ContentHtml className={styles.rowContent} html={content} />
 
-                      {!isReordering && canUpdateRelease && (
-                        <ButtonGroup className={styles.rowActions}>
-                          <Link
-                            to={generatePath<ReleaseFootnoteRouteParams>(
-                              releaseFootnotesEditRoute.path,
-                              {
-                                publicationId,
-                                releaseId,
-                                footnoteId: id,
-                              },
-                            )}
-                          >
-                            Edit footnote
-                          </Link>
-                          <ButtonText
-                            variant="warning"
-                            onClick={() => setDeleteFootnote(footnote)}
-                          >
-                            Delete footnote
-                          </ButtonText>
-                        </ButtonGroup>
-                      )}
-                    </div>
-                    {!isReordering && (
-                      <Details
-                        summary="See matching criteria"
-                        className="govuk-!-margin-0"
-                      >
-                        <table className={styles.footnoteSelectionTable}>
-                          <thead>
-                            <tr>
-                              <th>Subjects</th>
-                              <th>Indicators</th>
-                              <th>Filters</th>
-                            </tr>
-                          </thead>
-                          <tbody className="govuk-body-s">
-                            {Object.entries(footnote.subjects).map(
-                              ([subjectId, selection]) => (
-                                <FootnoteSubjectSelection
-                                  key={subjectId}
-                                  subjectId={subjectId}
-                                  subject={selection}
-                                  footnoteMetaGetters={footnoteMetaGetters}
-                                />
-                              ),
-                            )}
-                          </tbody>
-                        </table>
-                      </Details>
+                    {!isReordering && canUpdateRelease && (
+                      <ButtonGroup className={styles.rowActions}>
+                        <Link
+                          to={generatePath<ReleaseFootnoteRouteParams>(
+                            releaseFootnotesEditRoute.path,
+                            {
+                              publicationId,
+                              releaseId,
+                              footnoteId: id,
+                            },
+                          )}
+                        >
+                          Edit footnote
+                        </Link>
+
+                        <ModalConfirm
+                          title="Delete footnote"
+                          triggerButton={
+                            <ButtonText variant="warning">
+                              Delete footnote
+                            </ButtonText>
+                          }
+                          onConfirm={async () => {
+                            await onDelete(footnote);
+                          }}
+                        >
+                          <p>
+                            Are you sure you want to delete the following
+                            footnote:
+                          </p>
+
+                          <InsetText>
+                            <p>{footnote.content}</p>
+                          </InsetText>
+                        </ModalConfirm>
+                      </ButtonGroup>
                     )}
-                  </DraggableItem>
-                );
-              })}
-            </DroppableArea>
-          )}
-        </Droppable>
-      </DragDropContext>
-
-      {deleteFootnote && (
-        <ModalConfirm
-          title="Delete footnote"
-          open={!!deleteFootnote}
-          onExit={() => setDeleteFootnote(undefined)}
-          onConfirm={async () => {
-            if (!deleteFootnote) {
-              return;
-            }
-
-            await onDelete(deleteFootnote);
-            setDeleteFootnote(undefined);
-          }}
-        >
-          <p>Are you sure you want to delete the following footnote:</p>
-
-          <InsetText>
-            <p>{deleteFootnote.content}</p>
-          </InsetText>
-        </ModalConfirm>
-      )}
-    </>
+                  </div>
+                  {!isReordering && (
+                    <Details
+                      summary="See matching criteria"
+                      className="govuk-!-margin-0"
+                    >
+                      <table className={styles.footnoteSelectionTable}>
+                        <thead>
+                          <tr>
+                            <th>Subjects</th>
+                            <th>Indicators</th>
+                            <th>Filters</th>
+                          </tr>
+                        </thead>
+                        <tbody className="govuk-body-s">
+                          {Object.entries(footnote.subjects).map(
+                            ([subjectId, selection]) => (
+                              <FootnoteSubjectSelection
+                                key={subjectId}
+                                subjectId={subjectId}
+                                subject={selection}
+                                footnoteMetaGetters={footnoteMetaGetters}
+                              />
+                            ),
+                          )}
+                        </tbody>
+                      </table>
+                    </Details>
+                  )}
+                </DraggableItem>
+              );
+            })}
+          </DroppableArea>
+        )}
+      </Droppable>
+    </DragDropContext>
   );
 };
 

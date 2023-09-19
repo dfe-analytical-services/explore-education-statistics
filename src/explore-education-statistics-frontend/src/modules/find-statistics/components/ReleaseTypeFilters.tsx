@@ -1,10 +1,8 @@
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
-import useToggle from '@common/hooks/useToggle';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
 import { ReleaseTypesModal } from '@frontend/modules/find-statistics/components/FilterModals';
-import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/Filters';
+import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/FiltersDesktop';
 import React from 'react';
 
 interface Props {
@@ -16,7 +14,6 @@ const ReleaseTypeFilters = ({
   releaseType: initialReleaseType = 'all',
   onChange,
 }: Props) => {
-  const [showModal, toggleModal] = useToggle(false);
   const releaseTypeOptions = [
     { label: 'Show all', value: 'all' },
     ...Object.keys(releaseTypes).map(type => ({
@@ -28,11 +25,7 @@ const ReleaseTypeFilters = ({
   return (
     <form id="releaseTypeFilters">
       <FormRadioGroup
-        hint={
-          <ButtonText onClick={toggleModal.on}>
-            What are release types?
-          </ButtonText>
-        }
+        hint={<ReleaseTypesModal />}
         id="releaseType"
         legend="Filter by release type"
         legendHidden
@@ -51,8 +44,6 @@ const ReleaseTypeFilters = ({
       <Button className="dfe-js-hidden" type="submit">
         Submit
       </Button>
-
-      <ReleaseTypesModal open={showModal} onClose={toggleModal.off} />
     </form>
   );
 };
