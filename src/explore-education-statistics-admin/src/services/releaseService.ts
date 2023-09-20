@@ -29,12 +29,12 @@ export interface Release {
   timePeriodCoverage: ValueLabelPair;
   title: string;
   type: ReleaseType;
-  contact: Contact;
+  contact?: Contact;
   publishScheduled?: string;
   published?: string;
   nextReleaseDate?: PartialDate;
   latestInternalReleaseNote?: string;
-  previousVersionId: string;
+  previousVersionId?: string;
   preReleaseAccessList: string;
   preReleaseUsersOrInvitesAdded?: boolean;
   year: number;

@@ -106,14 +106,7 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
-      <Tabs
-        id="dashboardTabs"
-        onToggle={section => {
-          if (section.id === 'draft-releases') {
-            reloadDraftReleases();
-          }
-        }}
-      >
+      <Tabs id="dashboardTabs">
         <TabsSection id="publications" title="Your publications">
           <PublicationsTab isBauUser={isBauUser} />
         </TabsSection>
@@ -121,7 +114,9 @@ const AdminDashboardPage = () => {
           lazy
           id="draft-releases"
           data-testid="publication-draft-releases"
-          title={`Draft releases (${draftReleases.length})`}
+          title={`Draft releases ${
+            !isLoadingDraftReleases ? `(${draftReleases.length})` : ''
+          }`}
         >
           <DraftReleasesTab
             isBauUser={isBauUser}
@@ -136,7 +131,9 @@ const AdminDashboardPage = () => {
             lazy
             id="approvals"
             data-testid="publication-approvals"
-            title={`Your approvals (${totalApprovals})`}
+            title={`Your approvals ${
+              !isLoadingApprovals ? `(${totalApprovals})` : ''
+            }`}
           >
             <ApprovalsTab
               isLoading={isLoadingApprovals}
@@ -149,7 +146,9 @@ const AdminDashboardPage = () => {
         <TabsSection
           lazy
           id="scheduled-releases"
-          title={`Approved scheduled releases (${scheduledReleases?.length})`}
+          title={`Approved scheduled releases ${
+            !isLoadingScheduledReleases ? `(${scheduledReleases.length})` : ''
+          }`}
         >
           <ScheduledReleasesTab
             isLoading={isLoadingScheduledReleases}

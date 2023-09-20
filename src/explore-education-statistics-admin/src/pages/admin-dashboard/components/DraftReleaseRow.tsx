@@ -42,7 +42,7 @@ const DraftReleaseRow = ({ isBauUser, release, onDelete }: Props) => {
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
 
-        {release.amendment && (
+        {release.amendment && release.previousVersionId && (
           <Link
             className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
