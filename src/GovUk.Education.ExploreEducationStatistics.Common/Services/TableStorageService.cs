@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil;
 
         public TableStorageService(
-            string connectionString, 
+            string connectionString,
             StorageInstanceCreationUtil storageInstanceCreationUtil)
         {
             var account = CloudStorageAccount.Parse(connectionString);
@@ -37,33 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 () => table.CreateIfNotExists());
 
             return table;
-        }
-
-        public async Task<bool> DeleteEntityAsync(string tableName, ITableEntity entity)
-        {
-            try
-            {
-                var table = _client.GetTableReference(tableName);
-                entity.ETag = "*";
-                var result = await table.ExecuteAsync(TableOperation.Delete(entity));
-                return result != null;
-            }
-            catch
-            {
-                return false;
-            }
-        }
-
-        public async Task<TableResult> RetrieveEntity(string tableName, ITableEntity entity, List<string> columns)
-        {
-            var table = _client.GetTableReference(tableName);
-            return await table.ExecuteAsync(TableOperation.Retrieve(entity.PartitionKey, entity.RowKey, columns));
-        }
-
-        public async Task<TableResult> CreateOrUpdateEntity(string tableName, ITableEntity entity)
-        {
-            var table = _client.GetTableReference(tableName);
-            return await table.ExecuteAsync(TableOperation.InsertOrReplace(entity));
         }
 
         public async Task<IEnumerable<TElement>> ExecuteQueryAsync<TElement>(string tableName,

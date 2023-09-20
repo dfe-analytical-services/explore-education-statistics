@@ -11,11 +11,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             where TElement : ITableEntity, new();
 
         CloudTable GetTable(string tableName);
-
-        Task<bool> DeleteEntityAsync(string tableName, ITableEntity entity);
-
-        Task<TableResult> RetrieveEntity(string tableName, ITableEntity entity, List<string> columns);
-
-        Task<TableResult> CreateOrUpdateEntity(string tableName, ITableEntity entity);
     }
 }
