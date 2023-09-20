@@ -1,4 +1,7 @@
-import { toolbarConfigs } from '@admin/config/ckEditorConfig';
+import {
+  pluginsConfigSimple,
+  toolbarConfigSimple,
+} from '@admin/config/ckEditorConfig';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import releaseDataGuidanceService from '@admin/services/releaseDataGuidanceService';
 import Accordion from '@common/components/Accordion';
@@ -182,7 +185,8 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                                   renderContent={() =>
                                     isEditing ? (
                                       <FormFieldEditor<DataGuidanceFormValues>
-                                        toolbarConfig={toolbarConfigs.simple}
+                                        includePlugins={pluginsConfigSimple}
+                                        toolbarConfig={toolbarConfigSimple}
                                         name={`subjects[${index}].content`}
                                         label="File guidance content"
                                         testId="fileGuidanceContent"

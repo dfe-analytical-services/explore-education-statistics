@@ -19,6 +19,7 @@ import classNames from 'classnames';
 import React, { useMemo, useState } from 'react';
 import { generatePath } from 'react-router';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
+import ContentHtml from '@common/components/ContentHtml';
 
 interface Props {
   publicationId: string;
@@ -87,7 +88,10 @@ const FootnotesList = ({
                     testId={`Footnote - ${content}`}
                   >
                     <div className={styles.row}>
-                      <div className={styles.rowContent}>{content}</div>
+                      <ContentHtml
+                        className={styles.rowContent}
+                        html={content}
+                      />
 
                       {!isReordering && canUpdateRelease && (
                         <ButtonGroup className={styles.rowActions}>

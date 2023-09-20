@@ -85,7 +85,7 @@ Create footnote for both subjects
 
     user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to all data
     user clicks footnote subject radio    ${SUBJECT_2_NAME}    Applies to all data
-    user enters text into element    label:Footnote    ${FOOTNOTE_ALL}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -102,7 +102,7 @@ Create footnote for both subject indicators
     user opens footnote subject dropdown    ${SUBJECT_2_NAME}    Indicators
     user clicks footnote subject checkbox    ${SUBJECT_2_NAME}    Indicators    Admission Numbers
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_INDICATOR}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_INDICATOR}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -118,7 +118,7 @@ Create footnote for both subject filters
     user opens footnote subject dropdown    ${SUBJECT_2_NAME}    Random Filter
     user clicks footnote subject checkbox    ${SUBJECT_2_NAME}    Random Filter    Select all
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_FILTER}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_FILTER}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -128,7 +128,7 @@ Create footnote for subject 1
 
     user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to all data
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -141,7 +141,7 @@ Create footnote for subject 1 indicators
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Authorised absence rate
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Number of persistent absentees
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_INDICATOR}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_INDICATOR}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -157,7 +157,7 @@ Create footnote for subject 1 filters
     user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Colour
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Select all
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -171,7 +171,7 @@ Create footnote for subject 1 filter groups
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Combined
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Individual
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -190,7 +190,7 @@ Create footnote for subject 1 filter items
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Blue
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Orange
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -214,7 +214,7 @@ Create footnote for subject 1 with mixture of indicators and filters
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Blue
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Orange
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_MIXTURE}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_MIXTURE}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -444,7 +444,7 @@ Edit footnote
     user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_ALL_INDICATOR}
 
     user waits until h2 is visible    Edit footnote
-    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user clicks button    Save footnote
     user waits until page contains    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks page does not contain    ${FOOTNOTE_ALL_INDICATOR}
