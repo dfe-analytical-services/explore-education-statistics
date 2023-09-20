@@ -1,6 +1,9 @@
 import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
-import { ReleaseApprovalStatus } from '@common/services/publicationService';
+import {
+  PublicationSummary,
+  ReleaseApprovalStatus,
+} from '@common/services/publicationService';
 import { Contact } from '@admin/services/publicationService';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
@@ -60,8 +63,15 @@ export interface ReleaseSummary {
   nextReleaseDate?: PartialDate;
   type: ReleaseType;
   amendment: boolean;
+  latestRelease: boolean;
   previousVersionId?: string;
   permissions?: ReleasePermissions;
+  publication?: PublicationSummary;
+}
+
+export interface DashboardReleaseSummary extends ReleaseSummary {
+  publication: PublicationSummary;
+  permissions: ReleasePermissions;
 }
 
 export interface ReleaseSummaryWithPermissions extends ReleaseSummary {
@@ -231,15 +241,15 @@ const releaseService = {
     return client.delete(`/release/${releaseId}`);
   },
 
-  listDraftReleases(): Promise<Release[]> {
+  listDraftReleases(): Promise<DashboardReleaseSummary[]> {
     return client.get('/releases/draft');
   },
 
-  listScheduledReleases(): Promise<Release[]> {
+  listScheduledReleases(): Promise<DashboardReleaseSummary[]> {
     return client.get('/releases/scheduled');
   },
 
-  listReleasesForApproval(): Promise<Release[]> {
+  listReleasesForApproval(): Promise<DashboardReleaseSummary[]> {
     return client.get('/releases/approvals');
   },
 

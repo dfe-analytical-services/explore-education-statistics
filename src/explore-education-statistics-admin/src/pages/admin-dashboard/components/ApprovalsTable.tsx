@@ -1,6 +1,6 @@
 import Link from '@admin/components/Link';
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { Release } from '@admin/services/releaseService';
+import { DashboardReleaseSummary } from '@admin/services/releaseService';
 import {
   MethodologyRouteParams,
   methodologyContentRoute,
@@ -18,7 +18,7 @@ import merge from 'lodash/merge';
 
 interface Props {
   methodologyApprovals: MethodologyVersion[];
-  releaseApprovals: Release[];
+  releaseApprovals: DashboardReleaseSummary[];
 }
 
 export default function ApprovalsTable({
@@ -26,6 +26,7 @@ export default function ApprovalsTable({
   releaseApprovals,
 }: Props) {
   const releasesByPublication: Dictionary<{
+<<<<<<< Updated upstream
     releases?: Release[];
   }> = useMemo(() => {
     return releaseApprovals.reduce<Dictionary<{ releases: Release[] }>>(
@@ -41,6 +42,23 @@ export default function ApprovalsTable({
       },
       {},
     );
+=======
+    releases: DashboardReleaseSummary[];
+  }> = useMemo(() => {
+    return releaseApprovals.reduce<
+      Dictionary<{ releases: DashboardReleaseSummary[] }>
+    >((acc, release) => {
+      if (acc[release.publication.title]) {
+        acc[release.publication.title].releases.push(release);
+      } else {
+        acc[release.publication.title] = {
+          ...acc[release.publication.title],
+          releases: [release],
+        };
+      }
+      return acc;
+    }, {});
+>>>>>>> Stashed changes
   }, [releaseApprovals]);
 
   const methodologiesByPublication: Dictionary<{
@@ -103,8 +121,13 @@ export default function ApprovalsTable({
 
 interface PublicationRowProps {
   publication: string;
+<<<<<<< Updated upstream
   methodologies?: MethodologyVersion[];
   releases?: Release[];
+=======
+  methodologies: MethodologyVersion[];
+  releases: DashboardReleaseSummary[];
+>>>>>>> Stashed changes
 }
 
 function PublicationRow({
@@ -129,7 +152,7 @@ function PublicationRow({
           <td>
             <Link
               to={generatePath<ReleaseRouteParams>(releaseContentRoute.path, {
-                publicationId: release.publicationId,
+                publicationId: release.publication.id,
                 releaseId: release.id,
               })}
             >

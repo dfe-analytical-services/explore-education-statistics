@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             HostEnvironment = hostEnvironment;
 
             _adminUrlAndAliases = ListOf($"https://{Configuration.GetValue<string>("AdminUri")}");
-            if (hostEnvironment.IsDevelopment())
+            if (hostEnvironment.IsEnvironment("Test"))
             {
                 _adminUrlAndAliases.AddRange(DevelopmentAdminUrlAliases);
             }

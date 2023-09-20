@@ -416,7 +416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
+        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             return await _userService
@@ -436,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToAsyncEnumerable()
                         .SelectAwait(async release =>
                         {
-                            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
                             releaseViewModel.Permissions =
                                 await PermissionsUtils.GetReleasePermissions(_userService, release);
                             return releaseViewModel;
@@ -475,7 +475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _mapper.Map<List<ReleaseViewModel>>(releasesForApproval);
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases()
+        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases()
         {
             return await _userService
                 .CheckCanAccessSystem()
@@ -494,7 +494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToAsyncEnumerable()
                         .SelectAwait(async release =>
                         {
-                            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
                             releaseViewModel.Permissions =
                                 await PermissionsUtils.GetReleasePermissions(_userService, release);
                             return releaseViewModel;

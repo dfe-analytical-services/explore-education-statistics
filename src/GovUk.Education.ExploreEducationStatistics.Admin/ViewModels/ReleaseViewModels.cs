@@ -153,8 +153,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public bool Amendment { get; init; }
 
+        public bool LatestRelease { get; init; }
+
         public Guid? PreviousVersionId { get; init; }
 
         public ReleasePermissions? Permissions { get; set; }
+
+        public PublicationSummaryViewModel? Publication { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 import ApprovalsTable from '@admin/pages/admin-dashboard/components/ApprovalsTable';
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { Release } from '@admin/services/releaseService';
+import { DashboardReleaseSummary } from '@admin/services/releaseService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
@@ -9,31 +9,32 @@ import { MemoryRouter } from 'react-router';
 describe('ApprovalsTable', () => {
   const testMethodologies: MethodologyVersion[] = [
     {
-      id: 'c8c911e3-39c1-452b-801f-25bb79d1deb7',
-      methodologyId: 'b8bd000c-f9d8-4319-a2b3-6bc18675e5ac',
+      id: 'methodology-version-1',
+      methodologyId: 'methodology-1',
       owningPublication: {
-        id: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
-        title: 'Permanent and fixed-period exclusions in England',
+        id: 'publication-1',
+        title: 'Publication 1 title',
       },
       otherPublications: [],
       published: '2018-08-25T00:00:00',
       publishingStrategy: 'Immediately',
-      slug: 'permanent-and-fixed-period-exclusions-in-england',
+      slug: 'methodology-1-slug',
       status: 'Approved',
-      title: 'Pupil exclusion statistics: methodology',
+      title: 'Methodology 1',
       amendment: false,
     },
   ];
 
-  const testReleases: Release[] = [
+  const testReleases: DashboardReleaseSummary[] = [
     {
       id: 'test-id',
       title: 'Academic year 2016/17',
       slug: '2024-25',
-      publicationId: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
-      publicationTitle: 'Permanent and fixed-period exclusions in England',
-      publicationSummary: '',
-      publicationSlug: 'pub-slug',
+      publication: {
+        id: 'publication-1',
+        title: 'Publication 1 title',
+        slug: 'publication-1-slug',
+      },
       year: 2024,
       yearTitle: '2024/25',
       nextReleaseDate: {
@@ -42,16 +43,23 @@ describe('ApprovalsTable', () => {
         day: '',
       },
       live: false,
+      latestRelease: true,
       timePeriodCoverage: {
         value: 'AY',
         label: 'Academic year',
       },
+<<<<<<< Updated upstream
       preReleaseAccessList: '<p>Test public access list</p>',
       preReleaseUsersOrInvitesAdded: false,
       latestRelease: false,
       type: 'NationalStatistics',
       approvalStatus: 'Approved',
       notifySubscribers: false,
+=======
+      previousVersionId: 'old-release-2-id',
+      type: 'NationalStatistics',
+      approvalStatus: 'Approved',
+>>>>>>> Stashed changes
       amendment: false,
       permissions: {
         canAddPrereleaseUsers: true,
@@ -60,18 +68,16 @@ describe('ApprovalsTable', () => {
         canDeleteRelease: false,
         canMakeAmendmentOfRelease: false,
       },
-      updatePublishedDate: false,
     },
     {
       id: '86d868cf-ff4b-4325-ef26-08d93c9b5089',
       title: 'Academic year 2024/25',
       slug: '2024-25',
-      publicationId: '959bd40c-4685-46ff-396d-08d93c9b5159',
-      publicationTitle:
-        'UI tests - Publication and Release UI Permissions Publication Owner',
-      publicationSummary: '',
-      publicationSlug:
-        'ui-tests-publication-and-release-ui-permissions-publication-owner',
+      publication: {
+        id: 'publication-2',
+        title: 'Publication 2 title',
+        slug: 'publication-2-slug',
+      },
       year: 2024,
       yearTitle: '2024/25',
       nextReleaseDate: {
@@ -81,16 +87,23 @@ describe('ApprovalsTable', () => {
       },
       publishScheduled: '2048-11-16',
       live: false,
+      latestRelease: true,
       timePeriodCoverage: {
         value: 'AY',
         label: 'Academic year',
       },
+<<<<<<< Updated upstream
       preReleaseAccessList: '<p>Test public access list</p>',
       preReleaseUsersOrInvitesAdded: false,
       latestRelease: false,
       type: 'NationalStatistics',
       approvalStatus: 'Approved',
       notifySubscribers: false,
+=======
+      previousVersionId: 'old-release-2-id',
+      type: 'NationalStatistics',
+      approvalStatus: 'Approved',
+>>>>>>> Stashed changes
       amendment: false,
       permissions: {
         canAddPrereleaseUsers: true,
@@ -99,7 +112,6 @@ describe('ApprovalsTable', () => {
         canDeleteRelease: false,
         canMakeAmendmentOfRelease: false,
       },
-      updatePublishedDate: false,
     },
   ];
 
@@ -121,7 +133,7 @@ describe('ApprovalsTable', () => {
     expect(rows).toHaveLength(6);
 
     expect(within(rows[1]).getByRole('columnheader')).toHaveTextContent(
-      'Permanent and fixed-period exclusions in England',
+      'Publication 1 title',
     );
 
     const row3cells = within(rows[2]).getAllByRole('cell');
@@ -141,7 +153,7 @@ describe('ApprovalsTable', () => {
     ).toBeInTheDocument();
 
     expect(within(rows[4]).getByRole('columnheader')).toHaveTextContent(
-      'UI tests - Publication and Release UI Permissions Publication Owner',
+      'Publication 2 title',
     );
 
     const row6cells = within(rows[5]).getAllByRole('cell');

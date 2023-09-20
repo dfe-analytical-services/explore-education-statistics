@@ -1726,7 +1726,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     // Publication.
                     Assert.Equal(
                         higherReviewReleaseWithApproverRoleForUser.Publication.Title, 
-                        viewModel.PublicationTitle);
+                        viewModel.Publication!.Title);
                 }
             }
             

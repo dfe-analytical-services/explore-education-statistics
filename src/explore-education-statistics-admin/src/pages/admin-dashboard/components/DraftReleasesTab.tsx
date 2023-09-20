@@ -1,12 +1,15 @@
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
-import { Release } from '@admin/services/releaseService';
+import {
+  ReleaseSummaryWithPermissions,
+  DashboardReleaseSummary,
+} from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 
 interface Props {
   isBauUser: boolean;
   isLoading: boolean;
-  releases: Release[];
+  releases: (DashboardReleaseSummary & ReleaseSummaryWithPermissions)[];
   onChangeRelease: () => void;
 }
 

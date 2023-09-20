@@ -338,7 +338,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task ListReleasesForApproval()
         {
-            var releases = ListOf(new ReleaseViewModel
+            var releases = ListOf(new ReleaseSummaryViewModel
             {
                 Id = Guid.NewGuid()
             });
