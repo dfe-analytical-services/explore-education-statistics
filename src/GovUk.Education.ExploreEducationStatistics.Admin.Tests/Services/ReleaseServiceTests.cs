@@ -1135,7 +1135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     OwningPublicationTitle = "Methodology scheduled with this Release"
                 },
-                InternalReleaseNote = "A note"
             };
 
             // This Methodology has nothing to do with the Release being deleted.
@@ -1146,8 +1145,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ScheduledWithReleaseId = Guid.NewGuid(),
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Methodology scheduled with another Release"
-                }
+                    OwningPublicationTitle = "Methodology scheduled with another Release",
+                },
             };
 
             var userReleaseRole = new UserReleaseRole
@@ -1313,13 +1312,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
-                var retrievedMethodology = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithRelease.Id);
-                Assert.True(retrievedMethodology.ScheduledForPublishingImmediately);
-                Assert.Null(retrievedMethodology.ScheduledWithReleaseId);
-                Assert.Null(retrievedMethodology.InternalReleaseNote);
-                Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodology.Status);
+                var retrievedMethodologyVersion = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithRelease.Id);
+                Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
+                Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseId);
+                Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
                 Assert.InRange(DateTime.UtcNow
-                    .Subtract(retrievedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                    .Subtract(retrievedMethodologyVersion.Updated!.Value).Milliseconds, 0, 1500);
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
                 var unrelatedMethodology = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithAnotherRelease.Id);

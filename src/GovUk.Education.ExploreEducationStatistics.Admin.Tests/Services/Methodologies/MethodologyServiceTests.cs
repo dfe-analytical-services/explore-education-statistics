@@ -589,11 +589,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Methodology = methodology,
-                InternalReleaseNote = "Test approval",
                 Published = null,
                 PublishingStrategy = Immediately,
                 Status = Draft,
                 AlternativeTitle = "Alternative title"
+            };
+
+            var methodologyStatus = new MethodologyStatus
+            {
+                MethodologyVersion = methodologyVersion,
+                InternalReleaseNote = "Test approval",
+                ApprovalStatus = Approved,
             };
 
             var adoptingPublication = new Publication();
@@ -605,6 +611,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.Publications.AddRangeAsync(publication, adoptingPublication);
                 await context.Methodologies.AddAsync(methodology);
                 await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.MethodologyStatus.AddAsync(methodologyStatus);
                 await context.SaveChangesAsync();
             }
 
@@ -660,7 +667,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     new()
                     {
-                        InternalReleaseNote = "Test approval",
                         Published = null,
                         PublishingStrategy = Immediately,
                         Status = Draft,
@@ -794,7 +800,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Methodology = methodology,
-                InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
                 PublishingStrategy = WithRelease,
                 ScheduledWithRelease = new Release
@@ -807,6 +812,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 AlternativeTitle = "Alternative title"
             };
 
+            var methodologyStatus = new MethodologyStatus
+            {
+                MethodologyVersion = methodologyVersion,
+                InternalReleaseNote = "Test approval",
+                ApprovalStatus = Approved,
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -814,6 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.Methodologies.AddAsync(methodology);
                 await context.Publications.AddRangeAsync(owningPublication, adoptingPublication1, adoptingPublication2);
                 await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.MethodologyStatus.AddAsync(methodologyStatus);
                 await context.SaveChangesAsync();
             }
 
@@ -1127,7 +1140,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         Version = 0,
                         AlternativeTitle = "Methodology 1 Version 1",
-                        InternalReleaseNote = "Methodology 1 Version 1 release note",
                         Published = new DateTime(2021, 1, 1),
                         Status = Approved
                     }
@@ -1143,7 +1155,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         Version = 0,
                         AlternativeTitle = "Methodology 2 Version 1",
-                        InternalReleaseNote = "Methodology 2 Version 1 release note",
                         Published = new DateTime(2021, 1, 1),
                         Status = Approved
                     },
@@ -1167,7 +1178,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         Version = 0,
                         AlternativeTitle = "Methodology 3 Version 1",
-                        InternalReleaseNote = "Methodology 3 Version 1 release note",
                         Published = new DateTime(2021, 1, 1),
                         Status = Approved
                     },
@@ -1176,7 +1186,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         Version = 1,
                         AlternativeTitle = "Methodology 3 Version 2",
-                        InternalReleaseNote = "Methodology 3 Version 2 release note",
                         Published = new DateTime(2022, 1, 1),
                         Status = Approved
                     }

@@ -41,8 +41,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<MethodologyNote> Notes { get; set; } = new();
 
-        public string? InternalReleaseNote { get; set; }
-
         public Methodology Methodology { get; set; } = null!;
 
         public Guid MethodologyId { get; set; }
@@ -109,7 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.ScheduledWithRelease = null;
             copy.ScheduledWithReleaseId = null;
             copy.Methodology = null!;
-            copy.InternalReleaseNote = null;
 
             copy.MethodologyContent = MethodologyContent.Clone(createdDate);
 

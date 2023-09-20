@@ -232,7 +232,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         m.Status = Draft;
                         m.ScheduledWithRelease = null;
                         m.ScheduledWithReleaseId = null;
-                        m.InternalReleaseNote = null;
                         m.Updated = DateTime.UtcNow;
                     });
 
