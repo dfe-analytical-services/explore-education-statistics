@@ -40,9 +40,7 @@ public class TestStartup : Startup
         IConfiguration configuration,
         IHostEnvironment hostEnvironment) : base(
         configuration, 
-        hostEnvironment,
-        applyDatabaseMigrations: false,
-        configureSpa: false)
+        hostEnvironment)
     {
     }
 
@@ -55,10 +53,15 @@ public class TestStartup : Startup
             .UseInMemoryDbContext<StatisticsDbContext>()
             .UseInMemoryDbContext<UsersAndRolesDbContext>()
             .MockService<IStorageQueueService>()
-            .MockService<ITableStorageService>()
+            .MockService<ICoreTableStorageService>()
+            .MockService<IPublisherTableStorageService>()
             .MockService<IPrivateBlobStorageService>()
             .MockService<IPublicBlobStorageService>()
             .RegisterControllers<Startup>();
+
+        services
+            .AddAuthentication(TestAuthHandler.AuthenticationScheme)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, _ => { });
     }
 }
 
@@ -78,14 +81,7 @@ public static class TestStartupExtensions
         ClaimsPrincipal user)
     {
         return testApp.WithWebHostBuilder(builder => builder
-            .ConfigureServices(services =>
-            {
-                services
-                    .AddAuthentication(TestAuthHandler.AuthenticationScheme)
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, _ => { });
-
-                services.AddScoped(_ => user);
-            }));
+            .ConfigureServices(services => services.AddScoped(_ => user)));
     }
 }
 
@@ -104,7 +100,7 @@ internal class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptio
         ILoggerFactory logger, 
         UrlEncoder encoder, 
         ISystemClock clock, 
-        ClaimsPrincipal? claimsPrincipal) : base(options, logger, encoder, clock)
+        ClaimsPrincipal? claimsPrincipal = null) : base(options, logger, encoder, clock)
     {
         _claimsPrincipal = claimsPrincipal;
     }

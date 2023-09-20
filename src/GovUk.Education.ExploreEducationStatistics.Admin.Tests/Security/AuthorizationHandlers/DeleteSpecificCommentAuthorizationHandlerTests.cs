@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
                 Content = new List<ReleaseContentSection>
                 {
-                    new ReleaseContentSection
+                    new()
                     {
                         ContentSection = new ContentSection
                         {
@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 contentDbContext => contentDbContext.Add(release),
                 contentDbContext => new DeleteSpecificCommentAuthorizationHandler(
                     contentDbContext,
-                    new ReleasePublishingStatusRepository(Mock.Of<ITableStorageService>()),
+                    new ReleasePublishingStatusRepository(Mock.Of<IPublisherTableStorageService>()),
                     new AuthorizationHandlerResourceRoleService(
                         new UserReleaseRoleRepository(contentDbContext),
                         new UserPublicationRoleRepository(contentDbContext),

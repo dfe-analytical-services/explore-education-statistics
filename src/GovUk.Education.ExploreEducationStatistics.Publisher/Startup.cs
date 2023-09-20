@@ -82,10 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
                         publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>()
-                .AddScoped<ITableStorageService, TableStorageService>(provider =>
-                    new TableStorageService(
-                        GetConfigurationValue(provider, "PublisherStorage"),
-                        new StorageInstanceCreationUtil()))
+                .AddScoped<IPublisherTableStorageService, PublisherTableStorageService>()
                 .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                 .AddScoped<IMethodologyRepository, MethodologyRepository>()
                 .AddScoped<IMethodologyService, MethodologyService>()
