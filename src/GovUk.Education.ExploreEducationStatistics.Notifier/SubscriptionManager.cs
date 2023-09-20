@@ -50,7 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var subscriptionsTable = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
             var pendingSubscriptionsTable = GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);
-            var client = GetNotifyClient(config);
 
             string? id = req.Query["id"];
             string? email = req.Query["email"];
@@ -101,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                                 $"{baseUrl}{activeSubscriber.PartitionKey}/unsubscribe/{unsubscribeToken}"
                             }
                         };
-                        _emailService.SendEmail(client, email, confirmationEmailTemplateId, confirmationValues);
+                        _emailService.SendEmail(email, confirmationEmailTemplateId, confirmationValues);
                         return new OkResult();
                     }
 
@@ -118,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                         { "verification_link", $"{baseUrl}{id}/verify-subscription/{activationCode}" },
                     };
 
-                    _emailService.SendEmail(client, email, emailTemplateId, values);
+                    _emailService.SendEmail(email, emailTemplateId, values);
                 }
 
                 return new OkResult();
@@ -195,7 +194,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var email = _tokenService.GetEmailFromToken(token, tokenSecretKey);
-            var client = GetNotifyClient(config);
 
             if (email != null)
             {
@@ -223,7 +221,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                         { "unsubscribe_link", $"{baseUrl}{sub.PartitionKey}/unsubscribe/{unsubscribeToken}" }
                     };
 
-                    _emailService.SendEmail(client, email, emailTemplateId, values);
+                    _emailService.SendEmail(email, emailTemplateId, values);
 
                     return new RedirectResult(webApplicationBaseUrl + $"subscriptions?slug={sub.Slug}&verified=true",
                         true);

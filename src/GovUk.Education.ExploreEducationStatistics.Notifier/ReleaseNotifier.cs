@@ -50,7 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var client = GetNotifyClient(config);
             var table = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
@@ -84,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                         { "unsubscribe_link", $"{baseUrl}{entity.PartitionKey}/unsubscribe/{unsubscribeToken}" },
                     };
 
-                    _emailService.SendEmail(client, entity.RowKey, emailTemplateId, values);
+                    _emailService.SendEmail(entity.RowKey, emailTemplateId, values);
                 }
             } while (token != null);
         }
