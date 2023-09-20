@@ -31,7 +31,7 @@ export interface Release {
   published?: string;
   nextReleaseDate?: PartialDate;
   latestInternalReleaseNote?: string;
-  previousVersionId: string;
+  previousVersionId?: string;
   preReleaseAccessList: string;
   preReleaseUsersOrInvitesAdded?: boolean;
   year: number;

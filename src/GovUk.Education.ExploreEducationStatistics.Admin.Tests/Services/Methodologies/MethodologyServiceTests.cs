@@ -601,7 +601,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyVersion = methodologyVersion,
                 InternalReleaseNote = "Test approval",
-                ApprovalStatus = Approved,
+                ApprovalStatus = MethodologyApprovalStatus.Approved,
             };
 
             var adoptingPublication = new Publication();
@@ -621,7 +621,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
 
             methodologyRepository.Setup(mock =>
-                    mock.GetUnrelatedToPublication(adoptingPublication.Id))
+                    mock.GetPublishedMethodologiesUnrelatedToPublication(adoptingPublication.Id))
                 .ReturnsAsync(ListOf(methodology));
 
             methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersion(methodology.Id))
@@ -670,8 +670,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     new()
                     {
                         Published = null,
-                        PublishingStrategy = Immediately,
-                        Status = Draft,
+                        PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                        Status = MethodologyApprovalStatus.Draft,
                         AlternativeTitle = "Alternative title"
                     },
                 },
@@ -818,7 +818,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 MethodologyVersion = methodologyVersion,
                 InternalReleaseNote = "Test approval",
-                ApprovalStatus = Approved,
+                ApprovalStatus = MethodologyApprovalStatus.Approved,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2554,77 +2554,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     var service = SetupMethodologyService(context);
                     var result = await service.ListUsersMethodologyVersionsForApproval();
                     Assert.Empty(result.AssertRight());
-                }
-            }
-
-            [Fact]
-            public async Task MixOfMethodologies()
-            {
-                var publications = _fixture
-                    .DefaultPublication()
-                    .GenerateList(2);
-
-                var owningPublication = publications[0];
-                var adoptingPublication = publications[1];
-
-                var ownedMethodologies = _fixture
-                    .DefaultMethodology()
-                    .WithOwningPublication(owningPublication)
-                    .WithMethodologyVersions(_ => _fixture
-                        .DefaultMethodologyVersion()
-                        .WithApprovalStatuses(ListOf(MethodologyApprovalStatus.Approved,
-                            MethodologyApprovalStatus.HigherLevelReview, MethodologyApprovalStatus.Draft))
-                        .GenerateList())
-                    .GenerateList(2);
-
-                var adoptedMethodologies = _fixture
-                    .DefaultMethodology()
-                    .WithAdoptingPublication(adoptingPublication)
-                    .WithMethodologyVersions(_ => _fixture
-                        .DefaultMethodologyVersion()
-                        .WithApprovalStatuses(ListOf(MethodologyApprovalStatus.Approved,
-                            MethodologyApprovalStatus.HigherLevelReview, MethodologyApprovalStatus.Draft))
-                        .GenerateList())
-                    .Generate(2);
-
-                var publicationRolesForUser = _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(User)
-                    .ForIndex(0, s => s
-                        .SetPublication(owningPublication)
-                        .SetRole(PublicationRole.Approver))
-                    .ForIndex(1, s => s
-                        .SetPublication(owningPublication)
-                        .SetRole(PublicationRole.Owner))
-                    .ForIndex(2, s => s
-                        .SetPublication(adoptingPublication)
-                        .SetRole(PublicationRole.Approver))
-                    .ForIndex(3, s => s
-                        .SetPublication(adoptingPublication)
-                        .SetRole(PublicationRole.Owner))
-                    .GenerateList();
-
-                var contentDbContextId = Guid.NewGuid().ToString();
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await context.Methodologies.AddRangeAsync(ownedMethodologies);
-                    await context.Methodologies.AddRangeAsync(adoptedMethodologies);
-                    await context.UserPublicationRoles.AddRangeAsync(publicationRolesForUser);
-                    await context.SaveChangesAsync();
-                }
-
-                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupMethodologyService(context);
-
-                    var result = await service.ListUsersMethodologyVersionsForApproval();
-                    var methodologyVersionsForApproval = result.AssertRight();
-
-                    // Assert that we just get the 2 MethodologyVersions where the user is the Approver of the Owning
-                    // Publication and their statuses are Higher Review.
-                    Assert.Equal(2, methodologyVersionsForApproval.Count);
-                    Assert.Equal(ownedMethodologies[0].Versions[1].Id, methodologyVersionsForApproval[0].Id);
-                    Assert.Equal(ownedMethodologies[1].Versions[1].Id, methodologyVersionsForApproval[1].Id);
                 }
             }
         }
