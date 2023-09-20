@@ -48,8 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var emailTemplateId = config.GetValue<string>(VerificationEmailTemplateIdName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var subscriptionsTable = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
-            var pendingSubscriptionsTable = GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);
+            var subscriptionsTable = GetCloudTable(_storageTableService, config, SubscriptionTableNames.SubscriptionsTableName);
+            var pendingSubscriptionsTable = GetCloudTable(_storageTableService, config, SubscriptionTableNames.PendingSubscriptionsTableName);
 
             string? id = req.Query["id"];
             string? email = req.Query["email"];
@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
             if (email != null)
             {
-                var table = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
+                var table = GetCloudTable(_storageTableService, config, SubscriptionTableNames.SubscriptionsTableName);
                 var sub = new SubscriptionEntity(id, email);
                 sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
 
@@ -197,8 +197,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
             if (email != null)
             {
-                var pendingSubscriptionsTbl = GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);
-                var subscriptionsTbl = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
+                var pendingSubscriptionsTbl = GetCloudTable(_storageTableService, config, SubscriptionTableNames.PendingSubscriptionsTableName);
+                var subscriptionsTbl = GetCloudTable(_storageTableService, config, SubscriptionTableNames.SubscriptionsTableName);
                 var sub = _storageTableService
                     .RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntity(id, email)).Result;
 
@@ -243,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 DateTime.UtcNow);
 
             var config = LoadAppSettings(context);
-            var pendingSubscriptionsTbl = GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);
+            var pendingSubscriptionsTbl = GetCloudTable(_storageTableService, config, SubscriptionTableNames.PendingSubscriptionsTableName);
             // Remove any pending subscriptions where the token has expired i.e. more than 1 hour old
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterConditionForDate("DateTimeCreated", QueryComparisons.LessThan,

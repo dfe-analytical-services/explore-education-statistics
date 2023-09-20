@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var table = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
+            var table = GetCloudTable(_storageTableService, config, SubscriptionTableNames.SubscriptionsTableName);
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
                     notificationMessage.PublicationId.ToString()));
