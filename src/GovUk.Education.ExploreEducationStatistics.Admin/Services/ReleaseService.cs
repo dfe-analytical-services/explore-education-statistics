@@ -415,7 +415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
+        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             return await _userService
@@ -435,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToAsyncEnumerable()
                         .SelectAwait(async release =>
                         {
-                            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
                             releaseViewModel.Permissions =
                                 await PermissionsUtils.GetReleasePermissions(_userService, release);
                             return releaseViewModel;
@@ -443,7 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListUsersReleasesForApproval()
+        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListUsersReleasesForApproval()
         {
             var userId = _userService.GetUserId();
 
@@ -471,10 +471,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     && releaseIdsForApproval.Contains(release.Id))
                 .ToListAsync();
 
-            return _mapper.Map<List<ReleaseViewModel>>(releasesForApproval);
+            return _mapper.Map<List<ReleaseSummaryViewModel>>(releasesForApproval);
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases()
+        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases()
         {
             return await _userService
                 .CheckCanAccessSystem()
@@ -493,7 +493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToAsyncEnumerable()
                         .SelectAwait(async release =>
                         {
-                            var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                            var releaseViewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
                             releaseViewModel.Permissions =
                                 await PermissionsUtils.GetReleasePermissions(_userService, release);
                             return releaseViewModel;
@@ -643,7 +643,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             // Require publication / release graph to be able to work out:
             // If the release is the latest
-            return values.Include(r => r.Publication)
+            return values
+                .Include(r => r.Publication)
                 .Include(r => r.ReleaseStatuses);
         }
 

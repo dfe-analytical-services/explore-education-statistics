@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/draft")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> ListDraftReleases()
+        public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListDraftReleases()
         {
             return await _releaseService
                 .ListReleasesWithStatuses(ReleaseApprovalStatus.Draft, ReleaseApprovalStatus.HigherLevelReview)
@@ -207,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/approvals")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> ListUsersReleasesForApproval()
+        public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListUsersReleasesForApproval()
         {
             return await _releaseService
                 .ListUsersReleasesForApproval()
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/scheduled")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> ListScheduledReleases()
+        public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListScheduledReleases()
         {
             return await _releaseService
                 .ListScheduledReleases()

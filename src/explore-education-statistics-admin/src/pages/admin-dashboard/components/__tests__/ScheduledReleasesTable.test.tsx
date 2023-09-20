@@ -1,6 +1,6 @@
 import ScheduledReleasesTable from '@admin/pages/admin-dashboard/components/ScheduledReleasesTable';
 import _releaseService, {
-  ReleaseWithPermissions,
+  DashboardReleaseSummary,
 } from '@admin/services/releaseService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
@@ -11,71 +11,123 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('ScheduledReleasesTable', () => {
-  const testReleases: ReleaseWithPermissions[] = [
+  const testReleases: DashboardReleaseSummary[] = [
     {
       id: 'release-1',
       latestRelease: true,
       publishScheduled: '2021-06-30T00:00:00',
       slug: 'release-1-slug',
       title: 'Release 1',
-      publicationId: 'publication-1',
-      publicationTitle: 'Publication 1',
+      amendment: false,
+      live: false,
+      year: 2021,
+      yearTitle: '2021',
+      timePeriodCoverage: {
+        value: 'AY',
+        label: 'Academic year',
+      },
+      type: 'NationalStatistics',
+      publication: {
+        id: 'publication-1',
+        slug: 'publication-1-slug',
+        title: 'Publication 1',
+      },
       permissions: {
+        canViewRelease: true,
         canUpdateRelease: true,
         canAddPrereleaseUsers: false,
         canDeleteRelease: false,
         canMakeAmendmentOfRelease: false,
       },
       approvalStatus: 'Approved',
-    } as ReleaseWithPermissions,
+    },
     {
       id: 'release-2',
       latestRelease: true,
       publishScheduled: '2021-05-30T00:00:00',
       slug: 'release-2-slug',
       title: 'Release 2',
-      publicationId: 'publication-2',
-      publicationTitle: 'Publication 2',
+      amendment: false,
+      live: false,
+      year: 2021,
+      yearTitle: '2021',
+      timePeriodCoverage: {
+        value: 'AY',
+        label: 'Academic year',
+      },
+      type: 'NationalStatistics',
+      publication: {
+        id: 'publication-2',
+        slug: 'publication-2-slug',
+        title: 'Publication 2',
+      },
       permissions: {
+        canViewRelease: true,
         canUpdateRelease: true,
         canAddPrereleaseUsers: false,
         canDeleteRelease: false,
         canMakeAmendmentOfRelease: false,
       },
       approvalStatus: 'Approved',
-    } as ReleaseWithPermissions,
+    },
     {
       id: 'release-3',
       latestRelease: false,
       publishScheduled: '2021-01-01T00:00:00',
       slug: 'release-3-slug',
       title: 'Release 3',
-      publicationId: 'publication-1',
-      publicationTitle: 'Publication 1',
+      amendment: false,
+      live: false,
+      year: 2021,
+      yearTitle: '2021',
+      timePeriodCoverage: {
+        value: 'AY',
+        label: 'Academic year',
+      },
+      type: 'NationalStatistics',
+      publication: {
+        id: 'publication-1',
+        slug: 'publication-1-slug',
+        title: 'Publication 1',
+      },
       permissions: {
+        canViewRelease: true,
         canUpdateRelease: true,
         canDeleteRelease: true,
         canAddPrereleaseUsers: false,
         canMakeAmendmentOfRelease: false,
       },
       approvalStatus: 'Approved',
-    } as ReleaseWithPermissions,
+    },
     {
       id: 'release-4',
       latestRelease: true,
       publishScheduled: '2021-05-30T00:00:00',
       slug: 'release-4-slug',
       title: 'Release 4',
-      publicationId: 'publication-3',
-      publicationTitle: 'Publication 3',
+      amendment: false,
+      live: false,
+      year: 2021,
+      yearTitle: '2021',
+      timePeriodCoverage: {
+        value: 'AY',
+        label: 'Academic year',
+      },
+      type: 'NationalStatistics',
+      publication: {
+        id: 'publication-3',
+        slug: 'publication-3-slug',
+        title: 'Publication 3',
+      },
       permissions: {
+        canViewRelease: true,
         canUpdateRelease: true,
         canAddPrereleaseUsers: false,
         canDeleteRelease: false,
         canMakeAmendmentOfRelease: false,
       },
       approvalStatus: 'Approved',
-    } as ReleaseWithPermissions,
+    },
   ];
 
   beforeEach(() => {

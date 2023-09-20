@@ -46,6 +46,7 @@ describe('PublicationUnpublishedReleases', () => {
     type: 'NationalStatistics',
     year: 2022,
     yearTitle: '2022/23',
+    latestRelease: false,
   };
 
   const testRelease2: ReleaseSummaryWithPermissions = {
@@ -63,6 +64,7 @@ describe('PublicationUnpublishedReleases', () => {
     type: 'NationalStatistics',
     year: 2024,
     yearTitle: '2024/25',
+    latestRelease: false,
   };
 
   const testRelease3: ReleaseSummaryWithPermissions = {
@@ -80,6 +82,7 @@ describe('PublicationUnpublishedReleases', () => {
     type: 'NationalStatistics',
     year: 2023,
     yearTitle: '2023/24',
+    latestRelease: false,
   };
 
   const testReleasesPage1: PaginatedList<ReleaseSummaryWithPermissions> = {

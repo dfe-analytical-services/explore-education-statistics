@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 if (loadedMethodologyVersion.ScheduledWithRelease != null)
                 {
                     await _context.Entry(loadedMethodologyVersion.ScheduledWithRelease)
-                        .Reference(r => r!.Publication)
+                        .Reference(r => r.Publication)
                         .LoadAsync();
 
                     var title =

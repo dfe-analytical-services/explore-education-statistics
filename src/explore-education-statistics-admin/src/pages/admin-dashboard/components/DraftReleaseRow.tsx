@@ -1,7 +1,10 @@
 import Link from '@admin/components/Link';
 import DraftReleaseRowIssues from '@admin/pages/admin-dashboard/components/DraftReleaseRowIssues';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import { Release } from '@admin/services/releaseService';
+import {
+  ReleaseSummaryWithPermissions,
+  DashboardReleaseSummary,
+} from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -14,7 +17,7 @@ import { generatePath } from 'react-router';
 
 interface Props {
   isBauUser: boolean;
-  release: Release;
+  release: DashboardReleaseSummary & ReleaseSummaryWithPermissions;
   onDelete: () => void;
 }
 
@@ -34,7 +37,7 @@ const DraftReleaseRow = ({ isBauUser, release, onDelete }: Props) => {
         <Link
           className="govuk-!-margin-right-4 govuk-!-display-inline-block"
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-            publicationId: release.publicationId,
+            publicationId: release.publication.id,
             releaseId: release.id,
           })}
         >
@@ -42,11 +45,11 @@ const DraftReleaseRow = ({ isBauUser, release, onDelete }: Props) => {
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
 
-        {release.amendment && release.previousVersionId && (
+        {release.previousVersionId && (
           <Link
             className="govuk-!-margin-right-4 govuk-!-display-inline-block"
             to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-              publicationId: release.publicationId,
+              publicationId: release.publication.id,
               releaseId: release.previousVersionId,
             })}
           >
