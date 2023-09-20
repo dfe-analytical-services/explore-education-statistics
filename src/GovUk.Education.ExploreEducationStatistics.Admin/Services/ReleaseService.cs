@@ -456,8 +456,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var indirectReleasesWithApprovalRole = await _context
                 .UserPublicationRoles
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
-                .Select(role => role.Publication)
-                .SelectMany(publication => publication.Releases.Select(release => release.Id))
+                .SelectMany(role => role.Publication.Releases.Select(release => release.Id))
                 .ToListAsync();
 
             var releaseIdsForApproval = directReleasesWithApprovalRole

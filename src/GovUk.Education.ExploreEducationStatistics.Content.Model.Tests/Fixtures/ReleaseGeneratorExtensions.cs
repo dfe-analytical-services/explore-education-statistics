@@ -31,7 +31,7 @@ public static class ReleaseGeneratorExtensions
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.Title)
             .SetDefault(p => p.DataGuidance)
-            .Set(p => p.ReleaseName, (_, _, context) => $"{1000 + context.Index}");
+            .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}");
     
     public static InstanceSetters<Release> SetApprovalStatus(
         this InstanceSetters<Release> setters,
