@@ -7,6 +7,7 @@ import React, {
   CSSProperties,
   FocusEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
 
@@ -25,6 +26,7 @@ export interface FormSelectProps extends FormLabelProps {
   error?: string;
   id: string;
   inline?: boolean;
+  inputRef?: Ref<HTMLSelectElement>;
   hint?: string;
   name: string;
   onBlur?: FocusEventHandler;
@@ -45,6 +47,7 @@ const FormSelect = ({
   error,
   id,
   inline = false,
+  inputRef,
   hint,
   hideLabel,
   label,
@@ -93,6 +96,7 @@ const FormSelect = ({
           id={id}
           name={name}
           disabled={disabled}
+          ref={inputRef}
           onBlur={onBlur}
           onChange={onChange}
           value={value}
