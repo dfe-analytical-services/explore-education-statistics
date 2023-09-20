@@ -3,7 +3,7 @@ import {
   ScheduledStagesGuidanceModal,
   ScheduledStatusGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { Release } from '@admin/services/releaseService';
+import { DashboardReleaseSummary } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
 import useToggle from '@common/hooks/useToggle';
@@ -13,7 +13,7 @@ import React, { useMemo } from 'react';
 
 interface PublicationRowProps {
   publication: string;
-  releases: Release[];
+  releases: DashboardReleaseSummary[];
 }
 
 const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
@@ -27,7 +27,7 @@ const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
       {releases.map(release => (
         <ScheduledReleaseRow
           key={release.id}
-          publicationId={release.publicationId}
+          publicationId={release.publication.id}
           release={release}
         />
       ))}
@@ -36,7 +36,7 @@ const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
 };
 
 interface ScheduledReleasesTableProps {
-  releases: Release[];
+  releases: DashboardReleaseSummary[];
 }
 
 const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
@@ -45,17 +45,21 @@ const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
   const [showScheduledStagesGuidance, toggleScheduledStagesGuidance] =
     useToggle(false);
 
-  const releasesByPublication: Dictionary<Release[]> = useMemo(() => {
-    return releases.reduce<Dictionary<Release[]>>((acc, release) => {
-      if (acc[release.publicationTitle]) {
-        acc[release.publicationTitle].push(release);
-      } else {
-        acc[release.publicationTitle] = [release];
-      }
+  const releasesByPublication: Dictionary<DashboardReleaseSummary[]> =
+    useMemo(() => {
+      return releases.reduce<Dictionary<DashboardReleaseSummary[]>>(
+        (acc, release) => {
+          if (acc[release.publication.title]) {
+            acc[release.publication.title].push(release);
+          } else {
+            acc[release.publication.title] = [release];
+          }
 
-      return acc;
-    }, {});
-  }, [releases]);
+          return acc;
+        },
+        {},
+      );
+    }, [releases]);
   return (
     <>
       {releases.length === 0 ? (

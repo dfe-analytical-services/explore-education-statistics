@@ -55,12 +55,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(r => r.UserId == userId)
                 .Select(r => r.PublicationId)
                 .ToListAsync();
+            
             var userPublicationRoleReleaseIds = await _contentDbContext
                 .Releases
                 .AsQueryable()
                 .Where(r => userPublicationIds.Contains(r.PublicationId))
                 .Select(r => r.Id)
                 .ToListAsync();
+            
             userReleaseIds.AddRange(userPublicationRoleReleaseIds);
             userReleaseIds = userReleaseIds.Distinct().ToList();
 

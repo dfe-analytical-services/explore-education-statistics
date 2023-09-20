@@ -1708,11 +1708,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var viewModel = Assert.Single(viewModels);
                     Assert.Equal(higherReviewReleaseWithApproverRoleForUser.Id, viewModel.Id);
                     
-                    // Assert that we have a fully populated ReleaseViewModel, including details from the owning
+                    // Assert that we have a fully populated ReleaseSummaryViewModel, including details from the owning
                     // Publication.
                     Assert.Equal(
                         higherReviewReleaseWithApproverRoleForUser.Publication.Title, 
-                        viewModel.PublicationTitle);
+                        viewModel.Publication!.Title);
                 }
             }
             

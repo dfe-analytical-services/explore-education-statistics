@@ -1,5 +1,5 @@
 import ApprovalsTable from '@admin/pages/admin-dashboard/components/ApprovalsTable';
-import { Release } from '@admin/services/releaseService';
+import { DashboardReleaseSummary } from '@admin/services/releaseService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
@@ -7,7 +7,7 @@ import React from 'react';
 interface Props {
   isLoading: boolean;
   methodologyApprovals: MethodologyVersion[];
-  releaseApprovals: Release[];
+  releaseApprovals: DashboardReleaseSummary[];
 }
 
 export default function ApprovalsTab({

@@ -73,6 +73,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<Theme, IdTitleViewModel>();
             CreateMap<Topic, IdTitleViewModel>();
+            CreateMap<Publication, PublicationSummaryViewModel>();
             CreateMap<Publication, PublicationViewModel>()
                 .ForMember(
                     dest => dest.Theme,

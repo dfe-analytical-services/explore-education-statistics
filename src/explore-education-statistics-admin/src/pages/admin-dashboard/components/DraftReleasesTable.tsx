@@ -7,7 +7,7 @@ import {
 } from '@admin/pages/publication/components/PublicationGuidance';
 import releaseService, {
   DeleteReleasePlan,
-  Release,
+  DashboardReleaseSummary,
 } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
@@ -19,7 +19,7 @@ import React, { useMemo, useState } from 'react';
 interface PublicationRowProps {
   isBauUser: boolean;
   publication: string;
-  releases: Release[];
+  releases: DashboardReleaseSummary[];
   onDelete: (releaseId: string) => void;
 }
 const PublicationRow = ({
@@ -49,7 +49,7 @@ const PublicationRow = ({
 
 interface DraftReleasesTableProps {
   isBauUser: boolean;
-  releases: Release[];
+  releases: DashboardReleaseSummary[];
   onChangeRelease: () => void;
 }
 
@@ -67,17 +67,21 @@ const DraftReleasesTable = ({
   const [showDraftStatusGuidance, toggleDraftStatusGuidance] = useToggle(false);
   const [showIssuesGuidance, toggleIssuesGuidance] = useToggle(false);
 
-  const releasesByPublication: Dictionary<Release[]> = useMemo(() => {
-    return releases.reduce<Dictionary<Release[]>>((acc, release) => {
-      if (acc[release.publicationTitle]) {
-        acc[release.publicationTitle].push(release);
-      } else {
-        acc[release.publicationTitle] = [release];
-      }
+  const releasesByPublication: Dictionary<DashboardReleaseSummary[]> =
+    useMemo(() => {
+      return releases.reduce<Dictionary<DashboardReleaseSummary[]>>(
+        (acc, release) => {
+          if (acc[release.publication.title]) {
+            acc[release.publication.title].push(release);
+          } else {
+            acc[release.publication.title] = [release];
+          }
 
-      return acc;
-    }, {});
-  }, [releases]);
+          return acc;
+        },
+        {},
+      );
+    }, [releases]);
 
   return (
     <>
