@@ -2,6 +2,7 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Notifier;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
+using GovUk.Education.ExploreEducationStatistics.Notifier.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Utils;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         {
             builder.Services
                 .AddTransient<IEmailService, EmailService>()
-                .AddTransient<IStorageTableService, StorageTableService>()
+                .AddTransient<ISubscriberService, SubscriberService>()
                 .AddTransient<ITokenService, TokenService>()
                 .AddTransient<INotificationClient, NotificationClient>(provider =>
                 {

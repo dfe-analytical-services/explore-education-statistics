@@ -8,6 +8,7 @@
     <PackageReference Include="GovukNotify" Version="6.1.0" />
     <PackageReference Include="IsExternalInit" Version="1.0.3" PrivateAssets="all" />
     <PackageReference Include="JWT" Version="10.1.0" />
+    <PackageReference Include="Azure.Data.Tables" Version="12.8.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="5.2.0" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.2.0" />

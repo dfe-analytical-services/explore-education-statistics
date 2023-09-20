@@ -1,13 +1,20 @@
+#nullable enable
 using System;
-using Microsoft.WindowsAzure.Storage.Table;
+using Azure;
+using Azure.Data.Tables;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
-    public class SubscriptionEntity : TableEntity
+    public class SubscriptionEntity : ITableEntity
     {
-        public string Slug { get; set; }
-        public string Title { get; set; }
+        public string Slug { get; set; } = default!;
+        public string Title { get; set; } = default!;
         public DateTime? DateTimeCreated { get; set; }
+
+        public string PartitionKey { get; set; } = default!;
+        public string RowKey { get; set; } = default!;
+        public ETag ETag { get; set; } = default!;
+        public DateTimeOffset? Timestamp { get; set; } = default!;
 
         public SubscriptionEntity(string id, string email, string title, string slug, DateTime? dateTimeCreated)
         {
