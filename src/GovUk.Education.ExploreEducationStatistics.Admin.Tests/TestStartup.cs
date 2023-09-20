@@ -7,9 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Configuration;
@@ -47,61 +45,37 @@ public class TestStartup : Startup
         configureSpa: false)
     {
     }
+
+    public override void ConfigureServices(IServiceCollection services)
+    {
+        base.ConfigureServices(services);
+
+        services
+            .UseInMemoryDbContext<ContentDbContext>()
+            .UseInMemoryDbContext<StatisticsDbContext>()
+            .UseInMemoryDbContext<UsersAndRolesDbContext>()
+            .MockService<IStorageQueueService>()
+            .MockService<ITableStorageService>()
+            .MockService<IPrivateBlobStorageService>()
+            .MockService<IPublicBlobStorageService>()
+            .RegisterControllers<Startup>();
+    }
 }
 
 public static class TestStartupExtensions
 {
     /// <summary>
-    /// Call this method when using this TestStartup to replace DbContexts with in-memory equivalents and services
-    /// which have external dependencies with mocks.
-    /// </summary>
-    /// <param name="testApp"></param>
-    /// <returns></returns>
-    public static WebApplicationFactory<TestStartup> Initialise(
-        this WebApplicationFactory<TestStartup> testApp)
-    {
-        return testApp
-            .ReplaceExternalDependencies()
-            .RegisterControllers<TestStartup, Startup>()
-            .ResetDbContexts();
-    }
-    
-    private static WebApplicationFactory<TestStartup> ReplaceExternalDependencies(
-        this WebApplicationFactory<TestStartup> testApp)
-    {
-        return testApp.WithWebHostBuilder(builder => builder
-            .ConfigureServices(services =>
-            {
-                services
-                    .ReplaceDbContext<ContentDbContext>()
-                    .ReplaceDbContext<StatisticsDbContext>()
-                    .ReplaceDbContext<UsersAndRolesDbContext>()
-                    .ReplaceService<IStorageQueueService>()
-                    .ReplaceService<ITableStorageService>()
-                    .ReplaceService<IPrivateBlobStorageService>()
-                    .ReplaceService<IPublicBlobStorageService>();
-            }));
-    }
-    
-    private static WebApplicationFactory<TestStartup> ResetDbContexts(this WebApplicationFactory<TestStartup> testApp)
-    {
-        return testApp
-            .ResetContentDbContext()
-            .ResetStatisticsDbContext();
-    }
-    
-    /// <summary>
     /// This method adds an authenticated User in the form of a ClaimsPrincipal to the HttpContext.
     ///
     /// This User will subsequently be available for the Identity Framework as well as our own UserService, and any
-    /// other production code that looks up the User from the currect HttpContext.
+    /// other production code that looks up the User from the current HttpContext.
     /// </summary>
     /// <param name="testApp"></param>
     /// <param name="user"></param>
     /// <returns></returns>
     public static WebApplicationFactory<TestStartup> SetUser(
         this WebApplicationFactory<TestStartup> testApp, 
-        ClaimsPrincipal? user = null)
+        ClaimsPrincipal user)
     {
         return testApp.WithWebHostBuilder(builder => builder
             .ConfigureServices(services =>
@@ -110,10 +84,7 @@ public static class TestStartupExtensions
                     .AddAuthentication(TestAuthHandler.AuthenticationScheme)
                     .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, _ => { });
 
-                if (user != null)
-                {
-                    services.AddScoped<ClaimsPrincipal>(_ => user);
-                }
+                services.AddScoped(_ => user);
             }));
     }
 }

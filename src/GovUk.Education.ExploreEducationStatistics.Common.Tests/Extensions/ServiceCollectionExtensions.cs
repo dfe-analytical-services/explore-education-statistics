@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
     /// <summary>
     /// This method replaces a DcContext that has been registered in Startup with an in-memory equivalent.
     /// </summary>
-    public static IServiceCollection ReplaceDbContext<TDbContext>(this IServiceCollection services)
+    public static IServiceCollection UseInMemoryDbContext<TDbContext>(this IServiceCollection services)
         where TDbContext : DbContext
     {
         // Remove the default DbContext descriptor that was provided by Startup.cs.
@@ -54,19 +54,34 @@ public static class ServiceCollectionExtensions
             ServiceLifetime.Scoped => services.AddScoped(_ => replacement),
             ServiceLifetime.Transient => services.AddTransient(_ => replacement),
             _ => throw new ArgumentOutOfRangeException(
-                $"Cannot register test service with ${nameof(ServiceLifetime)} {descriptor.Lifetime}")
+                $"Cannot register test service with {nameof(ServiceLifetime)}.{descriptor.Lifetime}")
         };
     }
     
     /// <summary>
-    /// This method replaces a service that has been registered in Startup with a Strict Mock. The same
-    /// lifecycle that was registered in Startup will be used to register the new service.
+    /// This method replaces a service that has been registered in Startup with a Mock. The same
+    /// lifecycle that was registered in Startup will be used to register the Mock.
     /// </summary>
     public static IServiceCollection ReplaceService<TService>(
-        this IServiceCollection services)
+        this IServiceCollection services,
+        Mock<TService> replacement)
         where TService : class
     {
-        return services.ReplaceService(Mock.Of<TService>(Strict));
+        return services.ReplaceService(replacement.Object);
+    }
+    
+    /// <summary>
+    /// This method replaces a service that has been registered in Startup with a Mock. The same
+    /// lifecycle that was registered in Startup will be used to register the new service.
+    ///
+    /// The Mock will be setup with Strict behavior by default.
+    /// </summary>
+    public static IServiceCollection MockService<TService>(
+        this IServiceCollection services,
+        MockBehavior behavior = Strict)
+        where TService : class
+    {
+        return services.ReplaceService(Mock.Of<TService>(behavior));
     }
     
     /// <summary>

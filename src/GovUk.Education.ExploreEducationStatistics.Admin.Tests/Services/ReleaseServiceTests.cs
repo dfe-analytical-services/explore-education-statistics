@@ -1638,7 +1638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             private readonly DataFixture _fixture = new();
         
             [Fact]
-            public async Task ListUsersReleasesForApproval_UserHasApproverRoleOnRelease()
+            public async Task UserHasApproverRoleOnRelease()
             {
                 var contextId = Guid.NewGuid().ToString();
 
@@ -1717,7 +1717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
             
             [Fact]
-            public async Task ListUsersReleasesForApproval_UserHasApproverRoleOnPublications()
+            public async Task UserHasApproverRoleOnPublications()
             {
                 var contextId = Guid.NewGuid().ToString();
 
@@ -1794,65 +1794,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
             
             [Fact]
-            public async Task ListUsersReleasesForApproval_MixOfApproverReleaseAndPublicationRoles()
-            {
-                var contextId = Guid.NewGuid().ToString();
-
-                var publications = _fixture
-                    .DefaultPublication()
-                    .WithReleases(_ => _fixture
-                        .DefaultRelease()
-                        .WithApprovalStatuses(ListOf(
-                            ReleaseApprovalStatus.Draft, 
-                            ReleaseApprovalStatus.HigherLevelReview, 
-                            ReleaseApprovalStatus.Approved))
-                        .GenerateList())
-                    .GenerateList(3);
-
-                var approverPublicationRoleForUser = _fixture
-                    .DefaultUserPublicationRole()
-                    .WithUser(User)
-                    .WithRole(PublicationRole.Approver)
-                    .WithPublication(publications[0])
-                    .Generate();
-                
-                var approverReleaseRolesForUser = _fixture
-                    .DefaultUserReleaseRole()
-                    .WithUser(User)
-                    .WithRole(ReleaseRole.Approver)
-                    .WithReleases(publications[1].Releases)
-                    .GenerateList();
-                
-                var release1WithApproverRoleForUser = publications[0].Releases[1];
-                var release2WithApproverRoleForUser = publications[1].Releases[1];
-                
-                await using (var context = InMemoryApplicationDbContext(contextId))
-                {
-                    await context.Publications.AddRangeAsync(publications);
-                    await context.UserPublicationRoles.AddRangeAsync(approverPublicationRoleForUser);
-                    await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForUser);
-                    await context.SaveChangesAsync();
-                }
-                
-                await using (var context = InMemoryApplicationDbContext(contextId))
-                {
-                    var service = BuildReleaseService(context);
-
-                    var result = await service.ListUsersReleasesForApproval();
-
-                    var viewModels = result.AssertRight();
-                    
-                    // Assert that the only Releases returned for this user are the Releases where they have Approver
-                    // role on the overarching Publication and the Releases are in Higher Review, and where the user
-                    // has a direct Approver role on a Release in higher review.
-                    Assert.Equal(2, viewModels.Count);
-                    Assert.Equal(release1WithApproverRoleForUser.Id, viewModels[0].Id);
-                    Assert.Equal(release2WithApproverRoleForUser.Id, viewModels[1].Id);
-                }
-            }            
-            
-            [Fact]
-            public async Task ListUsersReleasesForApproval_UserHasApproverRoleOnPublicationsAndApproverRoleOnRelease()
+            public async Task UserIsPublicationAndReleaseApprover_NoDuplication()
             {
                 var contextId = Guid.NewGuid().ToString();
 
