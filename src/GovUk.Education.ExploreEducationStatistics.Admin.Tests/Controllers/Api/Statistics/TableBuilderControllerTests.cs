@@ -280,10 +280,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private WebApplicationFactory<TestStartup> SetupApp(
             ITableBuilderService? tableBuilderService = null)
         {
-            return _testApp
-                .Initialise()
-                .ConfigureServices(services => services
-                    .ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
+            return _testApp.ConfigureServices(services => 
+                services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
         }
     }
 }

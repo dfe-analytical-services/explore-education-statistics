@@ -24,28 +24,32 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     [Fact]
     public async Task GetGlobalPermissions_AuthenticatedUser()
     {
-        var user = AuthenticatedUser();
+        var client = _testApp
+            .SetUser(AuthenticatedUser())
+            .CreateClient();
         
-        var expectedPermissions = new GlobalPermissionsViewModel(
+        var response = await client.GetAsync("/api/permissions/access");
+        
+        response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: false,
             CanAccessAllImports: false,
             CanAccessPrereleasePages: false,
             CanManageAllTaxonomy: false,
             IsBauUser: false,
-            IsApprover: false);
-
-        var client = SetupApp().SetUser(user).CreateClient();
-        var response = await client.GetAsync("/api/permissions/access");
-        response.AssertOk(expectedPermissions);
+            IsApprover: false));
     }
     
     [Fact]
     public async Task GetGlobalPermissions_BauUser()
     {
-        var user = BauUser();
-
-        var expectedPermissions = new GlobalPermissionsViewModel(
+        var client = _testApp
+            .SetUser(BauUser())
+            .CreateClient();
+        
+        var response = await client.GetAsync("/api/permissions/access");
+        
+        response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: true,
             CanAccessAllImports: true,
@@ -54,11 +58,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
             IsBauUser: true,
             // Expect "IsApprover" to be false even for BAU as we don't expect BAU users to be assigned
             // individual Approver roles on Releases or Publications.
-            IsApprover: false);
-
-        var client = SetupApp().SetUser(user).CreateClient();
-        var response = await client.GetAsync("/api/permissions/access");
-        response.AssertOk(expectedPermissions);
+            IsApprover: false));
     }
     
     [Fact]
@@ -66,17 +66,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     {
         var user = AnalystUser();
 
-        var expectedPermissions = new GlobalPermissionsViewModel(
-            CanAccessSystem: true,
-            CanAccessAnalystPages: true,
-            CanAccessAllImports: false,
-            CanAccessPrereleasePages: true,
-            CanManageAllTaxonomy: false,
-            IsBauUser: false,
-            // Expect this to be false if the user isn't an approver of any kind
-            IsApprover: false);
-
-        var client = SetupApp()
+        var client = _testApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -97,7 +87,16 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
             .CreateClient();
         
         var response = await client.GetAsync("/api/permissions/access");
-        response.AssertOk(expectedPermissions);
+        
+        response.AssertOk(new GlobalPermissionsViewModel(
+            CanAccessSystem: true,
+            CanAccessAnalystPages: true,
+            CanAccessAllImports: false,
+            CanAccessPrereleasePages: true,
+            CanManageAllTaxonomy: false,
+            IsBauUser: false,
+            // Expect this to be false if the user isn't an approver of any kind
+            IsApprover: false));
     }
     
     [Fact]
@@ -105,17 +104,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     {
         var user = AnalystUser();
 
-        var expectedPermissions = new GlobalPermissionsViewModel(
-            CanAccessSystem: true,
-            CanAccessAnalystPages: true,
-            CanAccessAllImports: false,
-            CanAccessPrereleasePages: true,
-            CanManageAllTaxonomy: false,
-            IsBauUser: false,
-            // Expect this to be true if the user is a Release approver
-            IsApprover: true);
-
-        var client = SetupApp()
+        var client = _testApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -128,7 +117,16 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
             .CreateClient();
         
         var response = await client.GetAsync("/api/permissions/access");
-        response.AssertOk(expectedPermissions);
+        
+        response.AssertOk(new GlobalPermissionsViewModel(
+            CanAccessSystem: true,
+            CanAccessAnalystPages: true,
+            CanAccessAllImports: false,
+            CanAccessPrereleasePages: true,
+            CanManageAllTaxonomy: false,
+            IsBauUser: false,
+            // Expect this to be true if the user is a Release approver
+            IsApprover: true));
     }
 
     [Fact]
@@ -136,17 +134,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     {
         var user = AnalystUser();
 
-        var expectedPermissions = new GlobalPermissionsViewModel(
-            CanAccessSystem: true,
-            CanAccessAnalystPages: true,
-            CanAccessAllImports: false,
-            CanAccessPrereleasePages: true,
-            CanManageAllTaxonomy: false,
-            IsBauUser: false,
-            // Expect this to be true if the user is a Publication approver
-            IsApprover: true);
-
-        var client = SetupApp()
+        var client = _testApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -159,38 +147,41 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
             .CreateClient();
         
         var response = await client.GetAsync("/api/permissions/access");
-        response.AssertOk(expectedPermissions);
+        
+        response.AssertOk(new GlobalPermissionsViewModel(
+            CanAccessSystem: true,
+            CanAccessAnalystPages: true,
+            CanAccessAllImports: false,
+            CanAccessPrereleasePages: true,
+            CanManageAllTaxonomy: false,
+            IsBauUser: false,
+            // Expect this to be true if the user is a Publication approver
+            IsApprover: true));
     }
 
     [Fact]
     public async Task GetGlobalPermissions_PreReleaseUser()
     {
-        var user = PreReleaseUser();
-
-        var expectedPermissions = new GlobalPermissionsViewModel(
+        var client = _testApp
+            .SetUser(PreReleaseUser())
+            .CreateClient();
+        
+        var response = await client.GetAsync("/api/permissions/access");
+        
+        response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: false,
             CanAccessAllImports: false,
             CanAccessPrereleasePages: true,
             CanManageAllTaxonomy: false,
             IsBauUser: false,
-            IsApprover: false);
-
-        var client = SetupApp().SetUser(user).CreateClient();
-        
-        var response = await client.GetAsync("/api/permissions/access");
-        response.AssertOk(expectedPermissions);
+            IsApprover: false));
     }
     
     [Fact]
     public async Task GetGlobalPermissions_UnauthenticatedUser()
     {
-        var response = await SetupApp().CreateClient().GetAsync("/api/permissions/access");
+        var response = await _testApp.CreateClient().GetAsync("/api/permissions/access");
         response.AssertUnauthorized();
-    }
-
-    private WebApplicationFactory<TestStartup> SetupApp()
-    {
-        return _testApp.Initialise();
     }
 }
