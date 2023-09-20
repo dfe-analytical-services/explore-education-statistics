@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
+using static GovUk.Education.ExploreEducationStatistics.Common.Extensions.HostEnvironmentExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -32,16 +34,13 @@ public class TestApplicationFactory<TStartup> : WebApplicationFactory<TStartup> 
             {
                 builder
                     .UseStartup<TStartup>()
-                    .UseEnvironment("Development")
+                    .UseIntegrationTestEnvironment()
                     .UseTestServer();
             })
             .ConfigureAppConfiguration(config =>
             {
                 config.AddConfiguration(new ConfigurationBuilder()
-                    .AddJsonFile("appsettings.json", optional: true)
-                    .AddJsonFile("appsettings.Development.json", optional: true)
-                    .AddJsonFile("appsettings.Local.json", optional: true)
-                    .AddJsonFile("appsettings.IntegrationTests.json", optional: true)
+                    .AddJsonFile($"appsettings.{IntegrationTestEnvironment}.json", optional: true)
                     .Build());
             });
     }

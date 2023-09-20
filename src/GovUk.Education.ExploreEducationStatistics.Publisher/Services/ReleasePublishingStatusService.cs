@@ -20,11 +20,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
     {
         private readonly ContentDbContext _context;
         private readonly ILogger<ReleasePublishingStatusService> _logger;
-        private readonly ITableStorageService _tableStorageService;
+        private readonly IPublisherTableStorageService _tableStorageService;
 
         public ReleasePublishingStatusService(ContentDbContext context,
             ILogger<ReleasePublishingStatusService> logger,
-            ITableStorageService tableStorageService)
+            IPublisherTableStorageService tableStorageService)
         {
             _context = context;
             _logger = logger;
