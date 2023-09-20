@@ -4,6 +4,7 @@ import FormProvider from '@common/components/form/rhf/FormProvider';
 import RHFForm from '@common/components/form/rhf/RHFForm';
 import RHFFormFieldCheckboxGroupsMenu from '@common/components/form/rhf/RHFFormFieldCheckboxGroupsMenu';
 import RHFFormFieldCheckboxMenu from '@common/components/form/rhf/RHFFormFieldCheckboxMenu';
+import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
@@ -113,7 +114,7 @@ const LocationFiltersForm = ({
     levelKeys.length === 1 &&
     Object.keys(keyedOptions[levelKeys[0]]).length === 1;
 
-  const initialFormValues = useMemo(() => {
+  const initialFormValues = useMemo<FormValues>(() => {
     return {
       locations: mapValues(options, (_, levelKey) => {
         const level = keyedOptions[levelKey];
@@ -153,25 +154,33 @@ const LocationFiltersForm = ({
       initialValues={initialFormValues}
       validationSchema={validationSchema}
     >
-      {({ formState, getValues, reset }) => {
+      {({ formState, getValues, reset, trigger }) => {
         const showError =
           !formState.isValid &&
-          (Object.keys(formState.touchedFields).length ||
+          (Object.keys(formState.touchedFields).length > 0 ||
             formState.isSubmitted);
+
+        if (showError && !formState.errors.locations) {
+          trigger('locations');
+        }
 
         if (isActive) {
           return (
             <RHFForm
               id="locationFiltersForm"
               showSubmitError
-              showErrorSummary={!!showError}
+              showErrorSummary={showError}
               onSubmit={handleSubmit}
             >
               <FormFieldset
                 id="levels"
                 legend={stepHeading}
                 hint="Select at least one"
-                error={showError ? 'Select at least one location' : ''}
+                error={
+                  showError
+                    ? getErrorMessage(formState.errors, 'locations')
+                    : ''
+                }
               >
                 <div className="govuk-grid-row">
                   <div className="govuk-grid-column-one-half-from-desktop">
