@@ -88,7 +88,7 @@ describe('PublicationContactPage', () => {
       'john.smith@test.com',
     );
     expect(screen.getByLabelText('Contact name')).toHaveValue('John Smith');
-    expect(screen.getByLabelText('Contact telephone')).toHaveValue(
+    expect(screen.getByLabelText('Contact telephone (optional)')).toHaveValue(
       '0777777777',
     );
     expect(
@@ -150,7 +150,7 @@ describe('PublicationContactPage', () => {
     userEvent.clear(screen.getByLabelText('Team name'));
     userEvent.clear(screen.getByLabelText('Team email'));
     userEvent.clear(screen.getByLabelText('Contact name'));
-    userEvent.clear(screen.getByLabelText('Contact telephone'));
+    userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
 
     userEvent.tab();
 
@@ -173,10 +173,42 @@ describe('PublicationContactPage', () => {
         }),
       ).toBeInTheDocument();
 
+      // NOTE: Contact telephone number is optional, so no validation
+    });
+  });
+
+  test('show validation error when contact tel no is not valid', async () => {
+    publicationService.getContact.mockResolvedValue(testContact);
+
+    renderPage(testPublication);
+
+    await waitFor(() => {
       expect(
-        screen.getByText('Enter a contact telephone', {
-          selector: '#publicationContactForm-contactTelNo-error',
-        }),
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Edit contact details' }),
+    );
+
+    userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
+
+    userEvent.type(
+      screen.getByLabelText('Contact telephone (optional)'),
+      ' 0 3 7 0 0 0 0 2 2 8 8 ',
+    );
+
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'The DfE enquiries number is not suitable for use on statistics publications',
+          {
+            selector: '#publicationContactForm-contactTelNo-error',
+          },
+        ),
       ).toBeInTheDocument();
     });
   });

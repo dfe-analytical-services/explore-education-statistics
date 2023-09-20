@@ -37,7 +37,9 @@ const TableToolInfo = ({
               {contactDetails.teamEmail}
             </a>
           </p>
-          <p>Telephone: {contactDetails.contactTelNo}</p>
+          {contactDetails.contactTelNo && (
+            <p>Telephone: {contactDetails.contactTelNo}</p>
+          )}
         </>
       )}
     </>

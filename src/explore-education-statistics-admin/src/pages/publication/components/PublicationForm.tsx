@@ -25,7 +25,7 @@ export interface FormValues {
   teamName: string;
   teamEmail: string;
   contactName: string;
-  contactTelNo: string;
+  contactTelNo?: string;
   supersededById?: string;
 }
 
@@ -90,7 +90,17 @@ const PublicationForm = ({
         .required('Enter a team email address')
         .email('Enter a valid team email address'),
       contactName: Yup.string().required('Enter a contact name'),
-      contactTelNo: Yup.string().required('Enter a contact telephone number'),
+      contactTelNo: Yup.string()
+        .trim()
+        .matches(
+          /^[0-9 \t]*$/,
+          'The telephone number should only contain numeric characters',
+        )
+        .matches(
+          /^(?!^0[ \t]*3[ \t]*7[ \t]*0[ \t]*0[ \t]*0[ \t]*0[ \t]*2[ \t]*2[ \t]*8[ \t]*8$)/,
+          'The DfE enquiries number is not suitable for use on statistics publications',
+        )
+        .min(8, 'The telephone number must be at least 8 characters long'),
       supersededById: Yup.string(),
     });
 
@@ -179,7 +189,7 @@ const PublicationForm = ({
 
             <FormFieldTextInput<FormValues>
               name="contactTelNo"
-              label="Contact telephone number"
+              label="Contact telephone number (optional)"
               width={10}
             />
           </FormFieldset>

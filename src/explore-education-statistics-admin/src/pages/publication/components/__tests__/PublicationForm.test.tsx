@@ -126,7 +126,9 @@ describe('PublicationForm', () => {
     userEvent.click(screen.getByLabelText('Contact name'));
     userEvent.tab();
 
-    userEvent.click(screen.getByLabelText('Contact telephone number'));
+    userEvent.click(
+      screen.getByLabelText('Contact telephone number (optional)'),
+    );
     userEvent.tab();
 
     await waitFor(() => {
@@ -148,10 +150,33 @@ describe('PublicationForm', () => {
         }),
       ).toBeInTheDocument();
 
+      // NOTE: Contact telelphone number is optional, so no validation error
+    });
+  });
+
+  test('show validation error when contact tel no is not valid', async () => {
+    render(<PublicationForm onSubmit={noop} />);
+
+    await waitFor(() => {
       expect(
-        screen.getByText('Enter a contact telephone number', {
-          selector: '#publicationForm-contactTelNo-error',
-        }),
+        screen.getByLabelText('Contact telephone number (optional)'),
+      ).toBeInTheDocument();
+    });
+
+    await userEvent.type(
+      screen.getByLabelText('Contact telephone number (optional)'),
+      ' 0 3 7 0 0 0 0 2 2 8 8 ',
+    );
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(
+          'The DfE enquiries number is not suitable for use on statistics publications',
+          {
+            selector: '#publicationForm-contactTelNo-error',
+          },
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -224,7 +249,7 @@ describe('PublicationForm', () => {
     );
     await userEvent.type(screen.getByLabelText('Contact name'), 'John Smith');
     await userEvent.type(
-      screen.getByLabelText('Contact telephone number'),
+      screen.getByLabelText('Contact telephone number (optional)'),
       '0123456789',
     );
 

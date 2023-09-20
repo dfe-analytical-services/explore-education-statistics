@@ -856,6 +856,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task CreatePublication_NoContactTelNo()
+        {
+            var topic = new Topic
+            {
+                Title = "Test topic",
+                Theme = new Theme
+                {
+                    Title = "Test theme",
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.Add(topic);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                // Service method under test
+                var result = await publicationService.CreatePublication(
+                    new PublicationCreateRequest
+                    {
+                        Title = "Test publication",
+                        Summary = "Test summary",
+                        Contact = new ContactSaveViewModel
+                        {
+                            ContactName = "John Smith",
+                            ContactTelNo = "",
+                            TeamName = "Test team",
+                            TeamEmail = "john.smith@test.com",
+                        },
+                        TopicId = topic.Id
+                    }
+                );
+
+                var publicationViewModel = result.AssertRight();
+                Assert.Equal("Test publication", publicationViewModel.Title);
+
+                Assert.Equal("John Smith", publicationViewModel.Contact.ContactName);
+                Assert.Null(publicationViewModel.Contact.ContactTelNo);
+
+                var createdPublication = await context.Publications.FindAsync(publicationViewModel.Id);
+                Assert.NotNull(createdPublication);
+                Assert.Equal("John Smith", createdPublication.Contact.ContactName);
+                Assert.Null(createdPublication.Contact.ContactTelNo);
+            }
+        }
+
+        [Fact]
         public async Task CreatePublication_FailsWithNonExistingTopic()
         {
             await using var context = InMemoryApplicationDbContext();
@@ -1813,6 +1867,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updatedContact.ContactTelNo, dbPublication.Contact.ContactTelNo);
                 Assert.Equal(updatedContact.TeamName, dbPublication.Contact.TeamName);
                 Assert.Equal(updatedContact.TeamEmail, dbPublication.Contact.TeamEmail);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateContact_NoContactTelNo()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact
+                {
+                    ContactName = "contact name",
+                    ContactTelNo = "12345",
+                    TeamName = "team name",
+                    TeamEmail = "team@email.com",
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+                publicationCacheService.Setup(s => s.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                var service = BuildPublicationService(context: contentDbContext,
+                    publicationCacheService: publicationCacheService.Object);
+
+                var updatedContact = new Contact
+                {
+                    ContactName = "new contact name",
+                    ContactTelNo = "",
+                    TeamName = "new team name",
+                    TeamEmail = "new_team@email.com",
+                };
+
+                var result = await service.UpdateContact(publication.Id, updatedContact);
+                var contact = result.AssertRight();
+
+                Assert.Equal(updatedContact.ContactName, contact.ContactName);
+                Assert.Null(contact.ContactTelNo);
+
+                var dbPublication = await contentDbContext.Publications
+                    .Include(p => p.Contact)
+                    .SingleAsync(p => p.Id == publication.Id);
+
+                Assert.Equal(updatedContact.ContactName, dbPublication.Contact.ContactName);
+                Assert.Null(dbPublication.Contact.ContactTelNo);
             }
         }
 

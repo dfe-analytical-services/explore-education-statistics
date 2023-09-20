@@ -14,7 +14,7 @@ export interface PublicationContactFormValues {
   teamName: string;
   teamEmail: string;
   contactName: string;
-  contactTelNo: string;
+  contactTelNo?: string;
 }
 
 interface Props {
@@ -36,16 +36,17 @@ const PublicationContactForm = ({
       .required('Enter a team email')
       .email('Enter a valid team email'),
     contactName: Yup.string().required('Enter a contact name'),
-    contactTelNo: Yup.string().test({
-      name: 'telephone',
-      message: 'Enter a contact telephone',
-      test: value => {
-        if (!value) {
-          return false;
-        }
-        return true;
-      },
-    }),
+    contactTelNo: Yup.string()
+      .trim()
+      .matches(
+        /^[0-9 \t]*$/,
+        'The telephone number should only contain numeric characters',
+      )
+      .matches(
+        /^(?!^0[ \t]*3[ \t]*7[ \t]*0[ \t]*0[ \t]*0[ \t]*0[ \t]*2[ \t]*2[ \t]*8[ \t]*8$)/,
+        'The DfE enquiries number is not suitable for use on statistics publications',
+      )
+      .min(8, 'The telephone number must be at least 8 characters long'),
   });
 
   return (
@@ -78,7 +79,7 @@ const PublicationContactForm = ({
 
             <FormFieldTextInput<PublicationContactFormValues>
               name="contactTelNo"
-              label="Contact telephone"
+              label="Contact telephone (optional)"
               className="govuk-!-width-one-half"
             />
 

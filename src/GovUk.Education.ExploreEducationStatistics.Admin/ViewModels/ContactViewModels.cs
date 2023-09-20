@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string ContactName { get; set; } = string.Empty;
 
-        public string ContactTelNo { get; set; } = string.Empty;
+        public string? ContactTelNo { get; set; }
     }
 
     public class ContactSaveViewModel
@@ -22,6 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [Required] public string ContactName { get; set; } = string.Empty;
 
-        [Required] public string ContactTelNo { get; set; } = string.Empty;
+        public string? ContactTelNo { get; set; }
     }
 }
