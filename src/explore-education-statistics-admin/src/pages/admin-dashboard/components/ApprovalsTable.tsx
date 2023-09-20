@@ -26,7 +26,7 @@ export default function ApprovalsTable({
   releaseApprovals,
 }: Props) {
   const releasesByPublication: Dictionary<{
-    releases: Release[];
+    releases?: Release[];
   }> = useMemo(() => {
     return releaseApprovals.reduce<Dictionary<{ releases: Release[] }>>(
       (acc, release) => {
@@ -34,7 +34,6 @@ export default function ApprovalsTable({
           acc[release.publicationTitle].releases.push(release);
         } else {
           acc[release.publicationTitle] = {
-            ...acc[release.publicationTitle],
             releases: [release],
           };
         }
@@ -45,7 +44,7 @@ export default function ApprovalsTable({
   }, [releaseApprovals]);
 
   const methodologiesByPublication: Dictionary<{
-    methodologies: MethodologyVersion[];
+    methodologies?: MethodologyVersion[];
   }> = useMemo(() => {
     return methodologyApprovals.reduce<
       Dictionary<{ methodologies: MethodologyVersion[] }>
@@ -56,7 +55,6 @@ export default function ApprovalsTable({
         );
       } else {
         acc[methodology.owningPublication.title] = {
-          ...acc[methodology.owningPublication.title],
           methodologies: [methodology],
         };
       }
@@ -69,7 +67,9 @@ export default function ApprovalsTable({
     methodologiesByPublication,
   );
 
-  if (!Object.keys(allApprovalsByPublication).length) {
+  const publications = Object.keys(allApprovalsByPublication);
+
+  if (!publications.length) {
     return (
       <p>There are no releases or methodologies awaiting your approval.</p>
     );
@@ -85,7 +85,7 @@ export default function ApprovalsTable({
             <th>Page type</th>
             <th>Actions</th>
           </tr>
-          {orderBy(Object.keys(allApprovalsByPublication)).map(publication => (
+          {orderBy(publications).map(publication => (
             <PublicationRow
               key={publication}
               publication={publication}
@@ -103,8 +103,8 @@ export default function ApprovalsTable({
 
 interface PublicationRowProps {
   publication: string;
-  methodologies: MethodologyVersion[];
-  releases: Release[];
+  methodologies?: MethodologyVersion[];
+  releases?: Release[];
 }
 
 function PublicationRow({
@@ -115,7 +115,7 @@ function PublicationRow({
   return (
     <>
       <tr key={publication}>
-        <th className="govuk-!-padding-top-6" colSpan={5}>
+        <th className="govuk-!-padding-top-6" colSpan={3}>
           {publication}
         </th>
       </tr>
