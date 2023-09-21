@@ -4,15 +4,16 @@ import PrintThisPage from '@admin/components/PrintThisPage';
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
-import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
 import RelatedPagesSection from '@admin/pages/release/content/components/RelatedPagesSection';
+import ReleaseHelpAndSupportSection from '@common/modules/release/components/ReleaseHelpAndSupportSection';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseContentAccordion from '@admin/pages/release/content/components/ReleaseContentAccordion';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import ReleaseHeadlines from '@admin/pages/release/content/components/ReleaseHeadlines';
-import ReleaseHelpAndSupportSection from '@admin/pages/release/content/components/ReleaseHelpAndSupportSection';
+import ReleaseNotesSection from '@admin/pages/release/content/components/ReleaseNotesSection';
 import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import {
   preReleaseAccessListRoute,
@@ -25,10 +26,12 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
+import ScrollableContainer from '@common/components/ScrollableContainer';
+import Tag from '@common/components/Tag';
+import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
-import ScrollableContainer from '@common/components/ScrollableContainer';
 
 interface MethodologyLink {
   key: string;
@@ -127,7 +130,26 @@ const ReleaseContent = () => {
 
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <BasicReleaseSummary release={release} />
+          <ReleaseSummarySection
+            isEditing={editingMode === 'edit'}
+            lastUpdated={release.updates[0]?.on}
+            release={release}
+            releaseDate={release.published ?? release.publishScheduled}
+            renderReleaseNotes={<ReleaseNotesSection release={release} />}
+            renderStatusTags={
+              <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
+                {getReleaseApprovalStatusLabel(release.approvalStatus)}
+              </Tag>
+            }
+            renderSubscribeLink={
+              <a
+                className="govuk-!-display-none-print govuk-!-font-weight-bold"
+                href="#"
+              >
+                Sign up for email alerts
+              </a>
+            }
+          />
 
           <div id="releaseSummary">
             {release.summarySection && (
@@ -411,7 +433,23 @@ const ReleaseContent = () => {
 
       <ReleaseContentAccordion release={release} sectionName="Contents" />
 
-      <ReleaseHelpAndSupportSection release={release} />
+      <ReleaseHelpAndSupportSection
+        release={release}
+        renderExternalMethodologyLink={externalMethodology => (
+          <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
+        )}
+        renderMethodologyLink={methodology => {
+          <>
+            {editingMode === 'edit' ? (
+              <a>{`${methodology.title}`}</a>
+            ) : (
+              <Link to={`/methodology/${methodology.id}/summary`}>
+                {methodology.title}
+              </Link>
+            )}
+          </>;
+        }}
+      />
       <PrintThisPage />
     </>
   );

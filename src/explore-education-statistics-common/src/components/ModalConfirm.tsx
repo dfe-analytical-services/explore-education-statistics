@@ -8,7 +8,7 @@ import Modal from './Modal';
 interface Props {
   children?: ReactNode;
   className?: string;
-  cancelText?: string;
+  closeText?: string;
   confirmText?: string;
   open?: boolean;
   onConfirm(): void;
@@ -23,7 +23,7 @@ const ModalConfirm = ({
   children,
   className,
   confirmText = 'Confirm',
-  cancelText = 'Cancel',
+  closeText = 'Cancel',
   open,
   onConfirm,
   onExit,
@@ -70,7 +70,7 @@ const ModalConfirm = ({
             onClick={handleAction(onCancel)}
             disabled={isDisabled}
           >
-            {cancelText}
+            {closeText}
           </Button>
         )}
         <Button onClick={handleAction(onConfirm)} disabled={isDisabled}>

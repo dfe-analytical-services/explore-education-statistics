@@ -2,15 +2,18 @@ import styles from '@common/components/Modal.module.scss';
 import classNames from 'classnames';
 import React, { ReactNode, useEffect } from 'react';
 import BaseModal from 'react-modal';
+import Button from './Button';
 
 export interface ModalProps {
   children: ReactNode;
   className?: string;
   closeOnOutsideClick?: boolean;
   closeOnEsc?: boolean;
+  closeText?: string;
   fullScreen?: boolean;
   hideTitle?: boolean;
   open?: boolean;
+  showClose?: boolean;
   title: string;
   underlayClass?: string;
   onOpen?: () => void;
@@ -22,13 +25,15 @@ const Modal = ({
   className,
   closeOnOutsideClick = true,
   closeOnEsc = true,
+  closeText = 'Close',
   fullScreen = false,
   hideTitle = false,
   open = true,
-  onOpen,
-  onExit,
+  showClose = false,
   title,
   underlayClass,
+  onOpen,
+  onExit,
 }: ModalProps) => {
   const appElement =
     typeof document !== 'undefined'
@@ -74,6 +79,15 @@ const Modal = ({
         {title}
       </h2>
       {children}
+
+      {showClose && (
+        <Button
+          className="govuk-button govuk-!-margin-bottom-0"
+          onClick={onExit}
+        >
+          {closeText}
+        </Button>
+      )}
     </BaseModal>
   );
 };
