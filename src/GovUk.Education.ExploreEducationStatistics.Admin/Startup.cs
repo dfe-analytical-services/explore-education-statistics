@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>()
                 .AddDefaultTokenProviders();
 
-            if (!HostEnvironment.IsIntegrationTests())
+            if (!HostEnvironment.IsIntegrationTest())
             {
                 var identityServerConfig = services
                     .AddIdentityServer(options =>
@@ -647,7 +647,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             BlobCacheAttribute.AddService("default", privateCacheService);
             BlobCacheAttribute.AddService("public", publicCacheService);
 
-            if (!env.IsIntegrationTests())
+            if (!env.IsIntegrationTest())
             {
                 UpdateDatabase(app, env);
             }
@@ -716,7 +716,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthentication();
             app.UseAuthorization();
 
-            if (!env.IsIntegrationTests())
+            if (!env.IsIntegrationTest())
             {
                 app.UseIdentityServer();
             }
@@ -752,7 +752,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     template: "{controller}/{action=Index}/{id?}");
             });
 
-            if (!env.IsIntegrationTests())
+            if (!env.IsIntegrationTest())
             {
                 app.UseSpa(spa =>
                 {
