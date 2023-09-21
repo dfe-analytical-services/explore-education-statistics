@@ -7,9 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 public static class HostEnvironmentExtensions
 {
-    public const string IntegrationTestEnvironment = "IntegrationTests";
+    public const string IntegrationTestEnvironment = "IntegrationTest";
 
-    public static bool IsIntegrationTests(this IHostEnvironment? hostEnvironment) => 
+    public static bool IsIntegrationTest(this IHostEnvironment? hostEnvironment) => 
         hostEnvironment?.IsEnvironment(IntegrationTestEnvironment) ?? throw new ArgumentNullException(nameof(hostEnvironment));
     
     public static IWebHostBuilder UseIntegrationTestEnvironment(
