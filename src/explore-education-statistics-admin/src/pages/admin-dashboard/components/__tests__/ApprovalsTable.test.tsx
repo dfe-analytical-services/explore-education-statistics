@@ -32,7 +32,6 @@ describe('ApprovalsTable', () => {
       slug: '2024-25',
       publicationId: 'bf2b4284-6b84-46b0-aaaa-a2e0a23be2a9',
       publicationTitle: 'Permanent and fixed-period exclusions in England',
-      publicationSummary: '',
       publicationSlug: 'pub-slug',
       year: 2024,
       yearTitle: '2024/25',
@@ -69,7 +68,6 @@ describe('ApprovalsTable', () => {
       publicationId: '959bd40c-4685-46ff-396d-08d93c9b5159',
       publicationTitle:
         'UI tests - Publication and Release UI Permissions Publication Owner',
-      publicationSummary: '',
       publicationSlug:
         'ui-tests-publication-and-release-ui-permissions-publication-owner',
       year: 2024,
