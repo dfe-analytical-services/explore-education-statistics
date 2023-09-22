@@ -5,8 +5,9 @@ import _publicationService, {
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import _storageService from '@common/services/storageService';
+import render from '@common-test/render';
 import { waitFor } from '@testing-library/dom';
-import { render, screen, within } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';

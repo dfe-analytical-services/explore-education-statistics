@@ -2,37 +2,56 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { useAuthContext } from '@admin/contexts/AuthContext';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import ApprovalsTab from '@admin/pages/admin-dashboard/components/ApprovalsTab';
 import DraftReleasesTab from '@admin/pages/admin-dashboard/components/DraftReleasesTab';
 import PublicationsTab from '@admin/pages/admin-dashboard/components/PublicationsTab';
 import ScheduledReleasesTab from '@admin/pages/admin-dashboard/components/ScheduledReleasesTab';
+import releaseQueries from '@admin/queries/releaseQueries';
 import loginService from '@admin/services/loginService';
-import releaseService from '@admin/services/releaseService';
 import RelatedInformation from '@common/components/RelatedInformation';
 import Tabs from '@common/components/Tabs';
 import TabsSection from '@common/components/TabsSection';
-import React, { useState } from 'react';
+import WarningMessage from '@common/components/WarningMessage';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
+import methodologyQueries from '@admin/queries/methodologyQueries';
 
 const AdminDashboardPage = () => {
   const { user } = useAuthContext();
   const isBauUser = user?.permissions.isBauUser ?? false;
-
-  const [totalDraftReleases, setTotalDraftReleases] = useState<number>(0);
+  const isApprover = user?.permissions.isApprover ?? false;
 
   const {
-    value: draftReleases = [],
+    data: draftReleases = [],
     isLoading: isLoadingDraftReleases,
-    retry: reloadDraftReleases,
-  } = useAsyncHandledRetry(async () => {
-    const releases = await releaseService.getDraftReleases();
-    // Store the total so it doesn't flicker in the tab while reloading.
-    setTotalDraftReleases(releases.length);
-    return releases;
-  });
+    refetch: reloadDraftReleases,
+  } = useQuery(releaseQueries.listDraftReleases);
+
   const {
-    value: scheduledReleases = [],
+    data: scheduledReleases = [],
     isLoading: isLoadingScheduledReleases,
-  } = useAsyncHandledRetry(releaseService.getScheduledReleases);
+  } = useQuery(releaseQueries.listScheduledReleases);
+
+  const { data: releaseApprovals = [], isLoading: isLoadingReleaseApprovals } =
+    useQuery({
+      ...releaseQueries.listReleasesForApproval,
+      enabled: isApprover,
+    });
+
+  const {
+    data: methodologyApprovals = [],
+    isLoading: isLoadingMethodologyApprovals,
+  } = useQuery({
+    ...methodologyQueries.listMethodologiesForApproval,
+    enabled: isApprover,
+  });
+
+  const isLoadingApprovals =
+    isLoadingReleaseApprovals || isLoadingMethodologyApprovals;
+
+  const totalApprovals = !isLoadingApprovals
+    ? methodologyApprovals.length + releaseApprovals.length
+    : 0;
 
   return (
     <Page wide breadcrumbs={[{ name: 'Administrator dashboard' }]}>
@@ -54,6 +73,12 @@ const AdminDashboardPage = () => {
               Sign out
             </Link>
           </p>
+
+          {isApprover && totalApprovals > 0 && (
+            <WarningMessage testId="outstanding-approvals-warning">
+              You have outstanding <Link to="#approvals">approvals</Link>
+            </WarningMessage>
+          )}
 
           <p>
             This is your administration dashboard, here you can manage
@@ -81,14 +106,7 @@ const AdminDashboardPage = () => {
         </div>
       </div>
 
-      <Tabs
-        id="dashboardTabs"
-        onToggle={section => {
-          if (section.id === 'draft-releases') {
-            reloadDraftReleases();
-          }
-        }}
-      >
+      <Tabs id="dashboardTabs">
         <TabsSection id="publications" title="Your publications">
           <PublicationsTab isBauUser={isBauUser} />
         </TabsSection>
@@ -96,7 +114,9 @@ const AdminDashboardPage = () => {
           lazy
           id="draft-releases"
           data-testid="publication-draft-releases"
-          title={`Draft releases (${totalDraftReleases})`}
+          title={`Draft releases ${
+            !isLoadingDraftReleases ? `(${draftReleases.length})` : ''
+          }`}
         >
           <DraftReleasesTab
             isBauUser={isBauUser}
@@ -105,10 +125,30 @@ const AdminDashboardPage = () => {
             onChangeRelease={reloadDraftReleases}
           />
         </TabsSection>
+
+        {isApprover && (
+          <TabsSection
+            lazy
+            id="approvals"
+            data-testid="publication-approvals"
+            title={`Your approvals ${
+              !isLoadingApprovals ? `(${totalApprovals})` : ''
+            }`}
+          >
+            <ApprovalsTab
+              isLoading={isLoadingApprovals}
+              methodologyApprovals={methodologyApprovals}
+              releaseApprovals={releaseApprovals}
+            />
+          </TabsSection>
+        )}
+
         <TabsSection
           lazy
           id="scheduled-releases"
-          title={`Approved scheduled releases (${scheduledReleases?.length})`}
+          title={`Approved scheduled releases ${
+            !isLoadingScheduledReleases ? `(${scheduledReleases.length})` : ''
+          }`}
         >
           <ScheduledReleasesTab
             isLoading={isLoadingScheduledReleases}

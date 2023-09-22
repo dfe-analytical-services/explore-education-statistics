@@ -31,10 +31,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, IdTitleViewModel>> GetLatestPublishedRelease(Guid publicationId);
 
-        Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
+        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatues);
 
-        Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases();
+        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListUsersReleasesForApproval();
+
+        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListScheduledReleases();
 
         Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId);
 

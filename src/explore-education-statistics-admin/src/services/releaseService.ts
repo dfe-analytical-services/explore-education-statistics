@@ -1,6 +1,9 @@
 import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
-import { ReleaseApprovalStatus } from '@common/services/publicationService';
+import {
+  PublicationSummary,
+  ReleaseApprovalStatus,
+} from '@common/services/publicationService';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
 
@@ -31,16 +34,12 @@ export interface Release {
   published?: string;
   nextReleaseDate?: PartialDate;
   latestInternalReleaseNote?: string;
-  previousVersionId: string;
+  previousVersionId?: string;
   preReleaseAccessList: string;
   preReleaseUsersOrInvitesAdded?: boolean;
   year: number;
   yearTitle: string;
   permissions?: ReleasePermissions;
-}
-
-export interface ReleaseWithPermissions extends Release {
-  permissions: ReleasePermissions;
 }
 
 export interface ReleaseSummary {
@@ -57,8 +56,14 @@ export interface ReleaseSummary {
   nextReleaseDate?: PartialDate;
   type: ReleaseType;
   amendment: boolean;
+  latestRelease: boolean;
   previousVersionId?: string;
   permissions?: ReleasePermissions;
+  publication?: PublicationSummary;
+}
+
+export interface DashboardReleaseSummary extends ReleaseSummaryWithPermissions {
+  publication: PublicationSummary;
 }
 
 export interface ReleaseSummaryWithPermissions extends ReleaseSummary {
@@ -228,12 +233,16 @@ const releaseService = {
     return client.delete(`/release/${releaseId}`);
   },
 
-  getDraftReleases(): Promise<Release[]> {
+  listDraftReleases(): Promise<DashboardReleaseSummary[]> {
     return client.get('/releases/draft');
   },
 
-  getScheduledReleases(): Promise<Release[]> {
+  listScheduledReleases(): Promise<DashboardReleaseSummary[]> {
     return client.get('/releases/scheduled');
+  },
+
+  listReleasesForApproval(): Promise<DashboardReleaseSummary[]> {
+    return client.get('/releases/approvals');
   },
 
   getReleasePublicationStatus(

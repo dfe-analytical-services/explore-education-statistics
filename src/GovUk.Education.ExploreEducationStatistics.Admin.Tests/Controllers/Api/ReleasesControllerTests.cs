@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
@@ -31,18 +33,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var returnedViewModel = new ReleaseViewModel();
             
-            var mocks = Mocks();
+            var releaseService = new Mock<IReleaseService>(Strict);
 
-            mocks
-                .ReleaseService
+            releaseService
                 .Setup(s => s.CreateRelease(It.IsAny<ReleaseCreateRequest>()))
                 .ReturnsAsync(returnedViewModel);
             
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(releaseService.Object);
 
             // Call the method under test
             var result = await controller.CreateRelease(new ReleaseCreateRequest(), _publicationId);
-            VerifyAllMocks(mocks.ReleaseService);
+            VerifyAllMocks(releaseService);
             
             result.AssertOkResult(returnedViewModel);
         }
@@ -50,7 +51,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_Ok()
         {
-            var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
@@ -59,7 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 Name = "Subject name",
             };
 
-            mocks.ReleaseDataFilesService
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            releaseDataFileService
                 .Setup(service => service.Upload(_releaseId,
                     dataFile,
                     metaFile,
@@ -68,13 +69,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .ReturnsAsync(dataFileInfo);
 
             // Call the method under test
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
+            
             var result = await controller.AddDataFilesAsync(releaseId: _releaseId,
                 replacingFileId: null,
                 subjectName: "Subject name",
                 file: dataFile,
                 metaFile: metaFile);
-            VerifyAllMocks(mocks);
+            
+            VerifyAllMocks(releaseDataFileService);
             
             var dataFileInfoResult = result.AssertOkResult();
             Assert.Equal("Subject name", dataFileInfoResult.Name);
@@ -83,11 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task AddDataFilesAsync_UploadsTheFiles_Returns_ValidationProblem()
         {
-            var mocks = Mocks();
             var dataFile = MockFile("datafile.csv");
             var metaFile = MockFile("metafile.csv");
 
-            mocks.ReleaseDataFilesService
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            releaseDataFileService
                 .Setup(service => service.Upload(_releaseId,
                     dataFile,
                     metaFile,
@@ -95,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     "Subject name"))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
 
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
             // Call the method under test
             var result = await controller.AddDataFilesAsync(releaseId: _releaseId,
@@ -103,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 subjectName: "Subject name",
                 file: dataFile,
                 metaFile: metaFile);
-            VerifyAllMocks(mocks);
+            
+            VerifyAllMocks(releaseDataFileService);
 
             result.AssertBadRequest(CannotOverwriteFile);
         }
@@ -127,18 +131,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 }
             };
 
-            var mocks = Mocks();
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
 
-            mocks
-                .ReleaseDataFilesService
+            releaseDataFileService
                 .Setup(s => s.ListAll(_releaseId))
                 .ReturnsAsync(testFiles);
 
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(releaseDataFileService: releaseDataFileService.Object);
 
             // Call the method under test
             var result = await controller.GetDataFileInfo(_releaseId);
-            VerifyAllMocks(mocks.ReleaseDataFilesService);
+            VerifyAllMocks(releaseDataFileService);
 
             var unboxed = result.AssertOkResult();
             Assert.Contains(unboxed, f => f.Name == "Release a file 1");
@@ -148,16 +151,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task DeleteDataFilesAsync_Returns_OK()
         {
-            var mocks = Mocks();
+            var releaseService = new Mock<IReleaseService>(Strict);
 
             var fileId = Guid.NewGuid();
 
-            mocks.ReleaseService.Setup(service => service.RemoveDataFiles(_releaseId, fileId))
+            releaseService
+                .Setup(service => service.RemoveDataFiles(_releaseId, fileId))
                 .ReturnsAsync(Unit.Instance);
-            var controller = ReleasesControllerWithMocks(mocks);
+            
+            var controller = BuildController(releaseService: releaseService.Object);
 
             var result = await controller.DeleteDataFiles(_releaseId, fileId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(releaseService);
 
             Assert.IsAssignableFrom<NoContentResult>(result);
         }
@@ -165,17 +170,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task DeleteDataFilesAsync_Returns_ValidationProblem()
         {
-            var mocks = Mocks();
-
+            var releaseService = new Mock<IReleaseService>(Strict);
+            
             var fileId = Guid.NewGuid();
 
-            mocks.ReleaseService
+            releaseService
                 .Setup(service => service.RemoveDataFiles(_releaseId, fileId))
                 .ReturnsAsync(ValidationActionResult(UnableToFindMetadataFileToDelete));
-            var controller = ReleasesControllerWithMocks(mocks);
+            
+            var controller = BuildController(releaseService: releaseService.Object);
 
             var result = await controller.DeleteDataFiles(_releaseId, fileId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(releaseService);
 
             result.AssertBadRequest(UnableToFindMetadataFileToDelete);
         }
@@ -183,19 +189,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task UpdateRelease_Returns_Ok()
         {
-            var mocks = Mocks();
+            var releaseService = new Mock<IReleaseService>(Strict);
 
-            mocks.ReleaseService
+            releaseService
                 .Setup(s => s.UpdateRelease(
                     It.Is<Guid>(id => id.Equals(_releaseId)),
                     It.IsAny<ReleaseUpdateRequest>())
                 )
                 .ReturnsAsync(new ReleaseViewModel {Id = _releaseId});
-            var controller = ReleasesControllerWithMocks(mocks);
+            
+            var controller = BuildController(releaseService: releaseService.Object);
 
             // Method under test
             var result = await controller.UpdateRelease(new ReleaseUpdateRequest(), _releaseId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(releaseService);
 
             var unboxed = result.AssertOkResult();
             Assert.Equal(_releaseId, unboxed.Id);
@@ -204,17 +211,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetTemplateRelease_Returns_Ok()
         {
-            var mocks = Mocks();
+            var releaseService = new Mock<IReleaseService>(Strict);
+            
             var templateReleaseResult =
                 new Either<ActionResult, IdTitleViewModel>(new IdTitleViewModel());
-            mocks.ReleaseService
+            
+            releaseService
                 .Setup(s => s.GetLatestPublishedRelease(It.Is<Guid>(id => id == _releaseId)))
-                .Returns<Guid>(x => Task.FromResult(templateReleaseResult));
-            var controller = ReleasesControllerWithMocks(mocks);
+                .ReturnsAsync(templateReleaseResult);
+            
+            var controller = BuildController(releaseService.Object);
 
             // Method under test
             var result = await controller.GetTemplateRelease(_releaseId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(releaseService);
 
             result.AssertOkResult();
         }
@@ -222,18 +232,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CancelFileImport()
         {
-            var mocks = Mocks();
+            var importService = new Mock<IDataImportService>(Strict);
 
             var fileId = Guid.NewGuid();
 
-            mocks.ImportService
+            importService
                 .Setup(s => s.CancelImport(_releaseId, fileId))
                 .ReturnsAsync(Unit.Instance);
 
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(importService: importService.Object);
 
             var result = await controller.CancelFileImport(_releaseId, fileId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(importService);
             
             result.AssertAccepted();
         }
@@ -241,18 +251,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CancelFileImportButNotAllowed()
         {
-            var mocks = Mocks();
-            
+            var importService = new Mock<IDataImportService>(Strict);
+
             var fileId = Guid.NewGuid();
 
-            mocks.ImportService
+            importService
                 .Setup(s => s.CancelImport(_releaseId, fileId))
                 .ReturnsAsync(new ForbidResult());
 
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(importService: importService.Object);
 
             var result = await controller.CancelFileImport(_releaseId, fileId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(importService);
             
             result.AssertForbidden();
         }
@@ -260,20 +270,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetDeleteDataFilePlan()
         {
-            var mocks = Mocks();
-            
+            var releaseService = new Mock<IReleaseService>(Strict);
+
             var fileId = Guid.NewGuid();
 
             var deleteDataFilePlan = new DeleteDataFilePlan();
             
-            mocks.ReleaseService
+            releaseService
                 .Setup(s => s.GetDeleteDataFilePlan(_releaseId, fileId))
                 .ReturnsAsync(deleteDataFilePlan);
 
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(releaseService: releaseService.Object);
 
             var result = await controller.GetDeleteDataFilePlan(_releaseId, fileId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(releaseService);
 
             result.AssertOkResult(deleteDataFilePlan);
         }
@@ -281,18 +291,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task GetDeleteReleasePlan()
         {
-            var mocks = Mocks();
-            
+            var releaseService = new Mock<IReleaseService>(Strict);
+
             var deleteReleasePlan = new DeleteReleasePlan();
             
-            mocks.ReleaseService
+            releaseService
                 .Setup(s => s.GetDeleteReleasePlan(_releaseId))
                 .ReturnsAsync(deleteReleasePlan);
 
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(releaseService: releaseService.Object);
 
             var result = await controller.GetDeleteReleasePlan(_releaseId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(releaseService);
 
             result.AssertOkResult(deleteReleasePlan);
         }
@@ -300,28 +310,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task CreateReleaseStatus()
         {
+            var releaseApprovalService = new Mock<IReleaseApprovalService>(Strict);
+            var releaseService = new Mock<IReleaseService>(Strict);
+            
             var request = new ReleaseStatusCreateRequest();
             var returnedReleaseViewModel = new ReleaseViewModel();
             
-            var mocks = Mocks();
-
-            mocks
-                .ReleaseApprovalService
+            releaseApprovalService
                 .Setup(s => s.CreateReleaseStatus(_releaseId, request))
                 .ReturnsAsync(Unit.Instance);
             
-            mocks
-                .ReleaseService
+            releaseService
                 .Setup(s => s.GetRelease(_releaseId))
                 .ReturnsAsync(returnedReleaseViewModel);
             
-            var controller = ReleasesControllerWithMocks(mocks);
+            var controller = BuildController(
+                releaseApprovalService: releaseApprovalService.Object, 
+                releaseService: releaseService.Object);
 
             // Call the method under test
             var result = await controller.CreateReleaseStatus(request, _releaseId);
-            VerifyAllMocks(mocks);
+            VerifyAllMocks(releaseApprovalService, releaseService);
             
             result.AssertOkResult(returnedReleaseViewModel);
+        }
+
+        [Fact]
+        public async Task ListReleasesForApproval()
+        {
+            var releases = ListOf(new ReleaseSummaryViewModel
+            {
+                Id = Guid.NewGuid()
+            });
+            
+            var releaseService = new Mock<IReleaseService>(Strict);
+
+            releaseService
+                .Setup(s => s.ListUsersReleasesForApproval())
+                .ReturnsAsync(releases);
+
+            var controller = BuildController(
+                releaseService: releaseService.Object);
+
+            var result = await controller.ListUsersReleasesForApproval();
+            VerifyAllMocks(releaseService);
+
+            result.AssertOkResult(releases);
         }
 
         private static IFormFile MockFile(string fileName)
@@ -334,40 +368,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             return fileMock.Object;
         }
 
-        private static (
-            Mock<IReleaseService> ReleaseService, 
-            Mock<IReleaseApprovalService> ReleaseApprovalService, 
-            Mock<IReleaseDataFileService> ReleaseDataFilesService, 
-            Mock<IReleasePublishingStatusService> ReleasePublishingStatusService, 
-            Mock<IReleaseChecklistService> ReleaseChecklistService, 
-            Mock<IDataImportService> ImportService) Mocks()
-        {
-            return (new Mock<IReleaseService>(Strict),
-                    new Mock<IReleaseApprovalService>(Strict),
-                    new Mock<IReleaseDataFileService>(Strict),
-                    new Mock<IReleasePublishingStatusService>(Strict),
-                    new Mock<IReleaseChecklistService>(Strict),
-                    new Mock<IDataImportService>(Strict)
-                );
-        }
-
-        private static ReleasesController ReleasesControllerWithMocks(
-            (
-            Mock<IReleaseService> ReleaseService,
-            Mock<IReleaseApprovalService> ReleaseApprovalService,
-            Mock<IReleaseDataFileService> ReleaseDataFileService,
-            Mock<IReleasePublishingStatusService> ReleaseStatusService,
-            Mock<IReleaseChecklistService> ReleaseChecklistService,
-            Mock<IDataImportService> ImportService
-            ) mocks)
+        private static ReleasesController BuildController(
+            IReleaseService? releaseService = null,
+            IReleaseApprovalService? releaseApprovalService = null,
+            IReleaseDataFileService? releaseDataFileService = null,
+            IReleasePublishingStatusService? releaseStatusService = null,
+            IReleaseChecklistService? releaseChecklistService = null,
+            IDataImportService? importService = null)
         {
             return new ReleasesController(
-                mocks.ReleaseService.Object,
-                mocks.ReleaseApprovalService.Object,
-                mocks.ReleaseDataFileService.Object,
-                mocks.ReleaseStatusService.Object,
-                mocks.ReleaseChecklistService.Object,
-                mocks.ImportService.Object);
+                releaseService ?? Mock.Of<IReleaseService>(Strict),
+                releaseApprovalService ?? Mock.Of<IReleaseApprovalService>(Strict),
+                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
+                releaseStatusService ?? Mock.Of<IReleasePublishingStatusService>(Strict),
+                releaseChecklistService ?? Mock.Of<IReleaseChecklistService>(Strict),
+                importService ?? Mock.Of<IDataImportService>(Strict));
         }
     }
 }

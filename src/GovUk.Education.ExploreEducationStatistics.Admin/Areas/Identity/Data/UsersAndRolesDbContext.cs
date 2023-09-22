@@ -74,6 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
             string analystRoleId = Role.Analyst.GetEnumValue();
             string prereleaseRoleId = Role.PrereleaseUser.GetEnumValue();
 
+            // Note that when amending this list of Claims to add or remove Claims from a given Role,
+            // we also need to check to see if updates need to be addressed in ClaimsPrincipalUtils as well.
             modelBuilder.Entity<IdentityRoleClaim<string>>()
                 .HasData(
                     new IdentityRoleClaim<string>

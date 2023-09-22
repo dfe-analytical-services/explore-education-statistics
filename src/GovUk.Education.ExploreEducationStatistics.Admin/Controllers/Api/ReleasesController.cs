@@ -37,11 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IDataImportService dataImportService)
         {
             _releaseService = releaseService;
+            _releaseApprovalService = releaseApprovalService;
             _releaseDataFileService = releaseDataFileService;
             _releasePublishingStatusService = releasePublishingStatusService;
             _releaseChecklistService = releaseChecklistService;
             _dataImportService = dataImportService;
-            _releaseApprovalService = releaseApprovalService;
         }
 
         [HttpPost("publications/{publicationId:guid}/releases")]
@@ -199,15 +199,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/draft")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> ListDraftReleases()
+        public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListDraftReleases()
         {
             return await _releaseService
                 .ListReleasesWithStatuses(ReleaseApprovalStatus.Draft, ReleaseApprovalStatus.HigherLevelReview)
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("releases/approvals")]
+        public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListUsersReleasesForApproval()
+        {
+            return await _releaseService
+                .ListUsersReleasesForApproval()
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("releases/scheduled")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> ListScheduledReleases()
+        public async Task<ActionResult<List<ReleaseSummaryViewModel>>> ListScheduledReleases()
         {
             return await _releaseService
                 .ListScheduledReleases()
@@ -251,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _dataImportService
                 .CancelImport(releaseId, fileId)
-                .HandleFailuresOr(result => new AcceptedResult());
+                .HandleFailuresOr(_ => new AcceptedResult());
         }
 
         [HttpGet("releases/{releaseId:guid}/stage-status")]

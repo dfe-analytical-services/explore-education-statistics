@@ -119,5 +119,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .GetMethodologyStatuses(methodologyVersionId)
                 .HandleFailuresOrOk();
         }
+        
+        [HttpGet("methodology/approvals")]
+        public async Task<ActionResult<List<MethodologyVersionViewModel>>> ListMethodologyVersionsForApproval()
+        {
+            return await _methodologyService
+                .ListUsersMethodologyVersionsForApproval()
+                .HandleFailuresOrOk();
+        }
     }
 }

@@ -8,7 +8,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
@@ -51,8 +50,8 @@ public class MarkMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
         }
 
         var allowedPublicationRoles = methodologyVersion.Status == Approved
-            ? ListOf(Approver)
-            : ListOf(Owner, Approver);
+            ? ListOf(PublicationRole.Approver)
+            : ListOf(PublicationRole.Owner, PublicationRole.Approver);
 
         var allowedReleaseRoles = methodologyVersion.Status == Approved
             ? ListOf(ReleaseRole.Approver)

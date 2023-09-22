@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -22,15 +21,14 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
@@ -103,7 +101,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(_tableBuilderResults);
 
-            var client = SetupApp(tableBuilderService: tableBuilderService.Object)
+            var client = SetupApp(
+                    tableBuilderService: tableBuilderService.Object)
+                .SetUser(AuthenticatedUser())
                 .CreateClient();
 
             var response = await client.PostAsync(
@@ -130,6 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     (_, _, stream, _) => { stream.WriteText("Test csv"); });
 
             var client = SetupApp(tableBuilderService: tableBuilderService.Object)
+                .SetUser(AuthenticatedUser())
                 .CreateClient();
 
             var response = await client.PostAsync(
@@ -277,18 +278,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         private WebApplicationFactory<TestStartup> SetupApp(
-            ITableBuilderService? tableBuilderService = null,
-            IUserService? userService = null)
+            ITableBuilderService? tableBuilderService = null)
         {
-            return _testApp
-                .ResetDbContexts()
-                .ConfigureServices(
-                    services =>
-                    {
-                        services.AddTransient(_ => tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict));//
-                        services.AddTransient(_ => userService ?? AlwaysTrueUserService().Object);
-                    }
-                );
+            return _testApp.ConfigureServices(services => 
+                services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
         }
     }
 }

@@ -415,8 +415,8 @@ user creates public prerelease access list
     user presses keys    BACKSPACE
     user enters text into element    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     user clicks button    Save access list
-    user waits until element contains    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
-    ...    %{WAIT_SMALL}
+    user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]
+    ...    ${content}
 
 user updates public prerelease access list
     [Arguments]    ${content}
@@ -426,7 +426,8 @@ user updates public prerelease access list
     user presses keys    BACKSPACE
     user enters text into element    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     user clicks button    Save access list
-    user waits until element contains    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
+    user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]
+    ...    ${content}
 
 user clicks footnote subject radio
     [Arguments]    ${subject_label}    ${radio_label}
@@ -670,6 +671,16 @@ user changes methodology status to Draft
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks page contains tag    In Draft
+
+user changes methodology status to Higher level review
+    user clicks link    Sign off
+    user waits until h2 is visible    Sign off
+
+    user clicks button    Edit status
+    user clicks element    id:methodologyStatusForm-status-HigherLevelReview
+    user clicks button    Update status
+    user waits until h2 is visible    Sign off
+    user checks page contains tag    In Review
 
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk

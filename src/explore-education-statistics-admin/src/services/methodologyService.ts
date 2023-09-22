@@ -89,6 +89,10 @@ const methodologyService = {
     return client.get(`/publication/${publicationId}/methodologies`);
   },
 
+  listMethodologiesForApproval(): Promise<MethodologyVersion[]> {
+    return client.get('/methodology/approvals');
+  },
+
   createMethodologyAmendment(
     methodologyId: string,
   ): Promise<MethodologyVersion> {

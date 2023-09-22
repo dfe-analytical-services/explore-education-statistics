@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 if (loadedMethodologyVersion.ScheduledWithRelease != null)
                 {
                     await _context.Entry(loadedMethodologyVersion.ScheduledWithRelease)
-                        .Reference(r => r!.Publication)
+                        .Reference(r => r.Publication)
                         .LoadAsync();
 
                     var title =
@@ -413,6 +413,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .OrderByDescending(vm => vm.Created)
                         .ToList();
                 });
+        }
+
+        public async Task<Either<ActionResult, List<MethodologyVersionViewModel>>> ListUsersMethodologyVersionsForApproval()
+        {
+            var userId = _userService.GetUserId();
+            
+            var directPublicationsWithApprovalRole = await _context
+                .UserPublicationRoles
+                .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
+                .Select(role => role.PublicationId)
+                .ToListAsync();
+
+            var indirectPublicationsWithApprovalRole = await _context
+                .UserReleaseRoles
+                .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
+                .Select(role => role.Release.PublicationId)
+                .ToListAsync();
+
+            var publicationIdsForApproval = directPublicationsWithApprovalRole
+                .Concat(indirectPublicationsWithApprovalRole)
+                .Distinct();
+                
+            var methodologiesToApprove = await _context
+                    .MethodologyVersions
+                    .Where(methodologyVersion =>
+                        methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
+                        && methodologyVersion.Methodology.Publications.Any(
+                            publicationMethodology =>
+                                publicationMethodology.Owner
+                                && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)))
+                    .ToListAsync();
+            
+            return (await methodologiesToApprove
+                .SelectAsync(BuildMethodologyVersionViewModel))
+                .ToList();
         }
 
         private async Task<Either<ActionResult, Unit>> DeleteVersion(MethodologyVersion methodologyVersion,
