@@ -275,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.ToTable("FastTracks");
+                    b.ToTable("DataBlocks");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.FastTrackVersion", b =>
@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("DataBlockId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("FastTrackId")
+                    b.Property<Guid>("ContentBlockId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("Published")
@@ -309,11 +309,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("DataBlockId");
 
-                    b.HasIndex("FastTrackId");
+                    b.HasIndex("ContentBlockId");
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("FastTrackVersions");
+                    b.ToTable("DataBlockVersions");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.FeaturedTable", b =>

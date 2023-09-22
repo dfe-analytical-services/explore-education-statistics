@@ -5,29 +5,29 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    public partial class EES4467_AddFastTracks : Migration
+    public partial class EES4467_AddDataBlocks : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "FastTracks",
+                name: "DataBlocks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FastTracks", x => x.Id);
+                    table.PrimaryKey("PK_DataBlocks", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "FastTrackVersions",
+                name: "DataBlockVersions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FastTrackId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ReleaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DataBlockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ReleaseId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContentBlockId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Version = table.Column<int>(type: "int", nullable: false),
                     Published = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -35,21 +35,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FastTrackVersions", x => x.Id);
+                    table.PrimaryKey("PK_DataBlockVersions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FastTrackVersions_ContentBlock_DataBlockId",
+                        name: "FK_DataBlockVersions_ContentBlock_DataBlockId",
                         column: x => x.DataBlockId,
                         principalTable: "ContentBlock",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FastTrackVersions_FastTracks_FastTrackId",
-                        column: x => x.FastTrackId,
-                        principalTable: "FastTracks",
+                        name: "FK_DataBlockVersions_DataBlocks_DataBlockId",
+                        column: x => x.DataBlockId,
+                        principalTable: "DataBlocks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FastTrackVersions_Releases_ReleaseId",
+                        name: "FK_DataBlockVersions_Releases_ReleaseId",
                         column: x => x.ReleaseId,
                         principalTable: "Releases",
                         principalColumn: "Id",
@@ -57,28 +57,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_FastTrackVersions_DataBlockId",
-                table: "FastTrackVersions",
+                name: "IX_DataBlockVersions_DataBlockId",
+                table: "DataBlockVersions",
                 column: "DataBlockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FastTrackVersions_FastTrackId",
-                table: "FastTrackVersions",
-                column: "FastTrackId");
+                name: "IX_DataBlockVersions_DataBlockId",
+                table: "DataBlockVersions",
+                column: "DataBlockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FastTrackVersions_ReleaseId",
-                table: "FastTrackVersions",
+                name: "IX_DataBlockVersions_ReleaseId",
+                table: "DataBlockVersions",
                 column: "ReleaseId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "FastTrackVersions");
+                name: "DataBlockVersions");
 
             migrationBuilder.DropTable(
-                name: "FastTracks");
+                name: "DataBlocks");
         }
     }
 }

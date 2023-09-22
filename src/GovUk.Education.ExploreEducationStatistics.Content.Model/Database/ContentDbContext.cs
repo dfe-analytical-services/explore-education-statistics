@@ -696,10 +696,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
         private static void ConfigureFastTrack(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FastTrack>()
+                .ToTable("DataBlocks");
         }
 
         private static void ConfigureFastTrackVersion(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<FastTrackVersion>()
+                .ToTable("DataBlockVersions");
+            
+            modelBuilder.Entity<FastTrackVersion>()
+                .Property(f => f.FastTrackId)
+                .HasColumnName("DataBlockId");
+            
+            modelBuilder.Entity<FastTrackVersion>()
+                .Property(f => f.DataBlockId)
+                .HasColumnName("ContentBlockId");
+            
             modelBuilder.Entity<FastTrackVersion>()
                 .Property(invite => invite.Published)
                 .HasConversion(

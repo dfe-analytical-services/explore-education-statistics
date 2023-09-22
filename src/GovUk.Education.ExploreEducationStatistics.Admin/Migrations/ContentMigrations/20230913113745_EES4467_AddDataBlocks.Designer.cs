@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20230913113745_EES4467_AddFastTracks")]
-    partial class EES4467_AddFastTracks
+    [Migration("20230913113745_EES4467_AddDataBlocks")]
+    partial class EES4467_AddDataBlocks
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

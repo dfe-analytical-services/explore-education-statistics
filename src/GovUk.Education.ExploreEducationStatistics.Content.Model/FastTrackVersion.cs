@@ -12,9 +12,9 @@ public class FastTrackVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
         
     public FastTrack FastTrack { get; init; }
     
-    public Guid ReleaseId { get; init; }
+    public Guid ReleaseVersionId { get; init; }
     
-    public Release Release { get; init; }
+    public Release ReleaseVersion { get; init; }
     
     public Guid DataBlockId { get; init; }
     
