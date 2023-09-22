@@ -54,6 +54,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -763,6 +764,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     }
                 });
             }
+
+            app.ServerFeatures.Get<IServerAddressesFeature>()
+                ?.Addresses
+                .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
         }
 
         private void UpdateDatabase(IApplicationBuilder app, IWebHostEnvironment env)
