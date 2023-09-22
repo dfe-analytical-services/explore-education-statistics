@@ -180,6 +180,8 @@ Publish the scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
     ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
+    user waits for caches to expire
+
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 

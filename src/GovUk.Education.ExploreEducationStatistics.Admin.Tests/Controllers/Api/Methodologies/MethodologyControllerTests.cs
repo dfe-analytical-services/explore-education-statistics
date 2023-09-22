@@ -177,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
             methodologyService
-                .Setup(s => s.ListLatestMethodologyVersions(_id))
+                .Setup(s => s.ListLatestMethodologyVersions(_id, false))
                 .ReturnsAsync(ListOf(new MethodologyVersionSummaryViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);

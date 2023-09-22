@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -237,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 var result = await service.GetManageContentPageViewModel(release.Id);
 
-                Assert.True(result.IsRight);
+                var viewModel = result.AssertRight();
 
                 dataBlockService.Verify(mock =>
                     mock.GetUnattachedDataBlocks(release.Id), Times.Once);
@@ -245,9 +246,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
 
-                Assert.Equal(unattachedDataBlocks, result.Right.UnattachedDataBlocks);
+                Assert.Equal(unattachedDataBlocks, viewModel.UnattachedDataBlocks);
 
-                var contentRelease = result.Right.Release;
+                var contentRelease = viewModel.Release;
 
                 Assert.NotNull(contentRelease);
                 Assert.Equal(release.Id, contentRelease.Id);
@@ -361,7 +362,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var publication = new Publication
             {
                 Contact = new Contact(),
-                LegacyReleases = new List<LegacyRelease>(),
                 Slug = "test-publication",
                 Title = "Publication",
                 Topic = new Topic
@@ -372,33 +372,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             var release = new Release
             {
-                Id = Guid.NewGuid(),
                 NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
                 PreReleaseAccessList = "Test access list",
                 Publication = publication,
                 PublishScheduled = DateTime.Parse("2020-09-08T23:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
                 Published = null,
                 ReleaseName = "2020",
-                RelatedInformation = new List<Link>(),
                 Slug = "2020-21",
                 TimePeriodCoverage = AcademicYear,
                 Type = ReleaseType.OfficialStatistics,
-                Updates = new List<Update>(),
-                KeyStatistics = new List<KeyStatistic>(),
             };
 
-            var methodologies = AsList(
+            var previousMethodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 3 title",
+                // Previous versions should always be approved - so no status set
+            };
+
+            var methodologyVersions = AsList(
                 new MethodologyVersion
                 {
+                    // in result because approved
                     Id = Guid.NewGuid(),
                     AlternativeTitle = "Methodology 1 title",
                     Status = MethodologyApprovalStatus.Approved,
                 },
                 new MethodologyVersion
                 {
+                    // in result because approved
                     Id = Guid.NewGuid(),
                     AlternativeTitle = "Methodology 2 title",
                     Status = MethodologyApprovalStatus.Approved,
+                },
+                previousMethodologyVersion, // in result because amendment of this version is not Approved
+                new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology should be filtered 1",
+                    Status = MethodologyApprovalStatus.Draft,
+                    PreviousVersion = previousMethodologyVersion,
+                },
+                new MethodologyVersion
+                {
+                    // not in result because not Approved and no previous version
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology should be filtered 2",
+                    Status = MethodologyApprovalStatus.HigherLevelReview,
+                    PreviousVersion = null,
                 }
             );
 
@@ -407,6 +428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.MethodologyVersions.AddRangeAsync(methodologyVersions);
                 await contentDbContext.ReleaseContentSections.AddRangeAsync(
                     new()
                     {
@@ -460,8 +482,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 .ReturnsAsync(new List<DataBlockViewModel>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.GetLatestPublishedVersionByPublication(publication.Id))
-                .ReturnsAsync(methodologies);
+                    mock.GetLatestVersionByPublication(publication.Id))
+                .ReturnsAsync(methodologyVersions);
 
             releaseFileService.Setup(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data))
@@ -477,19 +499,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 var result = await service.GetManageContentPageViewModel(
                     release.Id, isPrerelease: true);
 
-                Assert.True(result.IsRight);
+                var viewModel = result.AssertRight();
 
-                var contentRelease = result.Right.Release;
-                Assert.NotNull(contentRelease);
+                var contentRelease = viewModel.Release;
 
                 var contentPublication = contentRelease.Publication;
                 Assert.NotNull(contentPublication);
 
-                Assert.Equal(2, contentPublication.Methodologies.Count);
-                Assert.Equal(methodologies[0].Id, contentPublication.Methodologies[0].Id);
+                Assert.Equal(3, contentPublication.Methodologies.Count);
+                Assert.Equal(methodologyVersions[0].Id, contentPublication.Methodologies[0].Id);
                 Assert.Equal("Methodology 1 title", contentPublication.Methodologies[0].Title);
-                Assert.Equal(methodologies[1].Id, contentPublication.Methodologies[1].Id);
+                Assert.Equal(methodologyVersions[1].Id, contentPublication.Methodologies[1].Id);
                 Assert.Equal("Methodology 2 title", contentPublication.Methodologies[1].Title);
+                Assert.Equal(methodologyVersions[2].Id, contentPublication.Methodologies[2].Id);
+                Assert.Equal("Methodology 3 title", contentPublication.Methodologies[2].Title);
             }
 
             MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
@@ -635,7 +658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 var result = await service.GetManageContentPageViewModel(release.Id);
 
-                Assert.True(result.IsRight);
+                var viewModel = result.AssertRight();
 
                 dataBlockService.Verify(mock =>
                     mock.GetUnattachedDataBlocks(release.Id), Times.Once);
@@ -643,9 +666,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
 
-                Assert.Equal(unattachedDataBlocks, result.Right.UnattachedDataBlocks);
+                Assert.Equal(unattachedDataBlocks, viewModel.UnattachedDataBlocks);
 
-                var contentRelease = result.Right.Release;
+                var contentRelease = viewModel.Release;
 
                 var contentReleaseSummary = contentRelease.SummarySection;
 
@@ -709,6 +732,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             IUserService? userService = null)
         {
             return new(
+                contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 mapper ?? MapperUtils.AdminMapper(),
                 dataBlockService ?? new Mock<IDataBlockService>().Object,

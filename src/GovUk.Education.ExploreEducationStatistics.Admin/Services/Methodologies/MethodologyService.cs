@@ -151,12 +151,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(BuildMethodologyVersionViewModel);
         }
 
-        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> ListLatestMethodologyVersions(Guid publicationId)
+        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>>
+            ListLatestMethodologyVersions(
+                Guid publicationId,
+                bool isPrerelease = false)
         {
             return await _persistenceHelper.CheckEntityExists<Publication>(publicationId,
-                    q => q.Include(p => p.Methodologies)
-                        .ThenInclude(p => p.Methodology)
-                        .ThenInclude(p => p.Versions))
+                    q => q.Include(publication => publication.Methodologies)
+                        .ThenInclude(publicationMethodology => publicationMethodology.Methodology)
+                        .ThenInclude(methodology => methodology.Versions)
+                        .ThenInclude(versions => versions.PreviousVersion))
                 .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
                 .OnSuccess(async publication =>
                 {
@@ -164,25 +168,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         .ToAsyncEnumerable()
                         .SelectAwait(async publicationMethodology =>
                         {
-                            var latestVersion = publicationMethodology.Methodology.LatestVersion();
+                            var methodologyVersion = publicationMethodology.Methodology.LatestVersion();
+
+                            if (isPrerelease && methodologyVersion.Status != MethodologyApprovalStatus.Approved)
+                            {
+                                // Get latest approved version
+                                if (methodologyVersion.PreviousVersion == null)
+                                {
+                                    return null;
+                                }
+
+                                // If there is a previous version, it must be approved, because cannot
+                                // create an amendment for an unpublished version
+                                methodologyVersion = methodologyVersion.PreviousVersion;
+                            }
+
                             var permissions =
                                 await PermissionsUtils.GetMethodologyVersionPermissions(_userService,
-                                    latestVersion,
+                                    methodologyVersion,
                                     publicationMethodology);
 
                             return new MethodologyVersionSummaryViewModel
                             {
-                                Id = latestVersion.Id,
-                                Amendment = latestVersion.Amendment,
+                                Id = methodologyVersion.Id,
+                                Amendment = methodologyVersion.Amendment,
                                 Owned = publicationMethodology.Owner,
-                                Published = latestVersion.Published,
-                                Status = latestVersion.Status,
-                                Title = latestVersion.Title,
-                                MethodologyId = latestVersion.MethodologyId,
-                                PreviousVersionId = latestVersion.PreviousVersionId,
+                                Published = methodologyVersion.Published,
+                                Status = methodologyVersion.Status,
+                                Title = methodologyVersion.Title,
+                                MethodologyId = methodologyVersion.MethodologyId,
+                                PreviousVersionId = methodologyVersion.PreviousVersionId,
                                 Permissions = permissions,
                             };
                         })
+                        .WhereNotNull()
                         .OrderBy(viewModel => viewModel.Title)
                         .ToListAsync();
                 });
@@ -436,17 +455,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .Distinct();
                 
             var methodologiesToApprove = await _context
-                    .MethodologyVersions
-                    .Where(methodologyVersion =>
-                        methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
-                        && methodologyVersion.Methodology.Publications.Any(
-                            publicationMethodology =>
-                                publicationMethodology.Owner
-                                && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)))
-                    .ToListAsync();
+                .MethodologyVersions
+                .Where(methodologyVersion =>
+                    methodologyVersion.Status == MethodologyApprovalStatus.HigherLevelReview
+                    && methodologyVersion.Methodology.Publications.Any(
+                        publicationMethodology =>
+                            publicationMethodology.Owner
+                            && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)))
+                .ToListAsync();
             
             return (await methodologiesToApprove
-                .SelectAsync(BuildMethodologyVersionViewModel))
+                    .SelectAsync(BuildMethodologyVersionViewModel))
                 .ToList();
         }
 
