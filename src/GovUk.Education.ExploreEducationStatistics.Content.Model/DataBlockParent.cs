@@ -5,21 +5,21 @@ using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class FastTrack
+public class DataBlockParent
 {
     public Guid Id { get; init; }
 
-    public List<FastTrackVersion> Versions { get; init; } = new();
+    public List<DataBlockVersion> Versions { get; init; } = new();
     
-    public FastTrackVersion GetLatestVersion => Versions
+    public DataBlockVersion GetLatestVersion => Versions
         .OrderByDescending(version => version.Version)
         .First();
 
-    public FastTrackVersion? GetLatestDraftVersion => Versions
+    public DataBlockVersion? GetLatestDraftVersion => Versions
         .Where(version => version.Published == null)
         .MaxBy(version => version.Version);
     
-    public FastTrackVersion? GetLatestPublishedVersion => Versions
+    public DataBlockVersion? GetLatestPublishedVersion => Versions
         .Where(version => version.Published != null)
         .MaxBy(version => version.Version);
 }

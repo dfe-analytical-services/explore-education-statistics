@@ -63,8 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<KeyStatisticDataBlock> KeyStatisticsDataBlock { get; set; }
         public virtual DbSet<KeyStatisticText> KeyStatisticsText { get; set; }
         public virtual DbSet<DataBlock> DataBlocks { get; set; }
-        public virtual DbSet<FastTrack> FastTracks { get; set; }
-        public virtual DbSet<FastTrackVersion> FastTrackVersions { get; set; }
+        public virtual DbSet<DataBlockParent> FastTracks { get; set; }
+        public virtual DbSet<DataBlockVersion> FastTrackVersions { get; set; }
         public virtual DbSet<DataImport> DataImports { get; set; }
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
         public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
@@ -126,8 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureGlossaryEntry(modelBuilder);
             ConfigureKeyStatisticsDataBlock(modelBuilder);
             ConfigureKeyStatisticsText(modelBuilder);
-            ConfigureFastTrack(modelBuilder);
-            ConfigureFastTrackVersion(modelBuilder);
+            ConfigureDataBlockParent(modelBuilder);
+            ConfigureDataBlockVersion(modelBuilder);
         }
 
         private static void ConfigureComment(ModelBuilder modelBuilder)
@@ -694,38 +694,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.NoAction);
         }
 
-        private static void ConfigureFastTrack(ModelBuilder modelBuilder)
+        private static void ConfigureDataBlockParent(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<FastTrack>()
+            modelBuilder.Entity<DataBlockParent>()
                 .ToTable("DataBlocks");
         }
 
-        private static void ConfigureFastTrackVersion(ModelBuilder modelBuilder)
+        private static void ConfigureDataBlockVersion(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<FastTrackVersion>()
-                .ToTable("DataBlockVersions");
-            
-            modelBuilder.Entity<FastTrackVersion>()
-                .Property(f => f.FastTrackId)
+            modelBuilder.Entity<DataBlockVersion>()
+                .Property(f => f.DataBlockParentId)
                 .HasColumnName("DataBlockId");
             
-            modelBuilder.Entity<FastTrackVersion>()
+            modelBuilder.Entity<DataBlockVersion>()
                 .Property(f => f.DataBlockId)
                 .HasColumnName("ContentBlockId");
             
-            modelBuilder.Entity<FastTrackVersion>()
+            modelBuilder.Entity<DataBlockVersion>()
                 .Property(invite => invite.Published)
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
-            modelBuilder.Entity<FastTrackVersion>()
+            modelBuilder.Entity<DataBlockVersion>()
                 .Property(invite => invite.Created)
                 .HasConversion(
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
-            modelBuilder.Entity<FastTrackVersion>()
+            modelBuilder.Entity<DataBlockVersion>()
                 .Property(invite => invite.Updated)
                 .HasConversion(
                     v => v,

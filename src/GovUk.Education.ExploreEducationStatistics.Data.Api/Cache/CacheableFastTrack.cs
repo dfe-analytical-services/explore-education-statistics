@@ -22,20 +22,20 @@ public record CacheableFastTrack
         Release = release;
     }
 
-    public CacheableFastTrack(FastTrackVersion fastTrackVersion)
+    public CacheableFastTrack(DataBlockVersion dataBlockVersion)
     {
-        if (fastTrackVersion.Release == null)
+        if (dataBlockVersion.Release == null)
         {
             throw new ArgumentException("Release must be hydrated");
         }
 
-        if (fastTrackVersion.Release.Publication == null)
+        if (dataBlockVersion.Release.Publication == null)
         {
             throw new ArgumentException("Publication must be hydrated");
         }
 
-        FastTrackId = fastTrackVersion.FastTrackId;
-        Release = fastTrackVersion.Release;
+        FastTrackId = dataBlockVersion.FastTrackId;
+        Release = dataBlockVersion.Release;
     }
 
     public Guid ReleaseId => Release.Id;

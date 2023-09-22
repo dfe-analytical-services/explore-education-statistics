@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid fastTrackId)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<FastTrackVersion>(fastTracks => fastTracks
+                .CheckEntityExists<DataBlockVersion>(fastTracks => fastTracks
                     .Include(fastTrackVersion => fastTrackVersion.Release)
                     .ThenInclude(release => release.Publication)
                     .Include(fastTrackVersion => fastTrackVersion.DataBlock)
@@ -150,16 +150,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         private static FastTrackViewModel BuildFastTrackViewModel(
-            FastTrackVersion fastTrackVersion,
+            DataBlockVersion dataBlockVersion,
             TableBuilderResultViewModel tableResult,
             Release latestRelease)
         {
-            var release = fastTrackVersion.Release;
-            var dataBlock = fastTrackVersion.DataBlock;
+            var release = dataBlockVersion.Release;
+            var dataBlock = dataBlockVersion.DataBlock;
             
             return new FastTrackViewModel
             {
-                Id = fastTrackVersion.DataBlockId,
+                Id = dataBlockVersion.DataBlockId,
                 Configuration = dataBlock.Table,
                 FullTable = tableResult,
                 Query = new TableBuilderQueryViewModel(release.PublicationId, dataBlock.Query),

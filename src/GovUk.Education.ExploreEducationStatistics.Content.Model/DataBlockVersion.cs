@@ -4,13 +4,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
-public class FastTrackVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
+public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 {
     public Guid Id { get; init; }
     
-    public Guid FastTrackId { get; init; }
+    public Guid DataBlockParentId { get; init; }
         
-    public FastTrack FastTrack { get; init; }
+    public DataBlockParent DataBlockParent { get; init; }
     
     public Guid ReleaseVersionId { get; init; }
     

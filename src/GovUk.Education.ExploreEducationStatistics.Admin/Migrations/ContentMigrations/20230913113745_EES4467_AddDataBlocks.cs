@@ -37,8 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 {
                     table.PrimaryKey("PK_DataBlockVersions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DataBlockVersions_ContentBlock_DataBlockId",
-                        column: x => x.DataBlockId,
+                        name: "FK_DataBlockVersions_ContentBlock_ContentBlockId",
+                        column: x => x.ContentBlockId,
                         principalTable: "ContentBlock",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -62,9 +62,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 column: "DataBlockId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataBlockVersions_DataBlockId",
+                name: "IX_DataBlockVersions_ContentBlockId",
                 table: "DataBlockVersions",
-                column: "DataBlockId");
+                column: "ContentBlockId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataBlockVersions_ReleaseId",
