@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
@@ -13,8 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil = new();
 
         protected TableStorageService(
-            string connectionString)
+            IConfiguration configuration,
+            string connectionStringKey)
         {
+            var connectionString = configuration.GetValue<string>(connectionStringKey);
             var account = CloudStorageAccount.Parse(connectionString);
             _client = account.CreateCloudTableClient();
         }
