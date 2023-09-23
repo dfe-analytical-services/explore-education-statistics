@@ -231,8 +231,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         await file.WriteAsync(listItemStart);
 
                         var indent = string.Empty.PadRight(listItemStart.Length);
+                        var label = await HtmlToTextUtils.HtmlToText(footnote.Label);
 
-                        await footnote.Label
+                        await label
                             .ToLines()
                             .ToAsyncEnumerable()
                             .ForEachAwaitAsync(
