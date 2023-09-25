@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    public partial class EES4467_AddDataBlocks : Migration
+    public partial class EES4467_AddDataBlockParentsAndVersions : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
