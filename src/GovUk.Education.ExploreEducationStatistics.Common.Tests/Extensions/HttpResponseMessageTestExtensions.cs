@@ -86,4 +86,9 @@ public static class HttpResponseMessageTestExtensions
 
         return body;
     }
+
+    public static void AssertPathAndQueryEqualTo(this HttpResponseMessage response, string expected)
+    {
+        Assert.Equal(expected, response.RequestMessage?.RequestUri?.PathAndQuery);
+    }
 }

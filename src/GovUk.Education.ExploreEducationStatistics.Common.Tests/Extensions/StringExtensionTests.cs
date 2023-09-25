@@ -423,6 +423,20 @@ Test
             }
         }
 
+        public class TrimToLowerTests
+        {
+            [Theory]
+            [InlineData("", "")]
+            [InlineData(" ", "")]
+            [InlineData("foo bar")]
+            [InlineData("foo BAR")]
+            [InlineData("  foo BAR  ")]
+            public void TrimToLower(string input, string expected = "foo bar")
+            {
+                Assert.Equal(expected, input.TrimToLower());
+            }
+        }
+
         public class ToMd5HashTests
         {
             [Fact]
@@ -452,7 +466,6 @@ Test
                 var input = "héy";
                 Assert.Equal("f7d6171b6bcfd8923a50b65721064b27", input.ToMd5Hash(Encoding.ASCII));
             }
-
         }
     }
 }
