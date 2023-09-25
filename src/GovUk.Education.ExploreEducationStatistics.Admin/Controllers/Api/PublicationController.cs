@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPut("api/publication/{publicationId:guid}/contact")]
         public async Task<ActionResult<ContactViewModel>> UpdateContact(
-            Guid publicationId, Contact updatedContact)
+            Guid publicationId, ContactSaveRequest updatedContact)
         {
             return await _publicationService.UpdateContact(publicationId, updatedContact)
                 .HandleFailuresOrOk();

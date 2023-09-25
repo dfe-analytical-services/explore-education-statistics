@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static System.String;
 
@@ -15,7 +14,7 @@ public record PublicationCreateRequest
 
         [Required] public Guid TopicId { get; set; }
 
-        [Required] public ContactSaveViewModel Contact { get; set; } = null!;
+        [Required] public ContactSaveRequest Contact { get; set; } = null!;
 
         private string _slug = Empty;
 

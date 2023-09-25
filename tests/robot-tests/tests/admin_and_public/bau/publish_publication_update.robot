@@ -60,7 +60,7 @@ Update publication contact
     user enters text into element    label:Team name    Team name updated
     user enters text into element    label:Team email    email_updated@test.com
     user enters text into element    label:Contact name    Contact name updated
-    user enters text into element    label:Contact telephone    4321 4321
+    user enters text into element    label:Contact telephone (optional)    4321 4321
 
     user clicks button    Update contact details
     ${modal}=    user waits until modal is visible    Confirm contact changes

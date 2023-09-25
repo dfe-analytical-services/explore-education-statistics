@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            if (release.PreReleaseAccessList.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(release.PreReleaseAccessList))
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoPublicPreReleaseAccessList));
             }

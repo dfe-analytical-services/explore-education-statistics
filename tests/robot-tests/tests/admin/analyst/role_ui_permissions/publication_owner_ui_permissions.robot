@@ -64,7 +64,7 @@ Check Edit publication contact page inputs are correct
     user waits until page contains element    label:Team name
     user waits until page contains element    label:Team email
     user waits until page contains element    label:Contact name
-    user waits until page contains element    label:Contact telephone
+    user waits until page contains element    label:Contact telephone (optional)
 
     user clicks button    Cancel
     user waits until page does not contain button    Cancel

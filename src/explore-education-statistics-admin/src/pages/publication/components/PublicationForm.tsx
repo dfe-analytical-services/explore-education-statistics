@@ -93,14 +93,14 @@ const PublicationForm = ({
       contactTelNo: Yup.string()
         .trim()
         .matches(
-          /^[0-9 \t]*$/,
-          'The telephone number should only contain numeric characters',
+          /^[0-9\s]*$/,
+          'Contact telephone must only contain numeric or whitespace characters',
         )
         .matches(
-          /^(?!^0[ \t]*3[ \t]*7[ \t]*0[ \t]*0[ \t]*0[ \t]*0[ \t]*2[ \t]*2[ \t]*8[ \t]*8$)/,
-          'The DfE enquiries number is not suitable for use on statistics publications',
+          /^(?!^0\s*3\s*7\s*0\s*0\s*0\s*0\s*2\s*2\s*8\s*8$)/,
+          'Contact telephone cannot be the DfE enquiries number',
         )
-        .min(8, 'The telephone number must be at least 8 characters long'),
+        .min(8, 'Contact telephone must be 8 characters or more'),
       supersededById: Yup.string(),
     });
 
@@ -189,7 +189,7 @@ const PublicationForm = ({
 
             <FormFieldTextInput<FormValues>
               name="contactTelNo"
-              label="Contact telephone number (optional)"
+              label="Contact telephone (optional)"
               width={10}
             />
           </FormFieldset>

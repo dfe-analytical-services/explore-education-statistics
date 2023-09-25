@@ -173,45 +173,128 @@ describe('PublicationContactPage', () => {
         }),
       ).toBeInTheDocument();
 
-      // NOTE: Contact telephone number is optional, so no validation
+      // NOTE: Contact telephone is optional, so no validation
     });
   });
 
-  test('show validation error when contact tel no is not valid', async () => {
-    publicationService.getContact.mockResolvedValue(testContact);
+  test.each([' abcdefgh ', '1234 4567a', '_12345678', '1234 5678 !'])(
+    'show validation error when contact tel no "%s" contains non-numeric or non-whitespace characters',
+    async telNo => {
+      publicationService.getContact.mockResolvedValue(testContact);
 
-    renderPage(testPublication);
+      renderPage(testPublication);
 
-    await waitFor(() => {
-      expect(
-        screen.getByText('Contact for this publication'),
-      ).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(
+          screen.getByText('Contact for this publication'),
+        ).toBeInTheDocument();
+      });
 
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit contact details' }),
-    );
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit contact details' }),
+      );
 
-    userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
+      userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
 
-    userEvent.type(
-      screen.getByLabelText('Contact telephone (optional)'),
-      ' 0 3 7 0 0 0 0 2 2 8 8 ',
-    );
+      userEvent.type(
+        screen.getByLabelText('Contact telephone (optional)'),
+        telNo,
+      );
 
-    userEvent.tab();
+      userEvent.tab();
 
-    await waitFor(() => {
-      expect(
-        screen.getByText(
-          'The DfE enquiries number is not suitable for use on statistics publications',
-          {
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Contact telephone must only contain numeric or whitespace characters',
+            {
+              selector: '#publicationContactForm-contactTelNo-error',
+            },
+          ),
+        ).toBeInTheDocument();
+      });
+    },
+  );
+
+  test.each([
+    ' 03700002288 ',
+    '0370 000 2288',
+    '037 0000 2288',
+    ' 0 3 7 0 0 0 0 2 2 8 8 ',
+  ])(
+    'show validation error when contact tel no "%s" is DfE enquiries number',
+    async telNo => {
+      publicationService.getContact.mockResolvedValue(testContact);
+
+      renderPage(testPublication);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Contact for this publication'),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit contact details' }),
+      );
+
+      userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
+
+      userEvent.type(
+        screen.getByLabelText('Contact telephone (optional)'),
+        telNo,
+      );
+
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Contact telephone cannot be the DfE enquiries number',
+            {
+              selector: '#publicationContactForm-contactTelNo-error',
+            },
+          ),
+        ).toBeInTheDocument();
+      });
+    },
+  );
+
+  test.each([' 1234567 ', '1', '123', '1234 67'])(
+    'show validation error when contact tel no "%s" is less than 8 characters',
+    async telNo => {
+      publicationService.getContact.mockResolvedValue(testContact);
+
+      renderPage(testPublication);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Contact for this publication'),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit contact details' }),
+      );
+
+      userEvent.clear(screen.getByLabelText('Contact telephone (optional)'));
+
+      userEvent.type(
+        screen.getByLabelText('Contact telephone (optional)'),
+        telNo,
+      );
+
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Contact telephone must be 8 characters or more', {
             selector: '#publicationContactForm-contactTelNo-error',
-          },
-        ),
-      ).toBeInTheDocument();
-    });
-  });
+          }),
+        ).toBeInTheDocument();
+      });
+    },
+  );
 
   test('show validation error when contact email is not valid', async () => {
     publicationService.getContact.mockResolvedValue(testContact);
