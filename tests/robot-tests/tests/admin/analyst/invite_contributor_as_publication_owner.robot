@@ -184,5 +184,4 @@ Cancel contributor invite
 user clicks remove user button for row
     [Arguments]    ${text}
     ${row}=    get webelement    xpath://tbody/tr/td[.="${text}"]/..
-    ${remove_user_button}=    get child element    ${row}    xpath://button[text()="Remove"]
-    user clicks element    ${remove_user_button}
+    user clicks button    Remove    ${row}

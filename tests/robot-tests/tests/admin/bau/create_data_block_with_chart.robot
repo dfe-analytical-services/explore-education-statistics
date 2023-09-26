@@ -980,7 +980,7 @@ Delete chart from data block
     user clicks link    Chart
     user clicks button    Delete chart
     user clicks button    Confirm
-    user waits until element does not contain infographic chart    id:chartBuilderPreview
+    user waits until page does not contain element    id:chartBuilderPreview
 
 Delete data block
     user clicks button    Delete this data block

@@ -100,7 +100,7 @@ user navigates to release page from dashboard
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
     user scrolls to element    ${ROW}
 
-    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}    # "user clicks link" doesn't work
+    user clicks link by visible text    ${LINK_TEXT}    ${ROW}
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
 
 user navigates to draft release page from dashboard
@@ -823,6 +823,13 @@ get release id from url
     ${release_id}=    Get From List    ${release_id_match}    0
     [Return]    ${release_id}
 
+user clicks the nth key stats tile button
+    [Arguments]
+    ...    ${tile_num}
+    ...    ${button_text}
+    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
+    user clicks button containing text    ${button_text}    xpath://*[@data-testid="keyStat"][${tile_num}]
+
 user adds free text key stat
     [Arguments]    ${title}    ${statistic}    ${trend}    ${guidance_title}    ${guidance_text}
     user clicks button    Add free text key statistic
@@ -841,10 +848,7 @@ user adds free text key stat
 
 user updates free text key stat
     [Arguments]    ${tile_num}    ${title}    ${statistic}    ${trend}    ${guidance_title}    ${guidance_text}
-    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
-
-    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Edit")]
-
+    user clicks the nth key stats tile button    ${tile_num}    Edit
     user waits until page contains button    Save
 
     user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="title"]    ${title}
@@ -862,8 +866,7 @@ user updates free text key stat
 
 user removes key stat
     [Arguments]    ${tile_num}
-    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
-    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Remove")]
+    user clicks the nth key stats tile button    ${tile_num}    Remove
 
 user closes admin feedback banner if needed
     user clicks element if exists    //*[@data-testid="admin-survey-banner"]//button[text()="Close"]

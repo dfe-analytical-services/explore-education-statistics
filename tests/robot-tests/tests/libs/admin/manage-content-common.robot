@@ -49,7 +49,7 @@ user creates new content section
     ...    ${content_section_name}
     ...    ${parent}=css:body
 
-    user clicks element    xpath://button[.="Add new section"]    ${parent}
+    user clicks button    Add new section    ${parent}
     user changes accordion section title    ${section_number}    ${content_section_name}    ${parent}
 
 user creates data block for dates csv
@@ -355,7 +355,7 @@ user adds image to accordion section text block
     choose file
     ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
     ...    ${FILES_DIR}${filename}
-    user clicks element    xpath://button[span[.="Change image text alternative"]]
+    user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
     user clicks element    css:button.ck-button-save
     user clicks element    xpath://div[@title="Insert paragraph after block"]

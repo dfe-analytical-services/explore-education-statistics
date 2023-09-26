@@ -73,7 +73,7 @@ Add Useful information related page link to release
     user clicks button    Add related page link
     user enters text into element    id:relatedPageForm-description    Test link one
     user enters text into element    id:relatedPageForm-url    http://test1.example.com/test1
-    user clicks element    //button[text()="Create link"]    //*[@id="relatedPageForm"]
+    user clicks button    Create link    id:relatedPageForm
     user checks page does not contain element    id:${SECONDARY_STATS_TABLE_TAB_ID}
 
 Add secondary statistics
@@ -236,4 +236,4 @@ user clicks the nth key stats tile button
     [Arguments]
     ...    ${tile_number}
     ...    ${button_text}
-    user clicks element    //*[@data-testid="keyStat"][${tile_number}]//button[contains(., "${button_text}")]
+    user clicks button containing text    ${button_text}    xpath://*[@data-testid="keyStat"][${tile_number}]

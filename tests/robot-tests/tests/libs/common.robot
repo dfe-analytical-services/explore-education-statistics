@@ -510,7 +510,7 @@ user clicks link by visible text
 
 user clicks link containing text
     [Arguments]    ${text}    ${parent}=css:body
-    user clicks element    xpath:.//a[contains(text(), ${text})]    ${parent}
+    user clicks element    xpath:.//a[contains(text(), "${text}")]    ${parent}
 
 user clicks button
     [Arguments]    ${text}    ${parent}=css:body
@@ -519,7 +519,7 @@ user clicks button
 
 user clicks button containing text
     [Arguments]    ${text}    ${parent}=css:body
-    user clicks element    xpath://button[contains(text(),${text})]    ${parent}
+    user clicks element    xpath://button[contains(text(), "${text}")]    ${parent}
 
 user waits until page contains button
     [Arguments]    ${text}    ${wait}=${timeout}

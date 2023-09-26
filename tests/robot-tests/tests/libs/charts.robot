@@ -33,7 +33,7 @@ user waits until element contains infographic chart
 
 user waits until element does not contain infographic chart
     [Arguments]    ${locator}
-    user waits until parent contains element    ${locator}    css:img
+    user waits until parent does not contain element    ${locator}    css:img
 
 user waits until element contains chart tooltip
     [Arguments]    ${locator}

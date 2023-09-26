@@ -70,7 +70,7 @@ Validate Number of schools row results
     user checks table cell contains    1    4    349
 
 Go back to Locations step
-    user clicks element    xpath://button[contains(text(), "Edit locations")]
+    user clicks button    Edit locations
     user waits until table tool wizard step is available    3    Choose locations
 
 Unselect England as a location
