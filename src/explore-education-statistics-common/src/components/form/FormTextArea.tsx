@@ -1,5 +1,6 @@
 import FormGroup from '@common/components/form/FormGroup';
 import FormLabel, { FormLabelProps } from '@common/components/form/FormLabel';
+import { mergeRefs } from '@common/utils/mergeRefs';
 import classNames from 'classnames';
 import React, {
   ChangeEventHandler,
@@ -17,6 +18,7 @@ export interface FormTextAreaProps extends FormLabelProps {
   error?: ReactNode | string;
   hint?: string;
   id: string;
+  inputRef?: Ref<HTMLTextAreaElement>;
   maxLength?: number;
   name: string;
   rows?: number;
@@ -35,6 +37,7 @@ const FormTextArea = ({
   hint,
   id,
   hideLabel,
+  inputRef,
   label,
   maxLength,
   name,
@@ -74,7 +77,7 @@ const FormTextArea = ({
         disabled={disabled}
         id={id}
         name={name}
-        ref={textAreaRef}
+        ref={mergeRefs(inputRef, textAreaRef)}
         onBlur={onBlur}
         onChange={onChange}
         onClick={onClick}
