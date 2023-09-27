@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20230927133851_EES4486_AlterIndexDataImportsFileId")]
+    [Migration("20230927144301_EES4486_AlterIndexDataImportsFileId")]
     partial class EES4486_AlterIndexDataImportsFileId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -211,6 +211,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("FileId")
                         .IsUnique();
+
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("FileId"), new[] { "Status" });
 
                     b.HasIndex("MetaFileId")
                         .IsUnique();

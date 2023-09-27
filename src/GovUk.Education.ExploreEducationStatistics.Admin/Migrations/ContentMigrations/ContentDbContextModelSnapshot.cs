@@ -210,6 +210,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("FileId")
                         .IsUnique();
 
+                    SqlServerIndexBuilderExtensions.IncludeProperties(b.HasIndex("FileId"), new[] { "Status" });
+
                     b.HasIndex("MetaFileId")
                         .IsUnique();
 
