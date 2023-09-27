@@ -523,32 +523,38 @@ user clicks button containing text
 
 user waits until page contains button
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath://button[text()="${text}"]    ${wait}
+    user waits until page contains element    xpath://button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
 
 user checks page contains button
     [Arguments]    ${text}
-    user checks page contains element    xpath://button[text()="${text}"]
+    user checks page contains element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
 
 user checks page does not contain button
     [Arguments]    ${text}
-    user checks page does not contain element    xpath://button[text()="${text}"]
+    user checks page does not contain element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
 
 user waits until page does not contain button
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page does not contain element    xpath://button[text()="${text}"]    ${wait}
+    user waits until page does not contain element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
+    ...    ${wait}
 
 user waits until button is enabled
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is enabled    xpath://button[text()="${text}"]    ${wait}
+    user waits until element is enabled    xpath://button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+
+user waits until parent contains button
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
 
 user waits until parent does not contain button
     [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
-    user waits until parent does not contain element    ${parent}    xpath://button[text()="${text}"]    ${wait}
+    user waits until parent does not contain element    ${parent}
+    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
 
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
-    user waits until parent contains element    ${parent}
-    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
+    user waits until parent contains button    ${parent}    ${text}
     ${button}=    get child element    ${parent}    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
     [Return]    ${button}
 
