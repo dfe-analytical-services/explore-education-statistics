@@ -1,3 +1,4 @@
+import FormProvider from '@common/components/form/rhf/FormProvider';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TableHeadersGroup from '@common/modules/table-tool/components/TableHeadersGroup';
 import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts/TableHeadersContext';
@@ -7,7 +8,6 @@ import {
   testLocationFilters,
   testTimePeriodFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
-import { Formik } from 'formik';
 import { DragDropContext, Droppable } from 'react-beautiful-dnd';
 import { render as baseRender, screen, within } from '@testing-library/react';
 import noop from 'lodash/noop';
@@ -112,7 +112,7 @@ function render({
       groupDraggingActive={groupDraggingActive}
       groupDraggingEnabled={groupDraggingEnabled}
     >
-      <Formik onSubmit={noop} initialValues={testInitialFormValues}>
+      <FormProvider initialValues={testInitialFormValues}>
         <DragDropContext onDragEnd={noop}>
           <Droppable droppableId="test">
             {droppableProvided => (
@@ -128,7 +128,7 @@ function render({
             )}
           </Droppable>
         </DragDropContext>
-      </Formik>
+      </FormProvider>
     </TableHeadersContextProvider>,
   );
 }

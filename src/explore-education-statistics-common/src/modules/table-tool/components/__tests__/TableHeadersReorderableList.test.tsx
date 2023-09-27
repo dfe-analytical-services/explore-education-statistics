@@ -1,3 +1,4 @@
+import FormProvider from '@common/components/form/rhf/FormProvider';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TableHeadersReorderableList from '@common/modules/table-tool/components/TableHeadersReorderableList';
 import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts/TableHeadersContext';
@@ -7,9 +8,7 @@ import {
   testLocationFilters,
   testTimePeriodFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
-import { Formik } from 'formik';
 import { render as baseRender, screen, within } from '@testing-library/react';
-import noop from 'lodash/noop';
 import React from 'react';
 
 describe('TableHeadersReorderableList', () => {
@@ -36,13 +35,13 @@ function render() {
 
   baseRender(
     <TableHeadersContextProvider>
-      <Formik onSubmit={noop} initialValues={testInitialFormValues}>
+      <FormProvider initialValues={testInitialFormValues}>
         <TableHeadersReorderableList
           id="test-id"
           legend="Category group"
           name="rowGroups[0]"
         />
-      </Formik>
+      </FormProvider>
     </TableHeadersContextProvider>,
   );
 }

@@ -1,3 +1,4 @@
+import FormProvider from '@common/components/form/rhf/FormProvider';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TableHeadersReadOnlyList from '@common/modules/table-tool/components/TableHeadersReadOnlyList';
 import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts/TableHeadersContext';
@@ -7,9 +8,7 @@ import {
   testLocationFilters,
   testTimePeriodFilters,
 } from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
-import { Formik } from 'formik';
 import { render as baseRender, screen, within } from '@testing-library/react';
-import noop from 'lodash/noop';
 import React from 'react';
 
 describe('TableHeadersReadOnlyList', () => {
@@ -51,14 +50,14 @@ function render(expandedLists: string[] = []) {
 
   baseRender(
     <TableHeadersContextProvider expandedLists={expandedLists}>
-      <Formik onSubmit={noop} initialValues={testInitialFormValues}>
+      <FormProvider initialValues={testInitialFormValues}>
         <TableHeadersReadOnlyList
           defaultNumberOfItems={2}
           id="test-id"
           legend="Locations"
           name="columnGroups[1]"
         />
-      </Formik>
+      </FormProvider>
     </TableHeadersContextProvider>,
   );
 }

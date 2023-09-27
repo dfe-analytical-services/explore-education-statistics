@@ -1,5 +1,7 @@
 import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import ScreenReaderMessage from '@common/components/ScreenReaderMessage';
 import useToggle from '@common/hooks/useToggle';
 import useMounted from '@common/hooks/useMounted';
@@ -10,11 +12,17 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import styles from '@common/modules/table-tool/components/TableHeadersForm.module.scss';
 import reorder from '@common/utils/reorder';
 import Yup from '@common/validation/yup';
-import { Form, Formik, FormikProps } from 'formik';
 import compact from 'lodash/compact';
 import last from 'lodash/last';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
+
+import {
+  UseFormGetValues,
+  UseFormSetValue,
+  UseFormTrigger,
+} from 'react-hook-form';
+import { ObjectSchema } from 'yup';
 
 export interface TableHeadersFormValues {
   rowGroups: Filter[][];
@@ -33,7 +41,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
   const id = 'tableHeaderForm';
 
   const handleSubmit = useCallback(
-    (values: TableHeadersFormValues) => {
+    async (values: TableHeadersFormValues) => {
       onSubmit({
         columnGroups:
           values.columnGroups.length > 1
@@ -52,41 +60,54 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
   const moveGroupToAxis = ({
     destinationId,
     destinationIndex,
-    form,
     sourceId,
     sourceIndex,
+    getValues,
+    setValue,
+    trigger,
   }: {
     destinationId: keyof TableHeadersFormValues;
     destinationIndex: number;
-    form: FormikProps<TableHeadersFormValues>;
     sourceId: keyof TableHeadersFormValues;
     sourceIndex: number;
+    getValues: UseFormGetValues<TableHeadersFormValues>;
+    setValue: UseFormSetValue<TableHeadersFormValues>;
+    trigger: UseFormTrigger<TableHeadersFormValues>;
   }) => {
-    const nextSourceValue = [...form.values[sourceId]];
-    const nextDestinationValue = [...form.values[destinationId]];
+    const nextSourceValue = getValues(sourceId);
+    const nextDestinationValue = getValues(destinationId);
     const [sourceItem] = nextSourceValue.splice(sourceIndex, 1);
     nextDestinationValue.splice(destinationIndex, 0, sourceItem);
-
-    form.setFieldValue(sourceId, nextSourceValue);
-    form.setFieldValue(destinationId, nextDestinationValue);
-    form.setFieldTouched(sourceId);
-    form.setFieldTouched(destinationId);
+    setValue(sourceId, nextSourceValue, { shouldTouch: true });
+    setValue(destinationId, nextDestinationValue, { shouldTouch: true });
+    trigger(destinationId);
   };
 
-  const handleMoveGroupToOtherAxis = (
-    sourceId: keyof TableHeadersFormValues,
-    groupIndex: number,
-    form: FormikProps<TableHeadersFormValues>,
-  ) => {
+  const handleMoveGroupToOtherAxis = ({
+    groupIndex,
+    sourceId,
+    getValues,
+    setValue,
+    trigger,
+  }: {
+    groupIndex: number;
+    sourceId: keyof TableHeadersFormValues;
+    getValues: UseFormGetValues<TableHeadersFormValues>;
+    setValue: UseFormSetValue<TableHeadersFormValues>;
+    trigger: UseFormTrigger<TableHeadersFormValues>;
+  }) => {
     const destinationId: keyof TableHeadersFormValues =
       sourceId === 'rowGroups' ? 'columnGroups' : 'rowGroups';
+    const destinationIndex = getValues(destinationId).length;
 
     moveGroupToAxis({
       destinationId,
-      destinationIndex: form.values[destinationId].length,
-      form,
+      destinationIndex,
       sourceIndex: groupIndex,
       sourceId,
+      getValues,
+      setValue,
+      trigger,
     });
 
     const message =
@@ -97,10 +118,17 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
     setScreenReaderMessage(message);
   };
 
-  const handleDragEnd = (
-    form: FormikProps<TableHeadersFormValues>,
-    result: DropResult,
-  ) => {
+  const handleDragEnd = ({
+    result,
+    getValues,
+    setValue,
+    trigger,
+  }: {
+    result: DropResult;
+    getValues: UseFormGetValues<TableHeadersFormValues>;
+    setValue: UseFormSetValue<TableHeadersFormValues>;
+    trigger: UseFormTrigger<TableHeadersFormValues>;
+  }) => {
     const { source, destination } = result;
 
     if (!destination) {
@@ -113,15 +141,8 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
 
     // Moving group within its axis
     if (destinationId === sourceId) {
-      form.setFieldTouched(destinationId);
-      form.setFieldValue(
-        destinationId,
-        reorder(
-          form.values[destinationId] as unknown[],
-          source.index,
-          destination.index,
-        ),
-      );
+      const values = getValues(destinationId);
+      setValue(destinationId, reorder(values, source.index, destination.index));
 
       return;
     }
@@ -130,10 +151,58 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
     moveGroupToAxis({
       destinationId,
       destinationIndex: destination.index,
-      form,
       sourceId,
       sourceIndex: source.index,
+      getValues,
+      setValue,
+      trigger,
     });
+  };
+
+  const validationSchema = useMemo<ObjectSchema<TableHeadersFormValues>>(() => {
+    return Yup.object({
+      rowGroups: Yup.array()
+        .required()
+        .of(
+          Yup.array()
+            .required()
+            .of<Filter>(
+              Yup.object({
+                id: Yup.string().required(),
+                label: Yup.string().required('Label is required'),
+                value: Yup.string().required('Value is required'),
+              }),
+            )
+            .ensure(),
+        )
+        .min(1, 'Must have at least one row group'),
+      columnGroups: Yup.array()
+        .required()
+        .of(
+          Yup.array()
+            .required()
+            .of<Filter>(
+              Yup.object({
+                id: Yup.string().required(),
+                label: Yup.string().required('Label is required'),
+                value: Yup.string().required('Value is required'),
+              }),
+            )
+            .ensure(),
+        )
+        .min(1, 'Must have at least one column group'),
+    });
+  }, []);
+
+  const initialFormValues: TableHeadersFormValues = {
+    columnGroups: compact([
+      ...(initialValues?.columnGroups ?? []),
+      initialValues?.columns,
+    ]),
+    rowGroups: compact([
+      ...(initialValues?.rowGroups ?? []),
+      initialValues?.rows,
+    ]),
   };
 
   if (!isMounted) {
@@ -180,53 +249,26 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                 </div>
               </div>
 
-              <Formik<TableHeadersFormValues>
+              <FormProvider
                 enableReinitialize
-                initialValues={{
-                  columnGroups: compact([
-                    ...(initialValues?.columnGroups ?? []),
-                    initialValues?.columns,
-                  ]),
-                  rowGroups: compact([
-                    ...(initialValues?.rowGroups ?? []),
-                    initialValues?.rows,
-                  ]),
-                }}
-                validationSchema={Yup.object<TableHeadersFormValues>({
-                  rowGroups: Yup.array()
-                    .of(
-                      Yup.array()
-                        .of<Omit<Filter, 'id'>>(
-                          Yup.object({
-                            label: Yup.string().required('Label is required'),
-                            value: Yup.string().required('Value is required'),
-                          }),
-                        )
-                        .ensure(),
-                    )
-                    .min(1, 'Must have at least one row group'),
-                  columnGroups: Yup.array()
-                    .of(
-                      Yup.array()
-                        .of<Omit<Filter, 'id'>>(
-                          Yup.object({
-                            label: Yup.string().required('Label is required'),
-                            value: Yup.string().required('Value is required'),
-                          }),
-                        )
-                        .ensure(),
-                    )
-                    .min(1, 'Must have at least one column group'),
-                })}
-                validateOnBlur={false}
-                onSubmit={handleSubmit}
+                initialValues={initialFormValues}
+                validationSchema={validationSchema}
               >
-                {form => {
+                {({ getValues, setValue, trigger }) => {
                   return (
-                    <Form id={`${id}-form`}>
+                    <RHFForm
+                      id={`${id}-form`}
+                      showErrorSummary={false}
+                      onSubmit={handleSubmit}
+                    >
                       <DragDropContext
                         onDragEnd={result => {
-                          handleDragEnd(form, result);
+                          handleDragEnd({
+                            result,
+                            getValues,
+                            setValue,
+                            trigger,
+                          });
                           toggleGroupDraggingActive(false);
                         }}
                         onDragStart={() => {
@@ -239,11 +281,13 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                             legend="Move column headers"
                             name="columnGroups"
                             onMoveGroupToOtherAxis={groupIndex => {
-                              handleMoveGroupToOtherAxis(
-                                'columnGroups',
+                              handleMoveGroupToOtherAxis({
                                 groupIndex,
-                                form,
-                              );
+                                sourceId: 'columnGroups',
+                                getValues,
+                                setValue,
+                                trigger,
+                              });
                             }}
                           />
 
@@ -251,13 +295,15 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                             id="rowGroups"
                             legend="Move row headers"
                             name="rowGroups"
-                            onMoveGroupToOtherAxis={groupIndex =>
-                              handleMoveGroupToOtherAxis(
-                                'rowGroups',
+                            onMoveGroupToOtherAxis={groupIndex => {
+                              handleMoveGroupToOtherAxis({
                                 groupIndex,
-                                form,
-                              )
-                            }
+                                sourceId: 'rowGroups',
+                                getValues,
+                                setValue,
+                                trigger,
+                              });
+                            }}
                           />
                         </FormGroup>
                       </DragDropContext>
@@ -270,10 +316,10 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                       >
                         Update and view reordered table
                       </Button>
-                    </Form>
+                    </RHFForm>
                   );
                 }}
-              </Formik>
+              </FormProvider>
             </div>
           )}
 

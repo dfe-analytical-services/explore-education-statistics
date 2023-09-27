@@ -10,9 +10,10 @@ import {
   Filter,
 } from '@common/modules/table-tool/types/filters';
 import classNames from 'classnames';
-import { useField } from 'formik';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
+import { useFormContext } from 'react-hook-form';
+import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 
 interface Props {
   id: string;
@@ -29,8 +30,15 @@ export default function TableHeadersAxis({
 }: Props) {
   const { groupDraggingActive, groupDraggingEnabled } =
     useTableHeadersContext();
-  const [field, meta] = useField(name);
 
+  const { formState, getValues } = useFormContext<TableHeadersFormValues>();
+
+  const values = getValues(name);
+
+  const { getError } = createRHFErrorHelper({
+    errors: formState.errors,
+    touchedFields: formState.touchedFields,
+  });
   return (
     <Droppable
       droppableId={name}
@@ -52,17 +60,17 @@ export default function TableHeadersAxis({
               id={id}
               legend={legend}
               legendWeight="regular"
-              error={meta.error}
+              error={getError(name)}
               legendSize="m"
             >
               <div className={styles.groupsContainer}>
-                {field.value.length === 0 && (
+                {values.length === 0 && (
                   <div className="govuk-inset-text govuk-!-margin-0">
                     Add groups by dragging them here
                   </div>
                 )}
 
-                {field.value.map((group: Filter[], index: number) => {
+                {values.map((group: Filter[], index: number) => {
                   const key = `group-${index}`;
 
                   return (
@@ -92,7 +100,7 @@ export default function TableHeadersAxis({
                 {legend}
               </h3>
               <div className={styles.groupsContainer}>
-                {field.value.map((group: Filter[], index: number) => {
+                {values.map((group: Filter[], index: number) => {
                   const key = `group-${index}`;
                   return (
                     <div
