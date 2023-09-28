@@ -1,28 +1,26 @@
 // Import order is important - these should be at the top
 import '@frontend/polyfill';
+import '@frontend/loadEnv';
 import '../styles/_all.scss';
 import {
-  ApplicationInsightsContextProvider,
+  ApplicationInsightsContextProvider as BaseApplicationInsightsContextProvider,
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
+import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
+import composeProviders from '@common/hocs/composeProviders';
 import useMounted from '@common/hooks/useMounted';
-import { contentApi, dataApi } from '@common/services/api';
 import { Dictionary } from '@common/types';
 import { useCookies } from '@frontend/hooks/useCookies';
-import notificationApi from '@frontend/services/clients/notificationApi';
 import NextApp, { AppContext, AppProps } from 'next/app';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import {
   Hydrate,
   QueryClient,
-  QueryClientProvider,
+  QueryClientProvider as BaseQueryClientProvider,
 } from '@tanstack/react-query';
-import loadEnv from '@frontend/loadEnv';
 import { parseCookies } from 'nookies';
-
-loadEnv();
 
 const ApplicationInsightsTracking = () => {
   const appInsights = useApplicationInsights();
@@ -49,17 +47,9 @@ type Props = AppProps<{ dehydratedState: unknown }> & {
   cookies: Dictionary<string>;
 };
 
-const App = ({ Component, pageProps, cookies }: Props) => {
+export default function App({ Component, pageProps, cookies }: Props) {
   const router = useRouter();
   const { getCookie } = useCookies(cookies);
-  const [queryClient] = useState(() => new QueryClient());
-
-  loadEnv();
-
-  contentApi.axios.defaults.baseURL = process.env.CONTENT_API_BASE_URL;
-  dataApi.axios.defaults.baseURL = process.env.DATA_API_BASE_URL;
-  notificationApi.axios.defaults.baseURL =
-    process.env.NOTIFICATION_API_BASE_URL;
 
   useMounted(() => {
     if (process.env.GA_TRACKING_ID && getCookie('disableGA') !== 'true') {
@@ -78,33 +68,55 @@ const App = ({ Component, pageProps, cookies }: Props) => {
   });
 
   return (
-    <ApplicationInsightsContextProvider
-      instrumentationKey={process.env.APPINSIGHTS_INSTRUMENTATIONKEY}
-    >
+    <Providers>
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
       <ApplicationInsightsTracking />
 
-      <QueryClientProvider client={queryClient}>
-        <Hydrate state={pageProps.dehydratedState}>
-          <Component {...pageProps} />
-        </Hydrate>
-      </QueryClientProvider>
-    </ApplicationInsightsContextProvider>
+      <Hydrate state={pageProps.dehydratedState}>
+        <Component {...pageProps} />
+      </Hydrate>
+    </Providers>
   );
-};
-
-export default App;
+}
 
 App.getInitialProps = async (appContext: AppContext) => {
   const appProps = await NextApp.getInitialProps(appContext);
-
-  loadEnv();
 
   return {
     ...appProps,
     cookies: parseCookies(appContext.ctx),
   };
 };
+
+const Providers = composeProviders(
+  ApplicationInsightsContextProvider,
+  NetworkActivityContextProvider,
+  QueryClientProvider,
+);
+
+function ApplicationInsightsContextProvider({
+  children,
+}: {
+  children?: ReactNode;
+}) {
+  return (
+    <BaseApplicationInsightsContextProvider
+      instrumentationKey={process.env.APPINSIGHTS_INSTRUMENTATIONKEY}
+    >
+      {children}
+    </BaseApplicationInsightsContextProvider>
+  );
+}
+
+function QueryClientProvider({ children }: { children?: ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  return (
+    <BaseQueryClientProvider client={queryClient}>
+      {children}
+    </BaseQueryClientProvider>
+  );
+}

@@ -53,7 +53,7 @@ Check cannot approve a draft release
 Check cannot see the readonly or editable version of the "Release access" section of the "Team access" page
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user clicks link    Team access
-    user waits for page to finish loading
+    user waits until page finishes loading
     user waits until h3 is not visible    Update release access
     user waits until h3 is not visible    Release access
     user waits until page does not contain link    Manage release contributors

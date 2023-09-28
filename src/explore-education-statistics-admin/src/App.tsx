@@ -5,16 +5,24 @@ import apiAuthorizationRouteList from '@admin/components/api-authorization/ApiAu
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
 import ProtectedRoute from '@admin/components/ProtectedRoute';
 import { AuthContextProvider } from '@admin/contexts/AuthContext';
-import { ConfigContextProvider } from '@admin/contexts/ConfigContext';
+import {
+  ConfigContextProvider,
+  useConfig,
+} from '@admin/contexts/ConfigContext';
 import ServiceProblemsPage from '@admin/pages/errors/ServiceProblemsPage';
 import routes from '@admin/routes/routes';
 import {
-  ApplicationInsightsContextProvider,
+  ApplicationInsightsContextProvider as BaseApplicationInsightsContextProvider,
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
+import { NetworkActivityContextProvider } from '@common/contexts/NetworkActivityContext';
+import composeProviders from '@common/hocs/composeProviders';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React, { lazy, Suspense, useEffect } from 'react';
+import {
+  QueryClient,
+  QueryClientProvider as BaseQueryClientProvider,
+} from '@tanstack/react-query';
+import React, { lazy, ReactNode, Suspense, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
@@ -66,53 +74,70 @@ function PrototypesEntry() {
   );
 }
 
-function App() {
+export default function App() {
   return (
-    <ConfigContextProvider>
-      {config => (
-        <ApplicationInsightsContextProvider
-          instrumentationKey={config.AppInsightsKey}
-        >
-          <BrowserRouter>
-            <ApplicationInsightsTracking />
-            <QueryClientProvider client={queryClient}>
-              <AuthContextProvider>
-                <LastLocationContextProvider>
-                  <PageErrorBoundary>
-                    <Switch>
-                      {Object.entries(apiAuthorizationRouteList).map(
-                        ([key, authRoute]) => (
-                          <Route exact key={key} {...authRoute} />
-                        ),
-                      )}
+    <Providers>
+      <PageErrorBoundary>
+        <ApplicationInsightsTracking />
 
-                      {Object.entries(routes).map(([key, route]) => (
-                        <ProtectedRoute key={key} {...route} />
-                      ))}
+        <Switch>
+          {Object.entries(apiAuthorizationRouteList).map(([key, authRoute]) => (
+            <Route exact key={key} {...authRoute} />
+          ))}
 
-                      {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
-                      {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
-                      <ProtectedRoute
-                        path="/prototypes"
-                        protectionAction={user => user.permissions.isBauUser}
-                        component={PrototypesEntry}
-                      />
+          {Object.entries(routes).map(([key, route]) => (
+            <ProtectedRoute key={key} {...route} />
+          ))}
 
-                      <ProtectedRoute
-                        path="*"
-                        allowAnonymousUsers
-                        component={PageNotFoundPage}
-                      />
-                    </Switch>
-                  </PageErrorBoundary>
-                </LastLocationContextProvider>
-              </AuthContextProvider>
-            </QueryClientProvider>
-          </BrowserRouter>
-        </ApplicationInsightsContextProvider>
-      )}
-    </ConfigContextProvider>
+          {/* Prototype pages are protected by default. To open them up change the ProtectedRoute to: */}
+          {/* <Route path="/prototypes" component={PrototypesEntry} /> */}
+          <ProtectedRoute
+            path="/prototypes"
+            protectionAction={user => user.permissions.isBauUser}
+            component={PrototypesEntry}
+          />
+
+          <ProtectedRoute
+            path="*"
+            allowAnonymousUsers
+            component={PageNotFoundPage}
+          />
+        </Switch>
+      </PageErrorBoundary>
+    </Providers>
   );
 }
 
-export default App;
+const Providers = composeProviders(
+  ConfigContextProvider,
+  ApplicationInsightsContextProvider,
+  BrowserRouter,
+  NetworkActivityContextProvider,
+  QueryClientProvider,
+  AuthContextProvider,
+  LastLocationContextProvider,
+);
+
+function ApplicationInsightsContextProvider({
+  children,
+}: {
+  children?: ReactNode;
+}) {
+  const config = useConfig();
+
+  return (
+    <BaseApplicationInsightsContextProvider
+      instrumentationKey={config.AppInsightsKey}
+    >
+      {children}
+    </BaseApplicationInsightsContextProvider>
+  );
+}
+
+function QueryClientProvider({ children }: { children?: ReactNode }) {
+  return (
+    <BaseQueryClientProvider client={queryClient}>
+      {children}
+    </BaseQueryClientProvider>
+  );
+}

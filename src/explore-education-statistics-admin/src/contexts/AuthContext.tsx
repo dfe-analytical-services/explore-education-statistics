@@ -39,7 +39,7 @@ export const AuthContext = createContext<AuthContextState | undefined>(
 );
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface State {

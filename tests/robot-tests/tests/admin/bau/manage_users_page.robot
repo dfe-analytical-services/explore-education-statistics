@@ -68,7 +68,7 @@ Select a user to manage
 
     user clicks link    Manage    ${PRE_RELEASE_ROW}
     user waits until page contains title    Manage user
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user waits until h1 is visible    Prerelease2 User2    10
 
 Check the initial manage user page
@@ -167,7 +167,7 @@ Give the user owner access to some publications
 Give the user the BAU User role
     user chooses select option    //*[@name="selectedRoleId"]    BAU User
     user clicks button    Update role
-    user waits for page to finish loading
+    user waits until page finishes loading
     user checks selected option label    //*[@name="selectedRoleId"]    BAU User
 
 Remove publication owner access for one of the publications from user while they are BAU
@@ -212,7 +212,7 @@ Give the user approver access to a release while they are BAU and manually set t
 
     user chooses select option    //*[@name="selectedRoleId"]    Analyst
     user clicks button    Update role
-    user waits for page to finish loading
+    user waits until page finishes loading
     user checks selected option label    //*[@name="selectedRoleId"]    Analyst
 
 Remove approver access for release from user after they have manually been set to Analyst

@@ -32,20 +32,21 @@ Upload subject
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Navigate to 'Footnotes' page
-    user waits for page to finish loading
+    user waits until page finishes loading
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
 Create footnote
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks footnote subject radio    UI test subject    Applies to all data
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content    ${FOOTNOTE_1}
     user clicks radio    Applies to all data
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
+    user waits until page finishes loading
 
 Start creating a data block
     user clicks link    Data blocks
@@ -301,12 +302,13 @@ Update footnote
     user clicks button    Save footnote
     user waits until page contains    ${FOOTNOTE_UPDATED}
     user checks page does not contain    ${FOOTNOTE_1}
+    user waits until page finishes loading
 
-Navigate to content tab
+Navigate to release content page
     user clicks link    Content
-    user waits until element is visible    //*[@class="dfe-page-editing"]//h2[text()="${PUBLICATION_NAME}"]
+    user waits until h2 is visible    ${PUBLICATION_NAME}
 
-Check updated footnote is displayed in content Tab
+Check updated footnote is displayed in release content page
     [Documentation]    EES-3136
     user clicks button    Test data block section
     ${section}=    user gets accordion section content element    Test data block section
@@ -423,7 +425,7 @@ Navigate to Chart tab
     user waits until h2 is visible    Edit data block
     user waits until h2 is visible    ${DATABLOCK_NAME}
 
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
     # Set url in suite variable so that we
     # can get back to this page quickly
@@ -595,7 +597,7 @@ Configure basic vertical bar chart
     user navigates to admin frontend    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
     user clicks link    Chart
     user configures basic chart    Vertical bar    500    800
@@ -693,7 +695,7 @@ Save and validate vertical bar chart embeds correctly
 Configure basic horizontal bar chart
     user navigates to admin frontend    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
     user clicks link    Chart
     user configures basic chart    Horizontal bar    600    700
@@ -734,6 +736,7 @@ Save and validate horizontal bar chart embeds correctly
     user clicks link    Chart configuration
     user clicks button    Save chart options
     user waits until button is enabled    Save chart options
+    user waits until page finishes loading
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
@@ -778,7 +781,7 @@ Save and validate horizontal bar chart embeds correctly
 Configure basic geographic chart
     user navigates to admin frontend    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
     user clicks link    Chart
     user configures basic chart    Geographic    700    600
@@ -815,7 +818,7 @@ Change geographic chart legend
     user enters text into element    id:chartLegendConfigurationForm-items-3-label    Admissions in 2017
     user enters text into element    id:chartLegendConfigurationForm-items-4-label    Admissions in 2018
 
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
 Validate basic geographic chart preview
     user waits until element does not contain bar chart    id:chartBuilderPreview
@@ -907,13 +910,13 @@ Validate basic geographic chart preview updates correctly
 
 Save and validate geographic chart embeds correctly
     user scrolls to the bottom of the page
-    user clicks element    //*[@id="chartDataGroupingsConfigurationForm-submit"]
-    user waits until page does not contain loading spinner
+    user clicks element    id:chartDataGroupingsConfigurationForm-submit
+    user waits until page finishes loading
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -937,7 +940,7 @@ Configure basic infographic chart
     user navigates to admin frontend    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
     user clicks link    Chart
     user waits until h3 is visible    Choose chart type
@@ -952,6 +955,7 @@ Validate basic infographic chart preview
 Save and validate infographic chart embeds correctly
     user clicks button    Save chart options
     user waits until button is enabled    Save chart options
+    user waits until page finishes loading
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
@@ -972,21 +976,21 @@ Delete embedded data block
 Delete chart from data block
     user navigates to admin frontend    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks link    Chart
     user clicks button    Delete chart
     user clicks button    Confirm
-    user waits until element does not contain infographic chart    id:chartBuilderPreview
+    user waits until page does not contain element    id:chartBuilderPreview
 
 Delete data block
     user clicks button    Delete this data block
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks button    Confirm
     user waits until page does not contain button    Confirm
 
 Delete featured table
     user clicks button    Delete block
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks button    Confirm
     user waits until page does not contain button    Confirm
 

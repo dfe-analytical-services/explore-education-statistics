@@ -91,7 +91,7 @@ Validate Analyst1 cannot create a release for Pupil absence publication
 
 Navigate to Absence release
     ${ROW}=    user gets table row    Academic year 2016/17    testid:publication-published-releases
-    user clicks element    xpath://*[text()="View"]    ${ROW}
+    user clicks link containing text    View    ${ROW}
 
     user waits until h1 is visible    Pupil absence in schools in England
     user waits until h2 is visible    Release summary
@@ -102,12 +102,12 @@ Validate Analyst1 can see Absence release summary
 
 Validate Analyst1 can see 'Content' page
     user clicks link    Content
-    user waits for page to finish loading
+    user waits until page finishes loading
     user waits until h2 is visible    Pupil absence in schools in England    %{WAIT_SMALL}
 
 Validate Analyst1 can see 'Content' page key stats
     user waits until page contains element    id:releaseHeadlines    %{WAIT_LONG}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user scrolls to element    id:releaseHeadlines
     user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    90
     user checks key stat guidance    1    What is overall absence?

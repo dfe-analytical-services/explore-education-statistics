@@ -6,7 +6,7 @@ Resource    ./common.robot
 user waits until results table appears
     [Arguments]    ${wait_time}
     user waits until page contains element    css:table thead th    ${wait_time}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
 user clicks indicator checkbox
     [Arguments]    ${indicator_label}
@@ -66,11 +66,11 @@ user checks category checkbox is checked
 
 user clicks select all for category
     [Arguments]    ${category_label}
-    user clicks element    xpath://legend[text()="${category_label}"]/..//button[contains(text(), "Select")]
+    user clicks button containing text    Select all    xpath://legend[text()="${category_label}"]/..
 
 user clicks unselect all for category
     [Arguments]    ${category_label}
-    user clicks element    xpath://legend[text()="${category_label}"]/..//button[contains(text(), "Unselect")]
+    user clicks button containing text    Unselect all    xpath://legend[text()="${category_label}"]/..
 
 user checks location checkbox is checked
     [Arguments]    ${location_label}
