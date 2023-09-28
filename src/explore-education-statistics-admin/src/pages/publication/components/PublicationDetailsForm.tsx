@@ -1,4 +1,4 @@
-import RHFFormFieldThemeTopicSelect from '@admin/components/form/RHFFormFieldThemeTopicSelect';
+import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
 import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
@@ -33,17 +33,17 @@ interface Props {
   initialValues: FormValues;
   publicationId: string;
   onCancel: () => void;
-  onSubmit: () => void;
+  onSubmit: () => void | Promise<void>;
 }
 
-const PublicationDetailsForm = ({
+export default function PublicationDetailsForm({
   canUpdatePublication = false,
   canUpdatePublicationSummary = false,
   initialValues,
   publicationId,
   onCancel,
   onSubmit,
-}: Props) => {
+}: Props) {
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
 
   const { value, isLoading } = useAsyncHandledRetry(async () => {
@@ -118,8 +118,9 @@ const PublicationDetailsForm = ({
                       maxLength={160}
                     />
                   )}
+
                   {canUpdatePublication && themes && initialValues?.topicId && (
-                    <RHFFormFieldThemeTopicSelect<FormValues>
+                    <FormFieldThemeTopicSelect<FormValues>
                       id={id}
                       inline={false}
                       legend="Choose a topic for this publication"
@@ -129,6 +130,7 @@ const PublicationDetailsForm = ({
                     />
                   )}
                 </FormFieldset>
+
                 {canUpdatePublication && (
                   <FormFieldset
                     id="supersede"
@@ -154,6 +156,7 @@ const PublicationDetailsForm = ({
                   <ButtonText onClick={onCancel}>Cancel</ButtonText>
                 </ButtonGroup>
               </RHFForm>
+
               <ModalConfirm
                 title="Confirm publication changes"
                 onConfirm={async () => {
@@ -176,6 +179,4 @@ const PublicationDetailsForm = ({
       </FormProvider>
     </LoadingSpinner>
   );
-};
-
-export default PublicationDetailsForm;
+}

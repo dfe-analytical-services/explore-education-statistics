@@ -2,35 +2,43 @@ import FormThemeTopicSelect, {
   FormThemeTopicSelectProps,
 } from '@admin/components/form/FormThemeTopicSelect';
 import { OmitStrict } from '@common/types';
-import { useField } from 'formik';
+import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
 import React from 'react';
+import {
+  FieldValues,
+  Path,
+  PathValue,
+  useFormContext,
+  useWatch,
+} from 'react-hook-form';
 
-interface FormFieldThemeTopicSelectProps<FormValues>
+interface Props<TFormValues extends FieldValues>
   extends OmitStrict<FormThemeTopicSelectProps, 'error' | 'topicId'> {
-  name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
+  name: Path<TFormValues>;
 }
 
-function FormFieldThemeTopicSelect<FormValues>({
-  name,
-  onChange,
-  ...props
-}: FormFieldThemeTopicSelectProps<FormValues>) {
-  const [field, meta, helpers] = useField(name as string);
+export default function FormFieldThemeTopicSelect<
+  TFormValues extends FieldValues,
+>({ name, onChange, ...props }: Props<TFormValues>) {
+  const {
+    formState: { errors },
+    setValue,
+  } = useFormContext<TFormValues>();
+
+  const value = useWatch({ name });
 
   return (
     <FormThemeTopicSelect
       {...props}
-      error={meta.touched && meta.error ? meta.error : undefined}
-      topicId={field.value}
+      error={getErrorMessage(errors, name)}
+      topicId={value}
       onChange={(topicId, themeId) => {
         if (onChange) {
           onChange(topicId, themeId);
         }
 
-        helpers.setValue(topicId);
+        setValue(name, topicId as PathValue<TFormValues, Path<TFormValues>>);
       }}
     />
   );
 }
-
-export default FormFieldThemeTopicSelect;

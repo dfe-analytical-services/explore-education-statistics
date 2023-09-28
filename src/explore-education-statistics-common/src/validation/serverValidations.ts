@@ -4,6 +4,7 @@ import { FormikErrors } from 'formik';
 import camelCase from 'lodash/camelCase';
 import set from 'lodash/set';
 import toPath from 'lodash/toPath';
+import { FieldErrors, FieldValues } from 'react-hook-form';
 
 export interface ServerValidationErrorResponse<T extends string = string> {
   errors: Dictionary<T[]>;
@@ -120,6 +121,49 @@ export function convertServerFieldErrors<FormValues>(
   fallbackMapper?: FieldMessageMapper<FormValues>,
 ): FormikErrors<FormValues> {
   return Object.entries(response.errors).reduce<FormikErrors<FormValues>>(
+    (acc, [source, messages]) => {
+      messages.forEach(message => {
+        const sourceField = source ? normalizeField(source) : undefined;
+
+        const error: ServerValidationError = {
+          sourceField,
+          message,
+        };
+
+        const matchingMappers = messageMappers
+          .map(mapper => mapper(error))
+          .filter(Boolean);
+
+        if (matchingMappers.length) {
+          matchingMappers.forEach(mappedError => {
+            if (mappedError) {
+              const { targetField, message: mappedMessage } = mappedError;
+              set(acc, targetField, mappedMessage);
+            }
+          });
+        } else if (sourceField) {
+          set(acc, sourceField, message);
+        } else if (fallbackMapper) {
+          const mappedFallback = fallbackMapper(error);
+          if (mappedFallback) {
+            const { targetField, message: mappedMessage } = mappedFallback;
+            set(acc, targetField, mappedMessage);
+          }
+        }
+      });
+
+      return acc;
+    },
+    {},
+  );
+}
+
+export function rhfConvertServerFieldErrors<FormValues extends FieldValues>(
+  response: ServerValidationErrorResponse,
+  messageMappers: FieldMessageMapper<FormValues>[] = [],
+  fallbackMapper?: FieldMessageMapper<FormValues>,
+) {
+  return Object.entries(response.errors).reduce<FieldErrors<FormValues>>(
     (acc, [source, messages]) => {
       messages.forEach(message => {
         const sourceField = source ? normalizeField(source) : undefined;

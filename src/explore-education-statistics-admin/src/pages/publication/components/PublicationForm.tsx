@@ -1,27 +1,19 @@
-import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
 import publicationService from '@admin/services/publicationService';
-import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import {
-  FormFieldSelect,
-  FormFieldset,
-  FormFieldTextArea,
-} from '@common/components/form';
-import Form from '@common/components/form/Form';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import useFormSubmit from '@common/hooks/useFormSubmit';
+import { FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import React, { ReactNode, useMemo } from 'react';
+import { ObjectSchema } from 'yup';
 
-export interface FormValues {
+interface FormValues {
   title: string;
   summary: string;
-  topicId?: string;
   teamName: string;
   teamEmail: string;
   contactName: string;
@@ -41,46 +33,18 @@ const errorMappings = [
 interface Props {
   cancelButton?: ReactNode;
   id?: string;
-  initialValues?: FormValues;
-  publicationId?: string;
-  showSupersededBy?: boolean;
-  showTitleInput?: boolean;
-  onSubmit: (values: FormValues) => void;
+  topicId: string;
+  onSubmit: () => void | Promise<void>;
 }
 
-const PublicationForm = ({
+export default function PublicationForm({
   cancelButton,
   id = 'publicationForm',
-  initialValues,
-  publicationId,
-  showSupersededBy = false,
-  showTitleInput = false,
+  topicId,
   onSubmit,
-}: Props) => {
-  const { value, isLoading: isThemesLoading } = useAsyncHandledRetry(
-    async () => {
-      const themes = await themeService.getThemes();
-      if (!showSupersededBy) {
-        return { themes };
-      }
-
-      const allPublications =
-        await publicationService.getPublicationSummaries();
-      const publications = allPublications.filter(
-        publication => publication.id !== publicationId,
-      );
-
-      return {
-        themes,
-        publications,
-      };
-    },
-  );
-
-  const { themes, publications } = value ?? {};
-
-  const validationSchema = useMemo(() => {
-    const schema = Yup.object<FormValues>({
+}: Props) {
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
       title: Yup.string().required('Enter a publication title'),
       summary: Yup.string()
         .required('Enter a publication summary')
@@ -103,124 +67,106 @@ const PublicationForm = ({
         .min(8, 'Contact telephone must be 8 characters or more'),
       supersededById: Yup.string(),
     });
+  }, []);
 
-    if (initialValues?.topicId) {
-      return schema.shape({
-        topicId: Yup.string().required('Choose a topic'),
-      });
+  const handleSubmit = async ({
+    contactName,
+    contactTelNo,
+    summary,
+    teamEmail,
+    teamName,
+    title,
+  }: FormValues) => {
+    const contact = {
+      teamName,
+      teamEmail,
+      contactName,
+      contactTelNo,
+    };
+
+    if (!contact.contactTelNo?.trim()) {
+      contact.contactTelNo = undefined;
     }
-    return schema;
-  }, [initialValues?.topicId]);
 
-  const handleSubmit = useFormSubmit(async (values: FormValues) => {
-    await onSubmit(values);
-  }, errorMappings);
+    await publicationService.createPublication({
+      summary,
+      title,
+      topicId,
+      contact,
+    });
 
-  if (isThemesLoading) {
-    return <LoadingSpinner />;
-  }
+    await onSubmit();
+  };
 
   return (
-    <Formik<FormValues>
+    <FormProvider
       enableReinitialize
       initialValues={{
-        ...(initialValues ?? {
-          title: '',
-          summary: '',
-          teamName: '',
-          teamEmail: '',
-          contactName: '',
-          contactTelNo: '',
-        }),
+        title: '',
+        summary: '',
+        teamName: '',
+        teamEmail: '',
+        contactName: '',
+        contactTelNo: '',
       }}
       validationSchema={validationSchema}
-      onSubmit={handleSubmit}
     >
-      {() => (
-        <Form id={id}>
-          {showTitleInput && (
-            <FormFieldTextInput<FormValues>
-              label="Publication title"
-              name="title"
-              className="govuk-!-width-two-thirds"
-            />
-          )}
+      <RHFForm
+        id={id}
+        showSubmitError
+        onSubmit={handleSubmit}
+        errorMappers={errorMappings}
+      >
+        <RHFFormFieldTextInput<FormValues>
+          label="Publication title"
+          name="title"
+          className="govuk-!-width-two-thirds"
+        />
 
-          <FormFieldTextArea<FormValues>
-            label="Publication summary"
-            name="summary"
+        <RHFFormFieldTextArea<FormValues>
+          label="Publication summary"
+          name="summary"
+          className="govuk-!-width-one-half"
+          maxLength={160}
+        />
+
+        <FormFieldset
+          id="contact"
+          legend="Contact for this publication"
+          legendSize="m"
+          hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
+        >
+          <RHFFormFieldTextInput<FormValues>
+            name="teamName"
+            label="Team name"
             className="govuk-!-width-one-half"
-            maxLength={160}
           />
 
-          {themes && initialValues?.topicId && (
-            <FormFieldThemeTopicSelect<FormValues>
-              name="topicId"
-              legend="Choose a topic for this publication"
-              legendSize="m"
-              id={id}
-              themes={themes}
-            />
-          )}
+          <RHFFormFieldTextInput<FormValues>
+            name="teamEmail"
+            label="Team email address"
+            className="govuk-!-width-one-half"
+          />
 
-          <FormFieldset
-            id="contact"
-            legend="Contact for this publication"
-            legendSize="m"
-            hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
-          >
-            <FormFieldTextInput<FormValues>
-              name="teamName"
-              label="Team name"
-              className="govuk-!-width-one-half"
-            />
+          <RHFFormFieldTextInput<FormValues>
+            name="contactName"
+            label="Contact name"
+            className="govuk-!-width-one-half"
+          />
 
-            <FormFieldTextInput<FormValues>
-              name="teamEmail"
-              label="Team email address"
-              className="govuk-!-width-one-half"
-            />
+          <RHFFormFieldTextInput<FormValues>
+            name="contactTelNo"
+            label="Contact telephone (optional)"
+            width={10}
+          />
+        </FormFieldset>
 
-            <FormFieldTextInput<FormValues>
-              name="contactName"
-              label="Contact name"
-              className="govuk-!-width-one-half"
-            />
+        <ButtonGroup>
+          <Button type="submit">Save publication</Button>
 
-            <FormFieldTextInput<FormValues>
-              name="contactTelNo"
-              label="Contact telephone (optional)"
-              width={10}
-            />
-          </FormFieldset>
-
-          {publications && showSupersededBy && (
-            <FormFieldset
-              id="supersede"
-              legend="Archive this publication"
-              legendSize="m"
-            >
-              <FormFieldSelect<FormValues>
-                label="Superseding publication"
-                hint="If superseded by a publication with a live release, this will archive the current publication immediately"
-                name="supersededById"
-                options={publications.map(publication => ({
-                  label: publication.title,
-                  value: publication.id,
-                }))}
-                placeholder="None selected"
-              />
-            </FormFieldset>
-          )}
-
-          <ButtonGroup>
-            <Button type="submit">Save publication</Button>
-            {cancelButton}
-          </ButtonGroup>
-        </Form>
-      )}
-    </Formik>
+          {cancelButton}
+        </ButtonGroup>
+      </RHFForm>
+    </FormProvider>
   );
-};
-
-export default PublicationForm;
+}
