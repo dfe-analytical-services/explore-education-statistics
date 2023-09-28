@@ -350,11 +350,17 @@ describe('PublicationDetailsPage', () => {
         screen.getByRole('button', { name: 'Update publication details' }),
       );
 
-      const modal = within(screen.getByRole('dialog'));
-      expect(modal.getByRole('heading')).toHaveTextContent(
-        'Confirm publication changes',
+      await waitFor(() => {
+        expect(
+          screen.getByText('Confirm publication changes'),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        within(screen.getByRole('dialog')).getByRole('button', {
+          name: 'Confirm',
+        }),
       );
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
     });
 
     test('successfullly submits with updated values', async () => {
@@ -390,6 +396,12 @@ describe('PublicationDetailsPage', () => {
       userEvent.click(
         screen.getByRole('button', { name: 'Update publication details' }),
       );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Confirm publication changes'),
+        ).toBeInTheDocument();
+      });
 
       userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
