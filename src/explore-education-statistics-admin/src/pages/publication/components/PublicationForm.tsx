@@ -16,8 +16,7 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React, { ReactNode, useMemo, useState } from 'react';
-import ModalConfirm from '@common/components/ModalConfirm';
+import React, { ReactNode, useMemo } from 'react';
 
 export interface FormValues {
   title: string;
@@ -41,7 +40,6 @@ const errorMappings = [
 
 interface Props {
   cancelButton?: ReactNode;
-  confirmOnSubmit?: boolean;
   id?: string;
   initialValues?: FormValues;
   publicationId?: string;
@@ -52,7 +50,6 @@ interface Props {
 
 const PublicationForm = ({
   cancelButton,
-  confirmOnSubmit = false,
   id = 'publicationForm',
   initialValues,
   publicationId,
@@ -81,9 +78,6 @@ const PublicationForm = ({
   );
 
   const { themes, publications } = value ?? {};
-
-  const [showConfirmSubmitModal, setShowConfirmSubmitModal] =
-    useState<boolean>(false);
 
   const validationSchema = useMemo(() => {
     const schema = Yup.object<FormValues>({
@@ -132,117 +126,88 @@ const PublicationForm = ({
       validationSchema={validationSchema}
       onSubmit={handleSubmit}
     >
-      {form => (
-        <>
-          <Form id={id}>
-            {showTitleInput && (
-              <FormFieldTextInput<FormValues>
-                label="Publication title"
-                name="title"
-                className="govuk-!-width-two-thirds"
-              />
-            )}
+      {() => (
+        <Form id={id}>
+          {showTitleInput && (
+            <FormFieldTextInput<FormValues>
+              label="Publication title"
+              name="title"
+              className="govuk-!-width-two-thirds"
+            />
+          )}
 
-            <FormFieldTextArea<FormValues>
-              label="Publication summary"
-              name="summary"
+          <FormFieldTextArea<FormValues>
+            label="Publication summary"
+            name="summary"
+            className="govuk-!-width-one-half"
+            maxLength={160}
+          />
+
+          {themes && initialValues?.topicId && (
+            <FormFieldThemeTopicSelect<FormValues>
+              name="topicId"
+              legend="Choose a topic for this publication"
+              legendSize="m"
+              id={id}
+              themes={themes}
+            />
+          )}
+
+          <FormFieldset
+            id="contact"
+            legend="Contact for this publication"
+            legendSize="m"
+            hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
+          >
+            <FormFieldTextInput<FormValues>
+              name="teamName"
+              label="Team name"
               className="govuk-!-width-one-half"
-              maxLength={160}
             />
 
-            {themes && initialValues?.topicId && (
-              <FormFieldThemeTopicSelect<FormValues>
-                name="topicId"
-                legend="Choose a topic for this publication"
-                legendSize="m"
-                id={id}
-                themes={themes}
-              />
-            )}
+            <FormFieldTextInput<FormValues>
+              name="teamEmail"
+              label="Team email address"
+              className="govuk-!-width-one-half"
+            />
 
+            <FormFieldTextInput<FormValues>
+              name="contactName"
+              label="Contact name"
+              className="govuk-!-width-one-half"
+            />
+
+            <FormFieldTextInput<FormValues>
+              name="contactTelNo"
+              label="Contact telephone number"
+              width={10}
+            />
+          </FormFieldset>
+
+          {publications && showSupersededBy && (
             <FormFieldset
-              id="contact"
-              legend="Contact for this publication"
+              id="supersede"
+              legend="Archive this publication"
               legendSize="m"
-              hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
             >
-              <FormFieldTextInput<FormValues>
-                name="teamName"
-                label="Team name"
-                className="govuk-!-width-one-half"
-              />
-
-              <FormFieldTextInput<FormValues>
-                name="teamEmail"
-                label="Team email address"
-                className="govuk-!-width-one-half"
-              />
-
-              <FormFieldTextInput<FormValues>
-                name="contactName"
-                label="Contact name"
-                className="govuk-!-width-one-half"
-              />
-
-              <FormFieldTextInput<FormValues>
-                name="contactTelNo"
-                label="Contact telephone number"
-                width={10}
+              <FormFieldSelect<FormValues>
+                label="Superseding publication"
+                hint="If superseded by a publication with a live release, this will archive the current publication immediately"
+                name="supersededById"
+                options={publications.map(publication => ({
+                  label: publication.title,
+                  value: publication.id,
+                }))}
+                placeholder="None selected"
               />
             </FormFieldset>
+          )}
 
-            {publications && showSupersededBy && (
-              <FormFieldset
-                id="supersede"
-                legend="Archive this publication"
-                legendSize="m"
-              >
-                <FormFieldSelect<FormValues>
-                  label="Superseding publication"
-                  hint="If superseded by a publication with a live release, this will archive the current publication immediately"
-                  name="supersededById"
-                  options={publications.map(publication => ({
-                    label: publication.title,
-                    value: publication.id,
-                  }))}
-                  placeholder="None selected"
-                />
-              </FormFieldset>
-            )}
-
-            <ButtonGroup>
-              <Button
-                type="submit"
-                onClick={async e => {
-                  e.preventDefault();
-                  if (confirmOnSubmit && form.isValid) {
-                    setShowConfirmSubmitModal(true);
-                  } else {
-                    await form.submitForm();
-                  }
-                }}
-              >
-                Save publication
-              </Button>
-              {cancelButton}
-            </ButtonGroup>
-          </Form>
-          <ModalConfirm
-            title="Confirm publication changes"
-            onConfirm={async () => {
-              await form.submitForm();
-              setShowConfirmSubmitModal(false);
-            }}
-            onExit={() => setShowConfirmSubmitModal(false)}
-            onCancel={() => setShowConfirmSubmitModal(false)}
-            open={showConfirmSubmitModal}
-          >
-            <p>
-              Any changes made here will appear on the public site immediately.
-            </p>
-            <p>Are you sure you want to save the changes?</p>
-          </ModalConfirm>
-        </>
+          <ButtonGroup>
+            <Button type="submit">Save publication</Button>
+            {cancelButton}
+          </ButtonGroup>
+        </Form>
       )}
     </Formik>
   );

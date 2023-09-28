@@ -1,5 +1,5 @@
 import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';
@@ -37,7 +37,7 @@ describe('RouteLeavingGuard', () => {
     expect(screen.queryByText('Other route')).not.toBeInTheDocument();
   });
 
-  test('shows modal when route change is blocked on `history.push`', () => {
+  test('shows modal when route change is blocked on `history.push`', async () => {
     const history = createMemoryHistory();
 
     render(
@@ -61,9 +61,13 @@ describe('RouteLeavingGuard', () => {
 
     expect(history.location.pathname).toBe('/');
 
-    const modal = within(screen.getByRole('dialog'));
-    expect(modal.getByText('Test modal title')).toBeInTheDocument();
-    expect(modal.getByText('Test modal content')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Test modal title')).toBeInTheDocument();
+    });
+
+    expect(
+      within(screen.getByRole('dialog')).getByText('Test modal content'),
+    ).toBeInTheDocument();
 
     expect(screen.getByText('Change route')).toBeInTheDocument();
     expect(screen.queryByText('Other route')).not.toBeInTheDocument();

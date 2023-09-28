@@ -87,32 +87,30 @@ export default function ReleaseSummarySection({
         )}
 
         <SummaryListItem term="Release type">
-          <ButtonText
-            onClick={() => {
-              toggleReleaseTypeModal.on();
-              onShowReleaseTypeModal?.();
-            }}
+          <Modal
+            showClose
+            title={releaseTypes[release.type]}
+            triggerButton={
+              <ButtonText
+                onClick={() => {
+                  onShowReleaseTypeModal?.();
+                }}
+              >
+                {releaseTypes[release.type]}{' '}
+                <InfoIcon
+                  description={`Information on ${releaseTypes[release.type]}`}
+                />
+              </ButtonText>
+            }
           >
-            {releaseTypes[release.type]}{' '}
-            <InfoIcon
-              description={`Information on ${releaseTypes[release.type]}`}
-            />
-          </ButtonText>
+            <ReleaseTypeSection showHeading={false} type={release.type} />
+          </Modal>
         </SummaryListItem>
 
         <SummaryListItem term="Receive updates">
           {renderSubscribeLink}
         </SummaryListItem>
       </SummaryList>
-
-      <Modal
-        open={showReleaseTypeModal}
-        showClose
-        title={releaseTypes[release.type]}
-        onExit={toggleReleaseTypeModal.off}
-      >
-        <ReleaseTypeSection showHeading={false} type={release.type} />
-      </Modal>
     </>
   );
 }

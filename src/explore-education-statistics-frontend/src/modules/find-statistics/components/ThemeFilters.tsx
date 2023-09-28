@@ -1,10 +1,8 @@
 import Button from '@common/components/Button';
-import ButtonText from '@common/components/ButtonText';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
-import useToggle from '@common/hooks/useToggle';
 import { ThemeSummary } from '@common/services/themeService';
 import { ThemesModal } from '@frontend/modules/find-statistics/components/FilterModals';
-import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/Filters';
+import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/FiltersDesktop';
 import React from 'react';
 
 interface Props {
@@ -18,7 +16,6 @@ const ThemeFilters = ({
   themes,
   onChange,
 }: Props) => {
-  const [showModal, toggleModal] = useToggle(false);
   const themeFilters = [
     { label: 'All themes', value: 'all' },
     ...themes.map(theme => ({
@@ -30,9 +27,7 @@ const ThemeFilters = ({
   return (
     <form id="themeFilters">
       <FormRadioGroup
-        hint={
-          <ButtonText onClick={toggleModal.on}>What are themes?</ButtonText>
-        }
+        hint={<ThemesModal themes={themes} />}
         id="theme"
         legend="Filter by theme"
         name="theme"
@@ -47,7 +42,6 @@ const ThemeFilters = ({
       <Button className="dfe-js-hidden" type="submit">
         Submit
       </Button>
-      <ThemesModal open={showModal} themes={themes} onClose={toggleModal.off} />
     </form>
   );
 };

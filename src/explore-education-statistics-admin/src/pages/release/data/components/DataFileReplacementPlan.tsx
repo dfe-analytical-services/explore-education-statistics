@@ -7,10 +7,7 @@ import {
   releaseFootnotesEditRoute,
 } from '@admin/routes/releaseRoutes';
 import dataBlockService from '@admin/services/dataBlockService';
-import dataReplacementService, {
-  DataBlockReplacementPlan,
-  FootnoteReplacementPlan,
-} from '@admin/services/dataReplacementService';
+import dataReplacementService from '@admin/services/dataReplacementService';
 import footnoteService from '@admin/services/footnoteService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -27,33 +24,28 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import useMountedRef from '@common/hooks/useMountedRef';
-import React, { useMemo, useState } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { generatePath } from 'react-router';
 import sanitizeHtml from '@common/utils/sanitizeHtml';
 
 interface Props {
+  cancelButton: ReactNode;
   publicationId: string;
   releaseId: string;
   fileId: string;
   replacementFileId: string;
-  onCancel?: () => void;
   onReplacement?: () => void;
 }
 
 const DataFileReplacementPlan = ({
+  cancelButton,
   publicationId,
   releaseId,
   fileId,
   replacementFileId,
-  onCancel,
   onReplacement,
 }: Props) => {
   const [isSubmitting, toggleSubmitting] = useToggle(false);
-
-  const [deleteDataBlock, setDeleteDataBlock] =
-    useState<DataBlockReplacementPlan>();
-  const [deleteFootnote, setDeleteFootnote] =
-    useState<FootnoteReplacementPlan>();
 
   const isMounted = useMountedRef();
 
@@ -89,7 +81,7 @@ const DataFileReplacementPlan = ({
           There was a problem loading the data replacement information.
         </WarningMessage>
 
-        <Button onClick={onCancel}>Cancel data replacement</Button>
+        {cancelButton}
       </>
     );
   }
@@ -240,14 +232,25 @@ const DataFileReplacementPlan = ({
                         Edit data block
                       </ButtonLink>
                     )}
-                    <Button
-                      variant="warning"
-                      onClick={() => {
-                        setDeleteDataBlock(dataBlock);
+
+                    <ModalConfirm
+                      title="Delete data block"
+                      triggerButton={
+                        <Button variant="warning">Delete data block</Button>
+                      }
+                      onConfirm={async () => {
+                        await dataBlockService.deleteDataBlock(
+                          releaseId,
+                          dataBlock.id,
+                        );
+                        reloadPlan();
                       }}
                     >
-                      Delete data block
-                    </Button>
+                      <p>
+                        Are you sure you want to delete{' '}
+                        <strong>'{dataBlock?.name}'</strong>?
+                      </p>
+                    </ModalConfirm>
                   </ButtonGroup>
                 </>
               )}
@@ -367,14 +370,29 @@ const DataFileReplacementPlan = ({
                       >
                         Edit footnote
                       </ButtonLink>
-                      <Button
-                        variant="warning"
-                        onClick={() => {
-                          setDeleteFootnote(footnote);
+
+                      <ModalConfirm
+                        title="Delete footnote"
+                        triggerButton={
+                          <Button variant="warning">Delete footnote</Button>
+                        }
+                        onConfirm={async () => {
+                          await footnoteService.deleteFootnote(
+                            releaseId,
+                            footnote.id,
+                          );
+                          reloadPlan();
                         }}
                       >
-                        Delete footnote
-                      </Button>
+                        <p>
+                          Are you sure you want to delete the following
+                          footnote?
+                        </p>
+
+                        <InsetText>
+                          <p>{footnote?.content}</p>
+                        </InsetText>
+                      </ModalConfirm>
                     </ButtonGroup>
                   </>
                 )}
@@ -406,52 +424,8 @@ const DataFileReplacementPlan = ({
                 Confirm data replacement
               </Button>
             )}
-
-            <Button variant="secondary" onClick={onCancel}>
-              Cancel data replacement
-            </Button>
+            {cancelButton}
           </ButtonGroup>
-
-          {deleteDataBlock && (
-            <ModalConfirm
-              title="Delete data block"
-              onExit={() => setDeleteDataBlock(undefined)}
-              onConfirm={async () => {
-                await dataBlockService.deleteDataBlock(
-                  releaseId,
-                  deleteDataBlock.id,
-                );
-                setDeleteDataBlock(undefined);
-                reloadPlan();
-              }}
-            >
-              <p>
-                Are you sure you want to delete{' '}
-                <strong>'{deleteDataBlock?.name}'</strong>?
-              </p>
-            </ModalConfirm>
-          )}
-
-          {deleteFootnote && (
-            <ModalConfirm
-              title="Delete footnote"
-              onExit={() => setDeleteFootnote(undefined)}
-              onConfirm={async () => {
-                await footnoteService.deleteFootnote(
-                  releaseId,
-                  deleteFootnote.id,
-                );
-                setDeleteFootnote(undefined);
-                reloadPlan();
-              }}
-            >
-              <p>Are you sure you want to delete the following footnote?</p>
-
-              <InsetText>
-                <p>{deleteFootnote?.content}</p>
-              </InsetText>
-            </ModalConfirm>
-          )}
         </>
       )}
     </LoadingSpinner>

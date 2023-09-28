@@ -8,21 +8,20 @@ import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
 import publicationQueries from '@frontend/queries/publicationQueries';
 import themeQueries from '@frontend/queries/themeQueries';
 import { GetServerSideProps, NextPage } from 'next';
-import React, { useRef } from 'react';
+import React from 'react';
 import { dehydrate, QueryClient, useQuery } from '@tanstack/react-query';
-import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
 import WarningMessage from '@common/components/WarningMessage';
-import useToggle from '@common/hooks/useToggle';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import { useMobileMedia } from '@common/hooks/useMedia';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import Pagination from '@frontend/components/Pagination';
 import FilterClearButton from '@frontend/modules/find-statistics/components/FilterClearButton';
-import Filters from '@frontend/modules/find-statistics/components/Filters';
+import FiltersDesktop from '@frontend/modules/find-statistics/components/FiltersDesktop';
+import FiltersMobile from '@frontend/modules/find-statistics/components/FiltersMobile';
 import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
 import SearchForm from '@frontend/modules/find-statistics/components/SearchForm';
 import SortControls from '@frontend/modules/find-statistics/components/SortControls';
@@ -44,8 +43,6 @@ export interface FindStatisticsPageQuery {
 const FindStatisticsPage: NextPage = () => {
   const router = useRouter();
   const { isMedia: isMobileMedia } = useMobileMedia();
-  const mobileFilterButtonRef = useRef<HTMLButtonElement>(null);
-  const [showMobileFilters, toggleMobileFilters] = useToggle(false);
 
   const {
     data: publicationsData,
@@ -203,18 +200,14 @@ const FindStatisticsPage: NextPage = () => {
           <a href="#searchResults" className="govuk-skip-link">
             Skip to search results
           </a>
-          <Filters
-            releaseType={releaseType}
-            showMobileFilters={showMobileFilters}
-            themeId={themeId}
-            themes={themes}
-            totalResults={totalResults}
-            onChange={handleChangeFilter}
-            onCloseMobileFilters={() => {
-              mobileFilterButtonRef.current?.focus();
-              toggleMobileFilters.off();
-            }}
-          />
+          {!isMobileMedia && (
+            <FiltersDesktop
+              releaseType={releaseType}
+              themeId={themeId}
+              themes={themes}
+              onChange={handleChangeFilter}
+            />
+          )}
         </div>
         <div className="govuk-grid-column-two-thirds">
           <div>
@@ -280,12 +273,13 @@ const FindStatisticsPage: NextPage = () => {
           </div>
 
           {isMobileMedia && (
-            <Button
-              ref={mobileFilterButtonRef}
-              onClick={toggleMobileFilters.on}
-            >
-              Filter results
-            </Button>
+            <FiltersMobile
+              releaseType={releaseType}
+              themeId={themeId}
+              themes={themes}
+              totalResults={totalResults}
+              onChange={handleChangeFilter}
+            />
           )}
 
           {publications.length > 0 && (

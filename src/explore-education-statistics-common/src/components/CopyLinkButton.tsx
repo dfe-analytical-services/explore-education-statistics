@@ -15,55 +15,36 @@ interface Props {
 
 const CopyLinkButton = ({ className, url }: Props) => {
   const [copied, toggleCopied] = useToggle(false);
-  const [showModal, toggleModal] = useToggle(false);
 
   return (
-    <>
-      <Button
-        className={className}
-        variant="secondary"
-        type="button"
-        onClick={toggleModal.on}
+    <Modal
+      showClose
+      title="Copy link to the clipboard"
+      triggerButton={
+        <Button className={className} variant="secondary">
+          <LinkIcon />
+          <VisuallyHidden>Copy link to the clipboard</VisuallyHidden>
+        </Button>
+      }
+    >
+      <div
+        className={classNames('dfe-flex dfe-align-items-start', styles.modal)}
       >
-        <LinkIcon />
-        <VisuallyHidden>Copy link to the clipboard</VisuallyHidden>
-      </Button>
-      <Modal
-        open={showModal}
-        title="Copy link to the clipboard"
-        onExit={() => {
-          toggleModal.off();
-          toggleCopied.off();
-        }}
-      >
-        <div
-          className={classNames('dfe-flex dfe-align-items-start', styles.modal)}
-        >
-          <UrlContainer url={url} />
-          <Button
-            className="govuk-!-margin-bottom-0"
-            onClick={async () => {
-              await navigator.clipboard.writeText(url);
-              toggleCopied.on();
-            }}
-          >
-            Copy
-          </Button>
-        </div>
-        <div aria-live="polite" className={styles.message}>
-          {copied && 'Link copied to the clipboard.'}
-        </div>
+        <UrlContainer url={url} />
         <Button
-          variant="secondary"
-          onClick={() => {
-            toggleModal.off();
-            toggleCopied.off();
+          className="govuk-!-margin-bottom-0"
+          onClick={async () => {
+            await navigator.clipboard.writeText(url);
+            toggleCopied.on();
           }}
         >
-          Close
+          Copy
         </Button>
-      </Modal>
-    </>
+      </div>
+      <div aria-live="polite" className={styles.message}>
+        {copied && 'Link copied to the clipboard.'}
+      </div>
+    </Modal>
   );
 };
 

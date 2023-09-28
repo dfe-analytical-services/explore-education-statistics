@@ -4,9 +4,6 @@ import {
   ScheduledStatusGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
 import { DashboardReleaseSummary } from '@admin/services/releaseService';
-import ButtonText from '@common/components/ButtonText';
-import InfoIcon from '@common/components/InfoIcon';
-import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
 import React, { useMemo } from 'react';
@@ -40,11 +37,6 @@ interface ScheduledReleasesTableProps {
 }
 
 const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
-  const [showScheduledStatusGuidance, toggleScheduledStatusGuidance] =
-    useToggle(false);
-  const [showScheduledStagesGuidance, toggleScheduledStagesGuidance] =
-    useToggle(false);
-
   const releasesByPublication: Dictionary<DashboardReleaseSummary[]> =
     useMemo(() => {
       return releases.reduce<Dictionary<DashboardReleaseSummary[]>>(
@@ -73,16 +65,10 @@ const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
                   <tr>
                     <th>Publication / Release period</th>
                     <th>
-                      Status{' '}
-                      <ButtonText onClick={toggleScheduledStatusGuidance.on}>
-                        <InfoIcon description="Guidance on scheduled states" />
-                      </ButtonText>
+                      Status <ScheduledStatusGuidanceModal />
                     </th>
                     <th className="govuk-!-width-one-quarter">
-                      Stages checklist{' '}
-                      <ButtonText onClick={toggleScheduledStagesGuidance.on}>
-                        <InfoIcon description="Guidance on publication stages" />
-                      </ButtonText>
+                      Stages checklist <ScheduledStagesGuidanceModal />
                     </th>
                     <th>Scheduled publish date</th>
                     <th>Actions</th>
@@ -101,14 +87,6 @@ const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
             )}
         </>
       )}
-      <ScheduledStagesGuidanceModal
-        open={showScheduledStagesGuidance}
-        onClose={toggleScheduledStagesGuidance.off}
-      />
-      <ScheduledStatusGuidanceModal
-        open={showScheduledStatusGuidance}
-        onClose={toggleScheduledStatusGuidance.off}
-      />
     </>
   );
 };

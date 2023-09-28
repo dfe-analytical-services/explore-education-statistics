@@ -829,12 +829,9 @@ describe('ReleaseStatusForm', () => {
 
       const nextYear = new Date().getFullYear() + 1;
 
-      await userEvent.type(publishDate.getByLabelText('Day'), '10');
-      await userEvent.type(publishDate.getByLabelText('Month'), '10');
-      await userEvent.type(
-        publishDate.getByLabelText('Year'),
-        nextYear.toString(),
-      );
+      userEvent.type(publishDate.getByLabelText('Day'), '10');
+      userEvent.type(publishDate.getByLabelText('Month'), '10');
+      userEvent.type(publishDate.getByLabelText('Year'), nextYear.toString());
 
       userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
@@ -855,6 +852,8 @@ describe('ReleaseStatusForm', () => {
       expect(errorModal.getByRole('heading')).toHaveTextContent(
         'Publish date cannot be scheduled',
       );
+
+      userEvent.click(screen.getByRole('button', { name: 'Back to form' }));
 
       expect(
         screen.getByRole('link', {

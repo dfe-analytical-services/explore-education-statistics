@@ -378,6 +378,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -591,6 +592,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -678,6 +680,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -708,6 +711,7 @@ describe('DataReplacementPlan', () => {
 
     render(
       <DataFileReplacementPlan
+        cancelButton={<button type="button">Cancel</button>}
         publicationId="publication-1"
         releaseId="release-1"
         fileId="file-1"
@@ -733,6 +737,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -777,6 +782,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -808,6 +814,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -851,6 +858,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -923,6 +931,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -955,6 +964,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -1005,6 +1015,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
@@ -1080,6 +1091,7 @@ describe('DataReplacementPlan', () => {
     render(
       <MemoryRouter>
         <DataFileReplacementPlan
+          cancelButton={<button type="button">Cancel</button>}
           publicationId="publication-1"
           releaseId="release-1"
           fileId="file-1"
