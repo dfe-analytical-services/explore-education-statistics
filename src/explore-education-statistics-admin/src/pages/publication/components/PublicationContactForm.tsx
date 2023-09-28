@@ -1,16 +1,19 @@
+import publicationService, {
+  Contact,
+} from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import Form from '@common/components/form/Form';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import ModalConfirm from '@common/components/ModalConfirm';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { ObjectSchema } from 'yup';
 
-export interface PublicationContactFormValues {
+interface FormValues {
   teamName: string;
   teamEmail: string;
   contactName: string;
@@ -18,107 +21,117 @@ export interface PublicationContactFormValues {
 }
 
 interface Props {
-  initialValues: PublicationContactFormValues;
+  initialValues: FormValues;
+  publicationId: string;
   onCancel: () => void;
-  onSubmit: (values: PublicationContactFormValues) => void;
+  onSubmit: (nextContact: Contact) => Promise<void> | void;
 }
 
-const PublicationContactForm = ({
+export default function PublicationContactForm({
   initialValues,
+  publicationId,
   onCancel,
   onSubmit,
-}: Props) => {
+}: Props) {
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
 
-  const validationSchema = Yup.object<PublicationContactFormValues>({
-    teamName: Yup.string().required('Enter a team name'),
-    teamEmail: Yup.string()
-      .required('Enter a team email')
-      .email('Enter a valid team email'),
-    contactName: Yup.string().required('Enter a contact name'),
-    contactTelNo: Yup.string()
-      .trim()
-      .matches(
-        /^0[0-9\s]*$/,
-        'Contact telephone must start with a "0" and only contain numeric or whitespace characters',
-      )
-      .matches(
-        /^(?!^0\s*3\s*7\s*0\s*0\s*0\s*0\s*2\s*2\s*8\s*8$)/,
-        'Contact telephone cannot be the DfE enquiries number',
-      )
-      .min(8, 'Contact telephone must be 8 characters or more'),
-  });
+  const handleSubmit = async (values: FormValues) => {
+    const contact = values;
+
+    if (!contact.contactTelNo?.trim()) {
+      contact.contactTelNo = undefined;
+    }
+
+    const nextContact = await publicationService.updateContact(
+      publicationId,
+      contact,
+    );
+
+    await onSubmit(nextContact);
+  };
+
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      teamName: Yup.string().required('Enter a team name'),
+      teamEmail: Yup.string()
+        .required('Enter a team email')
+        .email('Enter a valid team email'),
+      contactName: Yup.string().required('Enter a contact name'),
+      contactTelNo: Yup.string()
+        .trim()
+        .matches(
+          /^0[0-9\s]*$/,
+          'Contact telephone must start with a "0" and only contain numeric or whitespace characters',
+        )
+        .matches(
+          /^(?!^0\s*3\s*7\s*0\s*0\s*0\s*0\s*2\s*2\s*8\s*8$)/,
+          'Contact telephone cannot be the DfE enquiries number',
+        )
+        .min(8, 'Contact telephone must be 8 characters or more'),
+    });
+  }, []);
 
   return (
-    <Formik<PublicationContactFormValues>
-      enableReinitialize
+    <FormProvider
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={useFormSubmit(onSubmit)}
     >
-      {form => (
-        <>
-          <Form id="publicationContactForm">
-            <FormFieldTextInput<PublicationContactFormValues>
-              name="teamName"
-              label="Team name"
-              className="govuk-!-width-one-half"
-            />
+      {({ getValues }) => {
+        return (
+          <>
+            <RHFForm
+              id="publicationContactForm"
+              onSubmit={async () => toggleConfirmModal.on()}
+            >
+              <RHFFormFieldTextInput<FormValues>
+                name="teamName"
+                label="Team name"
+                className="govuk-!-width-one-half"
+              />
 
-            <FormFieldTextInput<PublicationContactFormValues>
-              name="teamEmail"
-              label="Team email"
-              className="govuk-!-width-one-half"
-            />
+              <RHFFormFieldTextInput<FormValues>
+                name="teamEmail"
+                label="Team email"
+                className="govuk-!-width-one-half"
+              />
 
-            <FormFieldTextInput<PublicationContactFormValues>
-              name="contactName"
-              label="Contact name"
-              className="govuk-!-width-one-half"
-            />
+              <RHFFormFieldTextInput<FormValues>
+                name="contactName"
+                label="Contact name"
+                className="govuk-!-width-one-half"
+              />
 
-            <FormFieldTextInput<PublicationContactFormValues>
-              name="contactTelNo"
-              label="Contact telephone (optional)"
-              className="govuk-!-width-one-half"
-            />
+              <RHFFormFieldTextInput<FormValues>
+                name="contactTelNo"
+                label="Contact telephone (optional)"
+                className="govuk-!-width-one-half"
+              />
 
-            <ButtonGroup>
-              <Button
-                type="submit"
-                onClick={async e => {
-                  e.preventDefault();
-                  if (form.isValid) {
-                    toggleConfirmModal.on();
-                  } else {
-                    await form.submitForm();
-                  }
-                }}
-              >
-                Update contact details
-              </Button>
-              <ButtonText onClick={onCancel}>Cancel</ButtonText>
-            </ButtonGroup>
-          </Form>
+              <ButtonGroup>
+                <Button type="submit">Update contact details</Button>
+                <ButtonText onClick={onCancel}>Cancel</ButtonText>
+              </ButtonGroup>
+            </RHFForm>
 
-          <ModalConfirm
-            title="Confirm contact changes"
-            onConfirm={async () => {
-              await form.submitForm();
-            }}
-            onExit={toggleConfirmModal.off}
-            onCancel={toggleConfirmModal.off}
-            open={showConfirmModal}
-          >
-            <p>
-              Any changes made here will appear on the public site immediately.
-            </p>
-            <p>Are you sure you want to save the changes?</p>
-          </ModalConfirm>
-        </>
-      )}
-    </Formik>
+            <ModalConfirm
+              title="Confirm contact changes"
+              onConfirm={async () => {
+                const values = getValues();
+                await handleSubmit(values);
+              }}
+              onExit={toggleConfirmModal.off}
+              onCancel={toggleConfirmModal.off}
+              open={showConfirmModal}
+            >
+              <p>
+                Any changes made here will appear on the public site
+                immediately.
+              </p>
+              <p>Are you sure you want to save the changes?</p>
+            </ModalConfirm>
+          </>
+        );
+      }}
+    </FormProvider>
   );
-};
-
-export default PublicationContactForm;
+}

@@ -1,6 +1,4 @@
-import PublicationContactForm, {
-  PublicationContactFormValues,
-} from '@admin/pages/publication/components/PublicationContactForm';
+import PublicationContactForm from '@admin/pages/publication/components/PublicationContactForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -19,24 +17,6 @@ const PublicationContactPage = () => {
     async () => publicationService.getContact(publication.id),
     [publication],
   );
-
-  const handleSubmit = async (updatedContact: PublicationContactFormValues) => {
-    if (!contact) {
-      return;
-    }
-    const sanitisedContact = updatedContact;
-    if (!updatedContact.contactTelNo?.trim()) {
-      sanitisedContact.contactTelNo = undefined;
-    }
-    const nextContact = await publicationService.updateContact(
-      publication.id,
-      sanitisedContact,
-    );
-
-    setContact({ value: nextContact });
-    toggleReadOnly.on();
-    onReload();
-  };
 
   if (!contact) {
     return <LoadingSpinner />;
@@ -80,8 +60,13 @@ const PublicationContactPage = () => {
       ) : (
         <PublicationContactForm
           initialValues={contact}
+          publicationId={publication.id}
           onCancel={toggleReadOnly.on}
-          onSubmit={handleSubmit}
+          onSubmit={nextContact => {
+            setContact({ value: nextContact });
+            toggleReadOnly.on();
+            onReload();
+          }}
         />
       )}
     </>
