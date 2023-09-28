@@ -109,6 +109,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<DataImport>()
+                .HasIndex(import => import.FileId)
+                .IncludeProperties(
+                    import => new { import.Status });
+
+            modelBuilder.Entity<DataImport>()
                 .HasOne(import => import.MetaFile)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Restrict);
