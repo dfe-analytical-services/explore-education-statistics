@@ -7,6 +7,22 @@ using Microsoft.Net.Http.Headers;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Rules;
 
+/// <summary>
+/// Rule which is used to redirect any request paths that contain uppercase characters to lowercase.
+/// This excludes any paths that match the regex defined in <see cref="ExcludedPathsRegex"/>.
+/// Examples of requests that we might want to exclude:
+/// <list type="bullet">
+/// <item>
+/// <description>Oidc configuration</description>
+/// </item>
+/// <item>
+/// <description>Identity endpoints</description>
+/// </item>
+/// <item>
+/// <description>Static assets</description>
+/// </item>
+/// </list>
+/// </summary>
 public class LowercasePathRule : IRule
 {
     private const string ExcludedPathsRegex = "^/(_configuration|identity|static).*$";
