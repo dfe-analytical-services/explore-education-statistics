@@ -194,45 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                                 );
                         }
 
-                        var footnotes = subject.Footnotes
-                            .Where(footnote => !footnote.Label.IsNullOrWhitespace())
-                            .ToList();
-
-                        if (footnotes.Any())
-                        {
-                            await file.WriteLineAsync();
-                            await file.WriteLineAsync("Footnotes:");
-                            await file.WriteLineAsync();
-
-                            await footnotes
-                                .ToAsyncEnumerable()
-                                .ForEachAwaitAsync(
-                                    async (footnote, footnoteIndex) =>
-                                    {
-                                        var listItemStart = $"{footnoteIndex + 1}. ";
-
-                                        await file.WriteAsync(listItemStart);
-
-                                        var indent = string.Empty.PadRight(listItemStart.Length);
-
-                                        await footnote.Label
-                                            .ToLines()
-                                            .ToAsyncEnumerable()
-                                            .ForEachAwaitAsync(
-                                                async (line, lineIndex) =>
-                                                {
-                                                    if (lineIndex == 0)
-                                                    {
-                                                        await file.WriteLineAsync(line);
-                                                        return;
-                                                    }
-
-                                                    await file.WriteLineAsync(indent + line);
-                                                }
-                                            );
-                                    }
-                                );
-                        }
+                        await WriteFootnotes(file, subject);
 
                         // Add some extra lines between data files
                         if (index < subjects.Count - 1)
@@ -240,6 +202,52 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                             await file.WriteLineAsync();
                             await file.WriteLineAsync();
                         }
+                    }
+                );
+        }
+
+        private static async Task WriteFootnotes(TextWriter file, DataGuidanceSubjectViewModel subject)
+        {
+            var footnotes = subject.Footnotes
+                .Where(footnote => !footnote.Label.IsNullOrWhitespace())
+                .ToList();
+
+            if (!footnotes.Any())
+            {
+                return;
+            }
+
+            await file.WriteLineAsync();
+            await file.WriteLineAsync("Footnotes:");
+            await file.WriteLineAsync();
+
+            await footnotes
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(
+                    async (footnote, footnoteIndex) =>
+                    {
+                        var listItemStart = $"{footnoteIndex + 1}. ";
+
+                        await file.WriteAsync(listItemStart);
+
+                        var indent = string.Empty.PadRight(listItemStart.Length);
+                        var label = await HtmlToTextUtils.HtmlToText(footnote.Label);
+
+                        await label
+                            .ToLines()
+                            .ToAsyncEnumerable()
+                            .ForEachAwaitAsync(
+                                async (line, lineIndex) =>
+                                {
+                                    if (lineIndex == 0)
+                                    {
+                                        await file.WriteLineAsync(line);
+                                        return;
+                                    }
+
+                                    await file.WriteLineAsync(indent + line);
+                                }
+                            );
                     }
                 );
         }

@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_SingleElementInDiv()
+        public async Task HtmlToText_SingleElement_InDiv()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 "<div><p>Test paragraph</p></div>");
@@ -69,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_InlineElementsWithMultilineFormatting()
+        public async Task HtmlToText_Paragraph_InlineElements_Multiline()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"<p>
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
-        public async Task HtmlToText_InlineElementsWithPunctuation()
+        public async Task HtmlToText_Paragraph_InlineElements_Punctuation()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"<p>
@@ -92,14 +92,117 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                     <em>italic text</em>! And
                     <small>small text</small>.
                     <strong>Next sentence?</strong>
-                    Over here.
+                    <a href=""https://test.com"">A link</a>
+                    over here.
                   </p>");
 
-            Assert.Equal("Test paragraph with bold text, italic text! And small text. Next sentence? Over here.", text);
+            Assert.Equal("Test paragraph with bold text, italic text! And small text. Next sentence? A link (https://test.com) over here.", text);
         }
 
         [Fact]
-        public async Task HtmlToText_MultipleElements()
+        public async Task HtmlToText_Link()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"<a href=""https://test.com"">Page link</a>");
+
+            Assert.Equal("Page link (https://test.com)", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_Link_Inline()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"<p>Test paragraph with <a href=""https://test.com"">page link</a> inline</p>");
+
+            Assert.Equal("Test paragraph with page link (https://test.com) inline", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_Link_Inline_InDiv()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"<div>Test <a href=""https://test.com"">page link</a> inline</div>");
+
+            Assert.Equal("Test page link (https://test.com) inline", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_Link_Inline_InText()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"Test <a href=""https://test.com"">page link</a> in some text");
+
+            Assert.Equal("Test page link (https://test.com) in some text", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_Links_Multiline()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"<p>
+                    Test paragraph with 
+                    <a href=""https://test.com"">page link</a> 
+                    and <a href=""https://test-2.com"">other page link</a>
+                    on another row.
+                  </p>");
+
+            Assert.Equal("Test paragraph with page link (https://test.com) and other page link (https://test-2.com) on another row.", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_InlineElements_NestedOneLevel()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"<span>Test <a href=""https://test.com"">page link</a> and <strong>strong text</strong></span>");
+
+            Assert.Equal("Test page link (https://test.com) and strong text", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_InlineElements_NestedOneLevel_Multiline()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <span>
+                    Test 
+                    <a href=""https://test.com"">page link</a> 
+                    and 
+                    <strong>strong text</strong>
+                </span>");
+
+            Assert.Equal("Test page link (https://test.com) and strong text", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_InlineElements_NestedTwoLevels()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"<span>Test <a href=""https://test.com"">page <em>link</em></a> and <strong>strong text</strong></span>");
+
+            Assert.Equal("Test page link (https://test.com) and strong text", text);
+        }
+
+
+        [Fact]
+        public async Task HtmlToText_InlineElements_NestedTwoLevels_Multiline()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <span>
+                    Test 
+                    <a href=""https://test.com"">
+                        page <em>link</em>
+                    </a> and
+                    <strong>
+                        strong text
+                    </strong>
+                </span>");
+
+            Assert.Equal("Test page link (https://test.com) and strong text", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_Blocks()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -109,14 +212,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                 <h4>Test heading 4</h4>
                 <h5>Test heading 5</h5>
                 <h6>Test heading 6</h6>
-                <p>Test paragraph 1</p>
-                <span>Test span 1</span>");
+                <p>Test paragraph 1</p>");
 
             Snapshot.Match(text);
         }
 
         [Fact]
-        public async Task HtmlToText_MultipleElementsInDiv()
+        public async Task HtmlToText_MultipleElements_Blocks_InDiv()
         {
             var text = await HtmlToTextUtils.HtmlToText(
                 @"
@@ -128,7 +230,93 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                     <h5>Test heading 5</h5>
                     <h6>Test heading 6</h6>
                     <p>Test paragraph 1</p>
+                </div>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_Blocks_Nested()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <section>
+                    <ul>
+                        <li>Test item 1</li>
+                        <li>Test item 2</li>
+                    </ul>
+                </section>
+                <section>
+                    <h2>Test heading 2<h2>
+                </section>");
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_Inline()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <span>Test span 1</span>
+                <a href=""https://test.com"">Test link 1</a>
+                <strong>Test strong 1</strong>
+                <em>Test emphasis 1</em>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_Inline_InDiv()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <div>
                     <span>Test span 1</span>
+                    <a href=""https://test.com"">Test link 1</a>
+                    <strong>Test strong 1</strong>
+                    <em>Test emphasis 1</em>
+                </div>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <h1>Test heading 1</h1>
+                <span>Test span 1</span>
+                <h2>Test heading 2</h2>
+                <a href=""https://test.com"">Test link 1</a>
+                <h3>Test heading 3</h3>
+                <strong>Test strong 1</strong>
+                <h4>Test heading 4</h4>
+                <em>Test emphasis 1</em>
+                <h5>Test heading 5</h5>
+                <h6>Test heading 6</h6>
+                <p>Test paragraph 1</p>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks_InDiv()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <div>
+                    <h1>Test heading 1</h1>
+                    <span>Test span 1</span>
+                    <h2>Test heading 2</h2>
+                    <a href=""https://test.com"">Test link 1</a>
+                    <h3>Test heading 3</h3>
+                    <strong>Test strong 1</strong>
+                    <h4>Test heading 4</h4>
+                    <em>Test emphasis 1</em>
+                    <h5>Test heading 5</h5>
+                    <h6>Test heading 6</h6>
+                    <p>Test paragraph 1</p>
                 </div>");
 
             Snapshot.Match(text);
@@ -1060,6 +1248,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                         </tr>
                     </tbody>
                 </table>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_TableElement_LineAfter()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <table>
+                    <tbody>
+                        <tr>
+                            <td>Cell 1</td>
+                            <td>Cell 2</td>
+                        </tr>
+                        <tr>
+                            <td>Cell 3</td>
+                            <td>Cell 4</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p>Test paragraph</p>");
+
+            Snapshot.Match(text);
+        }
+
+
+        [Fact]
+        public async Task HtmlToText_TableElement_InFigure_LineAfter()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <figure>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>Cell 1</td>
+                                <td>Cell 2</td>
+                            </tr>
+                            <tr>
+                                <td>Cell 3</td>
+                                <td>Cell 4</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </figure>
+                <p>Test paragraph</p>");
 
             Snapshot.Match(text);
         }
