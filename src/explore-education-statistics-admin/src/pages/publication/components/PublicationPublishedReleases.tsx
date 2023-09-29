@@ -1,4 +1,3 @@
-import { PublishedStatusGuidanceModal } from '@admin/pages/publication/components/PublicationGuidance';
 import PublicationPublishedReleasesTable from '@admin/pages/publication/components/PublicationPublishedReleasesTable';
 import {
   ReleaseRouteParams,
@@ -11,7 +10,6 @@ import releaseService, {
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import useToggle from '@common/hooks/useToggle';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import last from 'lodash/last';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
@@ -31,9 +29,6 @@ export default function PublicationPublishedReleases({
   const history = useHistory();
 
   const [focusReleaseId, setFocusReleaseId] = useState<string>();
-
-  const [showPublishedStatusGuidance, togglePublishedStatusGuidance] =
-    useToggle(false);
 
   const {
     data: releases,

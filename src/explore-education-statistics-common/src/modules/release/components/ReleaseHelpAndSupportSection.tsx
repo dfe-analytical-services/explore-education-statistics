@@ -33,7 +33,7 @@ export default function ReleaseHelpAndSupportSection({
         Help and support
       </h2>
 
-      {methodologies.length > 0 && (
+      {(methodologies.length > 0 || externalMethodology) && (
         <>
           <h3>Methodology</h3>
           <p>
