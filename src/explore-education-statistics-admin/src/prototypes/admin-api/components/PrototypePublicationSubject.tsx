@@ -86,7 +86,7 @@ const PrototypePublicationSubject = ({
           ) : (
             <>
               <div className="govuk-tag govuk-tag--yellow  govuk-!-margin-left-1">
-                Staging - unpublished
+                Unpublished
               </div>{' '}
             </>
           )}
@@ -136,12 +136,14 @@ const PrototypePublicationSubject = ({
                   ? 'Preview API data set'
                   : 'Close API data set preview'}
               </ButtonText>
-              <ButtonText
+              {/* 
+               <ButtonText
                 className="govuk-!-margin-right-3 govuk-!-margin-left-0"
                 onClick={() => onTogglePreview(subject)}
               >
                 Preview public API data set page
               </ButtonText>
+              */}
             </ButtonGroup>
 
             {previewInitialDataset && (
@@ -203,7 +205,7 @@ const PrototypePublicationSubject = ({
           </SummaryListItem>
           <SummaryListItem term="API data set version status">
             <div className="govuk-tag govuk-tag--yellow govuk-!-margin-right-3  ">
-              Staging - unpublished
+              Unpublished
             </div>
           </SummaryListItem>
           <SummaryListItem term="Preview">
@@ -216,12 +218,14 @@ const PrototypePublicationSubject = ({
                   ? 'Preview API data set'
                   : 'Close API data set preview'}
               </ButtonText>
+              {/* 
               <ButtonText
                 className="govuk-!-margin-right-3"
                 onClick={() => onTogglePreview(subject)}
               >
                 Preview public API data set page
               </ButtonText>
+              */}
             </ButtonGroup>
             {previewNextDataSet && (
               <div className="govuk-!-margin-bottom-4 govuk-!-margin-top-4">

@@ -67,14 +67,24 @@ const PrototypePublicationSubjectList = ({
                     key={publicationSubject.subjectId}
                   >
                     {subject.release !== currentRelease && (
-                      <Button
-                        variant="secondary"
-                        onClick={() =>
-                          onCreateNotification(nextSubject ?? subject)
-                        }
-                      >
-                        Publish a notification for this data set
-                      </Button>
+                      <div className="govuk-inset-text govuk-!-margin-top-0">
+                        <h4>Publish a notification for this data set</h4>
+                        <p>
+                          Notifications can be published at any time. If you are
+                          aware of any upcoming major changes to this data set,
+                          you can use this as a channel to keep your end users
+                          informed, and provide details on any elements that may
+                          be changing in the upcoming new version.
+                        </p>
+                        <Button
+                          variant="secondary"
+                          onClick={() =>
+                            onCreateNotification(nextSubject ?? subject)
+                          }
+                        >
+                          Publish a notification
+                        </Button>
+                      </div>
                     )}
 
                     <PrototypePublicationSubject

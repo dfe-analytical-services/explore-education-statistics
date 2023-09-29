@@ -146,14 +146,14 @@ const PrototypeMapFacetModal = ({
               className="govuk-!-margin-bottom-0 govuk-!-margin-top-4"
               type="submit"
             >
-              Update mapping (minor update)
+              Update mapping (MINOR update)
             </Button>
             <Button
-              variant="secondary"
+              variant="warning"
               className="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-!-margin-left-4"
               onClick={() => onSubmit()}
             >
-              No mapping available (major update)
+              No mapping available (MAJOR update)
             </Button>
           </div>
         </Form>

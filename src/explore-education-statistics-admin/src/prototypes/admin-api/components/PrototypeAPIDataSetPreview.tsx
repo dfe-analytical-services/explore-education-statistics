@@ -2,6 +2,7 @@ import PrototypePrevNextNav from '@admin/prototypes/components/PrototypePrevNext
 import pageStyles from '@admin/prototypes/PrototypePublicPage.module.scss';
 import { PrototypeSubject } from '@admin/prototypes/admin-api/PrototypePublicationSubjects';
 import styles from '@admin/prototypes/admin-api/components/PrototypeAPIDataSetPreview.module.scss';
+import FormattedDate from '@common/components/FormattedDate';
 import NotificationBanner from '@common/components/NotificationBanner';
 import ButtonText from '@common/components/ButtonText';
 import Button from '@common/components/Button';
@@ -85,6 +86,9 @@ const PrototypeAPIDataSetPreview = ({
           title="Important"
         >
           <p>{notificationSummary}</p>
+          <p className="govuk-hint">
+            Message published: <FormattedDate>{new Date()}</FormattedDate>
+          </p>
         </NotificationBanner>
       )}
 

@@ -50,7 +50,7 @@ const PrototypeChangeStatusForm = ({ selectedStatus, onSubmit }: Props) => {
                     <>
                       <FormFieldTextArea<StatusFormValues>
                         hint="These notes will be appended to the published API dataset. They are used to explain to the public users why this data set is being deprecated."
-                        label="Notes"
+                        label="Public guidance notes"
                         name="notes"
                         rows={3}
                       />

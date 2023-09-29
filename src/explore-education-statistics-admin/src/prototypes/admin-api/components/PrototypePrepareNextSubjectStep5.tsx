@@ -40,8 +40,9 @@ const PrototypePrepareNextSubjectStep5 = ({
     indicators,
   } = usePrototypeNextSubjectContext();
 
-  const [initialVersionType, setInitialVersionType] =
-    useState<VersionType>(versionType);
+  const [initialVersionType, setInitialVersionType] = useState<VersionType>(
+    versionType,
+  );
 
   useEffect(() => {
     if (
@@ -84,9 +85,9 @@ const PrototypePrepareNextSubjectStep5 = ({
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
                     <FormFieldTextArea<FormValues>
-                      hint="Use notes to highlight any extra guidance that may not
+                      hint="Use the public guidance notes to highlight any extra information to your end users that may not
                       be apparent in the automated changelog below"
-                      label="Version notes"
+                      label="Public guidance notes"
                       name="versionNotes"
                       rows={3}
                     />

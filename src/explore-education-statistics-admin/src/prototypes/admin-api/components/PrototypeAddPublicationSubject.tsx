@@ -55,7 +55,7 @@ const PrototypeAddPublicationSubject = ({
         <p>
           If your data set cannot meet these criteria, we advise you to continue
           using standard data sets, but note these will not be available in the
-          public api.
+          public API.
         </p>
         <WarningMessage>
           Changes will not be made in the public API until the next data set's
