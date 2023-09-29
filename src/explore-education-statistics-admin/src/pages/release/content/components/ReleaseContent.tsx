@@ -438,7 +438,7 @@ const ReleaseContent = () => {
         renderExternalMethodologyLink={externalMethodology => (
           <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
         )}
-        renderMethodologyLink={methodology => {
+        renderMethodologyLink={methodology => (
           <>
             {editingMode === 'edit' ? (
               <a>{`${methodology.title}`}</a>
@@ -447,8 +447,8 @@ const ReleaseContent = () => {
                 {methodology.title}
               </Link>
             )}
-          </>;
-        }}
+          </>
+        )}
       />
       <PrintThisPage />
     </>
