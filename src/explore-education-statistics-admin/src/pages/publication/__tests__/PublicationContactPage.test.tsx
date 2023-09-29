@@ -177,7 +177,7 @@ describe('PublicationContactPage', () => {
     });
   });
 
-  test.each([' abcdefgh ', '1234 4567a', '_12345678', '1234 5678 !'])(
+  test.each([' 0abcdefg ', '01234 4567a', '_12345678', '01234 5678 !'])(
     'show validation error when contact tel no "%s" contains non-numeric or non-whitespace characters',
     async telNo => {
       publicationService.getContact.mockResolvedValue(testContact);
@@ -206,7 +206,7 @@ describe('PublicationContactPage', () => {
       await waitFor(() => {
         expect(
           screen.getByText(
-            'Contact telephone must only contain numeric or whitespace characters',
+            'Contact telephone must start with a "0" and only contain numeric or whitespace characters',
             {
               selector: '#publicationContactForm-contactTelNo-error',
             },
@@ -260,7 +260,7 @@ describe('PublicationContactPage', () => {
     },
   );
 
-  test.each([' 1234567 ', '1', '123', '1234 67'])(
+  test.each([' 0123456 ', '0', '012', '0123 56'])(
     'show validation error when contact tel no "%s" is less than 8 characters',
     async telNo => {
       publicationService.getContact.mockResolvedValue(testContact);

@@ -93,8 +93,8 @@ const PublicationForm = ({
       contactTelNo: Yup.string()
         .trim()
         .matches(
-          /^[0-9\s]*$/,
-          'Contact telephone must only contain numeric or whitespace characters',
+          /^0[0-9\s]*$/,
+          'Contact telephone must start with a "0" and only contain numeric or whitespace characters',
         )
         .matches(
           /^(?!^0\s*3\s*7\s*0\s*0\s*0\s*0\s*2\s*2\s*8\s*8$)/,
