@@ -8,7 +8,6 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
-import useToggle from '@common/hooks/useToggle';
 import { Release } from '@common/services/publicationService';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import Modal from '@common/components/Modal';
@@ -48,8 +47,6 @@ export default function ReleaseSummarySection({
   renderSubscribeLink,
   onShowReleaseTypeModal,
 }: Props) {
-  const [showReleaseTypeModal, toggleReleaseTypeModal] = useToggle(false);
-
   return (
     <>
       <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">

@@ -7,7 +7,7 @@ import AdvancedFilters from '@frontend/modules/find-statistics/components/Advanc
 import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/FiltersDesktop';
 import styles from '@frontend/modules/find-statistics/components/FiltersMobile.module.scss';
 import ThemeFilters from '@frontend/modules/find-statistics/components/ThemeFilters';
-import React, { useRef } from 'react';
+import React from 'react';
 
 interface Props {
   releaseType?: ReleaseType;

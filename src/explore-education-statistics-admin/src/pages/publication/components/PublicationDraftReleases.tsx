@@ -4,10 +4,7 @@ import {
   IssuesGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
 import { ReleaseSummaryWithPermissions } from '@admin/services/releaseService';
-import ButtonText from '@common/components/ButtonText';
-import InfoIcon from '@common/components/InfoIcon';
 import InsetText from '@common/components/InsetText';
-import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 
 interface Props {
