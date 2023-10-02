@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Validators;
 
@@ -20,12 +21,19 @@ public class PhoneNumberAttribute : ValidationAttribute
             return new ValidationResult("A phone number must be a string");
         }
 
-        if (telNo.Length < 8)
+        var trimmedTelNo = telNo.Trim();
+
+        if (trimmedTelNo.IsNullOrWhitespace())
+        {
+            return new ValidationResult("A phone number cannot be an empty string or whitespace");
+        }
+
+        if (trimmedTelNo.Length < 8)
         {
             return new ValidationResult(LengthMessage(validationContext));
         }
 
-        return !Regex.IsMatch(telNo, @"^0[0-9\s]*$")
+        return !Regex.IsMatch(trimmedTelNo, @"^0[0-9\s]*$")
             ? new ValidationResult(FormatMessage(validationContext))
             : ValidationResult.Success;
     }

@@ -27,19 +27,23 @@ const TableToolInfo = ({
           <h3>Contact us</h3>
           <p>
             If you have a question about the data or methods used to create this
-            table contact the named statistician:
+            table, please contact us:
           </p>
           <h3 className="govuk-heading-s">{contactDetails.teamName}</h3>
-          <p>Named statistician: {contactDetails.contactName}</p>
-          <p>
+          <address className="govuk-!-margin-top-0">
             Email:{' '}
             <a href={`mailto:${contactDetails.teamEmail}`}>
               {contactDetails.teamEmail}
             </a>
-          </p>
-          {contactDetails.contactTelNo && (
-            <p>Telephone: {contactDetails.contactTelNo}</p>
-          )}
+            <br />
+            Contact name: {contactDetails.contactName}
+            {contactDetails.contactTelNo && (
+              <>
+                <br />
+                Telephone: {contactDetails.contactTelNo}
+              </>
+            )}
+          </address>
         </>
       )}
     </>

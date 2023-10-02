@@ -59,6 +59,11 @@ hr {
     %govuk-section-break--visible;
 }
 
+address {
+  @extend %govuk-body-m;
+  font-style: normal;
+}
+
 /* stylelint-disable scss/at-extend-no-missing-placeholder */
 
 blockquote {
