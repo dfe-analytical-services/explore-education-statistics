@@ -85,7 +85,7 @@ Create data block table
 
 Create chart for data block
     user waits until page contains link    Chart
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks link    Chart
 
     user clicks button    Choose an infographic as alternative
@@ -103,8 +103,8 @@ Navigate to 'Content' page
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
-    user waits for page to finish loading
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
+    user waits until page finishes loading
 
 Add headline text block
     user adds headlines text block
@@ -180,6 +180,8 @@ Publish the scheduled release
     set suite variable    ${EXPECTED_PUBLISHED_DATE}
     ...    ${publish_date_day} ${publish_date_month_word} ${publish_date_year}
 
+    user waits for caches to expire
+
 Verify newly published release is on Find Statistics page
     user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
@@ -198,7 +200,7 @@ Return to Admin and create amendment
 Change the Release type
     user waits until page contains link    Edit release summary
     user clicks link    Edit release summary
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user waits until h2 is visible    Edit release summary
     user checks page contains radio    Experimental statistics
     user clicks radio    Experimental statistics
@@ -430,8 +432,8 @@ Verify that the footnotes are unchanged
 Verify that release content is unchanged
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits for page to finish loading
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
+    user waits until page finishes loading
 
     user checks there are x accordion sections    3    id:releaseMainContent
     user checks accordion is in position    Dates data block    1    id:releaseMainContent

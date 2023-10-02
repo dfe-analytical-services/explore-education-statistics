@@ -181,21 +181,15 @@ user checks css property value
     ${actual_value}=    user gets css property value    ${locator}    ${property}
     should be equal    ${value}    ${actual_value}
 
-user waits for page to finish loading
-    # This is required because despite the DOM being loaded, and even a button being enabled, React/NextJS
-    # hasn't finished processing the page, and so click are intermittently ignored. I'm wrapping
-    # this sleep in a keyword such that if we find a way to check whether the JS processing has finished in the
-    # future, we can change it here.
-    sleep    1
-
-user waits until page does not contain loading spinner
-    # NOTE: The wait below is to prevent a transient error in CI ('Element 'css:[class^="LoadingSpinner"]' did not
-    # disappear in 30 seconds.')
-
-    # Also, we're only interested in loading spinners that aren't lazy loaders that are waiting for user interaction
-    # prior to loading their content.
+user waits until page finishes loading
+    [Arguments]    ${spinner_timeout}=%{WAIT_MEDIUM}    ${network_timeout}=%{WAIT_MEDIUM}
+    # We're only interested in loading spinners that aren't lazy loaders that are
+    # waiting for user interaction prior to loading their content.
     user waits until page does not contain element    //*[@class!="lazyload-wrapper"]/*[@data-testid="loadingSpinner"]
-    ...    %{WAIT_MEDIUM}
+    ...    ${spinner_timeout}
+    # Wait to ensure network activity attribute is updated in DOM
+    sleep    0.5
+    user waits until page does not contain element    css:body[data-network-activity="active"]    ${network_timeout}
 
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body
@@ -514,6 +508,10 @@ user clicks link by visible text
     [Arguments]    ${text}    ${parent}=css:body
     user clicks element    xpath:.//a[text()="${text}"]    ${parent}
 
+user clicks link containing text
+    [Arguments]    ${text}    ${parent}=css:body
+    user clicks element    xpath:.//a[contains(text(), "${text}")]    ${parent}
+
 user clicks button
     [Arguments]    ${text}    ${parent}=css:body
     ${button}=    user gets button element    ${text}    ${parent}
@@ -521,36 +519,42 @@ user clicks button
 
 user clicks button containing text
     [Arguments]    ${text}    ${parent}=css:body
-    user clicks element    xpath://button[contains(text(),${text})]    ${parent}
+    user clicks element    xpath://button[contains(text(), "${text}")]    ${parent}
 
 user waits until page contains button
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page contains element    xpath://button[text()="${text}"]    ${wait}
+    user waits until page contains element    xpath://button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
 
 user checks page contains button
     [Arguments]    ${text}
-    user checks page contains element    xpath://button[text()="${text}"]
+    user checks page contains element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
 
 user checks page does not contain button
     [Arguments]    ${text}
-    user checks page does not contain element    xpath://button[text()="${text}"]
+    user checks page does not contain element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
 
 user waits until page does not contain button
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until page does not contain element    xpath://button[text()="${text}"]    ${wait}
+    user waits until page does not contain element    xpath://button[text()="${text}" or .//*[text()="${text}"]]
+    ...    ${wait}
 
 user waits until button is enabled
     [Arguments]    ${text}    ${wait}=${timeout}
-    user waits until element is enabled    xpath://button[text()="${text}"]    ${wait}
+    user waits until element is enabled    xpath://button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
+
+user waits until parent contains button
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
 
 user waits until parent does not contain button
     [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
-    user waits until parent does not contain element    ${parent}    xpath://button[text()="${text}"]    ${wait}
+    user waits until parent does not contain element    ${parent}
+    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]    ${wait}
 
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
-    user waits until parent contains element    ${parent}
-    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
+    user waits until parent contains button    ${parent}    ${text}
     ${button}=    get child element    ${parent}    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
     [Return]    ${button}
 
@@ -912,7 +916,7 @@ user waits until table tool wizard step is available
     # this visible check passes when it should fail?!
     user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]
     ...    %{WAIT_SMALL}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
 user gets data block from parent
     [Arguments]    ${data_block_name}    ${parent}

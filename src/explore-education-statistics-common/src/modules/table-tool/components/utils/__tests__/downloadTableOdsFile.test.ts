@@ -133,5 +133,28 @@ describe('downloadTableOdsFile', () => {
         v: '(3) Test footnote 3',
       });
     });
+
+    test('formats footnote with link', () => {
+      const sheet = utils.aoa_to_sheet([
+        ['test', 'test', 'test'],
+        ['test', 'test', 'test'],
+        ['test', 'test', 'test'],
+      ]);
+
+      expect(sheet['!ref']).toBe('A1:C3');
+
+      appendFootnotes(sheet, [
+        {
+          id: '1',
+          label: 'Test footnote 1. <a href="http://gov.uk">Test link</a>',
+        },
+      ]);
+
+      expect(sheet['!ref']).toBe('A1:C5');
+      expect(sheet.A5).toEqual({
+        t: 's',
+        v: '(1) Test footnote 1. Test link (http://gov.uk)',
+      });
+    });
   });
 });

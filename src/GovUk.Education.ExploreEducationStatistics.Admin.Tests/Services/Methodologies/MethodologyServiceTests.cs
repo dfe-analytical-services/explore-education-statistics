@@ -9,10 +9,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -21,20 +23,20 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Methodologies
 {
     public class MethodologyServiceTests
     {
-        private static readonly Guid UserId = Guid.NewGuid();
+        private static readonly User User = new()
+        {
+            Id = Guid.NewGuid()
+        };
 
         [Fact]
         public async Task AdoptMethodology()
@@ -355,11 +357,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             }
                         }
                     },
-                    Status = Draft
+                    Status = MethodologyApprovalStatus.Draft
                 };
 
                 methodologyVersionRepository
-                    .Setup(s => s.CreateMethodologyForPublication(publication.Id, UserId))
+                    .Setup(s => s.CreateMethodologyForPublication(publication.Id, User.Id))
                     .ReturnsAsync(createdMethodology);
 
                 context.Attach(createdMethodology);
@@ -373,8 +375,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Equal(createdMethodology.Methodology.Id, viewModel.MethodologyId);
                 Assert.Null(viewModel.Published);
-                Assert.Equal(Immediately, viewModel.PublishingStrategy);
-                Assert.Equal(Draft, viewModel.Status);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, viewModel.PublishingStrategy);
+                Assert.Equal(MethodologyApprovalStatus.Draft, viewModel.Status);
                 Assert.Equal("Test publication", viewModel.Title);
 
                 Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
@@ -589,11 +591,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Methodology = methodology,
-                InternalReleaseNote = "Test approval",
                 Published = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 AlternativeTitle = "Alternative title"
+            };
+
+            var methodologyStatus = new MethodologyStatus
+            {
+                MethodologyVersion = methodologyVersion,
+                InternalReleaseNote = "Test approval",
+                ApprovalStatus = MethodologyApprovalStatus.Approved,
             };
 
             var adoptingPublication = new Publication();
@@ -605,6 +613,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.Publications.AddRangeAsync(publication, adoptingPublication);
                 await context.Methodologies.AddAsync(methodology);
                 await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.MethodologyStatus.AddAsync(methodologyStatus);
                 await context.SaveChangesAsync();
             }
 
@@ -639,8 +648,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
                 Assert.Equal(methodologyVersion.MethodologyId, viewModel.MethodologyId);
                 Assert.Null(viewModel.Published);
-                Assert.Equal(Immediately, viewModel.PublishingStrategy);
-                Assert.Equal(Draft, viewModel.Status);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, viewModel.PublishingStrategy);
+                Assert.Equal(MethodologyApprovalStatus.Draft, viewModel.Status);
                 Assert.Equal("Alternative title", viewModel.Title);
 
                 Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
@@ -660,10 +669,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     new()
                     {
-                        InternalReleaseNote = "Test approval",
                         Published = null,
-                        PublishingStrategy = Immediately,
-                        Status = Draft,
+                        PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                        Status = MethodologyApprovalStatus.Draft,
                         AlternativeTitle = "Alternative title"
                     },
                 },
@@ -794,17 +802,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Methodology = methodology,
-                InternalReleaseNote = "Test approval",
                 Published = new DateTime(2020, 5, 25),
-                PublishingStrategy = WithRelease,
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
                 ScheduledWithRelease = new Release
                 {
                     Publication = owningPublication,
                     TimePeriodCoverage = CalendarYear,
                     ReleaseName = "2021"
                 },
-                Status = Approved,
+                Status = MethodologyApprovalStatus.Approved,
                 AlternativeTitle = "Alternative title"
+            };
+
+            var methodologyStatus = new MethodologyStatus
+            {
+                MethodologyVersion = methodologyVersion,
+                InternalReleaseNote = "Test approval",
+                ApprovalStatus = MethodologyApprovalStatus.Approved,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -814,6 +828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await context.Methodologies.AddAsync(methodology);
                 await context.Publications.AddRangeAsync(owningPublication, adoptingPublication1, adoptingPublication2);
                 await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.MethodologyStatus.AddAsync(methodologyStatus);
                 await context.SaveChangesAsync();
             }
 
@@ -829,8 +844,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("Test approval", viewModel.InternalReleaseNote);
                 Assert.Equal(methodologyVersion.MethodologyId, viewModel.MethodologyId);
                 Assert.Equal(new DateTime(2020, 5, 25), viewModel.Published);
-                Assert.Equal(WithRelease, viewModel.PublishingStrategy);
-                Assert.Equal(Approved, viewModel.Status);
+                Assert.Equal(MethodologyPublishingStrategy.WithRelease, viewModel.PublishingStrategy);
+                Assert.Equal(MethodologyApprovalStatus.Approved, viewModel.Status);
                 Assert.Equal("Alternative title", viewModel.Title);
 
                 Assert.Equal(owningPublication.Id, viewModel.OwningPublication.Id);
@@ -1127,9 +1142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         Version = 0,
                         AlternativeTitle = "Methodology 1 Version 1",
-                        InternalReleaseNote = "Methodology 1 Version 1 release note",
                         Published = new DateTime(2021, 1, 1),
-                        Status = Approved
+                        Status = MethodologyApprovalStatus.Approved,
                     }
                 }
             };
@@ -1143,9 +1157,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         Version = 0,
                         AlternativeTitle = "Methodology 2 Version 1",
-                        InternalReleaseNote = "Methodology 2 Version 1 release note",
                         Published = new DateTime(2021, 1, 1),
-                        Status = Approved
+                        Status = MethodologyApprovalStatus.Approved,
                     },
                     new()
                     {
@@ -1153,10 +1166,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Version = 1,
                         AlternativeTitle = "Methodology 2 Version 2",
                         Published = null,
-                        Status = Draft
+                        Status = MethodologyApprovalStatus.Draft,
                     }
                 }
             };
+            methodology2.Versions[1].PreviousVersion = methodology2.Versions[0];
 
             var methodology3 = new Methodology
             {
@@ -1167,24 +1181,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Id = Guid.NewGuid(),
                         Version = 0,
                         AlternativeTitle = "Methodology 3 Version 1",
-                        InternalReleaseNote = "Methodology 3 Version 1 release note",
                         Published = new DateTime(2021, 1, 1),
-                        Status = Approved
+                        Status = MethodologyApprovalStatus.Approved,
                     },
                     new()
                     {
                         Id = Guid.NewGuid(),
                         Version = 1,
                         AlternativeTitle = "Methodology 3 Version 2",
-                        InternalReleaseNote = "Methodology 3 Version 2 release note",
                         Published = new DateTime(2022, 1, 1),
-                        Status = Approved
+                        Status = MethodologyApprovalStatus.Approved,
                     }
                 }
             };
+            methodology3.Versions[1].PreviousVersion = methodology3.Versions[0];
 
-            methodology2.Versions[1].PreviousVersionId = methodology2.Versions[0].Id;
-            methodology3.Versions[1].PreviousVersionId = methodology3.Versions[0].Id;
+            var methodology4 = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = 0,
+                        AlternativeTitle = "Methodology 4 Version 1",
+                        Published = new DateTime(2021, 1, 1),
+                        Status = MethodologyApprovalStatus.Draft,
+                        PreviousVersion = null,
+                    },
+                }
+            };
 
             var publication = new Publication
             {
@@ -1193,19 +1219,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     new()
                     {
                         Owner = false,
-                        Methodology = methodology2
+                        Methodology = methodology2,
                     },
                     new()
                     {
                         Owner = true,
-                        Methodology = methodology1
+                        Methodology = methodology1,
                     },
                     new()
                     {
                         Owner = false,
-                        Methodology = methodology3
-                    }
-                }
+                        Methodology = methodology3,
+                    },
+                    new()
+                    {
+                        Owner = true,
+                        Methodology = methodology4,
+                    },
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1220,7 +1251,177 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(contentDbContext);
 
-                var result = await service.ListLatestMethodologyVersions(publication.Id);
+                var result = await service.ListLatestMethodologyVersions(
+                    publication.Id);
+                var viewModels = result.AssertRight();
+
+                // Check that the latest versions of the methodologies are returned in title order
+                Assert.Equal(4, viewModels.Count);
+
+                Assert.Equal(methodology1.Versions[0].Id, viewModels[0].Id);
+                Assert.False(viewModels[0].Amendment);
+                Assert.True(viewModels[0].Owned);
+                Assert.Equal(new DateTime(2021, 1, 1), viewModels[0].Published);
+                Assert.Equal(MethodologyApprovalStatus.Approved, viewModels[0].Status);
+                Assert.Equal("Methodology 1 Version 1", viewModels[0].Title);
+                Assert.Equal(methodology1.Id, viewModels[0].MethodologyId);
+                Assert.Null(viewModels[0].PreviousVersionId);
+
+                Assert.Equal(methodology2.Versions[1].Id, viewModels[1].Id);
+                Assert.True(viewModels[1].Amendment);
+                Assert.False(viewModels[1].Owned);
+                Assert.Null(viewModels[1].Published);
+                Assert.Equal(MethodologyApprovalStatus.Draft, viewModels[1].Status);
+                Assert.Equal("Methodology 2 Version 2", viewModels[1].Title);
+                Assert.Equal(methodology2.Id, viewModels[1].MethodologyId);
+                Assert.Equal(methodology2.Versions[0].Id, viewModels[1].PreviousVersionId);
+
+                Assert.Equal(methodology3.Versions[1].Id, viewModels[2].Id);
+                Assert.False(viewModels[2].Amendment);
+                Assert.False(viewModels[2].Owned);
+                Assert.Equal(new DateTime(2022, 1, 1), viewModels[2].Published);
+                Assert.Equal(MethodologyApprovalStatus.Approved, viewModels[2].Status);
+                Assert.Equal("Methodology 3 Version 2", viewModels[2].Title);
+                Assert.Equal(methodology3.Id, viewModels[2].MethodologyId);
+                Assert.Equal(methodology3.Versions[0].Id, viewModels[2].PreviousVersionId);
+
+                Assert.Equal(methodology4.Versions[0].Id, viewModels[3].Id);
+                Assert.False(viewModels[3].Amendment);
+                Assert.True(viewModels[3].Owned);
+                Assert.Equal(new DateTime(2021, 1, 1), viewModels[3].Published);
+                Assert.Equal(MethodologyApprovalStatus.Draft, viewModels[3].Status);
+                Assert.Equal("Methodology 4 Version 1", viewModels[3].Title);
+                Assert.Equal(methodology4.Id, viewModels[3].MethodologyId);
+                Assert.Null(viewModels[3].PreviousVersionId);
+            }
+        }
+        [Fact]
+        public async Task ListLatestMethodologyVersions_IsPrerelease()
+        {
+            var methodology1 = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        // Version in result because latest is approved
+                        Id = Guid.NewGuid(),
+                        Version = 0,
+                        AlternativeTitle = "Methodology 1 Version 1",
+                        Published = new DateTime(2021, 1, 1),
+                        Status = MethodologyApprovalStatus.Approved,
+                    }
+                }
+            };
+
+            var methodology2 = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        // This version is in results because latest is draft, so previous is used
+                        Id = Guid.NewGuid(),
+                        Version = 0,
+                        AlternativeTitle = "Methodology 2 Version 1",
+                        Published = new DateTime(2021, 1, 1),
+                        Status = MethodologyApprovalStatus.Approved,
+                    },
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = 1,
+                        AlternativeTitle = "Methodology 2 Version 2",
+                        Published = null,
+                        Status = MethodologyApprovalStatus.Draft,
+                    }
+                }
+            };
+            methodology2.Versions[1].PreviousVersion = methodology2.Versions[0];
+
+            var methodology3 = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        Id = Guid.NewGuid(),
+                        Version = 0,
+                        AlternativeTitle = "Methodology 3 Version 1",
+                        Published = new DateTime(2021, 1, 1),
+                        Status = MethodologyApprovalStatus.Approved,
+                    },
+                    new()
+                    {
+                        // This is in results because it is latest approved
+                        Id = Guid.NewGuid(),
+                        Version = 1,
+                        AlternativeTitle = "Methodology 3 Version 2",
+                        Published = new DateTime(2022, 1, 1),
+                        Status = MethodologyApprovalStatus.Approved,
+                    }
+                }
+            };
+            methodology3.Versions[1].PreviousVersion = methodology3.Versions[0];
+
+            var methodology4 = new Methodology
+            {
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        // Not in results because draft and no previous
+                        Id = Guid.NewGuid(),
+                        Version = 0,
+                        AlternativeTitle = "Methodology 4 Version 1",
+                        Published = new DateTime(2021, 1, 1),
+                        Status = MethodologyApprovalStatus.Draft,
+                        PreviousVersion = null,
+                    },
+                }
+            };
+
+            var publication = new Publication
+            {
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new()
+                    {
+                        Owner = false,
+                        Methodology = methodology2,
+                    },
+                    new()
+                    {
+                        Owner = true,
+                        Methodology = methodology1,
+                    },
+                    new()
+                    {
+                        Owner = false,
+                        Methodology = methodology3,
+                    },
+                    new()
+                    {
+                        Owner = true,
+                        Methodology = methodology4,
+                    },
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupMethodologyService(contentDbContext);
+
+                var result = await service.ListLatestMethodologyVersions(
+                    publication.Id, isPrerelease: true);
                 var viewModels = result.AssertRight();
 
                 // Check that the latest versions of the methodologies are returned in title order
@@ -1230,25 +1431,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.False(viewModels[0].Amendment);
                 Assert.True(viewModels[0].Owned);
                 Assert.Equal(new DateTime(2021, 1, 1), viewModels[0].Published);
-                Assert.Equal(Approved, viewModels[0].Status);
+                Assert.Equal(MethodologyApprovalStatus.Approved, viewModels[0].Status);
                 Assert.Equal("Methodology 1 Version 1", viewModels[0].Title);
                 Assert.Equal(methodology1.Id, viewModels[0].MethodologyId);
                 Assert.Null(viewModels[0].PreviousVersionId);
 
-                Assert.Equal(methodology2.Versions[1].Id, viewModels[1].Id);
-                Assert.True(viewModels[1].Amendment);
+                Assert.Equal(methodology2.Versions[0].Id, viewModels[1].Id);
+                Assert.False(viewModels[1].Amendment);
                 Assert.False(viewModels[1].Owned);
-                Assert.Null(viewModels[1].Published);
-                Assert.Equal(Draft, viewModels[1].Status);
-                Assert.Equal("Methodology 2 Version 2", viewModels[1].Title);
+                Assert.Equal(new DateTime(2021, 1, 1), viewModels[1].Published);
+                Assert.Equal(MethodologyApprovalStatus.Approved, viewModels[1].Status);
+                Assert.Equal("Methodology 2 Version 1", viewModels[1].Title);
                 Assert.Equal(methodology2.Id, viewModels[1].MethodologyId);
-                Assert.Equal(methodology2.Versions[0].Id, viewModels[1].PreviousVersionId);
+                Assert.Null(viewModels[1].PreviousVersionId);
 
                 Assert.Equal(methodology3.Versions[1].Id, viewModels[2].Id);
                 Assert.False(viewModels[2].Amendment);
                 Assert.False(viewModels[2].Owned);
                 Assert.Equal(new DateTime(2022, 1, 1), viewModels[2].Published);
-                Assert.Equal(Approved, viewModels[2].Status);
+                Assert.Equal(MethodologyApprovalStatus.Approved, viewModels[2].Status);
                 Assert.Equal("Methodology 3 Version 2", viewModels[2].Title);
                 Assert.Equal(methodology3.Id, viewModels[2].MethodologyId);
                 Assert.Equal(methodology3.Versions[0].Id, viewModels[2].PreviousVersionId);
@@ -1269,10 +1470,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             Versions = new List<MethodologyVersion>
                             {
                                 new()
-                            }
-                        }
-                    }
-                }
+                                {
+                                    Status = MethodologyApprovalStatus.Approved,
+                                },
+                            },
+                        },
+                    },
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1337,8 +1541,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Methodology = new Methodology
                 {
                     Id = Guid.NewGuid(),
@@ -1355,8 +1559,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var request = new MethodologyUpdateRequest
             {
                 LatestInternalReleaseNote = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Title = "Updated Methodology Title"
             };
 
@@ -1378,7 +1582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("updated-methodology-title", viewModel.Slug);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
-                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
@@ -1395,8 +1599,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
                 Assert.Null(updatedMethodology.Published);
-                Assert.Equal(Draft, updatedMethodology.Status);
-                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodology.Status);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, updatedMethodology.PublishingStrategy);
                 Assert.Equal("Updated Methodology Title", updatedMethodology.Title);
                 Assert.Equal("Updated Methodology Title", updatedMethodology.AlternativeTitle);
                 Assert.Equal("updated-methodology-title", updatedMethodology.Slug);
@@ -1418,8 +1622,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Methodology = new Methodology
                 {
                     Slug = "test-publication",
@@ -1436,8 +1640,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var request = new MethodologyUpdateRequest
             {
                 LatestInternalReleaseNote = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Title = "Updated Methodology Title"
             };
 
@@ -1459,7 +1663,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("test-publication", viewModel.Slug);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
-                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
@@ -1476,8 +1680,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
                 Assert.Null(updatedMethodology.Published);
-                Assert.Equal(Draft, updatedMethodology.Status);
-                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodology.Status);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, updatedMethodology.PublishingStrategy);
                 Assert.Equal("Updated Methodology Title", updatedMethodology.Title);
                 Assert.Equal("Updated Methodology Title", updatedMethodology.AlternativeTitle);
                 Assert.Equal("test-publication", updatedMethodology.Slug);
@@ -1500,8 +1704,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Id = Guid.NewGuid(),
                 AlternativeTitle = "Alternative Methodology Title",
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Methodology = new Methodology
                 {
                     Slug = "test-publication",
@@ -1517,8 +1721,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var request = new MethodologyUpdateRequest
             {
                 LatestInternalReleaseNote = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Title = "Test publication"
             };
 
@@ -1540,7 +1744,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("test-publication", viewModel.Slug);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
-                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
@@ -1557,8 +1761,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
                 Assert.Null(updatedMethodology.Published);
-                Assert.Equal(Draft, updatedMethodology.Status);
-                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodology.Status);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, updatedMethodology.PublishingStrategy);
                 Assert.Equal(publication.Title, updatedMethodology.Title);
 
                 // Test explicitly that AlternativeTitle has been unset.
@@ -1584,8 +1788,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 Id = Guid.NewGuid(),
                 AlternativeTitle = "Alternative Methodology Title",
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Methodology = new Methodology
                 {
                     Slug = "alternative-methodology-title",
@@ -1602,8 +1806,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var request = new MethodologyUpdateRequest
             {
                 LatestInternalReleaseNote = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Title = publication.Title
             };
 
@@ -1625,7 +1829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("alternative-methodology-title", viewModel.Slug);
                 Assert.Null(viewModel.InternalReleaseNote);
                 Assert.Null(viewModel.Published);
-                Assert.Equal(Immediately, viewModel.PublishingStrategy);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, viewModel.PublishingStrategy);
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
@@ -1642,8 +1846,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
                 Assert.Null(updatedMethodology.Published);
-                Assert.Equal(Draft, updatedMethodology.Status);
-                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
+                Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodology.Status);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, updatedMethodology.PublishingStrategy);
                 Assert.Equal(publication.Title, updatedMethodology.Title);
 
                 // Test that the AlternativeTitle has explicitly be set to null.
@@ -1668,8 +1872,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Methodology = new Methodology
                 {
                     Slug = "test-publication",
@@ -1685,8 +1889,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             // This pre-existing Methodology has a slug that the update will clash with.
             var methodologyWithTargetSlug = new MethodologyVersion
             {
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Methodology = new Methodology
                 {
                     Slug = "updated-methodology-title",
@@ -1697,8 +1901,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var request = new MethodologyUpdateRequest
             {
                 LatestInternalReleaseNote = null,
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Title = "Updated Methodology Title"
             };
 
@@ -1726,8 +1930,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
                 Assert.Null(notUpdatedMethodology.Published);
-                Assert.Equal(Draft, notUpdatedMethodology.Status);
-                Assert.Equal(Immediately, notUpdatedMethodology.PublishingStrategy);
+                Assert.Equal(MethodologyApprovalStatus.Draft, notUpdatedMethodology.Status);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, notUpdatedMethodology.PublishingStrategy);
                 Assert.Equal("Test publication", notUpdatedMethodology.Title);
                 Assert.Null(notUpdatedMethodology.AlternativeTitle);
                 Assert.Equal("test-publication", notUpdatedMethodology.Slug);
@@ -1748,8 +1952,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Methodology = new Methodology
                 {
                     Id = Guid.NewGuid(),
@@ -1766,8 +1970,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var request = new MethodologyUpdateRequest
             {
                 LatestInternalReleaseNote = "Approved",
-                PublishingStrategy = Immediately,
-                Status = Approved,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Approved,
                 Title = "Updated Methodology Title"
             };
 
@@ -1919,8 +2123,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = Immediately,
-                Status = Draft,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
                 Methodology = new Methodology
                 {
                     Id = methodologyId,
@@ -1999,14 +2203,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Versions = ListOf(new MethodologyVersion
                     {
                         Id = Guid.NewGuid(),
-                        PublishingStrategy = Immediately,
-                        Status = Draft
+                        PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                        Status = MethodologyApprovalStatus.Draft
                     },
                     new MethodologyVersion
                     {
                         Id = Guid.NewGuid(),
-                        PublishingStrategy = Immediately,
-                        Status = Draft
+                        PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                        Status = MethodologyApprovalStatus.Draft
                     })
             };
 
@@ -2074,8 +2278,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Versions = ListOf(new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    PublishingStrategy = Immediately,
-                    Status = Draft
+                    PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                    Status = MethodologyApprovalStatus.Draft
                 })
             };
 
@@ -2087,8 +2291,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Versions = ListOf(new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    PublishingStrategy = Immediately,
-                    Status = Draft
+                    PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                    Status = MethodologyApprovalStatus.Draft
                 })
             };
 
@@ -2148,14 +2352,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Versions = ListOf(
                     new MethodologyVersion
                     {
-                        PublishingStrategy = Immediately,
-                        Status = Draft,
+                        PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                        Status = MethodologyApprovalStatus.Draft,
                         Version = 0,
                     },
                     new MethodologyVersion
                     {
-                        PublishingStrategy = WithRelease,
-                        Status = Approved,
+                        PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
+                        Status = MethodologyApprovalStatus.Approved,
                         Version = 1,
                     }
                 ),
@@ -2169,8 +2373,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Versions = ListOf(new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    PublishingStrategy = Immediately,
-                    Status = Draft
+                    PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                    Status = MethodologyApprovalStatus.Draft
                 })
             };
 
@@ -2180,23 +2384,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     MethodologyVersion = methodology.Versions[0],
                     InternalReleaseNote = "Status 1 note",
-                    ApprovalStatus = Approved,
+                    ApprovalStatus = MethodologyApprovalStatus.Approved,
                     Created = new DateTime(2000, 1, 1),
-                    CreatedById = UserId,
+                    CreatedById = User.Id,
                 },
                 new()
                 {
                     MethodologyVersion = methodology.Versions[1],
                     InternalReleaseNote = "Status 2 note",
-                    ApprovalStatus = Approved,
+                    ApprovalStatus = MethodologyApprovalStatus.Approved,
                     Created = new DateTime(2001, 1, 1),
-                    CreatedById = UserId,
+                    CreatedById = User.Id,
                 },
                 new()
                 {
                     MethodologyVersion = unrelatedMethodology.Versions[0],
                     InternalReleaseNote = "Unrelated note",
-                    ApprovalStatus = Approved,
+                    ApprovalStatus = MethodologyApprovalStatus.Approved,
                     Created = new DateTime(2002, 1, 1),
                     CreatedById = Guid.NewGuid(),
                 }
@@ -2204,7 +2408,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var user = new User
             {
-                Id = UserId,
+                Id = User.Id,
                 Email = "test@test.com",
             };
 
@@ -2272,13 +2476,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Versions = ListOf(
                     new MethodologyVersion
                     {
-                        PublishingStrategy = Immediately,
-                        Status = Draft,
+                        PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                        Status = MethodologyApprovalStatus.Draft,
                     },
                     new MethodologyVersion
                     {
-                        PublishingStrategy = WithRelease,
-                        Status = Approved,
+                        PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
+                        Status = MethodologyApprovalStatus.Approved,
                     }
                 ),
             };
@@ -2291,8 +2495,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Versions = ListOf(new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    PublishingStrategy = Immediately,
-                    Status = Draft
+                    PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                    Status = MethodologyApprovalStatus.Draft
                 })
             };
 
@@ -2302,7 +2506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     MethodologyVersion = unrelatedMethodology.Versions[0],
                     InternalReleaseNote = "Unrelated note",
-                    ApprovalStatus = Approved,
+                    ApprovalStatus = MethodologyApprovalStatus.Approved,
                     Created = new DateTime(2002, 1, 1),
                     CreatedById = Guid.NewGuid(),
                 },
@@ -2329,6 +2533,508 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
+        public class ListUsersMethodologyVersionsForApprovalForPublicationRoles
+        {
+            private readonly DataFixture _fixture = new();
+
+            [Fact]
+            public async Task UserIsApproverOnOwningPublication_Included()
+            {
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(User)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    var methodologyVersionsForApproval = result.AssertRight();
+
+                    var methodologyForApproval = Assert.Single(methodologyVersionsForApproval);
+                    Assert.Equal(methodology.Versions[0].Id, methodologyForApproval.Id);
+
+                    // Assert that we have a populated view model, including the owning Publication details.
+                    Assert.Equal(publication.Title, methodologyForApproval.OwningPublication.Title);
+                }
+            }
+
+            [Fact]
+            public async Task MethodologyVersionNotInHigherReview_NotIncluded()
+            {
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                // Generate 2 Methodologies that are not in Higher Review.
+                var methodologies = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .ForIndex(0, s => s.SetMethodologyVersions(_fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.Draft)
+                        .Generate(1)))
+                    .ForIndex(1, s => s.SetMethodologyVersions(_fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.Approved)
+                        .Generate(1)))
+                    .GenerateList();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(User)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodologies);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+
+            [Fact]
+            public async Task UserIsApproverButOnAdoptingPublication_NotIncluded()
+            {
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                // Create a Methodology that has only been adopted by the User's Publication.
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithAdoptingPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(User)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+
+            [Fact]
+            public async Task UserIsOnlyOwnerOnOwningPublication_NotIncluded()
+            {
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                // Set up the User as an Owner on the Methodology's Publication rather than an Approver.
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(User)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Owner)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+
+            [Fact]
+            public async Task DifferentUserIsApproverOnOwningPublication_NotIncluded()
+            {
+                // Set up a different User as the Approver for the owning Publication.
+                var otherUser = new User();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(otherUser)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+        }
+
+        public class ListUsersMethodologyVersionsForApprovalForReleaseRoles
+        {
+            private readonly DataFixture _fixture = new();
+
+            [Fact]
+            public async Task UserIsApproverOnOwningPublicationRelease_Included()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(ListOf(release))
+                    .Generate();
+
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    var methodologyVersionsForApproval = result.AssertRight();
+
+                    var methodologyForApproval = Assert.Single(methodologyVersionsForApproval);
+                    Assert.Equal(methodology.Versions[0].Id, methodologyForApproval.Id);
+
+                    // Assert that we have a populated view model, including the owning Publication details.
+                    Assert.Equal(publication.Title, methodologyForApproval.OwningPublication.Title);
+                }
+            }
+
+            [Fact]
+            public async Task UserIsApproverOnOwningPublicationRelease_MethodologyVersionNotInHigherReview_NotIncluded()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                // Generate 2 Methodologies that are not in Higher Review.
+                var methodologies = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .ForIndex(0, s => s.SetMethodologyVersions(_fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.Draft)
+                        .Generate(1)))
+                    .ForIndex(1, s => s.SetMethodologyVersions(_fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.Approved)
+                        .Generate(1)))
+                    .GenerateList();
+
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodologies);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+
+            [Fact]
+            public async Task UserIsReleaseApproverOnAdoptingPublication_NotIncluded()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                // Create a Methodology that has only been adopted by the User's Publication.
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithAdoptingPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+
+            [Fact]
+            public async Task UserIsOnlyContributorOnOwningPublicationRelease_NotIncluded()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                // Set up the User as a Contributor on the Methodology's Publication's Release rather than an Approver.
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Contributor)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+
+            [Fact]
+            public async Task DifferentUserIsApproverOnOwningPublicationRelease_NotIncluded()
+            {
+                // Set up a different User as the Approver for the owning Publication.
+                var otherUser = new User();
+
+                var release = _fixture.DefaultRelease().Generate();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .Generate();
+
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var releaseRoleForOtherUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(otherUser)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Contributor)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForOtherUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    Assert.Empty(result.AssertRight());
+                }
+            }
+
+            [Fact]
+            public async Task UserIsPublicationAndReleaseApprover_NoDuplication()
+            {
+                var release = _fixture.DefaultRelease().Generate();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(ListOf(release))
+                    .Generate();
+
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .GenerateList(1))
+                    .Generate();
+
+                var publicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(User)
+                    .WithPublication(publication)
+                    .WithRole(PublicationRole.Approver)
+                    .Generate();
+
+                var releaseRoleForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(release)
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    var methodologyVersionsForApproval = result.AssertRight();
+
+                    // Assert that we just get back a single MethodologyVersion with no duplication, despite the user
+                    // having links to this MethodologyVersion via Publication Roles and Release Roles.
+                    Assert.Single(methodologyVersionsForApproval);
+                }
+            }
+        }
+
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
@@ -2342,13 +3048,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             return new(
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 contentDbContext,
-                AdminMapper(),
+                MapperUtils.AdminMapper(),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
                 methodologyRepository ?? Mock.Of<IMethodologyRepository>(Strict),
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(Strict),
                 methodologyApprovalService ?? Mock.Of<IMethodologyApprovalService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                userService ?? AlwaysTrueUserService(UserId).Object);
+                userService ?? AlwaysTrueUserService(User.Id).Object);
         }
     }
 }

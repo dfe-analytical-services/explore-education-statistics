@@ -10,10 +10,11 @@ import React from 'react';
 import mockRouter from 'next-router-mock';
 import userEvent from '@testing-library/user-event';
 
+let mockIsMedia = false;
 jest.mock('@common/hooks/useMedia', () => ({
   useMobileMedia: () => {
     return {
-      isMedia: false,
+      isMedia: mockIsMedia,
     };
   },
 }));
@@ -475,6 +476,50 @@ describe('FindStatisticsPage', () => {
     expect(
       publicationsList.getByRole('heading', { name: 'Publication 3' }),
     ).toBeInTheDocument();
+  });
+
+  test.only('renders the desktop filters', async () => {
+    publicationService.listPublications.mockResolvedValue({
+      results: testPublications,
+      paging: testPaging,
+    });
+
+    render(<FindStatisticsPage />);
+
+    expect(
+      screen.getByRole('group', { name: 'Filter by theme' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('group', { name: 'Filter by release type' }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
+
+  test.only('renders the mobile filters', async () => {
+    mockIsMedia = true;
+    publicationService.listPublications.mockResolvedValue({
+      results: testPublications,
+      paging: testPaging,
+    });
+
+    render(<FindStatisticsPage />);
+
+    userEvent.click(screen.getByRole('button', { name: 'Filter results' }));
+
+    const modal = within(screen.getByRole('dialog'));
+
+    expect(
+      modal.getByRole('group', { name: 'Filter by theme' }),
+    ).toBeInTheDocument();
+    expect(
+      modal.getByRole('group', { name: 'Filter by release type' }),
+    ).toBeInTheDocument();
+    expect(
+      modal.getByRole('button', { name: 'Back to results' }),
+    ).toBeInTheDocument();
+
+    mockIsMedia = false;
   });
 
   test('adding filters', async () => {

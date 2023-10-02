@@ -9,6 +9,7 @@ import React, {
   memo,
   MouseEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 
 export interface FormBaseInputProps extends FormLabelProps {
@@ -20,6 +21,7 @@ export interface FormBaseInputProps extends FormLabelProps {
   hint?: string;
   id: string;
   inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
+  inputRef?: Ref<HTMLInputElement>;
   list?: string;
   name: string;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
@@ -44,6 +46,7 @@ const FormBaseInput = ({
   hideLabel,
   id,
   inputMode,
+  inputRef,
   label,
   labelSize,
   width,
@@ -66,6 +69,7 @@ const FormBaseInput = ({
       })}
       id={id}
       inputMode={inputMode}
+      ref={inputRef}
       type={type}
     />
   );

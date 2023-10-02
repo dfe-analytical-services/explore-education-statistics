@@ -118,7 +118,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
         private readonly List<string> _adminUrlAndAliases;
 
-        public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+        public Startup(
+            IConfiguration configuration,
+            IHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
             HostEnvironment = hostEnvironment;
@@ -131,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public virtual void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks();
 
@@ -175,10 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 });
 
             // Adds Brotli and Gzip compressing
-            services.AddResponseCompression(options =>
-            {
-                options.EnableForHttps = true;
-            });
+            services.AddResponseCompression(options => { options.EnableForHttps = true; });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
@@ -236,127 +235,130 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>()
                 .AddDefaultTokenProviders();
 
-            var identityServerConfig = services
-                .AddIdentityServer(options =>
-                {
-                    options.Events.RaiseErrorEvents = true;
-                    options.Events.RaiseInformationEvents = true;
-                    options.Events.RaiseFailureEvents = true;
-                    options.Events.RaiseSuccessEvents = true;
-                })
-                .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>(options =>
-                {
-                    var spaClient = options
-                        .Clients
-                        .First(client => client.ClientId == OpenIdConnectSpaClientId);
-
-                    var clientConfig = Configuration.GetSection("OpenIdConnectSpaClient");
-
-                    if (clientConfig == null)
-                    {
-                        return;
-                    }
-
-                    var allowRefreshTokens = clientConfig.GetValue("AllowOfflineAccess", false);
-
-                    if (allowRefreshTokens)
-                    {
-                        // Allow the use of refresh tokens to add persistent access to the service and enable the silent
-                        // login flow.
-                        spaClient.AllowOfflineAccess = true;
-                        spaClient.AllowedScopes = spaClient
-                            .AllowedScopes
-                            .Append(OpenIdConnectScope.OfflineAccess)
-                            .ToList();
-
-                        spaClient.UpdateAccessTokenClaimsOnRefresh = true;
-
-                        var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
-
-                        spaClient.RefreshTokenUsage = tokenUsage != null
-                            ? EnumUtil.GetFromString<TokenUsage>(tokenUsage)
-                            : TokenUsage.OneTimeOnly;
-
-                        var tokenExpiration = clientConfig.GetValue<string>("RefreshTokenExpiration");
-
-                        spaClient.RefreshTokenExpiration = tokenExpiration != null
-                            ? EnumUtil.GetFromString<TokenExpiration>(tokenExpiration)
-                            : TokenExpiration.Absolute;
-                    }
-                })
-                .AddProfileService<ApplicationUserProfileService>();
-
-            if (HostEnvironment.IsDevelopment())
+            if (!HostEnvironment.IsIntegrationTest())
             {
-                identityServerConfig.AddDeveloperSigningCredential();
-            }
-            else
-            {
-                identityServerConfig.AddSigningCredentials();
-            }
-
-            services.Configure<JwtBearerOptions>(
-                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
-                options =>
-                {
-                    options.TokenValidationParameters = new TokenValidationParameters
+                var identityServerConfig = services
+                    .AddIdentityServer(options =>
                     {
-                        // When the user returns from logging into the Identity Provider (e.g. Azure AD, Keycloak etc)
-                        // the external login portion of the Open ID Connect flow is completed, and then the Admin
-                        // SPA and Identity Server (the locally running implementation of an Open ID Connect IdP) enter
-                        // into a conversation, effectively swapping the access token issued from Azure or Keycloak
-                        // for a new access token issued from Identity Server itself specifically for the SPA's use.
-                        //
-                        // The "Issuer" of this access token is by default whatever URL that the SPA used to initiate
-                        // the conversation with Identity Server.  So if the external IdP returns the user to
-                        // https://localhost:5021, then the SPA will use https://localhost:5021 as a basis for
-                        // negotiating with Identity Server, and thus Identity Server will issue its access tokens with
-                        // the "Issuer" set to "https://localhost:5021".
-                        //
-                        // However, by default Identity Server will set its "TokenValidationParameters.ValidIssuer"
-                        // property to the "applicationUrl" value in "launchSettings.json" - locally for instance,
-                        // this would be "https://0.0.0.0:5021".  This complicates matters further as access tokens
-                        // that it issues would otherwise be immediately invalidated by this setting, regardless of what
-                        // URL the user was hitting the site on.  The answer is to manually let Identity Server know
-                        // which URLs are appropriate for each environment.
-                        //
-                        // As locally it's possible to access the service under an alternative URL like
-                        // "https://ees.local:5021", then we need to ensure that both "https://localhost:5021" and
-                        // "https://ees.local:5021" are *both* valid "Issuer" values on the access token provided by
-                        // Identity Server.
-                        ValidIssuers = _adminUrlAndAliases
-                    };
-                });
-
-            services
-                .AddAuthentication()
-                .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
-                .AddIdentityServerJwt();
-
-            services.Configure<JwtBearerOptions>(
-                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
-                options =>
-                {
-                    var originalOnMessageReceived = options.Events.OnMessageReceived;
-
-                    options.Events.OnMessageReceived = async context =>
+                        options.Events.RaiseErrorEvents = true;
+                        options.Events.RaiseInformationEvents = true;
+                        options.Events.RaiseFailureEvents = true;
+                        options.Events.RaiseSuccessEvents = true;
+                    })
+                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>(options =>
                     {
-                        await originalOnMessageReceived(context);
+                        var spaClient = options
+                            .Clients
+                            .First(client => client.ClientId == OpenIdConnectSpaClientId);
 
-                        if (!context.Token.IsNullOrEmpty())
+                        var clientConfig = Configuration.GetSection("OpenIdConnectSpaClient");
+
+                        if (clientConfig == null)
                         {
                             return;
                         }
 
-                        // Allows requests with `access_token` query parameter to authenticate.
-                        // Only really needed for websockets as we unfortunately can't set any
-                        // headers in the browser for the initial handshake.
-                        if (context.Request.Query.ContainsKey("access_token"))
+                        var allowRefreshTokens = clientConfig.GetValue("AllowOfflineAccess", false);
+
+                        if (allowRefreshTokens)
                         {
-                            context.Token = context.Request.Query["access_token"];
+                            // Allow the use of refresh tokens to add persistent access to the service and enable the silent
+                            // login flow.
+                            spaClient.AllowOfflineAccess = true;
+                            spaClient.AllowedScopes = spaClient
+                                .AllowedScopes
+                                .Append(OpenIdConnectScope.OfflineAccess)
+                                .ToList();
+
+                            spaClient.UpdateAccessTokenClaimsOnRefresh = true;
+
+                            var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
+
+                            spaClient.RefreshTokenUsage = tokenUsage != null
+                                ? EnumUtil.GetFromString<TokenUsage>(tokenUsage)
+                                : TokenUsage.OneTimeOnly;
+
+                            var tokenExpiration = clientConfig.GetValue<string>("RefreshTokenExpiration");
+
+                            spaClient.RefreshTokenExpiration = tokenExpiration != null
+                                ? EnumUtil.GetFromString<TokenExpiration>(tokenExpiration)
+                                : TokenExpiration.Absolute;
                         }
-                    };
-                });
+                    })
+                    .AddProfileService<ApplicationUserProfileService>();
+
+                if (HostEnvironment.IsDevelopment())
+                {
+                    identityServerConfig.AddDeveloperSigningCredential();
+                }
+                else
+                {
+                    identityServerConfig.AddSigningCredentials();
+                }
+
+                services.Configure<JwtBearerOptions>(
+                    IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                    options =>
+                    {
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            // When the user returns from logging into the Identity Provider (e.g. Azure AD, Keycloak etc)
+                            // the external login portion of the Open ID Connect flow is completed, and then the Admin
+                            // SPA and Identity Server (the locally running implementation of an Open ID Connect IdP) enter
+                            // into a conversation, effectively swapping the access token issued from Azure or Keycloak
+                            // for a new access token issued from Identity Server itself specifically for the SPA's use.
+                            //
+                            // The "Issuer" of this access token is by default whatever URL that the SPA used to initiate
+                            // the conversation with Identity Server.  So if the external IdP returns the user to
+                            // https://localhost:5021, then the SPA will use https://localhost:5021 as a basis for
+                            // negotiating with Identity Server, and thus Identity Server will issue its access tokens with
+                            // the "Issuer" set to "https://localhost:5021".
+                            //
+                            // However, by default Identity Server will set its "TokenValidationParameters.ValidIssuer"
+                            // property to the "applicationUrl" value in "launchSettings.json" - locally for instance,
+                            // this would be "https://0.0.0.0:5021".  This complicates matters further as access tokens
+                            // that it issues would otherwise be immediately invalidated by this setting, regardless of what
+                            // URL the user was hitting the site on.  The answer is to manually let Identity Server know
+                            // which URLs are appropriate for each environment.
+                            //
+                            // As locally it's possible to access the service under an alternative URL like
+                            // "https://ees.local:5021", then we need to ensure that both "https://localhost:5021" and
+                            // "https://ees.local:5021" are *both* valid "Issuer" values on the access token provided by
+                            // Identity Server.
+                            ValidIssuers = _adminUrlAndAliases
+                        };
+                    });
+
+                services
+                    .AddAuthentication()
+                    .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
+                    .AddIdentityServerJwt();
+
+                services.Configure<JwtBearerOptions>(
+                    IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                    options =>
+                    {
+                        var originalOnMessageReceived = options.Events.OnMessageReceived;
+
+                        options.Events.OnMessageReceived = async context =>
+                        {
+                            await originalOnMessageReceived(context);
+
+                            if (!context.Token.IsNullOrEmpty())
+                            {
+                                return;
+                            }
+
+                            // Allows requests with `access_token` query parameter to authenticate.
+                            // Only really needed for websockets as we unfortunately can't set any
+                            // headers in the browser for the initial handshake.
+                            if (context.Request.Query.ContainsKey("access_token"))
+                            {
+                                context.Token = context.Request.Query["access_token"];
+                            }
+                        };
+                    });
+            }
 
             // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
             services.Configure<IdentityOptions>(options =>
@@ -452,45 +454,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         new StorageInstanceCreationUtil()),
                     provider.GetService<IUserService>(),
                     provider.GetRequiredService<ILogger<PublishingService>>()));
-            services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>(s =>
-                new ReleasePublishingStatusService(
-                    s.GetService<IMapper>(),
-                    s.GetService<IUserService>(),
-                    s.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    new TableStorageService(
-                        publisherStorageConnectionString,
-                        new StorageInstanceCreationUtil())));
-            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(_ =>
-                new ReleasePublishingStatusRepository(
-                    new TableStorageService(
-                        publisherStorageConnectionString,
-                        new StorageInstanceCreationUtil())
-                )
-            );
+            services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>();
+            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>();
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<ITopicService, TopicService>();
-            services.AddTransient<IPublicationService, PublicationService>(provider =>
-                new PublicationService(
-                    context: provider.GetRequiredService<ContentDbContext>(),
-                    mapper: provider.GetRequiredService<IMapper>(),
-                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
-                    userService: provider.GetRequiredService<IUserService>(),
-                    publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
-                    methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
-                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
-                )
-            );
+            services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
-            services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
-                new LegacyReleaseService(
-                    context: provider.GetRequiredService<ContentDbContext>(),
-                    mapper: provider.GetRequiredService<IMapper>(),
-                    userService: provider.GetRequiredService<IUserService>(),
-                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
-                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>())
-            );
+            services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
             services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
@@ -506,19 +477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
             services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
-            services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>(provider =>
-                new MethodologyApprovalService(
-                    context: provider.GetRequiredService<ContentDbContext>(),
-                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
-                    methodologyContentService: provider.GetRequiredService<IMethodologyContentService>(),
-                    methodologyFileRepository: provider.GetRequiredService<IMethodologyFileRepository>(),
-                    methodologyImageService: provider.GetRequiredService<IMethodologyImageService>(),
-                    methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
-                    publishingService: provider.GetRequiredService<IPublishingService>(),
-                    userService: provider.GetRequiredService<IUserService>(),
-                    userReleaseRoleService: provider.GetRequiredService<IUserReleaseRoleService>(),
-                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
-                    emailTemplateService: provider.GetRequiredService<IEmailTemplateService>()));
+            services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>();
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -600,10 +559,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
             services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
 
-            services.AddTransient<ITableStorageService, TableStorageService>(_ =>
-                new TableStorageService(
-                    coreStorageConnectionString,
-                    new StorageInstanceCreationUtil()));
+            services.AddTransient<ICoreTableStorageService, CoreTableStorageService>();
+            services.AddTransient<IPublisherTableStorageService, PublisherTableStorageService>();
             services.AddTransient<IStorageQueueService, StorageQueueService>(_ =>
                 new StorageQueueService(
                     coreStorageConnectionString,
@@ -645,30 +602,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             /*
              * Swagger
              */
-
-            services.AddSwaggerGen(c =>
-            {
-                c.SwaggerDoc("v1",
-                    new OpenApiInfo { Title = "Explore education statistics - Admin API", Version = "v1" });
-                c.CustomSchemaIds((type) => type.FullName);
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            
+            if (Configuration.GetValue<bool>("enableSwagger"))
+                services.AddSwaggerGen(c =>
                 {
-                    Description = "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey
-                });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
+                    c.SwaggerDoc("v1",
+                        new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
+                    c.CustomSchemaIds((type) => type.FullName);
+                    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                     {
-                        new OpenApiSecurityScheme
+                        Description =
+                            "Please enter into field the word 'Bearer' followed by a space and the JWT contents",
+                        Name = "Authorization",
+                        In = ParameterLocation.Header,
+                        Type = SecuritySchemeType.ApiKey
+                    });
+                    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                    {
                         {
-                            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
-                        },
-                        new[] { string.Empty }
-                    }
+                            new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference {Type = ReferenceType.SecurityScheme, Id = "Bearer"}
+                            },
+                            new[] {string.Empty}
+                        }
+                    });
                 });
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -679,21 +638,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
             var privateCacheService = new BlobCacheService(
-                new PrivateBlobStorageService(
-                    provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                    Configuration),
+                app.ApplicationServices.GetRequiredService<IPrivateBlobStorageService>(),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()
             );
             var publicCacheService = new BlobCacheService(
-                new PublicBlobStorageService(
-                    provider.GetRequiredService<ILogger<IBlobStorageService>>(),
-                    Configuration),
+                app.ApplicationServices.GetRequiredService<IPublicBlobStorageService>(),
                 provider.GetRequiredService<ILogger<BlobCacheService>>()
             );
             BlobCacheAttribute.AddService("default", privateCacheService);
             BlobCacheAttribute.AddService("public", publicCacheService);
 
-            UpdateDatabase(app, env);
+            if (!env.IsIntegrationTest())
+            {
+                UpdateDatabase(app, env);
+            }
 
             if (env.IsDevelopment())
             {
@@ -757,8 +715,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseHealthChecks("/api/health");
 
             app.UseAuthentication();
-            app.UseIdentityServer();
             app.UseAuthorization();
+
+            if (!env.IsIntegrationTest())
+            {
+                app.UseIdentityServer();
+            }
 
             // Deny access to all /Identity routes other than:
             //
@@ -791,14 +753,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     template: "{controller}/{action=Index}/{id?}");
             });
 
-            app.UseSpa(spa =>
+            if (!env.IsIntegrationTest())
             {
-                if (env.IsDevelopment())
+                app.UseSpa(spa =>
                 {
-                    spa.Options.SourcePath = "../explore-education-statistics-admin";
-                    spa.UseReactDevelopmentServer("start");
-                }
-            });
+                    if (env.IsDevelopment())
+                    {
+                        spa.Options.SourcePath = "../explore-education-statistics-admin";
+                        spa.UseReactDevelopmentServer("start");
+                    }
+                });
+            }
 
             app.ServerFeatures.Get<IServerAddressesFeature>()
                 ?.Addresses
@@ -810,19 +775,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
                        .CreateScope())
             {
-                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetRequiredService<StatisticsDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
 
-                using (var context = serviceScope.ServiceProvider.GetService<UsersAndRolesDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetRequiredService<UsersAndRolesDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();
                 }
 
-                using (var context = serviceScope.ServiceProvider.GetService<ContentDbContext>())
+                using (var context = serviceScope.ServiceProvider.GetRequiredService<ContentDbContext>())
                 {
                     context.Database.SetCommandTimeout(int.MaxValue);
                     context.Database.Migrate();

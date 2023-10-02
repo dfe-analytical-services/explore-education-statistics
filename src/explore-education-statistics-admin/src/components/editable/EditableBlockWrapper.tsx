@@ -6,7 +6,6 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tooltip from '@common/components/Tooltip';
-import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode } from 'react';
 
 export interface EditableBlockProps {
@@ -27,8 +26,6 @@ const EditableBlockWrapper = ({
   onDelete,
   onEmbedBlockEdit,
 }: EditableBlockProps & { children: ReactNode }) => {
-  const [showConfirmDelete, toggleConfirmDelete] = useToggle(false);
-
   const lockedTooltip = lockedBy
     ? `This block is being edited by ${lockedBy?.displayName}`
     : undefined;
@@ -72,37 +69,29 @@ const EditableBlockWrapper = ({
         )}
 
         {onDelete && (
-          <>
-            <Tooltip text={lockedTooltip} enabled={!!lockedTooltip}>
-              {({ ref }) => (
-                <Button
-                  ariaDisabled={!!lockedTooltip}
-                  disabled={isLoading}
-                  ref={ref}
-                  variant="warning"
-                  onClick={toggleConfirmDelete.on}
-                >
-                  Remove block
-                </Button>
-              )}
-            </Tooltip>
-
-            <ModalConfirm
-              title="Remove block"
-              open={showConfirmDelete}
-              onConfirm={async () => {
-                await onDelete();
-                toggleConfirmDelete.off();
-              }}
-              onExit={toggleConfirmDelete.off}
-              onCancel={toggleConfirmDelete.off}
-            >
-              <p>
-                Are you sure you want to remove this block from this content
-                section?
-              </p>
-            </ModalConfirm>
-          </>
+          <Tooltip text={lockedTooltip} enabled={!!lockedTooltip}>
+            {({ ref }) => (
+              <ModalConfirm
+                title="Remove block"
+                triggerButton={
+                  <Button
+                    ariaDisabled={!!lockedTooltip}
+                    disabled={isLoading}
+                    ref={ref}
+                    variant="warning"
+                  >
+                    Remove block
+                  </Button>
+                }
+                onConfirm={onDelete}
+              >
+                <p>
+                  Are you sure you want to remove this block from this content
+                  section?
+                </p>
+              </ModalConfirm>
+            )}
+          </Tooltip>
         )}
       </ButtonGroup>
     </>

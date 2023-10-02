@@ -11,9 +11,7 @@ const downloadService = {
   async downloadFiles(releaseId: string, fileIds: string[]): Promise<void> {
     const query = qs.stringify({ fileIds }, { arrayFormat: 'comma' });
 
-    downloadFile(
-      `${contentApi.axios.defaults.baseURL}/releases/${releaseId}/files?${query}`,
-    );
+    downloadFile(`${contentApi.baseURL}/releases/${releaseId}/files?${query}`);
   },
 };
 

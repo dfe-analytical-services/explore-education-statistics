@@ -180,9 +180,8 @@ const ChartDataGroupingsConfiguration = ({
               {buttons}
             </ChartBuilderSaveActions>
           </Form>
-
           {editDataSetConfig && (
-            <Modal title="Edit groupings">
+            <Modal open={!!editDataSetConfig} title="Edit groupings">
               <ChartDataGroupingForm
                 dataSetConfig={editDataSetConfig.dataSetConfig}
                 dataSetConfigs={form.values.dataSetConfigs}

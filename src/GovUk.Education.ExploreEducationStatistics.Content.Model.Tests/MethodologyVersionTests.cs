@@ -181,7 +181,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
                 // general fields
                 Id = Guid.NewGuid(),
                 AlternativeTitle = "Alternative Title",
-                InternalReleaseNote = "Internal Release Note",
 
                 // creation and update fields
                 Created = DateTime.Today.AddDays(-2),
@@ -218,7 +217,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             Assert.NotEqual(Guid.Empty, amendment.Id);
             Assert.NotEqual(originalVersion.Id, amendment.Id);
             Assert.Equal(originalVersion.AlternativeTitle, amendment.AlternativeTitle);
-            Assert.Null(amendment.InternalReleaseNote);
 
             // Check creation and update fields.
             Assert.Equal(creationTime, amendment.Created);

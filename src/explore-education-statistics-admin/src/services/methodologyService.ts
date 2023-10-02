@@ -85,8 +85,15 @@ const methodologyService = {
 
   listLatestMethodologyVersions(
     publicationId: string,
+    isPrerelease = false,
   ): Promise<MethodologyVersionSummary[]> {
-    return client.get(`/publication/${publicationId}/methodologies`);
+    return client.get(`/publication/${publicationId}/methodologies`, {
+      params: { isPrerelease },
+    });
+  },
+
+  listMethodologiesForApproval(): Promise<MethodologyVersion[]> {
+    return client.get('/methodology/approvals');
   },
 
   createMethodologyAmendment(

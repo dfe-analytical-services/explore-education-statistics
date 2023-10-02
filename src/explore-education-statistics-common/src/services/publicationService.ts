@@ -63,7 +63,7 @@ export interface Contact {
   teamName: string;
   teamEmail: string;
   contactName: string;
-  contactTelNo: string;
+  contactTelNo?: string;
 }
 
 export interface PublicationTitle {

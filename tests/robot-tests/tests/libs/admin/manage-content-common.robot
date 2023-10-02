@@ -22,8 +22,8 @@ user navigates to content page
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add note    %{WAIT_SMALL}
 
-    user waits for page to finish loading
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
+    user waits until page finishes loading
 
 user adds basic release content
     [Arguments]    ${publication}    ${add_headlines_block}=${TRUE}
@@ -49,7 +49,7 @@ user creates new content section
     ...    ${content_section_name}
     ...    ${parent}=css:body
 
-    user clicks element    xpath://button[.="Add new section"]    ${parent}
+    user clicks button    Add new section    ${parent}
     user changes accordion section title    ${section_number}    ${content_section_name}    ${parent}
 
 user creates data block for dates csv
@@ -166,7 +166,7 @@ user chooses and embeds data block
     user waits until button is enabled    Embed    %{WAIT_SMALL}
     user clicks button    Embed
     user waits until page does not contain button    Embed    %{WAIT_MEDIUM}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
 user opens nth editable accordion section
     [Arguments]
@@ -235,7 +235,7 @@ user adds data block to editable accordion section
     ...    ${parent}=css:[data-testid="accordion"]
 
     ${section}=    user gets accordion section content element    ${section_name}    ${parent}
-    user waits for page to finish loading
+    user waits until page finishes loading
     user clicks button    Add data block    ${section}
     ${block_list}=    get child element    ${section}    css:select[name="selectedDataBlock"]
     user chooses select option    ${block_list}    Dates data block name
@@ -355,7 +355,7 @@ user adds image to accordion section text block
     choose file
     ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
     ...    ${FILES_DIR}${filename}
-    user clicks element    xpath://button[span[.="Change image text alternative"]]
+    user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    ${alt_text}
     user clicks element    css:button.ck-button-save
     user clicks element    xpath://div[@title="Insert paragraph after block"]
@@ -370,6 +370,7 @@ user adds image to accordion section text block
     user presses keys    SHIFT+TAB
 
     user clicks button    Save    ${block}
+    user waits until page finishes loading
 
 user adds image without alt text to accordion section text block
     [Arguments]
@@ -394,6 +395,7 @@ user adds image without alt text to accordion section text block
     ...    xpath://img[starts-with(@src, "/api/")]
 
     user clicks button    Save    ${block}
+    user waits until page finishes loading
 
 user removes image from accordion section text block
     [Arguments]
@@ -416,6 +418,7 @@ user removes image from accordion section text block
     # Delete the empty line left by the deleted image.
     user presses keys    DELETE
     user clicks button    ${save_button}    ${block}
+    user waits until page finishes loading
 
 user saves autosaving text block
     [Arguments]    ${parent}
@@ -427,6 +430,7 @@ user saves autosaving text block
     sleep    0.2
 
     user clicks button    Save & close    ${parent}
+    user waits until page finishes loading
     user waits until parent does not contain button    ${parent}    Save & close    %{WAIT_SMALL}
 
 user checks accordion section text block contains
@@ -468,9 +472,8 @@ user deletes editable accordion section content block
     ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
     user clicks button    Remove block    ${block}
     user clicks button    Confirm
-    # avoid blocks being lazy loaded
-    user waits until page does not contain loading spinner
-    Sleep    0.75
+    user waits until page finishes loading
+    sleep    0.75
     user scrolls down    1
 
 user deletes editable accordion section

@@ -38,8 +38,6 @@ export interface FormValues {
 
 export type FilterFormSubmitHandler = (values: FormValues) => void;
 
-const formId = 'filtersForm';
-
 const TableQueryErrorCodes = [
   'QueryExceedsMaxAllowableTableSize',
   'RequestCancelled',
@@ -119,7 +117,7 @@ const FiltersForm = ({
     <WizardStepHeading {...stepProps}>Choose your filters</WizardStepHeading>
   );
 
-  const handleSubmitForm = async (values: FormValues) => {
+  const handleSubmit = async (values: FormValues) => {
     setPreviousValues({ ...values });
 
     try {
@@ -203,7 +201,7 @@ const FiltersForm = ({
         });
         if (isActive) {
           return (
-            <RHFForm id={formId} showSubmitError onSubmit={handleSubmitForm}>
+            <RHFForm id="filtersForm" showSubmitError onSubmit={handleSubmit}>
               {tableQueryError && formState.submitCount > 0 && (
                 <TableQueryError
                   errorCode={tableQueryError}
@@ -288,7 +286,6 @@ const FiltersForm = ({
                               disabled={formState.isSubmitting}
                               groupLabel={filterGroup.legend}
                               hint={filterGroup.hint}
-                              id={`${formId}-${filterName}`}
                               key={filterKey}
                               legend={filterGroup.legend}
                               name={filterName}

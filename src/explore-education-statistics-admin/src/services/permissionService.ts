@@ -9,6 +9,7 @@ export interface GlobalPermissions {
   canAccessAllImports: boolean;
   canManageAllTaxonomy: boolean;
   isBauUser: boolean;
+  isApprover: boolean;
 }
 
 export interface ReleaseStatusPermissions {

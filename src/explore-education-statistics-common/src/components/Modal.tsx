@@ -1,81 +1,117 @@
+import Button from '@common/components/Button';
 import styles from '@common/components/Modal.module.scss';
+import useToggle from '@common/hooks/useToggle';
+import * as Dialog from '@radix-ui/react-dialog';
 import classNames from 'classnames';
-import React, { ReactNode, useEffect } from 'react';
-import BaseModal from 'react-modal';
+import React, { ReactNode, useEffect, useRef } from 'react';
 
 export interface ModalProps {
   children: ReactNode;
   className?: string;
-  closeOnOutsideClick?: boolean;
   closeOnEsc?: boolean;
+  closeOnOutsideClick?: boolean;
+  closeText?: string;
+  description?: string;
   fullScreen?: boolean;
   hideTitle?: boolean;
   open?: boolean;
+  showClose?: boolean;
   title: string;
+  triggerButton?: ReactNode;
   underlayClass?: string;
-  onOpen?: () => void;
   onExit?: () => void;
+  onOpen?: () => void;
+  onToggleOpen?: (open: boolean) => void;
 }
 
 const Modal = ({
   children,
   className,
-  closeOnOutsideClick = true,
   closeOnEsc = true,
+  closeOnOutsideClick = true,
+  closeText = 'Close',
+  description,
   fullScreen = false,
   hideTitle = false,
-  open = true,
-  onOpen,
-  onExit,
+  open: initialOpen = false,
+  showClose = false,
   title,
+  triggerButton,
   underlayClass,
+  onExit,
+  onOpen,
+  onToggleOpen,
 }: ModalProps) => {
-  const appElement =
-    typeof document !== 'undefined'
-      ? (document.getElementById(process.env.APP_ROOT_ID) as HTMLElement)
-      : undefined;
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const [open, toggleOpen] = useToggle(initialOpen);
 
-  // when fullscreen prevent scroll on the body while the modal is open.
   useEffect(() => {
-    if (fullScreen) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
-    }
-
-    return () => {
-      if (fullScreen) {
-        document.body.style.overflow = 'unset';
-        document.documentElement.style.overflow = 'unset';
-      }
-    };
-  }, [fullScreen]);
+    toggleOpen(initialOpen);
+  }, [initialOpen, toggleOpen]);
 
   return (
-    <BaseModal
-      appElement={appElement}
-      ariaHideApp={!!appElement}
-      contentLabel={title}
-      className={classNames(styles.dialog, className, {
-        [styles.fullScreen]: fullScreen,
-      })}
-      isOpen={open}
-      overlayClassName={classNames(styles.underlay, underlayClass)}
-      shouldFocusAfterRender
-      shouldCloseOnOverlayClick={closeOnOutsideClick}
-      shouldCloseOnEsc={closeOnEsc}
-      onRequestClose={onExit}
-      onAfterOpen={onOpen}
+    <Dialog.Root
+      open={open}
+      onOpenChange={isOpen => {
+        if (onToggleOpen) {
+          onToggleOpen?.(isOpen);
+        } else {
+          toggleOpen(isOpen);
+        }
+        return isOpen ? onOpen?.() : onExit?.();
+      }}
     >
-      <h2
-        className={classNames('govuk-heading-l', {
-          'govuk-visually-hidden': hideTitle,
-        })}
-      >
-        {title}
-      </h2>
-      {children}
-    </BaseModal>
+      {triggerButton && (
+        <Dialog.Trigger asChild>{triggerButton}</Dialog.Trigger>
+      )}
+      <Dialog.Portal>
+        <Dialog.Overlay
+          className={classNames(styles.underlay, underlayClass)}
+          data-testid="modal-underlay"
+        >
+          <Dialog.Content
+            className={classNames(styles.dialog, className, {
+              [styles.fullScreen]: fullScreen,
+            })}
+            ref={dialogRef}
+            onEscapeKeyDown={event =>
+              !closeOnEsc ? event.preventDefault() : undefined
+            }
+            onOpenAutoFocus={event => {
+              event.preventDefault();
+              dialogRef.current?.focus();
+            }}
+            onPointerDownOutside={event =>
+              !closeOnOutsideClick ? event.preventDefault() : undefined
+            }
+          >
+            <Dialog.Title asChild>
+              <h2
+                className={classNames('govuk-heading-l', {
+                  'govuk-visually-hidden': hideTitle,
+                })}
+              >
+                {title}
+              </h2>
+            </Dialog.Title>
+            {description && (
+              <Dialog.Description>{description}</Dialog.Description>
+            )}
+            {children}
+            {showClose && (
+              <Dialog.Close asChild>
+                <Button>{closeText}</Button>
+              </Dialog.Close>
+            )}
+          </Dialog.Content>
+        </Dialog.Overlay>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 };
 
 export default Modal;
+
+export function ModalCloseButton({ children }: { children: ReactNode }) {
+  return <Dialog.Close asChild>{children}</Dialog.Close>;
+}

@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
@@ -176,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var methodologyService = new Mock<IMethodologyService>(Strict);
 
             methodologyService
-                .Setup(s => s.ListLatestMethodologyVersions(_id))
+                .Setup(s => s.ListLatestMethodologyVersions(_id, false))
                 .ReturnsAsync(ListOf(new MethodologyVersionSummaryViewModel()));
 
             var controller = SetupMethodologyController(methodologyService.Object);
@@ -245,15 +246,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             result.AssertNoContent();
         }
 
+        [Fact]
+        public async void ListMethodologyVersionsForApproval()
+        {
+            var methodologyVersions = ListOf(new MethodologyVersionViewModel
+            {
+                Id = Guid.NewGuid()
+            });
+            
+            var userService = new Mock<IUserService>(Strict);
+            var methodologyService = new Mock<IMethodologyService>(Strict);
+
+            methodologyService
+                .Setup(s => s.ListUsersMethodologyVersionsForApproval())
+                .ReturnsAsync(methodologyVersions);
+
+            var controller = SetupMethodologyController(
+                methodologyService.Object);
+
+            var result = await controller.ListMethodologyVersionsForApproval();
+            VerifyAllMocks(userService, methodologyService);
+
+            result.AssertOkResult(methodologyVersions);
+        }
+
         private static MethodologyController SetupMethodologyController(
             IMethodologyService? methodologyService = null,
-            IMethodologyAmendmentService? methodologyAmendmentService = null
-        )
+            IMethodologyAmendmentService? methodologyAmendmentService = null)
         {
             return new(
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
-                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict)
-            );
+                methodologyAmendmentService ?? Mock.Of<IMethodologyAmendmentService>(Strict));
         }
     }
 }

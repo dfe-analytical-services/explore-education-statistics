@@ -526,7 +526,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = BuildPublicationService(
                         context: contentDbContext,
                         userService: userService.Object);
-                    return await service.UpdateContact(publication.Id, new Contact());
+                    return await service.UpdateContact(publication.Id, new ContactSaveRequest());
                 });
         }
 

@@ -95,7 +95,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         methodologyVersion.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
                             ? request.WithReleaseId
                             : null;
-                        methodologyVersion.InternalReleaseNote = request.LatestInternalReleaseNote;
 
                         methodologyVersion.Updated = DateTime.UtcNow;
 

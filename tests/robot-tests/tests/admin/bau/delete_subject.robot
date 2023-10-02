@@ -137,7 +137,7 @@ Create table
 
 Navigate to Create chart tab
     user waits until page contains link    Chart
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks link    Chart
     user clicks button    Choose an infographic as alternative
     choose file    id:chartConfigurationForm-file    ${FILES_DIR}dfe-logo.jpg

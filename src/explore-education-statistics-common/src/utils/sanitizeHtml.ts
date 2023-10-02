@@ -12,8 +12,9 @@ export type SanitizeHtmlOptions = {
   allowedSchemesByTag?: Dictionary<string[]>;
   allowedStyles?: Dictionary<Dictionary<RegExp[]>>;
   filterTags?: Dictionary<TagFilter>;
-  transformTags?: Dictionary<string | sanitize.Transformer>;
   parseStyleAttributes?: boolean;
+  transformTags?: Dictionary<string | sanitize.Transformer>;
+  textFilter?: (text: string, tagName: string) => string;
 };
 
 export const defaultSanitizeOptions: SanitizeHtmlOptions = {

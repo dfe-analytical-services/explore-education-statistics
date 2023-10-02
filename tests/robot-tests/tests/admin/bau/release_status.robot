@@ -240,6 +240,7 @@ Adopt a methodology with a draft amendment
     user waits until h2 is visible    Adopt a methodology
     user clicks radio    ${ADOPTED_PUBLICATION_NAME}
     user clicks button    Save
+    user waits until page finishes loading
 
 Check that having a draft methodology amendment adopted by this Release's Publication will show a checklist warning
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}

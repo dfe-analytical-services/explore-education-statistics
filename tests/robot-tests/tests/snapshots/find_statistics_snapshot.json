@@ -30,7 +30,7 @@
   {
     "publication_summary": "Apprenticeship and traineeship starts, achievements and participation. Includes breakdowns by age, sex, ethnicity, subject, provider, geography etc.",
     "publication_title": "Apprenticeships and traineeships",
-    "published": "10 Aug 2023",
+    "published": "7 Sep 2023",
     "release_type": "National statistics",
     "theme": "Further education"
   },
@@ -86,7 +86,7 @@
   {
     "publication_summary": "Children looked after, care leavers and children adopted in England. Annual statistics including characteristics, placement information and health outcomes.",
     "publication_title": "Children looked after in England including adoptions",
-    "published": "13 Jul 2023",
+    "published": "17 Nov 2022",
     "release_type": "National statistics",
     "theme": "Children's social care"
   },
@@ -198,7 +198,7 @@
   {
     "publication_summary": "Official statistics on vacancies, skills gaps and training, from the Employer Skills Survey.",
     "publication_title": "Employer Skills Survey",
-    "published": "30 Mar 2023",
+    "published": "28 Sep 2023",
     "release_type": "Official statistics",
     "theme": "UK education and training statistics"
   },
@@ -228,6 +228,13 @@
     "publication_title": "Further education skills index",
     "published": "30 Mar 2023",
     "release_type": "Official statistics",
+    "theme": "Further education"
+  },
+  {
+    "publication_summary": "This experimental statistics release includes characteristics and pay of the further education workforce as well as characteristics of governors in England.",
+    "publication_title": "Further education workforce",
+    "published": "31 Aug 2023",
+    "release_type": "Experimental statistics",
     "theme": "Further education"
   },
   {
@@ -275,7 +282,7 @@
   {
     "publication_summary": "Key stage 2 attainment statistics by pupil characteristics, school characteristics, region and local authority.",
     "publication_title": "Key stage 2 attainment",
-    "published": "6 Sep 2022",
+    "published": "12 Sep 2023",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -450,7 +457,7 @@
   {
     "publication_summary": "Local authority (LA) spending plans for education, children's services and social care.",
     "publication_title": "Planned LA and school expenditure",
-    "published": "29 Sep 2022",
+    "published": "28 Sep 2023",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
   },
@@ -499,7 +506,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "10 Aug 2023",
+    "published": "28 Sep 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },

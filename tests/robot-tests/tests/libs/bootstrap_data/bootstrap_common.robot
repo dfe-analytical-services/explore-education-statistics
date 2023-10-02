@@ -94,7 +94,7 @@ user creates a fully populated draft release
 
     # add data guidance
     user clicks link    Data guidance
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
@@ -102,12 +102,12 @@ user creates a fully populated draft release
     user clicks button    Save guidance
 
     # add footnote
-    user waits for page to finish loading
+    user waits until page finishes loading
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks footnote subject radio    ${SUBJECT_NAME}    Applies to all data
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content    test footnote
@@ -116,5 +116,5 @@ user creates a fully populated draft release
 
     # add public prerelease access list
     user clicks link    Pre-release access
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user creates public prerelease access list    Test public access list

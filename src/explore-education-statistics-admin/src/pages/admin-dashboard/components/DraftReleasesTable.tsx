@@ -1,32 +1,26 @@
-import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
 import DraftReleaseRow from '@admin/pages/admin-dashboard/components/DraftReleaseRow';
 import styles from '@admin/pages/admin-dashboard/components/DraftReleasesTable.module.scss';
 import {
   DraftStatusGuidanceModal,
   IssuesGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import releaseService, {
-  DeleteReleasePlan,
-  Release,
-} from '@admin/services/releaseService';
-import ButtonText from '@common/components/ButtonText';
-import InfoIcon from '@common/components/InfoIcon';
-import useToggle from '@common/hooks/useToggle';
+import { DashboardReleaseSummary } from '@admin/services/releaseService';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 
 interface PublicationRowProps {
   isBauUser: boolean;
   publication: string;
-  releases: Release[];
-  onDelete: (releaseId: string) => void;
+  releases: DashboardReleaseSummary[];
+  onChangeRelease: () => void;
 }
+
 const PublicationRow = ({
   isBauUser,
   publication,
   releases,
-  onDelete,
+  onChangeRelease,
 }: PublicationRowProps) => {
   return (
     <>
@@ -40,7 +34,7 @@ const PublicationRow = ({
           key={release.id}
           isBauUser={isBauUser}
           release={release}
-          onDelete={() => onDelete(release.id)}
+          onChangeRelease={onChangeRelease}
         />
       ))}
     </>
@@ -49,7 +43,7 @@ const PublicationRow = ({
 
 interface DraftReleasesTableProps {
   isBauUser: boolean;
-  releases: Release[];
+  releases: DashboardReleaseSummary[];
   onChangeRelease: () => void;
 }
 
@@ -58,26 +52,21 @@ const DraftReleasesTable = ({
   releases,
   onChangeRelease,
 }: DraftReleasesTableProps) => {
-  const [deleteReleasePlan, setDeleteReleasePlan] = useState<
-    DeleteReleasePlan & {
-      releaseId: string;
-    }
-  >();
+  const releasesByPublication: Dictionary<DashboardReleaseSummary[]> =
+    useMemo(() => {
+      return releases.reduce<Dictionary<DashboardReleaseSummary[]>>(
+        (acc, release) => {
+          if (acc[release.publication.title]) {
+            acc[release.publication.title].push(release);
+          } else {
+            acc[release.publication.title] = [release];
+          }
 
-  const [showDraftStatusGuidance, toggleDraftStatusGuidance] = useToggle(false);
-  const [showIssuesGuidance, toggleIssuesGuidance] = useToggle(false);
-
-  const releasesByPublication: Dictionary<Release[]> = useMemo(() => {
-    return releases.reduce<Dictionary<Release[]>>((acc, release) => {
-      if (acc[release.publicationTitle]) {
-        acc[release.publicationTitle].push(release);
-      } else {
-        acc[release.publicationTitle] = [release];
-      }
-
-      return acc;
-    }, {});
-  }, [releases]);
+          return acc;
+        },
+        {},
+      );
+    }, [releases]);
 
   return (
     <>
@@ -98,18 +87,12 @@ const DraftReleasesTable = ({
                       Publication / Release period
                     </th>
                     <th>
-                      Status{' '}
-                      <ButtonText onClick={toggleDraftStatusGuidance.on}>
-                        <InfoIcon description="Guidance on draft states" />
-                      </ButtonText>
+                      Status <DraftStatusGuidanceModal />
                     </th>
                     {/* Don't render the issues for BAU users to prevent performance problems. */}
                     {!isBauUser && (
                       <th className={styles.issuesColumn}>
-                        Issues{' '}
-                        <ButtonText onClick={toggleIssuesGuidance.on}>
-                          <InfoIcon description="Guidance on draft release issues" />
-                        </ButtonText>
+                        Issues <IssuesGuidanceModal />
                       </th>
                     )}
                     <th>Actions</th>
@@ -121,14 +104,7 @@ const DraftReleasesTable = ({
                         isBauUser={isBauUser}
                         publication={publication}
                         releases={releasesByPublication[publication]}
-                        onDelete={async releaseId => {
-                          setDeleteReleasePlan({
-                            ...(await releaseService.getDeleteReleasePlan(
-                              releaseId,
-                            )),
-                            releaseId,
-                          });
-                        }}
+                        onChangeRelease={onChangeRelease}
                       />
                     ),
                   )}
@@ -137,27 +113,6 @@ const DraftReleasesTable = ({
             )}
         </>
       )}
-
-      {deleteReleasePlan && (
-        <CancelAmendmentModal
-          scheduledMethodologies={deleteReleasePlan.scheduledMethodologies}
-          onConfirm={async () => {
-            await releaseService.deleteRelease(deleteReleasePlan.releaseId);
-            setDeleteReleasePlan(undefined);
-            onChangeRelease();
-          }}
-          onCancel={() => setDeleteReleasePlan(undefined)}
-        />
-      )}
-
-      <DraftStatusGuidanceModal
-        open={showDraftStatusGuidance}
-        onClose={toggleDraftStatusGuidance.off}
-      />
-      <IssuesGuidanceModal
-        open={showIssuesGuidance}
-        onClose={toggleIssuesGuidance.off}
-      />
     </>
   );
 };

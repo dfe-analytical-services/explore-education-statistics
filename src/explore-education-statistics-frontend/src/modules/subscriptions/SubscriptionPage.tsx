@@ -1,5 +1,7 @@
 import Button from '@common/components/Button';
-import { FormFieldTextInput, Form } from '@common/components/form';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import useMounted from '@common/hooks/useMounted';
 import publicationService, {
   PublicationTitle,
@@ -10,7 +12,6 @@ import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import notificationService from '@frontend/services/notificationService';
 import classNames from 'classnames';
-import { Formik } from 'formik';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useState } from 'react';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
@@ -19,8 +20,6 @@ import styles from './SubscriptionPage.module.scss';
 interface FormValues {
   email: string;
 }
-
-const formId = 'subscriptionForm';
 
 interface Props {
   slug: string;
@@ -101,7 +100,8 @@ const SubscriptionPage: NextPage<Props> = ({
           </ul>
 
           {isMounted && (
-            <Formik<FormValues>
+            <FormProvider
+              enableReinitialize
               initialValues={{
                 email: '',
               }}
@@ -110,25 +110,30 @@ const SubscriptionPage: NextPage<Props> = ({
                   .required('Email is required')
                   .email('Enter a valid email'),
               })}
-              onSubmit={handleFormSubmit}
             >
-              {form => (
-                <Form id={formId} showSubmitError>
-                  <FormFieldTextInput<FormValues>
-                    label="Enter your email address"
-                    hint="This will only be used to subscribe you to updates. You can unsubscribe at any time"
-                    name="email"
-                    width={20}
-                  />
+              {({ formState }) => {
+                return (
+                  <RHFForm
+                    id="subscriptionForm"
+                    showSubmitError
+                    onSubmit={handleFormSubmit}
+                  >
+                    <RHFFormFieldTextInput<FormValues>
+                      label="Enter your email address"
+                      hint="This will only be used to subscribe you to updates. You can unsubscribe at any time"
+                      name="email"
+                      width={20}
+                    />
 
-                  <Button type="submit" disabled={form.isSubmitting}>
-                    {form.isSubmitting && form.isValid
-                      ? 'Submitting'
-                      : 'Subscribe'}
-                  </Button>
-                </Form>
-              )}
-            </Formik>
+                    <Button type="submit" disabled={formState.isSubmitting}>
+                      {formState.isSubmitting && formState.isValid
+                        ? 'Submitting'
+                        : 'Subscribe'}
+                    </Button>
+                  </RHFForm>
+                );
+              }}
+            </FormProvider>
           )}
         </>
       )}

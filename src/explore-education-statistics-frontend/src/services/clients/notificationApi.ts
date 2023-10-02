@@ -1,12 +1,13 @@
+import {
+  networkActivityRequestInterceptor,
+  networkActivityResponseInterceptor,
+} from '@common/contexts/NetworkActivityContext';
 import Client from '@common/services/api/Client';
-import axios from 'axios';
-import qs from 'qs';
 
-const notificationApi = new Client(
-  axios.create({
-    baseURL: process.env.NOTIFICATION_API_BASE_URL,
-    paramsSerializer: params => qs.stringify(params, { arrayFormat: 'comma' }),
-  }),
-);
+const notificationApi = new Client({
+  baseURL: process.env.NOTIFICATION_API_BASE_URL,
+  requestInterceptors: [networkActivityRequestInterceptor],
+  responseInterceptors: [networkActivityResponseInterceptor],
+});
 
 export default notificationApi;

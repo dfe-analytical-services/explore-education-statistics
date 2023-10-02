@@ -178,7 +178,7 @@ Verify that methodology hash links open accoridon sections correctly
     user checks page contains    Content 3
 
     user navigates to public frontend    ${METHODOLOGY_URL}#content-section-4-test-title-4
-    user waits for page to finish loading
+    user waits until page finishes loading
 
     user checks page contains    4.-test-.title 4
     user checks page contains    Content 4

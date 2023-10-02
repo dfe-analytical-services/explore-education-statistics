@@ -70,7 +70,7 @@ Validate Number of schools row results
     user checks table cell contains    1    4    349
 
 Go back to Locations step
-    user clicks element    xpath://button[contains(text(), "Edit locations")]
+    user clicks button    Edit locations
     user waits until table tool wizard step is available    3    Choose locations
 
 Unselect England as a location
@@ -82,7 +82,7 @@ Unselect England as a location
 
     # Workaround to avoid error summary stealing focus when closing dropdown
     user sets focus to element    id:locationFiltersForm-submit
-    user waits until h2 is visible    There is a problem
+    user waits until page contains    Select at least one location
 
     user closes details dropdown    National
 

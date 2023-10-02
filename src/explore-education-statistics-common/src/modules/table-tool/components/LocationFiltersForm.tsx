@@ -1,8 +1,12 @@
 import CollapsibleList from '@common/components/CollapsibleList';
-import { Form, FormFieldset } from '@common/components/form';
+import { FormFieldset } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldCheckboxGroupsMenu from '@common/components/form/rhf/RHFFormFieldCheckboxGroupsMenu';
+import RHFFormFieldCheckboxMenu from '@common/components/form/rhf/RHFFormFieldCheckboxMenu';
+import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import {
@@ -13,24 +17,21 @@ import {
 import locationLevelsMap from '@common/utils/locationLevelsMap';
 import { Dictionary } from '@common/types/util';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import mapValues from 'lodash/mapValues';
 import sortBy from 'lodash/sortBy';
 import React, { useMemo } from 'react';
-import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
+import { ObjectSchema } from 'yup';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
 
-export interface LocationFormValues {
+interface FormValues {
   locations: Dictionary<string[]>;
 }
 
 export type LocationFiltersFormSubmitHandler = (values: {
   locationIds: string[];
 }) => void;
-
-const formId = 'locationFiltersForm';
 
 interface Props extends InjectedWizardProps {
   options: SubjectMeta['locations'];
@@ -113,7 +114,7 @@ const LocationFiltersForm = ({
     levelKeys.length === 1 &&
     Object.keys(keyedOptions[levelKeys[0]]).length === 1;
 
-  const initialFormValues = useMemo(() => {
+  const initialFormValues = useMemo<FormValues>(() => {
     return {
       locations: mapValues(options, (_, levelKey) => {
         const level = keyedOptions[levelKey];
@@ -129,40 +130,55 @@ const LocationFiltersForm = ({
     };
   }, [initialValues, hasSingleOption, keyedOptions, options]);
 
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      locations: Yup.object().test(
+        'required',
+        'Select at least one location',
+        (value: Dictionary<string[]>) =>
+          Object.values(value).some(groupOptions => groupOptions.length > 0),
+      ),
+    });
+  }, []);
+
+  const handleSubmit = async (values: FormValues) => {
+    const locationIds = Object.values(values.locations).flat();
+    await goToNextStep(async () => {
+      await onSubmit({ locationIds });
+    });
+  };
+
   return (
-    <Formik<LocationFormValues>
+    <FormProvider
       enableReinitialize
       initialValues={initialFormValues}
-      validateOnBlur={false}
-      validationSchema={Yup.object<LocationFormValues>({
-        locations: Yup.object().test(
-          'required',
-          'Select at least one location',
-          (value: Dictionary<string[]>) => {
-            return Object.values(value).some(
-              groupOptions => groupOptions.length > 0,
-            );
-          },
-        ),
-      })}
-      onSubmit={async values => {
-        const locationIds = Object.values(values.locations).flat();
-        await goToNextStep(async () => {
-          await onSubmit({ locationIds });
-        });
-      }}
+      validationSchema={validationSchema}
     >
-      {form => {
+      {({ formState, getValues, reset, trigger }) => {
+        const showError =
+          !formState.isValid &&
+          (Object.keys(formState.touchedFields).length > 0 ||
+            formState.isSubmitted);
+
+        if (showError && !formState.errors.locations) {
+          trigger('locations');
+        }
+
         if (isActive) {
           return (
-            <Form {...form} id={formId} showSubmitError>
+            <RHFForm
+              id="locationFiltersForm"
+              showSubmitError
+              showErrorSummary={showError}
+              onSubmit={handleSubmit}
+            >
               <FormFieldset
                 id="levels"
                 legend={stepHeading}
                 hint="Select at least one"
                 error={
-                  typeof form.errors.locations === 'string'
-                    ? form.errors.locations
+                  showError
+                    ? getErrorMessage(formState.errors, 'locations')
                     : ''
                 }
               >
@@ -175,13 +191,12 @@ const LocationFiltersForm = ({
                       const searchOnly = levelKey === 'school';
 
                       return hasSubGroups && !searchOnly ? (
-                        <FormFieldCheckboxGroupsMenu
+                        <RHFFormFieldCheckboxGroupsMenu
                           key={levelKey}
                           name={`locations.${levelKey}`}
-                          disabled={form.isSubmitting}
+                          disabled={formState.isSubmitting}
                           groupLabel={level.legend}
                           legend={level.legend}
-                          legendHidden
                           open={hasSingleOption}
                           order={[]}
                           options={level.options.map(group => ({
@@ -194,10 +209,10 @@ const LocationFiltersForm = ({
                           }))}
                         />
                       ) : (
-                        <FormFieldCheckboxMenu
+                        <RHFFormFieldCheckboxMenu
                           key={levelKey}
                           name={`locations.${levelKey}`}
-                          disabled={form.isSubmitting}
+                          disabled={formState.isSubmitting}
                           groupLabel={level.legend}
                           legend={level.legend}
                           legendHidden
@@ -229,14 +244,16 @@ const LocationFiltersForm = ({
 
               <WizardStepFormActions
                 {...stepProps}
-                isSubmitting={form.isSubmitting}
+                isSubmitting={formState.isSubmitting}
               />
-            </Form>
+            </RHFForm>
           );
         }
 
+        const values = getValues();
+
         const locationLevels: Dictionary<FilterOption[]> = mapValues(
-          form.values.locations,
+          values.locations,
           (locations, level) =>
             locations.reduce<FilterOption[]>((acc, value) => {
               const levelOptions = keyedOptions[level];
@@ -276,11 +293,11 @@ const LocationFiltersForm = ({
                 ))}
             </SummaryList>
 
-            <ResetFormOnPreviousStep {...stepProps} onReset={form.resetForm} />
+            <ResetFormOnPreviousStep {...stepProps} onReset={reset} />
           </WizardStepSummary>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

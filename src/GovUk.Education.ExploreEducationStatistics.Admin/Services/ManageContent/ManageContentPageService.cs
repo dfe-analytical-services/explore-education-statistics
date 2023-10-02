@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -24,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ManageContentPageService : IManageContentPageService
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
         private readonly IDataBlockService _dataBlockService;
@@ -32,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IUserService _userService;
 
         public ManageContentPageService(
+            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
             IDataBlockService dataBlockService,
@@ -39,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             IReleaseFileService releaseFileService,
             IUserService userService)
         {
+            _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _dataBlockService = dataBlockService;
@@ -48,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         }
 
         public async Task<Either<ActionResult, ManageContentPageViewModel>> GetManageContentPageViewModel(
-            Guid releaseId)
+            Guid releaseId, bool isPrerelease = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseQuery)
@@ -62,17 +66,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     var (release, unattachedDataBlocks, files) = releaseBlocksAndFiles;
 
-                    var methodologyVersions = await _methodologyVersionRepository
-                        .GetLatestVersionByPublication(release.PublicationId);
+                    var methodologyVersions =
+                        await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
 
-                    var approvedMethodologyVersions = methodologyVersions
-                        .Where(mv => mv.Approved)
-                        .ToList();
+                    if (isPrerelease)
+                    {
+                        // Get latest approved version
+                        methodologyVersions = await methodologyVersions
+                            .ToAsyncEnumerable()
+                            .SelectAwait(async version =>
+                            {
+                                if (version.Status == MethodologyApprovalStatus.Approved)
+                                {
+                                    return version;
+                                }
+
+                                if (version.PreviousVersionId == null)
+                                {
+                                    return null;
+                                }
+
+                                // If there is a previous version, it must be approved, because cannot
+                                // create an amendment for an unpublished version
+                                return await _contentDbContext.MethodologyVersions
+                                    .FirstAsync(mv => mv.Id == version.PreviousVersionId);
+                            })
+                            .WhereNotNull()
+                            .ToListAsync();
+                    }
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
-                        _mapper.Map<List<IdTitleViewModel>>(approvedMethodologyVersions);
+                        _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);
 
                     // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
                     // own Boundary Level selection

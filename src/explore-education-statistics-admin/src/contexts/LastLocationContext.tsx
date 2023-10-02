@@ -6,7 +6,7 @@ import { useLocation } from 'react-router';
 const LastLocationContext = createContext<Location | undefined>(undefined);
 
 interface LastLocationContextProviderProps {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 export const LastLocationContextProvider = ({

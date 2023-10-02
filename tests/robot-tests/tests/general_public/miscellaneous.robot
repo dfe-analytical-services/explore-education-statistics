@@ -19,7 +19,7 @@ Verify can accept cookie banner
     cookie should not exist    ees_banner_seen
     cookie should not exist    ees_disable_google_analytics
 
-    user clicks element    xpath://button[text()="Accept analytics cookies"]
+    user clicks button    Accept analytics cookies
 
     cookie should have value    ees_banner_seen    true
     cookie should have value    ees_disable_google_analytics    false
@@ -64,7 +64,7 @@ Validate Cookies page
 
 Disable google analytics
     user clicks element    id:cookieSettingsForm-googleAnalytics-off
-    user clicks element    xpath://button[text()="Save changes"]
+    user clicks button    Save changes
     user waits until page contains    Your cookie settings were saved
 
     cookie should have value    ees_banner_seen    true
@@ -77,7 +77,7 @@ Enable google analytics
 
     sleep    1    # NOTE(mark): Without the wait, the click doesn't select the radio despite the DOM being loaded
     user clicks element    id:cookieSettingsForm-googleAnalytics-on
-    user clicks element    xpath://button[text()="Save changes"]
+    user clicks button    Save changes
     user waits until page contains    Your cookie settings were saved
     cookie should have value    ees_banner_seen    true
     cookie should have value    ees_disable_google_analytics    false

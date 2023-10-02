@@ -7,10 +7,15 @@ import {
   SubjectSelectionType,
 } from '@admin/services/footnoteService';
 import footnoteToFlatFootnote from '@admin/services/utils/footnote/footnoteToFlatFootnote';
+import {
+  pluginsConfigLinksOnly,
+  toolbarConfigLinkOnly,
+} from '@admin/config/ckEditorConfig';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import sanitizeHtml from '@common/utils/sanitizeHtml';
+import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import deepmerge from 'deepmerge';
@@ -106,8 +111,12 @@ const FootnoteForm = ({
             'At least one Subject, Indicator or Filter must be selected',
           );
         }
+        const sanitizedValues = {
+          ...values,
+          content: sanitizeHtml(values.content, { allowedTags: ['a'] }),
+        };
 
-        await onSubmit(values);
+        await onSubmit(sanitizedValues);
       }}
     >
       {form => (
@@ -124,7 +133,12 @@ const FootnoteForm = ({
             to.
           </p>
 
-          <FormFieldTextArea<BaseFootnote> name="content" label="Footnote" />
+          <FormFieldEditor<BaseFootnote>
+            name="content"
+            label="Footnote"
+            includePlugins={pluginsConfigLinksOnly}
+            toolbarConfig={toolbarConfigLinkOnly}
+          />
 
           {orderBy(
             Object.values(footnoteMeta.subjects),

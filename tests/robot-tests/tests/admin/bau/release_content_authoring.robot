@@ -10,7 +10,7 @@ Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}=        Academic year Q1 2020/21
-${PUBLICATION_NAME}=    UI tests - comments %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}=    UI tests - release content authoring %{RUN_IDENTIFIER}
 ${SECTION_1_TITLE}=     First content section
 ${BLOCK_1_CONTENT}=     Block 1 content
 ${BLOCK_2_CONTENT}=     Block 2 content

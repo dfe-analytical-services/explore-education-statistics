@@ -5,7 +5,7 @@ import React, { createContext, ReactNode, useContext } from 'react';
 export const ConfigContext = createContext<Config | undefined>(undefined);
 
 interface ConfigContextProviderProps {
-  children: (config: Config) => ReactNode;
+  children?: ReactNode;
 }
 
 export const ConfigContextProvider = ({
@@ -15,7 +15,7 @@ export const ConfigContextProvider = ({
 
   return (
     <ConfigContext.Provider value={value}>
-      {!isLoading && value ? children(value) : null}
+      {!isLoading && value ? children : null}
     </ConfigContext.Provider>
   );
 };

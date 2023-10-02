@@ -270,7 +270,7 @@ Check data catalogue page contains archive and superseding publication subjects
     user checks page contains    This is not the latest data
 
     user clicks button    Change publication
-    user waits for page to finish loading
+    user waits until page finishes loading
     user waits until page contains    Choose a publication
 
     user clicks radio    %{TEST_THEME_NAME}
@@ -299,7 +299,7 @@ Check data catalogue page contains superseded warning for archived publication (
 
     user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks button    Next step
-    user waits for page to finish loading
+    user waits until page finishes loading
 
     user checks summary list contains    Publication    ${PUBLICATION_NAME_ARCHIVE}
 
@@ -466,7 +466,7 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user checks page does not contain    This is not the latest data
 
     user clicks button    Change publication
-    user waits for page to finish loading
+    user waits until page finishes loading
     user waits until page contains    Choose a publication
 
     user clicks radio    %{TEST_THEME_NAME}

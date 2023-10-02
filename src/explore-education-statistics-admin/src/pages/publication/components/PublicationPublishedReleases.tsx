@@ -1,4 +1,3 @@
-import { PublishedStatusGuidanceModal } from '@admin/pages/publication/components/PublicationGuidance';
 import PublicationPublishedReleasesTable from '@admin/pages/publication/components/PublicationPublishedReleasesTable';
 import {
   ReleaseRouteParams,
@@ -10,9 +9,7 @@ import releaseService, {
 } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
-import useToggle from '@common/hooks/useToggle';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import last from 'lodash/last';
 import React, { MutableRefObject, useEffect, useMemo, useState } from 'react';
@@ -31,11 +28,7 @@ export default function PublicationPublishedReleases({
 }: Props) {
   const history = useHistory();
 
-  const [amendReleaseId, setAmendReleaseId] = useState<string>();
   const [focusReleaseId, setFocusReleaseId] = useState<string>();
-
-  const [showPublishedStatusGuidance, togglePublishedStatusGuidance] =
-    useToggle(false);
 
   const {
     data: releases,
@@ -111,8 +104,17 @@ export default function PublicationPublishedReleases({
               focusReleaseId={focusReleaseId}
               publicationId={publicationId}
               releases={allReleases}
-              onAmend={setAmendReleaseId}
-              onGuidanceClick={togglePublishedStatusGuidance.on}
+              onAmend={async id => {
+                const amendment = await releaseService.createReleaseAmendment(
+                  id,
+                );
+                history.push(
+                  generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+                    publicationId,
+                    releaseId: amendment.id,
+                  }),
+                );
+              }}
             />
 
             {hasNextPage && showMoreNumber > 0 && (
@@ -150,37 +152,6 @@ export default function PublicationPublishedReleases({
           </WarningMessage>
         )}
       </LoadingSpinner>
-
-      <PublishedStatusGuidanceModal
-        open={showPublishedStatusGuidance}
-        onClose={togglePublishedStatusGuidance.off}
-      />
-
-      {amendReleaseId && (
-        <ModalConfirm
-          open={!!amendReleaseId}
-          title="Confirm you want to amend this published release"
-          onCancel={() => setAmendReleaseId(undefined)}
-          onConfirm={async () => {
-            const amendment = await releaseService.createReleaseAmendment(
-              amendReleaseId,
-            );
-
-            history.push(
-              generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-                publicationId,
-                releaseId: amendment.id,
-              }),
-            );
-          }}
-          onExit={() => setAmendReleaseId(undefined)}
-        >
-          <p>
-            Please note, any changes made to this published release must be
-            approved before updates can be published.
-          </p>
-        </ModalConfirm>
-      )}
     </>
   );
 }
