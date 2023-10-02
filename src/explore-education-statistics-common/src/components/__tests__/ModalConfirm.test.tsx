@@ -9,6 +9,7 @@ describe('ModalConfirm', () => {
   beforeEach(() => {
     jest.useFakeTimers();
   });
+
   describe('confirming', () => {
     test('clicking Confirm button disables all buttons', () => {
       const handleExit = jest.fn();
@@ -116,6 +117,56 @@ describe('ModalConfirm', () => {
   });
 
   describe('cancelling', () => {
+    test('clicking Cancel button calls `onExit` when no `onCancel` set', async () => {
+      const handleExit = jest.fn();
+      const handleConfirm = jest.fn();
+
+      render(
+        <ModalConfirm
+          open
+          title="Test modal"
+          triggerButton={<button type="button">Open</button>}
+          onConfirm={handleConfirm}
+          onExit={handleExit}
+        />,
+      );
+
+      expect(handleExit).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(handleExit).toHaveBeenCalledTimes(1);
+      });
+    });
+
+    test('clicking Cancel button calls `onCancel` when set', async () => {
+      const handleExit = jest.fn();
+      const handleCancel = jest.fn();
+      const handleConfirm = jest.fn();
+
+      render(
+        <ModalConfirm
+          open
+          title="Test modal"
+          triggerButton={<button type="button">Open</button>}
+          onCancel={handleCancel}
+          onConfirm={handleConfirm}
+          onExit={handleExit}
+        />,
+      );
+
+      expect(handleCancel).not.toHaveBeenCalled();
+      expect(handleExit).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      await waitFor(() => {
+        expect(handleCancel).toHaveBeenCalledTimes(1);
+        expect(handleExit).not.toHaveBeenCalled();
+      });
+    });
+
     test('clicking Cancel button disables all buttons', () => {
       const handleExit = jest.fn();
       const handleCancel = jest.fn();

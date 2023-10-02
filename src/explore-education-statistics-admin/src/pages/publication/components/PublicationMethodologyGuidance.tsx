@@ -18,7 +18,7 @@ export function MethodologyStatusGuidanceModal() {
         </ButtonText>
       }
     >
-      <p>A methodology can have various types of status as descibed below:</p>
+      <p>A methodology can have various types of status as described below:</p>
       <SummaryList>
         <SummaryListItem term={<Tag>Draft</Tag>}>
           This is an unpublished draft methodology that can still be edited
@@ -41,6 +41,11 @@ export function MethodologyTypeGuidanceModal() {
       className="govuk-!-width-one-half"
       showClose
       title="Methodology type guidance"
+      triggerButton={
+        <ButtonText>
+          <InfoIcon description="Guidance on methodology types" />
+        </ButtonText>
+      }
     >
       <p>Various types of methodology can be associated to this publication:</p>
       <SummaryList>
