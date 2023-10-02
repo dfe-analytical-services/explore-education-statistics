@@ -70,15 +70,19 @@ const PublicationCreatePage = ({
           contactTelNo,
           ...values
         }) => {
+          const contact = {
+            teamName,
+            teamEmail,
+            contactName,
+            contactTelNo,
+          };
+          if (!contact.contactTelNo?.trim()) {
+            contact.contactTelNo = undefined;
+          }
           await publicationService.createPublication({
             ...values,
             topicId: topic.id,
-            contact: {
-              teamName,
-              teamEmail,
-              contactName,
-              contactTelNo,
-            },
+            contact,
           });
 
           history.push(dashboardRoute.path);

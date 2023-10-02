@@ -24,9 +24,13 @@ const PublicationContactPage = () => {
     if (!contact) {
       return;
     }
+    const sanitisedContact = updatedContact;
+    if (!updatedContact.contactTelNo?.trim()) {
+      sanitisedContact.contactTelNo = undefined;
+    }
     const nextContact = await publicationService.updateContact(
       publication.id,
-      updatedContact,
+      sanitisedContact,
     );
 
     setContact({ value: nextContact });

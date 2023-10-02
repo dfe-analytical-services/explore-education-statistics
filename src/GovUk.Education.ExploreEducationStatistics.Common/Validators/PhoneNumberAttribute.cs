@@ -21,17 +21,19 @@ public class PhoneNumberAttribute : ValidationAttribute
             return new ValidationResult("A phone number must be a string");
         }
 
-        if (telNo.IsNullOrWhitespace())
+        var trimmedTelNo = telNo.Trim();
+
+        if (trimmedTelNo.IsNullOrWhitespace())
         {
-            return ValidationResult.Success;
+            return new ValidationResult("A phone number cannot be an empty string or whitespace");
         }
 
-        if (telNo.Length < 8)
+        if (trimmedTelNo.Length < 8)
         {
             return new ValidationResult(LengthMessage(validationContext));
         }
 
-        return !Regex.IsMatch(telNo, @"^0[0-9\s]*$")
+        return !Regex.IsMatch(trimmedTelNo, @"^0[0-9\s]*$")
             ? new ValidationResult(FormatMessage(validationContext))
             : ValidationResult.Success;
     }

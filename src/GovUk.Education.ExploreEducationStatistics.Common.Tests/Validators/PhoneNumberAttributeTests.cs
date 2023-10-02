@@ -11,8 +11,6 @@ public class PhoneNumberAttributeTests
     [InlineData("01234567")]
     [InlineData("0   123 4567")]
     [InlineData("0 1 2 3   4 5 6 7      ")]
-    [InlineData("")]
-    [InlineData("    ")]
     public void AllowedValues_Valid(string value)
     {
         var attribute = new PhoneNumberAttribute();
@@ -41,14 +39,27 @@ public class PhoneNumberAttributeTests
         Assert.Equal("A phone number must be a string", result?.ErrorMessage);
     }
 
-    [Fact]
-    public void DisallowedValues_TooShort()
+    [Theory]
+    [InlineData("0123456        ")]
+    [InlineData("0         ")]
+    [InlineData("     0123456")]
+    public void DisallowedValues_TooShort(string value)
     {
         var attribute = new PhoneNumberAttribute();
-        var value = "0123456";
         var result = attribute.GetValidationResult(value, new ValidationContext(value));
 
         Assert.Equal("The value must have a minimum length of 8.", result?.ErrorMessage);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("    ")]
+    public void DisallowedValues_EmptyStringOrWhitespace(string value)
+    {
+        var attribute = new PhoneNumberAttribute();
+        var result = attribute.GetValidationResult(value, new ValidationContext(value));
+
+        Assert.Equal("A phone number cannot be an empty string or whitespace", result?.ErrorMessage);
     }
 
     [Theory]
