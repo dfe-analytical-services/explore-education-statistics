@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Validators;
 
@@ -18,6 +19,11 @@ public class PhoneNumberAttribute : ValidationAttribute
         if (value is not string telNo)
         {
             return new ValidationResult("A phone number must be a string");
+        }
+
+        if (telNo.IsNullOrWhitespace())
+        {
+            return ValidationResult.Success;
         }
 
         if (telNo.Length < 8)

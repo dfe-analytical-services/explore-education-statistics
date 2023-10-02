@@ -11,6 +11,8 @@ public class PhoneNumberAttributeTests
     [InlineData("01234567")]
     [InlineData("0   123 4567")]
     [InlineData("0 1 2 3   4 5 6 7      ")]
+    [InlineData("")]
+    [InlineData("    ")]
     public void AllowedValues_Valid(string value)
     {
         var attribute = new PhoneNumberAttribute();

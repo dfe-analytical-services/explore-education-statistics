@@ -18,23 +18,27 @@ const ContactUsSection = ({
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
         {publicationContact.teamName}
       </h4>
-      <p className="govuk-!-margin-top-0">
-        Email <br />
+      <address className="govuk-!-margin-top-0">
+        Email:{' '}
         <a href={`mailto:${publicationContact.teamEmail}`}>
           {publicationContact.teamEmail}
         </a>
-      </p>
-      {publicationContact.contactTelNo && (
-        <p>
-          Telephone: {publicationContact.contactName} <br />{' '}
-          {publicationContact.contactTelNo}
-        </p>
-      )}
+        <br />
+        Contact name: {publicationContact.contactName}
+        {publicationContact.contactTelNo && (
+          <>
+            <br />
+            Telephone:{' '}
+            <a href={`tel:${publicationContact.contactTelNo}`}>
+              {publicationContact.contactTelNo}
+            </a>
+          </>
+        )}
+      </address>
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">Press office</h4>
       <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
       <p>
-        Telephone <br />
-        020 7783 8300
+        Telephone: <a href="tel:020 7783 8300">020 7783 8300</a>
       </p>
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
         Public enquiries
@@ -44,8 +48,7 @@ const ContactUsSection = ({
         or education:
       </p>
       <p>
-        Telephone <br />
-        037 0000 2288
+        Telephone: <a href="tel:037 0000 2288">037 0000 2288</a>
       </p>
       <p>
         Opening times: <br />
