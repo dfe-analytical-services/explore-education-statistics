@@ -1,9 +1,9 @@
 import Button from '@common/components/Button';
 import styles from '@common/components/Modal.module.scss';
 import useToggle from '@common/hooks/useToggle';
+import * as Dialog from '@radix-ui/react-dialog';
 import classNames from 'classnames';
 import React, { ReactNode, useEffect, useRef } from 'react';
-import * as Dialog from '@radix-ui/react-dialog';
 
 export interface ModalProps {
   children: ReactNode;
