@@ -27,7 +27,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
+using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -156,10 +156,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.Secure = CookieSecurePolicy.Always;
             });
 
-            services
-                .AddControllers(
-                    options => { options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")); }
-                )
+            services.AddControllers(options =>
+                {
+                    options.AddCommaSeparatedQueryModelBinderProvider();
+                    options.AddTrimStringBinderProvider();
+                })
                 .AddControllersAsServices();
 
             services.AddHttpContextAccessor();
@@ -722,6 +723,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 app.UseIdentityServer();
             }
 
+            var rewriteOptions = new RewriteOptions();
+
             // Deny access to all /Identity routes other than:
             //
             // /Identity/Account/Login
@@ -729,12 +732,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             // /Identity/Account/InviteExpired
             //
             // This Regex is case insensitive.
-            var options = new RewriteOptions()
-                .AddRewrite(
+            rewriteOptions.AddRewrite(
                     @"^(?i)identity/(?!account/(login|externallogin|inviteexpired))",
                     replacement: "/",
                     skipRemainingRules: true);
-            app.UseRewriter(options);
+
+            rewriteOptions.Add(new LowercasePathRule());
+            app.UseRewriter(rewriteOptions);
 
             app.UseEndpoints(endpoints =>
                 {

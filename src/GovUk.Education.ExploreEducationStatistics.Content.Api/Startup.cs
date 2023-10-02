@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
+using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddHealthChecks();
-            
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddApplicationInsightsTelemetry()
@@ -74,13 +74,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
-            
-            services.AddControllers(
-                options =>
-                {
-                    options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
-                }
-            );
+
+            services.AddControllers(options =>
+            {
+                options.AddCommaSeparatedQueryModelBinderProvider();
+                options.AddTrimStringBinderProvider();
+            });
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
@@ -198,6 +197,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
+            var rewriteOptions = new RewriteOptions()
+                .Add(new LowercasePathRule());
+
             if(Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
@@ -207,10 +209,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     c.RoutePrefix = "docs";
                 });
 
-                var option = new RewriteOptions();
-                option.AddRedirect("^$", "docs");
-                app.UseRewriter(option);
+                rewriteOptions.AddRedirect("^$", "docs");
             }
+
+            app.UseRewriter(rewriteOptions);
 
             app.UseCors(options => options
                 .WithOrigins(
