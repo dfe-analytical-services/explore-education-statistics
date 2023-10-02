@@ -126,7 +126,7 @@ describe('PublicationForm', () => {
     userEvent.click(screen.getByLabelText('Contact name'));
     userEvent.tab();
 
-    userEvent.click(screen.getByLabelText('Contact telephone number'));
+    userEvent.click(screen.getByLabelText('Contact telephone (optional)'));
     userEvent.tab();
 
     await waitFor(() => {
@@ -148,13 +148,101 @@ describe('PublicationForm', () => {
         }),
       ).toBeInTheDocument();
 
-      expect(
-        screen.getByText('Enter a contact telephone number', {
-          selector: '#publicationForm-contactTelNo-error',
-        }),
-      ).toBeInTheDocument();
+      // NOTE: Contact telelphone number is optional, so no validation error
     });
   });
+
+  test.each([' 0abcdefg ', '01234 4567a', '_12345678', '01234 5678 !'])(
+    'show validation error when contact tel no "%s" contains non-numeric or non-whitespace characters',
+    async telNo => {
+      render(<PublicationForm onSubmit={noop} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Contact telephone (optional)'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Contact telephone (optional)'),
+        telNo,
+      );
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Contact telephone must start with a "0" and only contain numeric or whitespace characters',
+            {
+              selector: '#publicationForm-contactTelNo-error',
+            },
+          ),
+        ).toBeInTheDocument();
+      });
+    },
+  );
+
+  test.each([
+    ' 03700002288 ',
+    '0370 000 2288',
+    '037 0000 2288',
+    ' 0 3 7 0 0 0 0 2 2 8 8 ',
+  ])(
+    'show validation error when contact tel no "%s" is DfE enquiries number',
+    async telNo => {
+      render(<PublicationForm onSubmit={noop} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Contact telephone (optional)'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Contact telephone (optional)'),
+        telNo,
+      );
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(
+            'Contact telephone cannot be the DfE enquiries number',
+            {
+              selector: '#publicationForm-contactTelNo-error',
+            },
+          ),
+        ).toBeInTheDocument();
+      });
+    },
+  );
+
+  test.each([' 0123456 ', '0', '012', '0123 56'])(
+    'show validation error when contact tel no "%s" is less than 8 characters',
+    async telNo => {
+      render(<PublicationForm onSubmit={noop} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Contact telephone (optional)'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Contact telephone (optional)'),
+        telNo,
+      );
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Contact telephone must be 8 characters or more', {
+            selector: '#publicationForm-contactTelNo-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    },
+  );
 
   test('show validation error when contact email is not valid', async () => {
     render(<PublicationForm onSubmit={noop} />);
@@ -224,7 +312,7 @@ describe('PublicationForm', () => {
     );
     await userEvent.type(screen.getByLabelText('Contact name'), 'John Smith');
     await userEvent.type(
-      screen.getByLabelText('Contact telephone number'),
+      screen.getByLabelText('Contact telephone (optional)'),
       '0123456789',
     );
 

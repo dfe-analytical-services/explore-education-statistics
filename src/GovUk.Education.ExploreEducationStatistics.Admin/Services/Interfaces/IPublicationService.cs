@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId);
 
-        Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact);
+        Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, ContactSaveRequest updatedContact);
 
         Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,

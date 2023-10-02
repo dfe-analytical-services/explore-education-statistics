@@ -24,10 +24,12 @@ const ContactUsSection = ({
           {publicationContact.teamEmail}
         </a>
       </p>
-      <p>
-        Telephone: {publicationContact.contactName} <br />{' '}
-        {publicationContact.contactTelNo}
-      </p>
+      {publicationContact.contactTelNo && (
+        <p>
+          Telephone: {publicationContact.contactName} <br />{' '}
+          {publicationContact.contactTelNo}
+        </p>
+      )}
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">Press office</h4>
       <p className="govuk-!-margin-top-0">If you have a media enquiry:</p>
       <p>

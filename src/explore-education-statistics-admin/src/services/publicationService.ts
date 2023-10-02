@@ -21,7 +21,7 @@ export interface Contact {
 
 export interface ContactSave {
   contactName: string;
-  contactTelNo: string;
+  contactTelNo?: string;
   teamEmail: string;
   teamName: string;
 }

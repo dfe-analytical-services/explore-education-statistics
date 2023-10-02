@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -115,7 +116,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var contact = await _context.Contacts.AddAsync(new Contact
                     {
                         ContactName = publication.Contact.ContactName,
-                        ContactTelNo = publication.Contact.ContactTelNo,
+                        ContactTelNo = string.IsNullOrWhiteSpace(publication.Contact.ContactTelNo)
+                            ? null
+                            : publication.Contact.ContactTelNo,
                         TeamName = publication.Contact.TeamName,
                         TeamEmail = publication.Contact.TeamEmail
                     });
@@ -324,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => _mapper.Map<ContactViewModel>(publication.Contact));
         }
 
-        public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact)
+        public async Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, ContactSaveRequest updatedContact)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query =>
@@ -341,7 +344,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     publication.Contact.ContactName = updatedContact.ContactName;
-                    publication.Contact.ContactTelNo = updatedContact.ContactTelNo;
+                    publication.Contact.ContactTelNo = string.IsNullOrWhiteSpace(updatedContact.ContactTelNo)
+                        ? null
+                        : updatedContact.ContactTelNo;
                     publication.Contact.TeamName = updatedContact.TeamName;
                     publication.Contact.TeamEmail = updatedContact.TeamEmail;
                     await _context.SaveChangesAsync();
@@ -349,7 +354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // Clear cache because Contact is in Content.Services.ViewModels.PublicationViewModel
                     await _publicationCacheService.UpdatePublication(publication.Slug);
 
-                    return _mapper.Map<ContactViewModel>(updatedContact);
+                    return _mapper.Map<ContactViewModel>(publication.Contact);
                 });
         }
 
