@@ -15,9 +15,9 @@ interface Props {
   title: string;
   triggerButton?: ReactNode;
   underlayClass?: string;
-  onCancel?(): void;
-  onConfirm(): void;
-  onExit?(): void;
+  onCancel?(): void | Promise<void>;
+  onConfirm(): void | Promise<void>;
+  onExit?(): void | Promise<void>;
 }
 
 const ModalConfirm = ({
@@ -30,9 +30,9 @@ const ModalConfirm = ({
   title,
   triggerButton,
   underlayClass,
-  onCancel,
-  onConfirm,
   onExit,
+  onCancel = onExit,
+  onConfirm,
 }: Props) => {
   const isMounted = useMountedRef();
   const [isDisabled, toggleDisabled] = useToggle(false);
@@ -42,7 +42,7 @@ const ModalConfirm = ({
     toggleOpen(initialOpen);
   }, [initialOpen, toggleOpen]);
 
-  const handleAction = (callback?: () => void) => async () => {
+  const handleAction = (callback?: () => void | Promise<void>) => async () => {
     if (!callback) {
       toggleOpen.off();
       return;
