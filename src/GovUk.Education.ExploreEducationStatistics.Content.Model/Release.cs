@@ -76,11 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         [JsonIgnore]
-        public List<ReleaseContentSection> Content { get; set; } = new();
-
-        // TODO: EES-1568 This should be DataBlocks
-        [JsonIgnore]
-        public List<ReleaseContentBlock> ContentBlocks { get; set; } = new();
+        public List<ContentSection> Content { get; set; } = new();
 
         public List<KeyStatistic> KeyStatistics { get; set; } = new();
 
@@ -112,39 +108,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
 
                 return Content
-                    .Where(rcs => rcs.ContentSection.Type == ContentSectionType.Generic)
-                    .Select(rcs => rcs.ContentSection)
+                    .Where(section => section.Type == ContentSectionType.Generic)
                     .ToImmutableList();
             }
             set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
-        }
-
-        public void AddGenericContentSection(ContentSection section)
-        {
-            Content.Add(new ReleaseContentSection
-            {
-                Release = this,
-                ContentSection = section
-            });
-        }
-
-        public void RemoveGenericContentSection(ContentSection section)
-        {
-            Content.Remove(Content.Find(join => join.ContentSection == section));
-        }
-
-        public void AddContentBlock(ContentBlock contentBlock)
-        {
-            if (ContentBlocks == null)
-            {
-                ContentBlocks = new List<ReleaseContentBlock>();
-            }
-
-            ContentBlocks.Add(new ReleaseContentBlock
-            {
-                Release = this,
-                ContentBlock = contentBlock
-            });
         }
 
         [NotMapped]
@@ -179,28 +146,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         {
             if (Content == null)
             {
-                Content = new List<ReleaseContentSection>();
+                Content = new List<ContentSection>();
             }
 
             return Content
-                .Select(join => join.ContentSection)
-                .ToList()
-                .Find(section => section.Type == type);
+                .SingleOrDefault(section => section.Type == type);
         }
 
         private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
         {
             if (Content == null)
             {
-                Content = new List<ReleaseContentSection>();
+                Content = new List<ContentSection>();
             }
 
-            Content.RemoveAll(join => join.ContentSection.Type == type);
-            Content.AddRange(replacementSections.Select(section => new ReleaseContentSection
-            {
-                Release = this,
-                ContentSection = section,
-            }));
+            Content.RemoveAll(section => section.Type == type);
+            Content.AddRange(replacementSections);
         }
 
         public ReleaseType Type { get; set; }

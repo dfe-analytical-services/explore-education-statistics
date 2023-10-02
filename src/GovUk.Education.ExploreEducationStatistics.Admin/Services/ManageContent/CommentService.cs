@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .AnyAsync(cb =>
                         cb.Id == contentBlockId &&
                         cb.ContentSection!.Id == contentSectionId &&
-                        cb.ContentSection!.Release.ReleaseId == releaseId))
+                        cb.ContentSection!.ReleaseId == releaseId))
             {
                 return Unit.Instance;
             }

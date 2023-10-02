@@ -488,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IContentBlockService, ContentBlockService>();
             services.AddTransient<IContentService, ContentService>();
             services.AddTransient<IEmbedBlockService, EmbedBlockService>();
-            services.AddTransient<IReleaseContentBlockService, ReleaseContentBlockService>();
+            services.AddTransient<IContentBlockLockService, ContentBlockLockService>();
             services.AddTransient<IKeyStatisticService, KeyStatisticService>();
             services.AddTransient<IFeaturedTableService, FeaturedTableService>();
             services.AddTransient<ICommentService, CommentService>();
@@ -536,7 +536,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
-            services.AddTransient<IReleaseContentSectionRepository, ReleaseContentSectionRepository>();
+            services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<Content.Model.Repository.Interfaces.IReleaseRepository,
                 Content.Model.Repository.ReleaseRepository>();

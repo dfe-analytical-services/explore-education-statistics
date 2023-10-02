@@ -18,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 
@@ -26,19 +25,16 @@ public class FeaturedTableService : IFeaturedTableService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-    private readonly IDataBlockService _dataBlockService;
     private readonly IUserService _userService;
     private readonly IMapper _mapper;
 
     public FeaturedTableService(ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
-        IDataBlockService dataBlockService,
         IUserService userService,
         IMapper mapper)
     {
         _contentDbContext = contentDbContext;
         _persistenceHelper = persistenceHelper;
-        _dataBlockService = dataBlockService;
         _userService = userService;
         _mapper = mapper;
     }
@@ -180,9 +176,8 @@ public class FeaturedTableService : IFeaturedTableService
     private async Task<List<FeaturedTable>> ListFeaturedTables(Guid releaseId)
     {
         var releaseDataBlockIds = await _contentDbContext
-            .ReleaseContentBlocks
-            .Where(releaseContentBlock => releaseContentBlock.ReleaseId == releaseId)
-            .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
+            .ContentBlocks
+            .Where(block => block.ReleaseId == releaseId)
             .OfType<DataBlock>()
             .Select(dataBlock => dataBlock.Id)
             .ToListAsync();

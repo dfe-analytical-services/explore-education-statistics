@@ -213,23 +213,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return dataBlock.Created.Value;
                 }
 
-                var owningReleaseByReleaseContentBlocks = (await _contentDbContext
-                        .ReleaseContentBlocks
-                        .Include(rcb => rcb.Release)
-                        .SingleOrDefaultAsync(rcb => rcb.ContentBlockId == dataBlock.Id))
+                var owningReleaseByContentBlocks = (await _contentDbContext
+                        .ContentBlocks
+                        .Include(block => block.Release)
+                        .FirstOrDefaultAsync(block => block.Id == dataBlock.Id))
                     ?.Release;
 
-                if (owningReleaseByReleaseContentBlocks != null)
+                if (owningReleaseByContentBlocks != null)
                 {
-                    return owningReleaseByReleaseContentBlocks.Created;
+                    return owningReleaseByContentBlocks.Created;
                 }
 
                 var owningReleaseByContentSection = (await _contentDbContext
-                        .ReleaseContentSections
-                        .Include(rcs => rcs.Release)
-                        .Include(rcs => rcs.ContentSection)
-                        .ThenInclude(cs => cs.Content)
-                        .Where(rcs => rcs.ContentSection.Content.Contains(dataBlock))
+                        .ContentSections
+                        .Include(section => section.Release)
+                        .ThenInclude(release => release.Content)
+                        .Where(section => section.Content.Contains(dataBlock))
                         .FirstOrDefaultAsync())
                     ?.Release;
 

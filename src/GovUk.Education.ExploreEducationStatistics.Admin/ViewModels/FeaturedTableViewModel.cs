@@ -16,7 +16,7 @@ public record FeaturedTableViewModel
 
     public Guid DataBlockId { get; set; }
 
-    public DataBlock DataBlock { get; set; } = null!;
+    public DataBlockViewModel DataBlock { get; set; } = null!;
 }
 
 public record FeaturedTableBasicViewModel
