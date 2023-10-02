@@ -81,17 +81,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             }
         };
 
-        private static readonly ReleaseContentBlock ReleaseContentBlock = new()
+        private static readonly DataBlock DataBlock = new()
         {
-            ReleaseId = ReleaseId,
-            Release = Release,
-            ContentBlockId = DataBlockId,
-            ContentBlock = new DataBlock
-            {
-                Id = DataBlockId,
-                Query = ObservationQueryContext,
-                Table = TableConfiguration
-            }
+            Id = DataBlockId,
+            Query = ObservationQueryContext,
+            Table = TableConfiguration,
+            Release = Release
         };
 
         private readonly TableBuilderResultViewModel _tableBuilderResults = new()
@@ -291,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         public async Task QueryForDataBlock_NotModified()
         {
             var client = SetupApp()
-                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .AddContentDbTestData(context => context.ContentBlocks.Add(DataBlock))
                 .CreateClient();
 
             var response = await client.GetAsync(
@@ -334,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
-                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .AddContentDbTestData(context => context.ContentBlocks.Add(DataBlock))
                 .CreateClient();
 
             var response = await client.GetAsync(
@@ -377,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(_tableBuilderResults);
 
             var client = SetupApp(dataBlockService: dataBlockService.Object)
-                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .AddContentDbTestData(context => context.ContentBlocks.Add(DataBlock))
                 .CreateClient();
 
             var response = await client.GetAsync(
@@ -440,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     dataBlockService: dataBlockService.Object,
                     releaseRepository: releaseRepository.Object
                 )
-                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .AddContentDbTestData(context => context.ContentBlocks.Add(DataBlock))
                 .CreateClient();
 
             var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockId}");
@@ -476,7 +471,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .ReturnsAsync(false);
 
             var client = SetupApp(releaseRepository: releaseRepository.Object)
-                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .AddContentDbTestData(context => context.ContentBlocks.Add(DataBlock))
                 .CreateClient();
 
             var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockId}");
@@ -526,7 +521,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     dataBlockService: dataBlockService.Object,
                     releaseRepository: releaseRepository.Object
                 )
-                .AddContentDbTestData(context => context.ReleaseContentBlocks.Add(ReleaseContentBlock))
+                .AddContentDbTestData(context => context.ContentBlocks.Add(DataBlock))
                 .CreateClient();
 
             var response = await client.GetAsync($"/api/tablebuilder/fast-track/{DataBlockId}");

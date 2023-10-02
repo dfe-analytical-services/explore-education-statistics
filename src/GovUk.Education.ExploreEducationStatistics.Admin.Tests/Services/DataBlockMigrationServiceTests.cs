@@ -989,25 +989,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }}
                         }
                     }
-                }
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
+                },
                 Release = new Release
                 {
                     Created = DateTime.UtcNow
-                },
-                ContentBlock = dataBlock
+                }
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId, updateTimestamps: false))
             {
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
-                await contentDbContext.ReleaseContentBlocks.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1112,25 +1106,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var releaseContentSection = new ReleaseContentSection
+            var contentSection = new ContentSection
             {
                 Release = new Release
                 {
                     Created = DateTime.UtcNow.AddDays(-400)
                 },
-                ContentSection = new ContentSection
+                Content = new List<ContentBlock>
                 {
-                    Content = new List<ContentBlock>
+                    new HtmlBlock
                     {
-                        new HtmlBlock
-                        {
-                            Id = Guid.NewGuid()
-                        },
-                        dataBlock,
-                        new HtmlBlock
-                        {
-                            Id = Guid.NewGuid()
-                        }
+                        Id = Guid.NewGuid()
+                    },
+                    dataBlock,
+                    new HtmlBlock
+                    {
+                        Id = Guid.NewGuid()
                     }
                 }
             };
@@ -1141,7 +1132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId, updateTimestamps: false))
             {
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
-                await contentDbContext.ReleaseContentSections.AddAsync(releaseContentSection);
+                await contentDbContext.ContentSections.AddAsync(contentSection);
                 await contentDbContext.SaveChangesAsync();
             }
 

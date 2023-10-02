@@ -96,7 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var actual = await context.Releases
+                var actual = await context
+                    .Releases
                     .SingleAsync(r => r.PublicationId == publication.Id);
 
                 Assert.Equal(2018, actual.Year);
@@ -118,6 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseWithTemplate()
         {
+            var templateReleaseId = Guid.NewGuid();
+
             var dataBlock1 = new DataBlock
             {
                 Id = Guid.NewGuid(),
@@ -135,16 +138,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Id = Guid.NewGuid(),
                         Content = "Comment 2 Text"
                     }
-                }
+                },
+                ReleaseId = templateReleaseId
             };
 
             var dataBlock2 = new DataBlock
             {
                 Id = Guid.NewGuid(),
-                Name = "Data Block 2"
+                Name = "Data Block 2",
+                ReleaseId = templateReleaseId
             };
 
-            var templateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f");
+            var templateRelease = new Release
+            {
+                Id = templateReleaseId,
+                ReleaseName = "2018",
+                Content = ListOf(new ContentSection
+                {
+                    Id = Guid.NewGuid(),
+                    Caption = "Template caption index 0",
+                    Heading = "Template heading index 0",
+                    Type = ContentSectionType.Generic,
+                    Order = 1,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Id = Guid.NewGuid(),
+                            Body = @"<div></div>",
+                            Order = 1,
+                            Comments = new List<Comment>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 1 Text"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 2 Text"
+                                }
+                            }
+                        },
+                        dataBlock1
+                    }
+                }),
+                Version = 0
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -155,71 +196,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                         Title = "Publication",
-                        Releases = new List<Release>
-                        {
-                            new() // Template release
-                            {
-                                Id = templateReleaseId,
-                                ReleaseName = "2018",
-                                Content = new List<ReleaseContentSection>
-                                {
-                                    new()
-                                    {
-                                        ReleaseId = Guid.NewGuid(),
-                                        ContentSection = new ContentSection
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Caption = "Template caption index 0",
-                                            Heading = "Template heading index 0",
-                                            Type = ContentSectionType.Generic,
-                                            Order = 1,
-                                            Content = new List<ContentBlock>
-                                            {
-                                                new HtmlBlock
-                                                {
-                                                    Id = Guid.NewGuid(),
-                                                    Body = @"<div></div>",
-                                                    Order = 1,
-                                                    Comments = new List<Comment>
-                                                    {
-                                                        new()
-                                                        {
-                                                            Id = Guid.NewGuid(),
-                                                            Content = "Comment 1 Text"
-                                                        },
-                                                        new()
-                                                        {
-                                                            Id = Guid.NewGuid(),
-                                                            Content = "Comment 2 Text"
-                                                        }
-                                                    }
-                                                },
-                                                dataBlock1
-                                            }
-                                        }
-                                    },
-                                },
-                                Version = 0,
-                                PreviousVersionId = templateReleaseId,
-                                ContentBlocks = new List<ReleaseContentBlock>
-                                {
-                                    new()
-                                    {
-                                        ReleaseId = templateReleaseId,
-                                        ContentBlock = dataBlock1,
-                                        ContentBlockId = dataBlock1.Id,
-                                    },
-                                    new()
-                                    {
-                                        ReleaseId = templateReleaseId,
-                                        ContentBlock = dataBlock2,
-                                        ContentBlockId = dataBlock2.Id,
-                                    }
-                                }
-                            }
-                        }
+                        Releases = ListOf(templateRelease)
                     }
                 );
+                await context.ContentBlocks.AddRangeAsync(dataBlock1, dataBlock2);
                 await context.SaveChangesAsync();
             }
 
@@ -239,9 +219,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 // Do an in depth check of the saved release
-                var newRelease = context.Releases
-                    .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
+                var newRelease = context
+                    .Releases
+                    .Include(release => release.Content)
                     .ThenInclude(section => section.Content)
                     .Single(r => r.Id == result.Result.Right.Id);
 

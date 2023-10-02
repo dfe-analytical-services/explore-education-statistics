@@ -24,24 +24,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Content = AsList(
-                    new ReleaseContentSection
+                Content = ListOf(
+                    new ContentSection
                     {
-                        ContentSection = new ContentSection
-                        {
-                            Heading = "New section",
-                            Order = 1,
-                            Content = AsList<ContentBlock>(
-                                new HtmlBlock
+                        Heading = "New section",
+                        Order = 1,
+                        Content = ListOf<ContentBlock>(
+                            new HtmlBlock
+                            {
+                                Created = new DateTime(2001, 1, 1),
+                                Comments = ListOf(new Comment
                                 {
-                                    Created = new DateTime(2001, 1, 1),
-                                    Comments = AsList(new Comment
-                                    {
-                                        Content = "Existing comment"
-                                    })
-                                }
-                            )
-                        }
+                                    Content = "Existing comment"
+                                })
+                            }
+                        )
                     }
                 )
             };
@@ -59,8 +56,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.AddComment(
                     release.Id,
-                    release.Content[0].ContentSection.Id,
-                    release.Content[0].ContentSection.Content[0].Id,
+                    release.Content[0].Id,
+                    release.Content[0].Content[0].Id,
                     new CommentSaveRequest
                     {
                         Content = "New comment"
@@ -134,15 +131,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release
             {
-                Content = AsList(
-                    new ReleaseContentSection
+                Content = ListOf(
+                    new ContentSection
                     {
-                        ContentSection = new ContentSection
-                        {
-                            Heading = "New section",
-                            Order = 1,
-                            Content = AsList<ContentBlock>()
-                        }
+                        Heading = "New section",
+                        Order = 1,
+                        Content = ListOf<ContentBlock>()
                     }
                 )
             };
@@ -160,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.AddComment(
                     releaseId: release.Id,
-                    contentSectionId: release.Content[0].ContentSection.Id,
+                    contentSectionId: release.Content[0].Id,
                     contentBlockId: Guid.NewGuid(),
                     new CommentSaveRequest
                     {
@@ -181,18 +175,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var release = new Release
             {
-                Content = AsList(
-                    new ReleaseContentSection
+                Content = ListOf(
+                    new ContentSection
                     {
-                        ContentSection = new ContentSection
-                        {
-                            Content = AsList<ContentBlock>(
-                                new HtmlBlock
-                                {
-                                    Comments = AsList(comment)
-                                }
-                            )
-                        }
+                        Content = ListOf<ContentBlock>(
+                            new HtmlBlock
+                            {
+                                Comments = ListOf(comment)
+                            }
+                        )
                     }
                 )
             };
@@ -241,18 +232,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var release = new Release
             {
-                Content = AsList(
-                    new ReleaseContentSection
+                Content = ListOf(
+                    new ContentSection
                     {
-                        ContentSection = new ContentSection
-                        {
-                            Content = AsList<ContentBlock>(
-                                new HtmlBlock
-                                {
-                                    Comments = AsList(comment)
-                                }
-                            )
-                        }
+                        Content = ListOf<ContentBlock>(
+                            new HtmlBlock
+                            {
+                                Comments = ListOf(comment)
+                            }
+                        )
                     }
                 )
             };
@@ -310,18 +298,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var release = new Release
             {
-                Content = AsList(
-                    new ReleaseContentSection
+                Content = ListOf(
+                    new ContentSection
                     {
-                        ContentSection = new ContentSection
-                        {
-                            Content = AsList<ContentBlock>(
-                                new HtmlBlock
-                                {
-                                    Comments = AsList(comment)
-                                }
-                            )
-                        }
+                        Content = ListOf<ContentBlock>(
+                            new HtmlBlock
+                            {
+                                Comments = ListOf(comment)
+                            }
+                        )
                     }
                 )
             };
@@ -401,18 +386,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var release = new Release
             {
-                Content = AsList(
-                    new ReleaseContentSection
+                Content = ListOf(
+                    new ContentSection
                     {
-                        ContentSection = new ContentSection
-                        {
-                            Content = AsList<ContentBlock>(
-                                new HtmlBlock
-                                {
-                                    Comments = AsList(comment1, comment2, comment3)
-                                }
-                            )
-                        }
+                        Content = ListOf<ContentBlock>(
+                            new HtmlBlock
+                            {
+                                Comments = ListOf(comment1, comment2, comment3)
+                            }
+                        )
                     }
                 )
             };
