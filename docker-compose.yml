@@ -1,24 +1,24 @@
-version: "3"
+version: '3'
 services:
   data-storage:
     image: mcr.microsoft.com/azure-storage/azurite:3.24.0
     ports:
-      - "10000:10000"
-      - "10001:10001"
-      - "10002:10002"
+      - '10000:10000'
+      - '10001:10001'
+      - '10002:10002'
     volumes:
       - data-storage-data:/data
   db:
     build:
       context: ./docker/mssql-server
     ports:
-      - "1433:1433"
+      - '1433:1433'
     volumes:
       - ./data/ees-mssql:/var/opt/mssql/data
       - ./data/sql-scripts:/scripts/
     environment:
-      SA_PASSWORD: "Your_Password123"
-      ACCEPT_EULA: "Y"
+      SA_PASSWORD: 'Your_Password123'
+      ACCEPT_EULA: 'Y'
     command:
       - /bin/bash
       - -c
@@ -33,12 +33,113 @@ services:
 
         # So that the container doesn't shut down, sleep this thread
         sleep infinity
+    depends_on:
+      - data-storage
   idp:
     container_name: ees-idp
     build:
       context: ./docker/keycloak
     ports:
-      - "5030:8080"
+      - '5030:8080'
+  data-api:
+    container_name: data-api
+    image: ${DOCKER_REGISTRY-}data-api
+    build:
+      context: ./src
+      dockerfile: ./GovUk.Education.ExploreEducationStatistics.Data.Api/Dockerfile
+    ports:
+      - 5000:80
+      - 5001:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://data-api:80/api/health']
+      interval: 10s
+      timeout: 5s
+      start_period: 3s
+      retries: 5
+  content-api:
+    container_name: content-api
+    image: ${DOCKER_REGISTRY-}content-api
+    build:
+      context: ./src
+      dockerfile: ./GovUk.Education.ExploreEducationStatistics.Content.Api/Dockerfile
+    ports:
+      - 5010:80
+      - 5011:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://content-api:80/api/health']
+      interval: 10s
+      timeout: 5s
+      start_period: 3s
+      retries: 5
+  processor:
+    container_name: processor
+    image: ${DOCKER_REGISTRY-}processor
+    build:
+      context: ./src
+      dockerfile: ./GovUk.Education.ExploreEducationStatistics.Data.Processor/Dockerfile
+    ports:
+      - 7071:80
+  publisher:
+    container_name: publisher
+    image: ${DOCKER_REGISTRY-}publisher
+    build:
+      context: ./src
+      dockerfile: ./GovUk.Education.ExploreEducationStatistics.Publisher/Dockerfile
+    ports:
+      - 7072:80
+  notifier:
+    container_name: notifier
+    image: ${DOCKER_REGISTRY-}notifier
+    build:
+      context: ./src
+      dockerfile: ./GovUk.Education.ExploreEducationStatistics.Notifier/Dockerfile
+    ports:
+      - 7073:80
+  admin:
+    container_name: admin
+    image: ${DOCKER_REGISTRY-}admin
+    build:
+      context: ./src
+      dockerfile: ./GovUk.Education.ExploreEducationStatistics.Admin/Dockerfile
+    ports:
+      - 5020:80
+      - 5021:443
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=password
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    volumes:
+      - ~/.aspnet/https:/https:ro
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://admin:80/api/health']
+      interval: 10s
+      timeout: 5s
+      start_period: 3s
+      retries: 5
+    depends_on:
+      - db
+      - data-storage
+      - idp
+      - content-api
+      - data-api
+      - notifier
+      - publisher
+      - processor
 
 volumes:
   data-storage-data:
