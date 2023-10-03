@@ -159,7 +159,7 @@ class SnapshotService:
     def _create_table_tool_snapshot(self) -> str:
         driver.get(f"{self.public_url}/data-tables")
 
-        theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
+        theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themeId-"]')
 
         themes = []
 
@@ -179,7 +179,7 @@ class SnapshotService:
     def _create_data_catalogue_snapshot(self) -> str:
         driver.get(f"{self.public_url}/data-catalogue")
 
-        theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
+        theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themeId-"]')
 
         themes = []
 
