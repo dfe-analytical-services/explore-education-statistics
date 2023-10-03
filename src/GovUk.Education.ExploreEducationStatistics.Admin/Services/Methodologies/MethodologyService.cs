@@ -443,7 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
                 .Select(role => role.PublicationId)
                 .ToListAsync();
-
+            
             var indirectPublicationsWithApprovalRole = await _context
                 .UserReleaseRoles
                 .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
