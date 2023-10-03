@@ -54,7 +54,7 @@ Update publication contact
     user enters text into element    id:publicationContactForm-teamName    UI test team name updated
     user enters text into element    id:publicationContactForm-teamEmail    ui_test_updated@test.com
     user enters text into element    id:publicationContactForm-contactName    UI test contact name updated
-    user enters text into element    id:publicationContactForm-contactTelNo    4321 4321
+    user enters text into element    id:publicationContactForm-contactTelNo    04321 4321
 
     user clicks button    Update contact details
     ${modal}=    user waits until modal is visible    Confirm contact changes
@@ -63,7 +63,7 @@ Update publication contact
     user checks summary list contains    Team name    UI test team name updated
     user checks summary list contains    Team email    ui_test_updated@test.com
     user checks summary list contains    Contact name    UI test contact name updated
-    user checks summary list contains    Contact telephone    4321 4321
+    user checks summary list contains    Contact telephone    04321 4321
 
 Update publication details
     user clicks link    Details
