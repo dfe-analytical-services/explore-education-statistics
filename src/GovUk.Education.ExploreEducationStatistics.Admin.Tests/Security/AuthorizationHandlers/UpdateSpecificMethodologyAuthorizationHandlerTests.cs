@@ -8,14 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static Moq.MockBehavior;
-using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -52,7 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         handler,
                         _,
                         _,
-                        _,
                         _) = CreateHandlerAndDependencies();
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -78,8 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         handler,
                         methodologyRepository,
                         userPublicationRoleRepository,
-                        _,
-                        publicationRepository
+                        userReleaseRoleRepository
                         ) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(s =>
@@ -94,9 +90,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     if (!expectedToPassByRole)
                     {
-                        publicationRepository
-                            .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                            .ReturnsAsync((Release?)null);
+                        userReleaseRoleRepository
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                            .ReturnsAsync(new List<ReleaseRole>());
                     }
 
                     var user = CreateClaimsPrincipal(UserId);
@@ -107,9 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     await handler.HandleAsync(authContext);
                     
                     VerifyAllMocks(
-                        methodologyRepository, 
-                        userPublicationRoleRepository,
-                        publicationRepository);
+                        methodologyRepository,
+                        userReleaseRoleRepository,
+                        userPublicationRoleRepository);
 
                     Assert.Equal(expectedToPassByRole, authContext.HasSucceeded);
                 });
@@ -119,23 +115,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public class ReleaseRoleTests
         {
             [Fact]
-            public async Task EditorsOrApproversOnOwningPublicationsLatestReleaseCanUpdateMethodology()
+            public async Task EditorsOrApproversOnAnyOwningPublicationReleaseCanUpdateMethodology()
             {
                 var expectedReleaseRolesToPass = ListOf(ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
 
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {
-                    var latestReleaseForPublication = new Release
-                    {
-                        Id = Guid.NewGuid()
-                    };
-                    
                     var (
                         handler,
                         methodologyRepository,
                         userPublicationRoleRepository,
-                        userReleaseRoleRepository,
-                        publicationRepository
+                        userReleaseRoleRepository
                         ) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(s =>
@@ -146,12 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
 
-                    publicationRepository
-                        .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                        .ReturnsAsync(latestReleaseForPublication);
-
                     userReleaseRoleRepository
-                        .Setup(s => s.GetAllRolesByUserAndRelease(UserId, latestReleaseForPublication.Id))
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(releaseRole));
 
                     var user = CreateClaimsPrincipal(UserId);
@@ -165,26 +151,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         methodologyRepository,
                         userPublicationRoleRepository,
                         userReleaseRoleRepository,
-                        publicationRepository);
+                        userReleaseRoleRepository);
 
                     Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
                 });
             }
 
             [Fact]
-            public async Task UsersWithNoRolesOnOwningPublicationsLatestReleaseCannotUpdateMethodology()
+            public async Task UsersWithNoRolesOnAnyOwningPublicationReleaseCannotUpdateMethodology()
             {
-                var latestReleaseForPublication = new Release
-                {
-                    Id = Guid.NewGuid()
-                };
-                    
                 var (
                     handler,
                     methodologyRepository,
                     userPublicationRoleRepository,
-                    userReleaseRoleRepository,
-                    publicationRepository
+                    userReleaseRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyRepository.Setup(s =>
@@ -195,12 +175,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                publicationRepository
-                    .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                    .ReturnsAsync(latestReleaseForPublication);
-
                 userReleaseRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndRelease(UserId, latestReleaseForPublication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
 
                 var user = CreateClaimsPrincipal(UserId);
@@ -213,21 +189,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 VerifyAllMocks(
                     methodologyRepository,
                     userPublicationRoleRepository,
-                    userReleaseRoleRepository,
-                    publicationRepository);
+                    userReleaseRoleRepository);
 
                 Assert.False(authContext.HasSucceeded);
             }
 
             [Fact]
-            public async Task NoLatestReleaseForPublicationSoUsersCannotUpdateMethodology()
+            public async Task NoReleaseRolesOnOwningPublicationReleasesSoUsersCannotUpdateMethodology()
             {
                 var (
                     handler,
                     methodologyRepository,
                     userPublicationRoleRepository,
-                    _,
-                    publicationRepository
+                    userReleaseRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyRepository.Setup(s =>
@@ -238,9 +212,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                publicationRepository
-                    .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                    .ReturnsAsync((Release?) null);
+                userReleaseRoleRepository
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .ReturnsAsync(new List<ReleaseRole>());
 
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext =
@@ -252,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 VerifyAllMocks(
                     methodologyRepository,
                     userPublicationRoleRepository,
-                    publicationRepository);
+                    userReleaseRoleRepository);
 
                 Assert.False(authContext.HasSucceeded);
             }
@@ -262,30 +236,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             UpdateSpecificMethodologyAuthorizationHandler,
             Mock<IMethodologyRepository>,
             Mock<IUserPublicationRoleRepository>,
-            Mock<IUserReleaseRoleRepository>,
-            Mock<IPublicationRepository>
+            Mock<IUserReleaseRoleRepository>
             )
             CreateHandlerAndDependencies()
         {
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
-            var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
             var handler = new UpdateSpecificMethodologyAuthorizationHandler(
                 methodologyRepository.Object,
                 new AuthorizationHandlerResourceRoleService(
                     userReleaseRoleRepository.Object,
-                    userPublicationRoleRepository.Object,
-                    publicationRepository.Object)
+                    userPublicationRoleRepository.Object)
                 );
 
             return (
                 handler,
                 methodologyRepository,
                 userPublicationRoleRepository,
-                userReleaseRoleRepository,
-                publicationRepository
+                userReleaseRoleRepository
             );
         }
     }

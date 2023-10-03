@@ -20,7 +20,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
-using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -345,8 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 methodologyRepository.Object,
                 new AuthorizationHandlerResourceRoleService(
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    userPublicationRoleRepository.Object,
-                    Mock.Of<IPublicationRepository>(Strict)));
+                    userPublicationRoleRepository.Object));
 
             return (handler, methodologyRepository, userPublicationRoleRepository);
         }

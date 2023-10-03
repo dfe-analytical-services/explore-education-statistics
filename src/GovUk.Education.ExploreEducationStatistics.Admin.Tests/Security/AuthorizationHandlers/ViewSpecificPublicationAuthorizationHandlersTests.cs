@@ -48,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 new HasOwnerOrApproverRoleOnPublicationAuthorizationHandler(
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict))),
+                        new UserPublicationRoleRepository(contentDbContext))),
                 Owner, Approver);
         }
 
@@ -115,8 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     context,
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(context),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        new UserPublicationRoleRepository(context)));
                 
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {new ViewSpecificPublicationRequirement()},

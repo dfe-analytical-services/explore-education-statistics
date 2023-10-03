@@ -2805,6 +2805,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
 
             [Fact]
+            public async Task UserIsApproverOnOwningPublicationOldRelease_Included()
+            {
+                var releases = _fixture
+                    .DefaultRelease()
+                    .WithApprovalStatuses(ListOf(
+                        ReleaseApprovalStatus.Approved, 
+                        ReleaseApprovalStatus.Draft))
+                    .GenerateList();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(releases)
+                    .Generate();
+
+                var methodology = _fixture
+                    .DefaultMethodology()
+                    .WithOwningPublication(publication)
+                    .WithMethodologyVersions(_ => _fixture
+                        .DefaultMethodologyVersion()
+                        .WithApprovalStatus(MethodologyApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var releaseRoleForUserOnOldRelease = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRelease(releases[0])
+                    .WithRole(ReleaseRole.Approver)
+                    .Generate();
+
+                var contentDbContextId = Guid.NewGuid().ToString();
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    await context.Methodologies.AddRangeAsync(methodology);
+                    await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUserOnOldRelease);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+                {
+                    var service = SetupMethodologyService(context);
+
+                    var result = await service.ListUsersMethodologyVersionsForApproval();
+                    var methodologyVersionsForApproval = result.AssertRight();
+                    
+                    // The user should have access to approve the Methodology if they have Approver permissions
+                    // on ANY of the Publication's Releases, not just the latest one.
+                    var methodologyForApproval = Assert.Single(methodologyVersionsForApproval);
+                    Assert.Equal(methodology.Versions[0].Id, methodologyForApproval.Id);
+                }
+            }
+
+            [Fact]
             public async Task UserIsApproverOnOwningPublicationRelease_MethodologyVersionNotInHigherReview_NotIncluded()
             {
                 var release = _fixture.DefaultRelease().Generate();
