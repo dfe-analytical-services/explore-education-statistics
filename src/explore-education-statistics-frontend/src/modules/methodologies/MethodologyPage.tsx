@@ -26,13 +26,6 @@ interface Props {
 }
 
 const MethodologyPage: NextPage<Props> = ({ data }) => {
-  const tempContact: Contact = {
-    teamName: 'Mock Team Name',
-    teamEmail: 'mockteammember@gmail.com',
-    contactName: 'Mock Team Member',
-    contactTelNo: '0161 234 5678',
-  };
-
   return (
     <Page
       title={data.title}
@@ -215,7 +208,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
 
       <MethodologyHelpAndSupportSection
         methodology={data}
-        contact={tempContact}
+        contact={data.contact}
       />
 
       <PrintThisPage

@@ -1,4 +1,7 @@
-import { PublicationSummary } from '@common/services/publicationService';
+import {
+  Contact,
+  PublicationSummary,
+} from '@common/services/publicationService';
 import { ContentBlock } from '@common/services/types/blocks';
 import { contentApi } from './api';
 
@@ -25,6 +28,7 @@ export interface Methodology {
     content: string;
     displayDate: Date;
   }[];
+  contact: Contact;
 }
 
 const methodologyService = {
