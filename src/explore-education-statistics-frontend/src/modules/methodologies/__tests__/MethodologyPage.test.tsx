@@ -197,4 +197,56 @@ describe('MethodologyPage', () => {
       );
     });
   });
+
+  describe('Help and Support Section', () => {
+    const selectRelatedInformationSection = (): HTMLElement => {
+      const relatedInformation = screen.getByRole('heading', {
+        name: 'Related information',
+      }).parentElement;
+
+      if (!relatedInformation) {
+        throw new Error(
+          'Failing test early - the "Related information" section could not be found.',
+        );
+      }
+
+      return relatedInformation;
+    };
+
+    it('Renders the Help and Support section', () => {
+      render(<MethodologyPage data={testMethodology} />);
+
+      expect(
+        within(selectRelatedInformationSection()).getByRole('heading', {
+          name: 'Help and support',
+        }),
+      ).toBeVisible();
+    });
+
+    it('Displays a link to the contact us section within the Related Information section', () => {
+      render(<MethodologyPage data={testMethodology} />);
+
+      expect(
+        within(selectRelatedInformationSection()).getByRole('link', {
+          name: 'Contact us',
+        }),
+      ).toBeVisible();
+    });
+
+    it('Navigates to the Contact Us section when the link is clicked', () => {
+      render(<MethodologyPage data={testMethodology} />);
+
+      expect(
+        within(selectRelatedInformationSection()).getByRole('link', {
+          name: 'Contact us',
+        }),
+      ).toHaveAttribute('href', '#contact-us');
+
+      expect(
+        screen
+          .queryAllByRole('heading', { name: 'Contact us' })
+          .find(e => e.id === 'contact-us'),
+      ).not.toBeUndefined();
+    });
+  });
 });
