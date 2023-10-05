@@ -13,6 +13,7 @@ Test Setup          fail test fast if required
 *** Variables ***
 ${OWNING_PUBLICATION_NAME}=         UI tests - methodology owning publication %{RUN_IDENTIFIER}
 ${ADOPTING_PUBLICATION_NAME}=       UI tests - adopting methodology publication %{RUN_IDENTIFIER}
+${OWNING_PUBLICATION_NAME_2}=       UI tests - publication with unpublished methodology %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=                    Calendar year 2000
 
 
@@ -31,6 +32,12 @@ Create owning publication methodology and publish
     user approves methodology for publication    ${OWNING_PUBLICATION_NAME}    ${OWNING_PUBLICATION_NAME}
     user creates methodology amendment for publication    ${OWNING_PUBLICATION_NAME}    ${OWNING_PUBLICATION_NAME}
 
+Create another owing publication with an unpublished methodology
+    [Documentation]    EES-4531
+    ${owning_publication_id}=    user creates test publication via api    ${OWNING_PUBLICATION_NAME_2}
+    user creates methodology for publication    ${OWNING_PUBLICATION_NAME_2}
+    user checks page contains tag    Draft
+
 Create adopting publication
     ${adopting_publication_id}=    user creates test publication via api    ${ADOPTING_PUBLICATION_NAME}
     user creates test release via api    ${adopting_publication_id}    CY    2000
@@ -40,9 +47,15 @@ Create adopting publication
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Adopt a Methodology
+Check that an unpublished methodology cannot be adopted
     user navigates to methodologies on publication page    ${ADOPTING_PUBLICATION_NAME}
+    user waits until page contains link    Adopt an existing methodology
+    user clicks link    Adopt an existing methodology
+    user waits until h2 is visible    Adopt a methodology
+    user checks page does not contain    ${OWNING_PUBLICATION_NAME_2}
 
+Adopt a published Methodology
+    user navigates to methodologies on publication page    ${ADOPTING_PUBLICATION_NAME}
     user waits until page contains link    Adopt an existing methodology
     user clicks link    Adopt an existing methodology
     user waits until h2 is visible    Adopt a methodology
