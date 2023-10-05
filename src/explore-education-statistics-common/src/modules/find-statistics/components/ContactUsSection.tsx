@@ -2,12 +2,18 @@ import { Contact } from '@common/services/publicationService';
 import React from 'react';
 
 const ContactUsSection = ({
-  publicationContact,
-  publicationTitle,
+  contact,
+  entityContactIsFor,
 }: {
-  publicationContact: Contact;
-  publicationTitle: string;
+  contact: Contact;
+  entityContactIsFor?: string;
 }) => {
+  const explanatoryText =
+    entityContactIsFor && entityContactIsFor.trim().length > 0
+      ? `If you have a specific enquiry about ${entityContactIsFor.trim()} statistics and
+  data:`
+      : `If you have a specific enquiry about this page`;
+
   return (
     <>
       <h3 id="contact-us">Contact us</h3>
@@ -18,17 +24,14 @@ const ContactUsSection = ({
       </p>
 
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-        {publicationContact.teamName}
+        {contact.teamName}
       </h4>
 
       <address className="govuk-!-margin-top-0">
-        Email:{' '}
-        <a href={`mailto:${publicationContact.teamEmail}`}>
-          {publicationContact.teamEmail}
-        </a>
+        Email: <a href={`mailto:${contact.teamEmail}`}>{contact.teamEmail}</a>
         <br />
-        Contact name: {publicationContact.contactName}
-        {publicationContact.contactTelNo && (
+        Contact name: {contact.contactName}
+        {contact.contactTelNo && (
           <>
             <br />
             Telephone: {publicationContact.contactTelNo}

@@ -7,8 +7,8 @@ describe('Contact Us Section', () => {
   it('Renders', () => {
     render(
       <ContactUsSection
-        publicationContact={mockContact}
-        publicationTitle="Mock Publication Title"
+        contact={mockContact}
+        entityContactIsFor="Mock Publication Title"
       />,
     );
 
@@ -30,8 +30,8 @@ describe('Contact Us Section', () => {
     (publicationTitle: string, expectedText: Matcher) => {
       render(
         <ContactUsSection
-          publicationContact={mockContact}
-          publicationTitle={publicationTitle}
+          contact={mockContact}
+          entityContactIsFor={publicationTitle}
         />,
       );
 
@@ -42,8 +42,8 @@ describe('Contact Us Section', () => {
   it('Contains an appropriate href to the contact email', () => {
     render(
       <ContactUsSection
-        publicationContact={mockContact}
-        publicationTitle="Mock Publication Title"
+        contact={mockContact}
+        entityContactIsFor="Mock Publication Title"
       />,
     );
 
@@ -59,8 +59,8 @@ describe('Contact Us Section', () => {
   it('Displays the telephone number if one is supplied', () => {
     render(
       <ContactUsSection
-        publicationContact={mockContact}
-        publicationTitle="Mock Publication Title"
+        contact={mockContact}
+        entityContactIsFor="Mock Publication Title"
       />,
     );
 
@@ -72,8 +72,8 @@ describe('Contact Us Section', () => {
   it('Hides the telephone number section if one is not supplied', () => {
     render(
       <ContactUsSection
-        publicationContact={{ ...mockContact, contactTelNo: undefined }}
-        publicationTitle="Mock Publication Title"
+        contact={{ ...mockContact, contactTelNo: undefined }}
+        entityContactIsFor="Mock Publication Title"
       />,
     );
 

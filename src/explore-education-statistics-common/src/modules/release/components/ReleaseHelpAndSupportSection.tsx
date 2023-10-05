@@ -54,7 +54,7 @@ export default function ReleaseHelpAndSupportSection({
 
       <ReleaseTypeSection type={release.type} />
 
-      <ContactUsSection publicationContact={contact} publicationTitle={title} />
+      <ContactUsSection contact={contact} entityContactIsFor={title} />
     </>
   );
 }
