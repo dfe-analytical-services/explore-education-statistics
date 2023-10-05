@@ -23,8 +23,8 @@ const MethodologyHelpAndSupportSection: FC<Props> = ({
       </h2>
 
       <ContactUsSection
-        publicationContact={contact}
-        publicationTitle={methodology.title}
+        contact={contact}
+        entityContactIsFor={methodology.title}
       />
     </>
   );

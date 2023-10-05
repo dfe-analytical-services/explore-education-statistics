@@ -13,17 +13,26 @@ import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
+import MethodologyHelpAndSupportSection from '@common/modules/methodology/components/MethodologyHelpAndSupportSection';
 import MethodologyContentSection from '@frontend/modules/methodologies/components/MethodologyContentSection';
 import MethodologySectionBlocks from '@frontend/modules/methodologies/components/MethodologySectionBlocks';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
+import { Contact } from '@common/services/publicationService';
 
 interface Props {
   data: Methodology;
 }
 
 const MethodologyPage: NextPage<Props> = ({ data }) => {
+  const tempContact: Contact = {
+    teamName: 'Mock Team Name',
+    teamEmail: 'mockteammember@gmail.com',
+    contactName: 'Mock Team Member',
+    contactTelNo: '0161 234 5678',
+  };
+
   return (
     <Page
       title={data.title}
@@ -123,6 +132,16 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
                 <Link to="/glossary">Education statistics: glossary</Link>
               </li>
             </ul>
+
+            <h3 className="govuk-heading-s" id="related-pages">
+              Help and support
+            </h3>
+
+            <ul className="govuk-list">
+              <li>
+                <a href="#contact-us">Contact us</a>
+              </li>
+            </ul>
           </RelatedInformation>
         </div>
       </div>
@@ -193,6 +212,11 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
           </Accordion>
         </>
       )}
+
+      <MethodologyHelpAndSupportSection
+        methodology={data}
+        contact={tempContact}
+      />
 
       <PrintThisPage
         onClick={() => {
