@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 {
                     var latestPublishedVersion =
                         await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id);
-                    
+
                     if (latestPublishedVersion == null)
                     {
                         return new NotFoundResult();
@@ -54,17 +54,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .Entry(latestPublishedVersion)
                         .Collection(m => m.Notes)
                         .LoadAsync();
-                    
+
                     await _contentDbContext
                         .Entry(latestPublishedVersion)
                         .Reference(m => m.MethodologyContent)
                         .LoadAsync();
 
                     var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
-                    
-                    viewModel.Publications =
-                        await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
 
+                    var publications = await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
+                    viewModel.Publications = publications;
+
+                    // TODO: Get contact from owning publication   
+                    var owningPublication = publications.Single(); // where...
+
+                    viewModel.Contact = new()
+                    {
+                        ContactName = "Test Contact Name from backend",
+                        ContactTelNo = "Test Contact Tel",
+                        TeamEmail = "Test Team Email",
+                        TeamName = "Test Team Name from backend"
+                    };
                     return viewModel;
                 });
         }
@@ -110,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         {
             var publicationsWithPublishedReleases = await _contentDbContext.PublicationMethodologies
                 .Include(pm => pm.Publication)
-                .Where(pm => pm.MethodologyId == methodologyId 
+                .Where(pm => pm.MethodologyId == methodologyId
                              && pm.Publication.LatestPublishedReleaseId != null)
                 .Select(pm => pm.Publication)
                 .OrderBy(p => p.Title)

@@ -104,6 +104,12 @@ export const testMethodology: Methodology = {
       slug: 'publication-2-slug',
     },
   ] as PublicationSummary[],
+  contact: {
+    teamName: 'Mock Team Name',
+    teamEmail: 'mockteammember@gmail.com',
+    contactName: 'Mock Team Member',
+    contactTelNo: '0161 234 5678',
+  },
 };
 
 export default testMethodology;
