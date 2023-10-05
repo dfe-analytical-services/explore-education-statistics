@@ -1737,7 +1737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, result.Right.UserName);
                 Assert.Null(result.Right.Rows);
                 Assert.Equal("10 Kb", result.Right.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created!.Value).Milliseconds, 0, 1500);
+                result.Right.Created.AssertRecent();
                 Assert.Equal(QUEUED, result.Right.Status);
             }
 
@@ -1903,7 +1903,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, dataFileInfo.UserName);
                 Assert.Null(dataFileInfo.Rows);
                 Assert.Equal("10 Kb", dataFileInfo.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(dataFileInfo.Created!.Value).Milliseconds, 0, 1500);
+                dataFileInfo.Created.AssertRecent();
                 Assert.Equal(QUEUED, dataFileInfo.Status);
             }
 
@@ -2240,7 +2240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, result.UserName);
                 Assert.Null(result.Rows);
                 Assert.Equal("1 Mb", result.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
+                result.Created.AssertRecent();
                 Assert.Equal(QUEUED, result.Status);
             }
 
@@ -2575,7 +2575,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, result.UserName);
                 Assert.Null(result.Rows);
                 Assert.Equal("1 Mb", result.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
+                result.Created.AssertRecent();
                 Assert.Equal(QUEUED, result.Status);
             }
 

@@ -566,8 +566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var viewModel = result.AssertRight();
 
                 // Published date in the view model should match the date now
-                Assert.NotNull(viewModel.Published);
-                Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published!.Value).Milliseconds, 0, 1500);
+                viewModel.Published.AssertRecent();
             }
         }
 

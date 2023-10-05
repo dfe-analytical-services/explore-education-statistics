@@ -1,3 +1,4 @@
+using System;
 using KellermanSoftware.CompareNetObjects;
 using Xunit;
 using Xunit.Sdk;
@@ -28,6 +29,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             var compareLogic = new CompareLogic();
             var comparison = compareLogic.Compare(actual, expected);
             return comparison.AreEqual;
+        }
+        
+        public static void AssertRecent(this DateTime dateTime, int withinMillis = 1500)
+        {
+            Assert.InRange(DateTime.UtcNow.Subtract(dateTime).Milliseconds, 0, withinMillis);
+        }
+        
+        public static void AssertRecent(this DateTime? dateTime, int withinMillis = 1500)
+        {
+            Assert.True(dateTime.HasValue);
+            Assert.InRange(DateTime.UtcNow.Subtract(dateTime.Value).Milliseconds, 0, withinMillis);
         }
     }
 }

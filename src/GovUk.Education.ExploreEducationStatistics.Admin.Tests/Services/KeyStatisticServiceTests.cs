@@ -528,8 +528,7 @@ public class KeyStatisticServiceTests
             Assert.Equal("new guidanceText", viewModel.GuidanceText);
             Assert.Equal(0, viewModel.Order);
             Assert.Equal(new DateTime(2000, 1, 1), viewModel.Created);
-            Assert.NotNull(viewModel.Updated);
-            Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Updated!.Value).Milliseconds, 0, 1500);
+            viewModel.Updated.AssertRecent();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -549,7 +548,7 @@ public class KeyStatisticServiceTests
             Assert.NotNull(keyStatDataBlock.Updated);
             Assert.Equal(keyStatisticDataBlock.CreatedById, keyStatDataBlock.CreatedById);
             Assert.Equal(_userId, keyStatDataBlock.UpdatedById);
-            Assert.InRange(DateTime.UtcNow.Subtract(keyStatDataBlock.Updated!.Value).Milliseconds, 0, 1500);
+            keyStatDataBlock.Updated.AssertRecent();
         }
     }
 
@@ -771,8 +770,7 @@ public class KeyStatisticServiceTests
             Assert.Equal("new guidanceText", viewModel.GuidanceText);
             Assert.Equal(0, viewModel.Order);
             Assert.Equal(new DateTime(2000, 1, 1), viewModel.Created);
-            Assert.NotNull(viewModel.Updated);
-            Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Updated!.Value).Milliseconds, 0, 1500);
+            viewModel.Updated.AssertRecent();
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
@@ -789,10 +787,9 @@ public class KeyStatisticServiceTests
             Assert.Equal("new guidanceText", keyStatText.GuidanceText);
             Assert.Equal(0, keyStatText.Order);
             Assert.Equal(new DateTime(2000, 1, 1), keyStatText.Created);
-            Assert.NotNull(keyStatText.Updated);
             Assert.Equal(keyStatisticText.CreatedById, keyStatText.CreatedById);
             Assert.Equal(_userId, keyStatText.UpdatedById);
-            Assert.InRange(DateTime.UtcNow.Subtract(keyStatText.Updated!.Value).Milliseconds, 0, 1500);
+            keyStatText.Updated.AssertRecent();
         }
     }
 
