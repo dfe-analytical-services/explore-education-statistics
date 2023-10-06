@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         
         public bool Owner { get; set; }
         
-        public Contact? Contact { get; set; }
+        public ContactViewModel? Contact { get; set; }
 
         public PublicationSummaryViewModel()
         {
