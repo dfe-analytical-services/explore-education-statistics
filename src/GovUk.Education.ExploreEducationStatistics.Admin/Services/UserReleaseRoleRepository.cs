@@ -65,6 +65,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return GetAllResourceRolesByUserAndResource(userId, releaseId);
         }
 
+        public Task<List<ReleaseRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
+        {
+            return ContentDbContext
+                .UserReleaseRoles
+                .Where(role => role.UserId == userId && role.Release.PublicationId == publicationId)
+                .Select(role => role.Role)
+                .Distinct()
+                .ToListAsync();
+        }
+
         public async Task<bool> IsUserApproverOnLatestRelease(Guid userId, Guid publicationId)
         {
             return await UserHasAnyOfRolesOnLatestRelease(

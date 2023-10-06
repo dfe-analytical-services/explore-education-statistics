@@ -41,9 +41,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
             await AuthorizationHandlersTestUtil.ForEachSecurityClaimAsync(async claim =>
             {
                 var (handler,
-                    _,
-                    userPublicationRoleRepository,
-                    _) = CreateHandlerAndDependencies();
+                    userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
                 var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(UserId, claim);
                 var authContext = CreateAuthContext(user, Publication);
@@ -70,10 +68,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         {
             await AuthorizationHandlersTestUtil.ForEachSecurityClaimAsync(async claim =>
             {
-                var (handler,
-                    _,
-                    _,
-                    _) = CreateHandlerAndDependencies();
+                var (handler, _) = CreateHandlerAndDependencies();
 
                 var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(UserId, claim);
                 var authContext = CreateAuthContext(user, PublicationArchived);
@@ -93,10 +88,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         {
             await AuthorizationHandlersTestUtil.ForEachPublicationRoleAsync(async publicationRole =>
             {
-                var (handler,
-                    _,
-                    userPublicationRoleRepository,
-                    _) = CreateHandlerAndDependencies();
+                var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
                 var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(UserId);
                 var authContext = CreateAuthContext(user, Publication);
@@ -117,10 +109,7 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         [Fact]
         public async Task CreateReleaseForSpecificPublicationAuthorizationHandler_FailsWhenArchived()
         {
-            var (handler,
-                _,
-                userPublicationRoleRepository,
-                _) = CreateHandlerAndDependencies();
+            var (handler, userPublicationRoleRepository) = CreateHandlerAndDependencies();
 
             var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(UserId);
             var authContext = CreateAuthContext(user, PublicationArchived);
@@ -146,28 +135,18 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
 
     private static
         (CreateReleaseForSpecificPublicationAuthorizationHandler,
-        Mock<IUserReleaseRoleRepository>,
-        Mock<IUserPublicationRoleRepository>,
-        Mock<IPublicationRepository>
-        )
+        Mock<IUserPublicationRoleRepository>)
         CreateHandlerAndDependencies()
     {
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
-        var publicationRepository = new Mock<IPublicationRepository>(MockBehavior.Strict);
 
         var handler = new CreateReleaseForSpecificPublicationAuthorizationHandler(
             new AuthorizationHandlerResourceRoleService(
                 userReleaseRoleRepository.Object,
-                userPublicationRoleRepository.Object,
-                publicationRepository.Object)
+                userPublicationRoleRepository.Object)
         );
 
-        return (
-            handler,
-            userReleaseRoleRepository,
-            userPublicationRoleRepository,
-            publicationRepository
-        );
+        return (handler, userPublicationRoleRepository);
     }
 }

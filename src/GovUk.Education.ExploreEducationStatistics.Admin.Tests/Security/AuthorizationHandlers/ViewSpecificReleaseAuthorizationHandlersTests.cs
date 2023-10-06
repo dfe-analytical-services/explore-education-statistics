@@ -39,8 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(
                         new AuthorizationHandlerResourceRoleService(
                             new UserReleaseRoleRepository(contentDbContext),
-                            new UserPublicationRoleRepository(contentDbContext),
-                            Mock.Of<IPublicationRepository>(Strict))),
+                            new UserPublicationRoleRepository(contentDbContext))),
                 ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver);
         }
 
@@ -55,8 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 contentDbContext => new HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler(
                         new AuthorizationHandlerResourceRoleService(
                             Mock.Of<IUserReleaseRoleRepository>(Strict),
-                            new UserPublicationRoleRepository(contentDbContext),
-                            Mock.Of<IPublicationRepository>(Strict))),
+                            new UserPublicationRoleRepository(contentDbContext))),
                 new Release
                 {
                     PublicationId = publication.Id,
@@ -87,8 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         preReleaseService.Object,
                         new AuthorizationHandlerResourceRoleService(
                             new UserReleaseRoleRepository(contentDbContext),
-                            new UserPublicationRoleRepository(contentDbContext),
-                            Mock.Of<IPublicationRepository>(Strict))),
+                            new UserPublicationRoleRepository(contentDbContext))),
                 release,
                 ReleaseRole.PrereleaseViewer);
         }
@@ -144,8 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 preReleaseService.Object,
                                 new AuthorizationHandlerResourceRoleService(
                                     new UserReleaseRoleRepository(contentDbContext),
-                                    new UserPublicationRoleRepository(contentDbContext),
-                                    Mock.Of<IPublicationRepository>(Strict))),
+                                    new UserPublicationRoleRepository(contentDbContext))),
                         failureScenario);
                 });
         }

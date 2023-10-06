@@ -61,7 +61,7 @@ public class MarkMethodologyAsDraftAuthorizationHandler : AuthorizationHandler<
             await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
         if (await _authorizationHandlerResourceRoleService
-                .HasRolesOnPublicationOrLatestRelease(
+                .HasRolesOnPublicationOrAnyRelease(
                     context.User.GetUserId(),
                     owningPublication.Id,
                     allowedPublicationRoles,

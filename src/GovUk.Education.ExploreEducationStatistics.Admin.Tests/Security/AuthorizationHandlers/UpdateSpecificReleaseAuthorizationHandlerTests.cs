@@ -347,8 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     releaseStatusRepository.Object,
                     new AuthorizationHandlerResourceRoleService(
                         new UserReleaseRoleRepository(contentDbContext),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(MockBehavior.Strict)));
+                        new UserPublicationRoleRepository(contentDbContext)));
             };
         }
     }

@@ -437,7 +437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         public async Task<Either<ActionResult, List<MethodologyVersionViewModel>>> ListUsersMethodologyVersionsForApproval()
         {
             var userId = _userService.GetUserId();
-            
+
             var directPublicationsWithApprovalRole = await _context
                 .UserPublicationRoles
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
@@ -453,7 +453,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             var publicationIdsForApproval = directPublicationsWithApprovalRole
                 .Concat(indirectPublicationsWithApprovalRole)
                 .Distinct();
-                
+
             var methodologiesToApprove = await _context
                 .MethodologyVersions
                 .Where(methodologyVersion =>
@@ -463,7 +463,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             publicationMethodology.Owner
                             && publicationIdsForApproval.Contains(publicationMethodology.PublicationId)))
                 .ToListAsync();
-            
+
             return (await methodologiesToApprove
                     .SelectAsync(BuildMethodologyVersionViewModel))
                 .ToList();
