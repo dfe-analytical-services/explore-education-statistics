@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
@@ -12,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public string Slug { get; set; } = string.Empty;
         
         public bool Owner { get; set; }
+        
+        public Contact? Contact { get; set; }
 
         public PublicationSummaryViewModel()
         {

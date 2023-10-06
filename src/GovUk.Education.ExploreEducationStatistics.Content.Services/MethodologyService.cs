@@ -65,19 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .LoadAsync();
 
                     var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
-
-
-                    var publications = await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
-
-                    viewModel.Publications = publications;
                     
-                    var contact = await GetOwningPublicationContact(publications.Single(p => p.Owner).Id);
-                    if (contact is null)
-                    {
-                        _logger.LogError("Failed to find a Contact for {MethodologyId}", latestPublishedVersion.MethodologyId);
-                    }
-                    
-                    viewModel.Contact = contact;
+                    viewModel.Publications = await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
                     
                     return viewModel;
                 });
@@ -122,24 +111,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private async Task<List<PublicationSummaryViewModel>> GetPublishedPublicationsForMethodology(Guid methodologyId)
         {
-            var publicationsWithPublishedReleases = await _contentDbContext.PublicationMethodologies
-                .Include(pm => pm.Publication)
-                .Where(pm => pm.MethodologyId == methodologyId
-                             && pm.Publication.LatestPublishedReleaseId != null)
-                .Select(pm => pm.Publication)
-                .OrderBy(p => p.Title)
-                .ToListAsync();
-
-            return _mapper.Map<List<PublicationSummaryViewModel>>(publicationsWithPublishedReleases);
-        }
-
-        private async Task<ContactViewModel> GetOwningPublicationContact(Guid owningPublicationId)
-        {
-            var owningPublication = await _contentDbContext.Publications
-                                             .Include(p => p.Contact)
-                                             .SingleAsync(p => p.Id == owningPublicationId);
-
-            return _mapper.Map<ContactViewModel>(owningPublication.Contact);
+            return await _contentDbContext.PublicationMethodologies
+                                            .Include(pm => pm.Publication)
+                                            .Where(pm => pm.MethodologyId == methodologyId
+                                                         && pm.Publication.LatestPublishedReleaseId != null)
+                                            .Select(pm => new PublicationSummaryViewModel()
+                                                          {
+                                                              Id = pm.PublicationId,
+                                                              Title = pm.Publication.Title,
+                                                              Slug = pm.Publication.Slug,
+                                                              Owner = pm.Owner,
+                                                              Contact = pm.Owner ? pm.Publication.Contact : null
+                                                          })
+                                            .OrderBy(pvm => pvm.Title)
+                                            .ToListAsync();
         }
 
         private async Task<List<MethodologyVersionSummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)

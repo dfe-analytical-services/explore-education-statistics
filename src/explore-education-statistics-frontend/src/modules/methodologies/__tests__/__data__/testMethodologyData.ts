@@ -97,19 +97,21 @@ export const testMethodology: Methodology = {
       id: 'publication-1',
       title: 'Publication 1',
       slug: 'publication-1-slug',
+      owner: false,
     },
     {
       id: 'publication-2',
       title: 'Publication 2',
       slug: 'publication-2-slug',
+      owner: true,
+      contact: {
+        teamName: 'Mock Team Name',
+        teamEmail: 'mockteammember@gmail.com',
+        contactName: 'Mock Team Member',
+        contactTelNo: '0161 234 5678',
+      },
     },
   ] as PublicationSummary[],
-  contact: {
-    teamName: 'Mock Team Name',
-    teamEmail: 'mockteammember@gmail.com',
-    contactName: 'Mock Team Member',
-    contactTelNo: '0161 234 5678',
-  },
 };
 
 export default testMethodology;

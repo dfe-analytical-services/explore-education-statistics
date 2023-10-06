@@ -1,17 +1,12 @@
 import React, { FC } from 'react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
-import { Methodology } from '@common/services/methodologyService';
-import { Contact } from '@common/services/publicationService';
+import { PublicationSummary } from '@common/services/publicationService';
 
 interface Props {
-  methodology: Methodology;
-  contact: Contact;
+  owningPublication: PublicationSummary;
 }
 
-const MethodologyHelpAndSupportSection: FC<Props> = ({
-  methodology,
-  contact,
-}) => {
+const MethodologyHelpAndSupportSection: FC<Props> = ({ owningPublication }) => {
   return (
     <>
       <h2
@@ -23,10 +18,8 @@ const MethodologyHelpAndSupportSection: FC<Props> = ({
       </h2>
 
       <ContactUsSection
-        publicationContact={contact}
-        publicationTitle={
-          methodology.publications.find(p => p.owner === true)?.title
-        }
+        publicationContact={owningPublication.contact}
+        publicationTitle={owningPublication.title}
       />
     </>
   );
