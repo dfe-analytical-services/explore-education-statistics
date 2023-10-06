@@ -29,6 +29,12 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
     publication => publication.owner === true,
   );
 
+  if (owningPublication === undefined) {
+    throw new Error(
+      `No owning publication was discovered on Methodology ${data.id}. All methodologies must belong to a publication.`,
+    );
+  }
+
   return (
     <Page
       title={data.title}
@@ -129,18 +135,14 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
               </li>
             </ul>
 
-            {owningPublication !== undefined && (
-              <>
-                <h3 className="govuk-heading-s" id="related-pages">
-                  Help and support
-                </h3>
-                <ul className="govuk-list">
-                  <li>
-                    <a href="#contact-us">Contact us</a>
-                  </li>
-                </ul>
-              </>
-            )}
+            <h3 className="govuk-heading-s" id="related-pages">
+              Help and support
+            </h3>
+            <ul className="govuk-list">
+              <li>
+                <a href="#contact-us">Contact us</a>
+              </li>
+            </ul>
           </RelatedInformation>
         </div>
       </div>
@@ -212,11 +214,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         </>
       )}
 
-      {owningPublication !== undefined && (
-        <MethodologyHelpAndSupportSection
-          owningPublication={owningPublication}
-        />
-      )}
+      <MethodologyHelpAndSupportSection owningPublication={owningPublication} />
 
       <PrintThisPage
         onClick={() => {
