@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
@@ -22,16 +23,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
+        private readonly ILogger<MethodologyService> _logger;
 
         public MethodologyService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
-            IMethodologyVersionRepository methodologyVersionRepository)
+            IMethodologyVersionRepository methodologyVersionRepository,
+            ILogger<MethodologyService> logger)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _methodologyVersionRepository = methodologyVersionRepository;
+            _logger = logger;
         }
 
         public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug)
@@ -62,19 +66,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
                     var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
 
+
                     var publications = await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
+
                     viewModel.Publications = publications;
-
-                    // TODO: Get contact from owning publication   
-                    var owningPublication = publications.Single(); // where...
-
-                    viewModel.Contact = new()
+                    
+                    var contact = await GetOwningPublicationContact(latestPublishedVersion.MethodologyId);
+                    if (contact is null)
                     {
-                        ContactName = "Test Contact Name from backend",
-                        ContactTelNo = "Test Contact Tel",
-                        TeamEmail = "Test Team Email",
-                        TeamName = "Test Team Name from backend"
-                    };
+                        _logger.LogError("Failed to find a Contact for {MethodologyId}", latestPublishedVersion.MethodologyId);
+                    }
+                    
+                    viewModel.Contact = contact;
+                    
                     return viewModel;
                 });
         }
@@ -127,6 +131,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ToListAsync();
 
             return _mapper.Map<List<PublicationSummaryViewModel>>(publicationsWithPublishedReleases);
+        }
+
+        private async Task<ContactViewModel> GetOwningPublicationContact(Guid methodologyId)
+        {
+            var owningPublicationMethodology = await _contentDbContext.PublicationMethodologies
+                                                                      .Include(pm => pm.Publication)
+                                                                      .Where(pm => pm.MethodologyId == methodologyId)
+                                                                      .SingleAsync(pm => pm.Owner == true);
+
+            var owningPublication = await _contentDbContext.Publications
+                                             .Include(p => p.Contact)
+                                             .SingleAsync(p => p.Id == owningPublicationMethodology.PublicationId);
+
+            var contactViewModel = _mapper.Map<ContactViewModel>(owningPublication.Contact);
+            
+            return contactViewModel;
         }
 
         private async Task<List<MethodologyVersionSummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
