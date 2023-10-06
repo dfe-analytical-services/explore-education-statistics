@@ -1,7 +1,10 @@
+#nullable enable
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 {
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public enum GeographicLevel
     {
         [EnumLabelValue("English devolved area", "EDA")]
@@ -15,6 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 
         [EnumLabelValue("Local enterprise partnership", "LEP")]
         LocalEnterprisePartnership,
+
+        [EnumLabelValue("Local skills improvement plan area", "LSIP")]
+        LocalSkillsImprovementPlanArea,
 
         [EnumLabelValue("Institution", "INS")] Institution,
 
@@ -43,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
         [EnumLabelValue("Sponsor", "SPO")] Sponsor,
 
         [EnumLabelValue("Ward", "WAR")] Ward,
-        
+
         [EnumLabelValue("Planning area", "PA")] PlanningArea
     }
 }
