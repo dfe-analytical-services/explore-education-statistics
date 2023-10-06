@@ -37,7 +37,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
             CreateMap<Publication, PublicationSummaryViewModel>();
-
+            
+            CreateMap<Contact, ContactViewModel>();
+            
             CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
             CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();
             CreateMap<KeyStatistic, KeyStatisticViewModel>()
