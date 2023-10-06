@@ -112,19 +112,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private async Task<List<PublicationSummaryViewModel>> GetPublishedPublicationsForMethodology(Guid methodologyId)
         {
             return await _contentDbContext.PublicationMethodologies
-                                            .Include(pm => pm.Publication)
-                                            .Where(pm => pm.MethodologyId == methodologyId
-                                                         && pm.Publication.LatestPublishedReleaseId != null)
-                                            .Select(pm => new PublicationSummaryViewModel()
-                                                          {
-                                                              Id = pm.PublicationId,
-                                                              Title = pm.Publication.Title,
-                                                              Slug = pm.Publication.Slug,
-                                                              Owner = pm.Owner,
-                                                              Contact = pm.Owner ? pm.Publication.Contact : null
-                                                          })
-                                            .OrderBy(pvm => pvm.Title)
-                                            .ToListAsync();
+                                          .Include(pm => pm.Publication)
+                                          .ThenInclude(p => p.Contact)
+                                          .Where(pm => pm.MethodologyId == methodologyId
+                                                       && pm.Publication.LatestPublishedReleaseId != null)
+                                          .Select(pm => new PublicationSummaryViewModel()
+                                                        {
+                                                            Id = pm.PublicationId,
+                                                            Title = pm.Publication.Title,
+                                                            Slug = pm.Publication.Slug,
+                                                            Owner = pm.Owner,
+                                                            Contact = pm.Owner ? pm.Publication.Contact : null
+                                                        })
+                                          .OrderBy(pvm => pvm.Title)
+                                          .ToListAsync();
         }
 
         private async Task<List<MethodologyVersionSummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
