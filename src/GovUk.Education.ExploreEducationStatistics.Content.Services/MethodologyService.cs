@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                                                             Title = pm.Publication.Title,
                                                             Slug = pm.Publication.Slug,
                                                             Owner = pm.Owner,
-                                                            Contact = pm.Owner ? pm.Publication.Contact : null
+                                                            Contact = pm.Owner ? _mapper.Map<ContactViewModel>(pm.Publication.Contact) : null
                                                         })
                                           .OrderBy(pvm => pvm.Title)
                                           .ToListAsync();
