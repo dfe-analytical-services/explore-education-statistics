@@ -47,6 +47,7 @@ export interface PublicationSummary {
   slug: string;
   title: string;
   owner: boolean;
+  contact: Contact;
 }
 
 export interface PublicationListSummary {

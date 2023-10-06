@@ -26,6 +26,10 @@ interface Props {
 }
 
 const MethodologyPage: NextPage<Props> = ({ data }) => {
+  const owningPublication = data.publications.find(
+    publication => publication.owner === true,
+  );
+
   return (
     <Page
       title={data.title}
@@ -126,15 +130,18 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
               </li>
             </ul>
 
-            <h3 className="govuk-heading-s" id="related-pages">
-              Help and support
-            </h3>
-
-            <ul className="govuk-list">
-              <li>
-                <a href="#contact-us">Contact us</a>
-              </li>
-            </ul>
+            {owningPublication !== undefined && (
+              <>
+                <h3 className="govuk-heading-s" id="related-pages">
+                  Help and support
+                </h3>
+                <ul className="govuk-list">
+                  <li>
+                    <a href="#contact-us">Contact us</a>
+                  </li>
+                </ul>
+              </>
+            )}
           </RelatedInformation>
         </div>
       </div>
@@ -206,10 +213,11 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
         </>
       )}
 
-      <MethodologyHelpAndSupportSection
-        methodology={data}
-        contact={data.contact}
-      />
+      {owningPublication !== undefined && (
+        <MethodologyHelpAndSupportSection
+          owningPublication={owningPublication}
+        />
+      )}
 
       <PrintThisPage
         onClick={() => {
