@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     await handler.HandleAsync(authContext);
                     VerifyAllMocks(
-                        methodologyRepository, 
+                        methodologyRepository,
                         methodologyVersionRepository,
                         userReleaseRoleRepository,
                         userPublicationRoleRepository);
@@ -182,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 });
             }
         }
-        
+
         public class PublicationRoleTests
         {
             [Fact]
@@ -246,8 +246,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {
-                    // If the user has the Approver role on the latest Release of the owning Publication of this
-                    // Methodology they are allowed to approve it
+                    // If the user has the Approver role on any Releases of the owning Publication of this
+                    // Methodology, they are allowed to approve it.
                     var expectedToPassByReleaseRole = releaseRole == Approver;
 
                     var (
@@ -293,51 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public async Task UsersWithNoRolesOnAnyOwningPublicationReleaseCannotApprove()
-            {
-                var (
-                    handler,
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(MethodologyVersion))
-                    .ReturnsAsync(false);
-
-                methodologyRepository
-                    .Setup(s => s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                    .ReturnsAsync(OwningPublication);
-
-                userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
-
-                userReleaseRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<ReleaseRole>());
-
-                var user = CreateClaimsPrincipal(UserId);
-
-                var authContext =
-                    CreateAuthorizationHandlerContext<MarkMethodologyAsApprovedRequirement, MethodologyVersion>
-                        (user, MethodologyVersion);
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userPublicationRoleRepository,
-                    userReleaseRoleRepository);
-
-                // A user with no role on the owning Publication's latest release is not allowed to approve it
-                Assert.False(authContext.HasSucceeded);
-            }
-
-            [Fact]
-            public async Task NoReleaseRolesOnAnyOwningPublicatioReleaseSoCannotApprove()
+            public async Task NoReleaseRolesOnAnyOwningPublicationReleaseSoCannotApprove()
             {
                 var (
                     handler,

@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         userReleaseRoleRepository
                             .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                             .ReturnsAsync(new List<ReleaseRole>());
-                        
+
                         userReleaseRoleRepository
                             .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, OwningPublication.Id))
                             .ReturnsAsync(false);
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .ReturnsAsync(OwningPublication);
 
                     var expectedToPassByRole = ListOf(PublicationRole.Owner, PublicationRole.Approver).Contains(publicationRole);
-                    
+
                     userPublicationRoleRepository
                         .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(publicationRole));
@@ -133,10 +133,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    
+
                     VerifyAllMocks(
-                        methodologyRepository, 
-                        userPublicationRoleRepository, 
+                        methodologyRepository,
+                        userPublicationRoleRepository,
                         publicationRepository);
 
                     // As the user has Publication Owner role on the owning Publication of this Methodology, they are
@@ -195,13 +195,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             (user, MethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    
+
                     VerifyAllMocks(
                         methodologyRepository,
                         userPublicationRoleRepository,
                         userReleaseRoleRepository);
 
-                    // As the user has a role on the latest Release of the owning Publication of this Methodology
+                    // As the user has a role on any Release of the owning Publication of this Methodology,
                     // they are allowed to view it.
                     Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
                 });
@@ -215,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid(),
                     PublicationId = Guid.NewGuid()
                 };
-                
+
                 var (
                     handler,
                     methodologyRepository,
@@ -232,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 userPublicationRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
-                
+
                 userReleaseRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
@@ -244,11 +244,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 userReleaseRoleRepository
                     .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, preReleaseForConnectedPublication.PublicationId))
                     .ReturnsAsync(true);
-                
+
                 publicationRepository
                     .Setup(s => s.GetLatestReleaseForPublication(preReleaseForConnectedPublication.PublicationId))
                     .ReturnsAsync(preReleaseForConnectedPublication);
-                
+
                 preReleaseService
                     .Setup(s => s.GetPreReleaseWindowStatus(
                         It.Is<Release>(r => r.Id == preReleaseForConnectedPublication.Id),
@@ -256,13 +256,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
 
                 var user = CreateClaimsPrincipal(UserId);
-                
+
                 var authContext =
                     CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                
+
                 VerifyAllMocks(
                     methodologyRepository,
                     userPublicationRoleRepository,
@@ -270,11 +270,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     preReleaseService,
                     publicationRepository);
 
-                // As the user has a role on the latest Release of the owning Publication of this Methodology
+                // As the user has a role on the any Release of the owning Publication of this Methodology,
                 // they are allowed to view it.
                 Assert.True(authContext.HasSucceeded);
             }
-            
+
             [Fact]
             public async Task PrereleaseViewersNoLatestReleasesForOnOwningPublicationCannotViewMethodology()
             {
@@ -283,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     Id = Guid.NewGuid(),
                     PublicationId = Guid.NewGuid()
                 };
-                
+
                 var (
                     handler,
                     methodologyRepository,
@@ -300,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 userPublicationRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
-                
+
                 userReleaseRoleRepository
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<ReleaseRole>());
@@ -312,19 +312,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 userReleaseRoleRepository
                     .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, preReleaseForConnectedPublication.PublicationId))
                     .ReturnsAsync(true);
-                
+
                 publicationRepository
                     .Setup(s => s.GetLatestReleaseForPublication(preReleaseForConnectedPublication.PublicationId))
                     .ReturnsAsync(null as Release);
-                
+
                 var user = CreateClaimsPrincipal(UserId);
-                
+
                 var authContext =
                     CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                
+
                 VerifyAllMocks(
                     methodologyRepository,
                     userPublicationRoleRepository,
@@ -374,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         (user, MethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                
+
                 VerifyAllMocks(
                     methodologyRepository,
                     userPublicationRoleRepository,

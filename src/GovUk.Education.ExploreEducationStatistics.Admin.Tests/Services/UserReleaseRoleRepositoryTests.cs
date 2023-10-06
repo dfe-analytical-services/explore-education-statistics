@@ -689,7 +689,92 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(Lead, result[1]);
             }
         }
-        
+
+        [Fact]
+        public async Task GetAllRolesByUserAndPublication()
+        {
+            var user = new User();
+            var publication = new Publication();
+
+            var userReleaseRolesForPublication = new List<UserReleaseRole>
+            {
+                new()
+                {
+                    User = user,
+                    Release = new Release
+                    {
+                        Publication = publication
+                    },
+                    Role = Contributor
+                },
+                new()
+                {
+                    User = user,
+                    Release = new Release
+                    {
+                        Publication = publication
+                    },
+                    Role = Lead
+                },
+                // Add a duplicate ReleaseRole to ensure duplicates are removed by the method under test
+                new()
+                {
+                    User = user,
+                    Release = new Release
+                    {
+                        Publication = publication
+                    },
+                    Role = Lead
+                }
+            };
+
+            var otherPublication = new Publication();
+            var otherUserReleaseRoles = new List<UserReleaseRole>
+            {
+                // Role for different Publication
+                new()
+                {
+                    User = user,
+                    Release = new Release
+                    {
+                        Publication = otherPublication
+                    },
+                    Role = Approver
+                },
+                // Role for same Publication but different user
+                new()
+                {
+                    User = new User(),
+                    Release = new Release
+                    {
+                        Publication = publication
+                    },
+                    Role = Approver
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRolesForPublication);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(otherUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                var result = await service.GetAllRolesByUserAndPublication(user.Id, publication.Id);
+
+                Assert.Equal(2, result.Count);
+                Assert.Equal(Contributor, result[0]);
+                Assert.Equal(Lead, result[1]);
+            }
+        }
+
         [Fact]
         public async Task GetDistinctRolesByUser()
         {

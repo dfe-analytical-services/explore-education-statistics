@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 });
             }
         }
-        
+
         public class PublicationRoleTests
         {
             [Fact]
@@ -174,9 +174,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             HigherReviewMethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    
+
                     VerifyAllMocks(
-                        methodologyRepository, 
+                        methodologyRepository,
                         methodologyVersionRepository,
                         userReleaseRoleRepository,
                         userPublicationRoleRepository);
@@ -283,9 +283,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             HigherReviewMethodologyVersion);
 
                     await handler.HandleAsync(authContext);
-                    
+
                     VerifyAllMocks(
-                        methodologyRepository, 
+                        methodologyRepository,
                         methodologyVersionRepository,
                         userReleaseRoleRepository,
                         userPublicationRoleRepository);
@@ -326,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(mock =>
                             mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(ListOf(releaseRole));
-                    
+
                     var user = CreateClaimsPrincipal(UserId);
 
                     var authContext =
@@ -344,46 +344,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
                 });
-            }
-
-            [Fact]
-            public async Task UsersWithNoRolesOnAnyOwningPublicationReleaseCannotMarkMethodologyAsDraft()
-            {
-                var (
-                    handler,
-                    methodologyRepository,
-                    methodologyVersionRepository,
-                    userReleaseRoleRepository,
-                    userPublicationRoleRepository
-                    ) = CreateHandlerAndDependencies();
-
-                methodologyVersionRepository.Setup(mock =>
-                        mock.IsLatestPublishedVersion(HigherReviewMethodologyVersion))
-                    .ReturnsAsync(false);
-
-                methodologyRepository.Setup(s =>
-                        s.GetOwningPublication(HigherReviewMethodologyVersion.MethodologyId))
-                    .ReturnsAsync(OwningPublication);
-
-                userPublicationRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<PublicationRole>());
-
-                userReleaseRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                    .ReturnsAsync(new List<ReleaseRole>());
-
-                var user = CreateClaimsPrincipal(UserId);
-
-                var authContext =
-                    CreateAuthorizationHandlerContext<MarkMethodologyAsDraftRequirement, MethodologyVersion>
-                        (user, HigherReviewMethodologyVersion);
-
-                await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userReleaseRoleRepository);
-
-                // A user with no role on the owning Publication of this Methodology is not allowed to mark it as draft
-                Assert.False(authContext.HasSucceeded);
             }
 
             [Fact]
@@ -421,7 +381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(
-                    methodologyRepository, 
+                    methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
                     userPublicationRoleRepository);
