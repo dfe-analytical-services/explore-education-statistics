@@ -46,6 +46,7 @@ export interface PublicationSummary {
   id: string;
   slug: string;
   title: string;
+  owner: boolean;
 }
 
 export interface PublicationListSummary {

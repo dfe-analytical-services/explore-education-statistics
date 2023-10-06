@@ -23,8 +23,10 @@ const MethodologyHelpAndSupportSection: FC<Props> = ({
       </h2>
 
       <ContactUsSection
-        contact={contact}
-        entityContactIsFor={methodology.title}
+        publicationContact={contact}
+        publicationTitle={
+          methodology.publications.find(p => p.owner === true)?.title
+        }
       />
     </>
   );
