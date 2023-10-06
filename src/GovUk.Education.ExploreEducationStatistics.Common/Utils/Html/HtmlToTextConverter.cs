@@ -36,15 +36,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
         {
             var rawLines = _builder.ToString().ToLines();
 
-            // Run post-filtering on lines to remove any extraneous
-            // whitespace from the end of lines. This is mostly for
-            // better compat with editors/IDEs, where whitespace may
-            // be automatically removed upon file save.
-            var filteredBuilder = new StringBuilder();
+            // Run post-filtering on lines to:
+            // 1. Remove any extraneous whitespace from the end of lines. This is
+            // mostly for better compatibility with formatters / editors / IDEs, where
+            // trailing whitespace may be automatically removed upon file save.
+            // 2. Ensure we have CRLF (\r\n) line endings for better compatibility with
+            // our Windows users (the majority of users). Otherwise, line endings
+            // would be server OS dependent and this can lead to inconsistent files.
+            var postFilterBuilder = new StringBuilder();
 
-            rawLines.ForEach(line => filteredBuilder.AppendLine(line.TrimEnd()));
+            rawLines.ForEach(line => postFilterBuilder.AppendCrlfLine(line.TrimEnd()));
 
-            return filteredBuilder.ToString().TrimEnd();
+            return postFilterBuilder.ToString().TrimEnd();
         }
 
         private void ParseChildren(INode node)
@@ -145,9 +148,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
 
             if (element.IsBlockType() || next is IElement nextElement && nextElement.IsBlockType())
             {
-                // If last two characters are new line characters, then don't
-                // append any more spacing as this would be excessive.
-                if (_builder[^2] == '\n' && _builder[^1] == '\n')
+                // Get last 4 chars to check their line endings. Windows uses CRLF line endings (\r\n),
+                // so there may be up to 4 chars, instead of 2 for LF (\n) when using Linux / Mac.
+                var currentEnding = _builder.Substring(^4..);
+
+                // If already have two line endings, then don't
+                // append more spacing as this would be excessive.
+                if (currentEnding.EndsWith($"{Environment.NewLine}{Environment.NewLine}"))
                 {
                     return;
                 }
