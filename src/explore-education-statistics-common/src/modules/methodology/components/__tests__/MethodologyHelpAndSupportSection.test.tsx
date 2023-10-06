@@ -1,9 +1,8 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import * as ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
-import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/mock-data';
 import MethodologyHelpAndSupportSection from '../MethodologyHelpAndSupportSection';
-import mockMethodology from './__data__/mock-data';
+import mockPublicationSummary from './__data__/mock-data';
 
 jest.mock('@common/modules/find-statistics/components/ContactUsSection');
 
@@ -15,8 +14,7 @@ describe('Methodology Help and Support Section', () => {
 
     render(
       <MethodologyHelpAndSupportSection
-        methodology={mockMethodology}
-        contact={mockContact}
+        owningPublication={mockPublicationSummary}
       />,
     );
   });

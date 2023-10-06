@@ -1,4 +1,5 @@
 import MethodologyPage from '@frontend/pages/methodology/[methodology]';
+import { Methodology } from '@common/services/methodologyService';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -247,6 +248,19 @@ describe('MethodologyPage', () => {
           .queryAllByRole('heading', { name: 'Contact us' })
           .find(e => e.id === 'contact-us'),
       ).not.toBeUndefined();
+    });
+
+    it('Hides the help and support section if no owning publication is found', () => {
+      const methodologyWithoutOwningPublication: Methodology = {
+        ...testMethodology,
+        publications: [{ id: '123', title: '123', slug: '123', owner: false }],
+      };
+
+      render(<MethodologyPage data={methodologyWithoutOwningPublication} />);
+
+      expect(
+        screen.queryByRole('heading', { name: 'HelpAndSupport' }),
+      ).toBeNull();
     });
   });
 });

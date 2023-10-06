@@ -19,7 +19,6 @@ import MethodologySectionBlocks from '@frontend/modules/methodologies/components
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import { Contact } from '@common/services/publicationService';
 
 interface Props {
   data: Methodology;
