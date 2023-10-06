@@ -6,24 +6,15 @@ const ContactUsSection = ({
   publicationTitle,
 }: {
   publicationContact: Contact;
-  publicationTitle?: string;
+  publicationTitle: string;
 }) => {
-  // TODO: Put this back to publicationTitle (we still want publication title, even on the methodologies page)
-  const explanatoryText =
-    publicationTitle && publicationTitle.trim().length > 0
-      ? `If you have a specific enquiry about ${publicationTitle.trim()} statistics and
-  data:`
-      : `If you have a specific enquiry about these statistics and data`;
-
   return (
     <>
       <h3 id="contact-us">Contact us</h3>
-
       <p>
         If you have a specific enquiry about {publicationTitle} statistics and
         data:
       </p>
-
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
         {publicationContact.teamName}
       </h4>
