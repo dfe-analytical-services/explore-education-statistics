@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetContentBlocks()
         {
             var releaseId = Guid.NewGuid();
-            
+
             var release = new Release
             {
                 Id = releaseId,
@@ -566,7 +566,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static ContentService SetupContentService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IKeyStatisticService keyStatisticService = null,
             IContentSectionRepository contentSectionRepository = null,
             IContentBlockService contentBlockService = null,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext = null,
@@ -575,7 +574,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ContentService(
                 contentDbContext,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                keyStatisticService ?? Mock.Of<IKeyStatisticService>(MockBehavior.Strict),
                 contentSectionRepository ?? new ContentSectionRepository(contentDbContext),
                 contentBlockService ?? new ContentBlockService(contentDbContext),
                 hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(MockBehavior.Strict),

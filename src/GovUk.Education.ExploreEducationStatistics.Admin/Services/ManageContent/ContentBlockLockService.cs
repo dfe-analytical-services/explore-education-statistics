@@ -74,7 +74,7 @@ public class ContentBlockLockService : IContentBlockLockService
         {
             throw new ArgumentException($"User with id {userId} does not exist", nameof(userId));
         }
-        
+
         var now = DateTime.UtcNow;
 
         block.Locked = now;
@@ -85,12 +85,12 @@ public class ContentBlockLockService : IContentBlockLockService
         await _contentDbContext.SaveChangesAsync();
 
         var viewModel = new ContentBlockLockViewModel(
-            id: block.Id,
-            sectionId: block.ContentSection!.Id,
-            releaseId: block.ContentSection!.ReleaseId,
-            locked: now,
-            lockedUntil: block.LockedUntil!.Value,
-            lockedBy: new UserDetailsViewModel(user)
+            Id: block.Id,
+            SectionId: block.ContentSection!.Id,
+            ReleaseId: block.ContentSection!.ReleaseId,
+            Locked: now,
+            LockedUntil: block.LockedUntil!.Value,
+            LockedBy: new UserDetailsViewModel(user)
         );
 
         await _hubContext.Clients
@@ -123,9 +123,9 @@ public class ContentBlockLockService : IContentBlockLockService
                     await _contentDbContext.SaveChangesAsync();
 
                     var viewModel = new ContentBlockUnlockViewModel(
-                        id: block.Id,
-                        sectionId: block.ContentSection!.Id,
-                        releaseId: block.ContentSection!.ReleaseId
+                        Id: block.Id,
+                        SectionId: block.ContentSection!.Id,
+                        ReleaseId: block.ContentSection!.ReleaseId
                     );
 
                     await _hubContext.Clients
@@ -185,12 +185,12 @@ public class ContentBlockLockService : IContentBlockLockService
 
         // There is a conflict as another user has the lock.
         conflictingLock = new ContentBlockLockViewModel(
-            id: contentBlock.Id,
-            sectionId: contentBlock.ContentSection!.Id,
-            releaseId: contentBlock.ContentSection!.ReleaseId,
-            locked: contentBlock.Locked.Value,
-            lockedUntil: contentBlock.LockedUntil!.Value,
-            lockedBy: new UserDetailsViewModel(contentBlock.LockedBy!)
+            Id: contentBlock.Id,
+            SectionId: contentBlock.ContentSection!.Id,
+            ReleaseId: contentBlock.ContentSection!.ReleaseId,
+            Locked: contentBlock.Locked.Value,
+            LockedUntil: contentBlock.LockedUntil!.Value,
+            LockedBy: new UserDetailsViewModel(contentBlock.LockedBy!)
         );
 
         return true;

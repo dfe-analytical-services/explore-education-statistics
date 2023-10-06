@@ -24,14 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "IX_ContentBlock_ReleaseId",
                 table: "ContentBlock",
                 column: "ReleaseId");
-            
+
             migrationBuilder.SqlFromFile(
-                ContentMigrationsPath, 
+                ContentMigrationsPath,
                 $"{MigrationId}_{nameof(EES4467_AddReleaseIdToContentBlock)}.sql");
 
-            // Initially create this foreign key with "NoAction" delete cascade behaviour. This is so as to not
+            // Initially create this foreign key with "Restrict" delete cascade behaviour. This is so as to not
             // cause potential cyclical delete cascades with the existing cascade delete behaviour from
-            // Releases -> ReleaseContentBlocks -> ContentBlock. 
+            // Releases -> ReleaseContentBlocks -> ContentBlock.
             migrationBuilder.AddForeignKey(
                 name: "FK_ContentBlock_Releases_ReleaseId",
                 table: "ContentBlock",

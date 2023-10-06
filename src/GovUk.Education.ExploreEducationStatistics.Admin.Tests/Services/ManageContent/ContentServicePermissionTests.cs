@@ -216,18 +216,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         private ContentService SetupContentService(
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IKeyStatisticService keyStatisticService = null,
             IContentSectionRepository contentSectionRepository = null,
             IContentBlockService contentBlockService = null,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext = null,
             IUserService userService = null)
         {
             var dbContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
-            
+
             return new ContentService(
                 dbContext,
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                keyStatisticService ?? Mock.Of<IKeyStatisticService>(),
                 contentSectionRepository ?? new ContentSectionRepository(dbContext),
                 contentBlockService ?? Mock.Of<IContentBlockService>(),
                 hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(),

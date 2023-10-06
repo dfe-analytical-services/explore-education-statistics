@@ -29,7 +29,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IKeyStatisticService _keyStatisticService;
         private readonly IContentSectionRepository _contentSectionRepository;
         private readonly IContentBlockService _contentBlockService;
         private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
@@ -38,7 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IKeyStatisticService keyStatisticService,
             IContentSectionRepository contentSectionRepository,
             IContentBlockService contentBlockService,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext,
@@ -47,7 +45,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
-            _keyStatisticService = keyStatisticService;
             _contentSectionRepository = contentSectionRepository;
             _contentBlockService = contentBlockService;
             _hubContext = hubContext;

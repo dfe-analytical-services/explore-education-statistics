@@ -43,8 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
             // TODO EES-4467 - this can be incorporated back into Release as the newly fashioned
             // DataBlock / DataBlockVersions tables.
-            // Copy DataBlocks not associated with any ContentSection.
-            // DataBlocks copied previously are fetched from context so not cloned twice.
+            // Copy DataBlocks not associated with any ContentSection (as these have already been cloned above).
             originalDataBlocks
                 // Only clone DataBlocks that have not already been cloned via Content.
                 .Where(dataBlock => !context.OriginalToAmendmentContentBlockMap.ContainsKey(dataBlock))
@@ -110,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             // TODO EES-4467 - the list of DataBlocks can be incorporated back into Release as the newly fashioned
             // DataBlock / DataBlockVersion tables and this Tuple can be removed at that point.
             return new Tuple<Release, List<DataBlock>>(
-                amendment, 
+                amendment,
                 context
                     .OriginalToAmendmentContentBlockMap
                     .Values
@@ -188,11 +187,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         }
 
         public static void CreateGenericContentFromTemplate(
-            this Release originalRelease, 
+            this Release originalRelease,
             Release.CloneContext context)
         {
             var newRelease = context.NewRelease;
-            
+
             newRelease.Content = originalRelease.Content
                 .Where(section => section.Type == ContentSectionType.Generic)
                 .ToList();

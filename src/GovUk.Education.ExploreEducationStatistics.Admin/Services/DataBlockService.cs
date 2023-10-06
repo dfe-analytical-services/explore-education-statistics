@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await GetDataBlock(id)
                 .OnSuccessDo(dataBlock => _userService.CheckCanUpdateRelease(dataBlock.Release))
-                .OnSuccessDo(async dataBlock => 
+                .OnSuccessDo(async dataBlock =>
                 {
                     // TODO EES-753 Alter this when multiple charts are supported
                     var infographicChart = dataBlock.Charts.OfType<InfographicChart>().FirstOrDefault();
@@ -289,11 +289,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 IsKeyStatistic = await _context.KeyStatisticsDataBlock
                     .AnyAsync(ks => ks.DataBlockId == block.Id),
                 FeaturedTable = featuredTable != null
-                    ? new FeaturedTableBasicViewModel
-                    {
-                        Name = featuredTable.Name,
-                        Description = featuredTable.Description,
-                    }
+                    ? new FeaturedTableBasicViewModel(
+                        Name: featuredTable.Name,
+                        Description: featuredTable.Description)
                     : null,
             };
         }
@@ -371,7 +369,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ContentBlocks
                 .Where(block => block.ReleaseId == releaseId)
                 .OfType<DataBlock>()
-                // Pull these results into memory so that the Query field (which is JSON) can be queried. 
+                // Pull these results into memory so that the Query field (which is JSON) can be queried.
                 .ToList()
                 .Where(block => subjectId == null || block.Query.SubjectId == subjectId)
                 .ToList();

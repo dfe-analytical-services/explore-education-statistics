@@ -566,7 +566,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 new StorageQueueService(
                     coreStorageConnectionString,
                     new StorageInstanceCreationUtil()));
-            services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
@@ -603,7 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             /*
              * Swagger
              */
-            
+
             if (Configuration.GetValue<bool>("enableSwagger"))
                 services.AddSwaggerGen(c =>
                 {

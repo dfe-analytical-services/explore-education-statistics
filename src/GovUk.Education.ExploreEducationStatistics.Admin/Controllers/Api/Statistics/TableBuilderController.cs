@@ -1,6 +1,5 @@
 using System;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
@@ -84,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                     query => query
                         .Include(block => block.Release)
                         .OfType<DataBlock>()
-                        .Where(block => 
+                        .Where(block =>
                             block.ReleaseId == releaseId
                             && block.Id == dataBlockId))
                 .OnSuccess(block => block is DataBlock dataBlock ? dataBlock : new Either<ActionResult,DataBlock>(new NotFoundResult()))
@@ -94,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
-            DataBlock dataBlock, 
+            DataBlock dataBlock,
             CancellationToken cancellationToken)
         {
             return await _userService

@@ -395,7 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     .HasMaxLength(25);
                 entity.HasIndex(e => e.Type);
             });
-            
+
             modelBuilder.Entity<Release>()
                 .Property(release => release.NextReleaseDate)
                 .HasConversion(

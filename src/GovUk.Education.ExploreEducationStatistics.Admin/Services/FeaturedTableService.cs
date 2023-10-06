@@ -46,7 +46,7 @@ public class FeaturedTableService : IFeaturedTableService
             .OnSuccess(async _ =>
                 await _persistenceHelper.CheckEntityExists<FeaturedTable>(query =>
                     query.Where(ft => ft.DataBlockId == dataBlockId && ft.ReleaseId == releaseId)))
-            .OnSuccess(featuredTable => _mapper.Map<FeaturedTableViewModel>(featuredTable));
+            .OnSuccess(_mapper.Map<FeaturedTableViewModel>);
     }
 
     public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> List(Guid releaseId)
