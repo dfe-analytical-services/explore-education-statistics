@@ -2,17 +2,18 @@ import { Contact } from '@common/services/publicationService';
 import React from 'react';
 
 const ContactUsSection = ({
-  contact,
-  entityContactIsFor,
+  publicationContact,
+  publicationTitle,
 }: {
-  contact: Contact;
-  entityContactIsFor?: string;
+  publicationContact: Contact;
+  publicationTitle?: string;
 }) => {
+  // TODO: Put this back to publicationTitle (we still want publication title, even on the methodologies page)
   const explanatoryText =
-    entityContactIsFor && entityContactIsFor.trim().length > 0
-      ? `If you have a specific enquiry about ${entityContactIsFor.trim()} statistics and
+    publicationTitle && publicationTitle.trim().length > 0
+      ? `If you have a specific enquiry about ${publicationTitle.trim()} statistics and
   data:`
-      : `If you have a specific enquiry about this page`;
+      : `If you have a specific enquiry about these statistics and data`;
 
   return (
     <>
@@ -24,14 +25,17 @@ const ContactUsSection = ({
       </p>
 
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
-        {contact.teamName}
+        {publicationContact.teamName}
       </h4>
 
       <address className="govuk-!-margin-top-0">
-        Email: <a href={`mailto:${contact.teamEmail}`}>{contact.teamEmail}</a>
+        Email:{' '}
+        <a href={`mailto:${publicationContact.teamEmail}`}>
+          {publicationContact.teamEmail}
+        </a>
         <br />
-        Contact name: {contact.contactName}
-        {contact.contactTelNo && (
+        Contact name: {publicationContact.contactName}
+        {publicationContact.contactTelNo && (
           <>
             <br />
             Telephone: {publicationContact.contactTelNo}

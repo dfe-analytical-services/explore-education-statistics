@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public string Title { get; set; } = string.Empty;
 
         public string Slug { get; set; } = string.Empty;
+        
+        public bool Owner { get; set; }
 
         public PublicationSummaryViewModel()
         {
