@@ -1,5 +1,5 @@
 import RHFFormField, {
-  RHFFormFieldComponentProps,
+  FormFieldComponentProps,
 } from '@common/components/form/rhf/RHFFormField';
 import FormTextArea, {
   FormTextAreaProps,
@@ -7,14 +7,13 @@ import FormTextArea, {
 import React from 'react';
 import { FieldValues } from 'react-hook-form';
 
-type Props<TFormValues extends FieldValues> = RHFFormFieldComponentProps<
+type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
   FormTextAreaProps,
   TFormValues
 >;
 
-export default function RHFFormFieldTextArea<TFormValues extends FieldValues>({
-  name,
-  ...props
-}: Props<TFormValues>) {
-  return <RHFFormField {...props} name={name} as={FormTextArea} />;
+export default function RHFFormFieldTextArea<TFormValues extends FieldValues>(
+  props: Props<TFormValues>,
+) {
+  return <RHFFormField {...props} as={FormTextArea} />;
 }

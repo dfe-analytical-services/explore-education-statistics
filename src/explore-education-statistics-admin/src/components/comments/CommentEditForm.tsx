@@ -62,7 +62,7 @@ const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
               label="Comment"
               name="content"
               rows={3}
-              textAreaRef={textAreaRef}
+              inputRef={textAreaRef}
             />
             <ButtonGroup className="govuk-!-margin-bottom-0">
               <Button type="submit" disabled={formState.isSubmitting}>

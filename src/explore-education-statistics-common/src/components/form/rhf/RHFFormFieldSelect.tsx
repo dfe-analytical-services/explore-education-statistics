@@ -1,5 +1,5 @@
 import RHFFormField, {
-  RHFFormFieldComponentProps,
+  FormFieldComponentProps,
 } from '@common/components/form/rhf/RHFFormField';
 import FormSelect, {
   FormSelectProps,
@@ -7,16 +7,15 @@ import FormSelect, {
 import React from 'react';
 import { FieldValues } from 'react-hook-form';
 
-type Props<TFormValues extends FieldValues> = RHFFormFieldComponentProps<
+type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
   FormSelectProps,
   TFormValues
 >;
 
-export default function RHFFormFieldSelect<TFormValues extends FieldValues>({
-  name,
-  ...props
-}: Props<TFormValues>) {
-  return <RHFFormField {...props} name={name} as={FormSelect} />;
+export default function RHFFormFieldSelect<TFormValues extends FieldValues>(
+  props: Props<TFormValues>,
+) {
+  return <RHFFormField {...props} as={FormSelect} />;
 }
 
 RHFFormFieldSelect.unordered = [] as [];

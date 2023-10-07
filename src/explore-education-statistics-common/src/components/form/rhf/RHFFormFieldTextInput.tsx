@@ -1,5 +1,5 @@
 import RHFFormField, {
-  RHFFormFieldComponentProps,
+  FormFieldComponentProps,
 } from '@common/components/form/rhf/RHFFormField';
 import FormTextInput, {
   FormTextInputProps,
@@ -7,14 +7,13 @@ import FormTextInput, {
 import React from 'react';
 import { FieldValues } from 'react-hook-form';
 
-type Props<TFormValues extends FieldValues> = RHFFormFieldComponentProps<
+type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
   FormTextInputProps,
   TFormValues
 >;
 
-export default function RHFFormFieldTextInput<TFormValues extends FieldValues>({
-  name,
-  ...props
-}: Props<TFormValues>) {
-  return <RHFFormField {...props} name={name} as={FormTextInput} />;
+export default function RHFFormFieldTextInput<TFormValues extends FieldValues>(
+  props: Props<TFormValues>,
+) {
+  return <RHFFormField {...props} as={FormTextInput} />;
 }

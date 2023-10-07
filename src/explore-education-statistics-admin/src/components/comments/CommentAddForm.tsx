@@ -68,7 +68,7 @@ const CommentAddForm = ({ baseId, containerRef, onCancel, onSave }: Props) => {
                 name="content"
                 data-testid="comment-textarea"
                 rows={3}
-                textAreaRef={textAreaRef}
+                inputRef={textAreaRef}
               />
               <ButtonGroup className="govuk-!-margin-bottom-2">
                 <Button type="submit" disabled={formState.isSubmitting}>
