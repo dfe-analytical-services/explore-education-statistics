@@ -57,7 +57,6 @@ const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
             onSubmit={handleSubmit}
           >
             <RHFFormFieldTextArea<FormValues>
-              data-testid="comment-textarea"
               hideLabel
               label="Comment"
               name="content"

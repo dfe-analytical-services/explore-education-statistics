@@ -14,8 +14,7 @@ exports[`FormTextArea renders correctly with error 1`] = `
   </span>
   Field is required
 </span>
-<textarea data-testid="comment-textarea"
-          aria-describedby="test-input-error"
+<textarea aria-describedby="test-input-error"
           class="govuk-textarea"
           id="test-input"
           name="testInput"
@@ -35,8 +34,7 @@ exports[`FormTextArea renders correctly with hint 1`] = `
 >
   Fill me in
 </div>
-<textarea data-testid="comment-textarea"
-          aria-describedby="test-input-hint"
+<textarea aria-describedby="test-input-hint"
           class="govuk-textarea"
           id="test-input"
           name="testInput"
@@ -51,8 +49,7 @@ exports[`FormTextArea renders correctly with required props 1`] = `
 >
   Test input
 </label>
-<textarea data-testid="comment-textarea"
-          class="govuk-textarea"
+<textarea class="govuk-textarea"
           id="test-input"
           name="testInput"
           rows="5"

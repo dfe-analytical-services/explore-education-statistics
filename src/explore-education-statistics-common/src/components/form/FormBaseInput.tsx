@@ -12,7 +12,8 @@ import React, {
   Ref,
 } from 'react';
 
-export interface FormBaseInputProps extends FormLabelProps {
+export interface FormBaseInputProps
+  extends Pick<FormLabelProps, 'hideLabel' | 'label' | 'labelSize'> {
   addOn?: ReactNode;
   addOnContainerClassName?: string;
   className?: string;

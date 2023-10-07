@@ -66,7 +66,6 @@ const CommentAddForm = ({ baseId, containerRef, onCancel, onSave }: Props) => {
                 label="Comment"
                 hideLabel
                 name="content"
-                data-testid="comment-textarea"
                 rows={3}
                 inputRef={textAreaRef}
               />

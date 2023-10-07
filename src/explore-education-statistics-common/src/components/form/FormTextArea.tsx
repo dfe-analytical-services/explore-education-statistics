@@ -11,7 +11,8 @@ import React, {
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
 
-export interface FormTextAreaProps extends FormLabelProps {
+export interface FormTextAreaProps
+  extends Pick<FormLabelProps, 'hideLabel' | 'label'> {
   className?: string;
   disabled?: boolean;
   error?: ReactNode | string;
@@ -59,7 +60,6 @@ export default function FormTextArea({
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
 
       <textarea
-        data-testid="comment-textarea"
         aria-describedby={
           classNames({
             [`${id}-error`]: !!error,
