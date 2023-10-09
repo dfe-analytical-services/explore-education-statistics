@@ -1,14 +1,10 @@
 #nullable enable
 using System.ComponentModel.DataAnnotations;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology
+namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
+
+public class MethodologyUpdateRequest : MethodologyApprovalUpdateRequest
 {
-    public class MethodologyUpdateRequest : MethodologyApprovalUpdateRequest
-    {
-        // TODO SOW4 EES-2212 - update to AlternativeTitle
-        [Required] public string Title { get; set; } = string.Empty;
-
-        public string Slug => SlugFromTitle(Title);
-    }
+    // TODO SOW4 EES-2212 - update to AlternativeTitle
+    [Required] public string Title { get; set; } = string.Empty;
 }
