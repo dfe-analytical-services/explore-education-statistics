@@ -17,7 +17,7 @@ from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
-from pabot.pabot import main as pabot_run_cli
+from pabot.pabot import main_program as pabot_run_cli
 from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
@@ -117,6 +117,7 @@ parser.add_argument(
     action="store_true",
     help="rerun failed test suites and merge results into original run results",
 )
+parser.add_argument("--rerun-attempts", dest="rerun_attempts", type=int, default=0, help="Number of rerun attempts")
 parser.add_argument(
     "--print-keywords",
     dest="print_keywords",
@@ -239,7 +240,6 @@ if args.rerun_failed_suites:
 # TODO EES-4412 - I *think* that we should still keep this for people using the CLI locally who just want
 #  to perform an arbitrary number of reruns when they need to.
 # But I'd totally expect people to also start using the new "rerun_attempts" option as well day-to-day.
-robotArgs += ["--rerunfailedsuites", "test-results/output.xml"]
 
 if args.tags:
     robotArgs += ["--include", args.tags]
@@ -457,12 +457,37 @@ if not os.path.exists("test-results/downloads"):
 try:
     # Run tests
     if args.interp == "robot":
-        robot_run_cli(robotArgs)
+        exitCode = robot_run_cli(robotArgs, exit=False)
     elif args.interp == "pabot":
         if args.processes:
             robotArgs = ["--processes", int(args.processes)] + robotArgs
+        exitCode = pabot_run_cli(robotArgs)
 
-        pabot_run_cli(robotArgs)
+    rerun_attempt = 0
+    while exitCode != 0 and args.rerun_attempts - rerun_attempt > 0:
+        rerun_attempt += 1
+        os.rename("test-results/output.xml", f"test-results/previous_attempt_{str(rerun_attempt)}.xml")
+
+        # We want to add arguments on the first rerun attempt, but on subsequent attempts, we just want
+        # to change rerunfailedsuites xml file we use
+        if robotArgs[-2] != "--rerunfailedsuites":
+            robotArgs += [
+                "--prerebotmodifier",
+                "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
+                "--merge",
+                f"test-results/previous_attempt_{str(rerun_attempt)}.xml",
+                "test-results/output.xml",
+            ]
+            robotArgs += ["--rerunfailedsuites", f"test-results/rerun_attempt_{str(rerun_attempt)}.xml"]
+        else:
+            robotArgs[-1] = f"test-results/rerun_attempt_{str(rerun_attempt)}.xml"
+
+        if args.interp == "robot":
+            exitCode = robot_run_cli(robotArgs, exit=False)
+        elif args.interp == "pabot":
+            if args.processes:
+                robotArgs = ["--processes", int(args.processes)] + robotArgs
+            exitCode = pabot_run_cli(robotArgs)
 
 finally:
     if not args.disable_teardown:

@@ -31,7 +31,7 @@ def run_tests_pipeline():
     run_tests_command = f"pipenv run python run_tests.py --admin-pass {args.admin_pass} --analyst-pass {args.analyst_pass} --expiredinvite-pass {args.expiredinvite_pass} --env {args.env} --file {args.file} --ci --processes {args.processes} --enable-slack-notifications"
 
     if args.rerun_attempts:
-        run_tests_command += " --rerun-attempts"
+        run_tests_command += f" --rerun-attempts {str(args.rerun_attempts)}"
 
     subprocess.check_call(run_tests_command, shell=True)
 
@@ -58,6 +58,6 @@ if __name__ == "__main__":
 
     parser.add_argument("--processes", dest="processes", help="number of processes to run", required=True)
 
-    parser.add_argument("--rerun-attempts", type=int, default=3, help="Number of rerun attempts")
+    parser.add_argument("--rerun-attempts", dest="rerun_attempts", type=int, help="Number of rerun attempts")
     args = parser.parse_args()
     run_tests_pipeline()
