@@ -97,7 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
 
                 case "hr":
                     _builder.AppendLine("---------------");
-                    _builder.AppendLine();
                     break;
 
                 case "table":
@@ -106,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
 
                 case "a":
                     ParseLinkElement(element);
-                    AddSpacing(element);
                     break;
 
                 case "br":
@@ -116,7 +114,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                 case "cite":
                     _builder.Append("— ");
                     ParseChildren(element);
-                    AddSpacing(element);
                     break;
 
                 default:
@@ -130,21 +127,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                         ParseEdgeNode(element);
                     }
 
-                    AddSpacing(element);
-
                     break;
                 }
             }
+
+            AddSpacing(element);
         }
 
         private void AddSpacing(IElement element)
         {
             var next = element.NextNonWhitespaceSibling();
-
-            if (next is null)
-            {
-                return;
-            }
 
             if (element.IsBlockType() || next is IElement nextElement && nextElement.IsBlockType())
             {
@@ -159,7 +151,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                     return;
                 }
 
-                _builder.AppendLine();
+                // Don't have a trailing line ending currently, so it
+                // should be safe to add an additional line ending to
+                // provide better spacing with the next block.
+                if (!currentEnding.EndsWith(Environment.NewLine))
+                {
+                    _builder.AppendLine();
+                }
+
                 _builder.AppendLine();
             }
         }
@@ -258,8 +257,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                         );
                 }
             );
-
-            _builder.AppendLine();
         }
 
         private void ParseDescriptionListElement(IElement element)
@@ -290,8 +287,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                     }
                 }
             );
-
-            _builder.AppendLine();
         }
 
         private void ParseTableElement(IElement element)
