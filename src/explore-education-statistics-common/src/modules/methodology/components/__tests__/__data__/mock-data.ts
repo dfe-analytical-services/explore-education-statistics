@@ -1,16 +1,17 @@
 import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/mock-data';
-import { Methodology } from '@common/services/methodologyService';
+import { MethodologyPublication } from '@common/services/methodologyService';
+import { PublicationSummary } from '@common/services/publicationService';
 
-const mockMethodology: Methodology = {
-  id: 'mockMethodologyId',
-  title: 'Mock Methodology Title',
-  published: '11th Mocktober, 2020',
-  slug: 'Mock Methodology Slug',
-  publications: [],
-  content: [],
-  annexes: [],
-  notes: [],
+export const mockPublicationSummary: PublicationSummary = {
+  id: 'Mock Publication Id',
+  slug: 'Mock Publication Slug',
+  title: 'Mock Publication Title',
+  owner: false,
   contact: mockContact,
 };
 
-export default mockMethodology;
+export const mockMethodologyPublication: MethodologyPublication = {
+  id: 'Mock Publication Id',
+  title: 'Mock Publication Title',
+  contact: mockContact,
+};
