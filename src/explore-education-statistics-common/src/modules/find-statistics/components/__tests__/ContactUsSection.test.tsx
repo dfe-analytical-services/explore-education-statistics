@@ -64,9 +64,12 @@ describe('Contact Us Section', () => {
       />,
     );
 
-    expect(screen.getByText(/Telephone:/)).toBeVisible();
-    expect(screen.getByText(/Telephone: Mock Contact Name/)).toBeVisible();
-    expect(screen.getByText(/Mock Contact Tel No/)).toBeVisible();
+    expect(
+      screen.getByRole('link', { name: 'Mock Contact Tel No' }),
+    ).toBeVisible();
+    expect(
+      screen.getByRole('link', { name: 'Mock Contact Tel No' }),
+    ).toHaveAttribute('href', 'tel:Mock Contact Tel No');
   });
 
   it('Hides the telephone number section if one is not supplied', () => {
@@ -77,8 +80,8 @@ describe('Contact Us Section', () => {
       />,
     );
 
-    expect(screen.queryByText(/Telephone:/)).toBeNull();
-    expect(screen.queryByText(/Telephone: Mock Contact Name/)).toBeNull();
-    expect(screen.queryByText(/Mock Contact Tel No/)).toBeNull();
+    expect(
+      screen.queryByRole('link', { name: 'Mock Contact Tel No' }),
+    ).toBeNull();
   });
 });

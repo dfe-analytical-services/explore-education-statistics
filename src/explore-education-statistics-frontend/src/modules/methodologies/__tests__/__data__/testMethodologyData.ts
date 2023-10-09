@@ -1,5 +1,4 @@
 import { Methodology } from '@common/services/methodologyService';
-import { PublicationSummary } from '@common/services/publicationService';
 
 export const testMethodology: Methodology = {
   id: 'methodology-1',
@@ -98,6 +97,12 @@ export const testMethodology: Methodology = {
       title: 'Publication 1',
       slug: 'publication-1-slug',
       owner: false,
+      contact: {
+        teamName: 'Mock Team Name',
+        teamEmail: 'mockteammember@gmail.com',
+        contactName: 'Mock Team Member',
+        contactTelNo: '0161 234 5678',
+      },
     },
     {
       id: 'publication-2',
@@ -111,7 +116,7 @@ export const testMethodology: Methodology = {
         contactTelNo: '0161 234 5678',
       },
     },
-  ] as PublicationSummary[],
+  ],
 };
 
 export default testMethodology;
