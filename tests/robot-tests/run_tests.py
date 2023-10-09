@@ -453,15 +453,20 @@ if not os.path.exists("test-results/downloads"):
 #
 # once as soon as we're starting to do reruns (so after the first run)
 
-
 try:
     # Run tests
     if args.interp == "robot":
-        exitCode = robot_run_cli(robotArgs, exit=False)
+        try:
+            exitCode = robot_run_cli(robotArgs, exit=False)
+        except Exception as e:
+            print("Exception: ", e, flush=True)
     elif args.interp == "pabot":
         if args.processes:
             robotArgs = ["--processes", int(args.processes)] + robotArgs
-        exitCode = pabot_run_cli(robotArgs)
+        try:
+            exitCode = pabot_run_cli(robotArgs)
+        except Exception as e:
+            print("Exception: ", e, flush=True)
 
     rerun_attempt = 0
     while exitCode != 0 and args.rerun_attempts - rerun_attempt > 0:
@@ -470,24 +475,30 @@ try:
 
         # We want to add arguments on the first rerun attempt, but on subsequent attempts, we just want
         # to change rerunfailedsuites xml file we use
-        if robotArgs[-2] != "--rerunfailedsuites":
-            robotArgs += [
-                "--prerebotmodifier",
-                "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
-                "--merge",
-                f"test-results/previous_attempt_{str(rerun_attempt)}.xml",
-                "test-results/output.xml",
-            ]
-            robotArgs += ["--rerunfailedsuites", f"test-results/rerun_attempt_{str(rerun_attempt)}.xml"]
+        if robotArgs[0] != "--rerunfailedsuites":
+            # robotArgs = [
+            #    "--prerebotmodifier",
+            #    "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
+            #    "--merge",
+            #    f"test-results/previous_attempt_{str(rerun_attempt)}.xml",
+            #    "test-results/output.xml",
+            # ] + robotArgs
+            robotArgs = ["--rerunfailedsuites", f"test-results/previous_attempt_{str(rerun_attempt)}.xml"] + robotArgs
         else:
-            robotArgs[-1] = f"test-results/rerun_attempt_{str(rerun_attempt)}.xml"
+            robotArgs[1] = f"test-results/previous_attempt_{str(rerun_attempt)}.xml"
 
         if args.interp == "robot":
-            exitCode = robot_run_cli(robotArgs, exit=False)
+            try:
+                exitCode = robot_run_cli(robotArgs, exit=False)
+            except Exception as e:
+                print("Exception: ", e, flush=True)
+            continue
         elif args.interp == "pabot":
-            if args.processes:
-                robotArgs = ["--processes", int(args.processes)] + robotArgs
-            exitCode = pabot_run_cli(robotArgs)
+            try:
+                exitCode = pabot_run_cli(robotArgs)
+            except Exception as e:
+                print("Exception: ", e, flush=True)
+            continue
 
 finally:
     if not args.disable_teardown:
