@@ -34,7 +34,6 @@ export interface Methodology {
     content: string;
     displayDate: Date;
   }[];
-  contact: Contact;
 }
 
 const methodologyService = {
