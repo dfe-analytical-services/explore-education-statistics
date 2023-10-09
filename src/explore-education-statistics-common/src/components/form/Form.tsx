@@ -9,9 +9,9 @@ import isErrorLike from '@common/utils/error/isErrorLike';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { useFormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
-import get from 'lodash/get';
 import isEqual from 'lodash/isEqual';
 import React, {
+  FormEvent,
   ReactNode,
   useCallback,
   useEffect,
@@ -64,10 +64,27 @@ const Form = ({
   const { getAllErrors } = createErrorHelper({
     errors,
     touched,
+    submitCount,
   });
 
   const [hasSummaryFocus, toggleSummaryFocus] = useToggle(false);
   const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
+
+  const allErrors = useMemo(() => {
+    const summaryErrors: ErrorSummaryMessage[] = Object.entries(
+      getAllErrors(),
+    ).map(([field, message]) => {
+      return {
+        id:
+          field !== 'root' && !field.startsWith('root.')
+            ? `${id}-${camelCase(field)}`
+            : submitId,
+        message: typeof message === 'string' ? message : '',
+      };
+    });
+
+    return submitError ? [...summaryErrors, submitError] : summaryErrors;
+  }, [getAllErrors, id, submitError, submitId]);
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -82,19 +99,8 @@ const Form = ({
     previousValues.current = values;
   }, [submitError, submitCount, values, isMounted]);
 
-  const allErrors = useMemo(() => {
-    const summaryErrors: ErrorSummaryMessage[] = Object.entries(getAllErrors())
-      .filter(([errorName]) => get(touched, errorName))
-      .map(([errorName, message]) => ({
-        id: `${id}-${camelCase(errorName)}`,
-        message: typeof message === 'string' ? message : '',
-      }));
-
-    return submitError ? [...summaryErrors, submitError] : summaryErrors;
-  }, [getAllErrors, id, submitError, touched]);
-
   const handleSubmit = useCallback(
-    async event => {
+    async (event: FormEvent) => {
       toggleSummaryFocus.off();
       setSubmitError(undefined);
       event.preventDefault();

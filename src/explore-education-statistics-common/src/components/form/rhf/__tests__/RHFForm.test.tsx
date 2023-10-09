@@ -1,3 +1,4 @@
+import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import FormProvider from '@common/components/form/rhf/FormProvider';
 import RHFForm from '@common/components/form/rhf/RHFForm';
 import Yup from '@common/validation/yup';
@@ -329,6 +330,211 @@ describe('Form', () => {
       expect(
         screen.queryByText('Something went wrong'),
       ).not.toBeInTheDocument();
+    });
+  });
+
+  test('renders mapped server validation errors when form submitted', async () => {
+    render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        <RHFForm
+          id="test-form"
+          showSubmitError
+          onSubmit={() => {
+            throw createServerValidationErrorMock([], {
+              firstName: ['Invalid first name'],
+            });
+          }}
+        >
+          The form
+          <button type="submit">Submit</button>
+        </RHFForm>
+      </FormProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid first name')).toBeInTheDocument();
+    });
+  });
+
+  test('removes mapped server validation errors when form can be submitted successfully', async () => {
+    const onSubmit = jest.fn(() => {
+      throw createServerValidationErrorMock([], {
+        firstName: ['Invalid first name'],
+      });
+    });
+
+    render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        <RHFForm id="test-form" showSubmitError onSubmit={onSubmit}>
+          The form
+          <button type="submit">Submit</button>
+        </RHFForm>
+      </FormProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid first name')).toBeInTheDocument();
+    });
+
+    // Stop the onSubmit from throwing error
+    onSubmit.mockImplementation();
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
+    });
+  });
+
+  test('removes mapped server validation errors when form is reset', async () => {
+    render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        {({ reset }) => (
+          <RHFForm
+            id="test-form"
+            showSubmitError
+            onSubmit={() => {
+              throw createServerValidationErrorMock([], {
+                firstName: ['Invalid first name'],
+              });
+            }}
+          >
+            The form
+            <button type="submit">Submit</button>
+            <button
+              type="button"
+              onClick={() => {
+                reset();
+              }}
+            >
+              Reset form
+            </button>
+          </RHFForm>
+        )}
+      </FormProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid first name')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByText('Reset form'));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
+    });
+  });
+
+  test('removes mapped server validation errors when field values are changed', async () => {
+    render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        {({ register }) => (
+          <RHFForm
+            id="test-form"
+            showSubmitError
+            onSubmit={() => {
+              throw createServerValidationErrorMock([], {
+                firstName: ['Invalid first name'],
+              });
+            }}
+          >
+            The form
+            <label htmlFor="firstName">Firstname</label>
+            <input
+              type="text"
+              id="firstName"
+              // eslint-disable-next-line react/jsx-props-no-spreading
+              {...register('firstName')}
+            />
+            <button type="submit">Submit</button>
+          </RHFForm>
+        )}
+      </FormProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid first name')).toBeInTheDocument();
+    });
+
+    userEvent.type(screen.getByLabelText('Firstname'), 'Another firstname');
+
+    await waitFor(() => {
+      expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
+    });
+  });
+
+  test('does not render unmapped server validation errors when form submitted', async () => {
+    render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        {({ formState }) => (
+          <RHFForm
+            id="test-form"
+            showSubmitError
+            onSubmit={() => {
+              throw createServerValidationErrorMock(['Global error'], {
+                field1: ['Invalid field 1'],
+                'nested.field2': ['Invalid field 2'],
+              });
+            }}
+          >
+            {formState.isSubmitted ? 'The form is submitted' : 'The form'}
+            <button type="submit">Submit</button>
+          </RHFForm>
+        )}
+      </FormProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('The form is submitted')).toBeInTheDocument();
+
+      expect(screen.queryByText('Global error')).not.toBeInTheDocument();
+      expect(screen.queryByText('Invalid field 1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Invalid field 2')).not.toBeInTheDocument();
     });
   });
 

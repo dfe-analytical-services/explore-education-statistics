@@ -1,13 +1,30 @@
+import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { FormFieldTextInput } from '@common/components/form';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import Yup from '@common/validation/yup';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Field, Formik } from 'formik';
+import {
+  Field,
+  Formik as BaseFormik,
+  FormikConfig,
+  FormikValues,
+} from 'formik';
 import noop from 'lodash/noop';
 import React from 'react';
 import Form from '../Form';
 
 describe('Form', () => {
+  // Wrapper around Formik so we can enable `useFormSubmit` hook.
+  function Formik<FormValues extends FormikValues>({
+    onSubmit,
+    ...props
+  }: FormikConfig<FormValues>) {
+    const handleSubmit = useFormSubmit(onSubmit);
+
+    return <BaseFormik {...props} onSubmit={handleSubmit} />;
+  }
+
   test('renders error summary from form errors when form is submitted', async () => {
     const { container } = render(
       <Formik
@@ -318,6 +335,191 @@ describe('Form', () => {
     });
 
     expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
+  });
+
+  test('renders mapped server validation submit errors', async () => {
+    render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+        onSubmit={() => {
+          throw createServerValidationErrorMock([], {
+            firstName: ['Invalid first name'],
+          });
+        }}
+      >
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
+      </Formik>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid first name')).toHaveAttribute(
+        'href',
+        '#test-form-firstName',
+      );
+    });
+  });
+
+  test('removes mapped server validation errors when form can be submitted successfully', async () => {
+    const onSubmit = jest.fn(() => {
+      throw createServerValidationErrorMock([], {
+        firstName: ['Invalid first name'],
+      });
+    });
+
+    render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+        onSubmit={onSubmit}
+      >
+        <Form id="test-form" showSubmitError>
+          The form
+          <button type="submit">Submit</button>
+        </Form>
+      </Formik>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid first name')).toBeInTheDocument();
+    });
+
+    // Stop the onSubmit from throwing error
+    onSubmit.mockImplementation();
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
+    });
+  });
+
+  test('removes mapped server validation errors when form is reset', async () => {
+    render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+        onSubmit={() => {
+          throw createServerValidationErrorMock([], {
+            firstName: ['Invalid first name'],
+          });
+        }}
+      >
+        {formik => (
+          <Form id="test-form" showSubmitError>
+            The form
+            <button type="submit">Submit</button>
+            <button type="button" onClick={formik.handleReset}>
+              Reset form
+            </button>
+          </Form>
+        )}
+      </Formik>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid first name')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByText('Reset form'));
+
+    await waitFor(() => {
+      expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
+    });
+  });
+
+  test('removes mapped server validation errors when field values are changed', async () => {
+    render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={() => {
+          throw createServerValidationErrorMock([], {
+            firstName: ['Invalid first name'],
+          });
+        }}
+      >
+        <Form id="test-form" showSubmitError>
+          <label htmlFor="firstName">Firstname</label>
+          <Field name="firstName" type="text" id="firstName" />
+
+          <button type="submit">Submit</button>
+        </Form>
+      </Formik>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Invalid first name')).toBeInTheDocument();
+    });
+
+    userEvent.type(screen.getByLabelText('Firstname'), 'Another firstname');
+
+    await waitFor(() => {
+      expect(screen.queryByText('Invalid first name')).not.toBeInTheDocument();
+    });
+  });
+
+  test('does not render unmapped server validation errors when form submitted', async () => {
+    render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+        onSubmit={() => {
+          throw createServerValidationErrorMock(['Global error'], {
+            field1: ['Invalid field 1'],
+            'nested.field2': ['Invalid field 2'],
+          });
+        }}
+      >
+        {({ submitCount }) => (
+          <Form id="test-form">
+            {submitCount > 0 ? 'The form is submitted' : 'The form'}
+            <button type="submit">Submit</button>
+          </Form>
+        )}
+      </Formik>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('The form is submitted')).toBeInTheDocument();
+
+      expect(screen.queryByText('Global error')).not.toBeInTheDocument();
+      expect(screen.queryByText('Invalid field 1')).not.toBeInTheDocument();
+      expect(screen.queryByText('Invalid field 2')).not.toBeInTheDocument();
+    });
   });
 
   test('focuses error summary on submit', async () => {

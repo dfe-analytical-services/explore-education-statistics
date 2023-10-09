@@ -24,8 +24,6 @@ const createRHFErrorHelper = <T extends FieldValues>({
       const isTouched = get(touchedFields, errorKey, false);
 
       // If the form isn't submitted, only show errors for touched fields.
-      // Formik touches all fields on submit, but RHF does not so we
-      // need to take whether the form has been submitted into account.
       if ((!isSubmitted && !isTouched) || typeof error === 'undefined') {
         return acc;
       }

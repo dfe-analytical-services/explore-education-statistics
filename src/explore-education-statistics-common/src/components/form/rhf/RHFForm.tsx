@@ -12,8 +12,8 @@ import {
   isServerValidationError,
   mapServerFieldErrors,
 } from '@common/validation/serverValidations';
-import { has } from 'lodash';
 import camelCase from 'lodash/camelCase';
+import has from 'lodash/has';
 import isEqual from 'lodash/isEqual';
 import React, {
   FormEvent,
@@ -88,6 +88,24 @@ export default function RHFForm<TFormValues extends FieldValues>({
   const [hasSummaryFocus, toggleSummaryFocus] = useToggle(false);
   const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
 
+  const allErrors = useMemo(() => {
+    const summaryErrors: ErrorSummaryMessage[] = Object.entries(
+      getAllErrors(),
+    ).map(([field, message]) => {
+      return {
+        id:
+          field !== 'root' && !field.startsWith('root.')
+            ? `${id}-${camelCase(field)}`
+            : submitId,
+        message: typeof message === 'string' ? message : '',
+      };
+    });
+
+    return submitError && isSubmitted
+      ? [...summaryErrors, submitError]
+      : summaryErrors;
+  }, [getAllErrors, submitError, isSubmitted, id, submitId]);
+
   useEffect(() => {
     if (!isMounted.current) {
       return;
@@ -99,19 +117,6 @@ export default function RHFForm<TFormValues extends FieldValues>({
 
     previousValues.current = values;
   }, [isSubmitted, submitError, submitCount, values, isMounted]);
-
-  const allErrors = useMemo(() => {
-    const summaryErrors: ErrorSummaryMessage[] = Object.entries(
-      getAllErrors(),
-    ).map(([errorName, message]) => ({
-      id: `${id}-${camelCase(errorName)}`,
-      message: typeof message === 'string' ? message : '',
-    }));
-
-    return submitError && isSubmitted
-      ? [...summaryErrors, submitError]
-      : summaryErrors;
-  }, [getAllErrors, id, submitError, isSubmitted]);
 
   useEffect(() => {
     if (
@@ -147,7 +152,9 @@ export default function RHFForm<TFormValues extends FieldValues>({
               );
 
               fieldErrors.forEach(({ field, message }) => {
-                setError(field, { message });
+                if (has(values, field)) {
+                  setError(field, { message });
+                }
               });
 
               return;

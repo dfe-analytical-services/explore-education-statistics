@@ -22,13 +22,14 @@ function useFormSubmit<FormValues>(
   const { handleError } = useErrorControl();
 
   return useMemo(
-    () => async (values: FormValues, actions: FormikHelpers<FormValues>) => {
+    () => async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
       try {
-        await onSubmit(values, actions);
+        await onSubmit(values, helpers);
       } catch (error) {
         if (isServerValidationError(error) && error.response?.data) {
           const errors = convertServerFieldErrors(
-            error.response?.data,
+            error.response.data,
+            values,
             typeof errorMappers === 'function'
               ? errorMappers(values)
               : errorMappers,
@@ -36,9 +37,7 @@ function useFormSubmit<FormValues>(
           );
 
           if (Object.values(errors).length) {
-            actions.setErrors(errors);
-          } else {
-            handleError(error);
+            helpers.setErrors(errors);
           }
         } else {
           handleError(error);
