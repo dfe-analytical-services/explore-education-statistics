@@ -1,9 +1,10 @@
 import React, { FC } from 'react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import { PublicationSummary } from '@common/services/publicationService';
+import { MethodologyPublication } from '@common/services/methodologyService';
 
 interface Props {
-  owningPublication: PublicationSummary;
+  owningPublication: PublicationSummary | MethodologyPublication;
 }
 
 const MethodologyHelpAndSupportSection: FC<Props> = ({ owningPublication }) => {
