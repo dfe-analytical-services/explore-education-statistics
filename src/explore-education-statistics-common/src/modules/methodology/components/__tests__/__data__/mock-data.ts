@@ -1,3 +1,4 @@
+import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/mock-data';
 import { Methodology } from '@common/services/methodologyService';
 
 const mockMethodology: Methodology = {
@@ -9,6 +10,7 @@ const mockMethodology: Methodology = {
   content: [],
   annexes: [],
   notes: [],
+  contact: mockContact,
 };
 
 export default mockMethodology;
