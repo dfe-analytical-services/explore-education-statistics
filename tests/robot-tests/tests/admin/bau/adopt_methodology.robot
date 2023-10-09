@@ -34,7 +34,7 @@ Create owning publication methodology and publish
 
 Create another owing publication with an unpublished methodology
     [Documentation]    EES-4531
-    ${owning_publication_id}=    user creates test publication via api    ${OWNING_PUBLICATION_NAME_2}
+    user creates test publication via api    ${OWNING_PUBLICATION_NAME_2}
     user creates methodology for publication    ${OWNING_PUBLICATION_NAME_2}
     user checks page contains tag    Draft
 
@@ -55,11 +55,6 @@ Check that an unpublished methodology cannot be adopted
     user checks page does not contain    ${OWNING_PUBLICATION_NAME_2}
 
 Adopt a published Methodology
-    user navigates to methodologies on publication page    ${ADOPTING_PUBLICATION_NAME}
-    user waits until page contains link    Adopt an existing methodology
-    user clicks link    Adopt an existing methodology
-    user waits until h2 is visible    Adopt a methodology
-
     user clicks radio    ${OWNING_PUBLICATION_NAME}
     user opens details dropdown    More details    css:[data-testid="Radio item for ${OWNING_PUBLICATION_NAME}"]
     ${selected_methodology_details}=    user gets details content element    More details
