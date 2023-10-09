@@ -200,6 +200,10 @@ if args.expiredinvite_pass:
 # Install chromedriver and add it to PATH
 get_webdriver(args.chromedriver_version or None)
 
+# TODO EES-4412 - this bit will need to be refactored.  It needs to be "rerun.xml" if the user has called this script
+# directly with the "rerun_failed_suites" argument OR if we're in the main "rerun loop" near the bottom of this file
+# and we're performing a rerun.  Therefore this "output_file" parameter probably needs setting in the rerun loop itself.
+
 output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
 
 
@@ -223,12 +227,19 @@ robotArgs += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os
 
 if args.fail_fast:
     robotArgs += ["--exitonfailure"]
+# TODO EES-4412 - this is separate to "rerun_failed_suites" so I think it can either be left alone or come out
+# entirely, as I've never heard of anyone actually using it :)
 
 if args.rerun_failed_tests:
     robotArgs += ["--rerunfailed", "test-results/output.xml"]
 
 if args.rerun_failed_suites:
     robotArgs += ["--rerunfailedsuites", "test-results/output.xml"]
+
+# TODO EES-4412 - I *think* that we should still keep this for people using the CLI locally who just want
+#  to perform an arbitrary number of reruns when they need to.
+# But I'd totally expect people to also start using the new "rerun_attempts" option as well day-to-day.
+robotArgs += ["--rerunfailedsuites", "test-results/output.xml"]
 
 if args.tags:
     robotArgs += ["--include", args.tags]
@@ -411,11 +422,38 @@ robotArgs += [args.tests]
 
 
 # Remove any existing test results if running from scratch
+# TODO EES-4412 - this can stay.  This will help people who are running run_tests.py directly locally with the
+#  "rerun_failed_suites" option enabled.
 if not args.rerun_failed_tests and not args.rerun_failed_suites and Path("test-results").exists():
     shutil.rmtree("test-results")
 
 if not os.path.exists("test-results/downloads"):
     os.makedirs("test-results/downloads")
+
+# TODO EES-4412 - this is where we need to add a loop, and within that loop we run robot or pabot at least once, and
+# then as many times as the user has specified that we rerun it if failures have been encountered.  That means that
+# if the user has asked for 3 rerun attempts, then we do 1 main run followed by at most 3 more runs for thr rerun
+# attempts.
+#
+# I think that the whole "try" block needs to be put into the loop.  An exception (I guess indicating a test failure)
+# would normally put us into the "finally" block, but in this case now we want to catch the exception, and go for a
+# rerun instead.
+#
+# I think that the part of the finally block that starts with:
+#   if args.rerun_failed_tests or args.rerun_failed_suites:
+#
+# needs to be included each time a rerun occurs, whether it's a failed test run or a passing test run.  This will
+# ensure that each test (re)run will add its set of passing tests to the overall set of passing tests, thus making each
+# rerun hopefully shorter!
+#
+# If we get a full set of passing tests after the first run or after any rerun, we can break out of this loop early.
+#
+# We will need to do:
+#   robotArgs += ["--rerunfailedsuites", "test-results/output.xml"]
+#
+# once as soon as we're starting to do reruns (so after the first run)
+
+
 try:
     # Run tests
     if args.interp == "robot":
