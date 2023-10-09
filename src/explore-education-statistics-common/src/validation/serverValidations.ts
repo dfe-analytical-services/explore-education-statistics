@@ -1,10 +1,9 @@
-import { Dictionary } from '@common/types';
+import { Dictionary, Path } from '@common/types';
 import { AxiosError, isAxiosError } from 'axios';
 import { FormikErrors } from 'formik';
 import camelCase from 'lodash/camelCase';
 import set from 'lodash/set';
 import toPath from 'lodash/toPath';
-import { FieldErrors, FieldValues } from 'react-hook-form';
 
 export interface ServerValidationErrorResponse<T extends string = string> {
   errors: Dictionary<T[]>;
@@ -18,7 +17,7 @@ export interface ServerValidationError {
 }
 
 export type FieldName<FormValues> = FormValues extends Record<string, unknown>
-  ? keyof FormValues
+  ? Path<FormValues>
   : string;
 
 export type FieldMessageMapper<FormValues = unknown> = (
@@ -29,6 +28,18 @@ export type FieldMessageMapper<FormValues = unknown> = (
       message: string;
     }
   | undefined;
+
+export type FieldMessage<FormValues> =
+  | {
+      field: FieldName<FormValues>;
+      message: string;
+      mapped: true;
+    }
+  | {
+      field: string;
+      message: string;
+      mapped: false;
+    };
 
 /**
  * Map custom server validation error messages to a
@@ -97,73 +108,55 @@ export function mapFallbackFieldError<FormValues>(options: {
   };
 }
 
-function normalizeField(fieldName: string): string {
+function normalizeField<FormValues = unknown>(
+  fieldName: string,
+): FieldName<FormValues> {
   const path = toPath(fieldName);
 
-  return path.reduce((string, item) => {
-    const prefix = string === '' ? '' : '.';
+  return path.reduce((acc, item) => {
+    const prefix = acc === '' ? '' : '.';
 
     return (
-      string +
+      acc +
       (Number.isNaN(Number(item)) ? prefix + camelCase(item) : `[${item}]`)
     );
-  }, '');
+  }, '') as FieldName<FormValues>;
 }
 
 /**
- * Convert server-side validation error {@param response} to
- * Formik field error messages. The message conversions can be
- * controlled by providing a set of {@param messageMappers}.
+ * Convert server validation errors to Formik field error messages.
+ *
+ * @param response The server validation error response.
+ * @param messageMappers Mappings between server validation errors and field error messages.
+ * @param fallbackMapper Optional fallback mapper if no mapping is found.
  */
 export function convertServerFieldErrors<FormValues>(
   response: ServerValidationErrorResponse,
   messageMappers: FieldMessageMapper<FormValues>[] = [],
   fallbackMapper?: FieldMessageMapper<FormValues>,
 ): FormikErrors<FormValues> {
-  return Object.entries(response.errors).reduce<FormikErrors<FormValues>>(
-    (acc, [source, messages]) => {
-      messages.forEach(message => {
-        const sourceField = source ? normalizeField(source) : undefined;
+  return mapServerFieldErrors(response, messageMappers, fallbackMapper).reduce<
+    FormikErrors<FormValues>
+  >((acc, { field, message }) => {
+    set(acc, field, message);
 
-        const error: ServerValidationError = {
-          sourceField,
-          message,
-        };
-
-        const matchingMappers = messageMappers
-          .map(mapper => mapper(error))
-          .filter(Boolean);
-
-        if (matchingMappers.length) {
-          matchingMappers.forEach(mappedError => {
-            if (mappedError) {
-              const { targetField, message: mappedMessage } = mappedError;
-              set(acc, targetField, mappedMessage);
-            }
-          });
-        } else if (sourceField) {
-          set(acc, sourceField, message);
-        } else if (fallbackMapper) {
-          const mappedFallback = fallbackMapper(error);
-          if (mappedFallback) {
-            const { targetField, message: mappedMessage } = mappedFallback;
-            set(acc, targetField, mappedMessage);
-          }
-        }
-      });
-
-      return acc;
-    },
-    {},
-  );
+    return acc;
+  }, {});
 }
 
-export function rhfConvertServerFieldErrors<FormValues extends FieldValues>(
+/**
+ * Map server validation errors to field error messages.
+ *
+ * @param response The server validation error response.
+ * @param messageMappers Mappings between server validation errors and field error messages.
+ * @param fallbackMapper Optional fallback mapper if no mapping is found.
+ */
+export function mapServerFieldErrors<FormValues>(
   response: ServerValidationErrorResponse,
   messageMappers: FieldMessageMapper<FormValues>[] = [],
   fallbackMapper?: FieldMessageMapper<FormValues>,
-) {
-  return Object.entries(response.errors).reduce<FieldErrors<FormValues>>(
+): FieldMessage<FormValues>[] {
+  return Object.entries(response.errors).reduce<FieldMessage<FormValues>[]>(
     (acc, [source, messages]) => {
       messages.forEach(message => {
         const sourceField = source ? normalizeField(source) : undefined;
@@ -181,23 +174,36 @@ export function rhfConvertServerFieldErrors<FormValues extends FieldValues>(
           matchingMappers.forEach(mappedError => {
             if (mappedError) {
               const { targetField, message: mappedMessage } = mappedError;
-              set(acc, targetField, mappedMessage);
+
+              acc.push({
+                field: targetField,
+                message: mappedMessage,
+                mapped: true,
+              });
             }
           });
         } else if (sourceField) {
-          set(acc, sourceField, message);
+          acc.push({
+            field: sourceField,
+            message,
+            mapped: false,
+          });
         } else if (fallbackMapper) {
           const mappedFallback = fallbackMapper(error);
           if (mappedFallback) {
             const { targetField, message: mappedMessage } = mappedFallback;
-            set(acc, targetField, mappedMessage);
+            acc.push({
+              field: targetField,
+              message: mappedMessage,
+              mapped: true,
+            });
           }
         }
       });
 
       return acc;
     },
-    {},
+    [],
   );
 }
 

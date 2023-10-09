@@ -10,8 +10,9 @@ import isErrorLike from '@common/utils/error/isErrorLike';
 import {
   FieldMessageMapper,
   isServerValidationError,
-  rhfConvertServerFieldErrors,
+  mapServerFieldErrors,
 } from '@common/validation/serverValidations';
+import { has } from 'lodash';
 import camelCase from 'lodash/camelCase';
 import isEqual from 'lodash/isEqual';
 import React, {
@@ -23,12 +24,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import {
-  ErrorOption,
-  FieldValues,
-  useFormContext,
-  useWatch,
-} from 'react-hook-form';
+import { FieldValues, useFormContext, useWatch } from 'react-hook-form';
 
 interface Props<TFormValues extends FieldValues> {
   children: ReactNode;
@@ -142,17 +138,18 @@ export default function RHFForm<TFormValues extends FieldValues>({
             logger.error(error);
 
             if (isServerValidationError(error) && error.response?.data) {
-              const serverErrors = rhfConvertServerFieldErrors(
-                error.response?.data,
+              const fieldErrors = mapServerFieldErrors(
+                error.response.data,
                 typeof errorMappers === 'function'
                   ? errorMappers(values as TFormValues)
                   : errorMappers,
                 fallbackErrorMapper,
               );
 
-              Object.entries(serverErrors).map(([key, message]) => {
-                return setError(key, { message } as ErrorOption);
+              fieldErrors.forEach(({ field, message }) => {
+                setError(field, { message });
               });
+
               return;
             }
 

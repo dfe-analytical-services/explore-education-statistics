@@ -1,3 +1,5 @@
+import type { Path as PathInternal } from 'react-hook-form';
+
 /**
  * Enumerates the typical comparison
  * integers of 1, 0 and -1.
@@ -62,3 +64,9 @@ export type NestedPartial<T> = {
 export type Writeable<T> = {
   -readonly [P in keyof T]: T[P];
 };
+
+/**
+ * Enumerates all property paths inside an object,
+ * traversing any deeply nested objects within.
+ */
+export type Path<T> = PathInternal<T>;
