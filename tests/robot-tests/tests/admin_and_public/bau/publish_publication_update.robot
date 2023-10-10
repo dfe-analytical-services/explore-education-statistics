@@ -60,7 +60,7 @@ Update publication contact
     user enters text into element    label:Team name    Team name updated
     user enters text into element    label:Team email    email_updated@test.com
     user enters text into element    label:Contact name    Contact name updated
-    user enters text into element    label:Contact telephone (optional)    4321 4321
+    user enters text into element    label:Contact telephone (optional)    04321 4321
 
     user clicks button    Update contact details
     ${modal}=    user waits until modal is visible    Confirm contact changes
@@ -70,7 +70,7 @@ Update publication contact
     user checks summary list contains    Team name    Team name updated
     user checks summary list contains    Team email    email_updated@test.com
     user checks summary list contains    Contact name    Contact name updated
-    user checks summary list contains    Contact telephone    4321 4321
+    user checks summary list contains    Contact telephone    04321 4321
 
 Check publication is updated on dashboard
     user navigates to admin dashboard if needed    %{ADMIN_URL}
@@ -88,4 +88,4 @@ Validate publication details are updated on public page
     user checks page contains    Team name updated
     user checks page contains    email_updated@test.com
     user checks page contains    Contact name updated
-    user checks page contains    4321 4321
+    user checks page contains    04321 4321

@@ -16,7 +16,6 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
-using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
@@ -56,10 +55,9 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     _,
                     methodologyVersionRepository,
                     _,
-                    _,
                     _) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => 
+                methodologyVersionRepository.Setup(mock =>
                         mock.IsLatestPublishedVersion(DraftMethodologyVersion))
                     .ReturnsAsync(true);
 
@@ -86,11 +84,10 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository,
-                    publicationRepository
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
-                methodologyVersionRepository.Setup(mock => 
+                methodologyVersionRepository.Setup(mock =>
                         mock.IsLatestPublishedVersion(DraftMethodologyVersion))
                     .ReturnsAsync(false);
 
@@ -103,14 +100,14 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         .ReturnsAsync(OwningPublication);
 
                     userPublicationRoleRepository
-                        .Setup(mock => 
+                        .Setup(mock =>
                             mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                         .ReturnsAsync(new List<PublicationRole>());
 
-                    publicationRepository
-                        .Setup(mock => 
-                            mock.GetLatestReleaseForPublication(OwningPublication.Id))
-                        .ReturnsAsync((Release?)null);
+                    userReleaseRoleRepository
+                        .Setup(mock =>
+                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .ReturnsAsync(new List<ReleaseRole>());
                 }
 
                 var user = CreateClaimsPrincipal(UserId, claim);
@@ -119,8 +116,11 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         (user, DraftMethodologyVersion);
 
                 await handler.HandleAsync(authContext);
-                VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                    userReleaseRoleRepository);
+                VerifyAllMocks(
+                    methodologyRepository,
+                    methodologyVersionRepository,
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
             });
@@ -141,9 +141,8 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    _,
-                    userPublicationRoleRepository,
-                    publicationRepository
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -155,16 +154,16 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     .ReturnsAsync(OwningPublication);
 
                 userPublicationRoleRepository
-                    .Setup(mock => 
+                    .Setup(mock =>
                         mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(publicationRole));
 
                 if (!expectedToPassByPublicationRole)
                 {
-                    publicationRepository
-                        .Setup(mock => 
-                            mock.GetLatestReleaseForPublication(OwningPublication.Id))
-                        .ReturnsAsync((Release?)null);
+                    userReleaseRoleRepository
+                        .Setup(mock =>
+                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .ReturnsAsync(new List<ReleaseRole>());
                 }
 
                 var user = CreateClaimsPrincipal(UserId);
@@ -179,8 +178,8 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userPublicationRoleRepository,
-                    publicationRepository);
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByPublicationRole, authContext.HasSucceeded);
             });
@@ -198,9 +197,8 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
-                    _,
-                    userPublicationRoleRepository,
-                    publicationRepository
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -218,10 +216,10 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
 
                 if (!expectedToPassByPublicationRole)
                 {
-                    publicationRepository
+                    userReleaseRoleRepository
                         .Setup(mock =>
-                            mock.GetLatestReleaseForPublication(OwningPublication.Id))
-                        .ReturnsAsync((Release?)null);
+                            mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                        .ReturnsAsync(new List<ReleaseRole>());
                 }
 
                 var user = CreateClaimsPrincipal(UserId);
@@ -236,8 +234,8 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                 VerifyAllMocks(
                     methodologyRepository,
                     methodologyVersionRepository,
-                    userPublicationRoleRepository,
-                    publicationRepository);
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByPublicationRole, authContext.HasSucceeded);
             });
@@ -247,24 +245,18 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
     public class ReleaseRoleTests
     {
         [Fact]
-        public async Task ReleaseEditorAndApproverRolesOnOwningPublicationsLatestReleaseCanMarkDraftMethodologyHigherReview()
+        public async Task ReleaseEditorAndApproverRolesOnAnyOwningPublicationReleaseCanMarkDraftMethodologyHigherReview()
         {
             await ForEachReleaseRoleAsync(async releaseRole =>
             {
                 var expectedToPassByReleaseRole = ReleaseEditorAndApproverRoles.Contains(releaseRole);
-
-                var latestReleaseForPublication = new Release
-                {
-                    Id = Guid.NewGuid()
-                };
 
                 var (
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository,
-                    publicationRepository
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -279,12 +271,13 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                publicationRepository
-                    .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                    .ReturnsAsync(latestReleaseForPublication);
+                userReleaseRoleRepository
+                    .Setup(mock =>
+                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .ReturnsAsync(new List<ReleaseRole>());
 
                 userReleaseRoleRepository
-                    .Setup(s => s.GetAllRolesByUserAndRelease(UserId, latestReleaseForPublication.Id))
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
                 var user = CreateClaimsPrincipal(UserId);
@@ -300,32 +293,25 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository,
-                    publicationRepository);
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
             });
         }
 
         [Fact]
-        public async Task ApproversOnOwningPublicationsLatestReleaseCanMarkApprovedMethodologyHigherReview()
+        public async Task ApproversOnAnyOwningPublicationReleaseCanMarkApprovedMethodologyHigherReview()
         {
             await ForEachReleaseRoleAsync(async releaseRole =>
             {
                 var expectedToPassByReleaseRole = releaseRole == ReleaseRole.Approver;
-
-                var latestReleaseForPublication = new Release
-                {
-                    Id = Guid.NewGuid()
-                };
 
                 var (
                     handler,
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository,
-                    publicationRepository
+                    userPublicationRoleRepository
                     ) = CreateHandlerAndDependencies();
 
                 methodologyVersionRepository.Setup(mock =>
@@ -341,14 +327,14 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                         mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
 
-                publicationRepository
+                userReleaseRoleRepository
                     .Setup(mock =>
-                        mock.GetLatestReleaseForPublication(OwningPublication.Id))
-                    .ReturnsAsync(latestReleaseForPublication);
+                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                    .ReturnsAsync(new List<ReleaseRole>());
 
                 userReleaseRoleRepository
                     .Setup(mock =>
-                        mock.GetAllRolesByUserAndRelease(UserId, latestReleaseForPublication.Id))
+                        mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                     .ReturnsAsync(ListOf(releaseRole));
 
                 var user = CreateClaimsPrincipal(UserId);
@@ -364,23 +350,21 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                     methodologyRepository,
                     methodologyVersionRepository,
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository,
-                    publicationRepository);
+                    userPublicationRoleRepository);
 
                 Assert.Equal(expectedToPassByReleaseRole, authContext.HasSucceeded);
             });
         }
 
         [Fact]
-        public async Task UsersWithNoRolesOnOwningPublicationsLatestReleaseCannotMarkMethodologyHigherReview()
+        public async Task NoReleaseRolesOnOwningPublicationReleasesSoCannotMarkMethodologyHigherReview()
         {
             var (
                 handler,
                 methodologyRepository,
                 methodologyVersionRepository,
                 userReleaseRoleRepository,
-                userPublicationRoleRepository,
-                publicationRepository
+                userPublicationRoleRepository
                 ) = CreateHandlerAndDependencies();
 
             methodologyVersionRepository.Setup(mock =>
@@ -395,49 +379,10 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
                 .ReturnsAsync(new List<PublicationRole>());
 
-            publicationRepository
-                .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                .ReturnsAsync((Release?)null);
-
-            var user = CreateClaimsPrincipal(UserId);
-
-            var authContext =
-                CreateAuthorizationHandlerContext<MarkMethodologyAsHigherLevelReviewRequirement, MethodologyVersion>
-                    (user, DraftMethodologyVersion);
-
-            await handler.HandleAsync(authContext);
-            VerifyAllMocks(methodologyRepository, methodologyVersionRepository, userReleaseRoleRepository);
-
-            Assert.False(authContext.HasSucceeded);
-        }
-
-        [Fact]
-        public async Task NoLatestReleaseForOwningPublicationSoCannotMarkMethodologyHigherReview()
-        {
-            var (
-                handler,
-                methodologyRepository,
-                methodologyVersionRepository,
-                _,
-                userPublicationRoleRepository,
-                publicationRepository
-                ) = CreateHandlerAndDependencies();
-
-            methodologyVersionRepository.Setup(mock =>
-                    mock.IsLatestPublishedVersion(DraftMethodologyVersion))
-                .ReturnsAsync(false);
-
-            methodologyRepository.Setup(s =>
-                    s.GetOwningPublication(DraftMethodologyVersion.MethodologyId))
-                .ReturnsAsync(OwningPublication);
-
-            userPublicationRoleRepository
-                .Setup(s => s.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
-                .ReturnsAsync(new List<PublicationRole>());
-
-            publicationRepository
-                .Setup(s => s.GetLatestReleaseForPublication(OwningPublication.Id))
-                .ReturnsAsync((Release?)null);
+            userReleaseRoleRepository
+                .Setup(mock =>
+                    mock.GetAllRolesByUserAndPublication(UserId, OwningPublication.Id))
+                .ReturnsAsync(new List<ReleaseRole>());
 
             var user = CreateClaimsPrincipal(UserId);
 
@@ -449,8 +394,8 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
             VerifyAllMocks(
                 methodologyRepository,
                 methodologyVersionRepository,
-                userPublicationRoleRepository,
-                publicationRepository);
+                userReleaseRoleRepository,
+                userPublicationRoleRepository);
 
             Assert.False(authContext.HasSucceeded);
         }
@@ -461,8 +406,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         Mock<IMethodologyRepository>,
         Mock<IMethodologyVersionRepository>,
         Mock<IUserReleaseRoleRepository>,
-        Mock<IUserPublicationRoleRepository>,
-        Mock<IPublicationRepository>
+        Mock<IUserPublicationRoleRepository>
         )
         CreateHandlerAndDependencies()
     {
@@ -470,15 +414,13 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
         var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
         var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
-        var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
         var handler = new MarkMethodologyAsHigherLevelReviewAuthorizationHandler(
             methodologyVersionRepository.Object,
             methodologyRepository.Object,
             new AuthorizationHandlerResourceRoleService(
                 userReleaseRoleRepository.Object,
-                userPublicationRoleRepository.Object,
-                publicationRepository.Object)
+                userPublicationRoleRepository.Object)
         );
 
         return (
@@ -486,8 +428,7 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
             methodologyRepository,
             methodologyVersionRepository,
             userReleaseRoleRepository,
-            userPublicationRoleRepository,
-            publicationRepository
+            userPublicationRoleRepository
         );
     }
 }

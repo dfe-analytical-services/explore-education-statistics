@@ -249,8 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 context,
                 new AuthorizationHandlerResourceRoleService(
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    userPublicationRoleRepository.Object,
-                    Mock.Of<IPublicationRepository>(Strict)));
+                    userPublicationRoleRepository.Object));
 
             return (handler, userPublicationRoleRepository);
         }

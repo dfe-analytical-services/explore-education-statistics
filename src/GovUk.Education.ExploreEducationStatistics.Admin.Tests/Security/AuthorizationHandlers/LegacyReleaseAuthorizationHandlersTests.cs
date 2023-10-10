@@ -45,8 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 return new ManageLegacyReleasesAuthorizationHandler(
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        new UserPublicationRoleRepository(contentDbContext)));
             }
         }
 
@@ -83,8 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 return new ViewLegacyReleaseAuthorizationHandler(
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        new UserPublicationRoleRepository(contentDbContext)));
             }
         }
 
@@ -121,8 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 return new UpdateLegacyReleaseAuthorizationHandler(
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        new UserPublicationRoleRepository(contentDbContext)));
             }
         }
 
@@ -159,8 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 return new DeleteLegacyReleaseAuthorizationHandler(
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
-                        new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        new UserPublicationRoleRepository(contentDbContext)));
             }
         }
     }

@@ -30,32 +30,15 @@ public class AuthorizationHandlerResourceRoleService
     
     private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
     private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
-    private readonly IPublicationRepository _publicationRepository;
 
     public AuthorizationHandlerResourceRoleService(
         IUserReleaseRoleRepository userReleaseRoleRepository, 
-        IUserPublicationRoleRepository userPublicationRoleRepository, 
-        IPublicationRepository publicationRepository)
+        IUserPublicationRoleRepository userPublicationRoleRepository)
     {
         _userReleaseRoleRepository = userReleaseRoleRepository;
         _userPublicationRoleRepository = userPublicationRoleRepository;
-        _publicationRepository = publicationRepository;
     }
 
-    public Task<bool> HasRolesOnPublicationOrLatestRelease(
-        Guid userId,
-        Guid publicationId,
-        IEnumerable<PublicationRole> publicationRoles,
-        IEnumerable<ReleaseRole> releaseRoles)
-    {
-        return HasRolesOnPublicationOrRelease(
-            userId, 
-            publicationId, 
-            async () => (await _publicationRepository.GetLatestReleaseForPublication(publicationId))?.Id, 
-            publicationRoles, 
-            releaseRoles);
-    }
-    
     public Task<bool> HasRolesOnPublicationOrRelease(
         Guid userId,
         Guid publicationId,
@@ -95,6 +78,26 @@ public class AuthorizationHandlerResourceRoleService
         
         var usersReleaseRoles = await _userReleaseRoleRepository
             .GetAllRolesByUserAndRelease(userId, releaseId.Value);
+
+        return usersReleaseRoles.Any(releaseRoles.Contains);
+    }
+    
+    public async Task<bool> HasRolesOnPublicationOrAnyRelease(
+        Guid userId,
+        Guid publicationId,
+        IEnumerable<PublicationRole> publicationRoles,
+        IEnumerable<ReleaseRole> releaseRoles)
+    {
+        var usersPublicationRoles = await _userPublicationRoleRepository
+            .GetAllRolesByUserAndPublication(userId, publicationId);
+            
+        if (usersPublicationRoles.Any(publicationRoles.Contains))
+        {
+            return true;
+        }
+
+        var usersReleaseRoles = await _userReleaseRoleRepository
+            .GetAllRolesByUserAndPublication(userId, publicationId);
 
         return usersReleaseRoles.Any(releaseRoles.Contains);
     }

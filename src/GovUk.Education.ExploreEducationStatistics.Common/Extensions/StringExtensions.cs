@@ -62,6 +62,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return firstChar > -1 ? firstChar : value.Length;
         }
 
+        public static string TrimToLower(this string value)
+        {
+            return value.Trim().ToLower(); 
+        }
+
         public static string TrimIndent(this string value)
         {
             var lines = value.ToLines()

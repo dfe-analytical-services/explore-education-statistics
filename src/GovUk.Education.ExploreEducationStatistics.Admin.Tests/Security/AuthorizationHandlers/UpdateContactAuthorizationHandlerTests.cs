@@ -38,8 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             return new UpdateContactAuthorizationHandler(
                 new AuthorizationHandlerResourceRoleService(
                     Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPublicationRepository>(Strict)));
+                    new UserPublicationRoleRepository(contentDbContext)));
         }
     }
 }

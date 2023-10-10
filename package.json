@@ -2,10 +2,10 @@
   "name": "explore-education-statistics",
   "private": true,
   "type": "module",
-  "packageManager": "pnpm@8.6.7",
+  "packageManager": "pnpm@8.8.0",
   "engines": {
     "node": "18.17.0",
-    "pnpm": "8.6.7"
+    "pnpm": ">=8.8.0"
   },
   "devDependencies": {
     "@commander-js/extra-typings": "^11.0.0",

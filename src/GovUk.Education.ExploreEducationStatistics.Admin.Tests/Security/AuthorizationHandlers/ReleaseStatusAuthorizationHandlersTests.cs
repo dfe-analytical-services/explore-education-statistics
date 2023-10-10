@@ -825,8 +825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 releasePublishingStatusRepository, 
                 new AuthorizationHandlerResourceRoleService(
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository,
-                    Mock.Of<IPublicationRepository>(Strict)));
+                    userPublicationRoleRepository));
         }
         
         private static MarkReleaseAsHigherLevelReviewAuthorizationHandler BuildMarkReleaseAsHigherLevelReviewHandler(
@@ -838,8 +837,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 releasePublishingStatusRepository, 
                 new AuthorizationHandlerResourceRoleService(
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository,
-                    Mock.Of<IPublicationRepository>(Strict)));
+                    userPublicationRoleRepository));
         }
 
         private static MarkReleaseAsApprovedAuthorizationHandler BuildMarkReleaseAsApprovedHandler(
@@ -851,8 +849,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 releasePublishingStatusRepository, 
                 new AuthorizationHandlerResourceRoleService(
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository,
-                    Mock.Of<IPublicationRepository>(Strict)));
+                    userPublicationRoleRepository));
         }
     }
 }
