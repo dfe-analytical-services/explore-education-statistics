@@ -76,12 +76,12 @@ export default function PublicationContactForm({
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
-      {({ getValues }) => {
+      {form => {
         return (
           <>
             <RHFForm
               id="publicationContactForm"
-              onSubmit={async () => toggleConfirmModal.on()}
+              onSubmit={() => toggleConfirmModal.on()}
             >
               <RHFFormFieldTextInput<FormValues>
                 name="teamName"
@@ -116,8 +116,7 @@ export default function PublicationContactForm({
             <ModalConfirm
               title="Confirm contact changes"
               onConfirm={async () => {
-                const values = getValues();
-                await handleSubmit(values);
+                await form.handleSubmit(handleSubmit)();
               }}
               onExit={toggleConfirmModal.off}
               onCancel={toggleConfirmModal.off}

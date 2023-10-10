@@ -7,13 +7,7 @@ import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import isErrorLike from '@common/utils/error/isErrorLike';
-import {
-  FieldMessageMapper,
-  isServerValidationError,
-  mapServerFieldErrors,
-} from '@common/validation/serverValidations';
 import camelCase from 'lodash/camelCase';
-import has from 'lodash/has';
 import isEqual from 'lodash/isEqual';
 import React, {
   FormEvent,
@@ -28,16 +22,12 @@ import { FieldValues, useFormContext, useWatch } from 'react-hook-form';
 
 interface Props<TFormValues extends FieldValues> {
   children: ReactNode;
-  errorMappers?:
-    | FieldMessageMapper<TFormValues>[]
-    | ((values: TFormValues) => FieldMessageMapper<TFormValues>[]);
-  fallbackErrorMapper?: FieldMessageMapper<TFormValues>;
   id: string;
   submitId?: string;
   showErrorSummary?: boolean;
   showSubmitError?: boolean;
   visuallyHiddenErrorSummary?: boolean;
-  onSubmit: (values: TFormValues) => Promise<void>;
+  onSubmit: (values: TFormValues) => Promise<void> | void;
 }
 
 /**
@@ -59,8 +49,6 @@ interface Props<TFormValues extends FieldValues> {
  */
 export default function RHFForm<TFormValues extends FieldValues>({
   children,
-  errorMappers = [],
-  fallbackErrorMapper,
   id,
   submitId = `${id}-submit`,
   showErrorSummary = true,
@@ -73,7 +61,6 @@ export default function RHFForm<TFormValues extends FieldValues>({
   const {
     formState: { errors, submitCount, touchedFields, isSubmitted },
     handleSubmit: submit,
-    setError,
   } = useFormContext();
 
   const values = useWatch();
@@ -143,24 +130,6 @@ export default function RHFForm<TFormValues extends FieldValues>({
           if (showSubmitError && isErrorLike(error)) {
             logger.error(error);
 
-            if (isServerValidationError(error) && error.response?.data) {
-              const fieldErrors = mapServerFieldErrors(
-                error.response.data,
-                typeof errorMappers === 'function'
-                  ? errorMappers(values as TFormValues)
-                  : errorMappers,
-                fallbackErrorMapper,
-              );
-
-              fieldErrors.forEach(({ field, message }) => {
-                if (has(values, field)) {
-                  setError(field, { message });
-                }
-              });
-
-              return;
-            }
-
             if (isMounted.current) {
               setSubmitError({
                 id: submitId,
@@ -174,10 +143,7 @@ export default function RHFForm<TFormValues extends FieldValues>({
       })(event);
     },
     [
-      errorMappers,
-      fallbackErrorMapper,
       isMounted,
-      setError,
       showSubmitError,
       submit,
       submitId,

@@ -20,7 +20,7 @@ import { ObjectSchema } from 'yup';
 
 const id = 'publicationDetailsForm';
 
-export interface FormValues {
+interface FormValues {
   summary: string;
   supersededById?: string;
   title: string;
@@ -97,7 +97,7 @@ export default function PublicationDetailsForm({
         }}
         validationSchema={validationSchema}
       >
-        {({ getValues }) => {
+        {form => {
           return (
             <>
               <RHFForm id={id} onSubmit={async () => toggleConfirmModal.on()}>
@@ -160,8 +160,7 @@ export default function PublicationDetailsForm({
               <ModalConfirm
                 title="Confirm publication changes"
                 onConfirm={async () => {
-                  const values = getValues();
-                  await handleSubmit(values);
+                  await form.handleSubmit(handleSubmit)();
                 }}
                 onExit={toggleConfirmModal.off}
                 onCancel={toggleConfirmModal.off}

@@ -101,6 +101,7 @@ export default function PublicationForm({
   return (
     <FormProvider
       enableReinitialize
+      errorMappers={errorMappings}
       initialValues={{
         title: '',
         summary: '',
@@ -111,12 +112,7 @@ export default function PublicationForm({
       }}
       validationSchema={validationSchema}
     >
-      <RHFForm
-        id={id}
-        showSubmitError
-        onSubmit={handleSubmit}
-        errorMappers={errorMappings}
-      >
+      <RHFForm id={id} showSubmitError onSubmit={handleSubmit}>
         <RHFFormFieldTextInput<FormValues>
           label="Publication title"
           name="title"
