@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 
 public class CommonMappingProfile: Profile
 {
-    protected CommonMappingProfile()
+    public CommonMappingProfile()
     {
         CreateMap<Contact, ContactViewModel>();
     }
