@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 
@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
     /**
      * AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
      */
-    public class MappingProfiles : Profile
+    public class MappingProfiles : CommonMappingProfile
     {
         public MappingProfiles()
         {
@@ -37,8 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
             CreateMap<Publication, PublicationSummaryViewModel>();
-            
-            CreateMap<Contact, ContactViewModel>();
             
             CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
             CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();

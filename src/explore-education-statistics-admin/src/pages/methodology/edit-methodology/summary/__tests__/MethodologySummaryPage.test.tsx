@@ -20,16 +20,31 @@ const testMethodology: MethodologyVersion = {
   otherPublications: [
     {
       id: 'op1',
-      title: 'Other publication title 1',
+      title: 'Other publication title 2',
+      contact: {
+        teamName: 'mock team name 2',
+        teamEmail: 'mock team email 2',
+        contactName: 'mock contact name 2',
+      },
     },
     {
       id: 'op2',
-      title: 'Other publication title 2',
+      title: 'Other publication title 3',
+      contact: {
+        teamName: 'mock team name 3',
+        teamEmail: 'mock team email 3',
+        contactName: 'mock contact name 3',
+      },
     },
   ],
   owningPublication: {
     id: 'p1',
     title: 'Publication title',
+    contact: {
+      teamName: 'mock team name 1',
+      teamEmail: 'mock team email 1',
+      contactName: 'mock contact name 1',
+    },
   },
   published: '',
 };
