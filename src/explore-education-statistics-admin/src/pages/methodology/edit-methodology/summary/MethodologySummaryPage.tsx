@@ -83,14 +83,7 @@ const MethodologySummaryPage = () => {
           )}
 
           <MethodologyHelpAndSupportSection
-            owningPublication={{
-              ...methodology.owningPublication,
-              contact: {
-                teamName: 'temp',
-                teamEmail: 'temp',
-                contactName: 'temp',
-              },
-            }}
+            owningPublication={methodology.owningPublication}
           />
         </>
       ) : (
