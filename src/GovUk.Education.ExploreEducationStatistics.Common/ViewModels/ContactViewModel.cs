@@ -1,7 +1,8 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+#nullable enable
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record ContactViewModel
 {

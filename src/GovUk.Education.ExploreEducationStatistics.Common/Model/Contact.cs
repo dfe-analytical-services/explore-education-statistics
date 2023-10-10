@@ -1,7 +1,6 @@
-#nullable enable
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 public class Contact
 {
