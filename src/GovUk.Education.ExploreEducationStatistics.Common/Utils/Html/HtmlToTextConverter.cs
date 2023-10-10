@@ -36,15 +36,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
         {
             var rawLines = _builder.ToString().ToLines();
 
-            // Run post-filtering on lines to remove any extraneous
-            // whitespace from the end of lines. This is mostly for
-            // better compat with editors/IDEs, where whitespace may
-            // be automatically removed upon file save.
-            var filteredBuilder = new StringBuilder();
+            // Run post-filtering on lines to:
+            // 1. Remove any extraneous whitespace from the end of lines. This is
+            // mostly for better compatibility with formatters / editors / IDEs, where
+            // trailing whitespace may be automatically removed upon file save.
+            // 2. Ensure we have CRLF (\r\n) line endings for better compatibility with
+            // our Windows users (the majority of users). Otherwise, line endings
+            // would be server OS dependent and this can lead to inconsistent files.
+            var postFilterBuilder = new StringBuilder();
 
-            rawLines.ForEach(line => filteredBuilder.AppendLine(line.TrimEnd()));
+            rawLines.ForEach(line => postFilterBuilder.AppendCrlfLine(line.TrimEnd()));
 
-            return filteredBuilder.ToString().TrimEnd();
+            return postFilterBuilder.ToString().TrimEnd();
         }
 
         private void ParseChildren(INode node)
@@ -94,7 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
 
                 case "hr":
                     _builder.AppendLine("---------------");
-                    _builder.AppendLine();
                     break;
 
                 case "table":
@@ -103,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
 
                 case "a":
                     ParseLinkElement(element);
-                    AddSpacing(element);
                     break;
 
                 case "br":
@@ -113,7 +114,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                 case "cite":
                     _builder.Append("— ");
                     ParseChildren(element);
-                    AddSpacing(element);
                     break;
 
                 default:
@@ -127,32 +127,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                         ParseEdgeNode(element);
                     }
 
-                    AddSpacing(element);
-
                     break;
                 }
             }
+
+            AddSpacing(element);
         }
 
         private void AddSpacing(IElement element)
         {
             var next = element.NextNonWhitespaceSibling();
 
-            if (next is null)
-            {
-                return;
-            }
-
             if (element.IsBlockType() || next is IElement nextElement && nextElement.IsBlockType())
             {
-                // If last two characters are new line characters, then don't
-                // append any more spacing as this would be excessive.
-                if (_builder[^2] == '\n' && _builder[^1] == '\n')
+                // Get last 4 chars to check their line endings. Windows uses CRLF line endings (\r\n),
+                // so there may be up to 4 chars, instead of 2 for LF (\n) when using Linux / Mac.
+                var currentEnding = _builder.Substring(^4..);
+
+                // If already have two line endings, then don't
+                // append more spacing as this would be excessive.
+                if (currentEnding.EndsWith($"{Environment.NewLine}{Environment.NewLine}"))
                 {
                     return;
                 }
 
-                _builder.AppendLine();
+                // Don't have a trailing line ending currently, so it
+                // should be safe to add an additional line ending to
+                // provide better spacing with the next block.
+                if (!currentEnding.EndsWith(Environment.NewLine))
+                {
+                    _builder.AppendLine();
+                }
+
                 _builder.AppendLine();
             }
         }
@@ -251,8 +257,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                         );
                 }
             );
-
-            _builder.AppendLine();
         }
 
         private void ParseDescriptionListElement(IElement element)
@@ -283,8 +287,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                     }
                 }
             );
-
-            _builder.AppendLine();
         }
 
         private void ParseTableElement(IElement element)

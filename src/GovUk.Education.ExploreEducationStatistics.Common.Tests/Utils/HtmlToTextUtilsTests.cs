@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Snapshooter.Xunit;
 using Xunit;
@@ -39,6 +40,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             Assert.Empty(await HtmlToTextUtils.HtmlToText("  "));
             Assert.Empty(await HtmlToTextUtils.HtmlToText("  \n  "));
             Assert.Empty(await HtmlToTextUtils.HtmlToText("  \r\n  "));
+        }
+
+        [Fact]
+        public async Task HtmlToText_CrlfLineEndingsOnly()
+        {
+            var text = await HtmlToTextUtils.HtmlToText("<p>Line 1</p><p>Line 2</p>");
+
+            Assert.Equal("Line 1\r\n\r\nLine 2", text);
         }
 
         [Fact]
@@ -97,6 +106,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                   </p>");
 
             Assert.Equal("Test paragraph with bold text, italic text! And small text. Next sentence? A link (https://test.com) over here.", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_Paragraph_AfterInlineText()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"Something before <p>Test paragraph</p>");
+
+            Assert.Equal("Something before\r\n\r\nTest paragraph", text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_Paragraph_AfterInlineTextWithLineBreak()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"Something before<br/><p>Test paragraph</p>");
+
+            Assert.Equal("Something before\r\n\r\nTest paragraph", text);
         }
 
         [Fact]
@@ -202,6 +229,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         }
 
         [Fact]
+        public async Task HtmlToText_MultipleElements_Blocks_CrlfLineEndingsOnly()
+        {
+            var lines = new []
+            {
+                "<h1>Test heading 1</h1>",
+                "<h2>Test heading 2</h2>",
+                "<h3>Test heading 3</h3>",
+                "<h4>Test heading 4</h4>",
+                "<h5>Test heading 5</h5>",
+                "<h6>Test heading 6</h6>",
+                "<p>Test paragraph 1</p>",
+            };
+
+            var text = await HtmlToTextUtils.HtmlToText(lines.JoinToString());
+
+            var expectedLines = new []
+            {
+                "Test heading 1",
+                "Test heading 2",
+                "Test heading 3",
+                "Test heading 4",
+                "Test heading 5",
+                "Test heading 6",
+                "Test paragraph 1",
+            };
+
+            var expected = expectedLines.JoinToString("\r\n\r\n");
+
+            Assert.Equal(expected, text);
+        }
+
+        [Fact]
         public async Task HtmlToText_MultipleElements_Blocks()
         {
             var text = await HtmlToTextUtils.HtmlToText(
@@ -247,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                     </ul>
                 </section>
                 <section>
-                    <h2>Test heading 2<h2>
+                    <h2>Test heading 2</h2>
                 </section>");
             Snapshot.Match(text);
         }
@@ -318,6 +377,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                     <h6>Test heading 6</h6>
                     <p>Test paragraph 1</p>
                 </div>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <span>Test span 1</span>
+                <p>Test paragraph 1</p>
+                <strong>Test strong 1</strong>
+                <h1>Test heading 1</h1>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst_InDiv()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <div>
+                    <span>Test span 1</span>
+                    <p>Test paragraph 1</p>
+                    <strong>Test strong 1</strong>
+                    <h1>Test heading 1</h1>
+                </div>");
+
+            Snapshot.Match(text);
+        }
+
+        [Fact]
+        public async Task HtmlToText_MultipleElements_MixOfInlineAndBlocks_InlineFirst_WithLineBreakElements()
+        {
+            var text = await HtmlToTextUtils.HtmlToText(
+                @"
+                <span>Test span 1 <br/></span>
+                <p>Test paragraph 1</p>
+                <strong>Test strong 1 <br/></strong>
+                <h1>Test heading 1</h1>");
 
             Snapshot.Match(text);
         }
