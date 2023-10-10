@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -25,6 +26,16 @@ public static class PublicationGeneratorExtensions
         this Generator<Publication> generator,
         IEnumerable<Release> releases)
         => generator.ForInstance(s => s.SetReleases(releases));
+    
+    public static Generator<Publication> WithContact(
+        this Generator<Publication> generator,
+        Contact contact)
+        => generator.ForInstance(p => p.SetContact(contact));
+
+    private static InstanceSetters<Publication> SetContact(
+        this InstanceSetters<Publication> setters,
+        Contact contact) 
+        => setters.Set(m => m.Contact, contact);
     
     public static Generator<Publication> WithReleases(
         this Generator<Publication> generator,
