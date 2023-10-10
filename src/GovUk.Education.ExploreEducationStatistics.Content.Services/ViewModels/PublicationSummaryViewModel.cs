@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
@@ -14,17 +16,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         
         public bool Owner { get; set; }
         
-        public ContactViewModel? Contact { get; set; }
-
+        public ContactViewModel Contact { get; set; }
+        
         public PublicationSummaryViewModel()
         {
         }
 
-        public PublicationSummaryViewModel(PublicationCacheViewModel publication)
+        public PublicationSummaryViewModel(Guid id, string title, string slug, bool owner, Contact contact)
         {
-            Id = publication.Id;
-            Title = publication.Title;
-            Slug = publication.Slug;
+            Id = id;
+            Title = title;
+            Slug = slug;
+            Owner = owner;
+            Contact = new ContactViewModel(contact);
+        }
+
+        public PublicationSummaryViewModel(PublicationCacheViewModel publicationCache)
+        {
+            Id = publicationCache.Id;
+            Title = publicationCache.Title;
+            Slug = publicationCache.Slug;
+            Contact = publicationCache.Contact;
         }
     }
 }

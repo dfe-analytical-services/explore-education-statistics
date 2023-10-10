@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -15,9 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodolog
 
         public string? InternalReleaseNote { get; set; }
 
-        public IdTitleViewModel OwningPublication { get; set; }
+        public PublicationSummaryViewModel OwningPublication { get; set; }
 
-        public List<IdTitleViewModel> OtherPublications { get; set; } = new();
+        public List<PublicationSummaryViewModel> OtherPublications { get; set; } = new();
 
         public DateTime? Published { get; set; }
 
