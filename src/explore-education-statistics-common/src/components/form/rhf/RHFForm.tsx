@@ -119,10 +119,11 @@ export default function RHFForm<TFormValues extends FieldValues>({
   }, [isSubmitted, submitError, submitCount, values, isMounted]);
 
   useEffect(() => {
-    if (
-      (isMounted && allErrors.length,
-      submitCount !== previousSubmitCount.current)
-    ) {
+    if (!isMounted.current) {
+      return;
+    }
+
+    if (allErrors.length && submitCount !== previousSubmitCount.current) {
       toggleSummaryFocus.on();
       previousSubmitCount.current = submitCount;
     }
