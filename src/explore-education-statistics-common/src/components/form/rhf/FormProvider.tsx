@@ -1,4 +1,5 @@
 import SubmitError from '@common/components/form/util/SubmitError';
+import { useErrorControl } from '@common/contexts/ErrorControlContext';
 import logger from '@common/services/logger';
 import { Path } from '@common/types';
 import isErrorLike from '@common/utils/error/isErrorLike';
@@ -50,6 +51,8 @@ export default function FormProvider<TFormValues extends FieldValues>({
     resolver: validationSchema ? yupResolver(validationSchema) : undefined,
     shouldFocusError: false,
   });
+
+  const { handleError } = useErrorControl();
 
   const previousInitialValues = useRef(initialValues);
 
@@ -123,7 +126,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
             return;
           }
 
-          throw error;
+          handleError(error);
         }
       }, onInvalid);
     },
@@ -133,6 +136,7 @@ export default function FormProvider<TFormValues extends FieldValues>({
       fallbackSubmitError,
       fallbackServerValidationError,
       form,
+      handleError,
     ],
   );
 
