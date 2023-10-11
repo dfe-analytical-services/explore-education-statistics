@@ -149,7 +149,7 @@ const DownloadStep = ({
         // isMounted check required as Formik context can be undefined
         // if the step is active on page load.
         return isActive && isMounted ? (
-          <Form id="downloadForm" showSubmitError>
+          <Form id="downloadForm">
             <FormFieldset id="downloadFiles" legend={stepHeading}>
               {checkboxOptions.length > 0 && (
                 <FormFieldCheckboxGroup<DownloadFormValues>

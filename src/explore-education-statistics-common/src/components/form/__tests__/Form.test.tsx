@@ -1,5 +1,6 @@
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { FormFieldTextInput } from '@common/components/form';
+import SubmitError from '@common/components/form/util/SubmitError';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import Yup from '@common/validation/yup';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -188,7 +189,7 @@ describe('Form', () => {
     });
   });
 
-  test('renders submit error', async () => {
+  test('renders submit error with default message when error thrown', async () => {
     const { container } = render(
       <Formik
         initialValues={{
@@ -198,10 +199,10 @@ describe('Form', () => {
           firstName: Yup.string().required(),
         })}
         onSubmit={() => {
-          throw new Error('Something went wrong');
+          throw new Error();
         }}
       >
-        <Form id="test-form" showSubmitError>
+        <Form id="test-form">
           The form
           <button type="submit">Submit</button>
         </Form>
@@ -211,7 +212,106 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Something went wrong')).toHaveAttribute(
+      expect(
+        screen.getByText('Something went wrong whilst submitting the form'),
+      ).toHaveAttribute('href', '#test-form-submit');
+    });
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders submit error with custom message when `SubmitError` thrown', async () => {
+    const { container } = render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={() => {
+          throw new SubmitError('Custom submit error message');
+        }}
+      >
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
+      </Formik>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Custom submit error message')).toHaveAttribute(
+        'href',
+        '#test-form-submit',
+      );
+    });
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders submit error with custom field when `SubmitError` thrown', async () => {
+    const { container } = render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={() => {
+          throw new SubmitError('Custom submit error message', {
+            field: 'firstName',
+          });
+        }}
+      >
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
+      </Formik>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Custom submit error message')).toHaveAttribute(
+        'href',
+        '#test-form-firstName',
+      );
+    });
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders submit error with default href when `SubmitError` thrown with invalid field', async () => {
+    const { container } = render(
+      <Formik
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().required(),
+        })}
+        onSubmit={() => {
+          throw new SubmitError('Custom submit error message', {
+            field: 'invalidField',
+          });
+        }}
+      >
+        <Form id="test-form">
+          The form
+          <button type="submit">Submit</button>
+        </Form>
+      </Formik>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Custom submit error message')).toHaveAttribute(
         'href',
         '#test-form-submit',
       );
@@ -222,7 +322,7 @@ describe('Form', () => {
 
   test('removes submit error when form can be submitted successfully', async () => {
     const onSubmit = jest.fn(() => {
-      throw new Error('Something went wrong');
+      throw new Error();
     });
 
     render(
@@ -235,7 +335,7 @@ describe('Form', () => {
         })}
         onSubmit={onSubmit}
       >
-        <Form id="test-form" showSubmitError>
+        <Form id="test-form">
           The form
           <button type="submit">Submit</button>
         </Form>
@@ -245,7 +345,9 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.queryByText('Something went wrong whilst submitting the form'),
+      ).toBeInTheDocument();
     });
 
     // Stop the onSubmit from throwing error
@@ -255,7 +357,7 @@ describe('Form', () => {
 
     await waitFor(() => {
       expect(
-        screen.queryByText('Something went wrong'),
+        screen.queryByText('Something went wrong whilst submitting the form'),
       ).not.toBeInTheDocument();
     });
   });
@@ -270,11 +372,11 @@ describe('Form', () => {
           firstName: Yup.string().required(),
         })}
         onSubmit={() => {
-          throw new Error('Something went wrong');
+          throw new Error();
         }}
       >
         {formik => (
-          <Form id="test-form" showSubmitError>
+          <Form id="test-form">
             The form
             <button type="submit">Submit</button>
             <button type="button" onClick={formik.handleReset}>
@@ -288,53 +390,18 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.queryByText('Something went wrong whilst submitting the form'),
+      ).toBeInTheDocument();
     });
 
     fireEvent.click(screen.getByText('Reset form'));
 
     await waitFor(() => {
       expect(
-        screen.queryByText('Something went wrong'),
+        screen.queryByText('Something went wrong whilst submitting the form'),
       ).not.toBeInTheDocument();
     });
-  });
-
-  test('removes submit error when form values are changed', async () => {
-    render(
-      <Formik
-        initialValues={{
-          firstName: 'Firstname',
-        }}
-        validationSchema={Yup.object({
-          firstName: Yup.string().required(),
-        })}
-        onSubmit={() => {
-          throw new Error('Something went wrong');
-        }}
-      >
-        <Form id="test-form" showSubmitError>
-          <label htmlFor="firstName">Firstname</label>
-          <Field name="firstName" type="text" id="firstName" />
-
-          <button type="submit">Submit</button>
-        </Form>
-      </Formik>,
-    );
-
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-
-    await waitFor(() => {
-      expect(screen.queryByText('Something went wrong')).toBeInTheDocument();
-    });
-
-    fireEvent.change(screen.getByLabelText('Firstname'), {
-      target: {
-        value: 'Another firstname',
-      },
-    });
-
-    expect(screen.queryByText('Something went wrong')).not.toBeInTheDocument();
   });
 
   test('renders mapped server validation submit errors', async () => {
@@ -386,7 +453,7 @@ describe('Form', () => {
         })}
         onSubmit={onSubmit}
       >
-        <Form id="test-form" showSubmitError>
+        <Form id="test-form">
           The form
           <button type="submit">Submit</button>
         </Form>
@@ -425,7 +492,7 @@ describe('Form', () => {
         }}
       >
         {formik => (
-          <Form id="test-form" showSubmitError>
+          <Form id="test-form">
             The form
             <button type="submit">Submit</button>
             <button type="button" onClick={formik.handleReset}>
@@ -464,7 +531,7 @@ describe('Form', () => {
           });
         }}
       >
-        <Form id="test-form" showSubmitError>
+        <Form id="test-form">
           <label htmlFor="firstName">Firstname</label>
           <Field name="firstName" type="text" id="firstName" />
 
@@ -533,7 +600,7 @@ describe('Form', () => {
         })}
         onSubmit={noop}
       >
-        <Form id="test-form" showSubmitError>
+        <Form id="test-form">
           <FormFieldTextInput
             id="test-form-firstName"
             label="First name"
@@ -563,7 +630,7 @@ describe('Form', () => {
         })}
         onSubmit={noop}
       >
-        <Form id="test-form" showSubmitError>
+        <Form id="test-form">
           <FormFieldTextInput
             id="test-form-firstName"
             label="First name"
@@ -610,7 +677,7 @@ describe('Form', () => {
         onSubmit={noop}
       >
         {() => (
-          <Form id="test-form" showSubmitError>
+          <Form id="test-form">
             <FormFieldTextInput
               id="test-form-firstName"
               label="First name"

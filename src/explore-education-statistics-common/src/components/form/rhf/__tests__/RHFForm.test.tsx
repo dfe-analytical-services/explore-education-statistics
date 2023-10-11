@@ -1,6 +1,7 @@
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import FormProvider from '@common/components/form/rhf/FormProvider';
 import RHFForm from '@common/components/form/rhf/RHFForm';
+import SubmitError from '@common/components/form/util/SubmitError';
 import Yup from '@common/validation/yup';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -165,7 +166,7 @@ describe('Form', () => {
     });
   });
 
-  test('renders submit error', async () => {
+  test('renders submit error with default message when error thrown', async () => {
     const { container } = render(
       <FormProvider
         initialValues={{
@@ -177,9 +178,8 @@ describe('Form', () => {
       >
         <RHFForm
           id="test-form"
-          showSubmitError
           onSubmit={() => {
-            throw new Error('Something went wrong');
+            throw new Error();
           }}
         >
           The form
@@ -191,7 +191,112 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Something went wrong')).toHaveAttribute(
+      expect(
+        screen.getByText('Something went wrong whilst submitting the form'),
+      ).toHaveAttribute('href', '#test-form-submit');
+    });
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders submit error with custom message when `SubmitError` thrown', async () => {
+    const { container } = render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        <RHFForm
+          id="test-form"
+          onSubmit={() => {
+            throw new SubmitError('Custom submit error message');
+          }}
+        >
+          The form
+          <button type="submit">Submit</button>
+        </RHFForm>
+      </FormProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Custom submit error message')).toHaveAttribute(
+        'href',
+        '#test-form-submit',
+      );
+    });
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders submit error with custom field when `SubmitError` thrown', async () => {
+    const { container } = render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        <RHFForm
+          id="test-form"
+          onSubmit={() => {
+            throw new SubmitError('Custom submit error message', {
+              field: 'firstName',
+            });
+          }}
+        >
+          The form
+          <button type="submit">Submit</button>
+        </RHFForm>
+      </FormProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Custom submit error message')).toHaveAttribute(
+        'href',
+        '#test-form-firstName',
+      );
+    });
+
+    expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('renders submit error with default href when `SubmitError` thrown with invalid field', async () => {
+    const { container } = render(
+      <FormProvider
+        initialValues={{
+          firstName: 'Firstname',
+        }}
+        validationSchema={Yup.object({
+          firstName: Yup.string().defined(),
+        })}
+      >
+        <RHFForm
+          id="test-form"
+          onSubmit={() => {
+            throw new SubmitError('Custom submit error message', {
+              field: 'invalidField',
+            });
+          }}
+        >
+          The form
+          <button type="submit">Submit</button>
+        </RHFForm>
+      </FormProvider>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Custom submit error message')).toHaveAttribute(
         'href',
         '#test-form-submit',
       );
@@ -202,7 +307,7 @@ describe('Form', () => {
 
   test('removes submit error when form can be submitted successfully', async () => {
     const onSubmit = jest.fn(() => {
-      throw new Error('Something went wrong');
+      throw new Error();
     });
 
     render(
@@ -214,7 +319,7 @@ describe('Form', () => {
           firstName: Yup.string().required(),
         })}
       >
-        <RHFForm id="test-form" showSubmitError onSubmit={onSubmit}>
+        <RHFForm id="test-form" onSubmit={onSubmit}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -224,7 +329,9 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Something went wrong whilst submitting the form'),
+      ).toBeInTheDocument();
     });
 
     // Stop the onSubmit from throwing error
@@ -234,7 +341,7 @@ describe('Form', () => {
 
     await waitFor(() => {
       expect(
-        screen.queryByText('Something went wrong'),
+        screen.queryByText('Something went wrong whilst submitting the form'),
       ).not.toBeInTheDocument();
     });
   });
@@ -252,9 +359,8 @@ describe('Form', () => {
         {({ reset }) => (
           <RHFForm
             id="test-form"
-            showSubmitError
             onSubmit={() => {
-              throw new Error('Something went wrong');
+              throw new Error();
             }}
           >
             The form
@@ -275,60 +381,16 @@ describe('Form', () => {
     userEvent.click(screen.getByRole('button', { name: 'Submit' }));
 
     await waitFor(() => {
-      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+      expect(
+        screen.getByText('Something went wrong whilst submitting the form'),
+      ).toBeInTheDocument();
     });
 
     userEvent.click(screen.getByText('Reset form'));
 
     await waitFor(() => {
       expect(
-        screen.queryByText('Something went wrong'),
-      ).not.toBeInTheDocument();
-    });
-  });
-
-  test('removes submit error when form values are changed', async () => {
-    render(
-      <FormProvider
-        initialValues={{
-          firstName: 'Firstname',
-        }}
-        validationSchema={Yup.object({
-          firstName: Yup.string().required('First name is required'),
-        })}
-      >
-        {({ register }) => (
-          <RHFForm
-            id="test-form"
-            showSubmitError
-            onSubmit={() => {
-              throw new Error('Something went wrong');
-            }}
-          >
-            <label htmlFor="firstName">Firstname</label>
-            <input
-              type="text"
-              id="firstName"
-              // eslint-disable-next-line react/jsx-props-no-spreading
-              {...register('firstName')}
-            />
-            <button type="submit">Submit</button>
-          </RHFForm>
-        )}
-      </FormProvider>,
-    );
-
-    userEvent.click(screen.getByRole('button', { name: 'Submit' }));
-
-    await waitFor(() => {
-      expect(screen.getByText('Something went wrong')).toBeInTheDocument();
-    });
-
-    userEvent.type(screen.getByLabelText('Firstname'), 'Another firstname');
-
-    await waitFor(() => {
-      expect(
-        screen.queryByText('Something went wrong'),
+        screen.queryByText('Something went wrong whilst submitting the form'),
       ).not.toBeInTheDocument();
     });
   });
@@ -345,7 +407,6 @@ describe('Form', () => {
       >
         <RHFForm
           id="test-form"
-          showSubmitError
           onSubmit={() => {
             throw createServerValidationErrorMock([], {
               firstName: ['Invalid first name'],
@@ -381,7 +442,7 @@ describe('Form', () => {
           firstName: Yup.string().defined(),
         })}
       >
-        <RHFForm id="test-form" showSubmitError onSubmit={onSubmit}>
+        <RHFForm id="test-form" onSubmit={onSubmit}>
           The form
           <button type="submit">Submit</button>
         </RHFForm>
@@ -417,7 +478,6 @@ describe('Form', () => {
         {({ reset }) => (
           <RHFForm
             id="test-form"
-            showSubmitError
             onSubmit={() => {
               throw createServerValidationErrorMock([], {
                 firstName: ['Invalid first name'],
@@ -465,7 +525,6 @@ describe('Form', () => {
         {({ register }) => (
           <RHFForm
             id="test-form"
-            showSubmitError
             onSubmit={() => {
               throw createServerValidationErrorMock([], {
                 firstName: ['Invalid first name'],
@@ -512,7 +571,6 @@ describe('Form', () => {
         {({ formState }) => (
           <RHFForm
             id="test-form"
-            showSubmitError
             onSubmit={() => {
               throw createServerValidationErrorMock(['Global error'], {
                 field1: ['Invalid field 1'],
@@ -549,7 +607,7 @@ describe('Form', () => {
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
+          <RHFForm id="test-form" onSubmit={jest.fn()}>
             <input
               id="test-form-firstName"
               // eslint-disable-next-line react/jsx-props-no-spreading
@@ -581,7 +639,7 @@ describe('Form', () => {
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
+          <RHFForm id="test-form" onSubmit={jest.fn()}>
             <label htmlFor="firstName">First name</label>
             <input
               id="firstName"
@@ -630,7 +688,7 @@ describe('Form', () => {
         })}
       >
         {({ register }) => (
-          <RHFForm id="test-form" showSubmitError onSubmit={jest.fn()}>
+          <RHFForm id="test-form" onSubmit={jest.fn()}>
             <label htmlFor="firstName">First name</label>
             <input
               id="firstName"

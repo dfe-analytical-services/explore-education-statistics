@@ -8,8 +8,10 @@ import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import ErrorSummary from '@common/components/ErrorSummary';
 import { Form, FormFieldSelect, FormSelect } from '@common/components/form';
+import SubmitError from '@common/components/form/util/SubmitError';
 import ModalConfirm from '@common/components/ModalConfirm';
 import VisuallyHidden from '@common/components/VisuallyHidden';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
@@ -77,6 +79,41 @@ const ChartDataSetsConfiguration = ({
     });
   }, [dataSets.length, updateForm]);
 
+  const handleSubmit = useFormSubmit((values: FormValues) => {
+    const selectedDataSets = getSelectedDataSets({
+      filters: meta.filters,
+      indicatorOptions,
+      values,
+    });
+    selectedDataSets.forEach(newDataSet => {
+      if (
+        dataSets.find(dataSet => {
+          return (
+            dataSet.indicator === newDataSet.indicator &&
+            difference(dataSet.filters, newDataSet.filters).length === 0 &&
+            dataSet.location?.level === newDataSet.location?.level &&
+            dataSet.location?.value === newDataSet.location?.value &&
+            dataSet.timePeriod === newDataSet.timePeriod
+          );
+        })
+      ) {
+        throw new SubmitError(
+          'The selected options have already been added to the chart',
+        );
+      }
+    });
+
+    const updatedDataSets = [...dataSets, ...selectedDataSets].map(
+      (dataSet, index) => {
+        return {
+          ...dataSet,
+          order: index,
+        };
+      },
+    );
+    onChange(updatedDataSets);
+  });
+
   return (
     <>
       {hasMixedUnits && (
@@ -107,44 +144,10 @@ const ChartDataSetsConfiguration = ({
           location: Yup.string(),
           timePeriod: Yup.string(),
         })}
-        onSubmit={values => {
-          const selectedDataSets = getSelectedDataSets({
-            filters: meta.filters,
-            indicatorOptions,
-            values,
-          });
-          selectedDataSets.forEach(newDataSet => {
-            if (
-              dataSets.find(dataSet => {
-                return (
-                  dataSet.indicator === newDataSet.indicator &&
-                  difference(dataSet.filters, newDataSet.filters).length ===
-                    0 &&
-                  dataSet.location?.level === newDataSet.location?.level &&
-                  dataSet.location?.value === newDataSet.location?.value &&
-                  dataSet.timePeriod === newDataSet.timePeriod
-                );
-              })
-            ) {
-              throw new Error(
-                'The selected options have already been added to the chart',
-              );
-            }
-          });
-
-          const updatedDataSets = [...dataSets, ...selectedDataSets].map(
-            (dataSet, index) => {
-              return {
-                ...dataSet,
-                order: index,
-              };
-            },
-          );
-          onChange(updatedDataSets);
-        }}
+        onSubmit={handleSubmit}
       >
         {() => (
-          <Form id={formId} showSubmitError>
+          <Form id={formId}>
             <div className={styles.formSelectRow}>
               {orderBy(
                 Object.entries(meta.filters),

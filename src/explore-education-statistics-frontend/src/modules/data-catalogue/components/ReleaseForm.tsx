@@ -18,7 +18,7 @@ export interface ReleaseFormValues {
 
 export type ReleaseFormSubmitHandler = (values: {
   release: ReleaseSummary;
-}) => void;
+}) => void | Promise<void>;
 
 const formId = 'releaseForm';
 
@@ -32,7 +32,7 @@ interface Props {
   hideLatestDataTag?: boolean;
 }
 
-const ReleaseForm = ({
+export default function ReleaseForm({
   legend,
   initialValues = {
     releaseId: '',
@@ -41,7 +41,7 @@ const ReleaseForm = ({
   options,
   hideLatestDataTag,
   ...stepProps
-}: Props & InjectedWizardProps) => {
+}: Props & InjectedWizardProps) {
   const { isActive, currentStep, stepNumber, goToNextStep } = stepProps;
 
   const radioOptions = useMemo<RadioOption[]>(
@@ -91,7 +91,7 @@ const ReleaseForm = ({
     >
       {form => {
         return isActive ? (
-          <Form id={formId} showSubmitError>
+          <Form id={formId}>
             <FormFieldRadioSearchGroup<ReleaseFormValues>
               name="releaseId"
               legend={legend}
@@ -119,6 +119,4 @@ const ReleaseForm = ({
       }}
     </Formik>
   );
-};
-
-export default ReleaseForm;
+}

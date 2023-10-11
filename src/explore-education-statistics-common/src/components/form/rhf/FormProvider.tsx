@@ -1,4 +1,7 @@
+import SubmitError from '@common/components/form/util/SubmitError';
+import logger from '@common/services/logger';
 import { Path } from '@common/types';
+import isErrorLike from '@common/utils/error/isErrorLike';
 import {
   FieldMessageMapper,
   isServerValidationError,
@@ -21,10 +24,12 @@ import { ObjectSchema, Schema } from 'yup';
 interface FormProviderProps<TFormValues extends FieldValues> {
   children: ReactNode | ((form: UseFormReturn<TFormValues>) => ReactNode);
   enableReinitialize?: boolean;
-  errorMappers?:
+  errorMappings?:
     | FieldMessageMapper<TFormValues>[]
     | ((values: TFormValues) => FieldMessageMapper<TFormValues>[]);
-  fallbackErrorMapper?: FieldMessageMapper<TFormValues>;
+  fallbackServerValidationError?: string;
+  fallbackErrorMapping?: FieldMessageMapper<TFormValues>;
+  fallbackSubmitError?: string;
   initialValues?: UseFormProps<TFormValues>['defaultValues'];
   validationSchema?: ObjectSchema<TFormValues> & Schema<TFormValues>;
 }
@@ -32,8 +37,10 @@ interface FormProviderProps<TFormValues extends FieldValues> {
 export default function FormProvider<TFormValues extends FieldValues>({
   children,
   enableReinitialize,
-  errorMappers = [],
-  fallbackErrorMapper,
+  errorMappings = [],
+  fallbackErrorMapping,
+  fallbackServerValidationError = 'The form submission is invalid and could not be processed',
+  fallbackSubmitError = 'Something went wrong whilst submitting the form',
   initialValues,
   validationSchema,
 }: FormProviderProps<TFormValues>) {
@@ -72,17 +79,46 @@ export default function FormProvider<TFormValues extends FieldValues>({
           if (isServerValidationError(error) && error.response?.data) {
             const fieldErrors = mapServerFieldErrors(
               error.response.data,
-              typeof errorMappers === 'function'
-                ? errorMappers(values as TFormValues)
-                : errorMappers,
-              fallbackErrorMapper,
+              typeof errorMappings === 'function'
+                ? errorMappings(values as TFormValues)
+                : errorMappings,
+              fallbackErrorMapping,
             );
 
-            fieldErrors.forEach(({ field, message }) => {
-              if (has(values, field)) {
+            const mappableErrors = fieldErrors.filter(({ field }) =>
+              has(values, field),
+            );
+
+            if (mappableErrors.length > 0) {
+              mappableErrors.forEach(({ field, message }) => {
                 form.setError(field as Path<TFormValues>, { message });
-              }
-            });
+              });
+            } else {
+              form.setError('root', {
+                message: fallbackServerValidationError,
+              });
+            }
+
+            return;
+          }
+
+          if (isErrorLike(error)) {
+            logger.error(error);
+
+            if (error instanceof SubmitError) {
+              form.setError(
+                error.field && has(values, error.field)
+                  ? (error.field as Path<TFormValues>)
+                  : 'root',
+                {
+                  message: error.message,
+                },
+              );
+            } else {
+              form.setError('root', {
+                message: fallbackSubmitError,
+              });
+            }
 
             return;
           }
@@ -91,7 +127,13 @@ export default function FormProvider<TFormValues extends FieldValues>({
         }
       }, onInvalid);
     },
-    [errorMappers, fallbackErrorMapper, form],
+    [
+      errorMappings,
+      fallbackErrorMapping,
+      fallbackSubmitError,
+      fallbackServerValidationError,
+      form,
+    ],
   );
 
   const providerProps = {

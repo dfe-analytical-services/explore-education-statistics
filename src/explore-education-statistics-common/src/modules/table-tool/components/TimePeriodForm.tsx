@@ -23,7 +23,9 @@ interface FormValues {
   end: string;
 }
 
-export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
+export type TimePeriodFormSubmitHandler = (
+  values: FormValues,
+) => void | Promise<void>;
 
 interface Props extends InjectedWizardProps {
   initialValues?: Partial<TimePeriodQuery>;
@@ -72,7 +74,7 @@ const TimePeriodForm = ({
     return `${getOptionLabel(startValue)} to ${getOptionLabel(endValue)}`;
   };
 
-  const initialFormValues = useMemo(() => {
+  const initialFormValues = useMemo<FormValues>(() => {
     const { startYear, startCode, endYear, endCode } = initialValues;
 
     const defaultTimePeriod =
@@ -169,11 +171,7 @@ const TimePeriodForm = ({
       {({ formState, getValues, reset }) => {
         if (isActive) {
           return (
-            <RHFForm
-              id="timePeriodForm"
-              showSubmitError
-              onSubmit={handleSubmit}
-            >
+            <RHFForm id="timePeriodForm" onSubmit={handleSubmit}>
               <FormFieldset
                 id="timePeriod"
                 hint={options.length === 1 && 'Only one time period available.'}

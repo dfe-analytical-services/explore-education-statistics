@@ -1,23 +1,25 @@
+import { Dictionary } from '@common/types';
 import get from 'lodash/get';
 import {
+  FieldError,
   FieldErrors,
   FieldNamesMarkedBoolean,
   FieldValues,
 } from 'react-hook-form';
 
-const createRHFErrorHelper = <T extends FieldValues>({
+export default function createRHFErrorHelper<TFormValues extends FieldValues>({
   touchedFields,
   errors,
   isSubmitted = false,
 }: {
-  touchedFields: Partial<Readonly<FieldNamesMarkedBoolean<T>>>;
-  errors: FieldErrors<T>;
+  touchedFields: Partial<Readonly<FieldNamesMarkedBoolean<TFormValues>>>;
+  errors: FieldErrors<TFormValues>;
   isSubmitted?: boolean;
-}) => {
+}) {
   const getAllErrors = (
-    errorGroup: FieldValues,
+    errorGroup: FieldErrors<TFormValues> | FieldError,
     keyPrefix?: string,
-  ): { [key: string]: string } => {
+  ): Dictionary<string> => {
     return Object.entries(errorGroup).reduce((acc, [key, error]) => {
       const errorKey = keyPrefix ? `${keyPrefix}.${key}` : key;
 
@@ -42,7 +44,7 @@ const createRHFErrorHelper = <T extends FieldValues>({
     }, {});
   };
 
-  const getError = (name: keyof T | string): string => {
+  const getError = (name: keyof TFormValues | string): string => {
     const isTouched = get(touchedFields, name, false);
 
     if (!isSubmitted && !isTouched) {
@@ -54,7 +56,7 @@ const createRHFErrorHelper = <T extends FieldValues>({
     return error?.message ? (error?.message as string) : '';
   };
 
-  const hasError = (value: keyof T | string): boolean => {
+  const hasError = (value: keyof TFormValues | string): boolean => {
     return !!getError(value);
   };
 
@@ -63,6 +65,4 @@ const createRHFErrorHelper = <T extends FieldValues>({
     hasError,
     getAllErrors: () => getAllErrors(errors),
   };
-};
-
-export default createRHFErrorHelper;
+}
