@@ -1,6 +1,5 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { MethodologyVersion } from '@admin/services/methodologyService';
 import { generatePath, MemoryRouter } from 'react-router';
 import MethodologySummaryPage from '@admin/pages/methodology/edit-methodology/summary/MethodologySummaryPage';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
@@ -9,45 +8,7 @@ import {
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import { Route } from 'react-router-dom';
-
-const testMethodology: MethodologyVersion = {
-  id: 'm1',
-  amendment: false,
-  methodologyId: 'm-1',
-  title: 'Test methodology',
-  slug: 'test-methodology',
-  status: 'Draft',
-  otherPublications: [
-    {
-      id: 'op1',
-      title: 'Other publication title 2',
-      contact: {
-        teamName: 'mock team name 2',
-        teamEmail: 'mock team email 2',
-        contactName: 'mock contact name 2',
-      },
-    },
-    {
-      id: 'op2',
-      title: 'Other publication title 3',
-      contact: {
-        teamName: 'mock team name 3',
-        teamEmail: 'mock team email 3',
-        contactName: 'mock contact name 3',
-      },
-    },
-  ],
-  owningPublication: {
-    id: 'p1',
-    title: 'Publication title',
-    contact: {
-      teamName: 'mock team name 1',
-      teamEmail: 'mock team email 1',
-      contactName: 'mock contact name 1',
-    },
-  },
-  published: '',
-};
+import testMethodology from '../../__tests__/__data__/mock-data';
 
 describe('MethodologySummaryPage', () => {
   test('renders methodology summary page correctly', async () => {
