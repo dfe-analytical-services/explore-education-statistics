@@ -26,16 +26,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<ContentBlock> Content { get; set; } = new();
 
-        public ReleaseContentSection Release { get; set; }
-
+        public Release Release { get; set; }
+        
+        public Guid ReleaseId { get; set; }
+        
         [JsonIgnore] public ContentSectionType Type { get; set; }
 
-        public ContentSection Clone(ReleaseContentSection newReleaseContentSection, Release.CloneContext context)
+        public ContentSection Clone(Release.CloneContext context)
         {
             var copy = MemberwiseClone() as ContentSection;
             copy.Id = Guid.NewGuid();
 
-            copy.Release = newReleaseContentSection;
+            copy.Release = context.NewRelease;
+            copy.ReleaseId = context.NewRelease.Id;
 
             copy.Content = copy
                 .Content?

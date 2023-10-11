@@ -22,14 +22,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache
             _contentPersistenceHelper = contentPersistenceHelper;
         }
         
-        public async Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(Guid releaseId, Guid dataBlockId)
+        public async Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(
+            Guid releaseId, 
+            Guid dataBlockId)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<ReleaseContentBlock>(query => query
-                    .Include(rcb => rcb.Release)
-                    .Include(rcb => rcb.ContentBlock)
-                    .Where(rcb => rcb.ContentBlockId == dataBlockId && rcb.ReleaseId == releaseId))
-                .OnSuccess(releaseContentBlock => new DataBlockTableResultCacheKey(releaseContentBlock));
+                .CheckEntityExists<ContentBlock>(query => query
+                    .Include(block => block.Release)
+                    .Where(block => block.Id == dataBlockId && block.ReleaseId == releaseId)
+                    .OfType<DataBlock>())
+                .OnSuccess(dataBlock => new DataBlockTableResultCacheKey((dataBlock as DataBlock)!));
         }
     }
 }

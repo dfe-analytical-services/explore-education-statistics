@@ -73,8 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<MethodologyNote> MethodologyNotes { get; set; }
         public virtual DbSet<Permalink> Permalinks { get; set; } = null!;
         public virtual DbSet<Contact> Contacts { get; set; }
-        public virtual DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
-        public virtual DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
         public virtual DbSet<Update> Update { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
@@ -472,12 +470,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Permalink>()
                 .HasIndex(data => data.SubjectId);
 
-            modelBuilder.Entity<ReleaseContentSection>()
-                .HasKey(item => new {item.ReleaseId, item.ContentSectionId});
-
-            modelBuilder.Entity<ReleaseContentBlock>()
-                .HasKey(item => new {item.ReleaseId, item.ContentBlockId});
-
             modelBuilder.Entity<User>();
 
             modelBuilder.Entity<UserPublicationRole>()
@@ -557,7 +549,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .ToTable("KeyStatisticsDataBlock");
 
             modelBuilder.Entity<KeyStatisticDataBlock>()
-                .HasOne<DataBlock>(ks => ks.DataBlock)
+                .HasOne(ks => ks.DataBlock)
                 .WithMany()
                 // WARN: This is necessary - otherwise an automatically generated cascade delete is added for when an
                 // associated data block is removed. That cascade delete _only_ removes the KeyStatisticsDataBlock

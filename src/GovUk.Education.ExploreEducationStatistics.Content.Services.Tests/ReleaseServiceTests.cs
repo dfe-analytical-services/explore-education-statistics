@@ -177,7 +177,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Release1SummarySectionHtmlContentBlock1,
                 Release1SummarySectionHtmlContentBlock2,
                 Release1SummarySectionHtmlContentBlock3,
-            }
+            },
+            Release = Release1V1
         };
 
         private static readonly ContentSection Release1RelatedDashboardsSection = new()
@@ -188,6 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Caption = "",
             Type = ContentSectionType.RelatedDashboards,
             Content = new List<ContentBlock>(),
+            Release = Release1V1
         };
 
 
@@ -203,7 +205,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Release1Section1HtmlContentBlock1,
                 Release1Section1HtmlContentBlock2,
                 Release1Section1HtmlContentBlock3,
-            }
+            },
+            Release = Release1V1
         };
 
         private static readonly ContentSection Release1Section2 = new()
@@ -212,7 +215,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Order = 0,
             Heading = "Release 1 section 2 order 0",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ContentSectionType.Generic,
+            Release = Release1V1
         };
 
         private static readonly ContentSection Release1Section3 = new()
@@ -221,37 +225,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Order = 1,
             Heading = "Release 1 section 3 order 1",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ContentSectionType.Generic,
+            Release = Release1V1
         };
 
-        private static readonly List<ReleaseContentSection> ReleaseContentSections = new()
-        {
-            new ReleaseContentSection
-            {
-                Release = Release1V1,
-                ContentSection = Release1SummarySection
-            },
-            new ReleaseContentSection
-            {
-                Release = Release1V1,
-                ContentSection = Release1RelatedDashboardsSection
-            },
-            new ReleaseContentSection
-            {
-                Release = Release1V1,
-                ContentSection = Release1Section1
-            },
-            new ReleaseContentSection
-            {
-                Release = Release1V1,
-                ContentSection = Release1Section2
-            },
-            new ReleaseContentSection
-            {
-                Release = Release1V1,
-                ContentSection = Release1Section3
-            },
-        };
+        private static readonly List<ContentSection> ContentSections = 
+            ListOf(
+                Release1SummarySection,
+                Release1RelatedDashboardsSection,
+                Release1Section1,
+                Release1Section2,
+                Release1Section3);
 
         [Fact]
         public async Task GetRelease()
@@ -306,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 await contentDbContext.AddRangeAsync(Releases);
                 await contentDbContext.AddRangeAsync(releaseFiles);
-                await contentDbContext.AddRangeAsync(ReleaseContentSections);
+                await contentDbContext.AddRangeAsync(ContentSections);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -350,7 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var relatedDashboardsSection = viewModel.RelatedDashboardsSection;
                 Assert.NotNull(relatedDashboardsSection);
-                Assert.Equal(Release1RelatedDashboardsSection.Id, relatedDashboardsSection!.Id);
+                Assert.Equal(Release1RelatedDashboardsSection.Id, relatedDashboardsSection.Id);
                 Assert.Empty(relatedDashboardsSection.Content);
 
                 var content = viewModel.Content;
@@ -403,15 +387,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task GetRelease_FiltersContent()
         {
-            var release = new Release
-            {
-                Publication = new Publication(),
-                ReleaseName = "2022",
-                TimePeriodCoverage = CalendarYear,
-                ApprovalStatus = Approved,
-                Published = DateTime.UtcNow
-            };
-
             var originalContent = @"
                 <p>
                     Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
@@ -422,12 +397,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
                 </ul>".TrimIndent();
 
-            var releaseContentSections = new List<ReleaseContentSection>
+            var release = new Release
             {
-                new()
-                {
-                    Release = release,
-                    ContentSection = new ContentSection
+                Publication = new Publication(),
+                ReleaseName = "2022",
+                TimePeriodCoverage = CalendarYear,
+                ApprovalStatus = Approved,
+                Published = DateTime.UtcNow,
+                Content = ListOf(
+                    new ContentSection
                     {
                         Type = ContentSectionType.ReleaseSummary,
                         Content = new List<ContentBlock>
@@ -437,12 +415,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 Body = originalContent
                             }
                         }
-                    }
-                },
-                new()
-                {
-                    Release = release,
-                    ContentSection = new ContentSection
+                    },
+                    new ContentSection
                     {
                         Type = ContentSectionType.RelatedDashboards,
                         Content = new List<ContentBlock>
@@ -452,12 +426,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 Body = originalContent
                             }
                         }
-                    }
-                },
-                new()
-                {
-                    Release = release,
-                    ContentSection = new ContentSection
+                    },
+                    new ContentSection
                     {
                         Type = ContentSectionType.Headlines,
                         Content = new List<ContentBlock>
@@ -467,12 +437,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 Body = originalContent
                             }
                         }
-                    }
-                },
-                new()
-                {
-                    Release = release,
-                    ContentSection = new ContentSection
+                    },
+                    new ContentSection
                     {
                         Type = ContentSectionType.Generic,
                         Content = new List<ContentBlock>
@@ -482,8 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                                 Body = originalContent
                             }
                         }
-                    }
-                }
+                    })
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -491,7 +456,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(release);
-                await contentDbContext.AddRangeAsync(releaseContentSections);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -525,7 +489,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var relatedDashboardsSection = viewModel.RelatedDashboardsSection;
                 Assert.NotNull(relatedDashboardsSection);
-                Assert.Single(relatedDashboardsSection!.Content);
+                Assert.Single(relatedDashboardsSection.Content);
                 Assert.Equal(expectedContent, (relatedDashboardsSection.Content[0] as HtmlBlockViewModel)?.Body);
 
                 var content = viewModel.Content;

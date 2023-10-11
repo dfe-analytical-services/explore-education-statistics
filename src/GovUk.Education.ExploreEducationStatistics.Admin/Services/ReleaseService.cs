@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
                 .OnSuccess(async () =>
                 {
-                    var release = new Release
+                    var newRelease = new Release
                     {
                         Id = _guidGenerator.NewGuid(),
                         PublicationId =  releaseCreate.PublicationId,
@@ -140,35 +140,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (releaseCreate.TemplateReleaseId.HasValue)
                     {
-                        await CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, release);
+                        var context = new Release.CloneContext(newRelease);
+                        await CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, context);
+                        var copiedDataBlocks = await CopyDataBlocksFromTemplateRelease(releaseCreate.TemplateReleaseId.Value, context);
+                        await _context.ContentBlocks.AddRangeAsync(copiedDataBlocks);
                     }
                     else
                     {
-                        release.GenericContent = new List<ContentSection>();
+                        newRelease.GenericContent = new List<ContentSection>();
                     }
 
-                    release.SummarySection = new ContentSection
+                    newRelease.SummarySection = new ContentSection
                     {
                         Type = ContentSectionType.ReleaseSummary,
                     };
-                    release.KeyStatisticsSecondarySection = new ContentSection
+                    newRelease.KeyStatisticsSecondarySection = new ContentSection
                     {
                         Type = ContentSectionType.KeyStatisticsSecondary,
                     };
-                    release.HeadlinesSection = new ContentSection
+                    newRelease.HeadlinesSection = new ContentSection
                     {
                         Type = ContentSectionType.Headlines,
                     };
-                    release.RelatedDashboardsSection = new ContentSection
+                    newRelease.RelatedDashboardsSection = new ContentSection
                     {
                         Type = ContentSectionType.RelatedDashboards,
                     };
-                    release.Created = DateTime.UtcNow;
-                    release.CreatedById = _userService.GetUserId();
+                    newRelease.Created = DateTime.UtcNow;
+                    newRelease.CreatedById = _userService.GetUserId();
 
-                    await _context.Releases.AddAsync(release);
+                    await _context.Releases.AddAsync(newRelease);
                     await _context.SaveChangesAsync();
-                    return await GetRelease(release.Id);
+                    return await GetRelease(newRelease.Id);
                 });
         }
 
@@ -305,8 +308,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release release)
         {
-            var amendment = release.CreateAmendment(DateTime.UtcNow, _userService.GetUserId());
+            var dataBlocks = await _context
+                .ContentBlocks
+                .Where(block => block.ReleaseId == release.Id)
+                .OfType<DataBlock>()
+                .ToListAsync();
+            
+            var (amendment, amendedDataBlocks) = release.CreateAmendment(dataBlocks, DateTime.UtcNow, _userService.GetUserId());
             await _context.Releases.AddAsync(amendment);
+            await _context.ContentBlocks.AddRangeAsync(amendedDataBlocks);
             await _context.SaveChangesAsync();
             return amendment;
         }
@@ -534,14 +544,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
 
-        private async Task CreateGenericContentFromTemplate(Guid releaseId, Release newRelease)
+        private async Task CreateGenericContentFromTemplate(Guid templateReleaseId, Release.CloneContext context)
         {
-            var templateRelease = await _context.Releases.AsNoTracking()
-                .Include(r => r.Content)
-                .ThenInclude(c => c.ContentSection)
-                .FirstAsync(r => r.Id == releaseId);
+            var templateRelease = await _context
+                .Releases
+                .AsNoTracking()
+                .Include(release => release.Content)
+                .FirstAsync(r => r.Id == templateReleaseId);
 
-            templateRelease.CreateGenericContentFromTemplate(newRelease);
+            templateRelease.CreateGenericContentFromTemplate(context);
+        }
+
+        // TODO EES-4467 - this can be incorporated back into Release as the newly fashioned
+        // DataBlock / DataBlockVersions tables when tackling EES-4467. For the time being though,
+        // this will need to be done separately from the cloning of the main Release entity.
+        private async Task<List<DataBlock>> CopyDataBlocksFromTemplateRelease(
+            Guid templateReleaseId, 
+            Release.CloneContext context)
+        {
+            var templateDataBlocks = await _context
+                .ContentBlocks
+                .AsNoTracking()
+                .Where(block => block.ReleaseId == templateReleaseId)
+                .OfType<DataBlock>()
+                .ToListAsync();
+
+            return templateDataBlocks
+                .Select(dataBlock => dataBlock.Clone(context))
+                .Cast<DataBlock>()
+                .ToList();
         }
 
         public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
@@ -652,17 +683,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return queryable
                 .AsSplitQuery()
-                .Include(r => r.Publication)
-                .Include(r => r.Content)
-                .ThenInclude(c => c.ContentSection)
-                .ThenInclude(c => c.Content)
-                .ThenInclude(cb => (cb as EmbedBlockLink)!.EmbedBlock)
-                .Include(r => r.Updates)
-                .Include(r => r.ContentBlocks)
-                .ThenInclude(r => r.ContentBlock)
-                .Include(r => r.KeyStatistics)
-                .ThenInclude(ks => (ks as KeyStatisticDataBlock)!.DataBlock)
-                .Include(r => r.FeaturedTables);
+                .Include(release => release.Publication)
+                .Include(release => release.Content)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
+                .Include(release => release.Updates)
+                .Include(release => release.Content)
+                .ThenInclude(release => release.Content)
+                .Include(release => release.KeyStatistics)
+                .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
+                .Include(release => release.FeaturedTables);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)

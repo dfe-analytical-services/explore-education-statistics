@@ -118,27 +118,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockId)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<ReleaseContentBlock>(q =>
+                .CheckEntityExists<ContentBlock>(q =>
                     q.Include(block => block.Release)
-                        .ThenInclude(release => release.Publication)
-                        .Include(block => block.ContentBlock)
-                        .Where(block => block.ContentBlockId == dataBlockId))
-                .OnSuccess(async block =>
+                    .ThenInclude(release => release.Publication)
+                    .Where(block => block.Id == dataBlockId))
+                .OnSuccess(contentBlock => contentBlock as DataBlock ?? new Either<ActionResult, DataBlock>(new NotFoundResult()))
+                .OnSuccess(async dataBlock =>
                     // Check the data block is for the latest published version of the release
-                    await _releaseRepository.IsLatestPublishedVersionOfRelease(block.ReleaseId)
-                        ? block
-                        : new Either<ActionResult, ReleaseContentBlock>(new NotFoundResult()))
+                    await _releaseRepository.IsLatestPublishedVersionOfRelease(dataBlock.ReleaseId)
+                        ? dataBlock
+                        : new Either<ActionResult, DataBlock>(new NotFoundResult()))
                 .OnSuccessCombineWith(
-                    block => _releaseRepository.GetLatestPublishedRelease(block.Release.PublicationId))
-                .OnSuccessCombineWith(tuple =>
-                {
-                    var block = tuple.Item1;
-                    return GetDataBlockTableResult(new CacheableDataBlock(block));
-                })
+                    dataBlock => _releaseRepository.GetLatestPublishedRelease(dataBlock.Release.PublicationId))
+                .OnSuccessCombineWith(tuple => GetDataBlockTableResult(new CacheableDataBlock(tuple.Item1)))
                 .OnSuccess(tuple =>
                 {
-                    var (block, latestRelease, tableResult) = tuple;
-                    return BuildFastTrackViewModel(block, tableResult, latestRelease);
+                    var (dataBlock, latestRelease, tableResult) = tuple;
+                    return BuildFastTrackViewModel(dataBlock, tableResult, latestRelease);
                 })
                 .HandleFailuresOrOk();
         }
@@ -156,17 +152,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         private static FastTrackViewModel BuildFastTrackViewModel(
-            ReleaseContentBlock releaseContentBlock,
+            DataBlock dataBlock,
             TableBuilderResultViewModel tableResult,
             Release latestRelease)
         {
-            if (releaseContentBlock.ContentBlock is not DataBlock dataBlock)
-            {
-                throw new ArgumentException(
-                    $"ContentBlock must be of type DataBlock. Found {releaseContentBlock.ContentBlock?.GetType().Name ?? "null"}.");
-            }
-
-            var release = releaseContentBlock.Release;
+            var release = dataBlock.Release;
 
             return new FastTrackViewModel
             {

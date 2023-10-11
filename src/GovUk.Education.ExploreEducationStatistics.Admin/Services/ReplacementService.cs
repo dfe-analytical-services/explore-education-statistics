@@ -193,10 +193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _contentDbContext
-                .ReleaseContentBlocks
-                .Include(join => join.ContentBlock)
-                .Where(join => join.ReleaseId == releaseId)
-                .Select(join => join.ContentBlock)
+                .ContentBlocks
+                .Where(block => block.ReleaseId == releaseId)
                 .OfType<DataBlock>()
                 .ToList()
                 .Where(dataBlock => dataBlock.Query.SubjectId == subjectId)

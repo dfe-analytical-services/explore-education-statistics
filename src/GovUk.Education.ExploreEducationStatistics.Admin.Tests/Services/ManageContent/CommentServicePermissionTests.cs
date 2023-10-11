@@ -14,6 +14,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent
@@ -23,29 +24,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         private static readonly Guid ContentSectionId = Guid.NewGuid();
         private static readonly Guid ContentBlockId = Guid.NewGuid();
 
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
             Id = Guid.NewGuid(),
-            Content = new List<ReleaseContentSection>
-            {
-                new ReleaseContentSection
+            Content = ListOf(
+                new ContentSection
                 {
-                    ContentSection = new ContentSection
+                    Id = ContentSectionId,
+                    Content = new List<ContentBlock>
                     {
-                        Id = ContentSectionId,
-                        Content = new List<ContentBlock>
+                        new DataBlock
                         {
-                            new DataBlock
-                            {
-                                Id = ContentBlockId
-                            }
+                            Id = ContentBlockId
                         }
                     }
-                }
-            }
+                })
         };
 
-        private readonly Comment _comment = new Comment
+        private readonly Comment _comment = new()
         {
             Id = Guid.NewGuid()
         };

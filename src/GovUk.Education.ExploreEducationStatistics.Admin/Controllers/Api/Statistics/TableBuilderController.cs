@@ -79,32 +79,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             CancellationToken cancellationToken = default)
         {
             return await _contentPersistenceHelper
-                .CheckEntityExists<ReleaseContentBlock>(
+                .CheckEntityExists<ContentBlock>(
                     query => query
-                        .Include(rcb => rcb.ContentBlock)
-                        .Include(rcb => rcb.Release)
-                        .Where(
-                            rcb => rcb.ReleaseId == releaseId
-                                   && rcb.ContentBlockId == dataBlockId
-                        )
-                )
-                .OnSuccess(block => GetReleaseDataBlockResults(block, cancellationToken))
+                        .Include(block => block.Release)
+                        .OfType<DataBlock>()
+                        .Where(block =>
+                            block.ReleaseId == releaseId
+                            && block.Id == dataBlockId))
+                .OnSuccess(block => block is DataBlock dataBlock ? dataBlock : new Either<ActionResult,DataBlock>(new NotFoundResult()))
+                .OnSuccess(dataBlock => GetReleaseDataBlockResults(dataBlock, cancellationToken))
                 .HandleFailuresOrOk();
         }
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
-            ReleaseContentBlock block, 
+            DataBlock dataBlock,
             CancellationToken cancellationToken)
         {
-            if (!(block.ContentBlock is DataBlock dataBlock))
-            {
-                return new NotFoundResult();
-            }
-            
             return await _userService
-                .CheckCanViewRelease(block.Release)
-                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, dataBlock.Query, cancellationToken));
+                .CheckCanViewRelease(dataBlock.Release)
+                .OnSuccess(_ => _tableBuilderService.Query(dataBlock.ReleaseId, dataBlock.Query, cancellationToken));
         }
     }
 }

@@ -24,6 +24,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static Moq.MockBehavior;
@@ -36,9 +37,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Get()
         {
             var subjectId = Guid.NewGuid();
+
+            var release = new Release();
             
             var dataBlock = new DataBlock
             {
+                Release = release,
                 Heading = "Test heading",
                 Name = "Test name",
                 Source = "Test source",
@@ -81,8 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
             };
 
-            var release = new Release();
-
             var releaseFile = new ReleaseFile
             {
                 Name = "test release file",
@@ -103,17 +105,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 DataBlock = dataBlock,
             };
 
-            var releaseContentBlock = new ReleaseContentBlock 
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
-
-
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, releaseFile, releaseContentBlock, featuredTable);
+                await context.AddRangeAsync(release, releaseFile, dataBlock, featuredTable);
                 await context.SaveChangesAsync();
             }
 
@@ -146,16 +141,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
+            var release = new Release();
+
             var dataBlock = new DataBlock
             {
+                Release = release,
                 Name = "Test name",
                 Query = new ObservationQueryContext
                 {
                     SubjectId = subjectId
                 }
             };
-
-            var release = new Release();
 
             var releaseFile = new ReleaseFile
             {
@@ -169,16 +165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
-
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, releaseFile, releaseContentBlock);                
+                await context.AddRangeAsync(release, releaseFile, dataBlock);                
                 await context.SaveChangesAsync();
             }
 
@@ -200,9 +190,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Get_ReleaseContentBlockFileWithoutNameReturnsEmptyString()
         {
             var subjectId = Guid.NewGuid();
+
+            var release = new Release();
             
             var dataBlock = new DataBlock
             {
+                Release = release,
                 Heading = "Test name",
                 Charts = new List<IChart>
                 {
@@ -217,8 +210,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     SubjectId = subjectId
                 }
             };
-
-            var release = new Release();
 
             var releaseFile = new ReleaseFile
             {
@@ -236,14 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryContentDbContext(contextId))
             {
 
-                await context.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock,
-                    },
-                    releaseFile
-                );
+                await context.AddRangeAsync(dataBlock, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -297,18 +281,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     SubjectId  = subjectId
                 },
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock,
+                Release = release
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(releaseContentBlock, releaseFile);
+                await context.AddRangeAsync(dataBlock, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -332,6 +311,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
             
+            var release = new Release();
+            
             var dataBlock = new DataBlock
             {
                 Heading = "Test heading",
@@ -346,10 +327,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Query = new ObservationQueryContext
                 {
                     SubjectId = subjectId
-                }
+                },
+                Release = release
             };
-            
-            var release = new Release();
 
             var releaseFile = new ReleaseFile
             {
@@ -369,14 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock,
-                    },
-                   releaseFile
-                );
+                await context.AddRangeAsync(dataBlock, releaseFile);
                 await context.SaveChangesAsync();
             }
             await using (var context = InMemoryContentDbContext(contextId))
@@ -475,6 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Width = 500,
                     }
                 },
+                Release = release
             };
             var featuredTable1 = new FeaturedTable
             {
@@ -516,32 +490,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 },
-                Charts = new List<IChart>()
+                Charts = new List<IChart>(),
+                Release = release
             };
             var featuredTable2 = new FeaturedTable
             {
                 Name = "Test highlight name 2",
                 Description = "Test highlight description 2",
                 DataBlock = dataBlock2,
-                Release = release,
+                Release = release
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock1
-                    },
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock2
-                    }
-                );
+                await context.AddRangeAsync(dataBlock1, dataBlock2);
                 await context.FeaturedTables.AddRangeAsync(featuredTable1, featuredTable2);
                 await context.SaveChangesAsync();
             }
@@ -583,6 +547,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 ContentSectionId = null,
+                Release = release
             };
 
             var keyStatistic = new KeyStatisticDataBlock
@@ -595,13 +560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock,
-                    }
-                );
+                await context.AddRangeAsync(dataBlock);
                 await context.KeyStatisticsDataBlock.AddAsync(keyStatistic);
                 await context.SaveChangesAsync();
             }
@@ -625,7 +584,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release();
 
-            var dataBlock1 = new DataBlock
+            var relatedDataBlock = new DataBlock
             {
                 Heading = "Test heading 1",
                 Name = "Test name 1",
@@ -667,36 +626,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Width = 500,
                     }
                 },
+                Release = release
             };
             var featuredTable1 = new FeaturedTable
             {
                 Name = "Test highlight name 1",
                 Description = "Test highlight description 1",
-                DataBlock = dataBlock1,
+                DataBlock = relatedDataBlock,
                 Release = release,
             };
-
-            var dataBlock2 = new DataBlock
+            var unrelatedDataBlock = new DataBlock
             {
                 Name = "Test name 2",
+                // This Data Block is attached to a different Release
+                Release = new Release()
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock1
-                    },
-                    new ReleaseContentBlock
-                    {
-                        Release = new Release(),
-                        ContentBlock = dataBlock2
-                    }
-                );
+                await context.AddRangeAsync(relatedDataBlock, unrelatedDataBlock);
                 await context.FeaturedTables.AddAsync(featuredTable1);
                 await context.SaveChangesAsync();
             }
@@ -708,12 +658,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var viewModel = Assert.Single(result.AssertRight());
 
-                Assert.Equal(dataBlock1.Heading, viewModel.Heading);
-                Assert.Equal(dataBlock1.Name, viewModel.Name);
-                Assert.Equal(dataBlock1.Created, viewModel.Created);
+                Assert.Equal(relatedDataBlock.Heading, viewModel.Heading);
+                Assert.Equal(relatedDataBlock.Name, viewModel.Name);
+                Assert.Equal(relatedDataBlock.Created, viewModel.Created);
                 Assert.Equal(featuredTable1.Name, viewModel.HighlightName);
                 Assert.Equal(featuredTable1.Description, viewModel.HighlightDescription);
-                Assert.Equal(dataBlock1.Source, viewModel.Source);
+                Assert.Equal(relatedDataBlock.Source, viewModel.Source);
                 Assert.Equal(1, viewModel.ChartsCount);
                 Assert.True(viewModel.InContent);
             }
@@ -741,7 +691,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ContentSection = new ContentSection
                 {
                     Heading = "Test heading"
-                }
+                },
+                Release = release
             };
             var file = new File
             {
@@ -753,13 +704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock
-                    }
-                );
+                await context.AddAsync(dataBlock);
                 await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
@@ -795,7 +740,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release();
 
-            var dataBlock = new DataBlock();
+            var dataBlock = new DataBlock
+            {
+                Release = release
+            };
 
             var keyStatistic = new KeyStatisticDataBlock
             {
@@ -805,13 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock
-                    }
-                );
+                await context.AddAsync(dataBlock);
                 await context.KeyStatisticsDataBlock.AddAsync(keyStatistic);
                 await context.SaveChangesAsync();
             }
@@ -841,7 +783,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release();
 
-            var dataBlock = new DataBlock();
+            var dataBlock = new DataBlock
+            {
+                Release = release
+            };
 
             var featuredTable = new FeaturedTable
             {
@@ -853,13 +798,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock
-                    }
-                );
+                await context.AddAsync(dataBlock);
                 await context.FeaturedTables.AddAsync(featuredTable);
                 await context.SaveChangesAsync();
             }
@@ -929,7 +868,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ContentSection = new ContentSection
                 {
                     Heading = "Test heading"
-                }
+                },
+                Release = new Release()
             };
             var file = new File
             {
@@ -941,13 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = new Release(),
-                        ContentBlock = dataBlock
-                    }
-                );
+                await context.AddAsync(dataBlock);
                 await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
@@ -1003,15 +937,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ContentSection = new ContentSection
                 {
                     Heading = "Test heading"
-                }
+                },
+                Release = release
             };
             
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
-
             var file = new File
             {
                 Id = fileId,
@@ -1022,7 +951,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(releaseContentBlock);
+                await context.AddAsync(dataBlock);
                 await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
@@ -1040,7 +969,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlock);
                 
                 cacheKeyService
                     .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
@@ -1069,7 +998,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Assert.Empty(context.DataBlocks.ToList());
                 Assert.Empty(context.ContentBlocks.ToList());
-                Assert.Empty(context.ReleaseContentBlocks.ToList());
                 Assert.Empty(context.KeyStatistics.ToList());
             }
         }
@@ -1105,13 +1033,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = new Release(),
-                        ContentBlock = dataBlock
-                    }
-                );
+                await context.AddAsync(dataBlock);
                 await context.SaveChangesAsync();
             }
 
@@ -1230,13 +1152,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 createRequest.Table.AssertDeepEqualTo(dataBlock.Table);
                 createRequest.Charts.AssertDeepEqualTo(dataBlock.Charts);
 
-                var savedRelease = await context.Releases
-                    .Include(r => r.ContentBlocks)
+                var savedRelease = await context
+                    .Releases
                     .FirstOrDefaultAsync(r => r.Id == release.Id);
 
+                var savedDataBlocks = context
+                    .ContentBlocks
+                    .Where(block => block.ReleaseId == release.Id)
+                    .ToList();
+
                 Assert.NotNull(savedRelease);
-                Assert.Single(savedRelease.ContentBlocks);
-                Assert.Equal(dataBlock, savedRelease.ContentBlocks[0].ContentBlock);
+                Assert.Single(savedDataBlocks);
+                Assert.Equal(dataBlock, savedDataBlocks[0]);
             }
         }
 
@@ -1405,23 +1332,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Height = 400,
                         Width = 500,
                     }
-                }
+                },
+                Release = release
             };
             
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock,
-            };
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(
-                    releaseContentBlock,
-                    releaseFile
-                );
+                await context.AddRangeAsync(dataBlock, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -1442,14 +1361,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Height = 600,
                         Width = 700,
                     }
-                },
+                }
             };
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlock);
                 
                 cacheKeyService
                     .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
@@ -1541,18 +1460,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Width = 500,
                     }
                 },
+                Release = release
             };
             
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
-
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(releaseContentBlock, releaseFile);
+                await context.AddRangeAsync(dataBlock, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -1578,7 +1492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlock);
                 
                 cacheKeyService
                     .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
@@ -1677,14 +1591,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Width = 500,
                     }
                 },
+                Release = release
             };
             
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
-
             var file = new File
             {
                 Id = fileId,
@@ -1695,7 +1604,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(releaseContentBlock, file, releaseFile);
+                await context.AddRangeAsync(dataBlock, file, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -1726,7 +1635,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 
                 var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlock);
                 
                 cacheKeyService
                     .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
@@ -1769,67 +1678,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 DataBlockId = attachedDataBlock1Id,
             };
 
-            var releaseContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
+            var contentBlocks = ListOf<ContentBlock>(
+                new DataBlock
                 {
-                    Release = release,
-                    ContentBlock = new DataBlock
-                    {
-                        Id = attachedDataBlock1Id, // attached to key stat
-                        Name = "Attached 1",
-                        ContentSectionId = null,
-                    },
+                    Id = attachedDataBlock1Id, // attached to key stat
+                    Name = "Attached 1",
+                    ContentSection = new ContentSection(),
+                    Release = release
                 },
-                new()
+                new DataBlock
                 {
-                    Release = release,
-                    ContentBlock = new DataBlock
-                    {
-                        Id = unattachedDataBlock1Id,
-                        Name = "Unattached 1",
-                        ContentSection = null,
-                    },
+                    Id = unattachedDataBlock1Id,
+                    Name = "Unattached 1",
+                    ContentSection = null,
+                    Release = release
                 },
-                new()
+                new HtmlBlock(),
+                new DataBlock
                 {
-                    Release = release,
-                    ContentBlock = new HtmlBlock(),
+                    Id = unattachedDataBlock2Id,
+                    Name = "Unattached 2",
+                    ContentSection = null,
+                    Release = release
                 },
-                new()
+                new DataBlock
                 {
-                    Release = release,
-                    ContentBlock = new DataBlock
-                    {
-                        Id = unattachedDataBlock2Id,
-                        Name = "Unattached 2",
-                        ContentSection = null,
-                    },
+                    Name = "Attached 2", // because has content section
+                    ContentSection = new ContentSection(),
+                    Release = release
                 },
-                new()
+                new DataBlock
                 {
-                    Release = release,
-                    ContentBlock = new DataBlock
-                    {
-                        Name = "Attached 2", // because has content section
-                        ContentSection = new ContentSection(),
-                    },
-                },
-                new()
-                {
-                    Release = new Release(),
-                    ContentBlock = new DataBlock
-                    {
-                        Name = "Attached 3", // because different release
-                        ContentSection = null,
-                    }
-                },
-            };
+                    Name = "Unattached for different Release", // because different release
+                    ContentSection = null,
+                    Release = new Release()
+                });
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(releaseContentBlocks);
+                await contentDbContext.ContentBlocks.AddRangeAsync(contentBlocks);
                 await contentDbContext.KeyStatisticsDataBlock.AddRangeAsync(keyStat);
                 await contentDbContext.SaveChangesAsync();
             }

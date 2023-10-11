@@ -7,9 +7,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
 
 public interface IReleaseContentHubClient
 {
-    Task ContentBlockLocked(ReleaseContentBlockLockViewModel lockViewModel);
+    Task ContentBlockLocked(ContentBlockLockViewModel lockViewModel);
 
-    Task ContentBlockUnlocked(ReleaseContentBlockUnlockViewModel unlockViewModel);
+    Task ContentBlockUnlocked(ContentBlockUnlockViewModel unlockViewModel);
 
     Task ContentBlockUpdated(IContentBlockViewModel viewModel);
 }

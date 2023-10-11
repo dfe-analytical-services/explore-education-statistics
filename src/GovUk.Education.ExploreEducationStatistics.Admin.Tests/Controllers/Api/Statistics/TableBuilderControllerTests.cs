@@ -151,33 +151,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var cancellationToken = new CancellationToken();
 
-            var releaseContentBlock = new ReleaseContentBlock
+            var dataBlock = new DataBlock
             {
-                ReleaseId = ReleaseId,
-                Release = new Release
-                {
-                    Id = ReleaseId,
-                    Publication = new Publication
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = _dataBlockId,
-                    Query = _query,
-                    Charts = new List<IChart>()
-                }
+                Id = _dataBlockId,
+                Query = _query,
+                Charts = new List<IChart>(),
+                ReleaseId = ReleaseId
             };
 
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
+            SetupCall<ContentDbContext, ContentBlock>(mocks.persistenceHelper, dataBlock);
 
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlock)),
                     typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
@@ -196,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             mocks.cacheService
                 .Setup(s => s.SetItemAsync<object>(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlock)),
                     _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
@@ -211,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            SetupCall<ContentDbContext, ReleaseContentBlock>(mocks.persistenceHelper, null);
+            SetupCall<ContentDbContext, ContentBlock>(mocks.persistenceHelper, null);
 
             var result = await controller.QueryForDataBlock(ReleaseId, _dataBlockId);
             VerifyAllMocks(mocks);
@@ -222,32 +210,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task QueryForDataBlock_NotDataBlockType()
         {
-            var releaseContentBlock = new ReleaseContentBlock
+            var htmlBlock = new HtmlBlock
             {
-                ReleaseId = ReleaseId,
-                Release = new Release
-                {
-                    Id = ReleaseId,
-                    Publication = new Publication
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new HtmlBlock
-                {
-                    Id = _dataBlockId,
-                }
+                Id = Guid.NewGuid(),
+                ReleaseId = ReleaseId
             };
 
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
+            SetupCall<ContentDbContext, ContentBlock>(mocks.persistenceHelper, htmlBlock);
 
-            var exception =
-                await Assert.ThrowsAsync<TargetInvocationException>(() =>
-                    controller.QueryForDataBlock(ReleaseId, _dataBlockId));
-            Assert.IsType<ArgumentException>(exception.InnerException);
+            var result = await controller.QueryForDataBlock(ReleaseId, htmlBlock.Id);
+            result.AssertNotFoundResult();
         }
 
         [Fact]

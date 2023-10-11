@@ -50,8 +50,7 @@ SELECT ContentBlock.Id                                      AS ContentBlockId,
   (
     SELECT MIN(cs.[Order]) 
     FROM ContentSections cs 
-    JOIN ReleaseContentSections rcs ON rcs.ContentSectionId = cs.Id 
-    AND rcs.ReleaseId = Releases.Id
+    WHERE cs.ReleaseId = Releases.Id
     AND cs.Type = ContentSections.Type
   ) AS MinContentSectionOrder,
   ContentBlock.[Order]                                 AS ContentBlockOrder,
@@ -65,8 +64,7 @@ SELECT ContentBlock.Id                                      AS ContentBlockId,
   JSON_VALUE([DataBlock_Charts], '$[0].Type')          AS ChartType,
   DataBlock_Table										AS TableConfig
 FROM ContentBlock
-JOIN ReleaseContentBlocks ON ContentBlock.Id = ReleaseContentBlocks.ContentBlockId
-JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
+JOIN Releases ON ContentBlock.ReleaseId = Releases.Id
 JOIN Publications ON Publications.Id = Releases.PublicationId 
 LEFT JOIN ContentSections ON ContentSections.Id = ContentSectionId
 LEFT JOIN FeaturedTables ON ContentBlock.Id = FeaturedTables.DataBlockId
