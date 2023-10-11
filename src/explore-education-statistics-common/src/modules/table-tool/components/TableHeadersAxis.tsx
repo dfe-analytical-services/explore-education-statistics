@@ -39,6 +39,7 @@ export default function TableHeadersAxis({
     errors: formState.errors,
     touchedFields: formState.touchedFields,
   });
+
   return (
     <Droppable
       droppableId={name}

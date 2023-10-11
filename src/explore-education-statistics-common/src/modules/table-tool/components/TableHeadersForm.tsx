@@ -16,12 +16,7 @@ import compact from 'lodash/compact';
 import last from 'lodash/last';
 import React, { useCallback, useMemo, useState } from 'react';
 import { DragDropContext, DropResult } from 'react-beautiful-dnd';
-
-import {
-  UseFormGetValues,
-  UseFormSetValue,
-  UseFormTrigger,
-} from 'react-hook-form';
+import { UseFormReturn } from 'react-hook-form';
 import { ObjectSchema } from 'yup';
 
 export interface TableHeadersFormValues {
@@ -31,10 +26,10 @@ export interface TableHeadersFormValues {
 
 interface Props {
   initialValues: TableHeadersConfig;
-  onSubmit: (values: TableHeadersConfig) => void;
+  onSubmit: (values: TableHeadersConfig) => void | Promise<void>;
 }
 
-const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
+export default function TableHeadersForm({ onSubmit, initialValues }: Props) {
   const { isMounted } = useMounted();
   const [screenReaderMessage, setScreenReaderMessage] = useState('');
   const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
@@ -42,7 +37,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
 
   const handleSubmit = useCallback(
     async (values: TableHeadersFormValues) => {
-      onSubmit({
+      await onSubmit({
         columnGroups:
           values.columnGroups.length > 1
             ? values.columnGroups.slice(0, -1)
@@ -52,6 +47,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
         columns: last(values.columnGroups) as Filter[],
         rows: last(values.rowGroups) as Filter[],
       });
+
       toggleShowTableHeadersForm.off();
     },
     [onSubmit, toggleShowTableHeadersForm],
@@ -62,52 +58,46 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
     destinationIndex,
     sourceId,
     sourceIndex,
-    getValues,
-    setValue,
-    trigger,
+    form,
   }: {
     destinationId: keyof TableHeadersFormValues;
     destinationIndex: number;
     sourceId: keyof TableHeadersFormValues;
     sourceIndex: number;
-    getValues: UseFormGetValues<TableHeadersFormValues>;
-    setValue: UseFormSetValue<TableHeadersFormValues>;
-    trigger: UseFormTrigger<TableHeadersFormValues>;
+    form: UseFormReturn<TableHeadersFormValues>;
   }) => {
-    const nextSourceValue = getValues(sourceId);
-    const nextDestinationValue = getValues(destinationId);
+    const nextSourceValue = form.getValues(sourceId);
+    const nextDestinationValue = form.getValues(destinationId);
+
     const [sourceItem] = nextSourceValue.splice(sourceIndex, 1);
+
     nextDestinationValue.splice(destinationIndex, 0, sourceItem);
-    setValue(sourceId, nextSourceValue, { shouldTouch: true });
-    setValue(destinationId, nextDestinationValue, { shouldTouch: true });
-    trigger(destinationId);
+
+    form.setValue(sourceId, nextSourceValue, { shouldTouch: true });
+    form.setValue(destinationId, nextDestinationValue, { shouldTouch: true });
+
+    form.trigger(destinationId);
   };
 
   const handleMoveGroupToOtherAxis = ({
     groupIndex,
     sourceId,
-    getValues,
-    setValue,
-    trigger,
+    form,
   }: {
     groupIndex: number;
     sourceId: keyof TableHeadersFormValues;
-    getValues: UseFormGetValues<TableHeadersFormValues>;
-    setValue: UseFormSetValue<TableHeadersFormValues>;
-    trigger: UseFormTrigger<TableHeadersFormValues>;
+    form: UseFormReturn<TableHeadersFormValues>;
   }) => {
     const destinationId: keyof TableHeadersFormValues =
       sourceId === 'rowGroups' ? 'columnGroups' : 'rowGroups';
-    const destinationIndex = getValues(destinationId).length;
+    const destinationIndex = form.getValues(destinationId).length;
 
     moveGroupToAxis({
       destinationId,
       destinationIndex,
       sourceIndex: groupIndex,
       sourceId,
-      getValues,
-      setValue,
-      trigger,
+      form,
     });
 
     const message =
@@ -120,14 +110,10 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
 
   const handleDragEnd = ({
     result,
-    getValues,
-    setValue,
-    trigger,
+    form,
   }: {
     result: DropResult;
-    getValues: UseFormGetValues<TableHeadersFormValues>;
-    setValue: UseFormSetValue<TableHeadersFormValues>;
-    trigger: UseFormTrigger<TableHeadersFormValues>;
+    form: UseFormReturn<TableHeadersFormValues>;
   }) => {
     const { source, destination } = result;
 
@@ -141,8 +127,11 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
 
     // Moving group within its axis
     if (destinationId === sourceId) {
-      const values = getValues(destinationId);
-      setValue(destinationId, reorder(values, source.index, destination.index));
+      const values = form.getValues(destinationId);
+      form.setValue(
+        destinationId,
+        reorder(values, source.index, destination.index),
+      );
 
       return;
     }
@@ -153,9 +142,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
       destinationIndex: destination.index,
       sourceId,
       sourceIndex: source.index,
-      getValues,
-      setValue,
-      trigger,
+      form,
     });
   };
 
@@ -254,7 +241,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                 initialValues={initialFormValues}
                 validationSchema={validationSchema}
               >
-                {({ getValues, setValue, trigger }) => {
+                {form => {
                   return (
                     <RHFForm
                       id={`${id}-form`}
@@ -263,12 +250,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                     >
                       <DragDropContext
                         onDragEnd={result => {
-                          handleDragEnd({
-                            result,
-                            getValues,
-                            setValue,
-                            trigger,
-                          });
+                          handleDragEnd({ result, form });
                           toggleGroupDraggingActive(false);
                         }}
                         onDragStart={() => {
@@ -284,9 +266,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                               handleMoveGroupToOtherAxis({
                                 groupIndex,
                                 sourceId: 'columnGroups',
-                                getValues,
-                                setValue,
-                                trigger,
+                                form,
                               });
                             }}
                           />
@@ -299,9 +279,7 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
                               handleMoveGroupToOtherAxis({
                                 groupIndex,
                                 sourceId: 'rowGroups',
-                                getValues,
-                                setValue,
-                                trigger,
+                                form,
                               });
                             }}
                           />
@@ -328,5 +306,4 @@ const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
       )}
     </TableHeadersContextProvider>
   );
-};
-export default TableHeadersForm;
+}

@@ -25,10 +25,12 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [draggingIndex, setDraggingIndex] = useState<number>();
 
+  const { getValues, setValue } = useFormContext();
   /**
    * Focus the list when it's shown to help with keyboard navigation.
    */
   const listRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     listRef.current?.focus();
   }, []);
@@ -153,8 +155,9 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
     event.preventDefault();
     toggleSelectionInGroup(index);
   };
-  const { getValues, setValue } = useFormContext();
+
   const list: Filter[] = getValues(name);
+
   return (
     <FormFieldset legend={legend} legendSize="s" id={id}>
       <div className={styles.focusContainer} ref={listRef} tabIndex={-1}>
@@ -168,6 +171,7 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
           }}
           onDragEnd={result => {
             const destinationIndex = result.destination?.index;
+
             if (destinationIndex === null || destinationIndex === undefined) {
               return;
             }
