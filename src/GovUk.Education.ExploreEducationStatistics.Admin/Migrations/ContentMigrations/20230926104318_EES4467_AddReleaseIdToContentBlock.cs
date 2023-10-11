@@ -17,8 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "ReleaseId",
                 table: "ContentBlock",
                 type: "uniqueidentifier",
-                nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+                nullable: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ContentBlock_ReleaseId",
@@ -39,6 +38,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 principalTable: "Releases",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
+
+            migrationBuilder.AlterColumn<Guid>(
+                name: "ReleaseId",
+                table: "ContentBlock",
+                nullable: false,
+                oldClrType: typeof(Guid),
+                oldType: "uniqueidentifier",
+                oldNullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
