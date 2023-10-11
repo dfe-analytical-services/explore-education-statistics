@@ -1834,6 +1834,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.Contacts.AddAsync(MockContact);
                 await context.SaveChangesAsync();
             }
 
