@@ -63,10 +63,17 @@ def enable_basic_auth_headers():
     if public_auth_user and public_auth_password:
         token = base64.b64encode(f"{public_auth_user}:{public_auth_password}".encode())
 
-        sl.driver.execute_cdp_cmd("Network.enable", {})
-        sl.driver.execute_cdp_cmd(
-            "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
-        )
+        try:
+            # Must refetch sl on rerun or sl.driver is None!
+            # sl = BuiltIn().get_library_instance("SeleniumLibrary")
+            assert sl.driver is not None, "sl.driver is None"
+            sl.driver.execute_cdp_cmd("Network.enable", {})
+
+            sl.driver.execute_cdp_cmd(
+                "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
+            )
+        except Exception as e:
+            BuiltIn().log_to_console("Exception: ", e)
 
 
 def disable_basic_auth_headers():

@@ -456,17 +456,9 @@ if not os.path.exists("test-results/downloads"):
 try:
     # Run tests
     if args.interp == "robot":
-        try:
-            exitCode = robot_run_cli(robotArgs, exit=False)
-        except Exception as e:
-            print("Exception: ", e, flush=True)
+        exitCode = robot_run_cli(robotArgs, exit=False)
     elif args.interp == "pabot":
-        if args.processes:
-            robotArgs = ["--processes", int(args.processes)] + robotArgs
-        try:
-            exitCode = pabot_run_cli(robotArgs)
-        except Exception as e:
-            print("Exception: ", e, flush=True)
+        robotArgs = ["--processes", int(args.processes)] + robotArgs
 
     rerun_attempt = 0
     while exitCode != 0 and args.rerun_attempts - rerun_attempt > 0:
@@ -477,30 +469,25 @@ try:
         # to change rerunfailedsuites xml file we use
         if robotArgs[0] != "--rerunfailedsuites":
             # robotArgs = [
-            #    "--prerebotmodifier",
-            #    "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
-            #    "--merge",
-            #    f"test-results/previous_attempt_{str(rerun_attempt)}.xml",
-            #    "test-results/output.xml",
+            #                 "--prerebotmodifier",
+            #                 "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
+            #                 "--merge",
+            #                 f"test-results/previous_attempt_{str(rerun_attempt)}.xml",
+            #                 "test-results/output.xml",
             # ] + robotArgs
             robotArgs = ["--rerunfailedsuites", f"test-results/previous_attempt_{str(rerun_attempt)}.xml"] + robotArgs
         else:
             robotArgs[1] = f"test-results/previous_attempt_{str(rerun_attempt)}.xml"
 
         if args.interp == "robot":
-            try:
-                exitCode = robot_run_cli(robotArgs, exit=False)
-            except Exception as e:
-                print("Exception: ", e, flush=True)
-            continue
+            exitCode = robot_run_cli(robotArgs, exit=False)
         elif args.interp == "pabot":
-            try:
-                exitCode = pabot_run_cli(robotArgs)
-            except Exception as e:
-                print("Exception: ", e, flush=True)
-            continue
+            exitCode = pabot_run_cli(robotArgs)
 
 finally:
+    # TODO merge xml files here?
+    # robot --merge previous_attempt.xml output.xml
+    # if more reruns - robot --merge ....blah
     if not args.disable_teardown:
         logger.info("Tearing down tests...")
         delete_test_topic()
