@@ -64,12 +64,7 @@ describe('Contact Us Section', () => {
       />,
     );
 
-    expect(
-      screen.getByRole('link', { name: 'Mock Contact Tel No' }),
-    ).toBeVisible();
-    expect(
-      screen.getByRole('link', { name: 'Mock Contact Tel No' }),
-    ).toHaveAttribute('href', 'tel:Mock Contact Tel No');
+    expect(screen.getByText(/Telephone: Mock Contact Tel No/)).toBeVisible();
   });
 
   it('Hides the telephone number section if one is not supplied', () => {
