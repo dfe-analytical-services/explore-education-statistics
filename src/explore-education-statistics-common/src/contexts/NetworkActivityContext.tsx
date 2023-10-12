@@ -10,7 +10,6 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useRef,
   useState,
 } from 'react';
 
@@ -54,8 +53,6 @@ export function NetworkActivityContextProvider({
   children,
   idleTimeout = 500,
 }: NetworkActivityContextProviderProps) {
-  const requestCount = useRef<number>(0);
-
   const isMountedRef = useMountedRef();
   const [state, _setState] = useState<NetworkActivityState>({
     status: 'idle',
@@ -96,29 +93,27 @@ export function NetworkActivityContextProvider({
 
   useEffect(() => {
     const handleRequest = () => {
-      requestCount.current += 1;
-
-      setState({
-        status: 'active',
-        requestCount: requestCount.current,
+      setState(prevState => {
+        return {
+          status: 'active',
+          requestCount: prevState.requestCount + 1,
+        };
       });
     };
 
     const handleResponse = () => {
-      requestCount.current -= 1;
-
       setState(prevState => ({
         ...prevState,
-        requestCount: requestCount.current,
+        requestCount: prevState.requestCount - 1,
       }));
 
       setTimeout(() => {
-        if (requestCount.current < 1) {
-          setState({
-            status: 'idle',
-            requestCount: requestCount.current,
-          });
-        }
+        setState(prevState => {
+          return {
+            ...prevState,
+            status: prevState.requestCount === 0 ? 'idle' : 'active',
+          };
+        });
       }, idleTimeout);
     };
 
