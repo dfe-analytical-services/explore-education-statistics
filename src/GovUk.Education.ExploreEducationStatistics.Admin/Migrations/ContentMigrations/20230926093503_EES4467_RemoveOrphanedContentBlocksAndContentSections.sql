@@ -44,3 +44,12 @@ WHERE NOT EXISTS (
     FROM ReleaseContentSections
     WHERE ReleaseContentSections.ContentSectionId = ContentSections.Id
 );
+
+-- Delete orphaned HTML Blocks - HTML Blocks that belong to no ContentSection and don't even have a way back to their
+-- owning Release via the ReleaseContentBlocks table.
+DELETE FROM ContentBlock
+WHERE [Type] != 'DataBlock'
+AND ContentSectionId IS NULL
+AND NOT EXISTS (
+	SELECT 1 FROM ReleaseContentBlocks WHERE ReleaseContentBlocks.ContentBlockId = ContentBlock.Id
+);
