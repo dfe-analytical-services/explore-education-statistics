@@ -1802,6 +1802,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodology_UpdatingAmendmentSoSlugDoesNotChange_AndUnsetsAlternativeTitle()
         {
+            var publication = new Publication
+                              {
+                                  Title = "Test publication",
+                                  Slug = "test-publication",
+                                  Contact = MockContact
+                              };
+            
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
@@ -1815,7 +1822,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = MockPublication
+                        Publication = publication
                     })
                 },
                 PreviousVersionId = Guid.NewGuid()
@@ -1826,7 +1833,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 LatestInternalReleaseNote = null,
                 PublishingStrategy = MethodologyPublishingStrategy.Immediately,
                 Status = MethodologyApprovalStatus.Draft,
-                Title = MockPublication.Title
+                Title = publication.Title
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1842,7 +1849,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupMethodologyService(context);
 
-                var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
+                var response = await service.UpdateMethodology(methodologyVersion.Id, request);
+                var viewModel = response.AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
                 Assert.Equal("alternative-methodology-title", viewModel.Slug);
@@ -1852,8 +1860,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
-                Assert.Equal(MockPublication.Id, viewModel.OwningPublication.Id);
-                Assert.Equal(MockPublication.Title, viewModel.OwningPublication.Title);
+                Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
+                Assert.Equal(publication.Title, viewModel.OwningPublication.Title);
                 Assert.Empty(viewModel.OtherPublications);
             }
 
@@ -1867,7 +1875,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodology.Status);
                 Assert.Equal(MethodologyPublishingStrategy.Immediately, updatedMethodology.PublishingStrategy);
-                Assert.Equal(MockPublication.Title, updatedMethodology.Title);
+                Assert.Equal(publication.Title, updatedMethodology.Title);
 
                 // Test that the AlternativeTitle has explicitly be set to null.
                 Assert.Null(updatedMethodology.AlternativeTitle);
