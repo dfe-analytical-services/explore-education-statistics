@@ -14,6 +14,11 @@ describe('ApprovalsTable', () => {
       owningPublication: {
         id: 'publication-1',
         title: 'Publication 1 title',
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       otherPublications: [],
       published: '2018-08-25T00:00:00',
@@ -34,6 +39,12 @@ describe('ApprovalsTable', () => {
         id: 'publication-1',
         title: 'Publication 1 title',
         slug: 'publication-1-slug',
+        owner: true,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       year: 2024,
       yearTitle: '2024/25',
@@ -67,6 +78,12 @@ describe('ApprovalsTable', () => {
         id: 'publication-2',
         title: 'Publication 2 title',
         slug: 'publication-2-slug',
+        owner: true,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       year: 2024,
       yearTitle: '2024/25',

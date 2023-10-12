@@ -153,6 +153,11 @@ describe('PublicationMethodologiesPage', () => {
         owningPublication: {
           id: 'p1',
           title: 'Publication title',
+          contact: {
+            teamName: 'Mock Contact Team Name',
+            teamEmail: 'Mock Contact Team Email',
+            contactName: 'Mock Contact Name',
+          },
         },
         status: 'Draft',
       };
@@ -717,6 +722,11 @@ describe('PublicationMethodologiesPage', () => {
           owningPublication: {
             id: 'p1',
             title: 'Publication title',
+            contact: {
+              teamName: 'Mock Contact Team Name',
+              teamEmail: 'Mock Contact Team Email',
+              contactName: 'Mock Contact Name',
+            },
           },
           status: 'Draft',
           previousVersionId: 'methodology-previous-version-1',

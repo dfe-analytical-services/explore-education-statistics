@@ -9,6 +9,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
+import { PublicationSummary } from '@common/services/publicationService';
 
 jest.mock('@admin/services/themeService');
 const themeService = _themeService as jest.Mocked<typeof _themeService>;
@@ -507,10 +508,30 @@ describe('PublicationForm', () => {
       slug: 'publication-2-slug',
     };
 
+    const testPublicationSummary1: PublicationSummary = {
+      ...testPublication1,
+      owner: false,
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
+    };
+
+    const testPublicationSummary2: PublicationSummary = {
+      ...testPublication2,
+      owner: false,
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
+    };
+
     test('does not render the `Archive publication` field when showSupersededBy is false', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
       publicationService.getPublicationSummaries.mockResolvedValue([
-        testPublication1,
+        testPublicationSummary1,
       ]);
 
       render(
@@ -542,7 +563,7 @@ describe('PublicationForm', () => {
     test('renders the `Archive publication` field when showSupersededBy is true', async () => {
       themeService.getThemes.mockResolvedValue([testSingleTheme]);
       publicationService.getPublicationSummaries.mockResolvedValue([
-        testPublication1,
+        testPublicationSummary1,
       ]);
 
       render(
@@ -583,8 +604,8 @@ describe('PublicationForm', () => {
     test('shows correct publications in the superseded by select', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
       publicationService.getPublicationSummaries.mockResolvedValueOnce([
-        testPublication1,
-        testPublication2,
+        testPublicationSummary1,
+        testPublicationSummary2,
       ]);
 
       render(
