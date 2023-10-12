@@ -73,7 +73,7 @@ Search for "pupil"
     user verifies accordion is closed    1. Overview of absence statistics
 
     user enters text into element    id:pageSearchForm-input    pupil
-    user waits until element contains    id:pageSearchForm-resultsLabel    Found 127 results
+    user waits until element contains    id:pageSearchForm-resultsLabel    Found 128 results
     user clicks element    id:pageSearchForm-option-0
 
     user verifies accordion is open    1. Overview of absence statistics
@@ -86,9 +86,13 @@ Search for "specific enquiry"
 
     user clears element text    id:pageSearchForm-input
     user enters text into element    id:pageSearchForm-input    specific enquiry
-    user waits until element contains    id:pageSearchForm-resultsLabel    Found 1 result
+    user waits until element contains    id:pageSearchForm-resultsLabel    Found 2 results
     user clicks element    id:pageSearchForm-option-0
 
     user verifies accordion is open    7. Contacts
     user checks page contains    If you have a specific enquiry about absence and exclusion statistics and
     user checks element is visible    xpath://h4[contains(text(),"School absence and exclusions team")]
+
+Search for "Contact us"
+    user checks page contains    Help and support
+    user checks page contains    Contact us
