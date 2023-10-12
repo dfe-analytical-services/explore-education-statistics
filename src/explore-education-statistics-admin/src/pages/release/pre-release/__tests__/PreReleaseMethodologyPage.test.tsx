@@ -28,6 +28,11 @@ describe('PreReleaseMethodologyPage', () => {
     owningPublication: {
       id: 'publication-1',
       title: 'Owning publication title',
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
     },
     slug: 'pupil-absence-in-schools-in-england',
     status: 'Approved',

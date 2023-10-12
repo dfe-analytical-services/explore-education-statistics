@@ -70,25 +70,54 @@ describe('PublicationDetailsPage', () => {
       id: 'publication-1',
       slug: 'publication-1-slug',
       title: 'Publication 1',
+      owner: false,
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
     },
     {
       id: 'publication-2',
       slug: 'publication-2-slug',
       title: 'Publication 2',
+      owner: false,
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
     },
     {
       id: 'publication-3',
       slug: 'publication-3-slug',
       title: 'Publication 3',
+      owner: false,
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
     },
   ];
+
+  const mockPublication: Publication = {
+    ...testPublicationSummaries[1],
+    summary: '',
+    theme: {
+      id: 'theme-id-1',
+      title: 'theme-title-1',
+    },
+    topic: {
+      id: 'topic-id-1',
+      title: 'topic-title-1',
+    },
+  };
 
   beforeEach(() => {
     themeService.getTheme.mockResolvedValue(testThemes[0]);
     themeService.getThemes.mockResolvedValue(testThemes);
-    publicationService.getPublication.mockResolvedValue(
-      testPublicationSummaries[1] as Publication,
-    );
+    publicationService.getPublication.mockResolvedValue(mockPublication);
     publicationService.getPublicationSummaries.mockResolvedValue(
       testPublicationSummaries,
     );
