@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -100,7 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId)
                 .OnSuccess(_userService.CheckCanCreateMethodologyForPublication)
-                .OnSuccess(() => _methodologyVersionRepository
+                .OnSuccess(publication => ValidateMethodologySlug(publication.Slug))
+                .OnSuccess(_ => _methodologyVersionRepository
                     .CreateMethodologyForPublication(publicationId, _userService.GetUserId())
                 )
                 .OnSuccess(BuildMethodologyVersionViewModel);
@@ -323,13 +325,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 return methodologyVersionToUpdate;
             }
 
+            var newSlug = SlugFromTitle(request.Title);
+
             return await _userService.CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
-                // Check that the Methodology will have a unique slug.  It is possible to have a clash in the case where
-                // another Methodology has previously set its AlternativeTitle (and Slug) to something specific and then
-                // this Methodology attempts to set its AlternativeTitle (and Slug) to the same value.  Whilst an
-                // unlikely scenario, it's entirely possible.
-                .OnSuccessDo(methodologyVersion =>
-                    ValidateMethodologySlugUniqueForUpdate(methodologyVersion, request.Slug))
+                .OnSuccessDo(async _ => await ValidateMethodologySlug(
+                            newSlug, oldSlug: methodologyVersionToUpdate.Methodology.Slug))
                 .OnSuccess(async methodologyVersion =>
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;
@@ -347,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         // Slug to change even though its AlternativeTitle can.
                         if (!methodologyVersion.Amendment)
                         {
-                            methodologyVersion.Methodology.Slug = request.Slug;
+                            methodologyVersion.Methodology.Slug = newSlug;
                         }
                     }
 
@@ -511,13 +511,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return new IdTitleViewModel(publication.Id, publication.Title);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlugUniqueForUpdate(
-            MethodologyVersion methodologyVersion, string slug)
+        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlug(
+            string newSlug, string? oldSlug = null)
         {
-            if (await _context
-                    .Methodologies
-                    .AsQueryable()
-                    .AnyAsync(p => p.Slug == slug && p.Id != methodologyVersion.MethodologyId))
+            if (newSlug == oldSlug)
+            {
+                // no slug change, no slug validation required
+                return Unit.Instance;
+            }
+
+            var methodologyVersion = await _methodologyVersionRepository.GetLatestPublishedVersionBySlug(newSlug);
+
+            if (methodologyVersion != null)
             {
                 return ValidationActionResult(SlugNotUnique);
             }
