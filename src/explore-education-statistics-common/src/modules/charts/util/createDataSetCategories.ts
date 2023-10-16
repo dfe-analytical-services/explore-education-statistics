@@ -337,14 +337,19 @@ export default function createDataSetCategories({
   >((acc, childDataSet) => {
     const { dataSet } = childDataSet;
     const rawValue = get(measuresByDataSet, getIndicatorPath(dataSet));
-    const value = Number(rawValue);
+
+    if (!rawValue) {
+      return acc;
+    }
+    // Remove commas which are added in the backend,
+    // see EES-4616 for explanation.
+    const value = Number(rawValue.replace(/,/g, ''));
 
     if (!Number.isNaN(value)) {
       acc.push([childDataSet, value]);
     } else if (includeNonNumericData && rawValue) {
       acc.push([childDataSet, rawValue]);
     }
-
     return acc;
   }, []);
 
