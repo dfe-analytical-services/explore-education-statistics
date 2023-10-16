@@ -86,9 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             return await _contentDbContext
                 .MethodologyVersions
-                .Include(mv => mv.Methodology)
                 .Where(mv =>
-                    mv.Slug == slug
+                    mv.Methodology.Slug == slug
                     && mv.Methodology.LatestPublishedVersionId == mv.Id)
                 .SingleOrDefaultAsync();
         }
