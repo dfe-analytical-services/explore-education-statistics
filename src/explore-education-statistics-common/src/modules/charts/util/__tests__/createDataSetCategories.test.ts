@@ -252,6 +252,172 @@ describe('createDataSetCategories', () => {
     ],
   };
 
+  const testTableWithCommas: TableDataResponse = {
+    ...testTable,
+    results: [
+      {
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '2,613',
+          'overall-absence-sessions': '3,134',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '30,364',
+          'overall-absence-sessions': '40,327',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '11',
+          'overall-absence-sessions': '22',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '479',
+          'overall-absence-sessions': '843',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '1,939',
+          'overall-absence-sessions': '2,269',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '26,594',
+          'overall-absence-sessions': '37,084',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '19',
+          'overall-absence-sessions': '35',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '939',
+          'overall-absence-sessions': '1,268',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '27,833',
+          'overall-absence-sessions': '38,130',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '39',
+          'overall-absence-sessions': '83',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '31,322',
+          'overall-absence-sessions': '41,228',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '2,652',
+          'overall-absence-sessions': '3,093',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnet',
+        measures: {
+          'authorised-absence-sessions': '1,856',
+          'overall-absence-sessions': '2,125',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '745',
+          'overall-absence-sessions': '1,105',
+        },
+        timePeriod: '2014_AY',
+      },
+      {
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '825',
+          'overall-absence-sessions': '1,003',
+        },
+        timePeriod: '2015_AY',
+      },
+      {
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+        geographicLevel: 'localAuthority',
+        locationId: 'barnsley',
+        measures: {
+          'authorised-absence-sessions': '4',
+          'overall-absence-sessions': '4',
+        },
+        timePeriod: '2015_AY',
+      },
+    ],
+  };
+
   test('returns single data set when a complete data set is configured', () => {
     const axisConfiguration: AxisConfiguration = {
       type: 'major',
@@ -1463,6 +1629,68 @@ describe('createDataSetCategories', () => {
         value: 'barnsley',
       },
       timePeriod: '2015_AY',
+    });
+  });
+
+  test('handles results with commas', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'timePeriod',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnet',
+          },
+          timePeriod: '2014_AY',
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable(testTableWithCommas);
+
+    const dataSetCategories = createDataSetCategories({
+      axisConfiguration,
+      data: fullTable.results,
+      meta: fullTable.subjectMeta,
+    });
+
+    expect(dataSetCategories).toHaveLength(1);
+
+    expect(dataSetCategories[0].filter.label).toBe('2014/15');
+
+    const dataSets = Object.entries(dataSetCategories[0].dataSets);
+
+    expect(dataSets).toHaveLength(1);
+
+    const [[dataSet1Key, dataSet1]] = dataSets;
+
+    expect(JSON.parse(dataSet1Key)).toEqual({
+      indicator: 'authorised-absence-sessions',
+      filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      location: {
+        level: 'localAuthority',
+        value: 'barnet',
+      },
+    });
+
+    expect(dataSet1.value).toBe(2613);
+    expect(dataSet1.dataSet).toEqual<DataSet>({
+      indicator: 'authorised-absence-sessions',
+      filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      location: {
+        level: 'localAuthority',
+        value: 'barnet',
+      },
+      timePeriod: '2014_AY',
     });
   });
 
