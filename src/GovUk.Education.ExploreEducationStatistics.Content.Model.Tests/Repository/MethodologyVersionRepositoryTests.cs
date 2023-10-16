@@ -312,6 +312,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
+        public async Task GetLatestPublishedVersionBySlug()
+        {
+            var methodologyVersionId = Guid.NewGuid();
+            var methodologyVersion = new MethodologyVersion
+            {
+                Id = methodologyVersionId,
+                Methodology = new Methodology
+                {
+                    Slug = "methodology-slug",
+                    LatestPublishedVersionId = methodologyVersionId,
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyVersionRepository(
+                    contentDbContext: contentDbContext);
+
+                var result = await service.GetLatestPublishedVersionBySlug(methodologyVersion.Slug);
+
+                Assert.NotNull(result);
+                Assert.Equal(methodologyVersionId, result.Id);
+            }
+        }
+
+        [Fact]
         public async Task GetLatestPublishedVersion()
         {
             var previousVersion = new MethodologyVersion
