@@ -430,6 +430,7 @@ export default function TableToolWizard({
                     {...stepProps}
                     initialValues={{
                       publicationId: state.query.publicationId ?? '',
+                      themeId: '',
                     }}
                     themes={themeMeta}
                     onSubmit={handlePublicationFormSubmit}
