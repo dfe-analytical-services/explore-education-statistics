@@ -92,7 +92,7 @@ const PublicationReleaseContributorsForm = ({
     >
       {form => {
         return (
-          <Form id="addExistingUsersForm" showSubmitError>
+          <Form id="addExistingUsersForm">
             <FormFieldCheckboxGroup<AddExistingUsersFormValues>
               name="userIds"
               legend="Select contributors for this release"

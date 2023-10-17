@@ -3,18 +3,17 @@ import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import PublicationForm from '@admin/pages/publication/components/PublicationForm';
 import { dashboardRoute, ThemeTopicParams } from '@admin/routes/routes';
-import publicationService from '@admin/services/publicationService';
 import topicService from '@admin/services/topicService';
-import appendQuery from '@common/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import appendQuery from '@common/utils/url/appendQuery';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
-const PublicationCreatePage = ({
+export default function PublicationCreatePage({
   history,
   match,
-}: RouteComponentProps<{ topicId: string }>) => {
+}: RouteComponentProps<{ topicId: string }>) {
   const { topicId } = match.params;
 
   const { value: topic, isLoading } = useAsyncHandledRetry(
@@ -36,22 +35,9 @@ const PublicationCreatePage = ({
         <div className="govuk-grid-column-two-thirds">
           <PageTitle caption={topic.title} title="Create new publication" />
         </div>
-        {/* EES-2464
-        <div className="govuk-grid-column-one-third">
-          <RelatedInformation heading="Help and guidance">
-            <ul className="govuk-list">
-              <li>
-                <Link to="/documentation/create-new-publication" target="blank">
-                  Creating a new publication
-                </Link>
-              </li>
-            </ul>
-          </RelatedInformation>
-        </div> */}
       </div>
 
       <PublicationForm
-        showTitleInput
         cancelButton={
           <Link
             unvisited
@@ -63,33 +49,9 @@ const PublicationCreatePage = ({
             Cancel
           </Link>
         }
-        onSubmit={async ({
-          teamName,
-          teamEmail,
-          contactName,
-          contactTelNo,
-          ...values
-        }) => {
-          const contact = {
-            teamName,
-            teamEmail,
-            contactName,
-            contactTelNo,
-          };
-          if (!contact.contactTelNo?.trim()) {
-            contact.contactTelNo = undefined;
-          }
-          await publicationService.createPublication({
-            ...values,
-            topicId: topic.id,
-            contact,
-          });
-
-          history.push(dashboardRoute.path);
-        }}
+        topicId={topic.id}
+        onSubmit={() => history.push(dashboardRoute.path)}
       />
     </Page>
   );
-};
-
-export default PublicationCreatePage;
+}

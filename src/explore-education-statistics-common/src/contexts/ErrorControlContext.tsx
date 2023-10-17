@@ -11,7 +11,9 @@ export interface ErrorControlState {
 }
 
 export const ErrorControlContext = createContext<ErrorControlState>({
-  handleError: noop,
+  handleError: error => {
+    throw error;
+  },
   errorPages: {
     forbidden: noop,
   },

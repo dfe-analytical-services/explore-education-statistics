@@ -244,8 +244,8 @@ Switch back to bau1 to update unresolved comment
     ${comment}=    user gets unresolved comment    Test comment 2    ${block}
 
     user clicks button    Edit    ${comment}
-    user waits until parent contains element    ${comment}    testid:comment-textarea
-    ${textarea}=    get child element    ${comment}    testid:comment-textarea
+    user waits until parent contains element    ${comment}    label:Comment
+    ${textarea}=    get child element    ${comment}    label:Comment
     user enters text into element    ${textarea}    Test updated comment 2
     user clicks button    Update    ${comment}
 
@@ -267,7 +267,7 @@ user adds comment to selected text
     user clicks element    ${button}
 
     ${comments}=    get comments sidebar    ${block}
-    user waits until parent contains element    ${comments}    testid:comment-textarea
-    ${textarea}=    get child element    ${comments}    testid:comment-textarea
+    user waits until parent contains element    ${comments}    label:Comment
+    ${textarea}=    get child element    ${comments}    label:Comment
     user enters text into element    ${textarea}    ${text}
     user clicks button    Add comment    ${comments}

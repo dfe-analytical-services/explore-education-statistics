@@ -20,7 +20,8 @@ export interface SelectOption<Value = string | number> {
   style?: CSSProperties;
 }
 
-export interface FormSelectProps extends FormLabelProps {
+export interface FormSelectProps
+  extends Pick<FormLabelProps, 'hideLabel' | 'label'> {
   className?: string;
   disabled?: boolean;
   error?: string;

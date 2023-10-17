@@ -4,20 +4,16 @@ import ErrorSummary, {
 import { FormIdContextProvider } from '@common/components/form/contexts/FormIdContext';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
-import logger from '@common/services/logger';
-import isErrorLike from '@common/utils/error/isErrorLike';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import { useFormikContext } from 'formik';
 import camelCase from 'lodash/camelCase';
-import get from 'lodash/get';
-import isEqual from 'lodash/isEqual';
 import React, {
+  FormEvent,
   ReactNode,
   useCallback,
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 
 interface Props {
@@ -25,7 +21,6 @@ interface Props {
   id: string;
   submitId?: string;
   showErrorSummary?: boolean;
-  showSubmitError?: boolean;
   visuallyHiddenErrorSummary?: boolean;
 }
 
@@ -50,7 +45,6 @@ const Form = ({
   children,
   id,
   showErrorSummary = true,
-  showSubmitError = false,
   submitId = `${id}-submit`,
   visuallyHiddenErrorSummary = false,
 }: Props) => {
@@ -60,67 +54,55 @@ const Form = ({
   const { errors, touched, values, submitCount, submitForm } = formik;
 
   const previousValues = useRef(values);
+  const previousSubmitCount = useRef(submitCount);
 
   const { getAllErrors } = createErrorHelper({
     errors,
     touched,
+    submitCount,
   });
 
   const [hasSummaryFocus, toggleSummaryFocus] = useToggle(false);
-  const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
+
+  const allErrors = useMemo<ErrorSummaryMessage[]>(() => {
+    return Object.entries(getAllErrors()).map(([field, message]) => {
+      return {
+        id:
+          field !== 'root' && !field.startsWith('root.')
+            ? `${id}-${camelCase(field)}`
+            : submitId,
+        message: typeof message === 'string' ? message : '',
+      };
+    });
+  }, [getAllErrors, id, submitId]);
 
   useEffect(() => {
     if (!isMounted.current) {
       return;
     }
 
-    // If form has changed at all, we should remove the submit error
-    if (!submitCount || !isEqual(values, previousValues.current)) {
-      setSubmitError(undefined);
+    previousValues.current = values;
+  }, [submitCount, values, isMounted]);
+
+  useEffect(() => {
+    if (!isMounted.current) {
+      return;
     }
 
-    previousValues.current = values;
-  }, [submitError, submitCount, values, isMounted]);
-
-  const allErrors = useMemo(() => {
-    const summaryErrors: ErrorSummaryMessage[] = Object.entries(getAllErrors())
-      .filter(([errorName]) => get(touched, errorName))
-      .map(([errorName, message]) => ({
-        id: `${id}-${camelCase(errorName)}`,
-        message: typeof message === 'string' ? message : '',
-      }));
-
-    return submitError ? [...summaryErrors, submitError] : summaryErrors;
-  }, [getAllErrors, id, submitError, touched]);
+    if (allErrors.length && submitCount !== previousSubmitCount.current) {
+      toggleSummaryFocus.on();
+      previousSubmitCount.current = submitCount;
+    }
+  }, [allErrors, isMounted, submitCount, toggleSummaryFocus]);
 
   const handleSubmit = useCallback(
-    async event => {
-      toggleSummaryFocus.off();
-      setSubmitError(undefined);
+    async (event: FormEvent) => {
       event.preventDefault();
+      toggleSummaryFocus.off();
 
-      try {
-        await submitForm();
-      } catch (error) {
-        if (showSubmitError && isErrorLike(error)) {
-          logger.error(error);
-
-          if (isMounted.current) {
-            setSubmitError({
-              id: submitId,
-              message: error.message,
-            });
-          }
-        } else {
-          throw error;
-        }
-      } finally {
-        if (isMounted.current) {
-          toggleSummaryFocus.on();
-        }
-      }
+      await submitForm();
     },
-    [toggleSummaryFocus, submitForm, showSubmitError, isMounted, submitId],
+    [toggleSummaryFocus, submitForm],
   );
 
   return (

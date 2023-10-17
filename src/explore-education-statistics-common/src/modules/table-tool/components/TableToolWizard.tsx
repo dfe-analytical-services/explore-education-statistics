@@ -1,3 +1,4 @@
+import SubmitError from '@common/components/form/util/SubmitError';
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
 import FiltersForm, {
   FilterFormSubmitHandler,
@@ -361,7 +362,7 @@ export default function TableToolWizard({
     const tableData = await tableBuilderService.getTableData(query);
 
     if (!tableData.results.length || !tableData.subjectMeta) {
-      throw new Error(
+      throw new SubmitError(
         'No data available for the options selected. Please try again with different options.',
       );
     }

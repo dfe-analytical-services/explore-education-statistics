@@ -232,7 +232,11 @@ const ChartConfiguration = ({
       enableReinitialize
       initialErrors={
         submitError
-          ? convertServerFieldErrors<FormValues>(submitError, errorMappings)
+          ? convertServerFieldErrors<FormValues>(
+              submitError,
+              initialValues,
+              errorMappings,
+            )
           : undefined
       }
       initialValues={initialValues}

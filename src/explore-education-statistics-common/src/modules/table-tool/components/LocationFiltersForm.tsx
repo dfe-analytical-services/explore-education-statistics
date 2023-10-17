@@ -31,7 +31,7 @@ interface FormValues {
 
 export type LocationFiltersFormSubmitHandler = (values: {
   locationIds: string[];
-}) => void;
+}) => void | Promise<void>;
 
 interface Props extends InjectedWizardProps {
   options: SubjectMeta['locations'];
@@ -168,7 +168,6 @@ const LocationFiltersForm = ({
           return (
             <RHFForm
               id="locationFiltersForm"
-              showSubmitError
               showErrorSummary={showError}
               onSubmit={handleSubmit}
             >
