@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React from 'react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import { PublicationSummary } from '@common/services/publicationService';
 import { MethodologyPublication } from '@common/services/methodologyService';

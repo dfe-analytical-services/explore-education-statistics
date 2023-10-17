@@ -2,7 +2,7 @@ import MethodologyPage from '@frontend/pages/methodology/[methodology]';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { testMethodology } from './__data__/testMethodologyData';
+import { testMethodology } from '@frontend/modules/methodologies/__tests__/__data__/testMethodologyData';
 
 describe('MethodologyPage', () => {
   test('renders methodology page basic details', async () => {
