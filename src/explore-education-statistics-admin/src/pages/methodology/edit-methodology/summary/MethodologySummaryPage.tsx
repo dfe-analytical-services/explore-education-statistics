@@ -15,7 +15,6 @@ import {
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
 import Link from '@admin/components/Link';
-import MethodologyHelpAndSupportSection from '@common/modules/methodology/components/MethodologyHelpAndSupportSection';
 
 const MethodologySummaryPage = () => {
   const { methodologyId, methodology } = useMethodologyContext();
@@ -81,10 +80,6 @@ const MethodologySummaryPage = () => {
               Edit summary
             </ButtonLink>
           )}
-
-          <MethodologyHelpAndSupportSection
-            owningPublication={methodology.owningPublication}
-          />
         </>
       ) : (
         <WarningMessage>

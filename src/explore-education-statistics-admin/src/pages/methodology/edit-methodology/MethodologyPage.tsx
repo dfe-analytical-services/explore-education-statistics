@@ -19,7 +19,6 @@ import Tag from '@common/components/Tag';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
-import RelatedInformation from '@common/components/RelatedInformation';
 
 const navRoutes: MethodologyRouteProps[] = [
   methodologySummaryRoute,
@@ -95,18 +94,6 @@ const MethodologyPage = ({
                       : 'Edit methodology'
                   }
                 />
-              </div>
-              <div className="govuk-grid-column-one-third">
-                <RelatedInformation>
-                  <h3 className="govuk-heading-s" id="related-pages">
-                    Help and support
-                  </h3>
-                  <ul className="govuk-list">
-                    <li>
-                      <a href="#contact-us">Contact us</a>
-                    </li>
-                  </ul>
-                </RelatedInformation>
               </div>
             </div>
 
