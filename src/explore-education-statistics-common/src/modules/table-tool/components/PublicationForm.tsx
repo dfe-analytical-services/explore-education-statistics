@@ -97,10 +97,14 @@ const PublicationForm = ({
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     return Yup.object({
-      publicationId: Yup.string().required('Choose publication'),
-      themeId: Yup.string(),
+      publicationId: Yup.string().required('Choose a publication'),
+      themeId: Yup.string().test(
+        'theme',
+        'Choose a theme',
+        value => !(!publications.length && !value),
+      ),
     });
-  }, []);
+  }, [publications.length]);
 
   const handleSubmit = async ({ publicationId }: FormValues) => {
     const publication = publications.find(p => p.id === publicationId);
