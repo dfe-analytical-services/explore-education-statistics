@@ -1,5 +1,5 @@
-import { MethodologyContent } from 'src/services/methodologyContentService';
-import { MethodologyVersion } from 'src/services/methodologyService';
+import { MethodologyContent } from '@admin/services/methodologyContentService';
+import { MethodologyVersion } from '@admin/services/methodologyService';
 
 const testMethodology: MethodologyVersion = {
   id: 'm1',

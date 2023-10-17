@@ -213,7 +213,7 @@ describe('MethodologyPage', () => {
       return relatedInformation;
     };
 
-    it('Renders the Help and Support section', () => {
+    test('that it renders the Help and Support section', () => {
       render(<MethodologyPage data={testMethodology} />);
 
       expect(
@@ -223,7 +223,7 @@ describe('MethodologyPage', () => {
       ).toBeVisible();
     });
 
-    it('Displays a link to the contact us section within the Related Information section', () => {
+    test('that it displays a link to the contact us section within the Related Information section', () => {
       render(<MethodologyPage data={testMethodology} />);
 
       expect(
@@ -233,7 +233,7 @@ describe('MethodologyPage', () => {
       ).toBeVisible();
     });
 
-    it('Navigates to the Contact Us section when the link is clicked', () => {
+    test('that it navigates to the Contact Us section when the link is clicked', () => {
       render(<MethodologyPage data={testMethodology} />);
 
       expect(

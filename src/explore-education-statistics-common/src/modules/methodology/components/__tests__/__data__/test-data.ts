@@ -1,8 +1,8 @@
-import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/mock-data';
+import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/test-data';
 import { MethodologyPublication } from '@common/services/methodologyService';
 import { PublicationSummary } from '@common/services/publicationService';
 
-export const mockPublicationSummary: PublicationSummary = {
+export const testPublicationSummary: PublicationSummary = {
   id: 'Mock Publication Id',
   slug: 'Mock Publication Slug',
   title: 'Mock Publication Title',
@@ -10,7 +10,7 @@ export const mockPublicationSummary: PublicationSummary = {
   contact: mockContact,
 };
 
-export const mockMethodologyPublication: MethodologyPublication = {
+export const testMethodologyPublication: MethodologyPublication = {
   id: 'Mock Publication Id',
   title: 'Mock Publication Title',
   contact: mockContact,

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Matcher, render, screen } from '@testing-library/react';
 import ContactUsSection from '../ContactUsSection';
-import mockContact from './__data__/mock-data';
+import mockContact from './__data__/test-data';
 
-describe('Contact Us Section', () => {
-  it('Renders', () => {
+describe('ContactUsSection', () => {
+  test('that it renders', () => {
     render(
       <ContactUsSection
         publicationContact={mockContact}
@@ -15,7 +15,7 @@ describe('Contact Us Section', () => {
     expect(screen.getByRole('heading', { name: 'Contact us' })).toBeVisible();
   });
 
-  it.each([
+  test.each([
     [
       'Mock Title 1',
       'If you have a specific enquiry about Mock Title 1 statistics and data:',
@@ -26,7 +26,7 @@ describe('Contact Us Section', () => {
     ],
     ['', 'If you have a specific enquiry about statistics and data'],
   ])(
-    'Constructs sensible prompt text',
+    'that it constructs a sensible prompt text',
     (publicationTitle: string, expectedText: Matcher) => {
       render(
         <ContactUsSection
@@ -39,7 +39,7 @@ describe('Contact Us Section', () => {
     },
   );
 
-  it('Contains an appropriate href to the contact email', () => {
+  test('that it contains an appropriate href to the contact email', () => {
     render(
       <ContactUsSection
         publicationContact={mockContact}
@@ -56,7 +56,7 @@ describe('Contact Us Section', () => {
     ).toHaveAttribute('href', 'mailto:Mock Contact Email');
   });
 
-  it('Displays the telephone number if one is supplied', () => {
+  test('that it displays the telephone number if one is supplied', () => {
     render(
       <ContactUsSection
         publicationContact={mockContact}
@@ -67,7 +67,7 @@ describe('Contact Us Section', () => {
     expect(screen.getByText(/Telephone: Mock Contact Tel No/)).toBeVisible();
   });
 
-  it('Hides the telephone number section if one is not supplied', () => {
+  test('that it hides the telephone number section if one is not supplied', () => {
     render(
       <ContactUsSection
         publicationContact={{ ...mockContact, contactTelNo: undefined }}

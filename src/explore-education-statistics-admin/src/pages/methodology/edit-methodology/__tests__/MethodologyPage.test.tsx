@@ -17,7 +17,7 @@ import render from '@common-test/render';
 import testMethodology, {
   testMethodologyAmendment,
   testMethodologyContent,
-} from './__data__/mock-data';
+} from './__data__/test-data';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');
@@ -51,7 +51,7 @@ describe('MethodologyPage', () => {
       });
     });
 
-    it('Renders the page with the summary tab', async () => {
+    test('renders the page with the summary tab', async () => {
       expect(
         screen.getByRole('heading', { name: 'Test methodology' }),
       ).toBeInTheDocument();
@@ -75,7 +75,7 @@ describe('MethodologyPage', () => {
       expect(screen.getByText('Methodology summary')).toBeInTheDocument();
     });
 
-    it('Shows the status tag', async () => {
+    test('showing the status tag', async () => {
       expect(screen.getByTestId('page-title-caption')).not.toHaveTextContent(
         'Amend methodology',
       );
@@ -117,7 +117,7 @@ describe('MethodologyPage', () => {
       });
     });
 
-    it('Renders the Help and Support section', async () => {
+    test('that the Help and Support section renders', async () => {
       methodologyService.getMethodology.mockResolvedValue(
         testMethodologyAmendment,
       );
@@ -129,7 +129,7 @@ describe('MethodologyPage', () => {
       ).toBeVisible();
     });
 
-    it('Displays a link to the contact us section within the Related Information section', () => {
+    test('that it displays a link to the Contact Us section within the Related Information section', () => {
       expect(
         within(selectRelatedInformationSection()).getByRole('link', {
           name: 'Contact us',
@@ -137,7 +137,7 @@ describe('MethodologyPage', () => {
       ).toBeVisible();
     });
 
-    it('Navigates to the Contact Us section when the link is clicked', () => {
+    test('that it navigates to the Contact Us section when the link is clicked', () => {
       expect(
         within(selectRelatedInformationSection()).getByRole('link', {
           name: 'Contact us',

@@ -3,9 +3,9 @@ import { render, screen } from '@testing-library/react';
 import * as ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import MethodologyHelpAndSupportSection from '../MethodologyHelpAndSupportSection';
 import {
-  mockMethodologyPublication,
-  mockPublicationSummary,
-} from './__data__/mock-data';
+  testMethodologyPublication,
+  testPublicationSummary,
+} from './__data__/test-data';
 
 jest.mock('@common/modules/find-statistics/components/ContactUsSection');
 
@@ -17,18 +17,18 @@ describe('Methodology Help and Support Section (PublicationSummary)', () => {
 
     render(
       <MethodologyHelpAndSupportSection
-        owningPublication={mockPublicationSummary}
+        owningPublication={testPublicationSummary}
       />,
     );
   });
 
-  it('Renders', () => {
+  test('that it renders', () => {
     expect(
       screen.getByRole('heading', { name: /Help and support/ }),
     ).toBeVisible();
   });
 
-  it('Renders a Contact Us Section', () => {
+  test('that it renders a Contact Us Section', () => {
     expect(screen.getByText('This is a mocked ContactUsSection')).toBeVisible();
   });
 });
@@ -41,18 +41,18 @@ describe('Methodology Help and Support Section (mockMethodologyPublication)', ()
 
     render(
       <MethodologyHelpAndSupportSection
-        owningPublication={mockMethodologyPublication}
+        owningPublication={testMethodologyPublication}
       />,
     );
   });
 
-  it('Renders', () => {
+  test('that it renders', () => {
     expect(
       screen.getByRole('heading', { name: /Help and support/ }),
     ).toBeVisible();
   });
 
-  it('Renders a Contact Us Section', () => {
+  test('that it renders a Contact Us Section', () => {
     expect(screen.getByText('This is a mocked ContactUsSection')).toBeVisible();
   });
 });

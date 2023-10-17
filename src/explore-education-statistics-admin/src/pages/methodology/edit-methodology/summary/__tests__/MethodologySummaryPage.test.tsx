@@ -8,7 +8,7 @@ import {
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import { Route } from 'react-router-dom';
-import testMethodology from '../../__tests__/__data__/mock-data';
+import testMethodology from '../../__tests__/__data__/test-data';
 
 describe('MethodologySummaryPage', () => {
   test('renders methodology summary page correctly', async () => {
