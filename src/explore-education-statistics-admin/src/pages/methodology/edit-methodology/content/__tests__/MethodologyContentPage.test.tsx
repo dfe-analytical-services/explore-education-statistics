@@ -51,7 +51,7 @@ describe('MethodologyContentPage', () => {
     userEvent.click(screen.getByRole('link', { name: 'Manage content' }));
   });
 
-  test('that the Help and Support section renders', async () => {
+  test('that the Help and Support section renders', () => {
     expect(
       within(selectRelatedInformationSection()).getByRole('heading', {
         name: 'Help and support',
