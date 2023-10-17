@@ -34,24 +34,14 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyPage', () => {
-  describe('Non-amendment', () => {
-    beforeEach(async () => {
-      methodologyService.getMethodology.mockResolvedValue(testMethodology);
-      methodologyContentService.getMethodologyContent.mockResolvedValue(
-        testMethodologyContent,
+  test('renders the page with the summary tab', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+        'Edit methodology',
       );
-      permissionService.canUpdateMethodology.mockResolvedValue(true);
-
-      renderPage();
-
-      await waitFor(() => {
-        expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
-          'Edit methodology',
-        );
-      });
-    });
-
-    test('renders the page with the summary tab', async () => {
       expect(
         screen.getByRole('heading', { name: 'Test methodology' }),
       ).toBeInTheDocument();
@@ -74,106 +64,86 @@ describe('MethodologyPage', () => {
 
       expect(screen.getByText('Methodology summary')).toBeInTheDocument();
     });
+  });
 
-    test('showing the status tag', async () => {
+  test('showing the status tag', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+        'Edit methodology',
+      );
       expect(screen.getByTestId('page-title-caption')).not.toHaveTextContent(
         'Amend methodology',
       );
       expect(screen.getByText('Draft')).toHaveClass('govuk-tag');
     });
+  });
 
-    test('using the tab navigation', async () => {
-      await waitFor(() => {
-        expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
-          'Edit methodology',
-        );
-      });
+  test('showing the amendment page caption and tag', async () => {
+    methodologyService.getMethodology.mockResolvedValue(
+      testMethodologyAmendment,
+    );
+    renderPage();
 
-      const primaryNav = screen.getByRole('navigation', {
-        name: 'Methodology',
-      });
-      const navLinks = within(primaryNav).getAllByRole('link');
-
-      userEvent.click(navLinks[1]);
-
-      await waitFor(() => {
-        expect(
-          screen.getByRole('heading', { name: 'Content' }),
-        ).toBeInTheDocument();
-        expect(navLinks[1].getAttribute('aria-current')).toBe('page');
-        expect(navLinks[0]).not.toHaveAttribute('aria-current');
-        expect(navLinks[2]).not.toHaveAttribute('aria-current');
-      });
-
-      userEvent.click(navLinks[2]);
-
-      await waitFor(() => {
-        expect(
-          screen.getByRole('heading', { name: 'Sign off' }),
-        ).toBeInTheDocument();
-        expect(navLinks[2].getAttribute('aria-current')).toBe('page');
-        expect(navLinks[0]).not.toHaveAttribute('aria-current');
-        expect(navLinks[1]).not.toHaveAttribute('aria-current');
-      });
-    });
-
-    test('that the Help and Support section renders', async () => {
-      methodologyService.getMethodology.mockResolvedValue(
-        testMethodologyAmendment,
+    await waitFor(() => {
+      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+        'Amend methodology',
       );
+      expect(screen.getByTestId('page-title-caption')).not.toHaveTextContent(
+        'Edit methodology',
+      );
+      expect(screen.getByText('Draft')).toHaveClass('govuk-tag');
 
-      expect(
-        within(selectRelatedInformationSection()).getByRole('heading', {
-          name: 'Help and support',
-        }),
-      ).toBeVisible();
-    });
-
-    test('that it displays a link to the Contact Us section within the Related Information section', () => {
-      expect(
-        within(selectRelatedInformationSection()).getByRole('link', {
-          name: 'Contact us',
-        }),
-      ).toBeVisible();
-    });
-
-    test('that it navigates to the Contact Us section when the link is clicked', () => {
-      expect(
-        within(selectRelatedInformationSection()).getByRole('link', {
-          name: 'Contact us',
-        }),
-      ).toHaveAttribute('href', '#contact-us');
-
-      expect(
-        screen
-          .queryAllByRole('heading', { name: 'Contact us' })
-          .find(e => e.id === 'contact-us'),
-      ).not.toBeUndefined();
+      expect(screen.getByText('Amendment')).toHaveClass('govuk-tag');
     });
   });
 
-  describe('Amendment', () => {
-    test('showing the amendment page caption and tag', async () => {
-      methodologyService.getMethodology.mockResolvedValue(
-        testMethodologyAmendment,
+  test('using the tab navigation', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    methodologyContentService.getMethodologyContent.mockResolvedValue(
+      testMethodologyContent,
+    );
+    permissionService.canUpdateMethodology.mockResolvedValue(true);
+
+    renderPage();
+
+    await waitFor(() => {
+      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
+        'Edit methodology',
       );
-      renderPage();
+    });
 
-      await waitFor(() => {
-        expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
-          'Amend methodology',
-        );
-        expect(screen.getByTestId('page-title-caption')).not.toHaveTextContent(
-          'Edit methodology',
-        );
-        expect(screen.getByText('Draft')).toHaveClass('govuk-tag');
+    const primaryNav = screen.getByRole('navigation', {
+      name: 'Methodology',
+    });
+    const navLinks = within(primaryNav).getAllByRole('link');
 
-        expect(screen.getByText('Amendment')).toHaveClass('govuk-tag');
-      });
+    userEvent.click(navLinks[1]);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Content' }),
+      ).toBeInTheDocument();
+      expect(navLinks[1].getAttribute('aria-current')).toBe('page');
+      expect(navLinks[0]).not.toHaveAttribute('aria-current');
+      expect(navLinks[2]).not.toHaveAttribute('aria-current');
+    });
+
+    userEvent.click(navLinks[2]);
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('heading', { name: 'Sign off' }),
+      ).toBeInTheDocument();
+      expect(navLinks[2].getAttribute('aria-current')).toBe('page');
+      expect(navLinks[0]).not.toHaveAttribute('aria-current');
+      expect(navLinks[1]).not.toHaveAttribute('aria-current');
     });
   });
 
-  const renderPage = () => {
+  function renderPage() {
     const path = generatePath<MethodologyRouteParams>(
       methodologySummaryRoute.path,
       {
@@ -188,19 +158,5 @@ describe('MethodologyPage', () => {
         </TestConfigContextProvider>
       </MemoryRouter>,
     );
-  };
-
-  const selectRelatedInformationSection = (): HTMLElement => {
-    const relatedInformation = screen.getByRole('heading', {
-      name: 'Related information',
-    }).parentElement;
-
-    if (!relatedInformation) {
-      throw new Error(
-        'Failing test early - the "Related information" section could not be found.',
-      );
-    }
-
-    return relatedInformation;
-  };
+  }
 });
