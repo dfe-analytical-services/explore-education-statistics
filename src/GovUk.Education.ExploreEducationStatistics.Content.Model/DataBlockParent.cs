@@ -1,19 +1,26 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class DataBlockParent
 {
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
 
-    public Guid LatestVersionId { get; init; }
+    public List<DataBlockVersion> Versions { get; set; } = new();
 
-    public DataBlockVersion LatestVersion { get; init; } = null!;
+    public Guid LatestVersionId { get; set; }
+
+    public DataBlockVersion LatestVersion { get; set; } = null!;
 
     public Guid? LatestPublishedVersionId { get; set; }
 
     public DataBlockVersion? LatestPublishedVersion { get; set; }
+
+    // TODO EES-4467 - is this confusing having this do differently to the other Clone methods?
+    public DataBlockParent Clone()
+    {
+        return (MemberwiseClone() as DataBlockParent)!;
+    }
 }

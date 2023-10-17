@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
     {
         public static T DeepEqualTo<T>(T expected)
         {
-            return It.Is<T>(actual => actual.IsDeepEqualTo(expected));
+            return It.Is<T>(actual => actual.IsDeepEqualTo(expected, null));
         }
 
         public static IList<T> ListSequenceEqualTo<T>(IEnumerable<T> expected)
@@ -25,5 +25,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         {
             return It.Is<IQueryable<T>>(actual => actual.SequenceEqual(expected));
         }
-    } 
+    }
 }

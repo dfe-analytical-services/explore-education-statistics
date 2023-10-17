@@ -36,6 +36,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return result is not null ? result : new NotFoundResult();
         }
 
+        public static async Task<Either<ActionResult, TRight>> OrNotFound<TRight>(this Task<Either<ActionResult, TRight?>> task)
+            where TRight : class?
+        {
+            var prev = await task;
+
+            return prev.OnSuccess(result => 
+                result ?? new Either<ActionResult, TRight>(new NotFoundResult()));
+        }
+
         public static async Task<ActionResult> HandleFailures<TRight>(
             this Task<Either<ActionResult, TRight>> task) where TRight : ActionResult
         {

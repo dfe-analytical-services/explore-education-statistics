@@ -10,9 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 {
     public static class ReleaseAmendmentExtensions
     {
-        public static Tuple<Release, List<DataBlock>> CreateAmendment(
+        public static Release CreateAmendment(
             this Release originalRelease,
-            List<DataBlock> originalDataBlocks,
             DateTime createdDate,
             Guid createdByUserId)
         {
@@ -32,23 +31,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             amendment.Version = originalRelease.Version + 1;
             amendment.PreviousVersionId = originalRelease.Id;
 
-            var context = new Release.CloneContext(amendment);
+            // Create new DataBlockVersions for each DataBlockParent and for each, replace the "LatestVersion"
+            // with the new DataBlockVersion.
+            amendment
+                .DataBlockParents = originalRelease
+                .DataBlockParents
+                .Select(dataBlockParent =>
+                {
+                    var clonedParent = dataBlockParent.Clone();
+                    var clonedDataBlockVersion = clonedParent.LatestPublishedVersion!.Clone(amendment);
+                    clonedParent.LatestVersion = clonedDataBlockVersion;
+                    clonedParent.Versions = dataBlockParent.Versions.Append(clonedDataBlockVersion).ToList();
+                    return clonedParent;
+                })
+                .ToList();
 
-            // Copy ContentSections and ContentBlocks associated with those sections
+            // Clone all non-DataBlock Content Blocks found within Release Content.
+            Dictionary<ContentBlock, ContentBlock> originalToClonedContentBlocks = originalRelease
+                .Content
+                .SelectMany(section => section.Content)
+                .Where(block => block is not DataBlock)
+                .ToDictionary(
+                    block => block,
+                    block => block.Clone(amendment));
+
+            Dictionary<DataBlock, DataBlock> originalToClonedDataBlocks = amendment
+                .DataBlockParents
+                .ToDictionary(
+                    dataBlockVersion => dataBlockVersion.LatestPublishedVersion!.ContentBlock,
+                    dataBlockVersion => dataBlockVersion.LatestVersion.ContentBlock);
+
+            var allClonedBlocks = originalToClonedContentBlocks
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+            originalToClonedDataBlocks.ForEach(kv => allClonedBlocks.Add(kv.Key, kv.Value));
+
+            // Copy ContentSections, using the newly-cloned ContentBlocks and DataBlocks rather than
+            // the original ones in the new ContentSections.
             amendment.Content = amendment
                 .Content
                 // Old / new ContentBlock pairs are added to context here.
-                .Select(section => section.Clone(context))
+                .Select(section => section.Clone(amendment, allClonedBlocks))
                 .ToList();
-
-            // TODO EES-4467 - this can be incorporated back into Release as the newly fashioned
-            // DataBlock / DataBlockVersions tables.
-            // Copy DataBlocks not associated with any ContentSection (as these have already been cloned above).
-            originalDataBlocks
-                // Only clone DataBlocks that have not already been cloned via Content.
-                .Where(dataBlock => !context.OriginalToAmendmentContentBlockMap.ContainsKey(dataBlock))
-                // Old / new DataBlock pairs are added to context here.
-                .ForEach(dataBlock => dataBlock.Clone(context));
 
             // NOTE: This is to ensure that a RelatedDashboards ContentSection exists on all new amendments.
             // There are older releases without a RelatedDashboards ContentSection.
@@ -68,13 +91,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
             amendment.KeyStatistics = amendment.KeyStatistics.Select(originalKeyStatistic =>
             {
-                var amendmentKeyStatistic = originalKeyStatistic.Clone(context.NewRelease);
+                var amendmentKeyStatistic = originalKeyStatistic.Clone(amendment);
 
                 if (originalKeyStatistic is KeyStatisticDataBlock originalKeyStatDataBlock
                     && amendmentKeyStatistic is KeyStatisticDataBlock amendmentKeyStatDataBlock)
                 {
-                    var originalDataBlock = originalKeyStatDataBlock.DataBlock;
-                    var amendmentDataBlock = (DataBlock)context.OriginalToAmendmentContentBlockMap[originalDataBlock];
+                    var amendmentDataBlock = originalToClonedDataBlocks[originalKeyStatDataBlock.DataBlock];
                     amendmentKeyStatDataBlock.DataBlock = amendmentDataBlock;
                     amendmentKeyStatDataBlock.DataBlockId = amendmentDataBlock.Id;
                 }
@@ -84,10 +106,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
             amendment.FeaturedTables = amendment.FeaturedTables.Select(originalFeaturedTable =>
             {
-                var amendmentFeaturedTable = originalFeaturedTable.Clone(context.NewRelease);
+                var amendmentFeaturedTable = originalFeaturedTable.Clone(amendment);
 
-                var originalDataBlock = originalFeaturedTable.DataBlock;
-                var amendmentDataBlock = (DataBlock)context.OriginalToAmendmentContentBlockMap[originalDataBlock];
+                var amendmentDataBlock = originalToClonedDataBlocks[originalFeaturedTable.DataBlock];
                 amendmentFeaturedTable.DataBlock = amendmentDataBlock;
                 amendmentFeaturedTable.DataBlockId = amendmentDataBlock.Id;
 
@@ -104,27 +125,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 .Select(update => update.Clone(amendment))
                 .ToList();
 
-            UpdateAmendmentContent(context);
+            UpdateAmendmentContent(allClonedBlocks);
 
-            // TODO EES-4467 - the list of DataBlocks can be incorporated back into Release as the newly fashioned
-            // DataBlock / DataBlockVersion tables and this Tuple can be removed at that point.
-            return new Tuple<Release, List<DataBlock>>(
-                amendment,
-                context
-                    .OriginalToAmendmentContentBlockMap
-                    .Values
-                    .OfType<DataBlock>()
-                    .ToList());
+            return amendment;
         }
 
-        private static void UpdateAmendmentContent(Release.CloneContext context)
+        private static void UpdateAmendmentContent(Dictionary<ContentBlock, ContentBlock> allClonedBlocks)
         {
             var replacements = new Dictionary<string, MatchEvaluator>();
 
             // Bit cheeky to re-use the clone context, but it's a nice
             // easy way to access and modify all of the content blocks
             // that we used during the clone.
-            context.OriginalToAmendmentContentBlockMap
+            allClonedBlocks
                 .ForEach(
                     pair =>
                     {
@@ -142,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 RegexOptions.Compiled
             );
 
-            foreach (var amendmentBlock in context.OriginalToAmendmentContentBlockMap.Values)
+            foreach (var amendmentBlock in allClonedBlocks.Values)
             {
                 switch (amendmentBlock)
                 {
@@ -187,22 +200,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         }
 
         public static void CreateGenericContentFromTemplate(
-            this Release originalRelease,
-            Release.CloneContext context)
+            this Release templateRelease,
+            Release newRelease)
         {
-            var newRelease = context.NewRelease;
-
-            newRelease.Content = originalRelease.Content
+            newRelease.Content = templateRelease.Content
                 .Where(section => section.Type == ContentSectionType.Generic)
                 .ToList();
 
-            newRelease.Content = originalRelease
+            newRelease.Content = templateRelease
                 .Content
-                .Select(section => section.Clone(context))
+                // TODO DW - EES-4467 - this CLone method being used again here feels a bit messy.
+                .Select(section => section.Clone(newRelease, new Dictionary<ContentBlock, ContentBlock>()))
                 .ToList();
-
-            // TODO EES-4467 - we can add the cloning of Data Blocks back in here rather than being doing separately
-            // when the new DataBlock / DataBlockVersion tables are added.
         }
     }
 }

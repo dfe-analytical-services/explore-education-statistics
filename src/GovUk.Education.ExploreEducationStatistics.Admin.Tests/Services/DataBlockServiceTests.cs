@@ -82,7 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Width = 500,
                     }
                 },
-                
             };
 
             var releaseFile = new ReleaseFile
@@ -1136,13 +1135,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                var dataBlockParents = context.DataBlockParents.ToList();
+                var dataBlockVersions = context.DataBlockVersions.ToList();
                 var dataBlocks = context.DataBlocks.ToList();
-
+                
+                // Validate that we have a new "DataBlockParent" to keep track of the various DataBlockVersions.
+                // Assert as well that it does not currently have a published DataBlockVersion as this is a new
+                // DataBlock.
+                var dataBlockParent = Assert.Single(dataBlockParents);
+                Assert.Null(dataBlockParent.LatestPublishedVersionId);
+                Assert.NotEqual(Guid.Empty, dataBlockParent.LatestVersionId);
+                
+                // Validate that we have a single "version 0" DataBlockVersion for this new DataBlock. Assert that it
+                // is attached to its parent correctly, that is recognised as the latest version, and that it is
+                // attached to the underlying ContentBlock successfully.
+                var dataBlockVersion = Assert.Single(dataBlockVersions);
                 var dataBlock = Assert.Single(dataBlocks);
+                Assert.Equal(0, dataBlockVersion.Version);
+                Assert.Equal(dataBlock.Id, dataBlockVersion.ContentBlockId);
+                Assert.Equal(dataBlockParent.Id, dataBlockVersion.DataBlockParentId);
+                Assert.Equal(dataBlockParent.LatestVersionId, dataBlockVersion.Id);
+                
+                // Assert that the new DataBlock is connected correctly to its owning Release.
+                Assert.Equal(release.Id, dataBlockVersion.ReleaseId);
+                Assert.Equal(release.Id, dataBlock.ReleaseId);
 
-                // Validate Created date is in the DB, even if not returned in result
-                Assert.True(dataBlock.Created.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created.Value).Milliseconds, 0, 1500);
+                // Assert that the DataBlockVersion has a Created date, but no Updated or Published dates at this time.
+                dataBlockVersion.Created.AssertRecent();
+                Assert.Null(dataBlockVersion.Updated);
+                Assert.Null(dataBlockVersion.Published);
+
+                dataBlock.Created.AssertRecent();
+                Assert.Null(dataBlock.Updated);
 
                 Assert.Equal(createRequest.Heading, dataBlock.Heading);
                 Assert.Equal(createRequest.Name, dataBlock.Name);

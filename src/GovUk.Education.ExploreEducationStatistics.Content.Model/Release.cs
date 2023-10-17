@@ -142,6 +142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, new List<ContentSection> { value });
         }
 
+        public List<DataBlockParent> DataBlockParents { get; set; } = new();
+
         private ContentSection FindSingleSectionByType(ContentSectionType type)
         {
             if (Content == null)
@@ -198,23 +200,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Release Clone()
         {
             return MemberwiseClone() as Release;
-        }
-
-        public record CloneContext
-        {
-            // Maps old content block references to new content blocks
-            // Ideally we want to try and get rid of this completely as we
-            // shouldn't have to deal with the same content blocks being
-            // referenced in multiple places.
-            // TODO: EES-1306 may be possible to remove this as part of this ticket
-            public Dictionary<ContentBlock, ContentBlock> OriginalToAmendmentContentBlockMap { get; } = new();
-
-            public Release NewRelease { get; }
-
-            public CloneContext(Release newRelease)
-            {
-                NewRelease = newRelease;
-            }
         }
     }
 }

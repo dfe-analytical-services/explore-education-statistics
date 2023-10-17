@@ -75,18 +75,23 @@ public class InstanceSetters<T> where T : class
             (faker, _, context) =>
             {
                 var index = GetDisplayIndex(context, faker);
-                
+
                 return $"{PropertyName.For(property)} of {typeof(T).Name} {index}";
             }
         );
     }
 
-    public InstanceSetters<T> SetDefault(Expression<Func<T, int?>> property)
+    public InstanceSetters<T> SetDefault(Expression<Func<T, int?>> property, int? offset = 0)
     {
         return Set(
             property,
-            (faker, _, context) => GetDisplayIndex(context, faker)
+            (faker, _, context) => offset + GetDisplayIndex(context, faker)
         );
+    }
+
+    public InstanceSetters<T> SetDefault(Expression<Func<T, DateTime?>> property)
+    {
+        return Set(property, DateTime.UtcNow.AddDays(-1));
     }
 
     private static int GetDisplayIndex(SetterContext context, Faker faker)

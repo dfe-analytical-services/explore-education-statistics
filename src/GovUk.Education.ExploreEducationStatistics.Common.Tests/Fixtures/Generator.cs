@@ -91,7 +91,7 @@ public class Generator<T> where T : class
     /// <remarks>
     /// Index setters will take precedence over <see cref="ForInstance"/> setters.
     /// If an index applies, it will override any previous instance setters. Index
-    /// setters have the same level of precedence as Range setters. 
+    /// setters have the same level of precedence as Range setters.
     /// </remarks>
     /// <param name="index">The index to which the setters apply.</param>
     /// <param name="builder">A builder for registering setters for the index.</param>
@@ -164,14 +164,14 @@ public class Generator<T> where T : class
             throw new ArgumentException(
                 "Cannot infer number of elements to create if no range setters are used");
         }
-        
+
         if (_rangeSetters.Any(setter => setter.Range.End.IsFromEnd))
         {
             throw new ArgumentException(
                 "Cannot infer number of elements to create if index-from-end range setters or range setters " +
                 "with unbounded upper limits are used");
         }
-        
+
         return Generate(GetMaximumIndex() + 1).ToList();
     }
 

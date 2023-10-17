@@ -27,22 +27,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<ContentBlock> Content { get; set; } = new();
 
         public Release Release { get; set; }
-        
+
         public Guid ReleaseId { get; set; }
-        
+
         [JsonIgnore] public ContentSectionType Type { get; set; }
 
-        public ContentSection Clone(Release.CloneContext context)
+        public ContentSection Clone(
+            Release amendment,
+            Dictionary<ContentBlock, ContentBlock> originalToAmendmentContentBlocks)
         {
-            var copy = MemberwiseClone() as ContentSection;
+            var copy = (MemberwiseClone() as ContentSection)!;
             copy.Id = Guid.NewGuid();
 
-            copy.Release = context.NewRelease;
-            copy.ReleaseId = context.NewRelease.Id;
+            copy.Release = amendment;
+            copy.ReleaseId = amendment.Id;
 
+            // Using the originalToAmendmentContentBlocks Dictionary, replace the original
+            // ContentBlocks with their cloned equivalents.
             copy.Content = copy
                 .Content?
-                .Select(content => content.Clone(context, copy))
+                .Select(originalBlock =>
+                {
+                    var clonedContentBlock = originalToAmendmentContentBlocks[originalBlock];
+                    clonedContentBlock.ContentSection = copy;
+                    clonedContentBlock.ContentSectionId = copy.Id;
+                    return clonedContentBlock;
+                })
                 .ToList();
 
             return copy;
