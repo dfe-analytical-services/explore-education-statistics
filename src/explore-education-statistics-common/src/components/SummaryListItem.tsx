@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import styles from './SummaryList.module.scss';
 
 interface Props {
   actions?: ReactNode;
@@ -15,7 +16,10 @@ const SummaryListItem = ({
 }: Props) => {
   return (
     <div className="govuk-summary-list__row" data-testid={testId}>
-      <dt className="govuk-summary-list__key" data-testid={`${testId}-key`}>
+      <dt
+        className={`govuk-summary-list__key ${styles.key}`}
+        data-testid={`${testId}-key`}
+      >
         {term}
       </dt>
 
