@@ -5,6 +5,7 @@ using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensions
 {
@@ -24,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, _) = release.CreateAmendment(new List<DataBlock>(), createdDate, createdById);
 
             Assert.NotEqual(release.Id, amendment.Id);
             Assert.Equal(2, amendment.Version);
@@ -50,62 +51,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var section1Id = Guid.NewGuid();
             var section2Id = Guid.NewGuid();
 
-            release.Content = new List<ReleaseContentSection>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section1Id,
-                    ContentSection = new ContentSection
+                    Id = section1Id,
+                    Heading = "Section 1",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section1Id,
-                        Heading = "Section 1",
-                        Content = new List<ContentBlock>
+                        new HtmlBlock
                         {
-                            new HtmlBlock
-                            {
-                                Id = Guid.NewGuid(),
-                                Order = 1,
-                                Body = "Block 1 body"
-                            },
-                            new DataBlock
-                            {
-                                Id = Guid.NewGuid(),
-                                Order = 2,
-                                Heading = "Block 2 heading",
-                                Name = "Block 2 name",
-                                Source = "Block 2 source"
-                            }
+                            Id = Guid.NewGuid(),
+                            Order = 1,
+                            Body = "Block 1 body"
                         },
-                    }
+                        new DataBlock
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 2,
+                            Heading = "Block 2 heading",
+                            Name = "Block 2 name",
+                            Source = "Block 2 source"
+                        }
+                    },
                 },
-                new()
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section2Id,
-                    ContentSection = new ContentSection
+                    Id = section2Id,
+                    Heading = "Section 2",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section2Id,
-                        Heading = "Section 2",
-                        Content = new List<ContentBlock>
+                        new HtmlBlock
                         {
-                            new HtmlBlock
-                            {
-                                Id = Guid.NewGuid(),
-                                Order = 1,
-                                Body = "Block 3 body"
-                            },
+                            Id = Guid.NewGuid(),
+                            Order = 1,
+                            Body = "Block 3 body"
                         },
-                    }
-                }
-            };
+                    },
+                });
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, _) = release.CreateAmendment(new List<DataBlock>(), createdDate, createdById);
 
             Assert.Equal(3, amendment.Content.Count);
 
@@ -113,20 +100,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal(amendment, section1.Release);
             Assert.Equal(amendment.Id, section1.ReleaseId);
 
-            Assert.NotEqual(release.Content[0].ContentSectionId, section1.ContentSectionId);
-            Assert.NotEqual(release.Content[0].ContentSection.Id, section1.ContentSection.Id);
-            Assert.Equal("Section 1", section1.ContentSection.Heading);
+            Assert.NotEqual(release.Content[0].Id, section1.Id);
+            Assert.NotEqual(release.Content[0].Id, section1.Id);
+            Assert.Equal("Section 1", section1.Heading);
 
-            Assert.Equal(2, section1.ContentSection.Content.Count);
+            Assert.Equal(2, section1.Content.Count);
 
-            var block1 = Assert.IsType<HtmlBlock>(section1.ContentSection.Content[0]);
+            var block1 = Assert.IsType<HtmlBlock>(section1.Content[0]);
 
-            Assert.NotEqual(release.Content[0].ContentSection.Content[0].Id, block1.Id);
+            Assert.NotEqual(release.Content[0].Content[0].Id, block1.Id);
             Assert.Equal(1, block1.Order);
             Assert.Equal("Block 1 body", block1.Body);
 
-            var block2 = Assert.IsType<DataBlock>(section1.ContentSection.Content[1]);
-            Assert.NotEqual(release.Content[0].ContentSection.Content[1].Id, block2.Id);
+            var block2 = Assert.IsType<DataBlock>(section1.Content[1]);
+            Assert.NotEqual(release.Content[0].Content[1].Id, block2.Id);
             Assert.Equal(2, block2.Order);
             Assert.Equal("Block 2 heading", block2.Heading);
             Assert.Equal("Block 2 name", block2.Name);
@@ -137,14 +124,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal(amendment, section2.Release);
             Assert.Equal(amendment.Id, section2.ReleaseId);
 
-            Assert.NotEqual(release.Content[1].ContentSectionId, section2.ContentSectionId);
-            Assert.NotEqual(release.Content[1].ContentSection.Id, section2.ContentSection.Id);
-            Assert.Equal("Section 2", section2.ContentSection.Heading);
+            Assert.NotEqual(release.Content[1].Id, section2.Id);
+            Assert.NotEqual(release.Content[1].Id, section2.Id);
+            Assert.Equal("Section 2", section2.Heading);
 
-            Assert.Single(section2.ContentSection.Content);
+            Assert.Single(section2.Content);
 
-            var block3 = Assert.IsType<HtmlBlock>(section2.ContentSection.Content[0]);
-            Assert.NotEqual(release.Content[1].ContentSection.Content[0].Id, block3.Id);
+            var block3 = Assert.IsType<HtmlBlock>(section2.Content[0]);
+            Assert.NotEqual(release.Content[1].Content[0].Id, block3.Id);
             Assert.Equal(1, block3.Order);
             Assert.Equal("Block 3 body", block3.Body);
 
@@ -155,8 +142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal(amendment, section3.Release);
             Assert.Equal(amendment.Id, section3.ReleaseId);
 
-            Assert.Equal(ContentSectionType.RelatedDashboards, section3.ContentSection.Type);
-            Assert.Empty(section3.ContentSection.Content);
+            Assert.Equal(ContentSectionType.RelatedDashboards, section3.Type);
+            Assert.Empty(section3.Content);
         }
 
         [Fact]
@@ -171,68 +158,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var section1Id = Guid.NewGuid();
             var section2Id = Guid.NewGuid();
 
-            release.Content = new List<ReleaseContentSection>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section1Id,
-                    ContentSection = new ContentSection
+                    Id = section1Id,
+                    Heading = "Section 1",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section1Id,
-                        Heading = "Section 1",
-                        Content = new List<ContentBlock>
+                        new HtmlBlock
                         {
-                            new HtmlBlock
+                            Id = Guid.NewGuid(),
+                            Order = 1,
+                            Body = "Block 1 body",
+                            Comments = new List<Comment>
                             {
-                                Id = Guid.NewGuid(),
-                                Order = 1,
-                                Body = "Block 1 body",
-                                Comments = new List<Comment>
+                                new()
                                 {
-                                    new()
-                                    {
-                                        Content = "Comment 1"
-                                    }
+                                    Content = "Comment 1"
                                 }
-                            },
+                            }
                         },
-                    }
+                    },
                 },
-                new()
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section2Id,
-                    ContentSection = new ContentSection
+                    Id = section2Id,
+                    Heading = "Section 2",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section2Id,
-                        Heading = "Section 2",
-                        Content = new List<ContentBlock>
+                        new HtmlBlock
                         {
-                            new HtmlBlock
+                            Id = Guid.NewGuid(),
+                            Order = 1,
+                            Body = "Block 2",
+                            Comments = new List<Comment>
                             {
-                                Id = Guid.NewGuid(),
-                                Order = 1,
-                                Body = "Block 2",
-                                Comments = new List<Comment>
+                                new()
                                 {
-                                    new()
-                                    {
-                                        Content = "Comment 1"
-                                    }
+                                    Content = "Comment 1"
                                 }
-                            },
+                            }
                         },
-                    }
-                }
-            };
+                    },
+                });
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, _) = release.CreateAmendment(new List<DataBlock>(), createdDate, createdById);
 
             Assert.Equal(3, amendment.Content.Count);
 
@@ -240,16 +213,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var section2 = amendment.Content[1];
             var section3 = amendment.Content[2];
 
-            var block1 = Assert.IsType<HtmlBlock>(section1.ContentSection.Content[0]);
+            var block1 = Assert.IsType<HtmlBlock>(section1.Content[0]);
             Assert.Empty(block1.Comments);
 
-            var block2 = Assert.IsType<HtmlBlock>(section2.ContentSection.Content[0]);
+            var block2 = Assert.IsType<HtmlBlock>(section2.Content[0]);
             Assert.Empty(block2.Comments);
 
             // NOTE: Some older releases do not have a RelatedDashboards ContentSection, so it is created
             // on amendments.
-            Assert.Equal(ContentSectionType.RelatedDashboards, section3.ContentSection.Type);
-            Assert.Empty(section3.ContentSection.Content);
+            Assert.Equal(ContentSectionType.RelatedDashboards, section3.Type);
+            Assert.Empty(section3.Content);
         }
 
         [Fact]
@@ -278,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, _) = release.CreateAmendment(new List<DataBlock>(), createdDate, createdById);
 
             Assert.Equal(2, amendment.RelatedInformation.Count);
 
@@ -325,7 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, _) = release.CreateAmendment(new List<DataBlock>(), createdDate, createdById);
 
             Assert.Equal(2, amendment.Updates.Count);
 
@@ -355,64 +328,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var block1Id = Guid.NewGuid();
             var block2Id = Guid.NewGuid();
 
-            release.ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = block1Id,
-                    ContentBlock = new HtmlBlock
-                    {
-                        Id = block1Id,
-                        Order = 1,
-                        Body = "Block 1 body"
-                    }
-                },
-                new()
+                    Content = ListOf(
+                        new HtmlBlock
+                        {
+                            Id = block1Id,
+                            Order = 1,
+                            Body = "Block 1 body",
+                            Release = release
+                        })
+                        .Cast<ContentBlock>()
+                        .ToList()
+                });
+            
+            var originalReleaseDataBlocks = ListOf(
+                new DataBlock
                 {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = block2Id,
-                    ContentBlock =  new DataBlock
-                    {
-                        Id = block2Id,
-                        Order = 2,
-                        Heading = "Block 2 heading",
-                        Name = "Block 2 name",
-                        Source = "Block 2 source"
-                    }
-                },
-            };
+                    Id = block2Id,
+                    Order = 2,
+                    Heading = "Block 2 heading",
+                    Name = "Block 2 name",
+                    Source = "Block 2 source",
+                    Release = release
+                });
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, amendmentDataBlocks) = release.CreateAmendment(originalReleaseDataBlocks, createdDate, createdById);
 
-            Assert.Equal(2, amendment.ContentBlocks.Count);
+            // Expect to have a copy of the original's ContentSection, plus a new RelatedDashboards section.
+            Assert.Equal(2, amendment.Content.Count);
+            Assert.Equal(ContentSectionType.Generic, amendment.Content[0].Type);
+            Assert.Equal(ContentSectionType.RelatedDashboards, amendment.Content[1].Type);
+            
+            var amendmentContentSection = amendment.Content[0];
+            var amendmentDataBlock = Assert.Single(amendmentDataBlocks);
+            var amendmentHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(amendmentContentSection.Content));
 
-            var releaseBlock1 = amendment.ContentBlocks[0];
-            Assert.Equal(amendment, releaseBlock1.Release);
-            Assert.Equal(amendment.Id, releaseBlock1.ReleaseId);
-            Assert.NotEqual(release.ContentBlocks[0].ContentBlockId, releaseBlock1.ContentBlockId);
+            Assert.Equal(amendment, amendmentHtmlBlock.Release);
+            Assert.Equal(amendment.Id, amendmentHtmlBlock.ReleaseId);
+            Assert.NotEqual(release.Content[0].Content[0].Id, amendmentHtmlBlock.Id);
 
-            var block1 = Assert.IsType<HtmlBlock>(releaseBlock1.ContentBlock);
-            Assert.NotEqual(release.ContentBlocks[0].ContentBlock.Id, block1.Id);
-            Assert.Equal(1, block1.Order);
-            Assert.Equal("Block 1 body", block1.Body);
+            Assert.Equal(1, amendmentHtmlBlock.Order);
+            Assert.Equal("Block 1 body", amendmentHtmlBlock.Body);
 
-            var releaseBlock2 = amendment.ContentBlocks[1];
-            Assert.Equal(amendment, releaseBlock2.Release);
-            Assert.Equal(amendment.Id, releaseBlock2.ReleaseId);
-            Assert.NotEqual(release.ContentBlocks[1].ContentBlockId, releaseBlock2.ContentBlockId);
+            Assert.Equal(amendment, amendmentDataBlock.Release);
+            Assert.Equal(amendment.Id, amendmentDataBlock.ReleaseId);
+            Assert.NotEqual(originalReleaseDataBlocks[0].Id, amendmentDataBlock.Id);
 
-            var block2 = Assert.IsType<DataBlock>(releaseBlock2.ContentBlock);
-            Assert.NotEqual(release.ContentBlocks[1].ContentBlock.Id, block2.Id);
-            Assert.Equal(2, block2.Order);
-            Assert.Equal("Block 2 heading", block2.Heading);
-            Assert.Equal("Block 2 name", block2.Name);
-            Assert.Equal("Block 2 source", block2.Source);
+            Assert.Equal(2, amendmentDataBlock.Order);
+            Assert.Equal("Block 2 heading", amendmentDataBlock.Heading);
+            Assert.Equal("Block 2 name", amendmentDataBlock.Name);
+            Assert.Equal("Block 2 source", amendmentDataBlock.Source);
         }
 
         [Fact]
@@ -431,6 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Order = 1,
                 Body = "Block 1 body",
                 ContentSectionId = section1Id,
+                Release = release
             };
             var dataBlock = new DataBlock
             {
@@ -440,92 +411,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Name = "Block 2 name",
                 Source = "Block 2 source",
                 ContentSectionId = section1Id,
+                Release = release
             };
 
-            release.Content = new List<ReleaseContentSection>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section1Id,
-                    ContentSection = new ContentSection
+                    Id = section1Id,
+                    Heading = "Section 1",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section1Id,
-                        Heading = "Section 1",
-                        Content = new List<ContentBlock>
-                        {
-                            contentBlock,
-                            dataBlock,
-                        },
-                    }
-                },
-            };
+                        contentBlock,
+                        dataBlock,
+                    },
+                    Release = release
+                });
+            
+            release.Content = ListOf(
+                new ContentSection
+                {
+                    Content = new List<ContentBlock>
+                    {
+                        contentBlock,
+                        dataBlock
+                    },
+                    Release = release
+                });
 
-            release.ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock.Id,
-                    ContentBlock = contentBlock
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = dataBlock.Id,
-                    ContentBlock =  dataBlock
-                },
-            };
+            var originalReleaseDataBlocks = ListOf(dataBlock);
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, amendmentDataBlocks) = release.CreateAmendment(originalReleaseDataBlocks, createdDate, createdById);
 
-            Assert.Equal(2, amendment.ContentBlocks.Count);
+            var amendmentDataBlock = Assert.Single(amendmentDataBlocks);
+            Assert.Equal(amendment, amendmentDataBlock.Release);
+            Assert.Equal(amendment.Id, amendmentDataBlock.ReleaseId);
+            Assert.NotEqual(originalReleaseDataBlocks[0].Id, amendmentDataBlock.Id);
+            Assert.Equal(2, amendmentDataBlock.Order);
+            Assert.Equal("Block 2 heading", amendmentDataBlock.Heading);
+            Assert.Equal("Block 2 name", amendmentDataBlock.Name);
+            Assert.Equal("Block 2 source", amendmentDataBlock.Source);
 
-            var releaseBlock1 = amendment.ContentBlocks[0];
-            Assert.Equal(amendment, releaseBlock1.Release);
-            Assert.Equal(amendment.Id, releaseBlock1.ReleaseId);
-            Assert.NotEqual(release.ContentBlocks[0].ContentBlockId, releaseBlock1.ContentBlockId);
+            var htmlBlock = Assert.IsType<HtmlBlock>(amendment.Content[0].Content[0]);
+            Assert.Equal(1, htmlBlock.Order);
+            Assert.Equal("Block 1 body", htmlBlock.Body);
+            Assert.NotEqual(release.Content[0].Content[0].Id, htmlBlock.Id);
 
-            var block1 = Assert.IsType<HtmlBlock>(releaseBlock1.ContentBlock);
-            Assert.NotEqual(release.ContentBlocks[0].ContentBlock.Id, block1.Id);
-            Assert.Equal(1, block1.Order);
-            Assert.Equal("Block 1 body", block1.Body);
-
-            var contentSection1Block1 = Assert.IsType<HtmlBlock>(amendment.Content[0].ContentSection.Content[0]);
-            Assert.Equal(block1, contentSection1Block1);
-
-            var releaseBlock2 = amendment.ContentBlocks[1];
-            Assert.Equal(amendment, releaseBlock2.Release);
-            Assert.Equal(amendment.Id, releaseBlock2.ReleaseId);
-            Assert.NotEqual(release.ContentBlocks[1].ContentBlockId, releaseBlock2.ContentBlockId);
-
-            var block2 = Assert.IsType<DataBlock>(releaseBlock2.ContentBlock);
-            Assert.NotEqual(release.ContentBlocks[1].ContentBlock.Id, block2.Id);
-            Assert.Equal(2, block2.Order);
-            Assert.Equal("Block 2 heading", block2.Heading);
-            Assert.Equal("Block 2 name", block2.Name);
-            Assert.Equal("Block 2 source", block2.Source);
-
-            var contentSection1Block2 = Assert.IsType<DataBlock>(amendment.Content[0].ContentSection.Content[1]);
-            Assert.Equal(block2, contentSection1Block2);
+            var contentSection1Block2 = Assert.IsType<DataBlock>(amendment.Content[0].Content[1]);
+            Assert.Equal(amendmentDataBlock, contentSection1Block2);
         }
 
         [Fact]
         public void CreateAmendment_CopiesKeyStatistics()
         {
+            var releaseId = Guid.NewGuid();
             var dataBlock = new DataBlock
             {
                 Name = "DataBlock name",
+                ReleaseId = releaseId
             };
             var release = new Release
             {
-                Id = Guid.NewGuid(),
+                Id = releaseId,
                 Version = 1,
                 Published = DateTime.Parse("2020-10-10T13:00:00"),
                 PublishScheduled = DateTime.Parse("2020-10-09T12:00:00"),
@@ -553,21 +502,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                         Order = 1,
                         Created = new DateTime(2023, 01, 03),
                         Updated = new DateTime(2023, 01, 04),
-                    },
-                },
-                ContentBlocks = new List<ReleaseContentBlock>
-                {
-                    new()
-                    {
-                        ContentBlock = dataBlock,
-                    },
-                },
+                    }
+                }
             };
 
+            var originalReleaseDataBlocks = ListOf(dataBlock);
+            
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, amendmentDataBlocks) = release.CreateAmendment(originalReleaseDataBlocks, createdDate, createdById);
 
             Assert.NotEqual(release.Id, amendment.Id);
             Assert.Equal(2, amendment.Version);
@@ -601,8 +545,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal(originalKeyStatDataBlock.Created, amendmentKeyStatDataBlock.Created);
             Assert.Equal(originalKeyStatDataBlock.Updated, amendmentKeyStatDataBlock.Updated);
 
-            var originalDataBlock = (DataBlock)release.ContentBlocks.Single().ContentBlock;
-            var amendmentDataBlock = Assert.IsType<DataBlock>(amendment.ContentBlocks.Single().ContentBlock);
+            var originalDataBlock = originalReleaseDataBlocks.Single();
+            var amendmentDataBlock = amendmentDataBlocks.Single();
             Assert.Equal(originalDataBlock.Name, amendmentDataBlock.Name);
             Assert.NotEqual(originalDataBlock.Id, amendmentDataBlock.Id);
 
@@ -614,11 +558,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void CreateAmendment_CopiesFeaturedTables()
         {
+            var releaseId = Guid.NewGuid();
             var dataBlock = new DataBlock
             {
                 Name = "DataBlock name",
+                ReleaseId = releaseId
             };
-            var releaseId = Guid.NewGuid();
             var release = new Release
             {
                 Id = releaseId,
@@ -637,21 +582,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                         ReleaseId = releaseId,
                         Created = new DateTime(2023, 01, 01),
                         Updated = new DateTime(2023, 01, 02),
-                    },
-                },
-                ContentBlocks = new List<ReleaseContentBlock>
-                {
-                    new()
-                    {
-                        ContentBlock = dataBlock,
-                    },
-                },
+                    }
+                }
             };
+
+            var originalReleaseDataBlocks = ListOf(dataBlock);
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, amendmentDataBlocks) = release.CreateAmendment(originalReleaseDataBlocks, createdDate, createdById);
 
             Assert.NotEqual(release.Id, amendment.Id);
             Assert.Equal(2, amendment.Version);
@@ -671,8 +611,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal(originalFeaturedTable.Created, amendmentFeaturedTable.Created);
             Assert.Equal(originalFeaturedTable.Updated, amendmentFeaturedTable.Updated);
 
-            var originalDataBlock = (DataBlock)release.ContentBlocks.Single().ContentBlock;
-            var amendmentDataBlock = Assert.IsType<DataBlock>(amendment.ContentBlocks.Single().ContentBlock);
+            var originalDataBlock = originalReleaseDataBlocks.Single();
+            var amendmentDataBlock = amendmentDataBlocks.Single();
             Assert.Equal(originalDataBlock.Name, amendmentDataBlock.Name);
             Assert.NotEqual(originalDataBlock.Id, amendmentDataBlock.Id);
 
@@ -690,36 +630,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             {
                 Id = Guid.NewGuid(),
             };
-
             var dataBlock1 = new DataBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
                 Heading = "Data block 1",
+                Release = release
             };
             var dataBlock2 = new DataBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
                 Heading = "Data block 2",
+                Release = release
             };
             var contentBlock1 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
-                Body = $"Content block 1 http://localhost/fast-track/{dataBlock1.Id}"
+                Body = $"Content block 1 http://localhost/fast-track/{dataBlock1.Id}",
+                Release = release
             };
             var contentBlock2 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 2,
-                Body = $"Content block 2 http://localhost/fast-track/{dataBlock2.Id}/ some other text"
+                Body = $"Content block 2 http://localhost/fast-track/{dataBlock2.Id}/ some other text",
+                Release = release
             };
             var contentBlock3 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 3,
-                Body = $"<p>Content block 3 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link text</a></p>"
+                Body = $"<p>Content block 3 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link text</a></p>",
+                Release = release
             };
             var contentBlock4 = new HtmlBlock
             {
@@ -729,91 +673,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     <p>Content block 4 http://localhost/fast-track/{dataBlock1.Id} http://localhost/fast-track/{dataBlock2.Id}</p>
                     <p><a href=""http://localhost/fast-track/{dataBlock1.Id}"">link 1 text</a></p>
                     <p><a href=""http://localhost/fast-track/{dataBlock2.Id}/"">link 2 text</a></p>
-                    "
+                    ",
+                Release = release
             };
-
-            release.ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
+            
+            release.Content = ListOf(
+                
+                new ContentSection
                 {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = dataBlock1.Id,
-                    ContentBlock = dataBlock1
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = dataBlock2.Id,
-                    ContentBlock = dataBlock2
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock1.Id,
-                    ContentBlock = contentBlock1
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock2.Id,
-                    ContentBlock = contentBlock2
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock3.Id,
-                    ContentBlock = contentBlock3
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock4.Id,
-                    ContentBlock = contentBlock4
-                },
-            };
+                    Content = new List<ContentBlock>
+                    {
+                        contentBlock1, contentBlock2, contentBlock3, contentBlock4
+                    },
+                    Release = release
+                });
 
             var section1Id = Guid.NewGuid();
 
-            release.Content = new List<ReleaseContentSection>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section1Id,
-                    ContentSection = new ContentSection
+                    Id = section1Id,
+                    Heading = "Section 1",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section1Id,
-                        Heading = "Section 1",
-                        Content = new List<ContentBlock>
-                        {
-                            contentBlock1,
-                            contentBlock2,
-                            contentBlock3,
-                            contentBlock4
-                        },
-                    }
-                },
-            };
+                        contentBlock1,
+                        contentBlock2,
+                        contentBlock3,
+                        contentBlock4
+                    },
+                    Release = release
+                });
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, amendmentDataBlocks) = release.CreateAmendment(ListOf(dataBlock1, dataBlock2), createdDate, createdById);
 
-            var amendmentDataBlock1 = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
-            var amendmentDataBlock2 = Assert.IsType<DataBlock>(amendment.ContentBlocks[1].ContentBlock);
+            Assert.Equal(2, amendmentDataBlocks.Count);
+            var amendmentDataBlock1 = amendmentDataBlocks[0];
+            var amendmentDataBlock2 = amendmentDataBlocks[1];
 
             Assert.NotEqual(dataBlock1.Id, amendmentDataBlock1.Id);
             Assert.NotEqual(dataBlock2.Id, amendmentDataBlock2.Id);
 
-            var section1 = amendment.Content[0].ContentSection;
+            var section1 = amendment.Content[0];
 
             var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(section1.Content[0]);
             var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(section1.Content[1]);
@@ -850,18 +754,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             {
                 Id = Guid.NewGuid(),
             };
-
             var dataBlock1 = new DataBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
                 Heading = "Data block 1",
+                Release = release
             };
             var contentBlock1 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
-                Body = $"<p>Content block 1 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link</a></p>"
+                Body = $"<p>Content block 1 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link</a></p>",
+                Release = release
             };
 
             var contentBlock2 = new HtmlBlock
@@ -876,7 +781,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
                     <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
                     <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
-                </ul>".TrimIndent()
+                </ul>".TrimIndent(),
+                Release = release
             };
             var contentBlock3 = new HtmlBlock
             {
@@ -890,95 +796,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                         <comment-end name=""comment-1""></comment-end>
 
                         <a href=""http://localhost/fast-track/{dataBlock1.Id}"">Another link</a>
-                    </p>".TrimIndent()
+                    </p>".TrimIndent(),
+                Release = release
             };
 
-            release.ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = dataBlock1.Id,
-                    ContentBlock = dataBlock1
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock1.Id,
-                    ContentBlock = contentBlock1
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock2.Id,
-                    ContentBlock = contentBlock2
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock3.Id,
-                    ContentBlock = contentBlock3
-                },
-            };
+                    Content = new List<ContentBlock>
+                    {
+                        contentBlock1, contentBlock2, contentBlock3
+                    },
+                    Release = release
+                });
 
             // Test that we are amending content across multiple sections too
             var section1Id = Guid.NewGuid();
             var section2Id = Guid.NewGuid();
 
-            release.Content = new List<ReleaseContentSection>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section1Id,
-                    ContentSection = new ContentSection
+                    Id = section1Id,
+                    Heading = "Section 1",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section1Id,
-                        Heading = "Section 1",
-                        Content = new List<ContentBlock>
-                        {
-                            contentBlock1,
-                            contentBlock2,
-                        },
-                    }
+                        contentBlock1,
+                        contentBlock2,
+                    },
+                    Release = release
                 },
-                new()
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section2Id,
-                    ContentSection = new ContentSection
+                    Id = section2Id,
+                    Heading = "Section 2",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section2Id,
-                        Heading = "Section 2",
-                        Content = new List<ContentBlock>
-                        {
-                            contentBlock3,
-                        },
-                    }
-                },
-            };
+                        contentBlock3,
+                    },
+                    Release = release
+                });
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, amendmentDataBlocks) = release.CreateAmendment(ListOf(dataBlock1), createdDate, createdById);
 
-            var amendmentDataBlock1 = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
+            var amendmentDataBlock1 = Assert.Single(amendmentDataBlocks);
 
             Assert.NotEqual(dataBlock1.Id, amendmentDataBlock1.Id);
 
-            var section1 = amendment.Content[0].ContentSection;
-            var section2 = amendment.Content[1].ContentSection;
+            Assert.Equal(3, amendment.Content.Count);
+            Assert.Equal(ContentSectionType.Generic, amendment.Content[0].Type);
+            Assert.Equal(ContentSectionType.Generic, amendment.Content[1].Type);
+            Assert.Equal(ContentSectionType.RelatedDashboards, amendment.Content[2].Type);
 
+            var section1 = amendment.Content[0];
+            var section2 = amendment.Content[1];
+
+            Assert.Equal(2, section1.Content.Count);
             var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(section1.Content[0]);
             var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(section1.Content[1]);
-            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(section2.Content[0]);
+            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(Assert.Single(section2.Content));
 
             Assert.Equal(
                 $"<p>Content block 1 <a href=\"http://localhost/fast-track/{amendmentDataBlock1.Id}\">link</a></p>",
@@ -1020,12 +899,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
             var section1Id = Guid.NewGuid();
 
-            var contentBlock = new HtmlBlock
+            var originalHtmlBlock = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
                 Body = null,
-                ContentSectionId = section1Id
+                ContentSectionId = section1Id,
+                Release = release
             };
 
             var dataBlock = new DataBlock
@@ -1035,61 +915,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Heading = "Block 2 heading",
                 Name = "Block 2 name",
                 Source = "Block 2 source",
-                ContentSectionId = section1Id
+                ContentSectionId = section1Id,
+                Release = release
             };
 
-            release.Content = new List<ReleaseContentSection>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    Release = release,
-                    ReleaseId = release.Id,
-                    ContentSectionId = section1Id,
-                    ContentSection = new ContentSection
+                    Id = section1Id,
+                    Heading = "Section 1",
+                    Content = new List<ContentBlock>
                     {
-                        Id = section1Id,
-                        Heading = "Section 1",
-                        Content = new List<ContentBlock>
-                        {
-                            contentBlock,
-                            dataBlock
-                        }
-                    }
-                }
-            };
+                        originalHtmlBlock,
+                        dataBlock
+                    },
+                    Release = release
+                });
 
-            release.ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
+            release.Content = ListOf(
+                new ContentSection
                 {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = contentBlock.Id,
-                    ContentBlock = contentBlock
-                },
-                new()
-                {
-                    ReleaseId = release.Id,
-                    Release = release,
-                    ContentBlockId = dataBlock.Id,
-                    ContentBlock =  dataBlock
-                }
-            };
+                    Content = new List<ContentBlock>
+                    {
+                        originalHtmlBlock
+                    },
+                    Release = release
+                });
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
             // Minimal test to make sure that a null HtmlBlock body doesn't affect creating a Release amendment
-            var amendment = release.CreateAmendment(createdDate, createdById);
+            var (amendment, amendmentDataBlocks) = release.CreateAmendment(ListOf(dataBlock), createdDate, createdById);
+            Assert.Single(amendmentDataBlocks);
 
-            Assert.Equal(2, amendment.ContentBlocks.Count);
-
-            var releaseBlock1 = amendment.ContentBlocks[0];
-            Assert.NotEqual(release.ContentBlocks[0].ContentBlockId, releaseBlock1.ContentBlockId);
-
-            var block1 = Assert.IsType<HtmlBlock>(releaseBlock1.ContentBlock);
-            Assert.NotEqual(release.ContentBlocks[0].ContentBlock.Id, block1.Id);
-            Assert.Null(block1.Body);
+            var amendmentHtmlBlock =  Assert.IsType<HtmlBlock>(amendment.Content[0].Content[0]);
+            Assert.NotEqual(originalHtmlBlock.Id, amendmentHtmlBlock.Id);
+            Assert.Null(amendmentHtmlBlock.Body);
         }
     }
 }

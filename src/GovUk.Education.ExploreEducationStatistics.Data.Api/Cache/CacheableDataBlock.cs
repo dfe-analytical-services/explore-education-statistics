@@ -21,26 +21,20 @@ public record CacheableDataBlock
         Release = release;
     }
 
-    public CacheableDataBlock(ReleaseContentBlock releaseContentBlock)
+    public CacheableDataBlock(DataBlock dataBlock)
     {
-        if (releaseContentBlock.ContentBlock is not DataBlock)
-        {
-            throw new ArgumentException(
-                $"ContentBlock must be of type DataBlock. Found {releaseContentBlock.ContentBlock?.GetType().Name ?? "null"}.");
-        }
-
-        if (releaseContentBlock.Release == null)
+        if (dataBlock.Release == null)
         {
             throw new ArgumentException("Release must be hydrated");
         }
 
-        if (releaseContentBlock.Release.Publication == null)
+        if (dataBlock.Release.Publication == null)
         {
             throw new ArgumentException("Publication must be hydrated");
         }
 
-        DataBlockId = releaseContentBlock.ContentBlockId;
-        Release = releaseContentBlock.Release;
+        DataBlockId = dataBlock.Id;
+        Release = dataBlock.Release;
     }
 
     public Guid ReleaseId => Release.Id;

@@ -25,23 +25,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var releaseContentBlock = new ReleaseContentBlock
+            var release = new Release();
+
+            var dataBlock = new DataBlock
             {
-                Release = new Release(),
-                ContentBlock = new DataBlock
+                Query = new ObservationQueryContext
                 {
-                    Query = new ObservationQueryContext
-                    {
-                        SubjectId = subjectId
-                    }
-                }
+                    SubjectId = subjectId
+                },
+                Release = release
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.ContentBlocks.AddRangeAsync(dataBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -61,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .Setup(
                         s =>
                             s.Query(
-                                releaseContentBlock.ReleaseId,
+                                dataBlock.ReleaseId,
                                 It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId),
                                 default
                             )
@@ -69,8 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .ReturnsAsync(tableBuilderResults);
 
                 var result = (await service.GetDataBlockTableResult(
-                    releaseContentBlock.ReleaseId,
-                    releaseContentBlock.ContentBlockId)).AssertRight();
+                    dataBlock.ReleaseId,
+                    dataBlock.Id)).AssertRight();
 
                 VerifyAllMocks(tableBuilderService);
 
@@ -81,17 +80,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task GetDataBlockTableResult_NotDataBlockType()
         {
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = new Release(),
-                ContentBlock = new HtmlBlock()
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
-
+            var htmlBlock = new HtmlBlock
+            {
+                Release = new Release()
+            };
+            
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.ContentBlocks.AddRangeAsync(htmlBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -100,8 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 var (service, _) = BuildServiceAndDependencies(contentDbContext);
 
                 var result = await service.GetDataBlockTableResult(
-                    releaseContentBlock.ReleaseId,
-                    releaseContentBlock.ContentBlockId);
+                    htmlBlock.ReleaseId,
+                    htmlBlock.Id);
 
                 result.AssertNotFound();
             }

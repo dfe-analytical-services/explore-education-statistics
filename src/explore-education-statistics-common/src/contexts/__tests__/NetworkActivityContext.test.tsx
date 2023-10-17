@@ -6,6 +6,7 @@ import {
   useNetworkActivityContext,
 } from '@common/contexts/NetworkActivityContext';
 import Client from '@common/services/api/Client';
+import delay from '@common/utils/delay';
 import { renderHook } from '@testing-library/react-hooks';
 import { AxiosError } from 'axios';
 import React, { FC } from 'react';
@@ -89,6 +90,19 @@ describe('useNetworkActivityContext', () => {
   test('updates `requestCount` correctly when multiple concurrent requests', async () => {
     const client = createTestClient();
 
+    xhrMock.get('/test', async (_, res) => {
+      await delay(150);
+      return res.status(200);
+    });
+    xhrMock.get('/test-slow', async (_, res) => {
+      await delay(300);
+      return res.status(200);
+    });
+    xhrMock.get('/test-slower', async (_, res) => {
+      await delay(450);
+      return res.status(200);
+    });
+
     const { result, waitForNextUpdate } = renderHook(
       () => useNetworkActivityContext(),
       { wrapper },
@@ -102,8 +116,8 @@ describe('useNetworkActivityContext', () => {
 
     const request = Promise.all([
       client.get('/test'),
-      client.get('/test'),
-      client.get('/test'),
+      client.get('/test-slow'),
+      client.get('/test-slower'),
     ]);
 
     await waitForNextUpdate();
@@ -111,6 +125,22 @@ describe('useNetworkActivityContext', () => {
     expect(result.current).toEqual<NetworkActivityState>({
       status: 'active',
       requestCount: 3,
+    });
+    expect(document.body).toHaveAttribute('data-network-activity', 'active');
+
+    await waitForNextUpdate();
+
+    expect(result.current).toEqual<NetworkActivityState>({
+      status: 'active',
+      requestCount: 2,
+    });
+    expect(document.body).toHaveAttribute('data-network-activity', 'active');
+
+    await waitForNextUpdate();
+
+    expect(result.current).toEqual<NetworkActivityState>({
+      status: 'active',
+      requestCount: 1,
     });
     expect(document.body).toHaveAttribute('data-network-activity', 'active');
 

@@ -52,10 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var contentBlock = context.ContentBlocks
                 .Include(block => block.ContentSection)
                 .ThenInclude(contentSection => contentSection!.Release)
-                .ThenInclude(section => section.Release)
                 .First(block => block.Id == comment.ContentBlockId);
 
-            return contentBlock.ContentSection?.Release.Release;
+            return contentBlock.ContentSection?.Release;
         }
     }
 }

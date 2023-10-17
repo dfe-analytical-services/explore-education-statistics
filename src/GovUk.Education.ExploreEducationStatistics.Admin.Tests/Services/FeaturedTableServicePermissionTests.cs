@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -114,13 +113,11 @@ public class FeaturedTableServicePermissionTests
     private FeaturedTableService SetupService(
         ContentDbContext? contentDbContext = null,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
-        IDataBlockService? dataBlockService = null,
         IUserService? userService = null)
     {
         return new FeaturedTableService(
             contentDbContext ?? new Mock<ContentDbContext>().Object,
             persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-            dataBlockService ?? Mock.Of<IDataBlockService>(),
             userService ?? Mock.Of<IUserService>(),
             AdminMapper()
         );

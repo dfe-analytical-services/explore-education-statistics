@@ -18,14 +18,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
-public class ReleaseContentBlockService : IReleaseContentBlockService
+public class ContentBlockLockService : IContentBlockLockService
 {
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
     private readonly IUserService _userService;
     private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
 
-    public ReleaseContentBlockService(
+    public ContentBlockLockService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IUserService userService,
@@ -45,7 +45,7 @@ public class ReleaseContentBlockService : IReleaseContentBlockService
     /// The lock details if was acquired. If another user
     /// holds the lock, then we return that instead.
     /// </returns>
-    public async Task<Either<ActionResult, ReleaseContentBlockLockViewModel>> LockContentBlock(
+    public async Task<Either<ActionResult, ContentBlockLockViewModel>> LockContentBlock(
         Guid id,
         bool force = false)
     {
@@ -66,7 +66,7 @@ public class ReleaseContentBlockService : IReleaseContentBlockService
             );
     }
 
-    private async Task<ReleaseContentBlockLockViewModel> DoContentBlockLock(ContentBlock block, Guid userId)
+    private async Task<ContentBlockLockViewModel> DoContentBlockLock(ContentBlock block, Guid userId)
     {
         var user = await _contentDbContext.Users.FindAsync(userId);
 
@@ -74,7 +74,7 @@ public class ReleaseContentBlockService : IReleaseContentBlockService
         {
             throw new ArgumentException($"User with id {userId} does not exist", nameof(userId));
         }
-        
+
         var now = DateTime.UtcNow;
 
         block.Locked = now;
@@ -84,13 +84,13 @@ public class ReleaseContentBlockService : IReleaseContentBlockService
 
         await _contentDbContext.SaveChangesAsync();
 
-        var viewModel = new ReleaseContentBlockLockViewModel(
-            id: block.Id,
-            sectionId: block.ContentSection!.Id,
-            releaseId: block.ContentSection!.Release!.ReleaseId,
-            locked: now,
-            lockedUntil: block.LockedUntil!.Value,
-            lockedBy: new UserDetailsViewModel(user)
+        var viewModel = new ContentBlockLockViewModel(
+            Id: block.Id,
+            SectionId: block.ContentSection!.Id,
+            ReleaseId: block.ContentSection!.ReleaseId,
+            Locked: now,
+            LockedUntil: block.LockedUntil!.Value,
+            LockedBy: new UserDetailsViewModel(user)
         );
 
         await _hubContext.Clients
@@ -122,10 +122,10 @@ public class ReleaseContentBlockService : IReleaseContentBlockService
 
                     await _contentDbContext.SaveChangesAsync();
 
-                    var viewModel = new ReleaseContentBlockUnlockViewModel(
-                        id: block.Id,
-                        sectionId: block.ContentSection!.Id,
-                        releaseId: block.ContentSection!.Release!.ReleaseId
+                    var viewModel = new ContentBlockUnlockViewModel(
+                        Id: block.Id,
+                        SectionId: block.ContentSection!.Id,
+                        ReleaseId: block.ContentSection!.ReleaseId
                     );
 
                     await _hubContext.Clients
@@ -141,21 +141,20 @@ public class ReleaseContentBlockService : IReleaseContentBlockService
             contentBlockId,
             q =>
                 q.Include(block => block.ContentSection)
-                    .ThenInclude(contentSection => contentSection!.Release)
-                    .ThenInclude(releaseContentSection => releaseContentSection.Release)
-                    .Include(block => block.LockedBy)
+                 .Include(contentBlock => contentBlock.Release)
+                 .Include(block => block.LockedBy)
         );
     }
 
     private async Task<Either<ActionResult, Unit>> CheckCanUpdateBlock(ContentBlock contentBlock)
     {
-        if (contentBlock.ContentSection?.Release.Release is null)
+        if (contentBlock.ContentSection?.Release is null)
         {
             return new ForbidResult();
         }
 
         return await _userService
-            .CheckCanUpdateRelease(contentBlock.ContentSection.Release.Release)
+            .CheckCanUpdateRelease(contentBlock.ContentSection.Release)
             .OnSuccessVoid();
     }
 
@@ -163,7 +162,7 @@ public class ReleaseContentBlockService : IReleaseContentBlockService
         ContentBlock contentBlock,
         Guid userId,
         bool force,
-        out ReleaseContentBlockLockViewModel conflictingLock)
+        out ContentBlockLockViewModel conflictingLock)
     {
         conflictingLock = null!;
 
@@ -185,13 +184,13 @@ public class ReleaseContentBlockService : IReleaseContentBlockService
         }
 
         // There is a conflict as another user has the lock.
-        conflictingLock = new ReleaseContentBlockLockViewModel(
-            id: contentBlock.Id,
-            sectionId: contentBlock.ContentSection!.Id,
-            releaseId: contentBlock.ContentSection!.Release!.ReleaseId,
-            locked: contentBlock.Locked.Value,
-            lockedUntil: contentBlock.LockedUntil!.Value,
-            lockedBy: new UserDetailsViewModel(contentBlock.LockedBy!)
+        conflictingLock = new ContentBlockLockViewModel(
+            Id: contentBlock.Id,
+            SectionId: contentBlock.ContentSection!.Id,
+            ReleaseId: contentBlock.ContentSection!.ReleaseId,
+            Locked: contentBlock.Locked.Value,
+            LockedUntil: contentBlock.LockedUntil!.Value,
+            LockedBy: new UserDetailsViewModel(contentBlock.LockedBy!)
         );
 
         return true;

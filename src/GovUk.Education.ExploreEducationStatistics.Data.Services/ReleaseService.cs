@@ -156,10 +156,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var publishedSubjectIds = GetPublishedSubjectIds(releaseId);
 
-            var releaseDataBlockList = (await _contentDbContext.ReleaseContentBlocks
-                    .Include(rcb => rcb.ContentBlock)
-                    .Where(rcb => rcb.ReleaseId == releaseId)
-                    .Select(rcb => rcb.ContentBlock)
+            var releaseDataBlockList = (await _contentDbContext
+                    .ContentBlocks
+                    .Where(block => block.ReleaseId == releaseId)
                     .OfType<DataBlock>()
                     .ToListAsync()) // we need to materialise the list access `dataBlock.Query.SubjectId` as `Query` is json
                 .Where(dataBlock => publishedSubjectIds.Contains(dataBlock.Query.SubjectId))

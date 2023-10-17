@@ -20,7 +20,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.ManageContent;
 
-public class ReleaseContentBlockServiceTests
+public class ContentBlockLockServiceTests
 {
     private readonly Guid _defaultUserId = Guid.NewGuid();
 
@@ -41,11 +41,9 @@ public class ReleaseContentBlockServiceTests
         {
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -57,7 +55,7 @@ public class ReleaseContentBlockServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        ReleaseContentBlockLockViewModel viewModel;
+        ContentBlockLockViewModel viewModel;
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
@@ -119,11 +117,9 @@ public class ReleaseContentBlockServiceTests
             LockedBy = user,
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -135,7 +131,7 @@ public class ReleaseContentBlockServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        ReleaseContentBlockLockViewModel viewModel;
+        ContentBlockLockViewModel viewModel;
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
@@ -214,11 +210,9 @@ public class ReleaseContentBlockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -230,7 +224,7 @@ public class ReleaseContentBlockServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        ReleaseContentBlockLockViewModel viewModel;
+        ContentBlockLockViewModel viewModel;
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
@@ -299,11 +293,9 @@ public class ReleaseContentBlockServiceTests
             },
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -315,7 +307,7 @@ public class ReleaseContentBlockServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        ReleaseContentBlockLockViewModel viewModel;
+        ContentBlockLockViewModel viewModel;
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
@@ -386,11 +378,9 @@ public class ReleaseContentBlockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -448,11 +438,9 @@ public class ReleaseContentBlockServiceTests
         {
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -464,7 +452,7 @@ public class ReleaseContentBlockServiceTests
             await contentDbContext.SaveChangesAsync();
         }
 
-        ReleaseContentBlockLockViewModel viewModel1;
+        ContentBlockLockViewModel viewModel1;
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
@@ -584,11 +572,9 @@ public class ReleaseContentBlockServiceTests
             LockedBy = user,
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release,
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -602,9 +588,9 @@ public class ReleaseContentBlockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            ReleaseContentBlockUnlockViewModel viewModel = null!;
+            ContentBlockUnlockViewModel viewModel = null!;
 
-            var match = new CaptureMatch<ReleaseContentBlockUnlockViewModel>(
+            var match = new CaptureMatch<ContentBlockUnlockViewModel>(
                 value => { viewModel = value; }
             );
 
@@ -671,11 +657,9 @@ public class ReleaseContentBlockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release,
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -689,9 +673,9 @@ public class ReleaseContentBlockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            ReleaseContentBlockUnlockViewModel viewModel = null!;
+            ContentBlockUnlockViewModel viewModel = null!;
 
-            var match = new CaptureMatch<ReleaseContentBlockUnlockViewModel>(
+            var match = new CaptureMatch<ContentBlockUnlockViewModel>(
                 value => { viewModel = value; }
             );
 
@@ -760,11 +744,9 @@ public class ReleaseContentBlockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release,
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -823,11 +805,9 @@ public class ReleaseContentBlockServiceTests
             LockedBy = previousUser,
             ContentSection = new ContentSection
             {
-                Release = new ReleaseContentSection
-                {
-                    Release = release,
-                }
-            }
+                Release = release
+            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
@@ -841,9 +821,9 @@ public class ReleaseContentBlockServiceTests
 
         await using (var contentDbContext = InMemoryContentDbContext(contextId))
         {
-            ReleaseContentBlockUnlockViewModel viewModel = null!;
+            ContentBlockUnlockViewModel viewModel = null!;
 
-            var match = new CaptureMatch<ReleaseContentBlockUnlockViewModel>(
+            var match = new CaptureMatch<ContentBlockUnlockViewModel>(
                 value => { viewModel = value; }
             );
 
@@ -920,13 +900,13 @@ public class ReleaseContentBlockServiceTests
         }
     }
 
-    private ReleaseContentBlockService BuildService(
+    private ContentBlockLockService BuildService(
         ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
         IUserService? userService = null,
         IHubContext<ReleaseContentHub, IReleaseContentHubClient>? hubContext = null)
     {
-        return new ReleaseContentBlockService(
+        return new ContentBlockLockService(
             contentDbContext: contentDbContext,
             persistenceHelper: persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
             userService: userService ?? AlwaysTrueUserService(_defaultUserId).Object,

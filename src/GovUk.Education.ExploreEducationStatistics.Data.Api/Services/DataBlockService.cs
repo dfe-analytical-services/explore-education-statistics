@@ -45,10 +45,9 @@ public class DataBlockService : IDataBlockService
 
     private async Task<Either<ActionResult, DataBlock>> CheckDataBlockExists(Guid releaseId, Guid dataBlockId)
     {
-        var dataBlock = await _contentDbContext.ReleaseContentBlocks
-            .Include(block => block.ContentBlock)
-            .Where(block => block.ReleaseId == releaseId && block.ContentBlockId == dataBlockId)
-            .Select(block => block.ContentBlock)
+        var dataBlock = await _contentDbContext
+            .ContentBlocks
+            .Where(block => block.ReleaseId == releaseId && block.Id == dataBlockId)
             .OfType<DataBlock>()
             .SingleOrDefaultAsync();
 

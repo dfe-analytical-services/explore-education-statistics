@@ -145,9 +145,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> ReleaseHasEmptySection(Guid releaseId, ContentSectionType sectionType)
         {
-            return await _contentDbContext.ContentSections
+            return await _contentDbContext
+                .ContentSections
                 .Where(cs =>
-                    cs.Release.ReleaseId == releaseId &&
+                    cs.ReleaseId == releaseId &&
                     cs.Type == sectionType)
                 .AnyAsync(cs => cs.Content.Count == 0);
         }
@@ -156,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.ContentBlocks
                 .Where(cb =>
-                    cb.ContentSection!.Release.ReleaseId == releaseId &&
+                    cb.ContentSection!.ReleaseId == releaseId &&
                     cb.ContentSection.Type == sectionType)
                 .OfType<HtmlBlock>()
                 .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
@@ -166,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.ContentBlocks
                 .Where(cb =>
-                    cb.ContentSection!.Release.ReleaseId == releaseId &&
+                    cb.ContentSection!.ReleaseId == releaseId &&
                     cb.ContentSection.Type == sectionType)
                 .OfType<HtmlBlock>()
                 .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));

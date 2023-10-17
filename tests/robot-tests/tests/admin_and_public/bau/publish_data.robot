@@ -382,31 +382,31 @@ Create another new data block
     user waits until h2 is visible    Create data block
     user waits until table tool wizard step is available    1    Select a data set
 
-Select subject "${SUBJECT_2_NAME}"
+Select subject "${SUBJECT_2_NAME}" again
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
     user waits until button is enabled    Next step    %{WAIT_SMALL}
     user clicks button    Next step
 
-Select locations
+Select locations again
     user waits until table tool wizard step is available    2    Choose locations
     user opens details dropdown    Opportunity area
     user clicks checkbox    Bolton 001
     user waits until button is enabled    Next step    %{WAIT_SMALL}
     user clicks button    Next step
 
-Select time period
+Select time period again
     user waits until table tool wizard step is available    3    Choose time period
     user chooses select option    id:timePeriodForm-start    2009
     user chooses select option    id:timePeriodForm-end    2017
     user waits until button is enabled    Next step    %{WAIT_SMALL}
     user clicks button    Next step
 
-Create table
+Create table again
     user waits until button is enabled    Create table
     user clicks button    Create table
 
-Save data block as a featured table
+Save data block as a featured table again
     user enters text into element    label:Name    UI Test data block name 2
     user enters text into element    label:Table title    UI Test table title 2
     user enters text into element    label:Source    UI Test source 2
@@ -490,12 +490,12 @@ Check footnotes were reordered on data block
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
 
-Add headline text block to Content page
+Add headline text block to Content page again
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Add public prerelease access list for release
+Add public prerelease access list again
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
 

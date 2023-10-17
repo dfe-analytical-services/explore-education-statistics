@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -20,7 +21,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
@@ -29,8 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
     {
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly IKeyStatisticService _keyStatisticService;
-        private readonly IReleaseContentSectionRepository _releaseContentSectionRepository;
+        private readonly IContentSectionRepository _contentSectionRepository;
         private readonly IContentBlockService _contentBlockService;
         private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
         private readonly IUserService _userService;
@@ -38,8 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            IKeyStatisticService keyStatisticService,
-            IReleaseContentSectionRepository releaseContentSectionRepository,
+            IContentSectionRepository contentSectionRepository,
             IContentBlockService contentBlockService,
             IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext,
             IUserService userService,
@@ -47,8 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
-            _keyStatisticService = keyStatisticService;
-            _releaseContentSectionRepository = releaseContentSectionRepository;
+            _contentSectionRepository = contentSectionRepository;
             _contentBlockService = contentBlockService;
             _hubContext = hubContext;
             _userService = userService;
@@ -60,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(release => _releaseContentSectionRepository.GetAllContentBlocks<T>(release.Id));
+                .OnSuccess(release => _contentSectionRepository.GetAllContentBlocks<T>(release.Id));
         }
 
         public Task<Either<ActionResult, List<ContentSectionViewModel>>> ReorderContentSections(
@@ -116,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         Order = orderForNewSection
                     };
 
-                    release.AddGenericContentSection(newContentSection);
+                    release.Content.Add(newContentSection);
 
                     _context.Releases.Update(release);
                     await _context.SaveChangesAsync();
@@ -155,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                         await _contentBlockService.DeleteSectionContentBlocks(sectionToRemove.Id);
 
-                        release.RemoveGenericContentSection(sectionToRemove);
+                        release.Content.Remove(sectionToRemove);
                         _context.ContentSections.Remove(sectionToRemove);
 
                         var removedSectionOrder = sectionToRemove.Order;
@@ -319,6 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ForEach(contentBlock => contentBlock.Order++);
 
             newContentBlock.Order = orderForNewBlock;
+            newContentBlock.ReleaseId = section.ReleaseId;
             section.Content.Add(newContentBlock);
 
             _context.ContentSections.Update(section);
@@ -398,23 +396,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return releases
                 .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.Comments)
+                    .ThenInclude(block => block.Comments)
                     .ThenInclude(comment => comment.CreatedBy)
                 .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.Comments)
+                    .ThenInclude(block => block.Comments)
                     .ThenInclude(comment => comment.ResolvedBy)
                 .Include(r => r.Content)
-                    .ThenInclude(rcs => rcs.ContentSection)
-                    .ThenInclude(cs => cs.Content)
-                    .ThenInclude(cb => (cb as EmbedBlockLink).EmbedBlock)
-                .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
-                    .ThenInclude(content => content.LockedBy);
+                    .ThenInclude(block => (block as EmbedBlockLink).EmbedBlock)
+                .Include(r => r.Content)
+                    .ThenInclude(section => section.Content)
+                    .ThenInclude(block => block.LockedBy);
         }
 
         private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(
@@ -422,22 +416,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             return _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateContentSectionsAndBlocks)
-                .OnSuccess(release =>
-                {
-                    var section = release
-                        .Content
-                        .Select(join => join.ContentSection)
-                        .ToList()
-                        .Find(contentSection => contentSection.Id == contentSectionId);
-
-                    if (section == null)
-                    {
-                        return new NotFoundResult();
-                    }
-
-                    return new Either<ActionResult, Tuple<Release, ContentSection>>(
-                        TupleOf(release, section));
-                });
+                .OnSuccessCombineWith(release => release
+                    .Content
+                    .FirstOrDefault(contentSection => contentSection.Id == contentSectionId)
+                    .OrNotFound());
         }
 
         private Task<Either<ActionResult, Release>> CheckCanUpdateRelease(Release release)

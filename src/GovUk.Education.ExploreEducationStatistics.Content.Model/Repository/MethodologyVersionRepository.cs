@@ -82,6 +82,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .ToList();
         }
 
+        public async Task<MethodologyVersion?> GetLatestPublishedVersionBySlug(string slug)
+        {
+            return await _contentDbContext
+                .MethodologyVersions
+                .Where(mv =>
+                    mv.Methodology.Slug == slug
+                    && mv.Methodology.LatestPublishedVersionId == mv.Id)
+                .SingleOrDefaultAsync();
+        }
+
         public async Task<MethodologyVersion?> GetLatestPublishedVersion(Guid methodologyId)
         {
             var methodology = await _contentDbContext.Methodologies

@@ -163,7 +163,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     {
                         Body = "Test block 1"
                     }
-                }
+                },
+                Release = release
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -172,44 +173,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.AddRangeAsync(release, otherRelease);
-                await contentDbContext.ReleaseContentSections.AddRangeAsync(
-                    new ReleaseContentSection
+                await contentDbContext.ContentSections.AddRangeAsync(
+                    new ContentSection
                     {
                         Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.Headlines
-                        }
+                        Type = ContentSectionType.Headlines
                     },
-                    new ReleaseContentSection
+                    new ContentSection
                     {
                         Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.KeyStatisticsSecondary
-                        }
+                        Type = ContentSectionType.KeyStatisticsSecondary
                     },
-                    new ReleaseContentSection
+                    new ContentSection
                     {
                         Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.ReleaseSummary
-                        }
+                        Type = ContentSectionType.ReleaseSummary
                     },
-                    new()
+                    new ContentSection
                     {
                         Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.RelatedDashboards
-                        }
+                        Type = ContentSectionType.RelatedDashboards
                     },
-                    new ReleaseContentSection
-                    {
-                        Release = release,
-                        ContentSection = genericContentSection
-                    });
+                    genericContentSection);
+                
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -308,14 +294,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Related 1", contentRelatedInformation[0].Description);
                 Assert.Equal("https://related-1", contentRelatedInformation[0].Url);
 
-                var contentReleaseContent = contentRelease.Content;
-                Assert.Single(contentReleaseContent);
-                Assert.Equal(genericContentSection.Id, contentReleaseContent[0].Id);
-                Assert.Equal("Test section 1", contentReleaseContent[0].Heading);
+                var contentSections = contentRelease.Content;
+                Assert.Single(contentSections);
+                Assert.Equal(genericContentSection.Id, contentSections[0].Id);
+                Assert.Equal("Test section 1", contentSections[0].Heading);
 
-                Assert.Single(contentReleaseContent[0].Content);
+                Assert.Single(contentSections[0].Content);
 
-                var contentBlock = Assert.IsType<HtmlBlockViewModel>(contentReleaseContent[0].Content[0]);
+                var contentBlock = Assert.IsType<HtmlBlockViewModel>(contentSections[0].Content[0]);
                 Assert.Equal("Test block 1", contentBlock.Body);
 
                 var contentPublication = contentRelease.Publication;
@@ -429,46 +415,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 await contentDbContext.Publications.AddAsync(publication);
                 await contentDbContext.Releases.AddAsync(release);
                 await contentDbContext.MethodologyVersions.AddRangeAsync(methodologyVersions);
-                await contentDbContext.ReleaseContentSections.AddRangeAsync(
+                await contentDbContext.ContentSections.AddRangeAsync(
                     new()
                     {
-                        Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.Headlines
-                        }
+                        Type = ContentSectionType.Headlines,
+                        Release = release
                     },
                     new()
                     {
-                        Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.KeyStatisticsSecondary
-                        }
+                        Type = ContentSectionType.KeyStatisticsSecondary,
+                        Release = release
                     },
                     new()
                     {
-                        Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.ReleaseSummary
-                        }
+                        Type = ContentSectionType.ReleaseSummary,
+                        Release = release
                     },
                     new()
                     {
-                        Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.RelatedDashboards
-                        }
+                        Type = ContentSectionType.RelatedDashboards,
+                        Release = release
                     },
                     new()
                     {
-                        Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.Generic,
-                        }
+                        Type = ContentSectionType.Generic,
+                        Release = release
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -564,13 +535,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var unattachedDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
+            var unattachedDataBlocks = new List<DataBlockViewModel>
             {
                 new()
             };
 
             var summaryContentSection = new ContentSection
             {
+                Release = release,
                 Type = ContentSectionType.ReleaseSummary,
                 Content = new List<ContentBlock>
                 {
@@ -598,6 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             };
             var genericContentSection = new ContentSection
             {
+                Release = release,
                 Heading = "Test section 1",
                 Type = ContentSectionType.Generic,
                 Content = new List<ContentBlock>
@@ -617,18 +590,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.AddRangeAsync(release);
-                await contentDbContext.ReleaseContentSections.AddRangeAsync(
-                    new ReleaseContentSection
-                    {
-                        Release = release,
-                        ContentSection = summaryContentSection
-                    },
-                    new ReleaseContentSection
-                    {
-                        Release = release,
-                        ContentSection = genericContentSection
-                    }
-                );
+                await contentDbContext.ContentSections.AddRangeAsync(
+                    summaryContentSection, genericContentSection);
+                
                 await contentDbContext.SaveChangesAsync();
             }
 

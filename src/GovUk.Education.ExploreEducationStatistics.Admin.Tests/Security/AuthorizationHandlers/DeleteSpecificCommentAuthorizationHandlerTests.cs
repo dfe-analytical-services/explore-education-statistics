@@ -24,18 +24,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Id = Guid.NewGuid(),
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Content = new List<ReleaseContentSection>
+                Content = new List<ContentSection>
                 {
                     new()
                     {
-                        ContentSection = new ContentSection
+                        Content = new List<ContentBlock>
                         {
-                            Content = new List<ContentBlock>
+                            new DataBlock
                             {
-                                new DataBlock
-                                {
-                                    Comments = new List<Comment> { comment },
-                                }
+                                Comments = new List<Comment> { comment },
                             }
                         }
                     }

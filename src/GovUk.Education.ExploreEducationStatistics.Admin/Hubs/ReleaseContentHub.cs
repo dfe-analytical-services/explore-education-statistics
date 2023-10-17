@@ -14,11 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 [Authorize]
 public class ReleaseContentHub : Hub<IReleaseContentHubClient>
 {
-    private readonly IReleaseContentBlockService _releaseContentBlockService;
+    private readonly IContentBlockLockService _contentBlockLockService;
 
-    public ReleaseContentHub(IReleaseContentBlockService releaseContentBlockService)
+    public ReleaseContentHub(IContentBlockLockService contentBlockLockService)
     {
-        _releaseContentBlockService = releaseContentBlockService;
+        _contentBlockLockService = contentBlockLockService;
     }
 
     public async Task JoinReleaseGroup(ReleaseMessage message)
@@ -31,17 +31,17 @@ public class ReleaseContentHub : Hub<IReleaseContentHubClient>
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, message.Id.ToString());
     }
 
-    public async Task<HubResult<ReleaseContentBlockLockViewModel>> LockContentBlock(
+    public async Task<HubResult<ContentBlockLockViewModel>> LockContentBlock(
         ContentBlockLockMessage lockMessage)
     {
-        return await _releaseContentBlockService
+        return await _contentBlockLockService
             .LockContentBlock(lockMessage.Id, lockMessage.Force)
             .HandleFailuresOrHubResult();
     }
 
     public async Task<HubResult> UnlockContentBlock(ContentBlockLockMessage lockMessage)
     {
-        return await _releaseContentBlockService
+        return await _contentBlockLockService
             .UnlockContentBlock(lockMessage.Id, lockMessage.Force)
             .HandleFailuresOrHubResult();
     }

@@ -30,22 +30,17 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock()
     {
-        var dataBlock = new DataBlock();
-        var release = new Release
+        var release = new Release();
+        var dataBlock = new DataBlock
         {
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = dataBlock,
-                },
-            },
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -116,28 +111,25 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_Order()
     {
-        var dataBlock = new DataBlock();
         var release = new Release
         {
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = dataBlock,
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 new KeyStatisticText { Order = 0 },
                 new KeyStatisticText { Order = 1 },
                 new KeyStatisticDataBlock { Order = 2 },
-            },
+            }
+        };
+        var dataBlock = new DataBlock
+        {
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -213,24 +205,18 @@ public class KeyStatisticServiceTests
     public async Task CreateKeyStatisticDataBlock_NoRelease()
     {
         var dataBlockId = Guid.NewGuid();
-        var release = new Release
+        var release = new Release();
+        var dataBlock = new DataBlock
         {
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
+            Id = dataBlockId,
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -252,24 +238,18 @@ public class KeyStatisticServiceTests
     public async Task CreateKeyStatisticDataBlock_NoDataBlock()
     {
         var dataBlockId = Guid.NewGuid();
-        var release = new Release
+        var release = new Release();
+        var dataBlock = new DataBlock
         {
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
+            Id = dataBlockId,
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -290,29 +270,28 @@ public class KeyStatisticServiceTests
     [Fact]
     public async Task CreateKeyStatisticDataBlock_DataBlockAttachedToContent()
     {
-        var dataBlock = new DataBlock();
+        var dataBlockId = Guid.NewGuid();
         var release = new Release
         {
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = dataBlock,
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 new KeyStatisticDataBlock
                 {
-                    DataBlock = dataBlock,
+                    DataBlockId = dataBlockId,
                 },
-            },
+            }
+        };
+        var dataBlock = new DataBlock
+        {
+            Id = dataBlockId,
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -509,26 +488,21 @@ public class KeyStatisticServiceTests
         var release = new Release
         {
             Id = releaseId,
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
             }
+        };
+        var dataBlock = new DataBlock
+        {
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.DataBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -599,26 +573,21 @@ public class KeyStatisticServiceTests
         var release = new Release
         {
             Id = releaseId,
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
             }
+        };
+        var dataBlock = new DataBlock
+        {
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -659,26 +628,21 @@ public class KeyStatisticServiceTests
         var release = new Release
         {
             Id = releaseId,
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
             }
+        };
+        var dataBlock = new DataBlock
+        {
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.DataBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -956,26 +920,21 @@ public class KeyStatisticServiceTests
         var release = new Release
         {
             Id = releaseId,
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
             }
+        };
+        var dataBlock = new DataBlock
+        {
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -1019,16 +978,6 @@ public class KeyStatisticServiceTests
         var release = new Release
         {
             Id = releaseId,
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 new KeyStatisticText(),
@@ -1036,11 +985,18 @@ public class KeyStatisticServiceTests
                 new KeyStatisticText(),
             }
         };
+        
+        var dataBlock = new DataBlock
+        {
+            Id = dataBlockId,
+            Release = release
+        };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -1061,8 +1017,8 @@ public class KeyStatisticServiceTests
             Assert.Null(keyStatistics.Find(ks => ks.Id == keyStatisticDataBlock.Id));
 
             var dataBlockList = context.DataBlocks.ToList();
-            var dataBlock = Assert.Single(dataBlockList);
-            Assert.Equal(dataBlockId, dataBlock.Id);
+            var retrievedDataBlock = Assert.Single(dataBlockList);
+            Assert.Equal(dataBlockId, retrievedDataBlock.Id);
         }
     }
 
@@ -1139,26 +1095,21 @@ public class KeyStatisticServiceTests
         var release = new Release
         {
             Id = releaseId,
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
             }
         };
-
+        var dataBlock = new DataBlock
+        {
+            Release = release
+        };
+        
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -1193,25 +1144,24 @@ public class KeyStatisticServiceTests
         var release = new Release
         {
             Id = releaseId,
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock { Id = dataBlockId },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStatisticDataBlock,
                 new KeyStatisticText(),
                 new KeyStatisticText(),
             }
+        };        
+        var dataBlock = new DataBlock
+        {
+            Id = dataBlockId,
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -1294,26 +1244,22 @@ public class KeyStatisticServiceTests
 
         var release = new Release
         {
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStat0, keyStat1, keyStat2, keyStat3,
             },
+        };
+        var dataBlock = new DataBlock
+        {
+            Id = dataBlockId,
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
 
@@ -1385,28 +1331,25 @@ public class KeyStatisticServiceTests
 
         var release = new Release
         {
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStat0, keyStat1, keyStat2, keyStat3,
             },
+        };
+        var dataBlock = new DataBlock
+        {
+            Id = dataBlockId,
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
+
 
         await using (var context = InMemoryContentDbContext(contextId))
         {
@@ -1456,28 +1399,25 @@ public class KeyStatisticServiceTests
 
         var release = new Release
         {
-            ContentBlocks = new List<ReleaseContentBlock>
-            {
-                new()
-                {
-                    ContentBlock = new DataBlock
-                    {
-                        Id = dataBlockId,
-                    },
-                },
-            },
             KeyStatistics = new List<KeyStatistic>
             {
                 keyStat0, keyStat1, keyStat2, keyStat3,
             },
+        };
+        var dataBlock = new DataBlock
+        {
+            Id = dataBlockId,
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
             await context.Releases.AddRangeAsync(release);
+            await context.ContentBlocks.AddRangeAsync(dataBlock);
             await context.SaveChangesAsync();
         }
+
 
         await using (var context = InMemoryContentDbContext(contextId))
         {

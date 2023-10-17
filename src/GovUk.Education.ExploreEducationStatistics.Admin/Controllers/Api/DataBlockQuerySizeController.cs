@@ -57,10 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .Select(r => r.Id)
                 .ToList();
 
-            var publishedDataBlocks = await _contentDbContext.ReleaseContentBlocks
-                .Include(rcb => rcb.ContentBlock)
-                .Where(rcb => publishedReleaseIds.Contains(rcb.ReleaseId))
-                .Select(rcb => rcb.ContentBlock)
+            var publishedDataBlocks = await _contentDbContext
+                .ContentBlocks
+                .Where(block => publishedReleaseIds.Contains(block.ReleaseId))
                 .OfType<DataBlock>()
                 .ToListAsync();
 

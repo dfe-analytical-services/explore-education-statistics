@@ -73,7 +73,7 @@ public class EmbedBlockService : IEmbedBlockService
                 {
                     Id = Guid.NewGuid(),
                     Title = request.Title,
-                    Url = request.Url,
+                    Url = request.Url
                 };
 
                 var order = contentSection.Content.Any()
@@ -85,9 +85,8 @@ public class EmbedBlockService : IEmbedBlockService
                     ContentSectionId = request.ContentSectionId,
                     Order = order,
                     EmbedBlock = embedBlock,
+                    ReleaseId = releaseId
                 };
-
-                // NOTE: No need to create a ReleaseContentBlock here - see EES-1568
 
                 _contentDbContext.EmbedBlocks.Add(embedBlock);
                 _contentDbContext.EmbedBlockLinks.Add(contentBlock);
@@ -133,12 +132,12 @@ public class EmbedBlockService : IEmbedBlockService
             {
                 return await _persistenceHelper
                     .CheckEntityExists<EmbedBlockLink>(contentBlockId, query
-                        => query.Include(cb => cb.EmbedBlock))
+                        => query.Include(block => block.EmbedBlock))
                     .OnSuccess<ActionResult, EmbedBlockLink, Unit>(async contentBlock =>
                     {
-                        if (!_contentDbContext.ReleaseContentSections
-                            .Any(rcs => rcs.ReleaseId == release.Id
-                            && rcs.ContentSectionId == contentBlock.ContentSectionId))
+                        if (!_contentDbContext.ContentSections
+                            .Any(section => section.ReleaseId == release.Id
+                            && section.Id == contentBlock.ContentSectionId))
                         {
                             return ValidationActionResult(
                                 ContentBlockNotAttachedToRelease);
@@ -163,8 +162,8 @@ public class EmbedBlockService : IEmbedBlockService
         Guid contentSectionId)
     {
         return _contentDbContext
-            .ReleaseContentSections
-            .Any(rcs => rcs.ReleaseId == releaseId && rcs.ContentSectionId == contentSectionId)
+            .ContentSections
+            .Any(section => section.ReleaseId == releaseId && section.Id == contentSectionId)
             ? Unit.Instance
             : ValidationActionResult(ContentSectionNotAttachedToRelease);
     }

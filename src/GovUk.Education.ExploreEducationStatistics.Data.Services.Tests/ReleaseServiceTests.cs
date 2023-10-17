@@ -861,7 +861,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject1.Subject.Id,
-                }
+                },
+                Release = release
             };
             var featuredTable1 = new FeaturedTable
             {
@@ -876,7 +877,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Query = new ObservationQueryContext
                 {
                     SubjectId = releaseSubject2.Subject.Id,
-                }
+                },
+                Release = release
             };
             var featuredTable2 = new FeaturedTable
             {
@@ -894,18 +896,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await contentDbContext.FeaturedTables.AddRangeAsync(featuredTable1, featuredTable2);
                 await contentDbContext.DataImports.AddRangeAsync(import1, import2);
                 // Order is reversed
-                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock2
-                    },
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock1
-                    }
-                );
+                await contentDbContext.ContentBlocks.AddRangeAsync(dataBlock2, dataBlock1);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -999,13 +990,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(releaseFile1);
                 await contentDbContext.AddAsync(import1);
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock1
-                    }
-                );
+                await contentDbContext.AddRangeAsync(dataBlock1);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1087,13 +1072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(releaseFile1);
                 await contentDbContext.AddAsync(import1);
-                await contentDbContext.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock1
-                    }
-                );
+                await contentDbContext.AddRangeAsync(dataBlock1);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1182,13 +1161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await contentDbContext.ReleaseFiles.AddAsync(releaseFile1);
                 await contentDbContext.FeaturedTables.AddAsync(featuredTable1);
                 await contentDbContext.DataImports.AddAsync(import1);
-                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(
-                    new ReleaseContentBlock
-                    {
-                        Release = release,
-                        ContentBlock = dataBlock1
-                    }
-                );
+                await contentDbContext.ContentBlocks.AddRangeAsync(dataBlock1);
                 await contentDbContext.SaveChangesAsync();
             }
 

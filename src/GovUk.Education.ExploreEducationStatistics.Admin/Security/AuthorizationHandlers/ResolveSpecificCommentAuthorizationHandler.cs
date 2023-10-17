@@ -49,13 +49,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
         private static Release? GetRelease(ContentDbContext context, Comment comment)
         {
-            var contentBlock = context.ContentBlocks
+            var contentBlock = context
+                .ContentBlocks
                 .Include(block => block.ContentSection)
                 .ThenInclude(contentSection => contentSection!.Release)
-                .ThenInclude(section => section.Release)
                 .First(block => block.Id == comment.ContentBlockId);
 
-            return contentBlock.ContentSection?.Release.Release;
+            return contentBlock.ContentSection?.Release;
         }
     }
 }
