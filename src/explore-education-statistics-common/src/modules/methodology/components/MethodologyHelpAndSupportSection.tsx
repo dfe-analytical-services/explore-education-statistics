@@ -7,7 +7,9 @@ interface Props {
   owningPublication: PublicationSummary | MethodologyPublication;
 }
 
-const MethodologyHelpAndSupportSection: FC<Props> = ({ owningPublication }) => {
+export default function MethodologyHelpAndSupportSection({
+  owningPublication,
+}: Props) {
   return (
     <>
       <h2
@@ -24,6 +26,4 @@ const MethodologyHelpAndSupportSection: FC<Props> = ({ owningPublication }) => {
       />
     </>
   );
-};
-
-export default MethodologyHelpAndSupportSection;
+}
