@@ -1266,7 +1266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var methodologyService = new Mock<IMethodologyService>(Strict);
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
                 var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
                 var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
@@ -1281,11 +1281,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new List<AllMethodologiesThemeViewModel>()));
 
                 var publicationService = BuildPublicationService(context,
-                    methodologyService: methodologyService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
                     publicationCacheService: publicationCacheService.Object,
                     methodologyCacheService: methodologyCacheService.Object);
 
-                methodologyService
+                methodologyVersionRepository
                     .Setup(s => s.PublicationTitleOrSlugChanged(
                         publication.Id,
                         publication.Slug,
@@ -1303,7 +1303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                VerifyAllMocks(methodologyService,
+                VerifyAllMocks(methodologyVersionRepository,
                     methodologyCacheService,
                     publicationCacheService);
 
