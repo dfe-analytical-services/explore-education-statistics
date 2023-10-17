@@ -64,12 +64,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 },
                 Contact = new Contact()
-                          {
-                              TeamEmail = "team-email",
-                              TeamName = "team-name",
-                              ContactName = "contact-name",
-                              ContactTelNo = "contact-tel-no"
-                          }
+                {
+                    TeamEmail = "team-email",
+                    TeamName = "team-name",
+                    ContactName = "contact-name",
+                    ContactTelNo = "contact-tel-no"
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -142,12 +142,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 },
                 Contact = new Contact()
-                                          {
-                                              TeamEmail = "team-email",
-                                              TeamName = "team-name",
-                                              ContactName = "contact-name",
-                                              ContactTelNo = "contact-tel-no"
-                                          }
+                {
+                    TeamEmail = "team-email",
+                    TeamName = "team-name",
+                    ContactName = "contact-name",
+                    ContactTelNo = "contact-tel-no"
+                }
             };
 
             // Publication has no published releases and is not visible

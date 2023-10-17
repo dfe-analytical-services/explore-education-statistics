@@ -39,18 +39,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         };
 
         private static readonly Contact MockContact = new()
-                                                      {
-                                                          TeamName = "Mock Team Name",
-                                                          TeamEmail = "mockteam@mockteam.com",
-                                                          ContactName = "Mock Contact Name",
-                                                      };
+        {
+            TeamName = "Mock Team Name",
+            TeamEmail = "mockteam@mockteam.com",
+            ContactName = "Mock Contact Name",
+        };
+
 
         private static readonly Publication MockPublication = new()
-                                                              {
-                                                                  Title = "Test publication",
-                                                                  Slug = "test-publication",
-                                                                  Contact = MockContact
-                                                              };
+        {
+            Title = "Test publication",
+            Slug = "test-publication",
+            Contact = MockContact
+        };
         
         [Fact]
         public async Task AdoptMethodology()
