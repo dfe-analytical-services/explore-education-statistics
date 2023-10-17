@@ -31,11 +31,6 @@ public static class PublicationGeneratorExtensions
         this Generator<Publication> generator,
         Contact contact)
         => generator.ForInstance(p => p.SetContact(contact));
-
-    private static InstanceSetters<Publication> SetContact(
-        this InstanceSetters<Publication> setters,
-        Contact contact) 
-        => setters.Set(m => m.Contact, contact);
     
     public static Generator<Publication> WithReleases(
         this Generator<Publication> generator,
@@ -61,4 +56,9 @@ public static class PublicationGeneratorExtensions
                 return list;
             }
         );
+    
+    private static InstanceSetters<Publication> SetContact(
+        this InstanceSetters<Publication> setters,
+        Contact contact) 
+        => setters.Set(m => m.Contact, contact);
 }
