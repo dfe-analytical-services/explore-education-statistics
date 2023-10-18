@@ -474,7 +474,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 .WithPublishScheduled(DateTime.Now.AddDays(-1))
                 .Generate();
 
-            var dataBlock = originalRelease.DataBlockParents[0].LatestPublishedVersion!.ContentBlock;
+            var originalDataBlock = originalRelease
+                .DataBlockParents[0]
+                .LatestPublishedVersion!
+                .ContentBlock;
 
             originalRelease.FeaturedTables = new List<FeaturedTable>
             {
@@ -484,42 +487,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Name = "Featured table 1",
                     Description = "Featured table 1 description",
                     Order = 0,
-                    DataBlock = dataBlock,
+                    DataBlock = originalDataBlock,
+                    DataBlockId = originalDataBlock.Id,
                     ReleaseId = originalRelease.Id,
                     Created = new DateTime(2023, 01, 01),
                     Updated = new DateTime(2023, 01, 02),
                 }
             };
 
-            var originalDataBlocks = ListOf(dataBlock);
-
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
             var amendment = originalRelease.CreateAmendment(createdDate, createdById);
 
-            Assert.NotEqual(originalRelease.Id, amendment.Id);
-            Assert.Equal(originalRelease.Version + 1, amendment.Version);
-            Assert.Equal(originalRelease.Id, amendment.PreviousVersionId);
-
-            Assert.Null(amendment.Published);
-            Assert.Null(amendment.PublishScheduled);
-            Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);
-
-            var amendmentFeaturedTable = Assert.Single(amendment.FeaturedTables);
-
-            var originalFeaturedTable = originalRelease.FeaturedTables[0];
-            Assert.NotEqual(originalFeaturedTable.Id, amendmentFeaturedTable.Id);
-            Assert.Equal(originalFeaturedTable.Name, amendmentFeaturedTable.Name);
-            Assert.Equal(originalFeaturedTable.Description, amendmentFeaturedTable.Description);
-            Assert.Equal(originalFeaturedTable.Order, amendmentFeaturedTable.Order);
-            Assert.Equal(originalFeaturedTable.Created, amendmentFeaturedTable.Created);
-            Assert.Equal(originalFeaturedTable.Updated, amendmentFeaturedTable.Updated);
-
-            var originalDataBlock = originalDataBlocks.Single();
-            var amendmentDataBlock = amendment.DataBlockParents[0].LatestVersion;
+            var amendmentDataBlock = amendment.DataBlockParents[0].LatestVersion.ContentBlock;
             Assert.Equal(originalDataBlock.Name, amendmentDataBlock.Name);
             Assert.NotEqual(originalDataBlock.Id, amendmentDataBlock.Id);
+
+            var amendmentFeaturedTable = Assert.Single(amendment.FeaturedTables);
+            var originalFeaturedTable = originalRelease.FeaturedTables[0];
+
+            amendmentFeaturedTable.AssertDeepEqualTo(originalFeaturedTable, Ignoring<FeaturedTable>(
+                f => f.Id,
+                f => f.DataBlock,
+                f => f.DataBlockId,
+                f => f.Release,
+                f => f.ReleaseId));
+
+            Assert.NotEqual(Guid.Empty, amendmentFeaturedTable.Id);
+            Assert.NotEqual(originalFeaturedTable.Id, amendmentFeaturedTable.Id);
+
+            Assert.Equal(amendmentDataBlock, amendmentFeaturedTable.DataBlock);
+            Assert.Equal(amendmentDataBlock.Id, amendmentFeaturedTable.DataBlockId);
+
+            Assert.Equal(amendment, amendmentFeaturedTable.Release);
+            Assert.Equal(amendment.Id, amendmentFeaturedTable.ReleaseId);
 
             // Check original and amendment data blocks/releases are linked to correct featured table
             Assert.Equal(originalRelease.Id, originalFeaturedTable.ReleaseId);
@@ -527,48 +529,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal(amendment.Id, amendmentFeaturedTable.ReleaseId);
             Assert.Equal(amendmentDataBlock.Id, amendmentFeaturedTable.DataBlockId);
         }
-/*
+
         [Fact]
         public void CreateAmendment_UpdatesFastTrackLinkIds()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-            };
-            var dataBlock1 = new DataBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                Heading = "Data block 1",
-                Release = release
-            };
-            var dataBlock2 = new DataBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                Heading = "Data block 2",
-                Release = release
-            };
+            var originalRelease = _fixture
+                .DefaultRelease()
+                .WithDataBlockParents(_fixture
+                    .DefaultDataBlockParent()
+                    .WithLatestPublishedVersion(_fixture
+                        .DefaultDataBlockVersion()
+                        .Generate())
+                    .Generate(1))
+                .WithPublished(DateTime.Now.AddDays(-2))
+                .WithPublishScheduled(DateTime.Now.AddDays(-1))
+                .Generate();
+
+            var dataBlock1 = originalRelease.DataBlockParents[0].LatestVersion.ContentBlock;
+            var dataBlock2 = originalRelease.DataBlockParents[1].LatestVersion.ContentBlock;
+
             var contentBlock1 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 1,
                 Body = $"Content block 1 http://localhost/fast-track/{dataBlock1.Id}",
-                Release = release
+                Release = originalRelease
             };
             var contentBlock2 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 2,
                 Body = $"Content block 2 http://localhost/fast-track/{dataBlock2.Id}/ some other text",
-                Release = release
+                Release = originalRelease
             };
             var contentBlock3 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
                 Order = 3,
                 Body = $"<p>Content block 3 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link text</a></p>",
-                Release = release
+                Release = originalRelease
             };
             var contentBlock4 = new HtmlBlock
             {
@@ -579,10 +578,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     <p><a href=""http://localhost/fast-track/{dataBlock1.Id}"">link 1 text</a></p>
                     <p><a href=""http://localhost/fast-track/{dataBlock2.Id}/"">link 2 text</a></p>
                     ",
-                Release = release
+                Release = originalRelease
             };
 
-            release.Content = ListOf(
+            originalRelease.Content = ListOf(
 
                 new ContentSection
                 {
@@ -590,12 +589,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     {
                         contentBlock1, contentBlock2, contentBlock3, contentBlock4
                     },
-                    Release = release
+                    Release = originalRelease
                 });
 
             var section1Id = Guid.NewGuid();
 
-            release.Content = ListOf(
+            originalRelease.Content = ListOf(
                 new ContentSection
                 {
                     Id = section1Id,
@@ -607,13 +606,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                         contentBlock3,
                         contentBlock4
                     },
-                    Release = release
+                    Release = originalRelease
                 });
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = release.CreateAmendment(ListOf(dataBlock1, dataBlock2), createdDate, createdById);
+            var amendment = originalRelease.CreateAmendment(ListOf(dataBlock1, dataBlock2), createdDate, createdById);
 
             Assert.Equal(2, amendmentDataBlocks.Count);
             var amendmentDataBlock1 = amendmentDataBlocks[0];
@@ -651,7 +650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 amendmentContentBlock4.Body
             );
         }
-
+/*
         [Fact]
         public void CreateAmendment_FiltersContent()
         {
