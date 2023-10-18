@@ -8,8 +8,6 @@ public class DataBlockParent
 {
     public Guid Id { get; set; }
 
-    public List<DataBlockVersion> Versions { get; set; } = new();
-
     public Guid LatestVersionId { get; set; }
 
     public DataBlockVersion LatestVersion { get; set; } = null!;

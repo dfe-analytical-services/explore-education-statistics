@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, new List<ContentSection> { value });
         }
 
-        public List<DataBlockParent> DataBlockParents { get; set; } = new();
+        public List<DataBlockVersion> DataBlockVersions { get; set; } = new();
 
         private ContentSection FindSingleSectionByType(ContentSectionType type)
         {

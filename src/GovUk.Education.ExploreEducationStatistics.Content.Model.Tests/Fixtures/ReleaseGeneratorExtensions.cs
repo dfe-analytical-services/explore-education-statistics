@@ -40,10 +40,10 @@ public static class ReleaseGeneratorExtensions
         return generator;
     }
 
-    public static Generator<Release> WithDataBlockParents(
+    public static Generator<Release> WithDataBlockVersions(
         this Generator<Release> generator,
-        IEnumerable<DataBlockParent> dataBlockParents)
-        => generator.ForInstance(d => d.SetDataBlockParents(dataBlockParents));
+        IEnumerable<DataBlockVersion> dataBlockVersions)
+        => generator.ForInstance(d => d.SetDataBlockVersions(dataBlockVersions));
 
     public static Generator<Release> WithContent(
         this Generator<Release> generator,
@@ -63,10 +63,10 @@ public static class ReleaseGeneratorExtensions
         ReleaseApprovalStatus status)
         => setters.Set(d => d.ApprovalStatus, status);
 
-    public static InstanceSetters<Release> SetDataBlockParents(
+    public static InstanceSetters<Release> SetDataBlockVersions(
         this InstanceSetters<Release> setters,
-        IEnumerable<DataBlockParent> dataBlockParents)
-        => setters.Set(d => d.DataBlockParents, dataBlockParents.ToList());
+        IEnumerable<DataBlockVersion> dataBlockVersions)
+        => setters.Set(d => d.DataBlockVersions, dataBlockVersions.ToList());
 
     public static InstanceSetters<Release> SetContentBlocks(
         this InstanceSetters<Release> setters,

@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -178,18 +175,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal(amendment.Id, update2.ReleaseId);
         }
 
+        // TODO check latestversion and latestpublishedversions on parents
         [Fact]
         public void CreateAmendment_ClonesContentBlocks()
         {
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .Generate())
+                .GenerateList(2);
+
             // Create a Release with 2 ContentSections and 2 DataBlocks.
             var originalRelease = _fixture
                 .DefaultRelease()
-                .WithDataBlockParents(_fixture
-                    .DefaultDataBlockParent()
-                    .WithLatestPublishedVersion(() => _fixture
-                        .DefaultDataBlockVersion()
-                        .Generate())
-                    .Generate(2))
+                .WithDataBlockVersions(dataBlockParents
+                    .Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!))
                 .Generate();
 
             // Add an HtmlBlock to the 1st ContentSection and a DataBlock to the 2nd.
@@ -201,22 +202,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     .DefaultHtmlBlock()
                     .Generate(1)))
                 .ForIndex(1, s => s.SetContentBlocks(
-                    ListOf(originalRelease.DataBlockParents[1].LatestPublishedVersion!.ContentBlock)))
+                    ListOf(dataBlockParents[1].LatestPublishedVersion!.ContentBlock)))
                 .GenerateList();
 
             var originalHtmlBlock = (originalRelease.Content[0].Content[0] as HtmlBlock)!;
-            var originalDataBlockStandaloneParent = originalRelease.DataBlockParents[0];
-            var originalDataBlockInContentParent = originalRelease.DataBlockParents[1];
+            var originalDataBlockStandaloneParent = dataBlockParents[0];
+            var originalDataBlockInContentParent = dataBlockParents[1];
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
             var amendment = originalRelease.CreateAmendment(createdDate, createdById);
 
-            // Assert that we have both DataBlockParents on the amendment.
-            Assert.Equal(2, amendment.DataBlockParents.Count);
+            // Assert that we have both DataBlocks on the amendment.
+            Assert.Equal(2, amendment.DataBlockVersions.Count);
 
-            var amendmentDataBlockStandaloneParent = amendment.DataBlockParents[0];
+            var amendmentDataBlockStandaloneParent = amendment.DataBlockVersions[0].DataBlockParent;
             Assert.Equal(originalDataBlockStandaloneParent.Id, amendmentDataBlockStandaloneParent.Id);
             AssertExistingDataBlockVersionCopiedOk(
                 originalDataBlockStandaloneParent,
@@ -226,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 amendmentDataBlockStandaloneParent,
                 amendment);
 
-            var amendmentDataBlockInContentParent = amendment.DataBlockParents[1];
+            var amendmentDataBlockInContentParent = amendment.DataBlockVersions[1].DataBlockParent;
             Assert.Equal(originalDataBlockInContentParent.Id, amendmentDataBlockInContentParent.Id);
             AssertExistingDataBlockVersionCopiedOk(
                 originalDataBlockInContentParent,
@@ -291,7 +292,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var originalDataBlockVersion = originalDataBlockParent.LatestPublishedVersion!;
 
             // Assert that a new DataBlockVersion has been created as a part of creating the Release amendment.
-            Assert.Equal(originalDataBlockParent.Versions.Count + 1, amendmentDataBlockParent.Versions.Count);
             var amendmentDataBlockOriginalVersion = amendmentDataBlockParent.LatestPublishedVersion!;
             var amendmentDataBlockNewVersion = amendmentDataBlockParent.LatestVersion;
 
@@ -369,17 +369,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void CreateAmendment_CopiesKeyStatistics()
         {
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .Generate())
+                .GenerateList(1);
+
             var originalRelease = _fixture
                 .DefaultRelease()
-                .WithDataBlockParents(_fixture
-                    .DefaultDataBlockParent()
-                    .WithLatestPublishedVersion(_fixture
-                        .DefaultDataBlockVersion()
-                        .Generate())
-                    .Generate(1))
+                .WithDataBlockVersions(dataBlockParents
+                    .Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!))
                 .Generate();
 
-            var originalDataBlock = originalRelease.DataBlockParents[0].LatestPublishedVersion!.ContentBlock;
+            var originalDataBlock = dataBlockParents[0].LatestPublishedVersion!.ContentBlock;
 
             originalRelease.KeyStatistics = new List<KeyStatistic>
             {
@@ -440,7 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             // Assert that the KeyStatisticDataBlock was copied successfully.
             var amendmentKeyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(amendment.KeyStatistics[1]);
             var originalKeyStatDataBlock = (KeyStatisticDataBlock)originalRelease.KeyStatistics[1];
-            var amendmentDataBlock = amendment.DataBlockParents[0].LatestVersion.ContentBlock;
+            var amendmentDataBlock = amendment.DataBlockVersions[0].ContentBlock;
 
             amendmentKeyStatDataBlock.AssertDeepEqualTo(originalKeyStatDataBlock, Ignoring<KeyStatisticDataBlock>(
                 k => k.Id,
@@ -462,20 +465,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void CreateAmendment_CopiesFeaturedTables()
         {
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .Generate())
+                .GenerateList(1);
+
             var originalRelease = _fixture
                 .DefaultRelease()
-                .WithDataBlockParents(_fixture
-                    .DefaultDataBlockParent()
-                    .WithLatestPublishedVersion(_fixture
-                        .DefaultDataBlockVersion()
-                        .Generate())
-                    .Generate(1))
+                .WithDataBlockVersions(dataBlockParents
+                    .Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!))
                 .WithPublished(DateTime.Now.AddDays(-2))
                 .WithPublishScheduled(DateTime.Now.AddDays(-1))
                 .Generate();
 
-            var originalDataBlock = originalRelease
-                .DataBlockParents[0]
+            var originalDataBlock = dataBlockParents[0]
                 .LatestPublishedVersion!
                 .ContentBlock;
 
@@ -500,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
             var amendment = originalRelease.CreateAmendment(createdDate, createdById);
 
-            var amendmentDataBlock = amendment.DataBlockParents[0].LatestVersion.ContentBlock;
+            var amendmentDataBlock = amendment.DataBlockVersions[0].ContentBlock;
             Assert.Equal(originalDataBlock.Name, amendmentDataBlock.Name);
             Assert.NotEqual(originalDataBlock.Id, amendmentDataBlock.Id);
 
@@ -533,86 +538,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         [Fact]
         public void CreateAmendment_UpdatesFastTrackLinkIds()
         {
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .Generate())
+                .GenerateList(1);
+
             var originalRelease = _fixture
                 .DefaultRelease()
-                .WithDataBlockParents(_fixture
-                    .DefaultDataBlockParent()
-                    .WithLatestPublishedVersion(_fixture
-                        .DefaultDataBlockVersion()
-                        .Generate())
-                    .Generate(1))
-                .WithPublished(DateTime.Now.AddDays(-2))
-                .WithPublishScheduled(DateTime.Now.AddDays(-1))
+                .WithDataBlockVersions(dataBlockParents
+                    .Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!))
                 .Generate();
 
-            var dataBlock1 = originalRelease.DataBlockParents[0].LatestVersion.ContentBlock;
-            var dataBlock2 = originalRelease.DataBlockParents[1].LatestVersion.ContentBlock;
+            var dataBlock1 = dataBlockParents[0].LatestPublishedVersion!.ContentBlock;
+            var dataBlock2 = dataBlockParents[1].LatestPublishedVersion!.ContentBlock;
 
-            var contentBlock1 = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                Body = $"Content block 1 http://localhost/fast-track/{dataBlock1.Id}",
-                Release = originalRelease
-            };
-            var contentBlock2 = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 2,
-                Body = $"Content block 2 http://localhost/fast-track/{dataBlock2.Id}/ some other text",
-                Release = originalRelease
-            };
-            var contentBlock3 = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 3,
-                Body = $"<p>Content block 3 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link text</a></p>",
-                Release = originalRelease
-            };
-            var contentBlock4 = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 4,
-                Body = $@"
-                    <p>Content block 4 http://localhost/fast-track/{dataBlock1.Id} http://localhost/fast-track/{dataBlock2.Id}</p>
-                    <p><a href=""http://localhost/fast-track/{dataBlock1.Id}"">link 1 text</a></p>
-                    <p><a href=""http://localhost/fast-track/{dataBlock2.Id}/"">link 2 text</a></p>
-                    ",
-                Release = originalRelease
-            };
-
-            originalRelease.Content = ListOf(
-
-                new ContentSection
-                {
-                    Content = new List<ContentBlock>
-                    {
-                        contentBlock1, contentBlock2, contentBlock3, contentBlock4
-                    },
-                    Release = originalRelease
-                });
-
-            var section1Id = Guid.NewGuid();
-
-            originalRelease.Content = ListOf(
-                new ContentSection
-                {
-                    Id = section1Id,
-                    Heading = "Section 1",
-                    Content = new List<ContentBlock>
-                    {
-                        contentBlock1,
-                        contentBlock2,
-                        contentBlock3,
-                        contentBlock4
-                    },
-                    Release = originalRelease
-                });
+            originalRelease.Content = _fixture
+                .DefaultContentSection()
+                .WithContentBlocks(_fixture
+                    .DefaultHtmlBlock()
+                    .ForIndex(0, s => s.SetBody($"Content block 1 http://localhost/fast-track/{dataBlock1.Id}"))
+                    .ForIndex(1,
+                        s => s.SetBody($"Content block 2 http://localhost/fast-track/{dataBlock2.Id}/ some other text"))
+                    .ForIndex(2,
+                        s => s.SetBody(
+                            $"<p>Content block 3 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link text</a></p>"))
+                    .ForIndex(3, s => s.SetBody($@"
+                        <p>Content block 4 http://localhost/fast-track/{dataBlock1.Id} http://localhost/fast-track/{dataBlock2.Id}</p>
+                        <p><a href=""http://localhost/fast-track/{dataBlock1.Id}"">link 1 text</a></p>
+                        <p><a href=""http://localhost/fast-track/{dataBlock2.Id}/"">link 2 text</a></p>
+                        "))
+                    .GenerateList())
+                .GenerateList(1);
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
-            var amendment = originalRelease.CreateAmendment(ListOf(dataBlock1, dataBlock2), createdDate, createdById);
+            var amendment = originalRelease.CreateAmendment(createdDate, createdById);
+            var amendmentDataBlocks = amendment.DataBlockVersions;
 
             Assert.Equal(2, amendmentDataBlocks.Count);
             var amendmentDataBlock1 = amendmentDataBlocks[0];

@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -13,6 +12,11 @@ public static class HtmlBlockGeneratorExtensions
 
     public static Generator<HtmlBlock> WithDefaults(this Generator<HtmlBlock> generator)
         => generator.ForInstance(d => d.SetDefaults());
+
+    public static Generator<HtmlBlock> WithBody(
+        this Generator<HtmlBlock> generator,
+        string body)
+        => generator.ForInstance(d => d.SetBody(body));
 
     public static InstanceSetters<HtmlBlock> SetDefaults(this InstanceSetters<HtmlBlock> setters)
         => setters
@@ -31,4 +35,9 @@ public static class HtmlBlockGeneratorExtensions
                         Content = $"{htmlBlock.Body} comment {num}"
                     })
                 .ToList());
+
+    public static InstanceSetters<HtmlBlock> SetBody(
+        this InstanceSetters<HtmlBlock> setters,
+        string body)
+        => setters.Set(d => d.Body, body);
 }

@@ -117,6 +117,7 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
         set => ContentBlock.Table = value;
     }
 
+    // TODO EES-4467 - do we need this?
     public DataBlockVersion Clone(Release amendment)
     {
         var now = DateTime.UtcNow;

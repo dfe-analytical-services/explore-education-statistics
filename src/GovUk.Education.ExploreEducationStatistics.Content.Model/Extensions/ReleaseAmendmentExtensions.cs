@@ -33,16 +33,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
             // Create new DataBlockVersions for each DataBlockParent and for each, replace the "LatestVersion"
             // with the new DataBlockVersion.
-            amendment
-                .DataBlockParents = originalRelease
-                .DataBlockParents
-                .Select(dataBlockParent =>
+            amendment.DataBlockVersions = amendment
+                .DataBlockVersions
+                .Select(originalDataBlockVersion =>
                 {
-                    var clonedParent = dataBlockParent.Clone();
-                    var clonedDataBlockVersion = clonedParent.LatestPublishedVersion!.Clone(amendment);
-                    clonedParent.LatestVersion = clonedDataBlockVersion;
-                    clonedParent.Versions = dataBlockParent.Versions.Append(clonedDataBlockVersion).ToList();
-                    return clonedParent;
+                    var clonedDataBlockVersion = originalDataBlockVersion.Clone(amendment);
+                    clonedDataBlockVersion.DataBlockParent.LatestPublishedVersion = originalDataBlockVersion;
+                    clonedDataBlockVersion.DataBlockParent.LatestVersion = clonedDataBlockVersion;
+                    return clonedDataBlockVersion;
                 })
                 .ToList();
 
@@ -56,10 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                     block => block.Clone(amendment));
 
             Dictionary<DataBlock, DataBlock> originalToClonedDataBlocks = amendment
-                .DataBlockParents
+                .DataBlockVersions
+                .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .ToDictionary(
-                    dataBlockVersion => dataBlockVersion.LatestPublishedVersion!.ContentBlock,
-                    dataBlockVersion => dataBlockVersion.LatestVersion.ContentBlock);
+                    dataBlockParent => dataBlockParent.LatestPublishedVersion!.ContentBlock,
+                    dataBlockParent => dataBlockParent.LatestVersion.ContentBlock);
 
             var allClonedBlocks = originalToClonedContentBlocks
                 .ToDictionary(kv => kv.Key, kv => kv.Value);
