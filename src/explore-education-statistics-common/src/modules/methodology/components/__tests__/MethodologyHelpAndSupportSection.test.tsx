@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import * as ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import MethodologyHelpAndSupportSection from '@common/modules/methodology/components/MethodologyHelpAndSupportSection';
-import { testPublicationSummary } from '@common/modules/methodology/components/__tests__/__data__/test-data';
+import testPublicationSummary from '@common/modules/methodology/components/__tests__/__data__/test-data';
 
 jest.mock('@common/modules/find-statistics/components/ContactUsSection');
 
