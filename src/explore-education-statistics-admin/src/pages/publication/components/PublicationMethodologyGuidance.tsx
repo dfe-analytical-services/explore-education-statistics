@@ -11,7 +11,7 @@ export function MethodologyStatusGuidanceModal() {
     <Modal
       className="govuk-!-width-one-half"
       showClose
-      title="Methodology type guidance"
+      title="Methodology status guidance"
       triggerButton={
         <ButtonText>
           <InfoIcon description="Guidance on methodology statuses" />
@@ -22,6 +22,17 @@ export function MethodologyStatusGuidanceModal() {
       <SummaryList>
         <SummaryListItem term={<Tag>Draft</Tag>}>
           This is an unpublished draft methodology that can still be edited
+        </SummaryListItem>
+        <SummaryListItem term={<Tag>In review</Tag>}>
+          This is a methodology that is ready to be reviewed prior to
+          publication
+        </SummaryListItem>
+        <SummaryListItem term={<Tag>Draft amendment</Tag>}>
+          This is a published methodology that is currently being amended
+        </SummaryListItem>
+        <SummaryListItem term={<Tag>In review amendment</Tag>}>
+          This is a published methodology that has an amendment that is ready to
+          be reviewed prior to publication
         </SummaryListItem>
         <SummaryListItem term={<Tag>Approved</Tag>}>
           This is an approved methodology that can be published at the same time
