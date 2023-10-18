@@ -12,7 +12,7 @@ public record ContactViewModel
 
     public string ContactName { get; init; } = string.Empty;
 
-    public string ContactTelNo { get; init; } = string.Empty;
+    public string? ContactTelNo { get; init; } = string.Empty;
 
     public ContactViewModel()
     {
