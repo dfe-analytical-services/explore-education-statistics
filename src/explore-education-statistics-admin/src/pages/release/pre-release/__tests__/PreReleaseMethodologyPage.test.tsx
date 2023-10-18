@@ -33,6 +33,8 @@ describe('PreReleaseMethodologyPage', () => {
         teamEmail: 'Mock Contact Team Email',
         contactName: 'Mock Contact Name',
       },
+      slug: 'mock slug',
+      owner: false,
     },
     slug: 'pupil-absence-in-schools-in-england',
     status: 'Approved',

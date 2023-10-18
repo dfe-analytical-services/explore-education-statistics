@@ -1,6 +1,6 @@
 import client from '@admin/services/utils/service';
 import { IdTitlePair } from '@admin/services/types/common';
-import { MethodologyPublication } from '@common/services/methodologyService';
+import { PublicationSummary } from '@common/services/publicationService';
 
 export type MethodologyApprovalStatus =
   | 'Draft'
@@ -31,8 +31,8 @@ export interface MethodologyVersion extends BaseMethodologyVersion {
   publishingStrategy?: MethodologyPublishingStrategy;
   scheduledWithRelease?: IdTitlePair;
   slug: string;
-  owningPublication: MethodologyPublication;
-  otherPublications?: MethodologyPublication[];
+  owningPublication: PublicationSummary;
+  otherPublications?: PublicationSummary[];
 }
 
 export interface MethodologyVersionSummary extends BaseMethodologyVersion {

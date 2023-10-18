@@ -1,10 +1,9 @@
 import React from 'react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import { PublicationSummary } from '@common/services/publicationService';
-import { MethodologyPublication } from '@common/services/methodologyService';
 
 interface Props {
-  owningPublication: PublicationSummary | MethodologyPublication;
+  owningPublication: PublicationSummary;
 }
 
 export default function MethodologyHelpAndSupportSection({

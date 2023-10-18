@@ -40,6 +40,8 @@ describe('MethodologyStatusPage', () => {
         teamEmail: 'Mock Contact Team Email',
         contactName: 'Mock Contact Name',
       },
+      slug: 'mock-slug',
+      owner: true,
     },
     status: 'Draft',
     methodologyId: '',
@@ -56,6 +58,8 @@ describe('MethodologyStatusPage', () => {
           teamEmail: 'Mock Contact Team Email',
           contactName: 'Mock Contact Name',
         },
+        slug: 'mock-slug',
+        owner: false,
       },
       {
         id: 'p3',
@@ -65,6 +69,8 @@ describe('MethodologyStatusPage', () => {
           teamEmail: 'Mock Contact Team Email',
           contactName: 'Mock Contact Name',
         },
+        slug: 'mock-slug',
+        owner: false,
       },
     ],
   };

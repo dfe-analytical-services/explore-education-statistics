@@ -158,6 +158,8 @@ describe('PublicationMethodologiesPage', () => {
             teamEmail: 'Mock Contact Team Email',
             contactName: 'Mock Contact Name',
           },
+          slug: 'mock-slug',
+          owner: false,
         },
         status: 'Draft',
       };
@@ -727,6 +729,8 @@ describe('PublicationMethodologiesPage', () => {
               teamEmail: 'Mock Contact Team Email',
               contactName: 'Mock Contact Name',
             },
+            slug: 'mock-slug',
+            owner: false,
           },
           status: 'Draft',
           previousVersionId: 'methodology-previous-version-1',

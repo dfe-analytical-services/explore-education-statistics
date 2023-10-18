@@ -36,6 +36,8 @@ describe('PublicationAdoptMethodologyPage', () => {
         teamEmail: 'Mock Contact Team Email',
         contactName: 'Mock Contact Name',
       },
+      slug: 'mock-slug',
+      owner: false,
     },
   };
   const testMethodology2: MethodologyVersion = {
@@ -55,6 +57,8 @@ describe('PublicationAdoptMethodologyPage', () => {
         teamEmail: 'Mock Contact Team Email',
         contactName: 'Mock Contact Name',
       },
+      slug: 'mock-slug',
+      owner: false,
     },
   };
   const testMethodology3: MethodologyVersion = {
@@ -74,6 +78,8 @@ describe('PublicationAdoptMethodologyPage', () => {
         teamEmail: 'Mock Contact Team Email',
         contactName: 'Mock Contact Name',
       },
+      slug: 'mock-slug',
+      owner: false,
     },
   };
 

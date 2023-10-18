@@ -1,15 +1,6 @@
-import {
-  Contact,
-  PublicationSummary,
-} from '@common/services/publicationService';
+import { PublicationSummary } from '@common/services/publicationService';
 import { ContentBlock } from '@common/services/types/blocks';
 import { contentApi } from './api';
-
-export interface MethodologyPublication {
-  id: string;
-  title: string;
-  contact: Contact;
-}
 
 export interface Methodology {
   id: string;

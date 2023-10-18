@@ -19,6 +19,8 @@ describe('ApprovalsTable', () => {
           teamEmail: 'Mock Contact Team Email',
           contactName: 'Mock Contact Name',
         },
+        slug: 'mock-slug',
+        owner: true,
       },
       otherPublications: [],
       published: '2018-08-25T00:00:00',

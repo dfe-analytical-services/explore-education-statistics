@@ -17,6 +17,8 @@ const testMethodology: MethodologyVersion = {
         teamEmail: 'mock team email 2',
         contactName: 'mock contact name 2',
       },
+      slug: 'mock-slug',
+      owner: false,
     },
     {
       id: 'op2',
@@ -26,6 +28,8 @@ const testMethodology: MethodologyVersion = {
         teamEmail: 'mock team email 3',
         contactName: 'mock contact name 3',
       },
+      slug: 'mock-slug',
+      owner: false,
     },
   ],
   owningPublication: {
@@ -36,6 +40,8 @@ const testMethodology: MethodologyVersion = {
       teamEmail: 'mock team email 1',
       contactName: 'mock contact name 1',
     },
+    slug: 'mock-slug',
+    owner: true,
   },
   published: '',
 };
