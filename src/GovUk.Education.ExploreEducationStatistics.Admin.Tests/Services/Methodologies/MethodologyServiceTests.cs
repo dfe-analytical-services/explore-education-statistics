@@ -1905,11 +1905,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         public async Task UpdateMethodology_UpdatingAmendmentUnsetsAlternativeTitleAndSlugAndCreatesRedirect()
         {
             var publication = new Publication
-                              {
-                                  Title = "Test publication",
-                                  Slug = "test-publication",
-                                  Contact = MockContact
-                              };
+            {
+                Title = "Test publication",
+                Slug = "test-publication",
+                Contact = MockContact
+            };
             
             var methodologyVersion = new MethodologyVersion
             {
