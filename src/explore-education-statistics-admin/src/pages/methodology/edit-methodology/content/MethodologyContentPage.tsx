@@ -84,7 +84,31 @@ export const MethodologyContentPageInternal = () => {
                     <PrintThisPage />
                   </>
                 )}
+              </section>
+            </div>
+            <div className="govuk-grid-column-one-third">
+              <RelatedInformation>
+                <h3 className="govuk-heading-s" id="related-pages">
+                  Help and support
+                </h3>
+                <ul className="govuk-list">
+                  <li>
+                    <a href="#contact-us">Contact us</a>
+                  </li>
+                </ul>
+              </RelatedInformation>
+            </div>
+          </div>
 
+          <div className="govuk-grid-row">
+            <div className="govuk-grid-column-two-thirds">
+              <section
+                className={
+                  editingMode === 'edit'
+                    ? 'dfe-page-editing'
+                    : 'dfe-page-preview'
+                }
+              >
                 <MethodologyAccordion
                   methodology={methodology}
                   sectionKey="content"
@@ -103,18 +127,6 @@ export const MethodologyContentPageInternal = () => {
                   owningPublication={methodologyVersion.owningPublication}
                 />
               </section>
-            </div>
-            <div className="govuk-grid-column-one-third">
-              <RelatedInformation>
-                <h3 className="govuk-heading-s" id="related-pages">
-                  Help and support
-                </h3>
-                <ul className="govuk-list">
-                  <li>
-                    <a href="#contact-us">Contact us</a>
-                  </li>
-                </ul>
-              </RelatedInformation>
             </div>
           </div>
         </>
