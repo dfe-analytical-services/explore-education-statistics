@@ -2,7 +2,7 @@
   {
     "publication_summary": "Students sustaining an education, apprenticeship or employment destination after 16-18 study in England. Includes disadvantage, ethnicity and other breakdowns.",
     "publication_title": "16-18 destination measures",
-    "published": "20 Oct 2022",
+    "published": "19 Oct 2023",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -210,6 +210,13 @@
     "theme": "Further education"
   },
   {
+    "publication_summary": "This statistical release provides data on Foundation Year providers and students, and on the outcomes of Foundation Years study.",
+    "publication_title": "Foundation Years statistics",
+    "published": "19 Oct 2023",
+    "release_type": "Ad hoc statistics",
+    "theme": "Higher education"
+  },
+  {
     "publication_summary": "Statistics on free school meals in schools in England as collected in the October 2020 school census.",
     "publication_title": "Free school meals: Autumn term",
     "published": "30 Mar 2021",
@@ -296,14 +303,14 @@
   {
     "publication_summary": "Pupils sustaining an education, apprenticeship or employment destination after GCSEs in England. Includes disadvantage, ethnicity and other breakdowns.",
     "publication_title": "Key stage 4 destination measures",
-    "published": "20 Oct 2022",
+    "published": "19 Oct 2023",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
   {
     "publication_summary": "GCSE results of pupils at the end of KS4 attending state-funded schools in England at national & LA level. This release includes pupil characteristic breakdowns",
     "publication_title": "Key stage 4 performance",
-    "published": "20 Oct 2022",
+    "published": "19 Oct 2023",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -387,8 +394,8 @@
   {
     "publication_summary": "Annual release providing national projections for the number of pupils in schools in England by type of school, age and whether full time or part time.",
     "publication_title": "National pupil projections",
-    "published": "14 Jul 2022",
-    "release_type": "Official statistics",
+    "published": "19 Oct 2023",
+    "release_type": "National statistics",
     "theme": "Pupils and schools"
   },
   {
@@ -429,7 +436,7 @@
   {
     "publication_summary": "Participation and not in education, employment or training (NEET) figures ages 16 to 18 in England. Includes institution type and qualification aim breakdowns.",
     "publication_title": "Participation in education, training and employment age 16 to 18",
-    "published": "30 Jun 2022",
+    "published": "19 Oct 2023",
     "release_type": "National statistics",
     "theme": "Destination of pupils and students"
   },
@@ -471,7 +478,7 @@
   {
     "publication_summary": "Rates and value-added scores of level 3 (e.g., A level) students that sustain a higher education or apprenticeship destination. Includes various breakdowns.",
     "publication_title": "Progression to higher education or training",
-    "published": "20 Oct 2022",
+    "published": "19 Oct 2023",
     "release_type": "Official statistics",
     "theme": "Destination of pupils and students"
   },
@@ -485,7 +492,7 @@
   {
     "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the full academic year.",
     "publication_title": "Pupil absence in schools in England",
-    "published": "20 Jul 2023",
+    "published": "19 Oct 2023",
     "release_type": "National statistics",
     "theme": "Pupils and schools"
   },
