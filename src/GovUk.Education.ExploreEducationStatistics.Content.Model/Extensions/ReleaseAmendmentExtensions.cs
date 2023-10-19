@@ -39,7 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 {
                     var clonedDataBlockVersion = originalDataBlockVersion.Clone(amendment);
                     clonedDataBlockVersion.DataBlockParent.LatestPublishedVersion = originalDataBlockVersion;
+                    clonedDataBlockVersion.DataBlockParent.LatestPublishedVersionId = originalDataBlockVersion.Id;
                     clonedDataBlockVersion.DataBlockParent.LatestVersion = clonedDataBlockVersion;
+                    clonedDataBlockVersion.DataBlockParent.LatestVersionId = clonedDataBlockVersion.Id;
                     return clonedDataBlockVersion;
                 })
                 .ToList();

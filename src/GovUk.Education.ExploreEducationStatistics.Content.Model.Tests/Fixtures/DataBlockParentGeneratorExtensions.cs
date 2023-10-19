@@ -51,6 +51,12 @@ public static class DataBlockGeneratorExtensions
             {
                 var dataBlockVersion = version.Invoke();
                 dataBlockParent.LatestPublishedVersion = dataBlockVersion;
+
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                if (dataBlockParent.LatestVersion == null)
+                {
+                    dataBlockParent.LatestVersion = dataBlockVersion;
+                }
                 dataBlockVersion.DataBlockParent = dataBlockParent;
             });
 }

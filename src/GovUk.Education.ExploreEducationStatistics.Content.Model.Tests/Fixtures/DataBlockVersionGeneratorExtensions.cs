@@ -16,6 +16,9 @@ public static class DataBlockVersionGeneratorExtensions
     public static Generator<DataBlockVersion> WithRelease(this Generator<DataBlockVersion> generator, Release release)
         => generator.ForInstance(d => d.SetRelease(release));
 
+    public static Generator<DataBlockVersion> WithReleaseId(this Generator<DataBlockVersion> generator, Guid releaseId)
+        => generator.ForInstance(d => d.SetReleaseId(releaseId));
+
     public static Generator<DataBlockVersion> WithVersion(this Generator<DataBlockVersion> generator, int version)
         => generator.ForInstance(d => d.SetVersion(version));
 
@@ -60,7 +63,14 @@ public static class DataBlockVersionGeneratorExtensions
     public static InstanceSetters<DataBlockVersion> SetRelease(
         this InstanceSetters<DataBlockVersion> setters,
         Release release)
-        => setters.Set(d => d.Release, release);
+        => setters
+            .Set(d => d.Release, release)
+            .SetReleaseId(release.Id);
+
+    public static InstanceSetters<DataBlockVersion> SetReleaseId(
+        this InstanceSetters<DataBlockVersion> setters,
+        Guid releaseId)
+        => setters.Set(d => d.ReleaseId, releaseId);
 
     public static InstanceSetters<DataBlockVersion> SetVersion(
         this InstanceSetters<DataBlockVersion> setters,

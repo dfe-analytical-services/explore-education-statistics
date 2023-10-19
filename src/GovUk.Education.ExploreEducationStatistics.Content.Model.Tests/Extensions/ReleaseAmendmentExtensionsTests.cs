@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
@@ -254,7 +255,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             AssertContentSectionCopiedOk(originalContentSection1, amendmentContentSection1, amendment);
 
             // Assert that the 1st ContentSection's HtmlBlock is copied OK.
-            AssertHtmlBlockCopiedOk(amendmentContentSection1, originalHtmlBlock, amendment);
+            var amendmentHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(amendmentContentSection1.Content));
+            AssertHtmlBlockCopiedOk(amendmentContentSection1, amendmentHtmlBlock, originalHtmlBlock, amendment);
 
             // Grab the 2nd generic ContentSection which was copied from the original Release. Assert that its general
             // properties and its DataBlock are copied across OK.
@@ -323,15 +325,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             // Release.
             Assert.Equal(amendment, amendmentDataBlockNewVersion.Release);
             Assert.Equal(amendment.Id, amendmentDataBlockNewVersion.ReleaseId);
+            Assert.Equal(amendment, amendmentDataBlockNewVersion.ContentBlock.Release);
+            Assert.Equal(amendment.Id, amendmentDataBlockNewVersion.ContentBlock.ReleaseId);
 
             // Assert the Created date has been set to have just been created.
             amendmentDataBlockNewVersion.Created.AssertRecent();
         }
 
-        private static void AssertHtmlBlockCopiedOk(ContentSection amendmentContentSection1, HtmlBlock originalHtmlBlock,
+        private static void AssertHtmlBlockCopiedOk(
+            ContentSection amendmentContentSection,
+            HtmlBlock amendmentHtmlBlock,
+            HtmlBlock originalHtmlBlock,
             Release amendment)
         {
-            var amendmentHtmlBlock = Assert.IsType<HtmlBlock>(Assert.Single(amendmentContentSection1.Content));
             amendmentHtmlBlock.AssertDeepEqualTo(originalHtmlBlock, Ignoring<HtmlBlock>(
                 b => b.Id,
                 b => b.Comments,
@@ -344,8 +350,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal(2, originalHtmlBlock.Comments.Count);
             Assert.Empty(amendmentHtmlBlock.Comments);
 
-            Assert.Equal(amendmentContentSection1.Id, amendmentHtmlBlock.ContentSectionId);
-            Assert.Equal(amendmentContentSection1, amendmentHtmlBlock.ContentSection);
+            Assert.Equal(amendmentContentSection.Id, amendmentHtmlBlock.ContentSectionId);
+            Assert.Equal(amendmentContentSection, amendmentHtmlBlock.ContentSection);
             Assert.Equal(amendment.Id, amendmentHtmlBlock.ReleaseId);
             Assert.Equal(amendment, amendmentHtmlBlock.Release);
         }
@@ -536,7 +542,105 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
         }
 
         [Fact]
-        public void CreateAmendment_UpdatesFastTrackLinkIds()
+        public void CreateAmendment_FiltersCommentsFromContent()
+        {
+            var htmlBlock1Body = @"
+                <p>
+                    Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
+                </p>
+                <ul>
+                    <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
+                    <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
+                    <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
+                </ul>".TrimIndent();
+
+            var expectedHtmlBlock1Body = @"
+                    <p>
+                        Content 1 goes here
+                    </p>
+                    <ul>
+                        <li>Content 2</li>
+                        <li>Content 3</li>
+                        <li>Content 4</li>
+                    </ul>".TrimIndent();
+
+            var htmlBlock2Body = $@"
+                    <p>
+                        Content block 2
+                        <comment-start name=""comment-1""></comment-start>
+                            Content 1
+                        <comment-end name=""comment-1""></comment-end>
+
+                        Content 2
+                    </p>".TrimIndent();
+
+            var expectedHtmlBlock2Body = $@"
+                    <p>
+                        Content block 2
+                        
+                            Content 1
+                        
+
+                        Content 2
+                    </p>".TrimIndent();
+
+            var htmlBlock3Body = $@"
+                    <p>
+                        Content block 3
+                        <comment-start name=""comment-1""></comment-start>
+                            Content 1
+                        <comment-end name=""comment-1""></comment-end>
+                    </p>".TrimIndent();
+
+            var expectedHtmlBlock3Body = $@"
+                    <p>
+                        Content block 3
+                        
+                            Content 1
+                        
+                    </p>".TrimIndent();
+
+            var originalRelease = _fixture.DefaultRelease().Generate();
+
+            // Test that we are amending content across multiple sections.
+            originalRelease.Content = _fixture
+                .DefaultContentSection()
+                .ForIndex(0, s => s.SetContentBlocks(_fixture
+                    .DefaultHtmlBlock()
+                    .ForIndex(0, s => s.SetBody(htmlBlock1Body))
+                    .ForIndex(1, s => s.SetBody(htmlBlock2Body))
+                    .GenerateList()))
+                .ForIndex(1, s => s.SetContentBlocks(_fixture
+                    .DefaultHtmlBlock()
+                    .WithBody(htmlBlock3Body)
+                    .Generate(1)))
+                .GenerateList();
+
+            var createdDate = DateTime.Now;
+            var createdById = Guid.NewGuid();
+
+            var amendment = originalRelease.CreateAmendment(createdDate, createdById);
+
+            Assert.Equal(3, amendment.Content.Count);
+            Assert.Equal(ContentSectionType.Generic, amendment.Content[0].Type);
+            Assert.Equal(ContentSectionType.Generic, amendment.Content[1].Type);
+            Assert.Equal(ContentSectionType.RelatedDashboards, amendment.Content[2].Type);
+
+            var amendmentContentSection1 = amendment.Content[0];
+            var amendmentContentSection2 = amendment.Content[1];
+
+            Assert.Equal(2, amendmentContentSection1.Content.Count);
+            var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(amendmentContentSection1.Content[0]);
+            var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(amendmentContentSection1.Content[1]);
+            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(Assert.Single(amendmentContentSection2.Content));
+
+            Assert.Equal(expectedHtmlBlock1Body, amendmentContentBlock1.Body);
+            Assert.Equal(expectedHtmlBlock2Body, amendmentContentBlock2.Body);
+            Assert.Equal(expectedHtmlBlock3Body, amendmentContentBlock3.Body);
+        }
+
+        [Fact]
+        public void CreateAmendment_NullHtmlBlockBody()
         {
             var dataBlockParents = _fixture
                 .DefaultDataBlockParent()
@@ -549,278 +653,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 .DefaultRelease()
                 .WithDataBlockVersions(dataBlockParents
                     .Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!))
+                .WithPublished(DateTime.Now.AddDays(-2))
+                .WithPublishScheduled(DateTime.Now.AddDays(-1))
                 .Generate();
-
-            var dataBlock1 = dataBlockParents[0].LatestPublishedVersion!.ContentBlock;
-            var dataBlock2 = dataBlockParents[1].LatestPublishedVersion!.ContentBlock;
 
             originalRelease.Content = _fixture
                 .DefaultContentSection()
                 .WithContentBlocks(_fixture
                     .DefaultHtmlBlock()
-                    .ForIndex(0, s => s.SetBody($"Content block 1 http://localhost/fast-track/{dataBlock1.Id}"))
-                    .ForIndex(1,
-                        s => s.SetBody($"Content block 2 http://localhost/fast-track/{dataBlock2.Id}/ some other text"))
-                    .ForIndex(2,
-                        s => s.SetBody(
-                            $"<p>Content block 3 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link text</a></p>"))
-                    .ForIndex(3, s => s.SetBody($@"
-                        <p>Content block 4 http://localhost/fast-track/{dataBlock1.Id} http://localhost/fast-track/{dataBlock2.Id}</p>
-                        <p><a href=""http://localhost/fast-track/{dataBlock1.Id}"">link 1 text</a></p>
-                        <p><a href=""http://localhost/fast-track/{dataBlock2.Id}/"">link 2 text</a></p>
-                        "))
-                    .GenerateList())
+                    .WithBody(null!)
+                    .Generate(1)
+                    .Concat(ListOf(originalRelease.DataBlockVersions[0].ContentBlock as ContentBlock)))
                 .GenerateList(1);
 
             var createdDate = DateTime.Now;
             var createdById = Guid.NewGuid();
 
+            // Minimal test to make sure that a null HtmlBlock body doesn't affect creating a Release amendment.
             var amendment = originalRelease.CreateAmendment(createdDate, createdById);
-            var amendmentDataBlocks = amendment.DataBlockVersions;
-
-            Assert.Equal(2, amendmentDataBlocks.Count);
-            var amendmentDataBlock1 = amendmentDataBlocks[0];
-            var amendmentDataBlock2 = amendmentDataBlocks[1];
-
-            Assert.NotEqual(dataBlock1.Id, amendmentDataBlock1.Id);
-            Assert.NotEqual(dataBlock2.Id, amendmentDataBlock2.Id);
-
-            var section1 = amendment.Content[0];
-
-            var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(section1.Content[0]);
-            var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(section1.Content[1]);
-            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(section1.Content[2]);
-            var amendmentContentBlock4 = Assert.IsType<HtmlBlock>(section1.Content[3]);
-
-            Assert.Equal(
-                $"Content block 1 http://localhost/fast-track/{amendmentDataBlock1.Id}",
-                amendmentContentBlock1.Body
-            );
-            Assert.Equal(
-                $"Content block 2 http://localhost/fast-track/{amendmentDataBlock2.Id}/ some other text",
-                amendmentContentBlock2.Body
-            );
-
-            Assert.Equal(
-                $"<p>Content block 3 <a href=\"http://localhost/fast-track/{amendmentDataBlock1.Id}\">link text</a></p>",
-                amendmentContentBlock3.Body
-            );
-            Assert.Equal(
-                $@"
-                    <p>Content block 4 http://localhost/fast-track/{amendmentDataBlock1.Id} http://localhost/fast-track/{amendmentDataBlock2.Id}</p>
-                    <p><a href=""http://localhost/fast-track/{amendmentDataBlock1.Id}"">link 1 text</a></p>
-                    <p><a href=""http://localhost/fast-track/{amendmentDataBlock2.Id}/"">link 2 text</a></p>
-                    ",
-                amendmentContentBlock4.Body
-            );
-        }
-/*
-        [Fact]
-        public void CreateAmendment_FiltersContent()
-        {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-            };
-            var dataBlock1 = new DataBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                Heading = "Data block 1",
-                Release = release
-            };
-            var contentBlock1 = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                Body = $"<p>Content block 1 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link</a></p>",
-                Release = release
-            };
-
-            var contentBlock2 = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                Body = @"
-                <p>
-                    Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
-                </p>
-                <ul>
-                    <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
-                    <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
-                    <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
-                </ul>".TrimIndent(),
-                Release = release
-            };
-            var contentBlock3 = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 2,
-                Body = $@"
-                    <p>
-                        Content block 3
-                        <comment-start name=""comment-1""></comment-start>
-                            <a href=""http://localhost/fast-track/{dataBlock1.Id}"">link</a>
-                        <comment-end name=""comment-1""></comment-end>
-
-                        <a href=""http://localhost/fast-track/{dataBlock1.Id}"">Another link</a>
-                    </p>".TrimIndent(),
-                Release = release
-            };
-
-            release.Content = ListOf(
-                new ContentSection
-                {
-                    Content = new List<ContentBlock>
-                    {
-                        contentBlock1, contentBlock2, contentBlock3
-                    },
-                    Release = release
-                });
-
-            // Test that we are amending content across multiple sections too
-            var section1Id = Guid.NewGuid();
-            var section2Id = Guid.NewGuid();
-
-            release.Content = ListOf(
-                new ContentSection
-                {
-                    Id = section1Id,
-                    Heading = "Section 1",
-                    Content = new List<ContentBlock>
-                    {
-                        contentBlock1,
-                        contentBlock2,
-                    },
-                    Release = release
-                },
-                new ContentSection
-                {
-                    Id = section2Id,
-                    Heading = "Section 2",
-                    Content = new List<ContentBlock>
-                    {
-                        contentBlock3,
-                    },
-                    Release = release
-                });
-
-            var createdDate = DateTime.Now;
-            var createdById = Guid.NewGuid();
-
-            var amendment = release.CreateAmendment(ListOf(dataBlock1), createdDate, createdById);
-
-            var amendmentDataBlock1 = Assert.Single(amendmentDataBlocks);
-
-            Assert.NotEqual(dataBlock1.Id, amendmentDataBlock1.Id);
-
-            Assert.Equal(3, amendment.Content.Count);
-            Assert.Equal(ContentSectionType.Generic, amendment.Content[0].Type);
-            Assert.Equal(ContentSectionType.Generic, amendment.Content[1].Type);
-            Assert.Equal(ContentSectionType.RelatedDashboards, amendment.Content[2].Type);
-
-            var section1 = amendment.Content[0];
-            var section2 = amendment.Content[1];
-
-            Assert.Equal(2, section1.Content.Count);
-            var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(section1.Content[0]);
-            var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(section1.Content[1]);
-            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(Assert.Single(section2.Content));
-
-            Assert.Equal(
-                $"<p>Content block 1 <a href=\"http://localhost/fast-track/{amendmentDataBlock1.Id}\">link</a></p>",
-                amendmentContentBlock1.Body
-            );
-            Assert.Equal(
-                @"
-                    <p>
-                        Content 1 goes here
-                    </p>
-                    <ul>
-                        <li>Content 2</li>
-                        <li>Content 3</li>
-                        <li>Content 4</li>
-                    </ul>".TrimIndent(),
-                amendmentContentBlock2.Body
-            );
-            Assert.Equal(
-                $@"
-                    <p>
-                        Content block 3
-
-                            <a href=""http://localhost/fast-track/{amendmentDataBlock1.Id}"">link</a>
-
-
-                        <a href=""http://localhost/fast-track/{amendmentDataBlock1.Id}"">Another link</a>
-                    </p>".TrimIndent(),
-                amendmentContentBlock3.Body
-            );
-        }
-
-        [Fact]
-        public void CreateAmendment_NullHtmlBlockBody()
-        {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var section1Id = Guid.NewGuid();
-
-            var originalHtmlBlock = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 1,
-                Body = null,
-                ContentSectionId = section1Id,
-                Release = release
-            };
-
-            var dataBlock = new DataBlock
-            {
-                Id = Guid.NewGuid(),
-                Order = 2,
-                Heading = "Block 2 heading",
-                Name = "Block 2 name",
-                Source = "Block 2 source",
-                ContentSectionId = section1Id,
-                Release = release
-            };
-
-            release.Content = ListOf(
-                new ContentSection
-                {
-                    Id = section1Id,
-                    Heading = "Section 1",
-                    Content = new List<ContentBlock>
-                    {
-                        originalHtmlBlock,
-                        dataBlock
-                    },
-                    Release = release
-                });
-
-            release.Content = ListOf(
-                new ContentSection
-                {
-                    Content = new List<ContentBlock>
-                    {
-                        originalHtmlBlock
-                    },
-                    Release = release
-                });
-
-            var createdDate = DateTime.Now;
-            var createdById = Guid.NewGuid();
-
-            // Minimal test to make sure that a null HtmlBlock body doesn't affect creating a Release amendment
-            var amendment = release.CreateAmendment(ListOf(dataBlock), createdDate, createdById);
-            Assert.Single(amendmentDataBlocks);
+            Assert.Single(amendment.DataBlockVersions);
 
             var amendmentHtmlBlock =  Assert.IsType<HtmlBlock>(amendment.Content[0].Content[0]);
-            Assert.NotEqual(originalHtmlBlock.Id, amendmentHtmlBlock.Id);
+            Assert.NotEqual(originalRelease.Content[0].Content[0].Id, amendmentHtmlBlock.Id);
             Assert.Null(amendmentHtmlBlock.Body);
         }
-        */
     }
 }
