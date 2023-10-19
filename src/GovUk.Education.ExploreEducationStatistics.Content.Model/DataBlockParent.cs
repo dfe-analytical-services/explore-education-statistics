@@ -8,9 +8,9 @@ public class DataBlockParent
 {
     public Guid Id { get; set; }
 
-    public Guid LatestVersionId { get; set; }
+    public Guid? LatestVersionId { get; set; }
 
-    public DataBlockVersion LatestVersion { get; set; } = null!;
+    public DataBlockVersion? LatestVersion { get; set; } = null!;
 
     public Guid? LatestPublishedVersionId { get; set; }
 

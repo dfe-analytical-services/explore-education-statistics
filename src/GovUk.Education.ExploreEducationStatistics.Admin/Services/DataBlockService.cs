@@ -71,19 +71,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         // EES-4467 - share the same Id with the underlying ContentBlock. This will make the process
                         // of removing DataBlock information out of the ContentBlocks table and into the
                         // DataBlockVersions table easier in future stages of extracting pure DataBlocks out of the
-                        // Content model. 
+                        // Content model.
                         Id = dataBlock.Id,
                         ContentBlock = dataBlock,
                         ReleaseId = releaseId,
                         Created = DateTime.UtcNow,
-                        DataBlockParent = new DataBlockParent
-                        {
-                            LatestVersionId = dataBlock.Id
-                        }
+                        DataBlockParent = new()
                     };
 
                     await _context.DataBlockVersions.AddAsync(dataBlockVersion);
                     await _context.SaveChangesAsync();
+
+                    dataBlockVersion.DataBlockParent.LatestVersion = dataBlockVersion;
+                    _context.DataBlockParents.Update(dataBlockVersion.DataBlockParent);
+                    await _context.SaveChangesAsync();
+
                     return await Get(dataBlock.Id);
                 });
         }

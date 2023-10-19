@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     public partial class EES4467_AddDataBlockAndDataBlockVersion : Migration
     {
         private const string MigrationId = "20231004144344";
-        
+
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
@@ -73,7 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "IX_DataBlocks_LatestVersionId",
                 table: "DataBlocks",
                 column: "LatestVersionId",
-                unique: true);
+                unique: true,
+                filter: "[LatestPublishedVersionId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataBlockVersions_ContentBlockId",
@@ -89,9 +90,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 name: "IX_DataBlockVersions_ReleaseId",
                 table: "DataBlockVersions",
                 column: "ReleaseId");
-            
+
             migrationBuilder.SqlFromFile(
-                ContentMigrationsPath, 
+                ContentMigrationsPath,
                 $"{MigrationId}_{nameof(EES4467_AddDataBlockAndDataBlockVersion)}.sql");
 
             migrationBuilder.AddForeignKey(
@@ -109,14 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 principalTable: "DataBlockVersions",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.NoAction);
-            
-            migrationBuilder.AlterColumn<Guid>(
-                name: "LatestVersionId",
-                table: "DataBlocks",
-                nullable: false,
-                oldClrType: typeof(Guid),
-                oldType: "uniqueidentifier",
-                oldNullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
