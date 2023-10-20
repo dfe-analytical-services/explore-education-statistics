@@ -74,8 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
                 OwningPublicationTitle = "Methodology title",
+                OwningPublicationSlug = "methodology-title",
                 Versions = new List<MethodologyVersion>
                 {
                     new()
@@ -191,8 +191,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodology = new Methodology
             {
-                Slug = "methodology-slug",
                 OwningPublicationTitle = "Methodology title",
+                OwningPublicationSlug = "methodology-title",
                 Versions = new List<MethodologyVersion>
                 {
                     new()

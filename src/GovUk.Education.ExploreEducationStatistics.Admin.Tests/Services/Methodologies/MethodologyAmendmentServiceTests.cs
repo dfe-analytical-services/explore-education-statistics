@@ -129,8 +129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Published = DateTime.Today,
                 Methodology = new Methodology
                 {
-                    Slug = "methodology-slug",
-                    OwningPublicationTitle = "Owning Publication Title"
+                    OwningPublicationTitle = "Owning Publication Title",
+                    OwningPublicationSlug = "owning-publication-slug",
                 },
                 MethodologyContent = new MethodologyVersionContent {
                     Content = AsList(new ContentSection

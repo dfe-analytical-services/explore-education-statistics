@@ -333,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             return await _userService.CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
                 .OnSuccessDo(async _ => await ValidateMethodologySlug(
-                    newSlug, oldSlug: methodologyVersionToUpdate.Methodology.Slug))
+                    newSlug, oldSlug: methodologyVersionToUpdate.Slug))
                 .OnSuccess(async methodologyVersion =>
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;

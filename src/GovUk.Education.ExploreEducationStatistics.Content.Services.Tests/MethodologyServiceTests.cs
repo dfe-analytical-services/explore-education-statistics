@@ -405,8 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             // Set up a methodology with a different slug to make sure it's not returned
             var methodology = new Methodology
             {
-                Slug = "some-other-slug",
-                OwningPublicationTitle = "Methodology title"
+                OwningPublicationTitle = "Methodology title",
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
