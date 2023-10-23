@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 public class ImporterLocationCache : IImporterLocationCache
 {
     private readonly ConcurrentDictionary<string, Location> _locations = new();
-    
+
     private readonly ILogger<ImporterLocationCache> _logger;
 
     public ImporterLocationCache(ILogger<ImporterLocationCache> logger)
@@ -27,16 +27,16 @@ public class ImporterLocationCache : IImporterLocationCache
     public void LoadLocations(StatisticsDbContext context)
     {
         _logger.LogInformation("Loading all Locations into cache");
-        
+
         var existingLocations = context
             .Location
             .AsNoTracking()
             .ToList();
-        
+
         existingLocations.ForEach(location =>
         {
             var locationCacheKey = GetLocationCacheKey(location);
-            
+
             var added = _locations.TryAdd(locationCacheKey, location);
 
             if (!added)
@@ -45,7 +45,7 @@ public class ImporterLocationCache : IImporterLocationCache
                                  $"a duplicate Location in the environment's database - {locationCacheKey}");
             }
         });
-        
+
         _logger.LogInformation($"Loaded {_locations.Count} Locations into cache successfully");
     }
 
@@ -53,7 +53,7 @@ public class ImporterLocationCache : IImporterLocationCache
     {
         return _locations[GetLocationCacheKey(locationFromCsv)];
     }
-    
+
     public async Task<Location> GetOrCreateAndCache(Location locationFromCsv, Func<Task<Location>> locationProvider)
     {
         var locationCacheKey = GetLocationCacheKey(locationFromCsv);
@@ -81,7 +81,7 @@ public class ImporterLocationCache : IImporterLocationCache
         {
             throw new ArgumentException($"Location already added to cache - {locationCacheKey}");
         }
-        
+
         return providedLocation;
     }
 
@@ -93,6 +93,7 @@ public class ImporterLocationCache : IImporterLocationCache
         LocalAuthority? localAuthority,
         LocalAuthorityDistrict? localAuthorityDistrict,
         LocalEnterprisePartnership? localEnterprisePartnership,
+        LocalSkillsImprovementPlanArea? localSkillsImprovementPlanArea,
         MayoralCombinedAuthority? mayoralCombinedAuthority,
         MultiAcademyTrust? multiAcademyTrust,
         OpportunityArea? opportunityArea,
@@ -113,6 +114,7 @@ public class ImporterLocationCache : IImporterLocationCache
             localAuthority,
             localAuthorityDistrict,
             localEnterprisePartnership,
+            localSkillsImprovementPlanArea,
             mayoralCombinedAuthority,
             multiAcademyTrust,
             parliamentaryConstituency,
@@ -145,6 +147,7 @@ public class ImporterLocationCache : IImporterLocationCache
             location.LocalAuthority,
             location.LocalAuthorityDistrict,
             location.LocalEnterprisePartnership,
+            location.LocalSkillsImprovementPlanArea,
             location.MayoralCombinedAuthority,
             location.MultiAcademyTrust,
             location.OpportunityArea,

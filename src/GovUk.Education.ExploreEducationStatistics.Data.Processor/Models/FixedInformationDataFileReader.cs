@@ -62,6 +62,12 @@ public class FixedInformationDataFileReader
         [EnumLabelValue("local_enterprise_partnership_name")]
         LepName,
 
+        [EnumLabelValue("lsip_code")]
+        LsipCode,
+
+        [EnumLabelValue("lsip_name")]
+        LsipName,
+
         [EnumLabelValue("mayoral_combined_authority_code")]
         McaCode,
 
@@ -195,6 +201,7 @@ public class FixedInformationDataFileReader
             LocalAuthority = GetLocalAuthority(rowValues),
             LocalAuthorityDistrict = GetLocalAuthorityDistrict(rowValues),
             LocalEnterprisePartnership = GetLocalEnterprisePartnership(rowValues),
+            LocalSkillsImprovementPlanArea = GetLocalSkillsImprovementPlanArea(rowValues),
             MayoralCombinedAuthority = GetMayoralCombinedAuthority(rowValues),
             MultiAcademyTrust = GetMultiAcademyTrust(rowValues),
             OpportunityArea = GetOpportunityArea(rowValues),
@@ -252,6 +259,13 @@ public class FixedInformationDataFileReader
         var code = GetLocationAttributeValue(LocationColumn.LepCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.LepName, rowValues);
         return GetLocationAttributeOrDefault(() => new LocalEnterprisePartnership(code, name), code, name);
+    }
+
+    private LocalSkillsImprovementPlanArea? GetLocalSkillsImprovementPlanArea(IReadOnlyList<string> rowValues)
+    {
+        var code = GetLocationAttributeValue(LocationColumn.LsipCode, rowValues);
+        var name = GetLocationAttributeValue(LocationColumn.LsipName, rowValues);
+        return GetLocationAttributeOrDefault(() => new LocalSkillsImprovementPlanArea(code, name), code, name);
     }
 
     private MayoralCombinedAuthority? GetMayoralCombinedAuthority(IReadOnlyList<string> rowValues)
