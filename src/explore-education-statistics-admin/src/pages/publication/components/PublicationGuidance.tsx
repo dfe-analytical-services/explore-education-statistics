@@ -32,7 +32,7 @@ export function DraftStatusGuidanceModal() {
         <SummaryListItem term={<Tag>Draft Amendment</Tag>}>
           This is a published release that is currently being amended
         </SummaryListItem>
-        <SummaryListItem term={<Tag>Draft In Review</Tag>}>
+        <SummaryListItem term={<Tag>In Review Amendment</Tag>}>
           This is a published release that has been amended and is ready to be
           reviewed prior to publication
         </SummaryListItem>
