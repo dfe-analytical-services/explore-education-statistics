@@ -93,6 +93,7 @@ const PrototypeUnmapFacetModal = ({
       </div>
       <Button
         className="govuk-!-margin-bottom-0 govuk-!-margin-top-4"
+        variant="warning"
         type="button"
         onClick={onSubmit}
       >

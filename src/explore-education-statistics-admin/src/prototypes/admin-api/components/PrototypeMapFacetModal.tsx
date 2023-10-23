@@ -3,6 +3,7 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import Button from '@common/components/Button';
 import {
   Form,
+  FormFieldCheckbox,
   FormFieldRadioGroup,
   FormTextSearchInput,
 } from '@common/components/form';
@@ -11,6 +12,7 @@ import Modal from '@common/components/Modal';
 import { groupBy } from 'lodash';
 import { Formik } from 'formik';
 import React, { useMemo, useState } from 'react';
+import ButtonText from '@common/components/ButtonText';
 import { MapItem } from '../PrototypePrepareNextSubjectPage';
 import styles from './PrototypeMapFacetModal.module.scss';
 
@@ -141,20 +143,37 @@ const PrototypeMapFacetModal = ({
               );
             })}
           </div>
-          <div className="dfe-flex dfe-justify-content--space-between">
-            <Button
-              className="govuk-!-margin-bottom-0 govuk-!-margin-top-4"
-              type="submit"
-            >
-              Update mapping (MINOR update)
-            </Button>
-            <Button
-              variant="warning"
+          <hr className="govuk-!-margin-0" />
+          <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+            <FormFieldCheckbox
+              small
+              name="no-mapping"
+              label={`No ${name} mapping available`}
+              className="govuk-!-margin-top-6"
+            />
+            <div className="dfe-flex dfe-justify-content--space-between dfe-align-items--center">
+              <Button
+                className="govuk-!-margin-bottom-0 govuk-!-margin-top-0"
+                type="submit"
+              >
+                Update {name} mapping
+              </Button>
+              <ButtonText
+                className="govuk-!-margin-left-3"
+                onClick={() => onClose()}
+              >
+                Cancel
+              </ButtonText>
+            </div>
+
+            {/* 
+             <Button
               className="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-!-margin-left-4"
               onClick={() => onSubmit()}
             >
               No mapping available (MAJOR update)
             </Button>
+            */}
           </div>
         </Form>
       </Formik>

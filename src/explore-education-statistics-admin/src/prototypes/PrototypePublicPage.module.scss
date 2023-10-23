@@ -53,9 +53,9 @@
   @include govuk-media-query($from: tablet) {
     grid-template-columns: 1fr 1fr;
   }
-  @include govuk-media-query($from: 1280px) {
+  /*@include govuk-media-query($from: 1280px) {
     grid-template-columns: 1fr 1fr 1fr 1fr;
-  }
+  }*/
 
   &.col3 {
     @include govuk-media-query($from: desktop) {
@@ -496,7 +496,7 @@
 .stickyLinks {
   //border-right: 2px solid $govuk-link-colour;
   margin-right: 1rem;
-  max-width: 250px;
+  min-width: 300px;
   padding-right: 1rem;
 
   @include govuk-media-query($until: tablet) {
@@ -591,4 +591,22 @@
 
 :global(.govuk-pagination__link-title) {
   margin-left: 0.3rem;
+}
+
+.prototypeInPageNavSpacing li {
+  line-height: 1;
+}
+
+.prototypeIntroMastHead {
+  background: govuk-colour('blue');
+  padding: 1rem;
+  margin-bottom: 1rem;
+
+  p {
+    color: govuk-colour('white') !important;
+  }
+}
+
+html {
+  scroll-padding-top: 1rem;
 }

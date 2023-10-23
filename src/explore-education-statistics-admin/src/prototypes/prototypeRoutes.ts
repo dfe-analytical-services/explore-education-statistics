@@ -47,6 +47,7 @@ import PrototypeDashboard2 from './PrototypeDashboard2';
 import PrototypeHomepageDashboard from './PrototypeHomepageDashboard';
 import PrototypeHomepageDashboard2 from './PrototypeHomepageDashboard2';
 import PrototypeReleasePage from './admin-api/PrototypeReleasePage';
+import PrototypeReleaseNav from './PrototypeReleaseNavigation';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -338,6 +339,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Admin dashboard',
     path: '/prototypes/admin-dashboard2',
     component: PrototypeAdminDashboard2,
+  },
+  {
+    name: 'Release navigation',
+    path: '/prototypes/release-nav',
+    component: PrototypeReleaseNav,
   },
 ];
 
