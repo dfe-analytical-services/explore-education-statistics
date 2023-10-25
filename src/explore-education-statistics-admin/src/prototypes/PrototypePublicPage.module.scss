@@ -496,7 +496,7 @@
 .stickyLinks {
   //border-right: 2px solid $govuk-link-colour;
   margin-right: 1rem;
-  min-width: 300px;
+  // min-width: 300px;
   padding-right: 1rem;
 
   @include govuk-media-query($until: tablet) {
@@ -505,7 +505,9 @@
 }
 
 .releaseContainer {
-  display: flex;
+  @include govuk-media-query($from: desktop) {
+    display: flex;
+  }
 }
 
 .releaseMainContent {

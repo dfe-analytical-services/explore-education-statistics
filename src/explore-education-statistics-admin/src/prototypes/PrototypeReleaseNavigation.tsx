@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import PrototypePage from '@admin/prototypes/components/PrototypePage';
 import PrototypeDashboardContent from '@admin/prototypes/components/PrototypeDashboardContent';
+import PrototypeChartExamples from '@admin/prototypes/components/PrototypeChartExamples';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import Tabs from '@common/components/Tabs';
@@ -35,6 +36,7 @@ const PrototypeReleaseData = () => {
         <h1 className="govuk-heading-xl" data-testid="page-title">
           Apprenticeships and traineeships
         </h1>
+        <span className="govuk-tag govuk-!-margin-bottom-3">Latest data</span>
         <div className="dfe-flex">
           <div>
             <div className="govuk-body-l">
@@ -124,8 +126,15 @@ const PrototypeReleaseData = () => {
                           'govuk-link--no-visited-state',
                           styles.prototypeLinkNoUnderline,
                           'govuk-body-s',
+                          {
+                            'govuk-!-font-weight-bold':
+                              navSelected === 'exploreData',
+                          },
                         )}
                         href="#exploreData"
+                        onClick={() => {
+                          setNavSelected('exploreData');
+                        }}
                       >
                         Explore data used in this release
                       </a>
@@ -136,8 +145,14 @@ const PrototypeReleaseData = () => {
                           'govuk-link--no-visited-state',
                           styles.prototypeLinkNoUnderline,
                           'govuk-body-s',
+                          {
+                            'govuk-!-font-weight-bold': navSelected === 'about',
+                          },
                         )}
                         href="#about"
+                        onClick={() => {
+                          setNavSelected('about');
+                        }}
                       >
                         About these statistics
                       </a>
@@ -148,8 +163,15 @@ const PrototypeReleaseData = () => {
                           'govuk-link--no-visited-state',
                           styles.prototypeLinkNoUnderline,
                           'govuk-body-s',
+                          {
+                            'govuk-!-font-weight-bold':
+                              navSelected === 'supplement',
+                          },
                         )}
                         href="#supplement"
+                        onClick={() => {
+                          setNavSelected('supplement');
+                        }}
                       >
                         How to find data and supplementary tables in this
                         release
@@ -253,7 +275,7 @@ const PrototypeReleaseData = () => {
                     </li>
                   </ul>
                   <hr />
-                  <div className="govuk-!-margin-bottom-9">
+                  <div className="govuk-!-margin-bottom-9 govuk-body-s">
                     <a href="#">Back to top</a>
                   </div>
                 </div>
@@ -267,26 +289,6 @@ const PrototypeReleaseData = () => {
                   Release details
                 </h2>
                 <dl className="govuk-summary-list govuk-summary-list--no-border">
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">Status</dt>
-                    <dd className="govuk-summary-list__value">
-                      <span className="govuk-tag">Latest data</span>
-                    </dd>
-                  </div>
-                  <div className="govuk-summary-list__row">
-                    <dt className="govuk-summary-list__key">
-                      Receive updates{' '}
-                    </dt>
-                    <dd className="govuk-summary-list__value">
-                      <a
-                        data-testid="subscription-children-looked-after-in-england-including-adoptions"
-                        href="/subscriptions?slug=children-looked-after-in-england-including-adoptions"
-                        className="govuk-link govuk-link--no-visited-state dfe-print-hidden"
-                      >
-                        <strong>Sign up for email alerts</strong>
-                      </a>
-                    </dd>
-                  </div>
                   <div className="govuk-summary-list__row">
                     <dt className="govuk-summary-list__key">Published</dt>
                     <dd className="govuk-summary-list__value">
@@ -351,6 +353,35 @@ const PrototypeReleaseData = () => {
                           </li>
                         </ol>
                       </Details>
+                    </dd>
+                  </div>
+                  <div className="govuk-summary-list__row">
+                    <dt className="govuk-summary-list__key">
+                      Releases in this series{' '}
+                    </dt>
+                    <dd className="govuk-summary-list__value">
+                      <Details
+                        className="govuk-!-margin-0"
+                        summary="View releases (8)"
+                      >
+                        <ol className="govuk-list">
+                          <li>Test</li>
+                        </ol>
+                      </Details>
+                    </dd>
+                  </div>
+                  <div className="govuk-summary-list__row">
+                    <dt className="govuk-summary-list__key">
+                      Receive updates{' '}
+                    </dt>
+                    <dd className="govuk-summary-list__value">
+                      <a
+                        data-testid="subscription-children-looked-after-in-england-including-adoptions"
+                        href="/subscriptions?slug=children-looked-after-in-england-including-adoptions"
+                        className="govuk-link govuk-link--no-visited-state dfe-print-hidden"
+                      >
+                        <strong>Sign up for email alerts</strong>
+                      </a>
                     </dd>
                   </div>
                 </dl>{' '}
@@ -776,12 +807,10 @@ const PrototypeReleaseData = () => {
                 this section. Three main factors are set out in the graphic
                 below.
               </p>
-              <figure className="image image_resized">
-                <img
-                  alt="Test"
-                  src="https://content.explore-education-statistics.service.gov.uk/api/releases/576fdd7a-e24f-4e71-9c84-050f23ac4a23/images/c8bc1cc0-28f3-47bf-5132-08db81e22266"
-                />
-              </figure>
+
+              <PrototypeChartExamples chartType="barChart" />
+              <PrototypeChartExamples chartType="map" />
+              <PrototypeChartExamples chartType="lineChart" />
             </div>
             <PrototypeDashboardContent />
             <h2 className="govuk-heading-l" id="help">
