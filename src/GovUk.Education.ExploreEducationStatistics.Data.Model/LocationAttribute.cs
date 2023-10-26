@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -122,7 +121,6 @@ public record LocalEnterprisePartnership(string? Code, string? Name) : LocationA
 
 public record LocalSkillsImprovementPlanArea(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public override KeyValuePair<string, string>[] CsvValues
         => new KeyValuePair<string, string>[]
         {
@@ -171,7 +169,6 @@ public record OpportunityArea(string? Code, string? Name) : LocationAttribute(Co
 
 public record ParliamentaryConstituency(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public override KeyValuePair<string, string>[] CsvValues
         => new KeyValuePair<string, string>[]
         {
@@ -196,7 +193,6 @@ public record PlanningArea(string? Code, string? Name) : LocationAttribute(Code,
 
 public record Provider(string? Code, string? Name) : LocationAttribute(Code, Name)
 {
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public override KeyValuePair<string, string>[] CsvValues
         => new KeyValuePair<string, string>[]
         {
