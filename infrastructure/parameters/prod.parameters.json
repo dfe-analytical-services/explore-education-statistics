@@ -87,7 +87,7 @@
       "value": 1000000
     },
     "maxContentDbSizeBytes": {
-      "value": 2147483648
+      "value": 4294967296
     },
     "maxStatsDbSizeBytes": {
       "value": 1020054732800
