@@ -301,11 +301,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         private async Task<Either<ActionResult, MethodologyVersion>> UpdateStatus(
             MethodologyVersion methodologyVersionToUpdate,
-            MethodologyApprovalUpdateRequest request)
+            MethodologyUpdateRequest request)
         {
             if (!request.IsStatusUpdateRequired(methodologyVersionToUpdate))
             {
                 return methodologyVersionToUpdate;
+            }
+
+            if (methodologyVersionToUpdate.Title != request.Title)
+            {
+                throw new ArgumentException(
+                    "Should not update status of MethodologyVersion while simultaneously updating it's title");
             }
 
             return await _methodologyApprovalService
@@ -329,6 +335,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             {
                 // Details unchanged
                 return methodologyVersionToUpdate;
+            }
+
+            if (request.Status == MethodologyApprovalStatus.Approved)
+            {
+                throw new ArgumentException("Should not be updating details of an approved methodology");
             }
 
             return await _userService.CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
@@ -380,6 +391,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     }
 
                     await _context.SaveChangesAsync();
+
+                    // NOTE: No need to invalidate redirects.json cache here as the methodologyVersion is unpublished
 
                     return methodologyVersion;
                 });

@@ -656,6 +656,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+            var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
@@ -674,13 +675,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
                         new List<AllMethodologiesThemeViewModel>()));
 
+            redirectsCacheService.Setup(mock => mock.UpdateRedirects())
+                .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     publishingService: publishingService.Object,
-                    methodologyCacheService: methodologyCacheService.Object);
+                    methodologyCacheService: methodologyCacheService.Object,
+                    redirectsCacheService: redirectsCacheService.Object);
 
                 var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
@@ -688,7 +693,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     contentService, 
                     methodologyVersionRepository, 
                     publishingService, 
-                    methodologyCacheService);
+                    methodologyCacheService,
+                    redirectsCacheService);
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
                 updatedMethodologyVersion.Published.AssertUtcNow();
@@ -1322,7 +1328,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IUserService? userService = null,
             IUserReleaseRoleService? userReleaseRoleService = null,
             IMethodologyCacheService? methodologyCacheService = null,
-            IEmailTemplateService? emailTemplateService = null)
+            IEmailTemplateService? emailTemplateService = null,
+            IRedirectsCacheService? redirectsCacheService = null)
 
         {
             return new(
@@ -1336,7 +1343,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 userService ?? AlwaysTrueUserService(UserId).Object,
                 userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict));
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
+                redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
         }
     }
 }

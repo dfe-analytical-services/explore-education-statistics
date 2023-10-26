@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -122,71 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return methodologyVersions
                 .WhereNotNull()
                 .ToList();
-        }
-
-        // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
-        // where appropriate.  Methodologies always keep track of their owning Publication's titles and slugs for
-        // optimisation purposes.
-        public async Task PublicationTitleOrSlugChanged(Guid publicationId, string originalSlug, string updatedTitle,
-            string updatedSlug)
-        {
-            var ownedMethodology = await _contentDbContext
-                .PublicationMethodologies
-                .Include(pm => pm.Methodology.LatestPublishedVersion)
-                .Include(pm => pm.Methodology.Versions)
-                .Where(pm => pm.PublicationId == publicationId && pm.Owner)
-                .Select(pm => pm.Methodology)
-                .SingleOrDefaultAsync();
-
-            if (ownedMethodology == null)
-            {
-                return;
-            }
-
-            ownedMethodology.OwningPublicationTitle = updatedTitle;
-            ownedMethodology.OwningPublicationSlug = updatedSlug;
-
-            _contentDbContext.Methodologies.Update(ownedMethodology);
-
-            // If slug has changed, we may need a redirect
-            if (originalSlug != updatedSlug)
-            {
-                // A redirect only needed for the LatestPublishedVersion.
-                // Unpublished methodology's don't need a redirect - they're not live.
-                // An unpublished amendment doesn't need a redirect because:
-                // - if it uses OwningPublicationSlug, it is covered by the LatestPublishedVersion redirect created here
-                // - if it uses AlternativeSlug, a redirect would have been created at the time the AlternativeSlug
-                //   was set (and that redirect will become active when that version is published).
-                if (ownedMethodology.LatestPublishedVersion is { AlternativeSlug: null })
-                {
-                    var redirect = new MethodologyRedirect
-                    {
-                        MethodologyVersion = ownedMethodology.LatestPublishedVersion,
-                        Slug = originalSlug,
-                    };
-                    _contentDbContext.MethodologyRedirects.Add(redirect);
-
-                    // NOTE: It's possible we now have two redirects from the same slug. This happens if:
-                    // - An unpublished amendment sets an AlternativeSlug
-                    // - Then the OwningPublicationSlug changes when the LatestPublishedVersion is inheriting it.
-                    // We must delete this, as otherwise if the unpublished version changes its slug again,
-                    // no redirect will be created for the methodology's new slug. (If updating an unpublished
-                    // version's slug multiple times, a redirect is only created the first time - see
-                    // MethodologyUpdate code).
-                    var redirectToRemove = await _contentDbContext.MethodologyRedirects
-                        .Where(mr =>
-                            mr.MethodologyVersionId == ownedMethodology.LatestVersion().Id
-                            && mr.Slug == originalSlug)
-                        .SingleOrDefaultAsync();
-
-                    if (redirectToRemove != null)
-                    {
-                        _contentDbContext.MethodologyRedirects.Remove(redirectToRemove);
-                    }
-                }
-            }
-
-            await _contentDbContext.SaveChangesAsync();
         }
 
         public async Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion)

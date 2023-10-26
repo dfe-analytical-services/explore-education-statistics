@@ -1655,6 +1655,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
 
+                VerifyAllMocks(methodologyVersionRepository);
+
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
                 Assert.Equal("updated-methodology-title", viewModel.Slug);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -1740,6 +1742,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
+
+                VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
                 Assert.Equal("Updated Methodology Title", viewModel.Title);
@@ -1836,6 +1840,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
 
+                VerifyAllMocks(methodologyVersionRepository);
+
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
                 Assert.Equal("test-publication", viewModel.Slug);
                 Assert.Null(viewModel.InternalReleaseNote);
@@ -1927,6 +1933,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
+
+                VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal(methodologyVersion.Id, viewModel.Id);
                 Assert.Equal("test-publication", viewModel.Slug);
@@ -2085,10 +2093,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var request = new MethodologyUpdateRequest
             {
-                LatestInternalReleaseNote = "Approved",
-                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
-                Status = MethodologyApprovalStatus.Approved,
-                Title = "Updated Methodology Title"
+                Title = "Updated Methodology Title",
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -2101,25 +2106,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var methodologyApprovalService = new Mock<IMethodologyApprovalService>();
-                methodologyApprovalService
-                    .Setup(s => s.UpdateApprovalStatus(methodologyVersion.Id, request))
-                    .ReturnsAsync(methodologyVersion);
-
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
                 methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestPublishedVersionBySlug("updated-methodology-title"))
+                    .Setup(mock => mock.GetLatestPublishedVersionBySlug(
+                        "updated-methodology-title"))
                     .ReturnsAsync((MethodologyVersion?)null);
 
                 var service = SetupMethodologyService(
                     context,
-                    methodologyApprovalService: methodologyApprovalService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 await service.UpdateMethodology(methodologyVersion.Id, request);
 
-                // Verify that the call to update the approval status happened.
-                VerifyAllMocks(methodologyApprovalService);
+                VerifyAllMocks(methodologyVersionRepository);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -3218,6 +3217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyApprovalService? methodologyApprovalService = null,
             IMethodologyCacheService? methodologyCacheService = null,
             IUserService? userService = null)
+
         {
             return new(
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
