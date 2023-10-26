@@ -56,13 +56,6 @@
     "theme": "Further education"
   },
   {
-    "publication_summary": "Statistics on children in need in England, including on child protection plans and referrals to and assessments completed by children\u2019s social care services.",
-    "publication_title": "Characteristics of children in need",
-    "published": "27 Oct 2022",
-    "release_type": "National statistics",
-    "theme": "Children's social care"
-  },
-  {
     "publication_summary": "Statistics on the characteristics of early years providers in England.",
     "publication_title": "Childcare and early years provider survey",
     "published": "15 Dec 2022",
@@ -80,6 +73,13 @@
     "publication_summary": "Children accommodated in secure children's homes in England and Wales including approved places, availability, occupancy, sex, age, ethnicity, length of stay",
     "publication_title": "Children accommodated in secure children's homes",
     "published": "18 May 2023",
+    "release_type": "National statistics",
+    "theme": "Children's social care"
+  },
+  {
+    "publication_summary": "Statistics on children in need in England, including on child protection plans and referrals to and assessments completed by children\u2019s social care services.",
+    "publication_title": "Children in need",
+    "published": "26 Oct 2023",
     "release_type": "National statistics",
     "theme": "Children's social care"
   },
@@ -450,7 +450,7 @@
   {
     "publication_summary": "Higher Education initial entrants and estimated percentages of participation. Annual statistics that include student characteristics and provider type.",
     "publication_title": "Participation measures in higher education",
-    "published": "26 Jan 2023",
+    "published": "26 Oct 2023",
     "release_type": "Official statistics",
     "theme": "Higher education"
   },
@@ -513,7 +513,7 @@
   {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "12 Oct 2023",
+    "published": "26 Oct 2023",
     "release_type": "Experimental statistics",
     "theme": "Pupils and schools"
   },
