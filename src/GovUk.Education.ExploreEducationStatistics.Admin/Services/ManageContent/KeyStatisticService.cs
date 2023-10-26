@@ -50,22 +50,16 @@ public class KeyStatisticService : IKeyStatisticService
     {
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanUpdateRelease)
-            .OnSuccess(async _ =>
-                await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
-            .OnSuccess(async dataBlock =>
-                await _context
-                    .ContentBlocks
-                    .AnyAsync(block =>
-                        block.ReleaseId == releaseId
-                        && block.Id == dataBlock.Id)
-                    ? new Either<ActionResult, DataBlock>(dataBlock)
-                      : ValidationActionResult(ContentBlockNotAttachedToRelease)
-            )
-            .OnSuccess(async dataBlock =>
-                await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlock)
+            .OnSuccess(_ => _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
+                query
+                    .Include(dataBlockVersion => dataBlockVersion.ContentBlock) // TODO EES-4467 - can we do this automatically?
+                    .Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
+                                                && dataBlockVersion.ReleaseId == releaseId)))
+            .OnSuccessDo(async dataBlockVersion =>
+                await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlockVersion)
                     ? new Either<ActionResult, Unit>(Unit.Instance)
                     : ValidationActionResult(DataBlockShouldBeUnattached))
-            .OnSuccess(async _ =>
+            .OnSuccess(async dataBlockVersion =>
             {
                 var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
                 keyStatisticDataBlock.ReleaseId = releaseId;
@@ -80,7 +74,11 @@ public class KeyStatisticService : IKeyStatisticService
                 await _context.KeyStatisticsDataBlock.AddAsync(keyStatisticDataBlock);
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStatisticDataBlock);
+                // TODO EES-4467 - this can go when DataBlockVersion replaces DataBlock.
+                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStatisticDataBlock) with
+                {
+                    DataBlockParentId = dataBlockVersion.DataBlockParentId
+                };
             });
     }
 
@@ -130,7 +128,17 @@ public class KeyStatisticService : IKeyStatisticService
 
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStat);
+                // TODO EES-4467 - need to temporarily add DataBlockParentId to KeyStatisticDataBlockViewModel until
+                // DataBlockVersion fully replaces the ContentBlock of type "DataBlock".
+                var dataBlockParentId = (await _context
+                        .DataBlockVersions
+                        .FirstAsync(dataBlockVersion => dataBlockVersion.Id == keyStat.DataBlockId))
+                    .DataBlockParentId;
+
+                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStat) with
+                {
+                    DataBlockParentId = dataBlockParentId
+                };
             });
     }
 

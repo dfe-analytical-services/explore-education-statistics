@@ -36,7 +36,7 @@ export default function EditableKeyStatDataBlock({
     value: dataBlockValues,
     isLoading,
     error,
-  } = useKeyStatQuery(releaseId, keyStat.dataBlockId);
+  } = useKeyStatQuery(releaseId, keyStat.dataBlockParentId);
 
   const handleSubmit = useCallback(
     async (values: KeyStatDataBlockFormValues) => {

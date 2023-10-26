@@ -68,6 +68,9 @@ public class InstanceSetters<T> where T : class
     public InstanceSetters<T> SetDefault(Expression<Func<T, Guid>> property)
         => Set(property, faker => faker.Random.Guid());
 
+    public InstanceSetters<T> SetDefault(Expression<Func<T, Guid?>> property)
+        => Set(property, faker => faker.Random.Guid());
+
     public InstanceSetters<T> SetDefault(Expression<Func<T, string?>> property)
     {
         return Set(

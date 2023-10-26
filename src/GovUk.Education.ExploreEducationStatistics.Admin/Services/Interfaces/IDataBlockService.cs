@@ -17,15 +17,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IDataBlockService
     {
-        Task<Either<ActionResult, DataBlockViewModel>> Create(ReleaseId releaseId, DataBlockCreateViewModel dataBlockCreate);
+        Task<Either<ActionResult, DataBlockVersionViewModel>> Create(ReleaseId releaseId, DataBlockCreateViewModel dataBlockCreate);
 
         Task<Either<ActionResult, Unit>> Delete(ReleaseId releaseId, DataBlockId id);
 
-        Task<Either<ActionResult, DataBlockViewModel>> Get(DataBlockId id);
+        Task<Either<ActionResult, DataBlockVersionViewModel>> Get(DataBlockId id);
 
         Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(ReleaseId releaseId);
 
-        Task<Either<ActionResult, DataBlockViewModel>> Update(DataBlockId id, DataBlockUpdateViewModel dataBlockUpdate);
+        Task<Either<ActionResult, DataBlockVersionViewModel>> Update(DataBlockId id, DataBlockUpdateViewModel dataBlockUpdate);
 
         Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
 
@@ -37,10 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task InvalidateCachedDataBlocks(Guid releaseId);
 
-        Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId);
+        Task<Either<ActionResult, List<DataBlockVersionViewModel>>> GetUnattachedDataBlocks(Guid releaseId);
 
-        Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlock dataBlock);
+        Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlockVersion dataBlockVersion);
 
         Task<List<DataBlock>> ListDataBlocks(Guid releaseId);
+
+        Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
+            Guid releaseId,
+            Guid dataBlockParentId);
     }
 }

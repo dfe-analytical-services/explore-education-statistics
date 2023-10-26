@@ -133,14 +133,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
             DataBlockVersion dataBlockVersion)
         {
-            // TODO EES-4467 - remove this comment?
-            // TODO EES-3363 The CacheableDataBlock parameter type exists to provide the Release and Publication slugs
-            // required in the cache key.
-            // In future we should change the storage path for public cached items to use a directory structure
-            // of Release id's so that we don't need to lookup the Release and Publication to use the slugs.
             return _dataBlockService.GetDataBlockTableResult(
-                dataBlockVersion.ReleaseId, 
-                dataBlockId: dataBlockVersion.ContentBlockId);
+                releaseId: dataBlockVersion.ReleaseId,
+                dataBlockId: dataBlockVersion.Id);
         }
 
         private static FastTrackViewModel BuildFastTrackViewModel(
@@ -150,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             var release = dataBlockVersion.Release;
             var dataBlock = dataBlockVersion.ContentBlock;
-            
+
             return new FastTrackViewModel
             {
                 // TODO EES-4467 - is this the right Id? Probably need to rename it to make it clearer

@@ -57,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseQuery)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccessCombineWith(release => _dataBlockService.GetUnattachedDataBlocks(releaseId))
-                .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
+                .OnSuccessCombineWith(_ => _dataBlockService.GetUnattachedDataBlocks(releaseId))
+                .OnSuccessCombineWith(_ => _releaseFileService.ListAll(
                     releaseId,
                     Ancillary,
                     FileType.Data))
@@ -96,6 +96,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     }
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
+
+                    // TODO EES-4467 - we need to manually add the DataBlockParentIds to the DataBlockVersionViewModels
+                    // in the content hierarchy tree currently, until we've fully replaced the ContentBlock version of
+                    // DataBlock with the new DataBlockVersion (and its equivalent ContentBlock "link" type, as used in
+                    // the EmbedBlock model).
+                    await SetDataBlockParentIds(releaseViewModel);
+
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);
@@ -104,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     // own Boundary Level selection
                     releaseViewModel.Content.ForEach(c => c.Content.ForEach(contentBlock =>
                     {
-                        if (contentBlock is DataBlockViewModel dataBlock)
+                        if (contentBlock is DataBlockVersionViewModel dataBlock)
                         {
                             dataBlock.Charts.ForEach(chart =>
                             {
@@ -122,6 +129,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         UnattachedDataBlocks = unattachedDataBlocks
                     };
                 });
+        }
+
+        // TODO EES-4467 - we need to manually add the DataBlockParentIds to the DataBlockVersionViewModels
+        // in the content hierarchy tree currently, until we've fully replaced the ContentBlock version of
+        // DataBlock with the new DataBlockVersion (and its equivalent ContentBlock "link" type, as used in
+        // the EmbedBlock model).
+        private async Task SetDataBlockParentIds(ManageContentPageViewModel.ReleaseViewModel releaseViewModel)
+        {
+            var dataBlockVersionToParentIds = await _contentDbContext
+                .DataBlockVersions
+                .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseViewModel.Id)
+                .ToDictionaryAsync(
+                    dataBlockVersion => dataBlockVersion.Id,
+                    dataBlockVersion => dataBlockVersion.DataBlockParentId);
+
+            var mainContentDataBlockVersions = releaseViewModel
+                .Content
+                .SelectMany(contentSection => contentSection.Content)
+                .OfType<DataBlockVersionViewModel>();
+
+            var keyStatDataBlockVersions = releaseViewModel
+                .KeyStatistics
+                .OfType<KeyStatisticDataBlockViewModel>()
+                .Select(keyStatDataBlock => keyStatDataBlock);
+
+            var keyStatSecondaryDataBlockVersions = releaseViewModel
+                .KeyStatisticsSecondarySection
+                .Content
+                .OfType<DataBlockVersionViewModel>();
+
+            var headlineDataBlockVersions = releaseViewModel
+                .HeadlinesSection
+                .Content
+                .OfType<DataBlockVersionViewModel>();
+
+            var allDataBlockVersionViewModels = mainContentDataBlockVersions
+                .Concat(keyStatSecondaryDataBlockVersions)
+                .Concat(headlineDataBlockVersions);
+
+            allDataBlockVersionViewModels.ForEach(dataBlockVersionViewModel =>
+                dataBlockVersionViewModel.DataBlockParentId = dataBlockVersionToParentIds[dataBlockVersionViewModel.Id]);
+
+            keyStatDataBlockVersions.ForEach(keyStatDataBlockVersionViewModel =>
+                keyStatDataBlockVersionViewModel.DataBlockParentId =
+                    dataBlockVersionToParentIds[keyStatDataBlockVersionViewModel.DataBlockId]);
         }
 
         private IQueryable<Release> HydrateReleaseQuery(IQueryable<Release> queryable)

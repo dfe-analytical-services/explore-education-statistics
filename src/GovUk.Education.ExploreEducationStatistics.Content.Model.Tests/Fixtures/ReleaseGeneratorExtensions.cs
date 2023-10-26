@@ -13,22 +13,22 @@ public static class ReleaseGeneratorExtensions
         => fixture.Generator<Release>().WithDefaults();
 
     public static Generator<Release> WithDefaults(this Generator<Release> generator)
-        => generator.ForInstance(d => d.SetDefaults());
+        => generator.ForInstance(release => release.SetDefaults());
 
     public static Generator<Release> WithApprovalStatus(
         this Generator<Release> generator,
         ReleaseApprovalStatus status)
-        => generator.ForInstance(d => d.SetApprovalStatus(status));
+        => generator.ForInstance(release => release.SetApprovalStatus(status));
 
     public static Generator<Release> WithPublished(
         this Generator<Release> generator,
         DateTime published)
-        => generator.ForInstance(d => d.SetPublished(published));
+        => generator.ForInstance(release => release.SetPublished(published));
 
     public static Generator<Release> WithPublishScheduled(
         this Generator<Release> generator,
         DateTime publishScheduled)
-        => generator.ForInstance(d => d.SetPublishScheduled(publishScheduled));
+        => generator.ForInstance(release => release.SetPublishScheduled(publishScheduled));
 
     public static Generator<Release> WithApprovalStatuses(
         this Generator<Release> generator,
@@ -43,12 +43,12 @@ public static class ReleaseGeneratorExtensions
     public static Generator<Release> WithDataBlockVersions(
         this Generator<Release> generator,
         IEnumerable<DataBlockVersion> dataBlockVersions)
-        => generator.ForInstance(d => d.SetDataBlockVersions(dataBlockVersions));
+        => generator.ForInstance(release => release.SetDataBlockVersions(dataBlockVersions));
 
     public static Generator<Release> WithContent(
         this Generator<Release> generator,
         IEnumerable<ContentSection> content)
-        => generator.ForInstance(d => d.SetContentBlocks(content));
+        => generator.ForInstance(release => release.SetContentBlocks(content));
 
     public static InstanceSetters<Release> SetDefaults(this InstanceSetters<Release> setters)
         => setters
@@ -61,25 +61,39 @@ public static class ReleaseGeneratorExtensions
     public static InstanceSetters<Release> SetApprovalStatus(
         this InstanceSetters<Release> setters,
         ReleaseApprovalStatus status)
-        => setters.Set(d => d.ApprovalStatus, status);
+        => setters.Set(release => release.ApprovalStatus, status);
 
     public static InstanceSetters<Release> SetDataBlockVersions(
         this InstanceSetters<Release> setters,
         IEnumerable<DataBlockVersion> dataBlockVersions)
-        => setters.Set(d => d.DataBlockVersions, dataBlockVersions.ToList());
+    {
+        var dataBlockVersionsList = dataBlockVersions.ToList();
+        return setters
+            .Set(release => release.DataBlockVersions, dataBlockVersionsList.ToList())
+            .Set((_, release, _) =>
+            {
+                dataBlockVersionsList.ForEach(dataBlockVersion =>
+                {
+                    dataBlockVersion.Release = release;
+                    dataBlockVersion.ReleaseId = release.Id;
+                    dataBlockVersion.ContentBlock.Release = release;
+                    dataBlockVersion.ContentBlock.ReleaseId = release.Id;
+                });
+            });
+    }
 
     public static InstanceSetters<Release> SetContentBlocks(
         this InstanceSetters<Release> setters,
         IEnumerable<ContentSection> content)
-        => setters.Set(d => d.Content, content.ToList());
+        => setters.Set(release => release.Content, content.ToList());
 
     public static InstanceSetters<Release> SetPublished(
         this InstanceSetters<Release> setters,
         DateTime published)
-        => setters.Set(d => d.Published, published);
+        => setters.Set(release => release.Published, published);
 
     public static InstanceSetters<Release> SetPublishScheduled(
         this InstanceSetters<Release> setters,
         DateTime publishScheduled)
-        => setters.Set(d => d.PublishScheduled, publishScheduled);
+        => setters.Set(release => release.PublishScheduled, publishScheduled);
 }

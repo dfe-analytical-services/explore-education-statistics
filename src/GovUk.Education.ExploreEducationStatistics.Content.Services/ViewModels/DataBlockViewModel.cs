@@ -12,6 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
     {
         public Guid Id { get; set; }
 
+        // TODO EES-4467 - unit test
+        public Guid DataBlockParentId { get; set; }
+
         public int Order { get; set; }
 
         public string Heading { get; set; }

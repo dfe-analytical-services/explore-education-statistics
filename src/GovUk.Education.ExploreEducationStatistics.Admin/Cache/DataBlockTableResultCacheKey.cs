@@ -13,10 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
         private Guid ReleaseId { get; }
         private Guid DataBlockId { get; }
 
-        public DataBlockTableResultCacheKey(DataBlock dataBlock)
+        public DataBlockTableResultCacheKey(DataBlockVersion dataBlockVersion)
         {
-            ReleaseId = dataBlock.ReleaseId;
-            DataBlockId = dataBlock.Id;
+            ReleaseId = dataBlockVersion.ReleaseId;
+            DataBlockId = dataBlockVersion.Id;
         }
 
         public IBlobContainer Container => PrivateContent;

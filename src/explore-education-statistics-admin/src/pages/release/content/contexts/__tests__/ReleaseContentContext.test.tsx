@@ -637,7 +637,7 @@ describe('ReleaseContentContext', () => {
     const newKeyStat: KeyStatisticDataBlock = {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-4',
-      dataBlockId: 'dataBlock-0',
+      dataBlockParentId: 'dataBlock-0',
       trend: 'keyStat-4 trend',
       guidanceTitle: 'keyStat-4 guidanceTitle',
       guidanceText: 'keyStat-4 guidanceText',

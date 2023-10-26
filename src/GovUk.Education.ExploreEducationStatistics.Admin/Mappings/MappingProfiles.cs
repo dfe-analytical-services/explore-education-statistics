@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using ContactViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContactViewModel;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
-using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
 using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
@@ -217,7 +216,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Comments,
                     m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));
 
-            CreateMap<DataBlock, DataBlockViewModel>();
+            // TODO EES-4467 - at the moment we need to retain this mapping as well as
+            // "CreateMap<DataBlockVersion, DataBlockVersionViewModel>()" solely because the
+            // ManageContentPageController needs to serialise the entire ContentSection -> ContentBlock hierarchy
+            // into a ReleaseViewModel, and the ContentSections only contain links to DataBlocks and not
+            // DataBlockVersions currently.
+            CreateMap<DataBlock, DataBlockVersionViewModel>();
+
+            CreateMap<DataBlockVersion, DataBlockVersionViewModel>();
 
             CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
                 .ForMember(dest => dest.Title,

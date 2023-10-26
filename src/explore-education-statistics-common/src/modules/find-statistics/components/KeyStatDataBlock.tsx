@@ -6,7 +6,7 @@ import KeyStat from '@common/modules/find-statistics/components/KeyStat';
 export interface KeyStatDataBlockProps {
   children?: ReactNode;
   releaseId: string;
-  dataBlockId: string;
+  dataBlockParentId: string;
   trend?: string;
   guidanceTitle?: string;
   guidanceText?: string;
@@ -16,7 +16,7 @@ export interface KeyStatDataBlockProps {
 export default function KeyStatDataBlock({
   children,
   releaseId,
-  dataBlockId,
+  dataBlockParentId,
   trend,
   guidanceTitle = 'Help',
   guidanceText,
@@ -26,7 +26,7 @@ export default function KeyStatDataBlock({
     value: dataBlock,
     isLoading,
     error,
-  } = useKeyStatQuery(releaseId, dataBlockId);
+  } = useKeyStatQuery(releaseId, dataBlockParentId);
 
   const title = dataBlock?.title;
   const statistic = dataBlock?.value;

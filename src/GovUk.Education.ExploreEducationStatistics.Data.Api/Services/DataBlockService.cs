@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -41,6 +42,19 @@ public class DataBlockService : IDataBlockService
             .OnSuccess(_userService.CheckCanViewRelease)
             .OnSuccess(() => CheckDataBlockExists(releaseId, dataBlockId))
             .OnSuccess(dataBlock => _tableBuilderService.Query(releaseId, dataBlock.Query));
+    }
+
+    public Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
+        Guid releaseId,
+        Guid dataBlockParentId)
+    {
+        return _contentDbContext
+            .DataBlockVersions
+            .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
+            .Include(dataBlockVersion => dataBlockVersion.Release)
+            .SingleAsync(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
+                                             && dataBlockVersion.DataBlockParentId == dataBlockParentId)!
+            .OrNotFound();
     }
 
     private async Task<Either<ActionResult, DataBlock>> CheckDataBlockExists(Guid releaseId, Guid dataBlockId)

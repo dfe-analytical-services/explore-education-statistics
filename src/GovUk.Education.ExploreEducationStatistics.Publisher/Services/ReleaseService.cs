@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -64,13 +65,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Last();
         }
 
-        public async Task SetPublishedDate(Guid releaseId, DateTime actualPublishedDate)
+        public async Task CompletePublishing(Guid releaseId, DateTime actualPublishedDate)
         {
             var release = await _contentDbContext.Releases
                 .SingleAsync(r => r.Id == releaseId);
 
             _contentDbContext.Releases.Update(release);
             release.Published = await _releaseRepository.GetPublishedDate(release.Id, actualPublishedDate);
+
+            // TODO EES-4467 - unit test here
+            var dataBlockParents = _contentDbContext
+                .DataBlockVersions
+                .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId)
+                .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .ThenInclude(dataBlockParent => dataBlockParent.LatestVersion)
+                .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .ToList();
+
+            dataBlockParents.ForEach(dataBlockParent =>
+                dataBlockParent.LatestPublishedVersion = dataBlockParent.LatestVersion);
+
+            _contentDbContext.DataBlockParents.UpdateRange(dataBlockParents);
 
             await _contentDbContext.SaveChangesAsync();
         }

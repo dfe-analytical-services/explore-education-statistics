@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("LatestPublishedVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("LatestVersionId")
+                    b.Property<Guid?>("LatestVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -189,7 +189,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasFilter("[LatestPublishedVersionId] IS NOT NULL");
 
                     b.HasIndex("LatestVersionId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[LatestVersionId] IS NOT NULL");
 
                     b.ToTable("DataBlocks", (string)null);
                 });
@@ -200,12 +201,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ContentBlockId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
-
-                    b.Property<Guid>("DataBlockId")
-                        .HasColumnType("uniqueidentifier")
-                        .HasColumnName("ContentBlockId");
 
                     b.Property<Guid>("DataBlockParentId")
                         .HasColumnType("uniqueidentifier")
@@ -225,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DataBlockId");
+                    b.HasIndex("ContentBlockId");
 
                     b.HasIndex("DataBlockParentId");
 
@@ -357,6 +357,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("DataBlockId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("DataBlockParentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -382,6 +385,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasIndex("DataBlockId")
                         .IsUnique();
+
+                    b.HasIndex("DataBlockParentId");
 
                     b.HasIndex("ReleaseId");
 
@@ -1423,9 +1428,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", "LatestVersion")
                         .WithOne()
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "LatestVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "LatestVersionId");
 
                     b.Navigation("LatestPublishedVersion");
 
@@ -1434,9 +1437,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlock", "DataBlock")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlock", "ContentBlock")
                         .WithMany()
-                        .HasForeignKey("DataBlockId")
+                        .HasForeignKey("ContentBlockId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1447,12 +1450,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
-                        .WithMany()
+                        .WithMany("DataBlockVersions")
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DataBlock");
+                    b.Navigation("ContentBlock");
 
                     b.Navigation("DataBlockParent");
 
@@ -1508,6 +1511,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "DataBlockParent")
+                        .WithMany()
+                        .HasForeignKey("DataBlockParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", "Release")
                         .WithMany("FeaturedTables")
                         .HasForeignKey("ReleaseId")
@@ -1521,6 +1530,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("CreatedBy");
 
                     b.Navigation("DataBlock");
+
+                    b.Navigation("DataBlockParent");
 
                     b.Navigation("Release");
 
@@ -2054,6 +2065,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Release", b =>
                 {
                     b.Navigation("Content");
+
+                    b.Navigation("DataBlockVersions");
 
                     b.Navigation("FeaturedTables");
 

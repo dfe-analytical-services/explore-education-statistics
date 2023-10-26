@@ -14,13 +14,13 @@ interface KeyStatResult {
 
 export default function useKeyStatQuery(
   releaseId: string,
-  dataBlockId: string,
+  dataBlockParentId: string,
 ): AsyncRetryState<KeyStatResult> {
   const {
     value: tableData,
     setState: setTableQueryState,
     ...tableQueryState
-  } = useTableQuery(releaseId, dataBlockId);
+  } = useTableQuery(releaseId, dataBlockParentId);
 
   const [value, setValue] = useState<KeyStatResult>();
 

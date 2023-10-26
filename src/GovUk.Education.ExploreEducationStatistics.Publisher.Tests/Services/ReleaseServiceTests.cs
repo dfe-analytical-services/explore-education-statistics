@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext);
-                await service.SetPublishedDate(release.Id, actualPublishedDate);
+                await service.CompletePublishing(release.Id, actualPublishedDate);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -271,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext);
-                await service.SetPublishedDate(release.Id, DateTime.UtcNow);
+                await service.CompletePublishing(release.Id, DateTime.UtcNow);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext);
-                await service.SetPublishedDate(release.Id, actualPublishedDate);
+                await service.CompletePublishing(release.Id, actualPublishedDate);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

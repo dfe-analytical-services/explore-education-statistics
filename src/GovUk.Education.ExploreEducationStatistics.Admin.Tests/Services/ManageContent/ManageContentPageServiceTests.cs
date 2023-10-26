@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var unattachedDataBlocks = new List<DataBlockViewModel>
+            var unattachedDataBlocks = new List<DataBlockVersionViewModel>
             {
                 new()
             };
@@ -450,7 +450,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             dataBlockService.Setup(mock =>
                     mock.GetUnattachedDataBlocks(release.Id))
-                .ReturnsAsync(new List<DataBlockViewModel>());
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
 
             methodologyVersionRepository.Setup(mock =>
                     mock.GetLatestVersionByPublication(publication.Id))
@@ -535,7 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var unattachedDataBlocks = new List<DataBlockViewModel>
+            var unattachedDataBlocks = new List<DataBlockVersionViewModel>
             {
                 new()
             };

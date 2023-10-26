@@ -135,22 +135,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         {
             var replacements = new Dictionary<string, MatchEvaluator>();
 
-            // Bit cheeky to re-use the clone context, but it's a nice
-            // easy way to access and modify all of the content blocks
-            // that we used during the clone.
-            allClonedBlocks
-                .ForEach(
-                    pair =>
-                    {
-                        switch (pair)
-                        {
-                            case { Key: DataBlock oldDataBlock, Value: DataBlock newDataBlock }:
-                                replacements[$"/fast-track/{oldDataBlock.Id}"] = _ => $"/fast-track/{newDataBlock.Id}";
-                                break;
-                        }
-                    }
-                );
-
             var regex = new Regex(
                 string.Join('|', replacements.Keys.Append(ContentFilterUtils.CommentsFilterPattern)),
                 RegexOptions.Compiled

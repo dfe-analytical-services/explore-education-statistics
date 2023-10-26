@@ -11,9 +11,13 @@ using JsonKnownTypes;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     [JsonKnownThisType(nameof(DataBlock))]
-    public record DataBlockViewModel : IContentBlockViewModel
+    public record DataBlockVersionViewModel : IContentBlockViewModel
     {
         public Guid Id { get; init; }
+
+        // TODO EES-4467 - this can get replaced with "init" when the workaround in ManageContentPageService for
+        // manually setting DataBlockParentId is removed.
+        public Guid DataBlockParentId { get; set; }
 
         public List<CommentViewModel> Comments { get; init; } = new();
 
@@ -22,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Name { get; init; } = string.Empty;
 
         public string? DataSetName { get; set; }
-        
+
         public Guid DataSetId { get; set; }
 
         public string? HighlightName { get; set; }

@@ -218,6 +218,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             // Assert that we have both DataBlocks on the amendment.
             Assert.Equal(2, amendment.DataBlockVersions.Count);
 
+            // EES-4467 - assert that the DataBlockVersions and ContentBlocks of type "DataBlock" have matching Ids,
+            // for easier migration in the future.
+            amendment.DataBlockVersions.ForEach(dataBlockVersion =>
+                Assert.Equal(dataBlockVersion.Id, dataBlockVersion.ContentBlockId));
+
             var amendmentDataBlockStandaloneParent = amendment.DataBlockVersions[0].DataBlockParent;
             Assert.Equal(originalDataBlockStandaloneParent.Id, amendmentDataBlockStandaloneParent.Id);
             AssertExistingDataBlockVersionCopiedOk(

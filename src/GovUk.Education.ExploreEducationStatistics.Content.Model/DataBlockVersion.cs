@@ -141,7 +141,10 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
         clonedContentBlock.Release = amendment;
 
         var copy = (MemberwiseClone() as DataBlockVersion)!;
-        copy.Id = Guid.NewGuid();
+
+        // Keep a one-to-one relationship between DataBlockVersions and ContentBlocks of type "DataBlock".
+        // This will make it easier to migrate DataBlocks out of the ContentBlock table in the future stages.
+        copy.Id = clonedContentBlock.Id;
         copy.Created = DateTime.UtcNow;
         copy.Updated = null;
         copy.Published = null;

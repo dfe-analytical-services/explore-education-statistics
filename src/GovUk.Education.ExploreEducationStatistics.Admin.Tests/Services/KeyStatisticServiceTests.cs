@@ -48,8 +48,8 @@ public class KeyStatisticServiceTests
         {
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
             dataBlockService.Setup(s => s.GetUnattachedDataBlocks(release.Id))
-                .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
-                    new List<DataBlockViewModel>
+                .ReturnsAsync(new Either<ActionResult, List<DataBlockVersionViewModel>>(
+                    new List<DataBlockVersionViewModel>
                     {
                         new()
                         {
@@ -137,8 +137,8 @@ public class KeyStatisticServiceTests
         {
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
             dataBlockService.Setup(s => s.GetUnattachedDataBlocks(release.Id))
-                .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
-                    new List<DataBlockViewModel>
+                .ReturnsAsync(new Either<ActionResult, List<DataBlockVersionViewModel>>(
+                    new List<DataBlockVersionViewModel>
                     {
                         new()
                         {
@@ -299,8 +299,8 @@ public class KeyStatisticServiceTests
         {
             var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
             dataBlockService.Setup(s => s.GetUnattachedDataBlocks(release.Id))
-                .ReturnsAsync(new Either<ActionResult, List<DataBlockViewModel>>(
-                    new List<DataBlockViewModel>
+                .ReturnsAsync(new Either<ActionResult, List<DataBlockVersionViewModel>>(
+                    new List<DataBlockVersionViewModel>
                     {
                         new(),
                         new(),

@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
     {
         public ReleaseViewModel Release { get; set; } = new();
 
-        public List<DataBlockViewModel> UnattachedDataBlocks { get; set; } = new();
+        public List<DataBlockVersionViewModel> UnattachedDataBlocks { get; set; } = new();
 
         public class ReleaseViewModel
         {

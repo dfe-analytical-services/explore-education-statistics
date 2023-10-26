@@ -1,7 +1,13 @@
--- Add appropriate permissions to the new DataBlocks and DataBlockVersions table for the "data"
--- contained database user that is used by the Data API.
+-- Add appropriate permissions to the new DataBlocks and DataBlockVersions table for the
+-- contained database users that are in use by the Content API, Data API and Publisher Function.
+GRANT SELECT ON DataBlocks TO [content];
+GRANT SELECT ON DataBlockVersions TO [content];
 GRANT SELECT ON DataBlocks TO [data];
 GRANT SELECT ON DataBlockVersions TO [data];
+GRANT SELECT ON DataBlocks TO [publisher];
+GRANT SELECT ON DataBlockVersions TO [publisher];
+GRANT UPDATE ON DataBlocks TO [publisher];
+GRANT UPDATE ON DataBlockVersions TO [publisher];
 
 -- As we're migrating historical data whereby we do not have the means to reliably determine a
 -- version, we'll be treating each existing ContentBLock of type "DataBlock" as an individual

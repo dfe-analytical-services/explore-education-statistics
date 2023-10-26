@@ -56,7 +56,7 @@ export const testEditableRelease: EditableRelease = {
     {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-1',
-      dataBlockId: 'dataBlock-1',
+      dataBlockParentId: 'dataBlock-1',
       trend: 'keyStat-1 trend',
       order: 0,
       created: '2023-01-01',
@@ -75,7 +75,7 @@ export const testEditableRelease: EditableRelease = {
     {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-3',
-      dataBlockId: 'dataBlock-2',
+      dataBlockParentId: 'dataBlock-2',
       guidanceText: 'KeyStat-3 guidanceText',
       order: 2,
       created: '2023-01-03',

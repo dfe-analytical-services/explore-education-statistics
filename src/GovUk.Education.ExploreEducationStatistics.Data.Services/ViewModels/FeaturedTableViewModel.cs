@@ -9,4 +9,5 @@ public record FeaturedTableViewModel(
     string? Description,
     Guid SubjectId,
     Guid DataBlockId,
+    Guid DataBlockParentId,
     int Order);
