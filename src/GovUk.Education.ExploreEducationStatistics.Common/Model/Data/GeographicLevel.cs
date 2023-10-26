@@ -1,10 +1,8 @@
 #nullable enable
-using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 {
-    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public enum GeographicLevel
     {
         [EnumLabelValue("English devolved area", "EDA")]

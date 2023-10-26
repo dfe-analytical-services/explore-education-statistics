@@ -203,6 +203,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasIndex(location => location.LocalEnterprisePartnership_Code);
 
             modelBuilder.Entity<Location>()
+                .HasIndex(location => location.LocalSkillsImprovementPlanArea_Code);
+
+            modelBuilder.Entity<Location>()
                 .HasIndex(location => location.MultiAcademyTrust_Code);
 
             modelBuilder.Entity<Location>()

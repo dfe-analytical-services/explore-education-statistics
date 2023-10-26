@@ -35,6 +35,11 @@ const locationLevelsMap: Dictionary<{
     plural: 'Local Enterprise Partnerships',
     prefix: 'a',
   },
+  localSkillsImprovementPlanArea: {
+    label: 'Local Skills Improvement Plan Area',
+    plural: 'Local Skills Improvement Plan Areas',
+    prefix: 'a',
+  },
   mayoralCombinedAuthority: {
     label: 'Mayoral Combined Authority',
     plural: 'Mayoral Combined Authorities',
