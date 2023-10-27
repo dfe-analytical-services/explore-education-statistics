@@ -415,7 +415,12 @@ Verify that the amended methodology is visible on the public methodologies page
     user scrolls down    400
     user checks page contains link with text and url
     ...    ${PUBLICATION_NAME} - Amended methodology
-    ...    ${PUBLIC_METHODOLOGY_URL_ENDING}
+    ...    ${PUBLIC_METHODOLOGY_URL_ENDING}-amended-methodology    # Slug has changed
+
+Validate methodology redirect works
+    go to   %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
+    user waits until h1 is visible   ${PUBLICATION_NAME} - Amended methodology
+    user checks url contains  %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-amended-methodology
 
 Schedule a methodology amendment to be published with a release amendment
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}
