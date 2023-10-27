@@ -242,7 +242,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<DataBlockVersion>(
                     query => query
                         .Include(dataBlockVersion => dataBlockVersion.Release)
-                        .Include(dataBlockVersion => dataBlockVersion.ContentSection)
+                        .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
+                        .ThenInclude(dataBlock => dataBlock.ContentSection)
                         .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
                                                    && dataBlockVersion.Id == dataBlockId)
                 )
@@ -418,6 +419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return _context
                 .DataBlockVersions
+                .Include(dataBlockVersion => dataBlockVersion.ContentBlock) // TODO EES-4467 - auto-include
                 .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId)
                 // Pull these results into memory so that the Query field (which is JSON) can be queried.
                 .ToList()

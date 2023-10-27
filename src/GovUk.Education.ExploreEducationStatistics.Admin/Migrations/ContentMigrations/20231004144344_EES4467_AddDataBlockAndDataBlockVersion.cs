@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "DataBlocks",
                 column: "LatestVersionId",
                 unique: true,
-                filter: "[LatestPublishedVersionId] IS NOT NULL");
+                filter: "[LatestVersionId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataBlockVersions_ContentBlockId",
