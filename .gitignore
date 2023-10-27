@@ -35,7 +35,6 @@ src/explore-education-statistics-frontend/*.xml
 **/test-results/
 .pabotsuitenames
 /tests/robot-tests/backup-data
-/tests/robot-tests/webdriver
 /tests/robot-tests/.env.*
 /tests/robot-tests/UI-test-report.zip
 !/tests/robot-tests/.env.example
@@ -43,7 +42,6 @@ src/explore-education-statistics-frontend/*.xml
 /tests/robot-tests/.pabotsuitenames
 /tests/robot-tests/geckodriver.log
 /tests/robot-tests/debug.log
-**/*/chromedriver
 **/*/jwt
 **/coverage
 /tests/robot-tests/scripts/permalink_snapshots/invalid-permalinks.csv
