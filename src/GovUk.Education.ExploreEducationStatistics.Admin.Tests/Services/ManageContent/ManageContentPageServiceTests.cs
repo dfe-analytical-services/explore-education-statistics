@@ -88,15 +88,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 TimePeriodCoverage = AcademicYear,
                 Type = ReleaseType.OfficialStatistics,
                 Updates = new List<Update>(),
-                KeyStatistics = new List<KeyStatistic>
+            };
+
+            var unattachedDataBlockParent = new DataBlockParent
+            {
+                LatestPublishedVersion = new DataBlockVersion
                 {
-                    new KeyStatisticText { Order = 1 },
-                    new KeyStatisticDataBlock
-                    {
-                        Order = 0,
-                        DataBlockId = Guid.NewGuid(),
-                    },
-                },
+                    ReleaseId = release.Id,
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var keyStatDataBlockParent = new DataBlockParent
+            {
+                LatestPublishedVersion = new DataBlockVersion
+                {
+                    ReleaseId = release.Id,
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            release.KeyStatistics = new List<KeyStatistic>
+            {
+                new KeyStatisticText {Order = 1},
+                new KeyStatisticDataBlock
+                {
+                    Order = 0,
+                    DataBlockId = keyStatDataBlockParent.LatestPublishedVersion!.Id
+                }
             };
 
             var otherRelease = new Release
@@ -114,6 +133,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             var unattachedDataBlocks = new List<DataBlockVersionViewModel>
             {
                 new()
+                {
+                    Id = unattachedDataBlockParent.LatestPublishedVersion!.Id
+                }
             };
 
             var ancillaryFileId = Guid.NewGuid();
@@ -171,8 +193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddRangeAsync(release, otherRelease);
+                await contentDbContext.Releases.AddRangeAsync(release, otherRelease);
+                await contentDbContext.DataBlockParents.AddRangeAsync(unattachedDataBlockParent, keyStatDataBlockParent);
                 await contentDbContext.ContentSections.AddRangeAsync(
                     new ContentSection
                     {
@@ -195,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         Type = ContentSectionType.RelatedDashboards
                     },
                     genericContentSection);
-                
+
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -535,11 +557,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var unattachedDataBlocks = new List<DataBlockVersionViewModel>
-            {
-                new()
-            };
-
             var summaryContentSection = new ContentSection
             {
                 Release = release,
@@ -592,7 +609,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 await contentDbContext.AddRangeAsync(release);
                 await contentDbContext.ContentSections.AddRangeAsync(
                     summaryContentSection, genericContentSection);
-                
+
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -602,7 +619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             dataBlockService.Setup(mock =>
                     mock.GetUnattachedDataBlocks(release.Id))
-                .ReturnsAsync(unattachedDataBlocks);
+                .ReturnsAsync(new List<DataBlockVersionViewModel>());
 
             methodologyVersionRepository.Setup(mock =>
                     mock.GetLatestVersionByPublication(publication.Id))
@@ -629,8 +646,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
-
-                Assert.Equal(unattachedDataBlocks, viewModel.UnattachedDataBlocks);
 
                 var contentRelease = viewModel.Release;
 

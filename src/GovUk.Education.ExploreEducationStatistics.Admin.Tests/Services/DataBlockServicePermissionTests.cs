@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Id = Guid.NewGuid()
         };
 
-        private static readonly DataBlock DataBlock = new()
+        private static readonly DataBlockVersion DataBlockVersion = new()
         {
             Id = Guid.NewGuid(),
             Release = Release
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.Get(DataBlock.Id);
+                        return service.Get(DataBlockVersion.Id);
                     });
         }
 
@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.GetDeletePlan(Release.Id, DataBlock.Id);
+                        return service.GetDeletePlan(Release.Id, DataBlockVersion.Id);
                     });
         }
 
@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.Update(DataBlock.Id, new DataBlockUpdateViewModel());
+                        return service.Update(DataBlockVersion.Id, new DataBlockUpdateViewModel());
                     });
         }
 
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = BuildDataBlockService(userService: userService.Object);
-                        return service.Delete(Release.Id, DataBlock.Id);
+                        return service.Delete(Release.Id, DataBlockVersion.Id);
                     });
         }
 
@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, Release.Id, Release);
-            MockUtils.SetupCall<ContentDbContext, ContentBlock>(persistenceHelper, DataBlock);
+            MockUtils.SetupCall<ContentDbContext, DataBlockVersion>(persistenceHelper, DataBlockVersion);
             return persistenceHelper;
         }
 

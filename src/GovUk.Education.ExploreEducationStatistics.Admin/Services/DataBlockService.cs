@@ -129,9 +129,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () => await _releaseFileService.Delete(releaseId, id));
         }
 
-        public async Task<Either<ActionResult, DataBlockVersionViewModel>> Get(Guid id)
+        public async Task<Either<ActionResult, DataBlockVersionViewModel>> Get(Guid dataBlockVersionId)
         {
-            return await GetDataBlockVersion(id)
+            return await GetDataBlockVersion(dataBlockVersionId)
                 .OnSuccessDo(dataBlockVersion => _userService.CheckCanViewRelease(dataBlockVersion.Release))
                 .OnSuccess(async dataBlockVersion =>
                 {
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     new DeleteDataBlockPlan
                     {
                         ReleaseId = releaseId,
-                        DependentDataBlocks = new List<DependentDataBlock>()
+                        DependentDataBlocks = new List<DependentDataBlock>
                         {
                             await CreateDependentDataBlock(dataBlockVersion)
                         }
@@ -268,8 +268,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .DataBlockVersions
                 .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
                 .Include(dataBlockVersion => dataBlockVersion.Release)
-                .SingleAsync(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
-                                                 && dataBlockVersion.DataBlockParentId == dataBlockParentId)!
+                .SingleOrDefaultAsync(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
+                                                          && dataBlockVersion.DataBlockParentId == dataBlockParentId)
                 .OrNotFound();
         }
 
@@ -389,17 +389,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(dataBlockVersion => blockIdsToDelete.Contains(dataBlockVersion.Id))
                 .ToListAsync();
 
-            // If this DataBlockVersion is the only version under its DataBlockParent (i.e. it's the LatestVersion but
-            // there isn't another already-published version), also delete its parent.
-            // TODO EES-4467 - unit test
-            var orphanDataBlockParents = dependentDataBlockVersions
-                .Where(dataBlockVersion => dataBlockVersion.DataBlockParent.LatestPublishedVersionId == null)
+            var dataBlockParents = dependentDataBlockVersions
                 .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .ToList();
 
+            // If this DataBlockVersion is the only version under its DataBlockParent (i.e. it's the LatestVersion but
+            // there isn't another already-published version), also delete its parent.
+            var orphanedDataBlockParents = dataBlockParents
+                .Where(dataBlockParent => dataBlockParent.LatestPublishedVersionId == null)
+                .ToList();
+
             // Detach any DataBlockVersions from any parents to become orphans.
-            orphanDataBlockParents.ForEach(dataBlockParent => dataBlockParent.LatestVersion = null);
-            _context.DataBlockParents.UpdateRange(orphanDataBlockParents);
+            orphanedDataBlockParents.ForEach(dataBlockParent => dataBlockParent.LatestVersionId = null);
+            _context.DataBlockParents.UpdateRange(orphanedDataBlockParents);
+
+            // Update the "LatestVersion" of any unorphaned DataBlockParents so that their LatestVersion also points to
+            // their existing LatestPublishedVersion that hasn't been removed as part of this operation.
+            var unorphanedDataBlockParents = dataBlockParents
+                .Where(dataBlockParent => dataBlockParent.LatestPublishedVersionId != null)
+                .ToList();
+
+            unorphanedDataBlockParents.ForEach(dataBlockParent => dataBlockParent.LatestVersionId = dataBlockParent.LatestPublishedVersionId);
+            _context.DataBlockParents.UpdateRange(unorphanedDataBlockParents);
 
             await _context.SaveChangesAsync();
 
@@ -409,7 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(dataBlockVersion => dataBlockVersion.ContentBlock));
 
             // Delete any now-orphaned parents.
-            _context.DataBlockParents.RemoveRange(orphanDataBlockParents);
+            _context.DataBlockParents.RemoveRange(orphanedDataBlockParents);
 
             await _context.SaveChangesAsync();
             return Unit.Instance;

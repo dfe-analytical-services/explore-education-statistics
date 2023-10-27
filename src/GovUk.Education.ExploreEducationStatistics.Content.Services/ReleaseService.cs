@@ -175,19 +175,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OfType<DataBlockViewModel>();
 
             var keyStatDataBlockVersions = releaseViewModel
-                .KeyStatistics
+                .KeyStatistics?
                 .OfType<KeyStatisticDataBlockViewModel>()
-                .Select(keyStatDataBlock => keyStatDataBlock);
+                .Select(keyStatDataBlock => keyStatDataBlock) ?? new List<KeyStatisticDataBlockViewModel>();
 
             var keyStatSecondaryDataBlockVersions = releaseViewModel
-                .KeyStatisticsSecondarySection
+                .KeyStatisticsSecondarySection?
                 .Content
-                .OfType<DataBlockViewModel>();
+                .OfType<DataBlockViewModel>() ?? new List<DataBlockViewModel>();
 
             var headlineDataBlockVersions = releaseViewModel
-                .HeadlinesSection
+                .HeadlinesSection?
                 .Content
-                .OfType<DataBlockViewModel>();
+                .OfType<DataBlockViewModel>() ?? new List<DataBlockViewModel>();
 
             var allDataBlockViewModels = mainContentDataBlockVersions
                 .Concat(keyStatSecondaryDataBlockVersions)

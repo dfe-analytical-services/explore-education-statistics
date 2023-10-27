@@ -8,12 +8,12 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
 {
-    public class DataBlockTableResultCacheKey : IBlobCacheKey
+    public class DataBlockVersionTableResultCacheKey : IBlobCacheKey
     {
         private Guid ReleaseId { get; }
         private Guid DataBlockId { get; }
 
-        public DataBlockTableResultCacheKey(DataBlockVersion dataBlockVersion)
+        public DataBlockVersionTableResultCacheKey(DataBlockVersion dataBlockVersion)
         {
             ReleaseId = dataBlockVersion.ReleaseId;
             DataBlockId = dataBlockVersion.Id;

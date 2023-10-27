@@ -35,36 +35,26 @@ public class DataBlockService : IDataBlockService
         _userService = userService;
     }
 
-    public async Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(Guid releaseId,
-        Guid dataBlockId)
+    public async Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
+        Guid releaseId,
+        Guid dataBlockVersionId)
     {
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanViewRelease)
-            .OnSuccess(() => CheckDataBlockExists(releaseId, dataBlockId))
+            .OnSuccess(() => CheckDataBlockVersionExists(releaseId, dataBlockVersionId))
             .OnSuccess(dataBlock => _tableBuilderService.Query(releaseId, dataBlock.Query));
     }
 
-    public Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
+    private async Task<Either<ActionResult, DataBlockVersion>> CheckDataBlockVersionExists(
         Guid releaseId,
-        Guid dataBlockParentId)
+        Guid dataBlockVersionId)
     {
-        return _contentDbContext
+        return await _contentDbContext
             .DataBlockVersions
-            .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
-            .Include(dataBlockVersion => dataBlockVersion.Release)
-            .SingleAsync(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
-                                             && dataBlockVersion.DataBlockParentId == dataBlockParentId)!
+            .Include(dataBlockVersion => dataBlockVersion.ContentBlock) // TODO EES-4467 - auto
+            .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
+                                       && dataBlockVersion.Id == dataBlockVersionId)
+            .SingleOrDefaultAsync()
             .OrNotFound();
-    }
-
-    private async Task<Either<ActionResult, DataBlock>> CheckDataBlockExists(Guid releaseId, Guid dataBlockId)
-    {
-        var dataBlock = await _contentDbContext
-            .ContentBlocks
-            .Where(block => block.ReleaseId == releaseId && block.Id == dataBlockId)
-            .OfType<DataBlock>()
-            .SingleOrDefaultAsync();
-
-        return dataBlock ?? new Either<ActionResult, DataBlock>(new NotFoundResult());
     }
 }

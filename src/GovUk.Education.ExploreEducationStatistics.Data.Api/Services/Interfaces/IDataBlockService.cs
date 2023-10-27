@@ -10,5 +10,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
 
 public interface IDataBlockService
 {
-    Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(Guid releaseId, Guid dataBlockId);
+    Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(Guid releaseId, Guid dataBlockVersionId);
 }

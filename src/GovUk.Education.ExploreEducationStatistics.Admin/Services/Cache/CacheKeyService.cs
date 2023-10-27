@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache
             _contentPersistenceHelper = contentPersistenceHelper;
         }
 
-        public async Task<Either<ActionResult, DataBlockTableResultCacheKey>> CreateCacheKeyForDataBlock(
+        public async Task<Either<ActionResult, DataBlockVersionTableResultCacheKey>> CreateCacheKeyForDataBlock(
             Guid releaseId,
             Guid dataBlockVersionId)
         {
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache
                 .CheckEntityExists<DataBlockVersion>(query => query
                     .Where(dataBlockVersion => dataBlockVersion.Id == dataBlockVersionId
                                                && dataBlockVersion.ReleaseId == releaseId))
-                .OnSuccess(dataBlockVersion => new DataBlockTableResultCacheKey(dataBlockVersion));
+                .OnSuccess(dataBlockVersion => new DataBlockVersionTableResultCacheKey(dataBlockVersion));
         }
     }
 }

@@ -15,6 +15,11 @@ public static class ReleaseGeneratorExtensions
     public static Generator<Release> WithDefaults(this Generator<Release> generator)
         => generator.ForInstance(release => release.SetDefaults());
 
+    public static Generator<Release> WithPublication(
+        this Generator<Release> generator,
+        Publication publication)
+        => generator.ForInstance(release => release.SetPublication(publication));
+
     public static Generator<Release> WithApprovalStatus(
         this Generator<Release> generator,
         ReleaseApprovalStatus status)
@@ -57,6 +62,15 @@ public static class ReleaseGeneratorExtensions
             .SetDefault(p => p.Title)
             .SetDefault(p => p.DataGuidance)
             .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}");
+
+    public static InstanceSetters<Release> SetPublication(
+        this InstanceSetters<Release> setters,
+        Publication publication)
+        => setters.Set((_, release, _) =>
+        {
+            release.Publication = publication;
+            release.PublicationId = publication.Id;
+        });
 
     public static InstanceSetters<Release> SetApprovalStatus(
         this InstanceSetters<Release> setters,

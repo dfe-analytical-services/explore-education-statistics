@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         {
             return _dataBlockService.GetDataBlockTableResult(
                 releaseId: dataBlockVersion.ReleaseId,
-                dataBlockId: dataBlockVersion.Id);
+                dataBlockVersionId: dataBlockVersion.Id);
         }
 
         private static FastTrackViewModel BuildFastTrackViewModel(
@@ -168,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                     .ThenInclude(dataBlockVersion => dataBlockVersion.Release)
                     .ThenInclude(release => release.Publication)
                     .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
-                    .ThenInclude(dataBlockVersion => dataBlockVersion.ContentBlock))
+                    .ThenInclude(dataBlockVersion => dataBlockVersion.ContentBlock)) // TODO EES-4467 auto
                 .OnSuccess(dataBlock => dataBlock.LatestPublishedVersion)
                 .OrNotFound();
         }

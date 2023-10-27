@@ -150,19 +150,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OfType<DataBlockVersionViewModel>();
 
             var keyStatDataBlockVersions = releaseViewModel
-                .KeyStatistics
+                .KeyStatistics?
                 .OfType<KeyStatisticDataBlockViewModel>()
-                .Select(keyStatDataBlock => keyStatDataBlock);
+                .Select(keyStatDataBlock => keyStatDataBlock) ?? new List<KeyStatisticDataBlockViewModel>();
 
             var keyStatSecondaryDataBlockVersions = releaseViewModel
-                .KeyStatisticsSecondarySection
+                .KeyStatisticsSecondarySection?
                 .Content
-                .OfType<DataBlockVersionViewModel>();
+                .OfType<DataBlockVersionViewModel>() ?? new List<DataBlockVersionViewModel>();
 
             var headlineDataBlockVersions = releaseViewModel
-                .HeadlinesSection
+                .HeadlinesSection?
                 .Content
-                .OfType<DataBlockVersionViewModel>();
+                .OfType<DataBlockVersionViewModel>() ?? new List<DataBlockVersionViewModel>();
 
             var allDataBlockVersionViewModels = mainContentDataBlockVersions
                 .Concat(keyStatSecondaryDataBlockVersions)

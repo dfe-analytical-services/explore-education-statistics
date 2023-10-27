@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> Delete(ReleaseId releaseId, DataBlockId id);
 
-        Task<Either<ActionResult, DataBlockVersionViewModel>> Get(DataBlockId id);
+        Task<Either<ActionResult, DataBlockVersionViewModel>> Get(DataBlockId dataBlockVersionId);
 
         Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(ReleaseId releaseId);
 

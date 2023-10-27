@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [BlobCache(typeof(DataBlockTableResultCacheKey))]
+        [BlobCache(typeof(DataBlockVersionTableResultCacheKey))]
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
             DataBlockVersion dataBlockVersion,
             CancellationToken cancellationToken)

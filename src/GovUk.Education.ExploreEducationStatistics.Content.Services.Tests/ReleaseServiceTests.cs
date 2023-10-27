@@ -27,14 +27,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseServiceTests
     {
-        private static readonly DataBlock Release1DataBlock = new()
+        private static readonly Guid ReleaseId = Guid.NewGuid();
+
+        private static readonly Guid DataBlockId = Guid.NewGuid();
+        private static readonly DataBlockVersion Release1DataBlockVersion = new()
         {
-            Id = Guid.NewGuid(),
+            Id = DataBlockId,
+            ReleaseId = ReleaseId,
+            ContentBlock = new DataBlock
+            {
+                Id = DataBlockId
+            },
+            DataBlockParent = new DataBlockParent()
         };
 
         private static readonly Release Release1V1 = new()
         {
-            Id = Guid.NewGuid(),
+            Id = ReleaseId,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v1 Guidance",
@@ -66,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 new KeyStatisticDataBlock
                 {
                     Order = 1,
-                    DataBlock = Release1DataBlock,
+                    DataBlock = Release1DataBlockVersion.ContentBlock,
                 },
                 new KeyStatisticText { Order = 0 },
             },
@@ -229,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Release = Release1V1
         };
 
-        private static readonly List<ContentSection> ContentSections = 
+        private static readonly List<ContentSection> ContentSections =
             ListOf(
                 Release1SummarySection,
                 Release1RelatedDashboardsSection,
@@ -289,6 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(Release1DataBlockVersion);
                 await contentDbContext.AddRangeAsync(releaseFiles);
                 await contentDbContext.AddRangeAsync(ContentSections);
                 await contentDbContext.SaveChangesAsync();
@@ -314,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(Release1V1.KeyStatistics[0].Id, viewModel.KeyStatistics[1].Id);
                 Assert.Equal(1, viewModel.KeyStatistics[1].Order);
                 var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(viewModel.KeyStatistics[1]);
-                Assert.Equal(Release1DataBlock.Id ,keyStatDataBlockViewModel.DataBlockId);
+                Assert.Equal(Release1DataBlockVersion.Id ,keyStatDataBlockViewModel.DataBlockId);
 
                 var summarySection = viewModel.SummarySection;
                 Assert.NotNull(summarySection);
