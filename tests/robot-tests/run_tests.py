@@ -342,10 +342,10 @@ def setup_authentication(clear_existing=False):
 if args.tests and "general_public" not in args.tests:
     setup_authentication()
 
-    # NOTE(mark): Tests that alter data only occur on local and dev environments
+    # Tests that alter data only occur on local and dev environments
     if args.env in ["local", "dev"]:
         # add randomness to prevent multiple simultaneous run_tests.py generating the same runIdentifier value
-        randomStr = "".join([random.choice(string.ascii_letters + string.digits) for n in range(6)])
+        randomStr = "".join([random.choice(string.ascii_lowercase + string.digits) for n in range(6)])
         runIdentifier = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S-" + randomStr)
 
         os.environ["RUN_IDENTIFIER"] = runIdentifier
