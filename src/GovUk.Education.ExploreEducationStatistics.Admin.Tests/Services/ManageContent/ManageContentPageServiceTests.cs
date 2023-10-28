@@ -104,7 +104,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 LatestPublishedVersion = new DataBlockVersion
                 {
                     ReleaseId = release.Id,
-                    Id = Guid.NewGuid()
+                    Id = Guid.NewGuid(),
+                }
+            };
+
+            var inContentDataBlockVersionId = Guid.NewGuid();
+
+            var inContentDataBlockParent = new DataBlockParent
+            {
+                LatestPublishedVersion = new DataBlockVersion
+                {
+                    ReleaseId = release.Id,
+                    Id = inContentDataBlockVersionId,
+                    ContentBlock = new DataBlock
+                    {
+                        Id = inContentDataBlockVersionId,
+                        Order = 1
+                    }
                 }
             };
 
@@ -183,8 +199,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 {
                     new HtmlBlock
                     {
+                        Order = 0,
                         Body = "Test block 1"
-                    }
+                    },
+                    inContentDataBlockParent.LatestPublishedVersion!.ContentBlock
                 },
                 Release = release
             };
@@ -194,7 +212,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddRangeAsync(release, otherRelease);
-                await contentDbContext.DataBlockParents.AddRangeAsync(unattachedDataBlockParent, keyStatDataBlockParent);
+                await contentDbContext.DataBlockParents.AddRangeAsync(
+                    unattachedDataBlockParent, keyStatDataBlockParent, inContentDataBlockParent);
                 await contentDbContext.ContentSections.AddRangeAsync(
                     new ContentSection
                     {
@@ -267,10 +286,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(2, contentRelease.KeyStatistics.Count);
                 Assert.Equal(release.KeyStatistics[1].Id, contentRelease.KeyStatistics[0].Id);
                 Assert.Equal(0, contentRelease.KeyStatistics[0].Order);
-                var keyStatDataBlock = Assert.IsType<KeyStatisticDataBlockViewModel>(contentRelease.KeyStatistics[0]);
+                var originalKeyStatDataBlock = (release.KeyStatistics[1] as KeyStatisticDataBlock)!;
+                var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(contentRelease.KeyStatistics[0]);
+                Assert.Equal(originalKeyStatDataBlock.DataBlockId, keyStatDataBlockViewModel.DataBlockId);
                 Assert.Equal(
-                    (release.KeyStatistics[1] as KeyStatisticDataBlock)!.DataBlockId,
-                    keyStatDataBlock.DataBlockId);
+                    keyStatDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
+                    keyStatDataBlockViewModel.DataBlockParentId);
 
                 Assert.Equal(release.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
                 Assert.Equal(1, contentRelease.KeyStatistics[1].Order);
@@ -321,10 +342,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(genericContentSection.Id, contentSections[0].Id);
                 Assert.Equal("Test section 1", contentSections[0].Heading);
 
-                Assert.Single(contentSections[0].Content);
+                Assert.Equal(2, contentSections[0].Content.Count);
 
-                var contentBlock = Assert.IsType<HtmlBlockViewModel>(contentSections[0].Content[0]);
-                Assert.Equal("Test block 1", contentBlock.Body);
+                var htmlBlockViewModel = Assert.IsType<HtmlBlockViewModel>(contentSections[0].Content[0]);
+                Assert.Equal("Test block 1", htmlBlockViewModel.Body);
+
+                var dataBlockViewModel = Assert.IsType<DataBlockVersionViewModel>(contentSections[0].Content[1]);
+                Assert.Equal(inContentDataBlockVersionId, dataBlockViewModel.Id);
+                Assert.Equal(
+                    inContentDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
+                    dataBlockViewModel.DataBlockParentId);
 
                 var contentPublication = contentRelease.Publication;
 
@@ -713,7 +740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                mapper ?? MapperUtils.AdminMapper(),
+                mapper ?? MapperUtils.AdminMapper(contentDbContext),
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,

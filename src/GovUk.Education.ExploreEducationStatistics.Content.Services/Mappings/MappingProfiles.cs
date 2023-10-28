@@ -66,7 +66,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
             CreateMap<ContentBlock, IContentBlockViewModel>()
                 .IncludeAllDerived();
 
-            CreateMap<DataBlock, DataBlockViewModel>();
+            // EES-4467 - we include an AfterMap configuration here to ensure that any time we create a
+            // DataBlockVersionViewModel from a plain DataBlock, we also include the DataBlockParentId on the
+            // destination DataBlockVersionViewModel that the DataBlock itself does not contain.
+            CreateMap<DataBlock, DataBlockVersionViewModel>()
+                .AfterMap<DataBlockVersionViewModelPostMappingAction>();
 
             CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
                 .ForMember(dest => dest.Title,

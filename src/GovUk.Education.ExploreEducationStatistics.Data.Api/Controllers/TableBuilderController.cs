@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             return new FastTrackViewModel
             {
                 // TODO EES-4467 - is this the right Id? Probably need to rename it to make it clearer
-                Id = dataBlockVersion.DataBlockParentId,
+                DataBlockParentId = dataBlockVersion.DataBlockParentId,
                 Configuration = dataBlock.Table,
                 FullTable = tableResult,
                 Query = new TableBuilderQueryViewModel(release.PublicationId, dataBlock.Query),

@@ -293,15 +293,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
                     }
 
-                    return await AddContentBlockToContentSectionAndSave(request.Order, section, dataBlockVersion.ContentBlock)
-                        .OnSuccess(contentBlockViewModel =>
-                        {
-                            // TODO EES-4467 - temporarily manually add DataBlockParentId to DataBlockVersionViewModel
-                            // until DataBlockVersion has replaced ContentBlock of type "DataBlock".
-                            var dataBlockViewModel = contentBlockViewModel as DataBlockVersionViewModel;
-                            dataBlockViewModel!.DataBlockParentId = dataBlockVersion.DataBlockParentId;
-                            return dataBlockViewModel;
-                        });
+                    return await AddContentBlockToContentSectionAndSave(
+                            request.Order, section, dataBlockVersion.ContentBlock)
+                        .OnSuccess(contentBlockViewModel => contentBlockViewModel as DataBlockVersionViewModel);
                 });
         }
 

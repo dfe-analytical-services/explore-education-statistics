@@ -8,11 +8,10 @@ using JsonKnownTypes;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
     [JsonKnownThisType("DataBlock")]
-    public class DataBlockViewModel : IContentBlockViewModel
+    public class DataBlockVersionViewModel : IContentBlockViewModel
     {
         public Guid Id { get; set; }
 
-        // TODO EES-4467 - unit test
         public Guid DataBlockParentId { get; set; }
 
         public int Order { get; set; }

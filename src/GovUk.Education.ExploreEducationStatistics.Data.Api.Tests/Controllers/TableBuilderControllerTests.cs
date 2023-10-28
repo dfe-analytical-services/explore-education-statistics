@@ -488,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             VerifyAllMocks(BlobCacheService, dataBlockService, releaseRepository);
 
             var viewModel = response.AssertOk<FastTrackViewModel>();
-            Assert.Equal(DataBlockParentId, viewModel.Id);
+            Assert.Equal(DataBlockParentId, viewModel.DataBlockParentId);
             Assert.Equal(ReleaseId, viewModel.ReleaseId);
             Assert.Equal(Release.Slug, viewModel.ReleaseSlug);
             viewModel.Configuration.AssertDeepEqualTo(TableConfiguration);
@@ -564,7 +564,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             VerifyAllMocks(BlobCacheService, dataBlockService, releaseRepository);
 
             var viewModel = response.AssertOk<FastTrackViewModel>();
-            Assert.Equal(DataBlockParentId, viewModel.Id);
+            Assert.Equal(DataBlockParentId, viewModel.DataBlockParentId);
             Assert.Equal(ReleaseId, viewModel.ReleaseId);
             Assert.Equal(Release.Slug, viewModel.ReleaseSlug);
             Assert.False(viewModel.LatestData);

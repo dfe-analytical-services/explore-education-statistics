@@ -2,6 +2,7 @@
 using System;
 using System.Linq.Expressions;
 using Bogus;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
@@ -9,6 +10,7 @@ public class InstanceSetters<T> where T : class
 {
     private readonly Action<string, Func<Faker, T, SetterContext, object?>> _onProperty;
     private readonly Action<Action<Faker, T, SetterContext>> _onAction;
+    private readonly SequentialGuidGenerator _guidGenerator = new();
 
     public InstanceSetters(
         Action<string, Func<Faker, T, SetterContext, object?>> onProperty,
@@ -66,10 +68,10 @@ public class InstanceSetters<T> where T : class
     // Default setters
 
     public InstanceSetters<T> SetDefault(Expression<Func<T, Guid>> property)
-        => Set(property, faker => faker.Random.Guid());
+        => Set(property, _guidGenerator.NewGuid);
 
     public InstanceSetters<T> SetDefault(Expression<Func<T, Guid?>> property)
-        => Set(property, faker => faker.Random.Guid());
+        => Set(property, () => _guidGenerator.NewGuid());
 
     public InstanceSetters<T> SetDefault(Expression<Func<T, string?>> property)
     {

@@ -99,14 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             releaseViewModel.RelatedDashboardsSection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.Content.ForEach(section => section.Content.ForEach(FilterContentBlock));
 
-            // TODO EES-4467 - we need to manually add the DataBlockParentIds to the DataBlockViewModels
-            // in the content hierarchy tree currently, until we've fully replaced the ContentBlock version of
-            // DataBlock with the new DataBlockVersion (and its equivalent ContentBlock "link" type, as used in
-            // the EmbedBlock model).
-            //
-            // TODO EES-4467 - this will require invalidating Release content caches at least
-            await SetDataBlockParentIds(releaseViewModel);
-
             releaseViewModel.DownloadFiles = await GetDownloadFiles(release);
 
             // If the view model has no mapped published date because it's not published, set a date
@@ -154,51 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Select(rf => rf.ToPublicFileInfo())
                 .OrderBy(file => file.Name)
                 .ToList();
-        }
-
-        // TODO EES-4467 - we need to manually add the DataBlockParentIds to the DataBlockViewModels
-        // in the content hierarchy tree currently, until we've fully replaced the ContentBlock version of
-        // DataBlock with the new DataBlockVersion (and its equivalent ContentBlock "link" type, as used in
-        // the EmbedBlock model).
-        private async Task SetDataBlockParentIds(ReleaseCacheViewModel releaseViewModel)
-        {
-            var dataBlockVersionToParentIds = await _contentDbContext
-                .DataBlockVersions
-                .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseViewModel.Id)
-                .ToDictionaryAsync(
-                    dataBlockVersion => dataBlockVersion.Id,
-                    dataBlockVersion => dataBlockVersion.DataBlockParentId);
-
-            var mainContentDataBlockVersions = releaseViewModel
-                .Content
-                .SelectMany(contentSection => contentSection.Content)
-                .OfType<DataBlockViewModel>();
-
-            var keyStatDataBlockVersions = releaseViewModel
-                .KeyStatistics?
-                .OfType<KeyStatisticDataBlockViewModel>()
-                .Select(keyStatDataBlock => keyStatDataBlock) ?? new List<KeyStatisticDataBlockViewModel>();
-
-            var keyStatSecondaryDataBlockVersions = releaseViewModel
-                .KeyStatisticsSecondarySection?
-                .Content
-                .OfType<DataBlockViewModel>() ?? new List<DataBlockViewModel>();
-
-            var headlineDataBlockVersions = releaseViewModel
-                .HeadlinesSection?
-                .Content
-                .OfType<DataBlockViewModel>() ?? new List<DataBlockViewModel>();
-
-            var allDataBlockViewModels = mainContentDataBlockVersions
-                .Concat(keyStatSecondaryDataBlockVersions)
-                .Concat(headlineDataBlockVersions);
-
-            allDataBlockViewModels.ForEach(dataBlockVersionViewModel =>
-                dataBlockVersionViewModel.DataBlockParentId = dataBlockVersionToParentIds[dataBlockVersionViewModel.Id]);
-
-            keyStatDataBlockVersions.ForEach(keyStatDataBlockViewModel =>
-                keyStatDataBlockViewModel.DataBlockParentId =
-                    dataBlockVersionToParentIds[keyStatDataBlockViewModel.DataBlockId]);
         }
     }
 }

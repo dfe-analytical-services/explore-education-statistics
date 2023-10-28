@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using ContactViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContactViewModel;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
@@ -216,12 +217,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Comments,
                     m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));
 
-            // TODO EES-4467 - at the moment we need to retain this mapping as well as
-            // "CreateMap<DataBlockVersion, DataBlockVersionViewModel>()" solely because the
-            // ManageContentPageController needs to serialise the entire ContentSection -> ContentBlock hierarchy
-            // into a ReleaseViewModel, and the ContentSections only contain links to DataBlocks and not
-            // DataBlockVersions currently.
-            CreateMap<DataBlock, DataBlockVersionViewModel>();
+            // EES-4467 - we include an AfterMap configuration here to ensure that any time we create a
+            // DataBlockVersionViewModel from a plain DataBlock, we also include the DataBlockParentId on the
+            // destination DataBlockVersionViewModel that the DataBlock itself does not contain.
+            CreateMap<DataBlock, DataBlockVersionViewModel>()
+                .AfterMap<DataBlockVersionViewModelPostMappingAction>();
 
             CreateMap<DataBlockVersion, DataBlockVersionViewModel>();
 

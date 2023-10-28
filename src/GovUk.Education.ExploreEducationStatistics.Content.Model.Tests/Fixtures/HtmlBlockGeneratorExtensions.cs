@@ -18,6 +18,11 @@ public static class HtmlBlockGeneratorExtensions
         string body)
         => generator.ForInstance(d => d.SetBody(body));
 
+    public static Generator<HtmlBlock> WithOrder(
+        this Generator<HtmlBlock> generator,
+        int order)
+        => generator.ForInstance(s => s.SetOrder(order));
+
     public static InstanceSetters<HtmlBlock> SetDefaults(this InstanceSetters<HtmlBlock> setters)
         => setters
             .SetDefault(block => block.Id)
@@ -40,4 +45,9 @@ public static class HtmlBlockGeneratorExtensions
         this InstanceSetters<HtmlBlock> setters,
         string body)
         => setters.Set(d => d.Body, body);
+
+    public static InstanceSetters<HtmlBlock> SetOrder(
+        this InstanceSetters<HtmlBlock> setters,
+        int order)
+        => setters.Set(d => d.Order, order);
 }

@@ -96,13 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     }
 
                     var releaseViewModel = _mapper.Map<ManageContentPageViewModel.ReleaseViewModel>(release);
-
-                    // TODO EES-4467 - we need to manually add the DataBlockParentIds to the DataBlockVersionViewModels
-                    // in the content hierarchy tree currently, until we've fully replaced the ContentBlock version of
-                    // DataBlock with the new DataBlockVersion (and its equivalent ContentBlock "link" type, as used in
-                    // the EmbedBlock model).
-                    await SetDataBlockParentIds(releaseViewModel);
-
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<IdTitleViewModel>>(methodologyVersions);
@@ -129,55 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         UnattachedDataBlocks = unattachedDataBlocks
                     };
                 });
-        }
-
-        // TODO EES-4467 - we need to manually add the DataBlockParentIds to the DataBlockVersionViewModels
-        // in the content hierarchy tree currently, until we've fully replaced the ContentBlock version of
-        // DataBlock with the new DataBlockVersion (and its equivalent ContentBlock "link" type, as used in
-        // the EmbedBlock model).
-        private async Task SetDataBlockParentIds(ManageContentPageViewModel.ReleaseViewModel releaseViewModel)
-        {
-            var dataBlockVersionToParentIds = await _contentDbContext
-                .DataBlockVersions
-                // This is a minor performance improvement. For 99% of cases, we always want to retrieve the backing
-                // ContentBlock with each DataBlockVersion. In this case however, we're just interested in mapping child
-                // and parent ids. When DataBlock is removed from the ContentBlock model altogether, this can go.
-                .IgnoreAutoIncludes()
-                .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseViewModel.Id)
-                .ToDictionaryAsync(
-                    dataBlockVersion => dataBlockVersion.Id,
-                    dataBlockVersion => dataBlockVersion.DataBlockParentId);
-
-            var mainContentDataBlockVersions = releaseViewModel
-                .Content
-                .SelectMany(contentSection => contentSection.Content)
-                .OfType<DataBlockVersionViewModel>();
-
-            var keyStatDataBlockVersions = releaseViewModel
-                .KeyStatistics?
-                .OfType<KeyStatisticDataBlockViewModel>()
-                .Select(keyStatDataBlock => keyStatDataBlock) ?? new List<KeyStatisticDataBlockViewModel>();
-
-            var keyStatSecondaryDataBlockVersions = releaseViewModel
-                .KeyStatisticsSecondarySection?
-                .Content
-                .OfType<DataBlockVersionViewModel>() ?? new List<DataBlockVersionViewModel>();
-
-            var headlineDataBlockVersions = releaseViewModel
-                .HeadlinesSection?
-                .Content
-                .OfType<DataBlockVersionViewModel>() ?? new List<DataBlockVersionViewModel>();
-
-            var allDataBlockVersionViewModels = mainContentDataBlockVersions
-                .Concat(keyStatSecondaryDataBlockVersions)
-                .Concat(headlineDataBlockVersions);
-
-            allDataBlockVersionViewModels.ForEach(dataBlockVersionViewModel =>
-                dataBlockVersionViewModel.DataBlockParentId = dataBlockVersionToParentIds[dataBlockVersionViewModel.Id]);
-
-            keyStatDataBlockVersions.ForEach(keyStatDataBlockVersionViewModel =>
-                keyStatDataBlockVersionViewModel.DataBlockParentId =
-                    dataBlockVersionToParentIds[keyStatDataBlockVersionViewModel.DataBlockId]);
         }
 
         private IQueryable<Release> HydrateReleaseQuery(IQueryable<Release> queryable)

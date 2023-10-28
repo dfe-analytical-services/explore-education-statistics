@@ -54,7 +54,7 @@ public class ReleaseCacheServiceTests : CacheServiceTestFixture
                     {
                         Id = Guid.NewGuid()
                     },
-                    new DataBlockViewModel
+                    new DataBlockVersionViewModel
                     {
                         Id = Guid.NewGuid(),
                         Charts = new List<IChart>
