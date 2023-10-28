@@ -477,7 +477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .HasIndex(release => release.Type);
-            
+
             modelBuilder.Entity<Release>()
                 .Property(release => release.NextReleaseDate)
                 .HasConversion(
@@ -493,7 +493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Release>()
                 .Property(release => release.ApprovalStatus)
                 .HasConversion(new EnumToStringConverter<ReleaseApprovalStatus>());
-            
+
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.PreviousVersion)
                 .WithMany()
@@ -687,12 +687,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             modelBuilder.Entity<DataBlockParent>()
                 .ToTable("DataBlocks");
-            
+
             modelBuilder.Entity<DataBlockParent>()
                 .HasOne(dataBlock => dataBlock.LatestVersion)
                 .WithOne()
                 .HasForeignKey<DataBlockParent>(version => version.LatestVersionId);
-            
+
             modelBuilder.Entity<DataBlockParent>()
                 .HasOne(dataBlock => dataBlock.LatestPublishedVersion)
                 .WithOne()
@@ -704,11 +704,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             modelBuilder.Entity<DataBlockVersion>()
                 .ToTable("DataBlockVersions");
-            
+
             modelBuilder.Entity<DataBlockVersion>()
                 .Property(f => f.DataBlockParentId)
                 .HasColumnName("DataBlockId");
-            
+
             modelBuilder.Entity<DataBlockVersion>()
                 .Property(invite => invite.Published)
                 .HasConversion(
@@ -726,8 +726,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            // EES-4467 - automatically include the backing ContentBlock of type "DataBlock" whenever we retrieve
+            // DataBlockVersions, as DataBlockVersions encapsulate their backing ContentBlocks and will replace them
+            // entirely in a future phase of work.
+            modelBuilder.Entity<DataBlockVersion>()
+                .Navigation(dataBlockVersion => dataBlockVersion.ContentBlock)
+                .AutoInclude();
         }
-        
+
         private static void ConfigureKeyStatisticsText(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<KeyStatisticText>()

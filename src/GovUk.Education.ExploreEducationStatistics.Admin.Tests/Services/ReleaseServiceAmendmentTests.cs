@@ -463,7 +463,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
                     .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
                     .Include(release => release.DataBlockVersions)
-                    .ThenInclude(dataBlockVersion => dataBlockVersion.ContentBlock)
                     .Include(release => release.Updates)
                     .Include(release => release.KeyStatistics)
                     .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)

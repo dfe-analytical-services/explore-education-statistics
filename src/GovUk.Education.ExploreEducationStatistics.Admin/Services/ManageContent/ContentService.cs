@@ -279,11 +279,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     var (_, section) = tuple;
 
-                    var dataBlockVersion =
-                        _context
-                            .DataBlockVersions
-                            .Include(dataBlockVersion => dataBlockVersion.ContentBlock)
-                            .FirstOrDefault(block => block.Id == request.ContentBlockId);
+                    var dataBlockVersion = _context
+                        .DataBlockVersions
+                        .FirstOrDefault(block => block.Id == request.ContentBlockId);
 
                     if (dataBlockVersion == null)
                     {

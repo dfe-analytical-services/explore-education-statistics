@@ -51,7 +51,6 @@ public class DataBlockService : IDataBlockService
     {
         return await _contentDbContext
             .DataBlockVersions
-            .Include(dataBlockVersion => dataBlockVersion.ContentBlock) // TODO EES-4467 - auto
             .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
                                        && dataBlockVersion.Id == dataBlockVersionId)
             .SingleOrDefaultAsync()

@@ -139,6 +139,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         {
             var dataBlockVersionToParentIds = await _contentDbContext
                 .DataBlockVersions
+                // This is a minor performance improvement. For 99% of cases, we always want to retrieve the backing
+                // ContentBlock with each DataBlockVersion. In this case however, we're just interested in mapping child
+                // and parent ids. When DataBlock is removed from the ContentBlock model altogether, this can go.
+                .IgnoreAutoIncludes()
                 .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseViewModel.Id)
                 .ToDictionaryAsync(
                     dataBlockVersion => dataBlockVersion.Id,

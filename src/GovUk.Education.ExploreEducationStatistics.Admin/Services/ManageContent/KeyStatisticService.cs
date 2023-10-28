@@ -51,9 +51,7 @@ public class KeyStatisticService : IKeyStatisticService
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanUpdateRelease)
             .OnSuccess(_ => _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
-                query
-                    .Include(dataBlockVersion => dataBlockVersion.ContentBlock) // TODO EES-4467 - can we do this automatically?
-                    .Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
+                query.Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
                                                 && dataBlockVersion.ReleaseId == releaseId)))
             .OnSuccessDo(async dataBlockVersion =>
                 await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlockVersion)

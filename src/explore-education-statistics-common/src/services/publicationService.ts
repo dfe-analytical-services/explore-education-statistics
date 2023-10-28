@@ -104,7 +104,6 @@ export type KeyStatisticType =
 
 export interface KeyStatisticDataBlock extends KeyStatisticBase {
   type: 'KeyStatisticDataBlock';
-  // TODO EES-4467 - need to account for this change in Admin
   dataBlockParentId: string;
 }
 

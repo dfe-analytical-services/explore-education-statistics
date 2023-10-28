@@ -1029,7 +1029,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                // TODO EES-4467 - add another case for non-orphaned DataBlockParent
                 Assert.Empty(context.DataBlocks.ToList());
                 Assert.Empty(context.DataBlockVersions.ToList());
                 Assert.Empty(context.DataBlockParents.ToList());

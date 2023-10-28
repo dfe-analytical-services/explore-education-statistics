@@ -166,9 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .CheckEntityExists<DataBlockParent>(dataBlockParentId, q => q
                     .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
                     .ThenInclude(dataBlockVersion => dataBlockVersion.Release)
-                    .ThenInclude(release => release.Publication)
-                    .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
-                    .ThenInclude(dataBlockVersion => dataBlockVersion.ContentBlock)) // TODO EES-4467 auto
+                    .ThenInclude(release => release.Publication))
                 .OnSuccess(dataBlock => dataBlock.LatestPublishedVersion)
                 .OrNotFound();
         }

@@ -34,9 +34,10 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     public DateTime? Updated { get; set; }
 
     //
-    // TODO EES-4467 - delegate methods to underlying ContentBlock of type "DataBlock" are included below.
+    // EES-4467 - delegate methods to underlying ContentBlock of type "DataBlock" are included below.
     // This is to make the effort in removing DataBlocks from the ContentBlock table easier in the future, as
-    // their DataBlock fields will eventually be incorporated into DataBlockVersion.
+    // their DataBlock fields will eventually be incorporated into DataBlockVersion. These delegate methods
+    // help DataBlockVersion to encapsulate properties from the underlying ContentBlock DataBlock.
     //
     [NotMapped]
     public ContentSection? ContentSection
