@@ -53,11 +53,11 @@ public class KeyStatisticService : IKeyStatisticService
             .OnSuccess(_ => _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
                 query.Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
                                                 && dataBlockVersion.ReleaseId == releaseId)))
-            .OnSuccessDo(async dataBlockVersion =>
+            .OnSuccess(async dataBlockVersion =>
                 await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlockVersion)
                     ? new Either<ActionResult, Unit>(Unit.Instance)
                     : ValidationActionResult(DataBlockShouldBeUnattached))
-            .OnSuccess(async dataBlockVersion =>
+            .OnSuccess(async _ =>
             {
                 var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
                 keyStatisticDataBlock.ReleaseId = releaseId;
@@ -72,11 +72,7 @@ public class KeyStatisticService : IKeyStatisticService
                 await _context.KeyStatisticsDataBlock.AddAsync(keyStatisticDataBlock);
                 await _context.SaveChangesAsync();
 
-                // TODO EES-4467 - this can go when DataBlockVersion replaces DataBlock.
-                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStatisticDataBlock) with
-                {
-                    DataBlockParentId = dataBlockVersion.DataBlockParentId
-                };
+                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStatisticDataBlock);
             });
     }
 
@@ -126,17 +122,7 @@ public class KeyStatisticService : IKeyStatisticService
 
                 await _context.SaveChangesAsync();
 
-                // TODO EES-4467 - need to temporarily add DataBlockParentId to KeyStatisticDataBlockViewModel until
-                // DataBlockVersion fully replaces the ContentBlock of type "DataBlock".
-                var dataBlockParentId = (await _context
-                        .DataBlockVersions
-                        .FirstAsync(dataBlockVersion => dataBlockVersion.Id == keyStat.DataBlockId))
-                    .DataBlockParentId;
-
-                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStat) with
-                {
-                    DataBlockParentId = dataBlockParentId
-                };
+                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStat) ;
             });
     }
 

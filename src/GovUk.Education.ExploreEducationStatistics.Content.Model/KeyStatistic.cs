@@ -52,6 +52,8 @@ public class KeyStatisticDataBlock : KeyStatistic
 {
     public Guid DataBlockId { get; set; }
 
+    public Guid DataBlockParentId { get; set; }
+
     public DataBlock DataBlock { get; set; } = null!;
 }
 
