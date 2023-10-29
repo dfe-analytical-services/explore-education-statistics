@@ -20,6 +20,8 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
       }),
     ]);
 
+    console.log(JSON.stringify(fastTrack, null, 2));
+
     if (!fastTrack) {
       throw new Error('Fast track not found');
     }
