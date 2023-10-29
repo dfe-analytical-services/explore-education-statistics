@@ -104,6 +104,7 @@ public class KeyStatisticServiceTests
             var keyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(keyStat);
 
             Assert.Equal(dataBlockVersion.Id, keyStatDataBlock.DataBlockId);
+            Assert.Equal(dataBlockParent.Id, keyStatDataBlock.DataBlockParentId);
 
             Assert.Equal(release.Id, keyStatDataBlock.ReleaseId);
             Assert.Equal("trend", keyStatDataBlock.Trend);

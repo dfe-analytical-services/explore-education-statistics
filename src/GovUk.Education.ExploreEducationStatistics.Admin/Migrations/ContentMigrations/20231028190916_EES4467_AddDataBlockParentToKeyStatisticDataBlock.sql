@@ -3,7 +3,7 @@
 --
 -- This can be found via the DataBlockVersions table, which shares its primary key with its associated ContentBlock
 -- of type "DataBlock".
-UPDATE KeyStatisticDataBlock
+UPDATE KeyStatisticsDataBlock
 SET DataBlockParentId = DataBlockVersions.DataBlockId
-FROM KeyStatisticDataBlock
-JOIN DataBlockVersions ON DataBlockVersions.Id = FeaturedTables.DataBlockId;
+FROM KeyStatisticsDataBlock
+JOIN DataBlockVersions ON DataBlockVersions.Id = KeyStatisticsDataBlock.DataBlockId;

@@ -30,6 +30,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 oldClrType: typeof(Guid),
                 oldType: "uniqueidentifier",
                 oldNullable: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KeyStatisticsDataBlock_DataBlockParentId",
+                table: "KeyStatisticsDataBlock",
+                column: "DataBlockParentId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_KeyStatisticsDataBlock_DataBlocks_DataBlockParentId",
+                table: "KeyStatisticsDataBlock",
+                column: "DataBlockParentId",
+                principalTable: "DataBlocks",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

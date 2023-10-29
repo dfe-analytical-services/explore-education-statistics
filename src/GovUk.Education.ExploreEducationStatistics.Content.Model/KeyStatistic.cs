@@ -52,9 +52,11 @@ public class KeyStatisticDataBlock : KeyStatistic
 {
     public Guid DataBlockId { get; set; }
 
+    public DataBlock DataBlock { get; set; } = null!;
+
     public Guid DataBlockParentId { get; set; }
 
-    public DataBlock DataBlock { get; set; } = null!;
+    public DataBlockParent DataBlockParent { get; set; }
 }
 
 public class KeyStatisticText : KeyStatistic

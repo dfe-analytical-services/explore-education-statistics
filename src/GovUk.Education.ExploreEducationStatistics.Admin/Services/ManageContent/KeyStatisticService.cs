@@ -53,15 +53,16 @@ public class KeyStatisticService : IKeyStatisticService
             .OnSuccess(_ => _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
                 query.Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
                                                 && dataBlockVersion.ReleaseId == releaseId)))
-            .OnSuccess(async dataBlockVersion =>
+            .OnSuccessDo(async dataBlockVersion =>
                 await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlockVersion)
                     ? new Either<ActionResult, Unit>(Unit.Instance)
                     : ValidationActionResult(DataBlockShouldBeUnattached))
-            .OnSuccess(async _ =>
+            .OnSuccess(async dataBlockVersion =>
             {
                 var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
                 keyStatisticDataBlock.ReleaseId = releaseId;
                 keyStatisticDataBlock.CreatedById = _userService.GetUserId();
+                keyStatisticDataBlock.DataBlockParentId = dataBlockVersion.DataBlockParentId;
 
                 var currentMaxOrder = await _context.KeyStatistics
                     .Where(ks => ks.ReleaseId == releaseId)
