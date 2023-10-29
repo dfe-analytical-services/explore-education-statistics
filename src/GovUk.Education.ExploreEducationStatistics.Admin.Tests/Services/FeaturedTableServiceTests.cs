@@ -525,7 +525,7 @@ public class FeaturedTableServiceTests
             Assert.Equal("Updated featured table name", viewModel.Name);
             Assert.Equal("Updated featured table description", viewModel.Description);
             Assert.Equal(featuredTable.Order, viewModel.Order);
-            Assert.Equal(featuredTable.DataBlock.Id, viewModel.DataBlockParentId);
+            Assert.Equal(dataBlockParent.Id, viewModel.DataBlockParentId);
         }
 
         await using (var context = InMemoryContentDbContext(contextId))
