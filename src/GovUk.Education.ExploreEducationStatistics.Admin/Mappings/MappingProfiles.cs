@@ -8,10 +8,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using ContactViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContactViewModel;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
-using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
 using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
@@ -217,7 +217,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Comments,
                     m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));
 
-            CreateMap<DataBlock, DataBlockViewModel>();
+<<<<<<< Updated upstream
+            // EES-4467 - we include an AfterMap configuration here to ensure that any time we create a
+            // DataBlockVersionViewModel from a plain DataBlock, we also include the DataBlockParentId on the
+            // destination DataBlockVersionViewModel that the DataBlock itself does not contain.
+=======
+            // EES-4640 - we include an AfterMap configuration here to ensure that any time we create a
+            // DataBlockViewModel from a plain DataBlock, we also include the DataBlockParentId on the
+            // destination DataBlockViewModel that the DataBlock itself does not contain. When DataBlock is
+            // removed from the ContentBlock model, this can go too.
+>>>>>>> Stashed changes
+            CreateMap<DataBlock, DataBlockViewModel>()
+                .AfterMap<DataBlockVersionViewModelPostMappingAction>();
+
+            CreateMap<DataBlockVersion, DataBlockViewModel>();
 
             CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
                 .ForMember(dest => dest.Title,

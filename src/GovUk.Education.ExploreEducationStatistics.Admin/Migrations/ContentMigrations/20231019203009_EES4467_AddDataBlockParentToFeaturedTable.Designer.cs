@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231019203009_EES4467_AddDataBlockParentToFeaturedTable")]
+    partial class EES4467_AddDataBlockParentToFeaturedTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1330,12 +1332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("DataBlockId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("DataBlockParentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasIndex("DataBlockId");
-
-                    b.HasIndex("DataBlockParentId");
 
                     b.ToTable("KeyStatisticsDataBlock", (string)null);
                 });
@@ -2010,12 +2007,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "DataBlockParent")
-                        .WithMany()
-                        .HasForeignKey("DataBlockParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatistic", null)
                         .WithOne()
                         .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatisticDataBlock", "Id")
@@ -2023,8 +2014,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("DataBlock");
-
-                    b.Navigation("DataBlockParent");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatisticText", b =>
