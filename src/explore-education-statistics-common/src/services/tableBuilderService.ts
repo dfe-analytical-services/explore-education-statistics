@@ -95,6 +95,7 @@ export interface FeaturedTable {
   description?: string;
   subjectId: string;
   dataBlockId: string;
+  dataBlockParentId: string;
   order: number;
 }
 
@@ -263,16 +264,16 @@ const tableBuilderService = {
   },
   async getDataBlockTableData(
     releaseId: string,
-    dataBlockId: string,
+    dataBlockParentId: string,
   ): Promise<TableDataResponse> {
     return dataApi.get(
-      `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
     );
   },
   getFastTrackTableAndReleaseMeta(
-    dataBlockId: string,
+    dataBlockParentId: string,
   ): Promise<FastTrackTableAndReleaseMeta> {
-    return dataApi.get(`/tablebuilder/fast-track/${dataBlockId}`);
+    return dataApi.get(`/tablebuilder/fast-track/${dataBlockParentId}`);
   },
 };
 

@@ -16,7 +16,7 @@ const ExploreDataButton = ({ block, hiddenText }: Props) => {
   return (
     <>
       <ButtonLink
-        to={`/data-tables/fast-track/${block.id}`}
+        to={`/data-tables/fast-track/${block.dataBlockParentId}`}
         disabled={buttonClicked}
         onClick={() => {
           toggleButtonClicked.on();

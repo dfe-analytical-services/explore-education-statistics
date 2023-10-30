@@ -5,14 +5,14 @@ import tableBuilderService from '@common/services/tableBuilderService';
 
 export default function useTableQuery(
   releaseId: string,
-  dataBlockId: string,
+  dataBlockParentId: string,
 ): AsyncRetryState<FullTable> {
   return useAsyncRetry(async () => {
     const response = await tableBuilderService.getDataBlockTableData(
       releaseId,
-      dataBlockId,
+      dataBlockParentId,
     );
 
     return mapFullTable(response);
-  }, [releaseId, dataBlockId]);
+  }, [releaseId, dataBlockParentId]);
 }
