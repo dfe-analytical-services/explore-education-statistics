@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`FormTextArea renders correctly with error 1`] = `
+exports[`RHFFormTextArea renders correctly with error 1`] = `
 <label class="govuk-label"
        for="test-input"
 >
@@ -23,7 +23,7 @@ exports[`FormTextArea renders correctly with error 1`] = `
 </textarea>
 `;
 
-exports[`FormTextArea renders correctly with hint 1`] = `
+exports[`RHFFormTextArea renders correctly with hint 1`] = `
 <label class="govuk-label"
        for="test-input"
 >
@@ -43,7 +43,7 @@ exports[`FormTextArea renders correctly with hint 1`] = `
 </textarea>
 `;
 
-exports[`FormTextArea renders correctly with required props 1`] = `
+exports[`RHFFormTextArea renders correctly with required props 1`] = `
 <label class="govuk-label"
        for="test-input"
 >
