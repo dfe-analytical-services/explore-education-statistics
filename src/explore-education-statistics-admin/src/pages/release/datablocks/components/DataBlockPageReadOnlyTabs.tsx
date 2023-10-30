@@ -26,6 +26,9 @@ interface Props {
   dataBlock: ReleaseDataBlock;
 }
 
+const testId = (dataBlock: ReleaseDataBlock) =>
+  `Data block - ${dataBlock.name}`;
+
 const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
   const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
     const query: ReleaseTableDataQuery = {
