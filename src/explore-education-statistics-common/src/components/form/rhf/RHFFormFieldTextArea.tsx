@@ -1,21 +1,19 @@
 import RHFFormField, {
   FormFieldComponentProps,
 } from '@common/components/form/rhf/RHFFormField';
-import FormSelect, {
-  FormSelectProps,
-} from '@common/components/form/FormSelect';
+import FormTextArea, {
+  FormTextAreaProps,
+} from '@common/components/form/FormTextArea';
 import React from 'react';
 import { FieldValues } from 'react-hook-form';
 
 type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
-  FormSelectProps,
+  FormTextAreaProps,
   TFormValues
 >;
 
-export default function RHFFormFieldSelect<TFormValues extends FieldValues>(
+export default function RHFFormFieldTextArea<TFormValues extends FieldValues>(
   props: Props<TFormValues>,
 ) {
-  return <RHFFormField {...props} as={FormSelect} />;
+  return <RHFFormField {...props} as={FormTextArea} />;
 }
-
-RHFFormFieldSelect.unordered = [] as [];

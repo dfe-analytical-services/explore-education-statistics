@@ -11,16 +11,17 @@ import React, {
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
 
-export interface FormTextAreaProps extends FormLabelProps {
+export interface FormTextAreaProps
+  extends Pick<FormLabelProps, 'hideLabel' | 'label'> {
   className?: string;
   disabled?: boolean;
   error?: ReactNode | string;
   hint?: string;
   id: string;
+  inputRef?: Ref<HTMLTextAreaElement>;
   maxLength?: number;
   name: string;
   rows?: number;
-  textAreaRef?: Ref<HTMLTextAreaElement>;
   value?: string;
   onBlur?: FocusEventHandler<HTMLTextAreaElement>;
   onChange?: ChangeEventHandler<HTMLTextAreaElement>;
@@ -28,24 +29,24 @@ export interface FormTextAreaProps extends FormLabelProps {
   onKeyPress?: KeyboardEventHandler<HTMLTextAreaElement>;
 }
 
-const FormTextArea = ({
+export default function FormTextArea({
   className,
   disabled,
   error,
   hint,
   id,
+  inputRef,
   hideLabel,
   label,
   maxLength,
   name,
   rows = 5,
-  textAreaRef,
   value,
   onBlur,
   onChange,
   onClick,
   onKeyPress,
-}: FormTextAreaProps) => {
+}: FormTextAreaProps) {
   const textArea = (
     <>
       <FormLabel id={id} label={label} hideLabel={hideLabel} />
@@ -59,7 +60,6 @@ const FormTextArea = ({
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
 
       <textarea
-        data-testid="comment-textarea"
         aria-describedby={
           classNames({
             [`${id}-error`]: !!error,
@@ -74,7 +74,7 @@ const FormTextArea = ({
         disabled={disabled}
         id={id}
         name={name}
-        ref={textAreaRef}
+        ref={inputRef}
         onBlur={onBlur}
         onChange={onChange}
         onClick={onClick}
@@ -113,6 +113,4 @@ const FormTextArea = ({
   }
 
   return textArea;
-};
-
-export default FormTextArea;
+}

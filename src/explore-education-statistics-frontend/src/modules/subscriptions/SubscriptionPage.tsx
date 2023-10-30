@@ -113,11 +113,7 @@ const SubscriptionPage: NextPage<Props> = ({
             >
               {({ formState }) => {
                 return (
-                  <RHFForm
-                    id="subscriptionForm"
-                    showSubmitError
-                    onSubmit={handleFormSubmit}
-                  >
+                  <RHFForm id="subscriptionForm" onSubmit={handleFormSubmit}>
                     <RHFFormFieldTextInput<FormValues>
                       label="Enter your email address"
                       hint="This will only be used to subscribe you to updates. You can unsubscribe at any time"

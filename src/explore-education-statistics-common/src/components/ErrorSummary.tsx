@@ -95,8 +95,9 @@ const ErrorSummary = ({
   return errors.length > 0 ? (
     <BaseErrorSummary ref={ref} title={title} visuallyHidden={visuallyHidden}>
       <ul className="govuk-list govuk-error-summary__list">
-        {errors.map(error => (
-          <li key={error.id}>
+        {errors.map((error, index) => (
+          // eslint-disable-next-line react/no-array-index-key
+          <li key={index}>
             {!visuallyHidden ? (
               <a href={`#${error.id}`} onClick={onErrorClick}>
                 {error.message}

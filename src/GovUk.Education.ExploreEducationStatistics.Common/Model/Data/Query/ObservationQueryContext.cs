@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public long? BoundaryLevel { get; set; }
         public IEnumerable<Guid> Indicators { get; set; } = new List<Guid>();
         public List<Guid> LocationIds { get; set; } = new();
-        [Obsolete("Legacy Location field that exists in queries of historical Permalinks", false)]
-        public LocationQuery Locations { get; set; }
 
         public override string ToString()
         {

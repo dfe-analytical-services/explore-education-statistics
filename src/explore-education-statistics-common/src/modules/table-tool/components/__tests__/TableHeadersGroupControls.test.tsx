@@ -1,13 +1,5 @@
-import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import TableHeadersGroupControls from '@common/modules/table-tool/components/TableHeadersGroupControls';
 import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts/TableHeadersContext';
-import {
-  testCategoryFilters,
-  testIndicators,
-  testLocationFilters,
-  testTimePeriodFilters,
-} from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
-import { Formik } from 'formik';
 import { render as baseRender, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -108,26 +100,19 @@ function render({
   expandedLists?: string[];
   totalItems?: number;
 }) {
-  const testInitialFormValues: TableHeadersFormValues = {
-    columnGroups: [testTimePeriodFilters, testLocationFilters],
-    rowGroups: [testCategoryFilters, testIndicators],
-  };
-
   baseRender(
     <TableHeadersContextProvider
       activeGroup={activeGroup}
       expandedLists={expandedLists}
     >
-      <Formik onSubmit={noop} initialValues={testInitialFormValues}>
-        <TableHeadersGroupControls
-          defaultNumberOfItems={2}
-          groupName="rowGroups"
-          id="test-id"
-          legend="Locations"
-          totalItems={totalItems}
-          onMove={noop}
-        />
-      </Formik>
+      <TableHeadersGroupControls
+        defaultNumberOfItems={2}
+        groupName="rowGroups"
+        id="test-id"
+        legend="Locations"
+        totalItems={totalItems}
+        onMove={noop}
+      />
     </TableHeadersContextProvider>,
   );
 }

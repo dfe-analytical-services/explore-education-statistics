@@ -5,8 +5,10 @@ import {
   FormGroup,
   FormRadioGroup,
 } from '@common/components/form';
+import SubmitError from '@common/components/form/util/SubmitError';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import useFormSubmit from '@common/hooks/useFormSubmit';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import {
   PublicationTreeSummary,
@@ -78,6 +80,20 @@ const PrototypePublicationForm = ({
     </WizardStepHeading>
   );
 
+  const handleSubmit = useFormSubmit(
+    async ({ publicationId }: PublicationFormValues) => {
+      const publication = publications.find(p => p.id === publicationId);
+
+      if (!publication) {
+        throw new SubmitError('Selected publication not found');
+      }
+
+      await goToNextStep(async () => {
+        await onSubmit({ publication });
+      });
+    },
+  );
+
   return (
     <Formik<PublicationFormValues>
       enableReinitialize
@@ -87,22 +103,12 @@ const PrototypePublicationForm = ({
       validationSchema={Yup.object<PublicationFormValues>({
         publicationId: Yup.string().required('Choose publication'),
       })}
-      onSubmit={async ({ publicationId }) => {
-        const publication = publications.find(p => p.id === publicationId);
-
-        if (!publication) {
-          throw new Error('Selected publication not found');
-        }
-
-        await goToNextStep(async () => {
-          await onSubmit({ publication });
-        });
-      }}
+      onSubmit={handleSubmit}
     >
       {form => {
         if (isActive) {
           return (
-            <Form {...form} id={formId} showSubmitError>
+            <Form {...form} id={formId}>
               <FormFieldset id="publicationForm" legend={stepHeading}>
                 <p>Search or select a theme to find publications</p>
                 <FormGroup className="govuk-!-margin-bottom-3">

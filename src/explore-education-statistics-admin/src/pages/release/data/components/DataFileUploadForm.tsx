@@ -7,6 +7,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import {
   FieldMessageMapper,
+  FieldName,
   mapFieldErrors,
 } from '@common/validation/serverValidations';
 import useMountedRef from '@common/hooks/useMountedRef';
@@ -22,13 +23,13 @@ export interface DataFileUploadFormValues {
   zipFile: File | null;
 }
 
-const baseErrorMappings = (
-  values: DataFileUploadFormValues,
-): FieldMessageMapper<DataFileUploadFormValues>[] => {
+function baseErrorMappings<FormValues extends DataFileUploadFormValues>(
+  values: FormValues,
+): FieldMessageMapper<FormValues>[] {
   if (values.uploadType === 'zip') {
     return [
-      mapFieldErrors<DataFileUploadFormValues>({
-        target: 'zipFile',
+      mapFieldErrors<FormValues>({
+        target: 'zipFile' as FieldName<FormValues>,
         messages: {
           DataZipMustBeZipFile: 'Choose a valid ZIP file',
           DataZipFileCanOnlyContainTwoFiles:
@@ -53,8 +54,8 @@ const baseErrorMappings = (
   }
 
   return [
-    mapFieldErrors<DataFileUploadFormValues>({
-      target: 'dataFile',
+    mapFieldErrors<FormValues>({
+      target: 'dataFile' as FieldName<FormValues>,
       messages: {
         DataFilenameNotUnique: 'Choose a unique data file name',
         DataAndMetadataFilesCannotHaveTheSameName:
@@ -65,8 +66,8 @@ const baseErrorMappings = (
           'Data filename cannot contain spaces or special characters',
       },
     }),
-    mapFieldErrors<DataFileUploadFormValues>({
-      target: 'metadataFile',
+    mapFieldErrors<FormValues>({
+      target: 'metadataFile' as FieldName<FormValues>,
       messages: {
         MetadataFileCannotBeEmpty: 'Choose a metadata file that is not empty',
         MetaFileMustBeCsvFile:
@@ -77,7 +78,7 @@ const baseErrorMappings = (
       },
     }),
   ];
-};
+}
 
 interface Props<FormValues extends DataFileUploadFormValues> {
   beforeFields?: ReactNode;
@@ -88,10 +89,12 @@ interface Props<FormValues extends DataFileUploadFormValues> {
     baseSchema: ObjectSchema<DataFileUploadFormValues>,
   ) => ObjectSchema<FormValues>;
   submitText?: string;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: FormValues) => void | Promise<void>;
 }
 
-const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
+export default function DataFileUploadForm<
+  FormValues extends DataFileUploadFormValues,
+>({
   beforeFields,
   errorMappings = [],
   id = 'dataFileUploadForm',
@@ -99,12 +102,13 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
   submitText = 'Upload data files',
   validationSchema,
   onSubmit,
-}: Props<FormValues>) => {
+}: Props<FormValues>) {
   const isMounted = useMountedRef();
 
   const handleSubmit = useFormSubmit<FormValues>(
     async (values, actions) => {
       await onSubmit(values);
+
       if (isMounted.current) {
         actions.resetForm();
       }
@@ -234,6 +238,4 @@ const DataFileUploadForm = <FormValues extends DataFileUploadFormValues>({
       )}
     </Formik>
   );
-};
-
-export default DataFileUploadForm;
+}

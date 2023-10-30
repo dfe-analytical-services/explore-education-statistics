@@ -347,11 +347,15 @@ describe('PublicationContactPage', () => {
       screen.getByRole('button', { name: 'Update contact details' }),
     );
 
+    await waitFor(() => {
+      expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
+    });
+
     const modal = within(screen.getByRole('dialog'));
     expect(modal.getByRole('heading')).toHaveTextContent(
       'Confirm contact changes',
     );
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+    userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
   });
 
   test('clicking confirm calls the publication service', async () => {
@@ -375,6 +379,10 @@ describe('PublicationContactPage', () => {
     userEvent.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
+
+    await waitFor(() => {
+      expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
+    });
 
     userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
@@ -411,6 +419,10 @@ describe('PublicationContactPage', () => {
     userEvent.click(
       screen.getByRole('button', { name: 'Update contact details' }),
     );
+
+    await waitFor(() => {
+      expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
+    });
 
     userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 

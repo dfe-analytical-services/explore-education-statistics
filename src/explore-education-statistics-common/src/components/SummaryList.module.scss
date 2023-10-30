@@ -13,3 +13,10 @@
     width: 15%;
   }
 }
+
+// Vertical alignment is needed because we sometimes
+// use <Tag> elements in the keys which can cause the
+// alignment to be off.
+.key {
+  vertical-align: top;
+}

@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 /// <summary>
 /// Class responsible for up-front calculation of the column indexes to look up particular
 /// expected pieces of information from a given data file. This includes column indexes for
-/// Geographic Level, various Location attributes and other  mandatory information like Time
+/// Geographic Level, various Location attributes and other mandatory information like Time
 /// Periods.
 /// </summary>
 public class FixedInformationDataFileReader
@@ -25,110 +25,116 @@ public class FixedInformationDataFileReader
     {
         [EnumLabelValue("country_code")]
         CountryCode,
-        
+
         [EnumLabelValue("country_name")]
         CountryName,
-        
+
         [EnumLabelValue("english_devolved_area_code")]
         EnglishDevolvedAreaCode,
-        
+
         [EnumLabelValue("english_devolved_area_name")]
         EnglishDevolvedAreaName,
-    
+
         [EnumLabelValue("institution_id")]
         InstitutionCode,
-        
+
         [EnumLabelValue("institution_name")]
         InstitutionName,
-    
+
         [EnumLabelValue("new_la_code")]
         NewLaCode,
-        
+
         [EnumLabelValue("old_la_code")]
         OldLaCode,
-        
+
         [EnumLabelValue("la_name")]
         LaName,
-    
+
         [EnumLabelValue("lad_code")]
         LadCode,
-        
+
         [EnumLabelValue("lad_name")]
         LadName,
-    
+
         [EnumLabelValue("local_enterprise_partnership_code")]
         LepCode,
-        
+
         [EnumLabelValue("local_enterprise_partnership_name")]
         LepName,
-    
+
+        [EnumLabelValue("lsip_code")]
+        LsipCode,
+
+        [EnumLabelValue("lsip_name")]
+        LsipName,
+
         [EnumLabelValue("mayoral_combined_authority_code")]
         McaCode,
-        
+
         [EnumLabelValue("mayoral_combined_authority_name")]
         McaName,
-    
+
         [EnumLabelValue("trust_id")]
         MatCode,
-        
+
         [EnumLabelValue("trust_name")]
         MatName,
-    
+
         [EnumLabelValue("opportunity_area_code")]
         OpportunityAreaCode,
-        
+
         [EnumLabelValue("opportunity_area_name")]
         OpportunityAreaName,
-    
+
         [EnumLabelValue("pcon_code")]
         ParliamentaryConstituencyCode,
-        
+
         [EnumLabelValue("pcon_name")]
         ParliamentaryConstituencyName,
-    
+
         [EnumLabelValue("provider_ukprn")]
         ProviderCode,
-        
+
         [EnumLabelValue("provider_name")]
         ProviderName,
-    
+
         [EnumLabelValue("region_code")]
         RegionCode,
-        
+
         [EnumLabelValue("region_name")]
         RegionName,
-    
+
         [EnumLabelValue("rsc_region_lead_name")]
         RscRegionName,
-    
+
         [EnumLabelValue("school_urn")]
         SchoolCode,
-        
+
         [EnumLabelValue("school_name")]
         SchoolName,
-    
+
         [EnumLabelValue("sponsor_id")]
         SponsorCode,
-        
+
         [EnumLabelValue("sponsor_name")]
         SponsorName,
-    
+
         [EnumLabelValue("ward_code")]
         WardCode,
-        
+
         [EnumLabelValue("ward_name")]
         WardName,
-    
+
         [EnumLabelValue("planning_area_code")]
         PlanningAreaCode,
-        
+
         [EnumLabelValue("planning_area_name")]
         PlanningAreaName
     }
 
     private static readonly EnumToEnumLabelConverter<TimeIdentifier> TimeIdentifierLookup = new();
     private static readonly EnumToEnumLabelConverter<GeographicLevel> GeographicLevelLookup = new();
-    
+
     private readonly int _timeIdentifierColumnIndex;
     private readonly int _yearColumnIndex;
     private readonly int _geographicLevelColumnIndex;
@@ -147,7 +153,7 @@ public class FixedInformationDataFileReader
     public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues)
     {
         var value = rowValues[_timeIdentifierColumnIndex];
-            
+
         try
         {
             return (TimeIdentifier) TimeIdentifierLookup.ConvertFromProvider.Invoke(value)!;
@@ -161,7 +167,7 @@ public class FixedInformationDataFileReader
     public int GetYear(IReadOnlyList<string> rowValues)
     {
         var year = rowValues[_yearColumnIndex];
-            
+
         if (year == null)
         {
             throw new InvalidTimePeriodException(null);
@@ -169,7 +175,7 @@ public class FixedInformationDataFileReader
 
         return int.Parse(year.Substring(0, 4));
     }
-    
+
     public GeographicLevel GetGeographicLevel(IReadOnlyList<string> rowValues)
     {
         var value = rowValues[_geographicLevelColumnIndex];
@@ -195,6 +201,7 @@ public class FixedInformationDataFileReader
             LocalAuthority = GetLocalAuthority(rowValues),
             LocalAuthorityDistrict = GetLocalAuthorityDistrict(rowValues),
             LocalEnterprisePartnership = GetLocalEnterprisePartnership(rowValues),
+            LocalSkillsImprovementPlanArea = GetLocalSkillsImprovementPlanArea(rowValues),
             MayoralCombinedAuthority = GetMayoralCombinedAuthority(rowValues),
             MultiAcademyTrust = GetMultiAcademyTrust(rowValues),
             OpportunityArea = GetOpportunityArea(rowValues),
@@ -236,7 +243,7 @@ public class FixedInformationDataFileReader
         var newCode = GetLocationAttributeValue(LocationColumn.NewLaCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.LaName, rowValues);
         return GetLocationAttributeOrDefault(
-            () => new LocalAuthority(newCode, oldCode, name), 
+            () => new LocalAuthority(newCode, oldCode, name),
             oldCode, newCode, name);
     }
 
@@ -252,6 +259,13 @@ public class FixedInformationDataFileReader
         var code = GetLocationAttributeValue(LocationColumn.LepCode, rowValues);
         var name = GetLocationAttributeValue(LocationColumn.LepName, rowValues);
         return GetLocationAttributeOrDefault(() => new LocalEnterprisePartnership(code, name), code, name);
+    }
+
+    private LocalSkillsImprovementPlanArea? GetLocalSkillsImprovementPlanArea(IReadOnlyList<string> rowValues)
+    {
+        var code = GetLocationAttributeValue(LocationColumn.LsipCode, rowValues);
+        var name = GetLocationAttributeValue(LocationColumn.LsipName, rowValues);
+        return GetLocationAttributeOrDefault(() => new LocalSkillsImprovementPlanArea(code, name), code, name);
     }
 
     private MayoralCombinedAuthority? GetMayoralCombinedAuthority(IReadOnlyList<string> rowValues)
@@ -337,7 +351,7 @@ public class FixedInformationDataFileReader
     }
 
     private TLocationAttribute? GetLocationAttributeOrDefault<TLocationAttribute>(
-        Func<TLocationAttribute> creatorFunc, 
+        Func<TLocationAttribute> creatorFunc,
         params string?[] attributeValues)
         where TLocationAttribute : LocationAttribute
     {
