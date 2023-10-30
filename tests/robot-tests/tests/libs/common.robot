@@ -694,6 +694,11 @@ user checks url contains
     ${current_url}=    get location
     should contain    ${current_url}    ${text}
 
+user checks url equals
+    [Arguments]    ${expected}
+    ${current_url}=    get location
+    should be equal    ${current_url}    ${expected}
+
 user checks page contains link with text and url
     [Arguments]
     ...    ${text}
