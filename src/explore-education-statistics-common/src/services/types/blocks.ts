@@ -74,6 +74,7 @@ export interface DataBlock extends BaseBlock {
   query: TableDataQuery;
   charts: Chart[];
   table: Table;
+  dataBlockParentId: string;
 }
 
 export interface EmbedBlock extends BaseBlock {

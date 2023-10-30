@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -34,23 +35,25 @@ public class DataBlockService : IDataBlockService
         _userService = userService;
     }
 
-    public async Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(Guid releaseId,
-        Guid dataBlockId)
+    public async Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
+        Guid releaseId,
+        Guid dataBlockVersionId)
     {
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanViewRelease)
-            .OnSuccess(() => CheckDataBlockExists(releaseId, dataBlockId))
+            .OnSuccess(() => CheckDataBlockVersionExists(releaseId, dataBlockVersionId))
             .OnSuccess(dataBlock => _tableBuilderService.Query(releaseId, dataBlock.Query));
     }
 
-    private async Task<Either<ActionResult, DataBlock>> CheckDataBlockExists(Guid releaseId, Guid dataBlockId)
+    private async Task<Either<ActionResult, DataBlockVersion>> CheckDataBlockVersionExists(
+        Guid releaseId,
+        Guid dataBlockVersionId)
     {
-        var dataBlock = await _contentDbContext
-            .ContentBlocks
-            .Where(block => block.ReleaseId == releaseId && block.Id == dataBlockId)
-            .OfType<DataBlock>()
-            .SingleOrDefaultAsync();
-
-        return dataBlock ?? new Either<ActionResult, DataBlock>(new NotFoundResult());
+        return await _contentDbContext
+            .DataBlockVersions
+            .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId
+                                       && dataBlockVersion.Id == dataBlockVersionId)
+            .SingleOrDefaultAsync()
+            .OrNotFound();
     }
 }

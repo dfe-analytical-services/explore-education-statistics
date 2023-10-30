@@ -60,7 +60,12 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
             />
           </TabsSection>
           {dataBlock.charts.length > 0 && [
-            <TabsSection title="Chart" key="chart" id="dataBlockTabs-chart">
+            <TabsSection
+              title="Chart"
+              key="chart"
+              id="dataBlockTabs-chart"
+              testId={`${testId(dataBlock)}-chart-tab`}
+            >
               <div className="govuk-width-container">
                 {dataBlock.charts.map((chart, index) => {
                   const key = index;

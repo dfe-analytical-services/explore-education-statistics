@@ -28,6 +28,7 @@ export interface TabsSectionProps {
   headingTag?: 'h2' | 'h3' | 'h4';
   tabLabel?: ReactNode;
   title: string;
+  testId?: string;
 }
 
 const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
@@ -39,6 +40,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
       headingTag = 'h3',
       hasSiblings,
       lazy,
+      testId = undefined,
       ...restProps
     }: TabsSectionProps,
     ref,
@@ -70,6 +72,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         ref={ref}
         role={hasSiblings ? onMedia('tabpanel') : undefined}
         tabIndex={hasSiblings ? onMedia(-1) : undefined}
+        data-testid={testId}
       >
         {headingTitle && createElement(headingTag, null, headingTitle)}
         {children}

@@ -197,6 +197,7 @@ describe('PreReleaseTableToolPage', () => {
     {
       id: 'block-1',
       dataBlockId: 'block-1',
+      dataBlockParentId: 'block-1-parent',
       name: 'Test highlight',
       description: 'Test highlight description',
       subjectId: 'subject-1',

@@ -44,7 +44,7 @@ const DataBlockTabs = ({
     value: fullTable,
     isLoading,
     error,
-  } = useTableQuery(releaseId, dataBlock.id);
+  } = useTableQuery(releaseId, dataBlock.dataBlockParentId);
 
   const errorMessage = <WarningMessage>Could not load content</WarningMessage>;
 
@@ -120,6 +120,7 @@ const DataBlockTabs = ({
         {dataBlock.table && (
           <TabsSection
             id={`${id}-tables`}
+            testId={`${testId(dataBlock)}-table-tab`}
             tabLabel={
               dataBlock.charts?.length ? (
                 <>
