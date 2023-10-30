@@ -44,12 +44,17 @@ public class RedirectsService : IRedirectsService
             {
                 if (mr.RedirectSlug == mr.LatestPublishedSlug)
                 {
-                    // should never be necessary, but just in case...
+                    // It is possible for a redirect to point to the currently active slug. This can happen as a
+                    // methodology can change to a slug even if there is a redirect for that slug,
+                    // *if* the redirect is for the same methodology - i.e. the methodology's slug is changing
+                    // back to a previous slug it used. But the slug may not change back immediately, if the change
+                    // is on an unpublished amendment, so we cannot remove the redirect immediately when changing the
+                    // slug back; redirect needs to be active until the amendment is published.
                     return null;
                 }
 
                 return new MethodologyRedirectViewModel(
-                    mr.RedirectSlug, mr.LatestPublishedSlug);
+                    FromSlug: mr.RedirectSlug, ToSlug: mr.LatestPublishedSlug);
             })
             .WhereNotNull()
             .Distinct()

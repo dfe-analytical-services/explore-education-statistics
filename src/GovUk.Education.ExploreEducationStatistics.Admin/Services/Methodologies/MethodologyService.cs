@@ -308,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 return methodologyVersionToUpdate;
             }
 
-            if (methodologyVersionToUpdate.Title != request.Title)
+            if (methodologyVersionToUpdate.Title != request.Title) // EES-3789 Should also check for slug change here too?
             {
                 throw new ArgumentException(
                     "Should not update status of MethodologyVersion while simultaneously updating it's title");
@@ -343,8 +343,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
 
             return await _userService.CheckCanUpdateMethodologyVersion(methodologyVersionToUpdate)
-                .OnSuccessDo(async _ => await ValidateMethodologySlug(
-                    newSlug, oldSlug: methodologyVersionToUpdate.Slug))
+                .OnSuccessDo(async methodologyVersion => await ValidateMethodologySlug(
+                    newSlug,
+                    oldSlug: methodologyVersionToUpdate.Slug,
+                    methodologyId: methodologyVersion.MethodologyId))
                 .OnSuccess(async methodologyVersion =>
                 {
                     methodologyVersion.Updated = DateTime.UtcNow;
@@ -558,7 +560,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlug(
-            string newSlug, string? oldSlug = null)
+           string newSlug, string? oldSlug = null, Guid? methodologyId = null)
         {
             if (newSlug == oldSlug)
             {
@@ -573,12 +575,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 return ValidationActionResult(SlugNotUnique);
             }
 
-            var redirectExists = await _context.MethodologyRedirects
-                .Where(mr => mr.Slug == newSlug)
+            var redirectExistsToOtherMethodology = await _context.MethodologyRedirects
+                .Where(mr =>
+                    mr.Slug == newSlug
+                    // we exclude redirects to the same methodology i.e. we allow the slug to be changed back
+                    && (methodologyId != null && methodologyId != mr.MethodologyVersion.MethodologyId))
                 .AnyAsync();
 
-            // @MarkFix but what happens if the redirect belongs to the same methodology? Then we can allow it?
-            if (redirectExists)
+            if (redirectExistsToOtherMethodology)
             {
                 return ValidationActionResult(SlugUsedByRedirect);
             }

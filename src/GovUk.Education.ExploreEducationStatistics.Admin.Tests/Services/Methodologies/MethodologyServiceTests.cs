@@ -2065,6 +2065,185 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task UpdateMethodology_RedirectForNewSlugAlreadyExists()
+        {
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Slug = "test-publication"
+            };
+
+            var methodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+                Status = MethodologyApprovalStatus.Draft,
+                Methodology = new Methodology
+                {
+                    LatestPublishedVersionId = null,
+                    OwningPublicationTitle = "Test publication",
+                    OwningPublicationSlug = "test-publication",
+                    Publications = ListOf(new PublicationMethodology
+                    {
+                        Owner = true,
+                        Publication = publication
+                    })
+                }
+            };
+
+            var versionWithRedirect = new MethodologyVersion
+            {
+                Methodology = new Methodology(),
+            };
+
+            var methodologyRedirect = new MethodologyRedirect
+            {
+                MethodologyVersion = versionWithRedirect,
+                Slug = "updated-methodology-title",
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                Title = "Updated Methodology Title"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyVersions.AddRangeAsync(methodologyVersion, versionWithRedirect);
+                await context.MethodologyRedirects.AddAsync(methodologyRedirect);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+                methodologyVersionRepository
+                    .Setup(mock => mock.GetLatestPublishedVersionBySlug("updated-methodology-title"))
+                    .ReturnsAsync((MethodologyVersion?)null);
+
+                var service = SetupMethodologyService(context,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
+
+                var result = await service.UpdateMethodology(methodologyVersion.Id, request);
+                result.AssertBadRequest(SlugUsedByRedirect);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var notUpdatedMethodology = await context
+                    .MethodologyVersions
+                    .Include(m => m.Methodology)
+                    .SingleAsync(m => m.Id == methodologyVersion.Id);
+
+                Assert.Equal("Test publication", notUpdatedMethodology.Title);
+                Assert.Equal("Test publication", notUpdatedMethodology.Methodology.OwningPublicationTitle);
+                Assert.Null(notUpdatedMethodology.AlternativeTitle);
+                Assert.Equal("test-publication", notUpdatedMethodology.Slug);
+                Assert.Equal("test-publication", notUpdatedMethodology.Methodology.OwningPublicationSlug);
+                Assert.Null(notUpdatedMethodology.AlternativeSlug);
+
+                Assert.False(notUpdatedMethodology.Updated.HasValue);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateMethodology_RedirectForNewSlugAlreadyExistsButForSameMethodology()
+        {
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Slug = "test-publication"
+            };
+
+            var versionWithRedirectId = Guid.NewGuid();
+            var methodology = new Methodology
+            {
+                LatestPublishedVersionId = versionWithRedirectId,
+                OwningPublicationTitle = "Test publication",
+                OwningPublicationSlug = "test-publication",
+                Publications = ListOf(new PublicationMethodology
+                {
+                    Owner = true,
+                    Publication = publication
+                })
+            };
+
+            var versionWithRedirect = new MethodologyVersion
+            {
+                Id = versionWithRedirectId,
+                Methodology = methodology,
+                Status = MethodologyApprovalStatus.Approved,
+            };
+
+            var methodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                Methodology = methodology,
+                Status = MethodologyApprovalStatus.Draft,
+                PreviousVersionId = versionWithRedirectId,
+            };
+
+            var methodologyRedirect = new MethodologyRedirect
+            {
+                MethodologyVersion = versionWithRedirect,
+                Slug = "updated-methodology-title",
+            };
+
+            var request = new MethodologyUpdateRequest
+            {
+                Title = "Updated Methodology Title",
+                Status = MethodologyApprovalStatus.Draft,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await context.MethodologyVersions.AddRangeAsync(methodologyVersion, versionWithRedirect);
+                await context.MethodologyRedirects.AddAsync(methodologyRedirect);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+                methodologyVersionRepository
+                    .Setup(mock => mock.GetLatestPublishedVersionBySlug("updated-methodology-title"))
+                    .ReturnsAsync((MethodologyVersion?)null);
+
+                var service = SetupMethodologyService(context,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
+
+                var result = await service.UpdateMethodology(methodologyVersion.Id, request);
+                var methodologyVersionViewModel = result.AssertRight();
+
+                Assert.Equal(methodologyVersion.Id, methodologyVersionViewModel.Id);
+                Assert.Equal("Updated Methodology Title", methodologyVersionViewModel.Title);
+                Assert.Equal("updated-methodology-title", methodologyVersionViewModel.Slug);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedVersion = await context
+                    .MethodologyVersions
+                    .Include(m => m.Methodology)
+                    .SingleAsync(m => m.Id == methodologyVersion.Id);
+
+                Assert.Equal("Updated Methodology Title", updatedVersion.Title);
+                Assert.Equal("Updated Methodology Title", updatedVersion.AlternativeTitle);
+                Assert.Equal("Test publication", updatedVersion.Methodology.OwningPublicationTitle);
+
+                Assert.Equal("updated-methodology-title", updatedVersion.Slug);
+                Assert.Equal("updated-methodology-title", updatedVersion.AlternativeSlug);
+                Assert.Equal("test-publication", updatedVersion.Methodology.OwningPublicationSlug);
+
+                Assert.True(updatedVersion.Updated.HasValue);
+            }
+        }
+
+        [Fact]
         public async Task UpdateMethodology_StatusUpdate()
         {
             var publication = new Publication
@@ -2930,7 +3109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var releases = _fixture
                     .DefaultRelease()
                     .WithApprovalStatuses(ListOf(
-                        ReleaseApprovalStatus.Approved, 
+                        ReleaseApprovalStatus.Approved,
                         ReleaseApprovalStatus.Draft))
                     .GenerateList();
 
@@ -2969,7 +3148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                     var result = await service.ListUsersMethodologyVersionsForApproval();
                     var methodologyVersionsForApproval = result.AssertRight();
-                    
+
                     // The user should have access to approve the Methodology if they have Approver permissions
                     // on ANY of the Publication's Releases, not just the latest one.
                     var methodologyForApproval = Assert.Single(methodologyVersionsForApproval);

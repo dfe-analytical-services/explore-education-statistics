@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         if (isToBePublished)
                         {
                             await _methodologyCacheService.UpdateSummariesTree();
-                            await _redirectsCacheService.UpdateRedirects(); // @MarkFix unit test?
+                            await _redirectsCacheService.UpdateRedirects();
                         }
 
                         if (request.Status == MethodologyApprovalStatus.HigherLevelReview)
