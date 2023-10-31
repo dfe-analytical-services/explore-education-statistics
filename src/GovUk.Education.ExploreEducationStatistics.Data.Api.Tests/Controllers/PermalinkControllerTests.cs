@@ -43,7 +43,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
         var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
 
         permalinkService
-            .Setup(s => s.CreatePermalink(It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest)),
+            .Setup(s => s.CreatePermalink(It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest, null)),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResult);
 

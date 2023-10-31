@@ -136,8 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(Approved, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
@@ -252,8 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(Approved, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
@@ -323,8 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal("Test approval", methodologyStatus.InternalReleaseNote);
                 Assert.Equal(Approved, methodologyStatus.ApprovalStatus);
-                Assert.NotNull(methodologyStatus.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
+                methodologyStatus.Created.AssertUtcNow();
                 Assert.Equal(UserId, methodologyStatus.CreatedById);
             }
         }
@@ -405,8 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal("Submitted for higher review", methodologyStatus.InternalReleaseNote);
                 Assert.Equal(HigherLevelReview, methodologyStatus.ApprovalStatus);
-                Assert.NotNull(methodologyStatus.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
+                methodologyStatus.Created.AssertUtcNow();
                 Assert.Equal(UserId, methodologyStatus.CreatedById);
             }
         }
@@ -487,8 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal("Moving to draft", methodologyStatus.InternalReleaseNote);
                 Assert.Equal(Draft, methodologyStatus.ApprovalStatus);
-                Assert.NotNull(methodologyStatus.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
+                methodologyStatus.Created.AssertUtcNow();
                 Assert.Equal(UserId, methodologyStatus.CreatedById);
             }
         }
@@ -619,8 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.False(updatedMethodologyVersion.Published.HasValue);
                 Assert.Equal(Approved, updatedMethodologyVersion.Status);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.True(updatedMethodologyVersion.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodologyVersion.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
@@ -697,8 +691,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyCacheService);
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
-                Assert.True(updatedMethodologyVersion.Published.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodologyVersion.Published!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Published.AssertUtcNow();
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
@@ -712,12 +705,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .Include(m => m.Methodology)
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
-                Assert.True(updatedMethodologyVersion.Published.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodologyVersion.Published!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Published.AssertUtcNow();
                 Assert.Equal(Approved, updatedMethodologyVersion.Status);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.True(updatedMethodologyVersion.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodologyVersion.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
@@ -899,8 +890,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(Approved, updatedMethodologyVersion.Status);
                 Assert.Equal(WithRelease, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Equal(scheduledWithRelease.Id, updatedMethodologyVersion.ScheduledWithReleaseId);
-                Assert.True(updatedMethodologyVersion.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodologyVersion.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
@@ -1196,8 +1186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Draft, updatedMethodologyVersion.Status);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.True(updatedMethodologyVersion.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodologyVersion.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
@@ -1317,8 +1306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(HigherLevelReview, updatedMethodologyVersion.Status);
-                Assert.True(updatedMethodologyVersion.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodologyVersion.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }

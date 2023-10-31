@@ -1068,8 +1068,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SingleAsync(p => p.Title == "New title");
 
                 Assert.False(updatedPublication.Live);
-                Assert.True(updatedPublication.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
+                updatedPublication.Updated.AssertUtcNow();
                 Assert.Equal("new-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
                 Assert.Equal(newSupersededById, updatedPublication.SupersededById);
@@ -1201,8 +1200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SingleAsync(p => p.Title == "New title");
 
                 Assert.True(updatedPublication.Live);
-                Assert.True(updatedPublication.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
+                updatedPublication.Updated.AssertUtcNow();
                 // Slug remains unchanged
                 Assert.Equal("old-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);

@@ -1671,8 +1671,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("Updated Methodology Title", updatedMethodology.AlternativeTitle);
                 Assert.Equal("updated-methodology-title", updatedMethodology.Slug);
                 Assert.Equal("updated-methodology-title", updatedMethodology.Methodology.Slug);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
@@ -1758,8 +1757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("Updated Methodology Title", updatedMethodology.AlternativeTitle);
                 Assert.Equal("test-publication", updatedMethodology.Slug);
                 Assert.Equal("test-publication", updatedMethodology.Methodology.Slug);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
@@ -1848,8 +1846,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal("test-publication", updatedMethodology.Slug);
                 Assert.Equal("test-publication", updatedMethodology.Methodology.Slug);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
@@ -1939,8 +1936,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal("alternative-methodology-title", updatedMethodology.Slug);
                 Assert.Equal("alternative-methodology-title", updatedMethodology.Methodology.Slug);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
@@ -2109,8 +2105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("Updated Methodology Title", updatedMethodology.AlternativeTitle);
                 Assert.Equal("updated-methodology-title", updatedMethodology.Slug);
                 Assert.Equal("updated-methodology-title", updatedMethodology.Methodology.Slug);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
