@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -65,8 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Assert.Equal(savedPublication, methodologyVersion.Methodology.Publications[0].Publication);
                 Assert.Equal(savedPublication.Title, methodologyVersion.Title);
                 Assert.Equal(savedPublication.Slug, methodologyVersion.Slug);
-                Assert.NotNull(methodologyVersion.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyVersion.Created!.Value).Milliseconds, 0, 1500);
+                methodologyVersion.Created.AssertUtcNow();
                 Assert.Equal(userId, methodologyVersion.CreatedById);
             }
         }
