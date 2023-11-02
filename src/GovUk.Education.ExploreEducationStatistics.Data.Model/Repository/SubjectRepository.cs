@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -15,6 +16,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         public SubjectRepository(StatisticsDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<IList<Subject>> FindAll(
+            IEnumerable<Guid> subjectIds,
+            Func<IQueryable<Subject>, IQueryable<Subject>>? hydrateSubjectFunction = null)
+        {
+            IQueryable<Subject> subjectQueryable = _context
+                .Subject
+                .Where(s => subjectIds.Contains(s.Id));
+
+            if (hydrateSubjectFunction is not null)
+            {
+                subjectQueryable = hydrateSubjectFunction.Invoke(subjectQueryable);
+            }
+
+            return await subjectQueryable
+                .ToListAsync();
         }
 
         public async Task<Subject?> Find(Guid subjectId)

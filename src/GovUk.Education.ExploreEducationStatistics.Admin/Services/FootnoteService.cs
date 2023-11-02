@@ -31,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IFootnoteRepository _footnoteRepository;
+        private readonly ISubjectRepository _subjectRepository;
 
         public FootnoteService(
             StatisticsDbContext context,
@@ -38,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IDataBlockService dataBlockService,
             IFootnoteRepository footnoteRepository,
+            ISubjectRepository subjectRepository,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper)
         {
             _context = context;
@@ -45,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _dataBlockService = dataBlockService;
             _footnoteRepository = footnoteRepository;
+            _subjectRepository = subjectRepository;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
         }
 
@@ -60,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsExist(subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds))
                 .OnSuccess(async () =>
                 {
                     var releaseHasFootnotes = await _context.ReleaseFootnote
@@ -151,6 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
+                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsExist(subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds))
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId, HydrateFootnote)
                 .OnSuccess(async footnote =>
                 {
@@ -356,6 +361,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(f => f.Subjects);
         }
 
+        private static IQueryable<Subject> HydrateSubjectWithFiltersAndIndicators(IQueryable<Subject> query)
+        {
+            return query
+                .Include(s => s.Filters)
+                .ThenInclude(filter => filter.FilterGroups)
+                .ThenInclude(filterGroup => filterGroup.FilterItems)
+                .Include(s => s.IndicatorGroups)
+                .ThenInclude(indicatorGroup => indicatorGroup.Indicators);
+        }
+
         private async Task<Either<ActionResult, Unit>> ValidateFootnoteIdsForRelease(
             Guid releaseId,
             IEnumerable<Guid> footnoteIds)
@@ -368,6 +383,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!SequencesAreEqualIgnoringOrder(allReleaseFootnoteIds, footnoteIds))
             {
                 return ValidationResult(ValidationErrorMessages.FootnotesDifferFromReleaseFootnotes);
+            }
+
+            return Unit.Instance;
+        }
+
+        private async Task<Either<ActionResult, Unit>> CheckSubjectsFiltersAndIndicatorsExist(
+            IReadOnlySet<Guid> subjectIds,
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlySet<Guid> indicatorIds)
+        {
+            IList<Subject> subjects = await _subjectRepository.FindAll(subjectIds, HydrateSubjectWithFiltersAndIndicators);
+
+            var errors = new List<Enum>();
+
+            foreach (Guid subjectId in subjectIds)
+            {
+                if (!subjects.Any(f => f.Id == subjectId))
+                {
+                    errors.Add(ValidationErrorMessages.SubjectDoesNotExist);
+                }
+            }
+
+            foreach (Subject subject in subjects)
+            {
+                foreach (Guid filterId in filterIds)
+                {
+                    if (!subject.Filters.Any(f => f.Id == filterId))
+                    {
+                        errors.Add(ValidationErrorMessages.FilterDoesNotExist);
+                    }
+                }
+
+                foreach (Filter filter in subject.Filters)
+                {
+                    foreach (Guid filterGroupId in filterGroupIds)
+                    {
+                        if (!filter.FilterGroups.Any(f => f.Id == filterGroupId))
+                        {
+                            errors.Add(ValidationErrorMessages.FilterGroupDoesNotExist);
+                        }
+                    }
+
+                    foreach (FilterGroup filterGroup in filter.FilterGroups)
+                    {
+                        foreach (Guid filterItemId in filterItemIds)
+                        {
+                            if (!filterGroup.FilterItems.Any(f => f.Id == filterItemId))
+                            {
+                                errors.Add(ValidationErrorMessages.FilterItemDoesNotExist);
+                            }
+                        }
+                    }
+                }
+
+                foreach (Guid indicatorId in indicatorIds)
+                {
+                    IEnumerable<Indicator> allSubjectIndicators = subject.IndicatorGroups.SelectMany(ig => ig.Indicators);
+
+                    if (!allSubjectIndicators.Any(f => f.Id == indicatorId))
+                    {
+                        errors.Add(ValidationErrorMessages.IndicatorDoesNotExist);
+                    }
+                }
+            }
+
+            if (errors.Any())
+            {
+                return ValidationResult(errors.ToArray());
             }
 
             return Unit.Instance;
