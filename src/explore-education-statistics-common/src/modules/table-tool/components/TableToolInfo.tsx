@@ -1,20 +1,34 @@
 import React, { ReactNode } from 'react';
 import { Contact } from '@common/services/publicationService';
+import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
+import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 
 interface Props {
   contactDetails?: Contact;
   methodologyLinks?: ReactNode[];
   releaseLink?: ReactNode;
+  releaseType?: ReleaseType;
 }
 
 const TableToolInfo = ({
   contactDetails,
   methodologyLinks,
   releaseLink,
+  releaseType,
 }: Props) => {
   return (
     <>
       <h3>Related information</h3>
+
+      {releaseType && (
+        <>
+          <p>Release Type: {releaseTypes[releaseType]}</p>
+          <div className="govuk-hint">
+            <ReleaseTypesModal />
+          </div>
+        </>
+      )}
+
       <ul className="govuk-list">
         {releaseLink && <li>Publication: {releaseLink}</li>}
         {methodologyLinks?.map((methodologyLink, index) => (
@@ -22,6 +36,12 @@ const TableToolInfo = ({
           <li key={index}>Methodology: {methodologyLink}</li>
         ))}
       </ul>
+
+      <p>
+        Our statistical practice is regulated by the Office for Statistics
+        Regulation (OSR).
+      </p>
+
       {contactDetails && (
         <>
           <h3>Contact us</h3>
