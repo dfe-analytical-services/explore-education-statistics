@@ -43,7 +43,7 @@ Validate table
     user checks table cell contains    1    3    148,820
 
 Validate footnotes
-    user checks page contains element    //h3[@class="govuk-heading-m"]
+    user checks page contains element    testid:footnotes
     user checks page contains
     ...    State-funded secondary schools include city technology colleges and all secondary academies, including all-through academies and free schools.
     user checks page contains    x - 1 or 2 pupils, or a percentage based on 1 or 2.

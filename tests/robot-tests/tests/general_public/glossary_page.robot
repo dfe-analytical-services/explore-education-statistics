@@ -27,11 +27,9 @@ Validate glossary accordion sections
 
 Search for Voluntary repayment
     user verifies accordion is closed    V
-
     user enters text into element    id:pageSearchForm-input    Voluntary repayment
     user waits until element contains    id:pageSearchForm-resultsLabel    Found 1 result
     user clicks element    id:pageSearchForm-option-0
-
     user verifies accordion is open    V
 
     ${section}=    user gets accordion section content element    V

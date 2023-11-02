@@ -61,7 +61,7 @@ Validate table
     user checks row cell contains text    ${row}    3    798
 
 Validate footnotes
-    user checks page contains element    //h3[@class="govuk-heading-m"]
+    user checks page contains element    testid:footnotes
     user checks page contains
     ...    The number of fixed period exclusions expressed as a percentage of the number of pupils in January each year.
     user checks page contains    x - 1 or 2 pupils, or a percentage based on 1 or 2.

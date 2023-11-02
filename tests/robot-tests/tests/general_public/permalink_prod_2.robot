@@ -55,7 +55,7 @@ Validate table
     user checks row cell contains text    ${row}    3    7,916,225
 
 Validate footnotes
-    user checks page contains element    //h3[@class="govuk-heading-m"]
+    user checks page contains element    testid:footnotes
     user checks page contains    Includes pupils who are sole or dual main registrations. Includes boarding pupils.
     user checks page contains    x - 1 or 2 pupils, or a percentage based on 1 or 2.
 
