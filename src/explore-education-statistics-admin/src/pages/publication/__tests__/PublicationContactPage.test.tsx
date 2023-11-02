@@ -397,6 +397,48 @@ describe('PublicationContactPage', () => {
     });
   });
 
+  test('can submit without a contact tel no', async () => {
+    publicationService.getContact.mockResolvedValue({
+      contactName: testContact.contactName,
+      contactTelNo: '',
+      teamEmail: testContact.teamEmail,
+      teamName: testContact.teamName,
+    });
+    renderPage(testPublication);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Edit contact details' }),
+    );
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Update contact details' }),
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('Confirm contact changes')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+    await waitFor(() => {
+      expect(publicationService.updateContact).toHaveBeenCalledWith(
+        testPublication.id,
+        {
+          contactName: testContact.contactName,
+          contactTelNo: undefined,
+          teamEmail: testContact.teamEmail,
+          teamName: testContact.teamName,
+        },
+      );
+    });
+  });
+
   test('clicking confirm switches page to readOnly', async () => {
     publicationService.getContact.mockResolvedValue(testContact);
     publicationService.updateContact.mockResolvedValue({
