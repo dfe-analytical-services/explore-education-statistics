@@ -110,11 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
         // Footnotes
         FootnotesDifferFromReleaseFootnotes,
-        IndicatorDoesNotExist,
-        FilterDoesNotExist,
-        FilterGroupDoesNotExist,
-        FilterItemDoesNotExist,
-        SubjectDoesNotExist,
+        FootnoteSpecificationsAreInvalid,
 
         // Key statistics
         DataBlockShouldBeUnattached,

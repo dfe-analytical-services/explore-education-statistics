@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         indicatorIds: indicatorIds,
                         subjectIds: subjectIds,
                         footnote.Order);
-                    })
+                })
                     .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId)));
         }
 
@@ -361,16 +361,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(f => f.Subjects);
         }
 
-        private static IQueryable<Subject> HydrateSubjectWithFiltersAndIndicators(IQueryable<Subject> query)
-        {
-            return query
-                .Include(s => s.Filters)
-                .ThenInclude(filter => filter.FilterGroups)
-                .ThenInclude(filterGroup => filterGroup.FilterItems)
-                .Include(s => s.IndicatorGroups)
-                .ThenInclude(indicatorGroup => indicatorGroup.Indicators);
-        }
-
         private async Task<Either<ActionResult, Unit>> ValidateFootnoteIdsForRelease(
             Guid releaseId,
             IEnumerable<Guid> footnoteIds)
@@ -397,65 +387,114 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             IList<Subject> subjects = await _subjectRepository.FindAll(subjectIds, HydrateSubjectWithFiltersAndIndicators);
 
-            var errors = new List<Enum>();
-
-            foreach (Guid subjectId in subjectIds)
+            if (!AllSpecifiedSubjectsExist(subjectIds, subjects))
             {
-                if (!subjects.Any(f => f.Id == subjectId))
-                {
-                    errors.Add(ValidationErrorMessages.SubjectDoesNotExist);
-                }
+                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
             }
 
             foreach (Subject subject in subjects)
             {
-                foreach (Guid filterId in filterIds)
+                if (!AllSpecifiedFiltersExist(filterIds, subject)
+                    || !AllSpecifiedFilterGroupsExist(filterGroupIds, subject)
+                    || !AllSpecifiedFilterItemsExist(filterItemIds, subject)
+                    || !AllSpecifiedIndicatorsExist(indicatorIds, subject))
                 {
-                    if (!subject.Filters.Any(f => f.Id == filterId))
-                    {
-                        errors.Add(ValidationErrorMessages.FilterDoesNotExist);
-                    }
+                    return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
                 }
-
-                foreach (Filter filter in subject.Filters)
-                {
-                    foreach (Guid filterGroupId in filterGroupIds)
-                    {
-                        if (!filter.FilterGroups.Any(f => f.Id == filterGroupId))
-                        {
-                            errors.Add(ValidationErrorMessages.FilterGroupDoesNotExist);
-                        }
-                    }
-
-                    foreach (FilterGroup filterGroup in filter.FilterGroups)
-                    {
-                        foreach (Guid filterItemId in filterItemIds)
-                        {
-                            if (!filterGroup.FilterItems.Any(f => f.Id == filterItemId))
-                            {
-                                errors.Add(ValidationErrorMessages.FilterItemDoesNotExist);
-                            }
-                        }
-                    }
-                }
-
-                foreach (Guid indicatorId in indicatorIds)
-                {
-                    IEnumerable<Indicator> allSubjectIndicators = subject.IndicatorGroups.SelectMany(ig => ig.Indicators);
-
-                    if (!allSubjectIndicators.Any(f => f.Id == indicatorId))
-                    {
-                        errors.Add(ValidationErrorMessages.IndicatorDoesNotExist);
-                    }
-                }
-            }
-
-            if (errors.Any())
-            {
-                return ValidationResult(errors.ToArray());
             }
 
             return Unit.Instance;
+        }
+
+        private static IQueryable<Subject> HydrateSubjectWithFiltersAndIndicators(IQueryable<Subject> query)
+        {
+            return query
+                .Include(s => s.Filters)
+                .ThenInclude(filter => filter.FilterGroups)
+                .ThenInclude(filterGroup => filterGroup.FilterItems)
+                .Include(s => s.IndicatorGroups)
+                .ThenInclude(indicatorGroup => indicatorGroup.Indicators);
+        }
+
+        private static bool AllSpecifiedSubjectsExist(IReadOnlySet<Guid> subjectIds, IList<Subject> subjects)
+        {
+            foreach (Guid subjectId in subjectIds)
+            {
+                if (!subjects.Any(f => f.Id == subjectId))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool AllSpecifiedFiltersExist(IReadOnlySet<Guid> filterIds, Subject subject)
+        {
+            IEnumerable<Guid> subjectFilterIds = subject.Filters
+                .Select(f => f.Id);
+
+            foreach (Guid filterId in filterIds)
+            {
+                if (!subjectFilterIds.Contains(filterId))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool AllSpecifiedFilterGroupsExist(IReadOnlySet<Guid> filterGroupIds, Subject subject)
+        {
+            IEnumerable<Guid> subjectFilterGroupIds = subject.Filters
+                .SelectMany(f => f.FilterGroups)
+                .Select(fg => fg.Id);
+
+            foreach (Guid filterGroupId in filterGroupIds)
+            {
+                if (!subjectFilterGroupIds.Contains(filterGroupId))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool AllSpecifiedFilterItemsExist(IReadOnlySet<Guid> filterItemIds, Subject subject)
+        {
+            IEnumerable<Guid> subjectFilterItemIds = subject.Filters
+                .SelectMany(f => f.FilterGroups)
+                .SelectMany(fg => fg.FilterItems)
+                .Select(fi => fi.Id);
+
+            foreach (Guid filterItemId in filterItemIds)
+            {
+                if (!subjectFilterItemIds.Contains(filterItemId))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool AllSpecifiedIndicatorsExist(IReadOnlySet<Guid> indicatorIds, Subject subject)
+        {
+            IEnumerable<Guid> allSubjectIndicatorIds = subject.IndicatorGroups
+                .SelectMany(ig => ig.Indicators)
+                .Select(i => i.Id);
+
+            foreach (Guid indicatorId in indicatorIds)
+            {
+                if (!allSubjectIndicatorIds.Contains(indicatorId))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
     }
 }
