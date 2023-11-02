@@ -486,6 +486,9 @@
   top: 1rem;
 
   @include govuk-media-query($from: tablet) {
+    height: calc(100vh - 3rem);
+    overflow: auto;
+    margin-right: 1rem;
     position: sticky;
   }
   @include govuk-media-query($until: tablet) {
@@ -517,6 +520,10 @@
   @include govuk-media-query($from: desktop) {
     display: flex;
   }
+}
+
+.releaseNav {
+  flex: 1 0 25%;
 }
 
 .releaseMainContent {
@@ -620,4 +627,21 @@
 
 html {
   scroll-padding-top: 1rem;
+}
+
+.stickyBackToTop {
+  @include govuk-media-query($from: tablet) {
+    display: none;
+  }
+  @include govuk-media-query($until: tablet) {
+    background: govuk-colour('light-grey');
+    padding: 0.2rem;
+    position: sticky;
+    top: 97.5%;
+  }
+}
+
+.prototypeHeaderLinks {
+  min-width: 275px;
+  text-align: right;
 }

@@ -2487,15 +2487,7 @@ const ExampleCharts = ({ chartType }: Props) => {
               </div>
             </li>
           </ol>
-          <button
-            aria-controls="chartFootnotes-dataBlock-0cd5437b-0be3-4cc8-9b62-249df4d4076c-chart"
-            aria-disabled="false"
-            aria-expanded="false"
-            type="button"
-            className="ButtonText_button__60Q71 govuk-!-display-none-print govuk-!-margin-bottom-4"
-          >
-            Show 2 more footnotes
-          </button>
+
           <p className="govuk-body-s">
             Source: Individualised Learner Record (ILR)
           </p>

@@ -97,7 +97,7 @@ const PrototypeReleaseData = () => {
         wide={false}
       >
         <div ref={headerRef}>
-          <PrototypeSectionExamples sectionExample="header1" />
+          <PrototypeSectionExamples sectionExample="header3" />
         </div>
 
         <div>
@@ -163,22 +163,6 @@ const PrototypeReleaseData = () => {
                               'govuk-body-s',
                               {
                                 'govuk-!-font-weight-bold':
-                                  visibleSection === 'Summary',
-                              },
-                            )}
-                            href="#Summary"
-                          >
-                            Release details
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            className={classNames(
-                              'govuk-link--no-visited-state',
-                              styles.prototypeLinkNoUnderline,
-                              'govuk-body-s',
-                              {
-                                'govuk-!-font-weight-bold':
                                   visibleSection === 'Headlines',
                               },
                             )}
@@ -201,6 +185,22 @@ const PrototypeReleaseData = () => {
                             href="#exploreData"
                           >
                             Explore data used in this release
+                          </a>
+                        </li>
+                        <li>
+                          <a
+                            className={classNames(
+                              'govuk-link--no-visited-state',
+                              styles.prototypeLinkNoUnderline,
+                              'govuk-body-s',
+                              {
+                                'govuk-!-font-weight-bold':
+                                  visibleSection === 'Summary',
+                              },
+                            )}
+                            href="#Summary"
+                          >
+                            Release details
                           </a>
                         </li>
                         <li>
@@ -374,14 +374,14 @@ const PrototypeReleaseData = () => {
             )}
 
             <div className={styles.releaseMainContent}>
-              <section id="Summary" ref={summaryRef}>
-                <PrototypeSectionExamples sectionExample="summary" />
-              </section>
               <section id="Headlines" ref={headlinesRef}>
                 <PrototypeSectionExamples sectionExample="headlines" />
               </section>
               <section id="ExploreData" ref={exploreRef}>
                 <PrototypeSectionExamples sectionExample="explore" />
+              </section>{' '}
+              <section id="Summary" ref={summaryRef}>
+                <PrototypeSectionExamples sectionExample="summarySmall" />
               </section>
               <div className={styles.stickyBackToTop}>
                 <a href="#">Back to top</a>
@@ -419,7 +419,6 @@ const PrototypeReleaseData = () => {
               <section id="additionalData" ref={addtionalDataRef}>
                 <PrototypeSectionExamples sectionExample="additionalData" />
               </section>
-
               <section id="Help" ref={helpRef}>
                 <PrototypeSectionExamples sectionExample="help" />
               </section>

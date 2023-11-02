@@ -48,6 +48,9 @@ import PrototypeHomepageDashboard from './PrototypeHomepageDashboard';
 import PrototypeHomepageDashboard2 from './PrototypeHomepageDashboard2';
 import PrototypeReleasePage from './admin-api/PrototypeReleasePage';
 import PrototypeReleaseNav from './PrototypeReleaseNavigation';
+import PrototypeReleaseNav2 from './PrototypeReleaseNavigation2';
+import PrototypeReleaseNav3 from './PrototypeReleaseNavigation3';
+import PrototypeReleaseNav4 from './PrototypeReleaseNavigation4';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -344,6 +347,21 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Release navigation',
     path: '/prototypes/release-nav',
     component: PrototypeReleaseNav,
+  },
+  {
+    name: 'Release navigation 2',
+    path: '/prototypes/release-nav2',
+    component: PrototypeReleaseNav2,
+  },
+  {
+    name: 'Release navigation 3',
+    path: '/prototypes/release-nav3',
+    component: PrototypeReleaseNav3,
+  },
+  {
+    name: 'Release navigation 4',
+    path: '/prototypes/release-nav4',
+    component: PrototypeReleaseNav4,
   },
 ];
 
