@@ -1,7 +1,7 @@
 import Button from '@common/components/Button';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import { ThemeSummary } from '@common/services/themeService';
-import { ThemesModal } from '@frontend/modules/find-statistics/components/FilterModals';
+import ThemesModal from '@frontend/modules/find-statistics/components/FilterModals';
 import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/FiltersDesktop';
 import React from 'react';
 
