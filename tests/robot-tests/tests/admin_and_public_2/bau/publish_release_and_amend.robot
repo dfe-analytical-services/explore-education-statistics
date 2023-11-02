@@ -450,13 +450,13 @@ Change the Release type
     user clicks link    Edit release summary
     user waits until page finishes loading
     user waits until h2 is visible    Edit release summary
-    user checks page contains radio    Experimental statistics
-    user clicks radio    Experimental statistics
+    user checks page contains radio    Official statistics in development
+    user clicks radio    Official statistics in development
     user clicks button    Update release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Financial year
     ...    3000-01
-    ...    Experimental statistics
+    ...    Official statistics in development
 
 Navigate to data replacement page
     user clicks link    Data and files
@@ -845,7 +845,7 @@ Verify amendment accordions are correct
 
 Verify amendment help and support section is correct
     user checks page contains    Help and support
-    user checks page contains    Experimental statistics
+    user checks page contains    Official statistics in development
     user checks page contains    Contact us
 
 Verify amendment Dates data block accordion section
