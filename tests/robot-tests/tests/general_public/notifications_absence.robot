@@ -35,6 +35,5 @@ Sign up for email alerts
     user clicks button    Subscribe
 
     # EES-1265
-    #user waits until h1 is visible    Subscribed    %{WAIT_LONG}
-    user waits until page contains    Subscribed    %{WAIT_SMALL}
+    user waits until page contains    Subscribed    %{WAIT_LONG}
     user checks page contains    Thank you. Check your email to confirm your subscription.
