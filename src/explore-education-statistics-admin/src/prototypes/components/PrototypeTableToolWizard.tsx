@@ -158,6 +158,7 @@ const PrototypeTableToolWizard = ({
           latestData: latestRelease.latestRelease,
           slug: latestRelease.slug,
           title: latestRelease.title,
+          type: latestRelease.type,
         },
         latestRelease: {
           title: latestRelease.title,
