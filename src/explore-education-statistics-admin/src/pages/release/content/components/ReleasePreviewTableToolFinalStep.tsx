@@ -19,6 +19,7 @@ import methodologyService, {
 } from '@admin/services/methodologyService';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { ReleaseType } from '@common/services/types/releaseType';
 
 interface Model {
   methodologies: MethodologyVersionSummary[];
@@ -32,6 +33,7 @@ interface ReleasePreviewTableToolFinalStepProps {
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
+  releaseType: ReleaseType;
 }
 const ReleasePreviewTableToolFinalStep = ({
   publication,
@@ -39,6 +41,7 @@ const ReleasePreviewTableToolFinalStep = ({
   table,
   tableHeaders,
   onReorderTableHeaders,
+  releaseType,
 }: ReleasePreviewTableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
 
@@ -110,6 +113,7 @@ const ReleasePreviewTableToolFinalStep = ({
               contactDetails={model?.contact}
               methodologyLinks={getMethodologyLinks()}
               releaseLink={<span>{publication.title}</span>}
+              releaseType={releaseType}
             />
           </LoadingSpinner>
         </>

@@ -18,11 +18,13 @@ import React, { memo, useRef } from 'react';
 import { generatePath } from 'react-router-dom';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import { ReleaseType } from '@common/services/types/releaseType';
 
 interface TableToolFinalStepProps {
   publication?: Publication;
   query: ReleaseTableDataQuery;
   releaseId: string;
+  releaseType?: ReleaseType;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
@@ -32,6 +34,7 @@ const PreReleaseTableToolFinalStep = ({
   publication,
   query,
   releaseId,
+  releaseType,
   table,
   tableHeaders,
   onReorderTableHeaders,
@@ -99,6 +102,7 @@ const PreReleaseTableToolFinalStep = ({
                   {publication.title}
                 </Link>
               }
+              releaseType={releaseType}
             />
           </LoadingSpinner>
         </>

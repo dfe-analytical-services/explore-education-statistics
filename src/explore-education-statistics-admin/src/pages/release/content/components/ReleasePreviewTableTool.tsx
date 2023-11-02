@@ -14,12 +14,18 @@ import ReleasePreviewTableToolFinalStep from '@admin/pages/release/content/compo
 import { Publication } from '@admin/services/publicationService';
 import { Publication as ContentPublication } from '@common/services/publicationService';
 import React, { useState } from 'react';
+import { ReleaseType } from '@common/services/types/releaseType';
 
 interface Props {
   releaseId: string;
+  releaseType: ReleaseType;
   publication: Publication | ContentPublication;
 }
-const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
+const ReleasePreviewTableTool = ({
+  releaseId,
+  releaseType,
+  publication,
+}: Props) => {
   const [dataBlockId, setDataBlockId] = useState<string>();
 
   const { value: initialState, isLoading } = useAsyncHandledRetry<
@@ -111,6 +117,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}
+                        releaseType={releaseType}
                       />
                     )}
                   </>
