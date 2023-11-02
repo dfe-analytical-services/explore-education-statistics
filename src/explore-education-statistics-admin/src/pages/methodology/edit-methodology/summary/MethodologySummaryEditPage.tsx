@@ -1,6 +1,4 @@
-import MethodologySummaryForm, {
-  MethodologySummaryFormValues,
-} from '@admin/pages/methodology/components/MethodologySummaryForm';
+import MethodologySummaryForm from '@admin/pages/methodology/components/MethodologySummaryForm';
 import {
   MethodologyRouteParams,
   methodologySummaryRoute,
@@ -16,7 +14,7 @@ const MethodologySummaryEditPage = ({
   const { methodologyId, methodology, onMethodologyChange } =
     useMethodologyContext();
 
-  const handleSubmit = async ({ title }: MethodologySummaryFormValues) => {
+  const handleSubmit = async (title: string) => {
     if (!methodology) {
       throw new Error('Could not update missing methodology');
     }
