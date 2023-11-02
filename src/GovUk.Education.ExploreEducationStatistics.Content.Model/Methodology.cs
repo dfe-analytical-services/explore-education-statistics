@@ -15,8 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [Required] public string OwningPublicationTitle { get; set; } = null!;
 
-        [Required]
-        public string OwningPublicationSlug { get; set; } = null!;
+        [Required] public string OwningPublicationSlug { get; set; } = null!;
 
         [Required] public string Slug { get; set; } = null!; // TODO: Remove in EES-4627
 

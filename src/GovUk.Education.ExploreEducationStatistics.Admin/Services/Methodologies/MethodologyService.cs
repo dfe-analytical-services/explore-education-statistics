@@ -367,13 +367,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             .LoadAsync();
 
                         // Only unpublished versions need a redirect to be created, as users cannot
-                        // update a published methodology version's AlternateSlug
+                        // update a published methodology version's AlternativeSlug
                         if (methodologyVersion.Id == methodology.LatestVersion().Id
-                            // If an unpublished version already has a redirect, that means it's slug been updated
-                            // previously. And so it doesn't need a new redirect, as the hypothetical redirect's
-                            // fromSlug would have never have been live. We only need to create one redirect from the
-                            // methodology's current slug for the unpublished amendment, as that is the only slug that
-                            // has been live.
+                            // If an unpublished version already has a redirect, that means the version's slug has
+                            // been updated previously. And so it doesn't need a new redirect, as the hypothetical
+                            // redirect's `Slug` would have never have been live. We only need to create one redirect
+                            // from the methodology's current slug for the unpublished amendment, as that is the only
+                            // slug that has been live.
                             && !await _context.MethodologyRedirects.AnyAsync(mr =>
                                 mr.MethodologyVersionId == methodologyVersion.Id))
 
@@ -519,10 +519,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(() => _methodologyImageService.DeleteAll(methodologyVersion.Id, forceDelete))
                 .OnSuccessVoid(async () =>
                 {
-                    _context.MethodologyRedirects.RemoveRange(
-                        _context.MethodologyRedirects
-                            .Where(mr => mr.MethodologyVersionId == methodologyVersion.Id));
-
                     _context.MethodologyVersions.Remove(methodologyVersion);
 
                     await _context.SaveChangesAsync();

@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await redirectsService.List();
 
                 var viewModel = result.AssertRight();
-                var methodologyRedirectViewModel = viewModel.MethodologyRedirects;
+                var methodologyRedirectViewModel = viewModel.Methodologies;
 
                 Assert.Equal(2, methodologyRedirectViewModel.Count);
 
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                Assert.Empty(viewModel.MethodologyRedirects);
+                Assert.Empty(viewModel.Methodologies);
             }
         }
 
@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await redirectsService.List();
 
                 var viewModel = result.AssertRight();
-                var methodologyRedirectViewModel = viewModel.MethodologyRedirects;
+                var methodologyRedirectViewModel = viewModel.Methodologies;
 
                 var redirect = Assert.Single(methodologyRedirectViewModel);
 
@@ -266,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await redirectsService.List();
 
                 var viewModel = result.AssertRight();
-                var methodologyRedirectsViewModel = viewModel.MethodologyRedirects;
+                var methodologyRedirectsViewModel = viewModel.Methodologies;
 
                 Assert.Equal(2, methodologyRedirectsViewModel.Count);
 
@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await redirectsService.List();
 
                 var viewModel = result.AssertRight();
-                Assert.Empty(viewModel.MethodologyRedirects);
+                Assert.Empty(viewModel.Methodologies);
             }
         }
 
@@ -386,7 +386,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                var redirect = Assert.Single(viewModel.MethodologyRedirects);
+                var redirect = Assert.Single(viewModel.Methodologies);
                 Assert.Equal("duplicated-redirect", redirect.FromSlug);
                 Assert.Equal("redirect-to", redirect.ToSlug);
             }

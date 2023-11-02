@@ -5,8 +5,7 @@ FROM [dbo].[MethodologyVersions] MV
          JOIN [dbo].[Methodologies] M ON MV.MethodologyId = M.Id
          JOIN [dbo].[PublicationMethodologies] PM ON PM.MethodologyId = M.Id
          JOIN [dbo].[Publications] P ON P.Id = PM.PublicationId
-WHERE PM.Owner = 1
-AND P.Slug != M.OwningPublicationSlug;
+WHERE PM.Owner = 1;
 
 -- If Methodology.Slug is different to the owning publication's slug,
 -- it is an AlternativeSlug

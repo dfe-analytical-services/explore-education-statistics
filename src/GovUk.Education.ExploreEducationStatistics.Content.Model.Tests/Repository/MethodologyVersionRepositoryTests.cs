@@ -961,17 +961,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             var methodology = new Methodology
             {
                 LatestPublishedVersionId = null,
-                OwningPublicationSlug = "slug",
+                OwningPublicationSlug = "owning-publication-slug",
                 Versions = new List<MethodologyVersion>
                 {
                     new()
                     {
-                        AlternativeSlug = "slug",
-                        Version = 1,
-                    },
-                    new()
-                    {
-                        AlternativeSlug = "slug",
+                        AlternativeSlug = "alternative-slug",
                         Version = 0,
                     },
                 },

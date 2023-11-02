@@ -22,9 +22,9 @@ public class RedirectsService : IRedirectsService
 
     public async Task<Either<ActionResult, RedirectsViewModel>> List()
     {
-        // A redirect for a methodologyVersion that isn't published shouldn't appear in the list. A redirect becomes
-        // active once the associated methodologyVersion is published. It remains active if subsequent methodology
-        // amendment's are published. We establish this by checking against each methodologyVersion's Version.
+        // A redirect for a MethodologyVersion that isn't published shouldn't appear in the list. A redirect becomes
+        // active once the associated MethodologyVersion is published. It remains active if subsequent methodology
+        // amendments are published. We establish this by checking against each MethodologyVersion's Version number.
         var methodologyRedirects = await _contentDbContext.MethodologyRedirects
             .Where(mr => mr.MethodologyVersion.Methodology.LatestPublishedVersion != null
                          && mr.MethodologyVersion.Methodology.LatestPublishedVersion.Version >=

@@ -161,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             if (slugChanged)
             {
                 // A redirect is only needed for the LatestPublishedVersion.
-                // Unpublished methodology's don't need a redirect - they're not live.
+                // Unpublished methodologies don't need a redirect - they're not live.
                 // An unpublished amendment doesn't need a redirect because:
                 // - if it uses OwningPublicationSlug, it is covered by the LatestPublishedVersion redirect created here
                 // - if it uses AlternativeSlug, a redirect would have been created at the time the AlternativeSlug
@@ -187,7 +187,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     // We must delete the unpublished amendment's redirect, as otherwise if the unpublished version
                     // changes its slug again, no redirect will be created for the methodology's new slug. (If updating
                     // an unpublished version's slug multiple times, a redirect is only created the first time - see
-                    // MethodologyUpdate code). If this doesn't make any sense, see the associated unit test
+                    // MethodologyUpdate code). If this doesn't make any sense, see the unit test
+                    // PublicationTitleOrSlugChanged_NewMethodologyRedirectSlugMatchesExistingRedirectSlug
                     var redirectToRemove = await _contentDbContext.MethodologyRedirects
                         .Where(mr =>
                             mr.MethodologyVersionId == ownedMethodology.LatestVersion().Id
