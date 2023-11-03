@@ -50,7 +50,8 @@ export default function OfficialStatisticsSection({
         <a href="mailto:regulation@statistics.gov.uk">
           regulation@statistics.gov.uk
         </a>{' '}
-        or via the OSR website.
+        or via the{' '}
+        <a href="https://osr.statisticsauthority.gov.uk/">OSR website</a>.
       </p>
     </>
   );

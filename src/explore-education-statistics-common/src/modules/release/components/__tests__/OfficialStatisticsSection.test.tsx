@@ -51,5 +51,10 @@ describe('OfficialStatisticsSection', () => {
     expect(
       screen.getByRole('link', { name: 'regulation@statistics.gov.uk' }),
     ).toHaveAttribute('href', 'mailto:regulation@statistics.gov.uk');
+
+    expect(screen.getByRole('link', { name: 'OSR website' })).toHaveAttribute(
+      'href',
+      'https://osr.statisticsauthority.gov.uk/',
+    );
   });
 });
