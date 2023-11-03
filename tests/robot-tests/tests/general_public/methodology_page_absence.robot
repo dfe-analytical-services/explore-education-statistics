@@ -77,7 +77,6 @@ Search for "pupil"
 
     user verifies accordion is closed    1. Overview of absence statistics
 
-    # This is a comment
     user enters text into element    id:pageSearchForm-input    pupil
     user waits until element contains    id:pageSearchForm-resultsLabel
     ...    Found ${expected_occurrences_of_pupil} results
