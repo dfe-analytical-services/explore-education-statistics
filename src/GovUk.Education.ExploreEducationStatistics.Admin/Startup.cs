@@ -570,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
             AddPersistenceHelper<UsersAndRolesDbContext>(services);
-            services.AddTransient<AuthorizationHandlerResourceRoleService>();
+            services.AddTransient<AuthorizationHandlerService>();
             services.AddScoped<DateTimeProvider>();
 
             // This service handles the generation of the JWTs for users after they log in

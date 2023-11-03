@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
@@ -16,14 +16,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         where TRequirement : IAuthorizationRequirement
     {
         private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         protected ReleaseStatusAuthorizationHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
             _releasePublishingStatusRepository = releasePublishingStatusRepository;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected abstract ReleaseApprovalStatus TargetApprovalStatus { get; }
@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
                         context.User.GetUserId(),
                         release.PublicationId,
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 ? ListOf(ReleaseRole.Approver)
                 : ReleaseEditorAndApproverRoles;
 
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
                         context.User.GetUserId(),
                         release.PublicationId,
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 ? ListOf(ReleaseRole.Approver)
                 : ReleaseEditorAndApproverRoles;
 
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
                         context.User.GetUserId(),
                         release.PublicationId,
@@ -155,10 +155,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public MarkReleaseAsDraftAuthorizationHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
             : base(
                 releasePublishingStatusRepository,
-                authorizationHandlerResourceRoleService)
+                authorizationHandlerService)
         {
         }
 
@@ -174,10 +174,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public MarkReleaseAsHigherLevelReviewAuthorizationHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
             : base(
                 releasePublishingStatusRepository,
-                authorizationHandlerResourceRoleService)
+                authorizationHandlerService)
         {
         }
 
@@ -193,10 +193,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         public MarkReleaseAsApprovedAuthorizationHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) 
+            AuthorizationHandlerService authorizationHandlerService) 
             : base(
                 releasePublishingStatusRepository,
-                authorizationHandlerResourceRoleService)
+                authorizationHandlerService)
         {
         }
 

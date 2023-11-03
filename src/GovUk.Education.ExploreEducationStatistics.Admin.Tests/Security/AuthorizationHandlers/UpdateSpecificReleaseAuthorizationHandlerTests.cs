@@ -12,10 +12,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -30,21 +32,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task UpdateAllReleases_ClaimSucceedsIfNotApproved()
             {
                 await GetEnumValues<ReleaseApprovalStatus>()
+                    .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(async status =>
                     {
-                        if (status == Approved)
-                        {
-                            return;
-                        }
-
                         var release = new Release
                         {
                             Id = Guid.NewGuid(),
                             ApprovalStatus = status
                         };
 
-                        await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
+                        await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
                             HandlerSupplier(release),
                             release,
                             SecurityClaimTypes.UpdateAllReleases
@@ -62,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ApprovalStatus = Approved
                 };
 
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
                     HandlerSupplier(release),
                     release,
                     claimsExpectedToSucceed: Array.Empty<SecurityClaimTypes>());
@@ -75,15 +73,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task PublicationOwnerAndApproversCanUpdateUnapprovedRelease()
             {
                 await GetEnumValues<ReleaseApprovalStatus>()
+                    .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            if (status == Approved)
-                            {
-                                return;
-                            }
-
                             var release = new Release
                             {
                                 Id = Guid.NewGuid(),
@@ -139,15 +133,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task EditorsCanUpdateUnapprovedRelease()
             {
                 await GetEnumValues<ReleaseApprovalStatus>()
+                    .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
                         {
-                            if (status == Approved)
-                            {
-                                return;
-                            }
-
                             var release = new Release
                             {
                                 Id = Guid.NewGuid(),
@@ -219,9 +209,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 contentDbContext.SaveChanges();
 
                 return new UpdateSpecificReleaseAuthorizationHandler(
-                    new AuthorizationHandlerResourceRoleService(
+                    new AuthorizationHandlerService(
+                        contentDbContext,
                         new UserReleaseRoleRepository(contentDbContext),
-                        new UserPublicationRoleRepository(contentDbContext)));
+                        new UserPublicationRoleRepository(contentDbContext),
+                        Mock.Of<IPreReleaseService>(Strict)));
             };
         }
     }
