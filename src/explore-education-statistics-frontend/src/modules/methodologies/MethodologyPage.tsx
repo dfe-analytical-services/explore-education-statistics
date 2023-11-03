@@ -135,7 +135,7 @@ const MethodologyPage: NextPage<Props> = ({ data }) => {
               </li>
             </ul>
 
-            <h3 className="govuk-heading-s" id="related-pages">
+            <h3 className="govuk-heading-s" id="help-and-support">
               Help and support
             </h3>
             <ul className="govuk-list">
