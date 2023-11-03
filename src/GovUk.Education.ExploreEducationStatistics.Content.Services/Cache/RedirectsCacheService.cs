@@ -25,8 +25,8 @@ public class RedirectsCacheService : IRedirectsCacheService
     }
 
     [BlobCache(typeof(RedirectsCacheKey), forceUpdate: true, ServiceName = "public")]
-    public Task<Either<ActionResult,RedirectsViewModel>> UpdateRedirects()
+    public async Task<Either<ActionResult,RedirectsViewModel>> UpdateRedirects()
     {
-        return _redirectsService.List();
+        return await _redirectsService.List();
     }
 }

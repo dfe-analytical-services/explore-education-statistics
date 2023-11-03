@@ -4,9 +4,9 @@ using System.Collections.Generic;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 
 public record RedirectsViewModel(
-    List<MethodologyRedirectViewModel> Methodologies);
+    List<RedirectViewModel> Publications,
+    List<RedirectViewModel> Methodologies);
 
-public record MethodologyRedirectViewModel(
+public record RedirectViewModel(
     string FromSlug,
     string ToSlug);
-

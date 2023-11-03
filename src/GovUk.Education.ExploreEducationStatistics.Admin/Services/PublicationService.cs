@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IRedirectsCacheService _redirectsCacheService;
 
         public PublicationService(
             ContentDbContext context,
@@ -49,7 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPublicationRepository publicationRepository,
             IMethodologyService methodologyService,
             IPublicationCacheService publicationCacheService,
-            IMethodologyCacheService methodologyCacheService)
+            IMethodologyCacheService methodologyCacheService,
+            IRedirectsCacheService redirectsCacheService)
         {
             _context = context;
             _mapper = mapper;
@@ -59,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _methodologyService = methodologyService;
             _publicationCacheService = publicationCacheService;
             _methodologyCacheService = methodologyCacheService;
+            _redirectsCacheService = redirectsCacheService;
         }
 
         public async Task<Either<ActionResult, List<PublicationViewModel>>> ListPublications(
@@ -110,13 +113,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             PublicationCreateRequest publication)
         {
             return await ValidateSelectedTopic(publication.TopicId)
+                .OnSuccess(_ => ValidatePublicationSlug(publication.Slug))
                 .OnSuccess(async _ =>
                 {
-                    if (_context.Publications.Any(p => p.Slug == publication.Slug))
-                    {
-                        return ValidationActionResult(SlugNotUnique);
-                    }
-
                     var contact = await _context.Contacts.AddAsync(new Contact
                     {
                         ContactName = publication.Contact.ContactName,
@@ -192,10 +191,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var originalTitle = publication.Title;
                     var originalSlug = publication.Slug;
 
-                    if (!publication.Live)
+                    var titleChanged = originalTitle != updatedPublication.Title;
+                    var slugChanged = originalSlug != updatedPublication.Slug;
+
+                    if (slugChanged)
                     {
                         var slugValidation =
-                            await ValidatePublicationSlugUniqueForUpdate(publication.Id, updatedPublication.Slug);
+                            await ValidatePublicationSlug(updatedPublication.Slug, publication.Id);
 
                         if (slugValidation.IsLeft)
                         {
@@ -203,6 +205,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
 
                         publication.Slug = updatedPublication.Slug;
+
+                        if (publication.Live
+                            && _context.PublicationRedirects.All(pr =>
+                                !(pr.PublicationId == publicationId && pr.Slug == originalSlug))) // don't create duplicate redirect
+                            {
+                                var publicationRedirect = new PublicationRedirect
+                                {
+                                    Slug = originalSlug,
+                                    Publication = publication,
+                                    PublicationId = publication.Id,
+                                };
+                                _context.PublicationRedirects.Add(publicationRedirect);
+                            }
                     }
 
                     publication.Title = updatedPublication.Title;
@@ -215,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    if (originalTitle != publication.Title || originalSlug != publication.Slug)
+                    if (titleChanged || slugChanged)
                     {
                         await _methodologyService.PublicationTitleOrSlugChanged(publicationId,
                             originalSlug,
@@ -228,6 +243,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _methodologyCacheService.UpdateSummariesTree();
                         await _publicationCacheService.UpdatePublicationTree();
                         await _publicationCacheService.UpdatePublication(publication.Slug);
+
+                        if (slugChanged)
+                        {
+                            await _publicationCacheService.RemovePublication(originalSlug);
+                            await _redirectsCacheService.UpdateRedirects();
+                        }
 
                         await UpdateCachedSupersededPublications(publication);
                     }
@@ -342,7 +363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     // Replace existing contact that is shared with another publication with a new
                     // contact, as we want each publication to have its own contact.
                     if (_context.Publications
-                            .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
+                        .Any(p => p.ContactId == publication.ContactId && p.Id != publication.Id))
                     {
                         publication.Contact = new Contact();
                     }
@@ -450,12 +471,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidatePublicationSlugUniqueForUpdate(Guid id, string slug)
+        private async Task<Either<ActionResult, Unit>> ValidatePublicationSlug(
+            string slug, Guid? publicationId = null)
         {
             if (await _context.Publications.AsQueryable()
-                    .AnyAsync(publication => publication.Slug == slug && publication.Id != id))
+                    .AnyAsync(publication =>
+                        publication.Id != publicationId
+                        && publication.Slug == slug))
             {
                 return ValidationActionResult(SlugNotUnique);
+            }
+
+            var hasRedirect = await _context.PublicationRedirects
+                .AnyAsync(pr =>
+                    pr.PublicationId != publicationId // If publication previously used this slug, can change it back
+                    && pr.Slug == slug);
+
+            if (hasRedirect)
+            {
+                return ValidationActionResult(SlugUsedByRedirect);
+            }
+
+            if (publicationId.HasValue)
+            {
+                // if a methodology is inheriting the new publication slug, it must also be validated
+                //_methodologyService.ValidateMethodologySlug(slug); // @MarkFix
             }
 
             return Unit.Instance;

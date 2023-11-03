@@ -166,8 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
             if (slugChanged)
             {
-                // A redirect is only needed for the LatestPublishedVersion.
-                // Unpublished methodologies don't need a redirect - they're not live.
+                // A redirect is (with one exception, below) is only needed for the LatestPublishedVersion.
                 // An unpublished amendment doesn't need a redirect because:
                 // - if it uses OwningPublicationSlug, it is covered by the LatestPublishedVersion redirect created here
                 // - if it uses AlternativeSlug, a redirect would have been created at the time the AlternativeSlug
@@ -185,6 +184,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         Slug = originalSlug,
                     };
                     _contentDbContext.MethodologyRedirects.Add(redirect);
+
+                    // This is the exception mentioned above. If we have an unpublished amendment with an
+                    // AlternativeSlug set, and the LatestPublishedVersion inherits the publication slug,
+                    // then we need to create a redirect for the unpublished amendment for the new slug.
+                    if (ownedMethodology.LatestVersion().Id != ownedMethodology.LatestPublishedVersionId
+                        // && ownedMethodology.LatestPublishedVersion is { AlternativeSlug: null} // already checked above
+                        && ownedMethodology.LatestVersion().AlternativeSlug != null)
+                        // && (redirectSlugs.Contains(updatedSlug) && ownedVersionIds.Contains(
+                    {
+                        var unpublishedAmendmentRedirect = new MethodologyRedirect
+                        {
+                            MethodologyVersion = ownedMethodology.LatestVersion(),
+                            Slug = updatedSlug,
+                        };
+                        _contentDbContext.MethodologyRedirects.Add(unpublishedAmendmentRedirect);
+                    }
 
                     // It's possible we now have two redirects from the same slug. This happens if:
                     // - An unpublished amendment sets an AlternativeSlug

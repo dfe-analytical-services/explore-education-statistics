@@ -568,7 +568,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublicationRepository? publicationRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
-            IMethodologyCacheService? methodologyCacheService = null)
+            IMethodologyCacheService? methodologyCacheService = null,
+            IRedirectsCacheService? redirectsCacheService = null)
         {
             context ??= Mock.Of<ContentDbContext>();
 
@@ -580,7 +581,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
         }
     }
 }

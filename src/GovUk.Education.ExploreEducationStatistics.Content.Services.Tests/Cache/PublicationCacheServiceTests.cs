@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
@@ -507,11 +508,13 @@ public class PublicationCacheServiceTests : CacheServiceTestFixture
     }
 
     private static PublicationCacheService BuildService(
-        IPublicationService? publicationService = null
+        IPublicationService? publicationService = null,
+        IPublicBlobStorageService? publicBlobStorageService = null
     )
     {
         return new PublicationCacheService(
             publicationService: publicationService ?? Mock.Of<IPublicationService>(Strict),
+            publicBlobStorageService: publicBlobStorageService ?? Mock.Of<IPublicBlobStorageService>(Strict),
             Mock.Of<ILogger<PublicationCacheService>>()
         );
     }

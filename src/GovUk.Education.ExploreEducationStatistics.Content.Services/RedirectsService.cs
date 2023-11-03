@@ -22,6 +22,15 @@ public class RedirectsService : IRedirectsService
 
     public async Task<Either<ActionResult, RedirectsViewModel>> List()
     {
+        var publicationRedirectViewModels = await _contentDbContext.PublicationRedirects
+            .Where(pr => pr.Slug != pr.Publication.Slug) // don't use redirects to the current live slug
+            .Distinct()
+            .Select(pr => new RedirectViewModel(
+                pr.Slug,
+                pr.Publication.Slug
+            ))
+            .ToListAsync();
+
         // A redirect for a MethodologyVersion that isn't published shouldn't appear in the list. A redirect becomes
         // active once the associated MethodologyVersion is published. It remains active if subsequent methodology
         // amendments are published. We establish this by checking against each MethodologyVersion's Version number.
@@ -53,13 +62,15 @@ public class RedirectsService : IRedirectsService
                     return null;
                 }
 
-                return new MethodologyRedirectViewModel(
+                return new RedirectViewModel(
                     FromSlug: mr.RedirectSlug, ToSlug: mr.LatestPublishedSlug);
             })
             .WhereNotNull()
             .Distinct()
             .ToList();
 
-        return new RedirectsViewModel(methodologyRedirectViewModels);
+        return new RedirectsViewModel(
+            publicationRedirectViewModels,
+            methodologyRedirectViewModels);
     }
 }

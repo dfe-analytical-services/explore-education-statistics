@@ -6,6 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Slug
         SlugNotUnique,
         SlugUsedByRedirect,
+        SlugUsedByMethodology,
 
         // Partial date
         PartialDateNotValid,

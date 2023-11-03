@@ -739,7 +739,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -798,7 +798,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -880,7 +880,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -979,7 +979,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -1046,7 +1046,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -1066,96 +1066,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var redirect = await contentDbContext
                     .MethodologyRedirects
                     .SingleAsync();
-
-                Assert.Equal(latestPublishedVersionId, redirect.MethodologyVersionId);
-                Assert.Equal("original-slug", redirect.Slug);
-            }
-        }
-
-        [Fact]
-        public async Task PublicationTitleOrSlugChanged_NewMethodologyRedirectSlugMatchesExistingRedirectSlug()
-        {
-            var publicationId = Guid.NewGuid();
-            var latestPublishedVersionId = Guid.NewGuid();
-            var amendmentVersionId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = new PublicationMethodology
-                {
-                    Publication = new Publication
-                    {
-                        Id = publicationId,
-                        LatestPublishedRelease = new Release()
-                    },
-                    Owner = true,
-                    Methodology = new Methodology
-                    {
-                        LatestPublishedVersionId = latestPublishedVersionId,
-                        Versions = new List<MethodologyVersion>
-                        {
-                            new ()
-                            {
-                                Id = latestPublishedVersionId,
-                                Version = 0,
-                            },
-                            new ()
-                            {
-                                Id = amendmentVersionId,
-                                AlternativeSlug = "newer-slug",
-                                Version = 1,
-                                PreviousVersionId = latestPublishedVersionId,
-                            },
-                        },
-                        OwningPublicationTitle = "Original title",
-                        OwningPublicationSlug = "original-slug",
-                    }
-                };
-
-                var methodologyRedirect = new MethodologyRedirect
-                {
-                    MethodologyVersion = publicationMethodology.Methodology.Versions[1],
-                    Slug = "original-slug",
-                };
-
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
-                await contentDbContext.MethodologyRedirects.AddAsync(methodologyRedirect);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
-                redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
-
-                var service = SetupMethodologyService(contentDbContext,
-                    redirectsCacheService: redirectsCacheService.Object);
-                await service.PublicationTitleOrSlugChanged(publicationId, "original-slug",
-                    "New Title", "new-slug");
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = await contentDbContext
-                    .PublicationMethodologies
-                    .Include(m => m.Methodology.Versions)
-                    .SingleAsync(m => m.PublicationId == publicationId);
-
-                Assert.Equal("New Title", publicationMethodology.Methodology.OwningPublicationTitle);
-                Assert.Equal("new-slug", publicationMethodology.Methodology.OwningPublicationSlug);
-
-                var redirects = await contentDbContext
-                    .MethodologyRedirects
-                    .ToListAsync();
-
-                // We remove the now redundant redirect from the unpublished amendment. This is necessary because
-                // if the unpublished amendment's slug is changed again from "newer-slug" to "even-newer-slug", no
-                // new redirect will be created, as the amendment already has a redirect from "original-slug". This
-                // would mean that when the amendment is published, and the methodology's slug changes to
-                // "even-newer-slug", there will be no redirect from "new-slug".
-                var redirect = Assert.Single(redirects);
 
                 Assert.Equal(latestPublishedVersionId, redirect.MethodologyVersionId);
                 Assert.Equal("original-slug", redirect.Slug);
@@ -1198,8 +1108,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var methodologyRedirect = new MethodologyRedirect
                 {
                     MethodologyVersion = publicationMethodology.Methodology.Versions[0],
-                    // The current methodology slug could match a redirect if a user changes via publication slug
-                    // multiple times
+                    // The current methodology slug can match a redirect slug if a user changes via inherited
+                    // publication slug multiple times
                     Slug = "original-slug",
                 };
 
@@ -1212,7 +1122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
                 redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
+                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
 
                 var service = SetupMethodologyService(contentDbContext,
                     redirectsCacheService: redirectsCacheService.Object);
@@ -1238,6 +1148,101 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(latestPublishedVersionId, redirect.MethodologyVersionId);
                 Assert.Equal("original-slug", redirect.Slug);
+            }
+        }
+
+        [Fact]
+        public async Task PublicationTitleOrSlugChanged_UnpublishedMethodologyAmendmentNeedsRedirectIfInheritedPubSlugChanges()
+        {
+            var publicationId = Guid.NewGuid();
+            var oldVersionId = Guid.NewGuid();
+            var latestPublishedVersionId = Guid.NewGuid();
+            var latestVersionId = Guid.NewGuid();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var publicationMethodology = new PublicationMethodology
+                {
+                    Publication = new Publication
+                    {
+                        Id = publicationId,
+                        LatestPublishedRelease = new Release()
+                    },
+                    Owner = true,
+                    Methodology = new Methodology
+                    {
+                        LatestPublishedVersionId = latestPublishedVersionId,
+                        Versions = new List<MethodologyVersion>
+                        {
+                            new ()
+                            {
+                                Id = latestPublishedVersionId,
+                                Version = 0,
+                            },
+                            new ()
+                            {
+                                Id = latestVersionId,
+                                Version = 1,
+                                AlternativeSlug = "methodology-alternative-slug",
+                                PreviousVersionId = latestPublishedVersionId,
+                            }
+                        },
+                        OwningPublicationTitle = "Current title",
+                        OwningPublicationSlug = "current-slug",
+                    }
+                };
+
+                var methodologyRedirect = new MethodologyRedirect
+                {
+                    // This would have been created when the unpublished amendment's AlternativeSlug was set.
+                    MethodologyVersionId = latestVersionId,
+                    Slug = "current-slug",
+                };
+
+                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
+                await contentDbContext.MethodologyRedirects.AddAsync(methodologyRedirect);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var redirectsCacheService = new Mock<IRedirectsCacheService>(MockBehavior.Strict);
+                redirectsCacheService.Setup(mock => mock.UpdateRedirects())
+                    .ReturnsAsync(new RedirectsViewModel(new List<RedirectViewModel>(), new List<RedirectViewModel>()));
+
+                var service = SetupMethodologyService(contentDbContext,
+                    redirectsCacheService: redirectsCacheService.Object);
+                await service.PublicationTitleOrSlugChanged(publicationId, "current-slug",
+                    "New Title", "new-slug");
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var publicationMethodology = await contentDbContext
+                    .PublicationMethodologies
+                    .Include(m => m.Methodology.Versions)
+                    .SingleAsync(m => m.PublicationId == publicationId);
+
+                Assert.Equal("New Title", publicationMethodology.Methodology.OwningPublicationTitle);
+                Assert.Equal("new-slug", publicationMethodology.Methodology.OwningPublicationSlug);
+
+                var redirects = await contentDbContext
+                    .MethodologyRedirects
+                    .ToListAsync();
+
+                Assert.Equal(2, redirects.Count);
+
+                // "current-slug" redirect for latestVersion is removed, as a "current-slug" redirect has been added
+                // for the latestPublishedVersion
+
+                Assert.Equal(latestPublishedVersionId, redirects[0].MethodologyVersionId);
+                Assert.Equal("current-slug", redirects[0].Slug);
+
+                // A new redirect for the unpublished amendment, as otherwise we have no redirect for
+                // "new-slug" once the amendment is published
+                Assert.Equal(latestVersionId, redirects[1].MethodologyVersionId);
+                Assert.Equal("new-slug", redirects[1].Slug);
             }
         }
 
