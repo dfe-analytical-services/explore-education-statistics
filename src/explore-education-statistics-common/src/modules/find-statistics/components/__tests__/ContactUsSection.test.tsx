@@ -4,7 +4,7 @@ import ContactUsSection from '@common/modules/find-statistics/components/Contact
 import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/test-data';
 
 describe('ContactUsSection', () => {
-  test('that it renders', () => {
+  test('renders', () => {
     render(
       <ContactUsSection
         publicationContact={mockContact}
@@ -12,7 +12,9 @@ describe('ContactUsSection', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Contact us' })).toBeVisible();
+    expect(
+      screen.getByRole('heading', { name: 'Contact us' }),
+    ).toBeInTheDocument();
   });
 
   test.each([
@@ -26,7 +28,7 @@ describe('ContactUsSection', () => {
     ],
     ['', 'If you have a specific enquiry about statistics and data'],
   ])(
-    'that it constructs a sensible prompt text',
+    'constructs a sensible prompt text',
     (publicationTitle: string, expectedText: Matcher) => {
       render(
         <ContactUsSection
@@ -35,11 +37,13 @@ describe('ContactUsSection', () => {
         />,
       );
 
-      expect(screen.getByText(expectedText, { exact: false })).toBeVisible();
+      expect(
+        screen.getByText(expectedText, { exact: false }),
+      ).toBeInTheDocument();
     },
   );
 
-  test('that it contains an appropriate href to the contact email', () => {
+  test('contains an appropriate href to the contact email', () => {
     render(
       <ContactUsSection
         publicationContact={mockContact}
@@ -49,14 +53,14 @@ describe('ContactUsSection', () => {
 
     expect(
       screen.getByRole('link', { name: 'Mock Contact Email' }),
-    ).toBeVisible();
+    ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', { name: 'Mock Contact Email' }),
     ).toHaveAttribute('href', 'mailto:Mock Contact Email');
   });
 
-  test('that it displays the telephone number if one is supplied', () => {
+  test('displays the telephone number if one is supplied', () => {
     render(
       <ContactUsSection
         publicationContact={mockContact}
@@ -64,10 +68,12 @@ describe('ContactUsSection', () => {
       />,
     );
 
-    expect(screen.getByText(/Telephone: Mock Contact Tel No/)).toBeVisible();
+    expect(
+      screen.getByText(/Telephone: Mock Contact Tel No/),
+    ).toBeInTheDocument();
   });
 
-  test('that it hides the telephone number section if one is not supplied', () => {
+  test('hides the telephone number section if one is not supplied', () => {
     render(
       <ContactUsSection
         publicationContact={{ ...mockContact, contactTelNo: undefined }}
@@ -77,6 +83,6 @@ describe('ContactUsSection', () => {
 
     expect(
       screen.queryByRole('link', { name: 'Mock Contact Tel No' }),
-    ).toBeNull();
+    ).not.toBeInTheDocument();
   });
 });

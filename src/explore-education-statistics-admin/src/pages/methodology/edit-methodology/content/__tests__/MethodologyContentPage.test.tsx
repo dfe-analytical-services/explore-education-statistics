@@ -51,25 +51,34 @@ describe('MethodologyContentPage', () => {
     userEvent.click(screen.getByRole('link', { name: 'Manage content' }));
   });
 
-  test('that the Help and Support section renders', () => {
+  test('Help and Support section renders', () => {
     expect(
-      within(selectRelatedInformationSection()).getByRole('heading', {
+      within(
+        screen.getByRole('navigation', { name: 'Related information' }),
+      ).getByRole('heading', {
         name: 'Help and support',
       }),
-    ).toBeVisible();
+    ).toBeInTheDocument();
+
+    expect(screen.getByText('mock team email 1')).toBeInTheDocument();
+    expect(screen.getByText('mock team name 1')).toBeInTheDocument();
   });
 
-  test('that it displays a link to the Contact Us section within the Related Information section', () => {
+  test('displays a link to the Contact Us section within the Related Information section', () => {
     expect(
-      within(selectRelatedInformationSection()).getByRole('link', {
+      within(
+        screen.getByRole('navigation', { name: 'Related information' }),
+      ).getByRole('link', {
         name: 'Contact us',
       }),
-    ).toBeVisible();
+    ).toBeInTheDocument();
   });
 
-  test('that it navigates to the Contact Us section when the link is clicked', () => {
+  test('navigates to the Contact Us section when the link is clicked', () => {
     expect(
-      within(selectRelatedInformationSection()).getByRole('link', {
+      within(
+        screen.getByRole('navigation', { name: 'Related information' }),
+      ).getByRole('link', {
         name: 'Contact us',
       }),
     ).toHaveAttribute('href', '#contact-us');
@@ -80,20 +89,6 @@ describe('MethodologyContentPage', () => {
         .find(e => e.id === 'contact-us'),
     ).not.toBeUndefined();
   });
-
-  const selectRelatedInformationSection = (): HTMLElement => {
-    const relatedInformation = screen.getByRole('heading', {
-      name: 'Related information',
-    }).parentElement;
-
-    if (!relatedInformation) {
-      throw new Error(
-        'Failing test early - the "Related information" section could not be found.',
-      );
-    }
-
-    return relatedInformation;
-  };
 
   const renderPage = () => {
     const path = generatePath<MethodologyRouteParams>(

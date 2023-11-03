@@ -199,45 +199,37 @@ describe('MethodologyPage', () => {
   });
 
   describe('Help and Support Section', () => {
-    const selectRelatedInformationSection = (): HTMLElement => {
-      const relatedInformation = screen.getByRole('heading', {
-        name: 'Related information',
-      }).parentElement;
-
-      if (!relatedInformation) {
-        throw new Error(
-          'Failing test early - the "Related information" section could not be found.',
-        );
-      }
-
-      return relatedInformation;
-    };
-
-    test('that it renders the Help and Support section', () => {
+    test('renders the Help and Support section', () => {
       render(<MethodologyPage data={testMethodology} />);
 
       expect(
-        within(selectRelatedInformationSection()).getByRole('heading', {
+        within(
+          screen.getByRole('navigation', { name: 'Related information' }),
+        ).getByRole('heading', {
           name: 'Help and support',
         }),
-      ).toBeVisible();
+      ).toBeInTheDocument();
     });
 
-    test('that it displays a link to the contact us section within the Related Information section', () => {
+    test('displays a link to the contact us section within the Related Information section', () => {
       render(<MethodologyPage data={testMethodology} />);
 
       expect(
-        within(selectRelatedInformationSection()).getByRole('link', {
+        within(
+          screen.getByRole('navigation', { name: 'Related information' }),
+        ).getByRole('link', {
           name: 'Contact us',
         }),
-      ).toBeVisible();
+      ).toBeInTheDocument();
     });
 
-    test('that it navigates to the Contact Us section when the link is clicked', () => {
+    test('navigates to the Contact Us section when the link is clicked', () => {
       render(<MethodologyPage data={testMethodology} />);
 
       expect(
-        within(selectRelatedInformationSection()).getByRole('link', {
+        within(
+          screen.getByRole('navigation', { name: 'Related information' }),
+        ).getByRole('link', {
           name: 'Contact us',
         }),
       ).toHaveAttribute('href', '#contact-us');
