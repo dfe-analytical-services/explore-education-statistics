@@ -1,13 +1,13 @@
 import React from 'react';
 import { Matcher, render, screen } from '@testing-library/react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
-import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/test-data';
+import testContact from '@common/modules/find-statistics/components/__tests__/__data__/test-data';
 
 describe('ContactUsSection', () => {
   test('renders', () => {
     render(
       <ContactUsSection
-        publicationContact={mockContact}
+        publicationContact={testContact}
         publicationTitle="Mock Publication Title"
       />,
     );
@@ -32,7 +32,7 @@ describe('ContactUsSection', () => {
     (publicationTitle: string, expectedText: Matcher) => {
       render(
         <ContactUsSection
-          publicationContact={mockContact}
+          publicationContact={testContact}
           publicationTitle={publicationTitle}
         />,
       );
@@ -46,7 +46,7 @@ describe('ContactUsSection', () => {
   test('contains an appropriate href to the contact email', () => {
     render(
       <ContactUsSection
-        publicationContact={mockContact}
+        publicationContact={testContact}
         publicationTitle="Mock Publication Title"
       />,
     );
@@ -63,7 +63,7 @@ describe('ContactUsSection', () => {
   test('displays the telephone number if one is supplied', () => {
     render(
       <ContactUsSection
-        publicationContact={mockContact}
+        publicationContact={testContact}
         publicationTitle="Mock Publication Title"
       />,
     );
@@ -76,7 +76,7 @@ describe('ContactUsSection', () => {
   test('hides the telephone number section if one is not supplied', () => {
     render(
       <ContactUsSection
-        publicationContact={{ ...mockContact, contactTelNo: undefined }}
+        publicationContact={{ ...testContact, contactTelNo: undefined }}
         publicationTitle="Mock Publication Title"
       />,
     );
