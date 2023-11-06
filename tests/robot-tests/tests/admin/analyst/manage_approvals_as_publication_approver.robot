@@ -44,7 +44,7 @@ Sign in as Analyst1 User1 (publication approver)
     user changes to analyst1
 
 Check Approvals warning
-    user checks page contains element    testid:outstanding-approvals-warning
+    user waits until page contains element    testid:outstanding-approvals-warning
 
 Check Analyst can see correct tabs
     user checks element should contain    id:publications-tab    Your publications

@@ -923,7 +923,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ReleaseApprovalStatus.Approved, saved.ApprovalStatus);
                 
                 // PublishScheduled should have been set to "now".
-                Assert.InRange(DateTime.UtcNow.Subtract(saved.PublishScheduled!.Value).Milliseconds, 0, 1500);
+                saved.PublishScheduled.AssertUtcNow();
                 
                 nextReleaseDateEdited.AssertDeepEqualTo(saved.NextReleaseDate);
                 // NotifySubscribers should default to true for original releases

@@ -5,6 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 
 public class DataFixtureTests
 {
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class Person
     {
         public string FirstName { get; set; } = string.Empty;
@@ -12,6 +13,7 @@ public class DataFixtureTests
         public int Age { get; set; }
     }
 
+    // ReSharper disable once ClassNeverInstantiated.Local
     private class Company
     {
         public string Name { get; set; } = string.Empty;
@@ -28,15 +30,15 @@ public class DataFixtureTests
                 .Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
-        Assert.Equal("Moises", items[0].FirstName);
-        Assert.Equal("Delores", items[1].FirstName);
-        Assert.Equal("Ole", items[2].FirstName);
+        Assert.Equal("Lenore", items[0].FirstName);
+        Assert.Equal("Breanne", items[1].FirstName);
+        Assert.Equal("Macy", items[2].FirstName);
 
         items = generator.GenerateList(3);
 
-        Assert.Equal("Eldora", items[0].FirstName);
-        Assert.Equal("Ray", items[1].FirstName);
-        Assert.Equal("Eula", items[2].FirstName);
+        Assert.Equal("Chanelle", items[0].FirstName);
+        Assert.Equal("Maxie", items[1].FirstName);
+        Assert.Equal("Dakota", items[2].FirstName);
     }
 
     [Fact]
@@ -51,9 +53,9 @@ public class DataFixtureTests
                 .Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
-        Assert.Equal("Moises", items[0].FirstName);
-        Assert.Equal("Delores", items[1].FirstName);
-        Assert.Equal("Ole", items[2].FirstName);
+        Assert.Equal("Lenore", items[0].FirstName);
+        Assert.Equal("Breanne", items[1].FirstName);
+        Assert.Equal("Macy", items[2].FirstName);
 
         fixture.SetSeed<Person>(100);
 
@@ -124,9 +126,9 @@ public class DataFixtureTests
                 .Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
-        Assert.Equal("Moises", items[0].FirstName);
-        Assert.Equal("Delores", items[1].FirstName);
-        Assert.Equal("Ole", items[2].FirstName);
+        Assert.Equal("Lenore", items[0].FirstName);
+        Assert.Equal("Breanne", items[1].FirstName);
+        Assert.Equal("Macy", items[2].FirstName);
 
         items = fixture
             .Generator<Person>()
@@ -136,9 +138,41 @@ public class DataFixtureTests
 
         // Multiple generator instances should produce
         // new sets of deterministic random data.
-        Assert.Equal("Eldora", items[0].FirstName);
-        Assert.Equal("Ray", items[1].FirstName);
-        Assert.Equal("Eula", items[2].FirstName);
+        Assert.Equal("Chanelle", items[0].FirstName);
+        Assert.Equal("Maxie", items[1].FirstName);
+        Assert.Equal("Dakota", items[2].FirstName);
+    }
+
+    [Fact]
+    public void Generator_RandomIsDeterministicButDifferentPerType()
+    {
+        var fixture = new DataFixture();
+
+        var peopleGenerator = fixture.Generator<Person>();
+
+        var people = peopleGenerator
+            .ForInstance(s => s
+                .Set(p => p.FirstName, faker => faker.Name.FirstName()))
+            .GenerateList(3);
+
+        Assert.Equal("Lenore", people[0].FirstName);
+        Assert.Equal("Breanne", people[1].FirstName);
+        Assert.Equal("Macy", people[2].FirstName);
+
+        var companyGenerator = fixture.Generator<Company>();
+
+        var companies = companyGenerator
+            .ForInstance(s => s
+                .Set(p => p.Name, faker => faker.Name.FirstName()))
+            .GenerateList(3);
+
+        // The companyGenerator's faker instance is providing a different set of deterministic names
+        // than the personGenerator, because they are generators of different types. This helps us to
+        // avoid generating similar data for different types so that, for instance, we can avoid
+        // generating clashing information like ids between different data types.
+        Assert.Equal("Marcia", companies[0].Name);
+        Assert.Equal("Clay", companies[1].Name);
+        Assert.Equal("Michale", companies[2].Name);
     }
 
     [Fact]
@@ -152,9 +186,9 @@ public class DataFixtureTests
                 .Set(p => p.FirstName, faker => faker.Name.FirstName()))
             .GenerateList(3);
 
-        Assert.Equal("Moises", items[0].FirstName);
-        Assert.Equal("Delores", items[1].FirstName);
-        Assert.Equal("Ole", items[2].FirstName);
+        Assert.Equal("Lenore", items[0].FirstName);
+        Assert.Equal("Breanne", items[1].FirstName);
+        Assert.Equal("Macy", items[2].FirstName);
 
         items = fixture
             .SetSeed<Person>(100)

@@ -61,10 +61,10 @@ Validate table
     user checks row cell contains text    ${row}    3    798
 
 Validate footnotes
-    user checks page contains element
-    ...    xpath://h3[text()="Footnotes"]/../ol/li[text()="The number of fixed period exclusions expressed as a percentage of the number of pupils in January each year."]
-    user checks page contains element
-    ...    xpath://h3[text()="Footnotes"]/../ol/li[text()="x - 1 or 2 pupils, or a percentage based on 1 or 2."]
+    user checks page contains element    testid:footnotes
+    user checks page contains
+    ...    The number of fixed period exclusions expressed as a percentage of the number of pupils in January each year.
+    user checks page contains    x - 1 or 2 pupils, or a percentage based on 1 or 2.
 
 Validate download files
     user checks page contains    Table in ODS format (spreadsheet, with title and footnotes)

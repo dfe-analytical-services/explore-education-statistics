@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -42,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, result.UserId);
                 Assert.Equal(publication.Id, result.PublicationId);
                 Assert.Equal(Owner, result.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
+                result.Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, result.CreatedById);
             }
 
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, userPublicationRoles[0].UserId);
                 Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
                 Assert.Equal(Owner, userPublicationRoles[0].Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(userPublicationRoles[0].Created!.Value).Milliseconds, 0, 1500);
+                userPublicationRoles[0].Created.AssertUtcNow();
                 Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
             }
         }

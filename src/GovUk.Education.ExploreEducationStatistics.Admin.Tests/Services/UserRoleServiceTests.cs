@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created!.Value).Milliseconds, 0, 1500);
+                assignedRole.Created.AssertUtcNow();
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
@@ -425,7 +425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created!.Value).Milliseconds, 0, 1500);
+                assignedRole.Created.AssertUtcNow();
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
@@ -504,7 +504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created!.Value).Milliseconds, 0, 1500);
+                assignedRole.Created.AssertUtcNow();
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
@@ -592,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created!.Value).Milliseconds, 0, 1500);
+                assignedRole.Created.AssertUtcNow();
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
