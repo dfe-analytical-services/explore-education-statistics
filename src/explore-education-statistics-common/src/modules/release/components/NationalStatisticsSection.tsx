@@ -9,20 +9,25 @@ export default function NationalStatisticsSection({
     <>
       {showHeading && <h3>National statistics</h3>}
       <p>
-        The{' '}
-        <a href="https://www.statisticsauthority.gov.uk/">
-          United Kingdom Statistics Authority
-        </a>{' '}
-        designated these statistics as National Statistics in accordance with
+        These accredited official statistics have been independently reviewed by
         the{' '}
+        <a href="https://osr.statisticsauthority.gov.uk/what-we-do/">
+          Office for Statistics Regulation
+        </a>{' '}
+        (OSR). They comply with the standards of trustworthiness, quality and
+        value in the{' '}
+        <a href="https://code.statisticsauthority.gov.uk/the-code/">
+          Code of Practice for Statistics
+        </a>
+        . Accredited official statistics are called National Statistics in the{' '}
         <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
           Statistics and Registration Service Act 2007
-        </a>{' '}
-        and signifying compliance with the Code of Practice for Statistics.
+        </a>
+        .
       </p>
       <p>
-        Designation signifying their compliance with the authority's{' '}
-        <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
+        Accreditation signifies their compliance with the authority's{' '}
+        <a href="https://code.statisticsauthority.gov.uk/the-code/">
           Code of Practice for Statistics
         </a>{' '}
         which broadly means these statistics are:
@@ -34,17 +39,24 @@ export default function NationalStatisticsSection({
         <li>well explained and readily accessible</li>
       </ul>
       <p>
-        Once designated as National Statistics it's a statutory requirement for
-        statistics to follow and comply with the Code of Practice for Statistics
-        to be observed.
+        Our statistical practice is regulated by the Office for Statistics
+        Regulation (OSR).
       </p>
       <p>
-        Find out more about the standards we follow to produce these statistics
-        through our{' '}
-        <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-          Standards for official statistics published by DfE
+        OSR sets the standards of trustworthiness, quality and value in the{' '}
+        <a href="https://code.statisticsauthority.gov.uk/the-code/">
+          Code of Practice for Statistics
         </a>{' '}
-        guidance.
+        that all producers of official statistics should adhere to.
+      </p>
+      <p>
+        You are welcome to contact us directly with any comments about how we
+        meet these standards. Alternatively, you can contact OSR by emailing{' '}
+        <a href="mailto:regulation@statistics.gov.uk">
+          regulation@statistics.gov.uk
+        </a>{' '}
+        or via the{' '}
+        <a href="https://osr.statisticsauthority.gov.uk/">OSR website</a>.
       </p>
     </>
   );
