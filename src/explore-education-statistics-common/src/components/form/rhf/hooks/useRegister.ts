@@ -16,7 +16,14 @@ export default function useRegister<
 >(
   name: TFieldName,
   register: UseFormRegister<TFieldValues>,
+  trimInput = false,
 ): UseFormRegisterReturn<TFieldName> {
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  return useMemo(() => register(name), [name]);
+  return useMemo(
+    () =>
+      register(name, {
+        setValueAs: value => (trimInput ? value.trim() : value),
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [name, trimInput],
+  );
 }

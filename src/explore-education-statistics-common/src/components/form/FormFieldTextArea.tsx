@@ -6,7 +6,10 @@ import FormField, { FormFieldComponentProps } from './FormField';
 type Props<FormValues> = FormFieldComponentProps<FormTextAreaProps, FormValues>;
 
 function FormFieldTextArea<FormValues>(props: Props<FormValues>) {
-  return <FormField {...props} as={FormTextArea} />;
+  const { trimInput } = props;
+  return (
+    <FormField {...props} as={FormTextArea} trimInput={trimInput ?? true} />
+  );
 }
 
 export default FormFieldTextArea;

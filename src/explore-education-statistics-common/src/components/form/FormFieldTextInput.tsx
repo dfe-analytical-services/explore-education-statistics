@@ -10,7 +10,15 @@ type Props<FormValues> = FormFieldComponentProps<
 >;
 
 function FormFieldTextInput<FormValues>(props: Props<FormValues>) {
-  return <FormField {...props} as={FormTextInput} />;
+  const { trimInput } = props;
+  return (
+    <FormField
+      {...props}
+      as={FormTextInput}
+      trimInput={trimInput ?? true}
+      trimInputOnEnter={trimInput ?? true}
+    />
+  );
 }
 
 export default FormFieldTextInput;

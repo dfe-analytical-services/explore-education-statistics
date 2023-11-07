@@ -55,7 +55,6 @@ export default function PublicationForm({
         .email('Enter a valid team email address'),
       contactName: Yup.string().required('Enter a contact name'),
       contactTelNo: Yup.string()
-        .trim()
         .matches(/^0[0-9\s]*$/, {
           excludeEmptyString: true,
           message:
@@ -88,7 +87,7 @@ export default function PublicationForm({
       contactTelNo,
     };
 
-    if (!contact.contactTelNo?.trim()) {
+    if (!contact.contactTelNo) {
       contact.contactTelNo = undefined;
     }
 

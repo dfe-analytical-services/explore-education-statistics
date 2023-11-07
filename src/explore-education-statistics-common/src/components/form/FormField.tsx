@@ -5,6 +5,7 @@ import {
   FieldInputProps,
   FieldMetaProps,
   useField,
+  useFormikContext,
 } from 'formik';
 import React, {
   ChangeEvent,
@@ -28,6 +29,8 @@ export interface FormFieldProps<FormValues = unknown> {
   formGroupClass?: string;
   name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
   showError?: boolean;
+  trimInput?: boolean;
+  trimInputOnEnter?: boolean;
 }
 
 interface FormFieldInputProps<Value> extends FieldInputProps<Value> {
@@ -57,6 +60,8 @@ function FormField<Value, Props = Record<string, unknown>>({
   id: customId,
   name,
   showError = true,
+  trimInput = false,
+  trimInputOnEnter = false,
   type,
   ...props
 }: FormFieldProps & InternalFormFieldProps<Props, Value>) {
@@ -67,6 +72,8 @@ function FormField<Value, Props = Record<string, unknown>>({
     name,
     type,
   });
+
+  const { setFieldValue } = useFormikContext();
 
   const error = showError && meta.error && meta.touched ? meta.error : '';
 
@@ -95,6 +102,12 @@ function FormField<Value, Props = Record<string, unknown>>({
             }
           }}
           onBlur={(event: FocusEvent) => {
+            if (trimInput) {
+              setFieldValue(
+                name,
+                (event.target as HTMLInputElement).value.trim(),
+              );
+            }
             if (typedProps.onBlur) {
               typedProps.onBlur(event);
             }
@@ -103,6 +116,11 @@ function FormField<Value, Props = Record<string, unknown>>({
               field.onBlur(event);
             }
           }}
+          onKeyPress={(event: KeyboardEvent) =>
+            trimInputOnEnter &&
+            event.key === 'Enter' &&
+            (event.currentTarget as HTMLInputElement)?.blur()
+          }
         />
       );
     }
@@ -130,6 +148,9 @@ function FormField<Value, Props = Record<string, unknown>>({
     meta,
     name,
     props,
+    setFieldValue,
+    trimInput,
+    trimInputOnEnter,
   ]);
 
   return formGroup ? (

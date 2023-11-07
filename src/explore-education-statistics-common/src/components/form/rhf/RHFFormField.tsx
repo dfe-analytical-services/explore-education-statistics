@@ -38,6 +38,7 @@ export type FormFieldProps<TFormValues> = {
   inputRef?: Ref<Element>;
   name: Path<TFormValues>;
   showError?: boolean;
+  trimInput?: boolean;
   onChange?: ChangeEventHandler;
   onBlur?: FocusEventHandler;
 };
@@ -57,6 +58,7 @@ export default function RHFFormField<
   inputRef,
   name,
   showError = true,
+  trimInput = false,
   onBlur,
   onChange,
   ...props
@@ -70,7 +72,7 @@ export default function RHFFormField<
     ref: fieldRef,
     onBlur: fieldOnBlur,
     onChange: fieldOnChange,
-  } = useRegister(name, register);
+  } = useRegister(name, register, trimInput);
 
   const { fieldId } = useFormIdContext();
 
@@ -111,10 +113,10 @@ export default function RHFFormField<
     customId,
     fieldRef,
     inputRef,
-    onChange,
     fieldOnChange,
-    onBlur,
     fieldOnBlur,
+    onBlur,
+    onChange,
   ]);
 
   return formGroup ? (

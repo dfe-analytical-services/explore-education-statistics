@@ -15,5 +15,8 @@ type Props<TFormValues extends FieldValues> = FormFieldComponentProps<
 export default function RHFFormFieldTextInput<TFormValues extends FieldValues>(
   props: Props<TFormValues>,
 ) {
-  return <RHFFormField {...props} as={FormTextInput} />;
+  const { trimInput } = props;
+  return (
+    <RHFFormField {...props} as={FormTextInput} trimInput={trimInput ?? true} />
+  );
 }

@@ -43,10 +43,11 @@ const FormSearchBar = ({
   }, [initialValue]);
 
   const handleSubmit = () => {
-    if (searchTerm.length >= min) {
+    const trimmed = searchTerm.trim();
+    if (trimmed.length >= min) {
       toggleHasSubmitted.on();
       toggleError.off();
-      onSubmit?.(searchTerm);
+      onSubmit?.(trimmed);
     } else {
       toggleError.on();
     }
@@ -78,8 +79,9 @@ const FormSearchBar = ({
         value={searchTerm}
         onChange={event => {
           setSearchTerm(event.target.value);
-          onChange?.(event.target.value);
-          if (event.target.value.length >= min || !event.target.value.length) {
+          onChange?.(event.target.value.trim());
+          const trimmed = event.target.value.trim();
+          if (trimmed.length >= min || !trimmed.length) {
             toggleError.off();
           }
         }}

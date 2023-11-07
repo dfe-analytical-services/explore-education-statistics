@@ -1,0 +1,17 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormFieldTextArea renders correctly 1`] = `
+<div class="govuk-form-group">
+  <label class="govuk-label"
+         for="testField"
+  >
+    Test field
+  </label>
+  <textarea class="govuk-textarea"
+            id="testField"
+            name="testField"
+            rows="5"
+  >
+  </textarea>
+</div>
+`;
