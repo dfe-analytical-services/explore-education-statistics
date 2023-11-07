@@ -123,7 +123,7 @@ public class KeyStatisticService : IKeyStatisticService
 
                 await _context.SaveChangesAsync();
 
-                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStat) ;
+                return _mapper.Map<KeyStatisticDataBlockViewModel>(keyStat);
             });
     }
 

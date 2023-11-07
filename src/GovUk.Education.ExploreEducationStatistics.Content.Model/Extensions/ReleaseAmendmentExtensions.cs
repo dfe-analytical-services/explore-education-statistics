@@ -68,11 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
             originalToClonedDataBlocks.ForEach(kv => allClonedBlocks.Add(kv.Key, kv.Value));
 
-            // Copy ContentSections, using the newly-cloned ContentBlocks and DataBlocks rather than
-            // the original ones in the new ContentSections.
+            // Copy ContentSections, using the newly-cloned ContentBlocks and DataBlocks in the new ContentSections
+            // rather than the original ones.
             amendment.Content = amendment
                 .Content
-                // Old / new ContentBlock pairs are added to context here.
                 .Select(section => section.Clone(amendment, allClonedBlocks))
                 .ToList();
 

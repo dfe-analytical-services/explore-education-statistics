@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -103,7 +102,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             latestDataBlockParents.ForEach(latestDataBlockParent =>
             {
+                // Promote the latest "draft" version as the newly published version.
+                latestDataBlockParent.LatestPublishedVersion = latestDataBlockParent.LatestVersion;
                 latestDataBlockParent.LatestPublishedVersionId = latestDataBlockParent.LatestVersionId;
+                latestDataBlockParent.LatestPublishedVersion!.Published = DateTime.UtcNow;
+
+                // Remove the "draft" version completely until such a point in the future as a Release Amendment is
+                // created that will contain this Data Block.
                 latestDataBlockParent.LatestVersionId = null;
             });
 
@@ -127,8 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     var parent = latestDataBlockVersion.DataBlockParent;
                     parent.LatestPublishedVersionId = null;
                 });
-
-                _contentDbContext.DataBlockVersions.UpdateRange(removedDataBlockVersions);
             }
         }
     }

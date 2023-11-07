@@ -1,5 +1,4 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
@@ -11,14 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
@@ -29,18 +25,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
     public class TableBuilderController : ControllerBase
     {
         private readonly ITableBuilderService _tableBuilderService;
-        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserService _userService;
         private readonly IDataBlockService _dataBlockService;
 
         public TableBuilderController(
             ITableBuilderService tableBuilderService,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IUserService userService,
             IDataBlockService dataBlockService)
         {
             _tableBuilderService = tableBuilderService;
-            _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
             _dataBlockService = dataBlockService;
         }

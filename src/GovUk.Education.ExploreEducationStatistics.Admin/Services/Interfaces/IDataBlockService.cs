@@ -1,7 +1,5 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -29,22 +27,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
 
-        Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid dataBlockId);
+        Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(ContentSectionId releaseId, ContentSectionId dataBlockId);
 
-        Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject? subject);
+        Task<DeleteDataBlockPlan> GetDeletePlan(ContentSectionId releaseId, Subject? subject);
 
-        Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id);
+        Task<Either<ActionResult, Unit>> RemoveChartFile(ContentSectionId releaseId, ContentSectionId id);
 
-        Task InvalidateCachedDataBlocks(Guid releaseId);
+        Task InvalidateCachedDataBlocks(ContentSectionId releaseId);
 
-        Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId);
+        Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(ContentSectionId releaseId);
 
-        Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlockVersion dataBlockVersion);
+        Task<bool> IsUnattachedDataBlock(ContentSectionId releaseId, DataBlockVersion dataBlockVersion);
 
-        Task<List<DataBlock>> ListDataBlocks(Guid releaseId);
+        Task<List<DataBlock>> ListDataBlocks(ContentSectionId releaseId);
 
         Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
-            Guid releaseId,
-            Guid dataBlockParentId);
+            ContentSectionId releaseId,
+            ContentSectionId dataBlockParentId);
     }
 }
