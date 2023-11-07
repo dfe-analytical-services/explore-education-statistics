@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -17,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Fixtures;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -32,25 +34,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class FootnoteServiceTests
     {
         private readonly DataFixture _fixture = new();
-        
+
+        [Fact]
+        public async Task CreateFootnote_SubjectDoesNotExist_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            Subject subject = _fixture.DefaultSubject().Generate();
+
+            ReleaseSubject releaseSubject = _fixture
+                .DefaultReleaseSubject()
+                .WithRelease(release)
+                .WithSubject(subject)
+                .Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.Release.AddAsync(release);
+                await statisticsDbContext.Subject.AddRangeAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+
+                await contentDbContext.AddAsync(new Content.Model.Release
+                {
+                    Id = release.Id
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                FootnoteService footnoteService = SetupFootnoteService(contentDbContext: contentDbContext, statisticsDbContext: statisticsDbContext);
+                
+                Either<ActionResult, Footnote> result = await footnoteService.CreateFootnote(
+                    release.Id,
+                    It.IsAny<string>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    It.IsAny<IReadOnlySet<Guid>>(),
+                    SetOf(Guid.NewGuid()));
+
+                result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            }
+        }
+
         [Fact]
         public async Task CreateFootnote()
         {
-            var release = _fixture.DefaultStatsRelease().Generate();
-            
-            var releaseSubjects = _fixture
+            Release release = _fixture.DefaultStatsRelease().Generate();
+
+            IEnumerable<Subject> subjects = _fixture
+                .DefaultSubject()
+                .ForIndex(1, s => s
+                    .SetFilters(_fixture
+                        .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
+                        .Generate(3))
+                    .SetIndicatorGroups(_fixture.DefaultIndicatorGroup()
+                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
+                        .Generate(1)))
+                .Generate(2);
+
+            List<ReleaseSubject> releaseSubjects = _fixture
                 .DefaultReleaseSubject()
                 .WithRelease(release)
-                .WithSubjects(_fixture
-                    .DefaultSubject()
-                    .ForIndex(1, s => s
-                        .SetFilters(_fixture
-                            .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                            .Generate(3))
-                        .SetIndicatorGroups(_fixture.DefaultIndicatorGroup()
-                            .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                            .Generate(1)))
-                    .Generate(2))
+                .WithSubjects(subjects)
                 .GenerateList();
             
             var contextId = Guid.NewGuid().ToString();
@@ -59,6 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 await statisticsDbContext.Release.AddAsync(release);
+                await statisticsDbContext.Subject.AddRangeAsync(subjects);
                 await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
                 await statisticsDbContext.SaveChangesAsync();
 
@@ -1212,6 +1264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IDataBlockService? dataBlockService = null,
             IFootnoteRepository? footnoteRepository = null,
+            IReleaseSubjectRepository? releaseSubjectRepository = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null)
         {
             var contentContext = contentDbContext ?? new Mock<ContentDbContext>().Object;
@@ -1222,6 +1275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
+                releaseSubjectRepository ?? new ReleaseSubjectRepository(statisticsDbContext, footnoteRepository),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext)
             );
         }
