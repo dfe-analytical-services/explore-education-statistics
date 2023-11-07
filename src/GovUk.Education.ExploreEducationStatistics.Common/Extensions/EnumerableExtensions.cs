@@ -291,5 +291,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             
             return new Tuple<T, T, T>(list[0], list[1], list[2]);
         }
+
+        public static bool ContainsAll<T>(this IEnumerable<T> source, IEnumerable<T> values)
+        {
+            return values.All(id => source.Contains(id));
+        }
     }
 }

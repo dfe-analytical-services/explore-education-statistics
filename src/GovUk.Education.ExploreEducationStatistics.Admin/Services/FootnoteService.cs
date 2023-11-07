@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -31,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IFootnoteRepository _footnoteRepository;
-        private readonly ISubjectRepository _subjectRepository;
+        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
 
         public FootnoteService(
             StatisticsDbContext context,
@@ -39,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IDataBlockService dataBlockService,
             IFootnoteRepository footnoteRepository,
-            ISubjectRepository subjectRepository,
+            IReleaseSubjectRepository releaseSubjectRepository,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper)
         {
             _context = context;
@@ -47,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _dataBlockService = dataBlockService;
             _footnoteRepository = footnoteRepository;
-            _subjectRepository = subjectRepository;
+            _releaseSubjectRepository = releaseSubjectRepository;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
         }
 
@@ -63,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsExist(subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds))
+                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(releaseId, subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds))
                 .OnSuccess(async () =>
                 {
                     var releaseHasFootnotes = await _context.ReleaseFootnote
@@ -155,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsExist(subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds))
+                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(releaseId, subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds))
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId, HydrateFootnote)
                 .OnSuccess(async footnote =>
                 {
@@ -378,123 +379,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> CheckSubjectsFiltersAndIndicatorsExist(
+        private async Task<Either<ActionResult, Unit>> CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
+            Guid releaseId,
             IReadOnlySet<Guid> subjectIds,
             IReadOnlySet<Guid> filterIds,
             IReadOnlySet<Guid> filterGroupIds,
             IReadOnlySet<Guid> filterItemIds,
             IReadOnlySet<Guid> indicatorIds)
         {
-            IList<Subject> subjects = await _subjectRepository.FindAll(subjectIds, HydrateSubjectWithFiltersAndIndicators);
+            IReadOnlyList<ReleaseSubject> releaseSubjects = await _releaseSubjectRepository.FindAll(releaseId, HydrateReleaseSubjects);
 
-            if (!AllSpecifiedSubjectsExist(subjectIds, subjects))
+            if (!AllSpecifiedSubjectsAreLinkedToRelease(subjectIds, releaseSubjects))
             {
                 return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
             }
 
-            foreach (Subject subject in subjects)
+            if (!AllSpecifiedFiltersAreLinkedToRelease(filterIds, releaseSubjects))
             {
-                if (!AllSpecifiedFiltersExist(filterIds, subject)
-                    || !AllSpecifiedFilterGroupsExist(filterGroupIds, subject)
-                    || !AllSpecifiedFilterItemsExist(filterItemIds, subject)
-                    || !AllSpecifiedIndicatorsExist(indicatorIds, subject))
-                {
-                    return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
-                }
+                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
+            }
+
+            if (!AllSpecifiedFilterGroupsAreLinkedToRelease(filterGroupIds, releaseSubjects))
+            {
+                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
+            }
+
+            if (!AllSpecifiedFilterItemsAreLinkedToRelease(filterItemIds, releaseSubjects))
+            {
+                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
+            }
+
+            if (!AllSpecifiedIndicatorsAreLinkedToRelease(indicatorIds, releaseSubjects))
+            {
+                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
             }
 
             return Unit.Instance;
         }
 
-        private static IQueryable<Subject> HydrateSubjectWithFiltersAndIndicators(IQueryable<Subject> query)
+        private IQueryable<ReleaseSubject> HydrateReleaseSubjects(IQueryable<ReleaseSubject> queryable)
         {
-            return query
-                .Include(s => s.Filters)
-                .ThenInclude(filter => filter.FilterGroups)
-                .ThenInclude(filterGroup => filterGroup.FilterItems)
-                .Include(s => s.IndicatorGroups)
-                .ThenInclude(indicatorGroup => indicatorGroup.Indicators);
+            return queryable
+                .Include(rs => rs.Subject)
+                .ThenInclude(s => s.IndicatorGroups)
+                .ThenInclude(ig => ig.Indicators)
+                .Include(rs => rs.Subject)
+                .ThenInclude(s => s.Filters)
+                .ThenInclude(f => f.FilterGroups)
+                .ThenInclude(fg => fg.FilterItems);
         }
 
-        private static bool AllSpecifiedSubjectsExist(IReadOnlySet<Guid> subjectIds, IList<Subject> subjects)
+        private static bool AllSpecifiedSubjectsAreLinkedToRelease(IReadOnlySet<Guid> subjectIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
-            foreach (Guid subjectId in subjectIds)
-            {
-                if (!subjects.Any(f => f.Id == subjectId))
-                {
-                    return false;
-                }
-            }
+            IReadOnlyList<Guid> releaseSubjectIds = releaseSubjects
+                .Select(rs => rs.SubjectId)
+                .ToList();
 
-            return true;
+            return releaseSubjectIds.ContainsAll(subjectIds);
         }
 
-        private static bool AllSpecifiedFiltersExist(IReadOnlySet<Guid> filterIds, Subject subject)
+        private static bool AllSpecifiedFiltersAreLinkedToRelease(IReadOnlySet<Guid> filterIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
-            IEnumerable<Guid> subjectFilterIds = subject.Filters
-                .Select(f => f.Id);
+            IReadOnlyList<Guid> releaseFilterIds = releaseSubjects
+                .SelectMany(rs => rs.Subject.Filters)
+                .Select(f => f.Id)
+                .ToList();
 
-            foreach (Guid filterId in filterIds)
-            {
-                if (!subjectFilterIds.Contains(filterId))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return releaseFilterIds.ContainsAll(filterIds);
         }
 
-        private static bool AllSpecifiedFilterGroupsExist(IReadOnlySet<Guid> filterGroupIds, Subject subject)
+        private static bool AllSpecifiedFilterGroupsAreLinkedToRelease(IReadOnlySet<Guid> filterGroupIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
-            IEnumerable<Guid> subjectFilterGroupIds = subject.Filters
+            IReadOnlyList<Guid> releaseFilterGroupIds = releaseSubjects
+                .SelectMany(rs => rs.Subject.Filters)
                 .SelectMany(f => f.FilterGroups)
-                .Select(fg => fg.Id);
+                .Select(f => f.Id)
+                .ToList();
 
-            foreach (Guid filterGroupId in filterGroupIds)
-            {
-                if (!subjectFilterGroupIds.Contains(filterGroupId))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return releaseFilterGroupIds.ContainsAll(filterGroupIds);
         }
 
-        private static bool AllSpecifiedFilterItemsExist(IReadOnlySet<Guid> filterItemIds, Subject subject)
+        private static bool AllSpecifiedFilterItemsAreLinkedToRelease(IReadOnlySet<Guid> filterItemIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
-            IEnumerable<Guid> subjectFilterItemIds = subject.Filters
+            IReadOnlyList<Guid> releaseFilterItemIds = releaseSubjects
+                .SelectMany(rs => rs.Subject.Filters)
                 .SelectMany(f => f.FilterGroups)
                 .SelectMany(fg => fg.FilterItems)
-                .Select(fi => fi.Id);
+                .Select(f => f.Id)
+                .ToList();
 
-            foreach (Guid filterItemId in filterItemIds)
-            {
-                if (!subjectFilterItemIds.Contains(filterItemId))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return releaseFilterItemIds.ContainsAll(filterItemIds);
         }
 
-        private static bool AllSpecifiedIndicatorsExist(IReadOnlySet<Guid> indicatorIds, Subject subject)
+        private static bool AllSpecifiedIndicatorsAreLinkedToRelease(IReadOnlySet<Guid> indicatorIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
-            IEnumerable<Guid> allSubjectIndicatorIds = subject.IndicatorGroups
+            IReadOnlyList<Guid> releaseIndicatorIds = releaseSubjects
+                .SelectMany(rs => rs.Subject.IndicatorGroups)
                 .SelectMany(ig => ig.Indicators)
-                .Select(i => i.Id);
+                .Select(f => f.Id)
+                .ToList();
 
-            foreach (Guid indicatorId in indicatorIds)
-            {
-                if (!allSubjectIndicatorIds.Contains(indicatorId))
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return releaseIndicatorIds.ContainsAll(indicatorIds);
         }
     }
 }
