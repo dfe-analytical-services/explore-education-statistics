@@ -379,15 +379,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_SubjectNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release);
+            await SeedDatabase(contextId, release, footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf<Guid>(),
@@ -402,17 +403,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_SubjectIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             Subject subject = _fixture.DefaultSubject().Generate();
             ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf<Guid>(),
@@ -429,17 +431,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_FilterNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             Subject subject = _fixture.DefaultSubject().Generate();
             ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf(Guid.NewGuid()),
@@ -454,6 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_FilterIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             Filter filter = _fixture.DefaultFilter().Generate();
             Subject subject = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).Generate();
@@ -461,11 +465,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf(filter.Id),
@@ -482,6 +486,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_FilterGroupNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             Filter filter = _fixture.DefaultFilter().Generate();
             Subject subject = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).Generate();
@@ -489,11 +494,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf<Guid>(),
@@ -508,6 +513,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_FilterGroupIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             FilterGroup filterGroup = _fixture.DefaultFilterGroup().Generate();
             Filter filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup>() { filterGroup }).Generate();
@@ -516,11 +522,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf<Guid>(),
@@ -537,6 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_FilterItemNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             FilterGroup filterGroup = _fixture.DefaultFilterGroup().Generate();
             Filter filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup>() { filterGroup }).Generate();
@@ -545,11 +552,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf<Guid>(),
@@ -564,6 +571,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_FilterItemIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             FilterItem filterItem = _fixture.DefaultFilterItem().Generate();
             FilterGroup filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem>() { filterItem }).Generate();
@@ -573,11 +581,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf<Guid>(),
@@ -594,17 +602,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_IndicatorNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             Subject subject = _fixture.DefaultSubject().Generate();
             ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf<Guid>(),
@@ -619,6 +628,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_IndicatorIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             Indicator indicator = _fixture.DefaultIndicator().Generate();
             IndicatorGroup indicatorGroup = _fixture.DefaultIndicatorGroup().WithIndicators(new List<Indicator>() { indicator }).Generate();
@@ -627,11 +637,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf<Guid>(),
@@ -648,6 +658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             FilterItem filterItem = _fixture.DefaultFilterItem().Generate();
             FilterGroup filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem>() { filterItem }).Generate();
@@ -661,11 +672,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject1, subject2), releaseSubjects: ListOf(releaseSubject1, releaseSubject2));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject1, subject2), releaseSubjects: ListOf(releaseSubject1, releaseSubject2), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf(filter.Id),
@@ -700,6 +711,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             bool indicatorMissing,
             bool subjectMissing)
         {
+            Footnote footnote = _fixture.DefaultFootnote().Generate();
             Release release = _fixture.DefaultStatsRelease().Generate();
             FilterItem filterItem = _fixture.DefaultFilterItem().Generate();
             FilterGroup filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem>() { filterItem }).Generate();
@@ -713,11 +725,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await SeedDatabase(contextId, release, subjects: ListOf(subject1, subject2), releaseSubjects: ListOf(releaseSubject1, releaseSubject2));
+            await SeedDatabase(contextId, release, subjects: ListOf(subject1, subject2), releaseSubjects: ListOf(releaseSubject1, releaseSubject2), footnotes: ListOf(footnote));
 
             Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
                 release.Id,
-                Guid.Empty,
+                footnote.Id,
                 contextId,
                 string.Empty,
                 SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
@@ -1904,7 +1916,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static async Task SeedDatabase(string contextId, Release release, IReadOnlyList<Subject>? subjects = null, IReadOnlyList<ReleaseSubject> releaseSubjects = null)
+        private static async Task SeedDatabase(string contextId, Release release, IReadOnlyList<Subject>? subjects = null, IReadOnlyList<ReleaseSubject> releaseSubjects = null, IReadOnlyList<Footnote>? footnotes = null)
         {
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -1919,6 +1931,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 if (!releaseSubjects.IsNullOrEmpty())
                 {
                     await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects!);
+                }
+
+                if (!footnotes.IsNullOrEmpty())
+                {
+                    await statisticsDbContext.Footnote.AddRangeAsync(footnotes!);
                 }
 
                 await statisticsDbContext.SaveChangesAsync();
