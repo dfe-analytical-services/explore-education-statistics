@@ -185,24 +185,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 }
             );
         }
-
-        public static void CreateGenericContentFromTemplate(
-            this Release originalRelease,
-            Release.CloneContext context)
-        {
-            var newRelease = context.NewRelease;
-
-            newRelease.Content = originalRelease.Content
-                .Where(section => section.Type == ContentSectionType.Generic)
-                .ToList();
-
-            newRelease.Content = originalRelease
-                .Content
-                .Select(section => section.Clone(context))
-                .ToList();
-
-            // TODO EES-4467 - we can add the cloning of Data Blocks back in here rather than being doing separately
-            // when the new DataBlock / DataBlockVersion tables are added.
-        }
     }
 }
