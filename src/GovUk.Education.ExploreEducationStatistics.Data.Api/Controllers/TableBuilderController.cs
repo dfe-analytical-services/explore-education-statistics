@@ -161,6 +161,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             };
         }
 
+        // Get the latest published DataBlockVersion for the given parent id, also including its Release and
+        // Publication for the purposes of generating a cache key for Data Block table results.
         private Task<Either<ActionResult, DataBlockVersion>> GetLatestPublishedDataBlockVersion(Guid dataBlockParentId)
         {
             return _contentPersistenceHelper

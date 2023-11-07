@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -219,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .DefaultRelease()
                 .Generate();
 
-            var dataBlockParents = _fixture
+            var originalDataBlockParents = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestVersion(() => _fixture
                     .DefaultDataBlockVersion()
@@ -254,21 +255,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var actualDataBlockParents = await contentDbContext
                     .DataBlockParents
+                    .Include(dataBlockParent => dataBlockParent.LatestVersion)
+                    .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
                     .ToListAsync();
 
                 Assert.Equal(2, actualDataBlockParents.Count);
 
                 // Assert that the original DataBlockParents did not point to a LatestPublishedVersion.
-                dataBlockParents.ForEach(parent => Assert.Null(parent.LatestPublishedVersionId));
+                originalDataBlockParents.ForEach(parent => Assert.Null(parent.LatestPublishedVersionId));
 
                 // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
                 // reference the newly published DataBlockVersion.
                 actualDataBlockParents.ForEach(parent =>
                 {
-                    var originalParent = dataBlockParents.Single(p => p.Id == parent.Id);
+                    var originalParent = originalDataBlockParents.Single(p => p.Id == parent.Id);
 
-                    // The "Published" version is now the one that was previously just the "Latest".
+                    // The "Published" version is now the one that was previously just the "Latest".  Its "Published"
+                    // date should have just been set as well.
                     Assert.Equal(originalParent.LatestVersionId, parent.LatestPublishedVersionId);
+                    Assert.Null(originalParent.LatestVersion!.Published);
+                    parent.LatestPublishedVersion!.Published.AssertUtcNow();
 
                     // The "Latest" is now set to null, until a Release amendment is created.
                     Assert.Null(parent.LatestVersionId);
@@ -294,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             };
 
             // Generate Data Blocks for both the previous Release version and for the new Amendment.
-            var dataBlockParents = _fixture
+            var originalDataBlockParents = _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(() => _fixture
                     .DefaultDataBlockVersion()
@@ -331,22 +337,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var actualDataBlockParents = await contentDbContext
                     .DataBlockParents
+                    .Include(dataBlockParent => dataBlockParent.LatestVersion)
+                    .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
                     .ToListAsync();
 
                 Assert.Equal(2, actualDataBlockParents.Count);
 
                 // Assert that the original DataBlockParents pointed to a LatestPublishedVersion and LatestVersion.
-                dataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestVersionId));
-                dataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestPublishedVersionId));
+                originalDataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestVersionId));
+                originalDataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestPublishedVersionId));
 
                 // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
                 // reference the newly published DataBlockVersion.
                 actualDataBlockParents.ForEach(parent =>
                 {
-                    var originalParent = dataBlockParents.Single(p => p.Id == parent.Id);
+                    var originalParent = originalDataBlockParents.Single(p => p.Id == parent.Id);
 
-                    // The "Published" version is now the one that was previously just the "Latest".
+                    // The "Published" version is now the one that was previously just the "Latest".  Its "Published"
+                    // date should have just been set as well, and we'll double-check that it didn't just inherit that
+                    // from the original "latest" DataBlockVersion.
                     Assert.Equal(originalParent.LatestVersionId, parent.LatestPublishedVersionId);
+                    Assert.Null(originalParent.LatestVersion!.Published);
+                    parent.LatestPublishedVersion!.Published.AssertUtcNow();
 
                     // The "Latest" is now set to null, until a Release amendment is created.
                     Assert.Null(parent.LatestVersionId);
@@ -372,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             };
 
             // Generate Data Blocks for both the previous Release version and for the new Amendment.
-            var dataBlockParents = _fixture
+            _fixture
                 .DefaultDataBlockParent()
                 .WithLatestPublishedVersion(() => _fixture
                     .DefaultDataBlockVersion()
@@ -408,12 +420,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var actualDataBlockParents = await contentDbContext
                     .DataBlockParents
+                    .Include(dataBlockParent => dataBlockParent.LatestVersion)
+                    .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
                     .ToListAsync();
 
-                Assert.Equal(2, actualDataBlockParents.Count);
-
                 // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
-                // be null.
+                // be null so that this Data Block is effectively no longer publicly visible.
                 actualDataBlockParents.ForEach(parent =>
                 {
                      Assert.Null(parent.LatestPublishedVersionId);
