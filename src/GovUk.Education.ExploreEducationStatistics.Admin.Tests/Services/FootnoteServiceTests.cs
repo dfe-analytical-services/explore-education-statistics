@@ -377,6 +377,359 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdateFootnote_SubjectNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release);
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf(Guid.NewGuid()));
+
+            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_SubjectIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            Subject subject = _fixture.DefaultSubject().Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf(subject.Id));
+
+            result.AssertRight();
+            Assert.Single(result.Right.Subjects);
+            Assert.Equal(subject.Id, result.Right.Subjects.Single().SubjectId);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_FilterNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            Subject subject = _fixture.DefaultSubject().Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf(Guid.NewGuid()),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>());
+
+            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_FilterIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            Filter filter = _fixture.DefaultFilter().Generate();
+            Subject subject = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf(filter.Id),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>());
+
+            result.AssertRight();
+            Assert.Single(result.Right.Filters);
+            Assert.Equal(filter.Id, result.Right.Filters.Single().FilterId);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_FilterGroupNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            Filter filter = _fixture.DefaultFilter().Generate();
+            Subject subject = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf<Guid>(),
+                SetOf(Guid.NewGuid()),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>());
+
+            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_FilterGroupIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            FilterGroup filterGroup = _fixture.DefaultFilterGroup().Generate();
+            Filter filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup>() { filterGroup }).Generate();
+            Subject subject = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf<Guid>(),
+                SetOf(filterGroup.Id),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>());
+
+            result.AssertRight();
+            Assert.Single(result.Right.FilterGroups);
+            Assert.Equal(filterGroup.Id, result.Right.FilterGroups.Single().FilterGroupId);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_FilterItemNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            FilterGroup filterGroup = _fixture.DefaultFilterGroup().Generate();
+            Filter filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup>() { filterGroup }).Generate();
+            Subject subject = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf(Guid.NewGuid()),
+                SetOf<Guid>(),
+                SetOf<Guid>());
+
+            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_FilterItemIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            FilterItem filterItem = _fixture.DefaultFilterItem().Generate();
+            FilterGroup filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem>() { filterItem }).Generate();
+            Filter filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup>() { filterGroup }).Generate();
+            Subject subject = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf(filterItem.Id),
+                SetOf<Guid>(),
+                SetOf<Guid>());
+
+            result.AssertRight();
+            Assert.Single(result.Right.FilterItems);
+            Assert.Equal(filterItem.Id, result.Right.FilterItems.Single().FilterItemId);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_IndicatorNotLinkedToRelease_ReturnsFootnoteSpecificationsAreInvalidValidationResult()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            Subject subject = _fixture.DefaultSubject().Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf(Guid.NewGuid()),
+                SetOf<Guid>());
+
+            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_IndicatorIsLinkedToRelease_CreatesFootnoteWithCorrectLinks()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            Indicator indicator = _fixture.DefaultIndicator().Generate();
+            IndicatorGroup indicatorGroup = _fixture.DefaultIndicatorGroup().WithIndicators(new List<Indicator>() { indicator }).Generate();
+            Subject subject = _fixture.DefaultSubject().WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup }).Generate();
+            ReleaseSubject releaseSubject = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject), releaseSubjects: ListOf(releaseSubject));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf<Guid>(),
+                SetOf(indicator.Id),
+                SetOf<Guid>());
+
+            result.AssertRight();
+            Assert.Single(result.Right.Indicators);
+            Assert.Equal(indicator.Id, result.Right.Indicators.Single().IndicatorId);
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToRelease_CreatesFootnoteWithCorrectLinks()
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            FilterItem filterItem = _fixture.DefaultFilterItem().Generate();
+            FilterGroup filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem>() { filterItem }).Generate();
+            Filter filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup>() { filterGroup }).Generate();
+            Indicator indicator = _fixture.DefaultIndicator().Generate();
+            IndicatorGroup indicatorGroup = _fixture.DefaultIndicatorGroup().WithIndicators(new List<Indicator>() { indicator }).Generate();
+            Subject subject1 = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup }).Generate();
+            Subject subject2 = _fixture.DefaultSubject().Generate();
+            ReleaseSubject releaseSubject1 = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject1).Generate();
+            ReleaseSubject releaseSubject2 = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject2).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject1, subject2), releaseSubjects: ListOf(releaseSubject1, releaseSubject2));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf(filter.Id),
+                SetOf(filterGroup.Id),
+                SetOf(filterItem.Id),
+                SetOf(indicator.Id),
+                SetOf(subject2.Id));
+
+            result.AssertRight();
+            Assert.Single(result.Right.Subjects);
+            Assert.Equal(subject2.Id, result.Right.Subjects.Single().SubjectId);
+            Assert.Single(result.Right.Filters);
+            Assert.Equal(filter.Id, result.Right.Filters.Single().FilterId);
+            Assert.Single(result.Right.FilterGroups);
+            Assert.Equal(filterGroup.Id, result.Right.FilterGroups.Single().FilterGroupId);
+            Assert.Single(result.Right.FilterItems);
+            Assert.Equal(filterItem.Id, result.Right.FilterItems.Single().FilterItemId);
+            Assert.Single(result.Right.Indicators);
+            Assert.Equal(indicator.Id, result.Right.Indicators.Single().IndicatorId);
+        }
+
+        [Theory]
+        [InlineData(true, false, false, false, false)]
+        [InlineData(false, true, false, false, false)]
+        [InlineData(false, false, true, false, false)]
+        [InlineData(false, false, false, true, false)]
+        [InlineData(false, false, false, false, true)]
+        public async Task UpdateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToReleaseExceptOne_ReturnsFootnoteSpecificationsAreInvalidValidationResult(
+            bool filterMissing,
+            bool filterGroupMissing,
+            bool filterItemMissing,
+            bool indicatorMissing,
+            bool subjectMissing)
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            FilterItem filterItem = _fixture.DefaultFilterItem().Generate();
+            FilterGroup filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem>() { filterItem }).Generate();
+            Filter filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup>() { filterGroup }).Generate();
+            Indicator indicator = _fixture.DefaultIndicator().Generate();
+            IndicatorGroup indicatorGroup = _fixture.DefaultIndicatorGroup().WithIndicators(new List<Indicator>() { indicator }).Generate();
+            Subject subject1 = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup }).Generate();
+            Subject subject2 = _fixture.DefaultSubject().Generate();
+            ReleaseSubject releaseSubject1 = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject1).Generate();
+            ReleaseSubject releaseSubject2 = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject2).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject1, subject2), releaseSubjects: ListOf(releaseSubject1, releaseSubject2));
+
+            Either<ActionResult, Footnote> result = await UpdateFootnoteWithConfiguration(
+                release.Id,
+                Guid.Empty,
+                contextId,
+                string.Empty,
+                SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
+                SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
+                SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
+                SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
+                SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
+
+            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+        }
+
+        [Fact]
         public async Task CreateFootnote()
         {
             Release release = _fixture.DefaultStatsRelease().Generate();
@@ -1600,6 +1953,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 return await footnoteService.CreateFootnote(
                     releaseId,
+                    content,
+                    filterIds,
+                    filterGroupIds,
+                    filterItemIds,
+                    indicatorIds,
+                    subjectIds);
+            }
+        }
+
+        private static async Task<Either<ActionResult, Footnote>> UpdateFootnoteWithConfiguration(
+            Guid releaseId,
+            Guid footnoteId,
+            string contextId,
+            string content,
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlySet<Guid> indicatorIds,
+            IReadOnlySet<Guid> subjectIds)
+        {
+            var dataBlockService = new Mock<IDataBlockService>();
+            dataBlockService
+                .Setup(dbs => dbs.InvalidateCachedDataBlocks(releaseId))
+                .Verifiable();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                FootnoteService footnoteService = SetupFootnoteService(contentDbContext: contentDbContext, statisticsDbContext: statisticsDbContext, dataBlockService: dataBlockService.Object);
+
+                return await footnoteService.UpdateFootnote(
+                    releaseId,
+                    footnoteId,
                     content,
                     filterIds,
                     filterGroupIds,
