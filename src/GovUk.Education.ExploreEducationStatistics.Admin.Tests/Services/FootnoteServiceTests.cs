@@ -295,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreLinkedToRelease_CreatesFootnoteWithCorrectLinks()
+        public async Task CreateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToRelease_CreatesFootnoteWithCorrectLinks()
         {
             Release release = _fixture.DefaultStatsRelease().Generate();
             FilterItem filterItem = _fixture.DefaultFilterItem().Generate();
@@ -333,6 +333,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(filterItem.Id, result.Right.FilterItems.Single().FilterItemId);
             Assert.Single(result.Right.Indicators);
             Assert.Equal(indicator.Id, result.Right.Indicators.Single().IndicatorId);
+        }
+
+        [Theory]
+        [InlineData(true, false, false, false, false)]
+        [InlineData(false, true, false, false, false)]
+        [InlineData(false, false, true, false, false)]
+        [InlineData(false, false, false, true, false)]
+        [InlineData(false, false, false, false, true)]
+        public async Task CreateFootnote_WithFiltersAndIndicatorsAndSubjectsWhichAreAllLinkedToReleaseExceptOne_ReturnsFootnoteSpecificationsAreInvalidValidationResult(
+            bool filterMissing, 
+            bool filterGroupMissing, 
+            bool filterItemMissing,
+            bool indicatorMissing,
+            bool subjectMissing)
+        {
+            Release release = _fixture.DefaultStatsRelease().Generate();
+            FilterItem filterItem = _fixture.DefaultFilterItem().Generate();
+            FilterGroup filterGroup = _fixture.DefaultFilterGroup().WithFilterItems(new List<FilterItem>() { filterItem }).Generate();
+            Filter filter = _fixture.DefaultFilter().WithFilterGroups(new List<FilterGroup>() { filterGroup }).Generate();
+            Indicator indicator = _fixture.DefaultIndicator().Generate();
+            IndicatorGroup indicatorGroup = _fixture.DefaultIndicatorGroup().WithIndicators(new List<Indicator>() { indicator }).Generate();
+            Subject subject1 = _fixture.DefaultSubject().WithFilters(new List<Filter>() { filter }).WithIndicatorGroups(new List<IndicatorGroup>() { indicatorGroup }).Generate();
+            Subject subject2 = _fixture.DefaultSubject().Generate();
+            ReleaseSubject releaseSubject1 = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject1).Generate();
+            ReleaseSubject releaseSubject2 = _fixture.DefaultReleaseSubject().WithRelease(release).WithSubject(subject2).Generate();
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await SeedDatabase(contextId, release, subjects: ListOf(subject1, subject2), releaseSubjects: ListOf(releaseSubject1, releaseSubject2));
+
+            Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
+                release.Id,
+                contextId,
+                string.Empty,
+                SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
+                SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
+                SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
+                SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
+                SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
+
+            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
         }
 
         [Fact]
