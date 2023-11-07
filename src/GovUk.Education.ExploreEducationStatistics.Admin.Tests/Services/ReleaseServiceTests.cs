@@ -203,11 +203,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
+            Guid newReleaseId = Guid.Empty;
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = releaseService.CreateRelease(
+                var result = await releaseService.CreateRelease(
                     new ReleaseCreateRequest
                     {
                         PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
@@ -218,12 +220,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
+                var newRelease = result.AssertRight();
+                newReleaseId = newRelease.Id;
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
                 // Do an in depth check of the saved release
                 var newRelease = context
                     .Releases
                     .Include(release => release.Content)
                     .ThenInclude(section => section.Content)
-                    .Single(r => r.Id == result.Result.Right.Id);
+                    .Single(r => r.Id == newReleaseId);
 
                 var contentSections = newRelease.GenericContent.ToList();
                 Assert.Single(contentSections);
@@ -232,12 +240,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(contentSections);
                 Assert.Equal(1, contentSections[0].Order);
 
-                // Content should not be copied when create from template
+                // Content should not be copied when created from a template.
                 Assert.Empty(contentSections[0].Content);
                 Assert.Empty(contentSections[0].Content.AsReadOnly());
                 Assert.Equal(ContentSectionType.ReleaseSummary, newRelease.SummarySection.Type);
                 Assert.Equal(ContentSectionType.Headlines, newRelease.HeadlinesSection.Type);
                 Assert.Equal(ContentSectionType.KeyStatisticsSecondary, newRelease.KeyStatisticsSecondarySection.Type);
+
+                // Data Blocks should not be copied when created from a template.
+                Assert.Equal(2, context.DataBlocks.Count());
+                Assert.Empty(context
+                    .DataBlocks
+                    .Where(dataBlock => dataBlock.ReleaseId == newReleaseId));
             }
         }
 
@@ -742,13 +756,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     release
                 }
             };
-            
+
             var nonPreReleaseUserRole = new UserReleaseRole
             {
                 Role = ReleaseRole.Contributor,
                 Release = release
             };
-            
+
             var nonPreReleaseUserInvite = new UserReleaseInvite
             {
                 Role = ReleaseRole.Contributor,
@@ -821,7 +835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = ReleaseRole.PrereleaseViewer,
                 Release = release
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -864,7 +878,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = ReleaseRole.PrereleaseViewer,
                 Release = release
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1616,21 +1630,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public class ListUsersReleasesForApproval
         {
             private readonly DataFixture _fixture = new();
-        
+
             [Fact]
             public async Task UserHasApproverRoleOnRelease()
             {
                 var contextId = Guid.NewGuid().ToString();
 
                 var otherUser = new User();
-                
+
                 var publications = _fixture
                     .DefaultPublication()
                     .WithReleases(_ => _fixture
                         .DefaultRelease()
                         .WithApprovalStatuses(ListOf(
-                            ReleaseApprovalStatus.Draft, 
-                            ReleaseApprovalStatus.HigherLevelReview, 
+                            ReleaseApprovalStatus.Draft,
+                            ReleaseApprovalStatus.HigherLevelReview,
                             ReleaseApprovalStatus.Approved))
                         .GenerateList())
                     .GenerateList(4);
@@ -1641,30 +1655,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithRole(ReleaseRole.Contributor)
                     .WithReleases(publications[0].Releases)
                     .GenerateList();
-                
+
                 var approverReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRole(ReleaseRole.Approver)
                     .WithReleases(publications[1].Releases)
                     .GenerateList();
-                
+
                 var prereleaseReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
                     .WithRole(ReleaseRole.PrereleaseViewer)
                     .WithReleases(publications[2].Releases)
                     .GenerateList();
-                
+
                 var approverReleaseRolesForOtherUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(otherUser)
                     .WithRole(ReleaseRole.Approver)
                     .WithReleases(publications.SelectMany(publication => publication.Releases))
                     .GenerateList();
-                
+
                 var higherReviewReleaseWithApproverRoleForUser = publications[1].Releases[1];
-                
+
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
                     await context.Publications.AddRangeAsync(publications);
@@ -1674,7 +1688,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForOtherUser);
                     await context.SaveChangesAsync();
                 }
-                
+
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
                     var service = BuildReleaseService(context);
@@ -1682,35 +1696,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var result = await service.ListUsersReleasesForApproval();
 
                     var viewModels = result.AssertRight();
-                    
+
                     // Assert that the only Release returned for this user is the Release where they have a direct
                     // Approver role on and it is in Higher Review.
                     var viewModel = Assert.Single(viewModels);
                     Assert.Equal(higherReviewReleaseWithApproverRoleForUser.Id, viewModel.Id);
-                    
+
                     // Assert that we have a fully populated ReleaseSummaryViewModel, including details from the owning
                     // Publication.
                     Assert.Equal(
-                        higherReviewReleaseWithApproverRoleForUser.Publication.Title, 
+                        higherReviewReleaseWithApproverRoleForUser.Publication.Title,
                         viewModel.Publication!.Title);
                 }
             }
-            
+
             [Fact]
             public async Task UserHasApproverRoleOnPublications()
             {
                 var contextId = Guid.NewGuid().ToString();
 
                 var otherUser = new User();
-                
+
                 var publications = _fixture
                     .DefaultPublication()
                     .WithReleases(_ => _fixture
                         .DefaultRelease()
                         .WithApprovalStatuses(ListOf(
-                            ReleaseApprovalStatus.Draft, 
-                            ReleaseApprovalStatus.HigherLevelReview, 
-                            ReleaseApprovalStatus.Approved, 
+                            ReleaseApprovalStatus.Draft,
+                            ReleaseApprovalStatus.HigherLevelReview,
+                            ReleaseApprovalStatus.Approved,
                             ReleaseApprovalStatus.HigherLevelReview))
                         .GenerateList())
                     .GenerateList(3);
@@ -1721,42 +1735,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithRole(PublicationRole.Owner)
                     .WithPublication(publications[0])
                     .Generate();
-                
+
                 var approverPublicationRoleForUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(User)
                     .WithRole(PublicationRole.Approver)
                     .WithPublication(publications[1])
                     .Generate();
-                
+
                 var ownerPublicationRolesForOtherUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(otherUser)
                     .WithRole(PublicationRole.Owner)
                     .WithPublications(publications)
                     .GenerateList();
-                
+
                 var approverPublicationRolesForOtherUser = _fixture
                     .DefaultUserPublicationRole()
                     .WithUser(otherUser)
                     .WithRole(PublicationRole.Approver)
                     .WithPublications(publications)
                     .GenerateList();
-                
+
                 var release1WithApproverRoleForUser = publications[1].Releases[1];
                 var release2WithApproverRoleForUser = publications[1].Releases[3];
-                
+
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
                     await context.Publications.AddRangeAsync(publications);
                     await context.UserPublicationRoles.AddRangeAsync(
-                        ownerPublicationRoleForUser, 
+                        ownerPublicationRoleForUser,
                         approverPublicationRoleForUser);
                     await context.UserPublicationRoles.AddRangeAsync(ownerPublicationRolesForOtherUser);
                     await context.UserPublicationRoles.AddRangeAsync(approverPublicationRolesForOtherUser);
                     await context.SaveChangesAsync();
                 }
-                
+
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
                     var service = BuildReleaseService(context);
@@ -1764,7 +1778,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var result = await service.ListUsersReleasesForApproval();
 
                     var viewModels = result.AssertRight();
-                    
+
                     // Assert that the only Releases returned for this user are the Releases where they have Approver
                     // role on the overarching Publication and the Releases are in Higher Review.
                     Assert.Equal(2, viewModels.Count);
@@ -1772,7 +1786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Assert.Equal(release2WithApproverRoleForUser.Id, viewModels[1].Id);
                 }
             }
-            
+
             [Fact]
             public async Task UserIsPublicationAndReleaseApprover_NoDuplication()
             {
@@ -1785,7 +1799,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
                         .Generate(1))
                     .Generate();
-                
+
                 var approverReleaseRolesForUser = _fixture
                     .DefaultUserReleaseRole()
                     .WithUser(User)
@@ -1799,7 +1813,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .WithRole(PublicationRole.Approver)
                     .WithPublication(publication)
                     .Generate();
-                
+
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
                     await context.Publications.AddRangeAsync(publication);
@@ -1807,7 +1821,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await context.UserPublicationRoles.AddRangeAsync(approverPublicationRoleForUser);
                     await context.SaveChangesAsync();
                 }
-                
+
                 await using (var context = InMemoryApplicationDbContext(contextId))
                 {
                     var service = BuildReleaseService(context);
@@ -1815,7 +1829,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var result = await service.ListUsersReleasesForApproval();
 
                     var viewModels = result.AssertRight();
-                    
+
                     // Assert that the Release only appears once despite the user having approval directly via the
                     // Release itself AND via the overarching Publication.
                     Assert.Single(viewModels);

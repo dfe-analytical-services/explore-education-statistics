@@ -110,11 +110,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         PreReleaseUsersOrInvitesAdded = _context
                             .UserReleaseRoles
-                            .Any(role => role.ReleaseId == id 
+                            .Any(role => role.ReleaseId == id
                                          && role.Role == ReleaseRole.PrereleaseViewer) ||
                             _context
                             .UserReleaseInvites
-                            .Any(role => role.ReleaseId == id 
+                            .Any(role => role.ReleaseId == id
                                          && role.Role == ReleaseRole.PrereleaseViewer)
                     });
         }
@@ -140,10 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (releaseCreate.TemplateReleaseId.HasValue)
                     {
-                        var context = new Release.CloneContext(newRelease);
-                        await CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, context);
-                        var copiedDataBlocks = await CopyDataBlocksFromTemplateRelease(releaseCreate.TemplateReleaseId.Value, context);
-                        await _context.ContentBlocks.AddRangeAsync(copiedDataBlocks);
+                        await CreateGenericContentFromTemplate(releaseCreate.TemplateReleaseId.Value, newRelease);
                     }
                     else
                     {
@@ -296,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 // manually removed from a Release as opposed to SoftDeleted, which is only set when a Release is
                 // deleted)
                 .IgnoreQueryFilters()
-                .Where(releaseRole => releaseRole.ReleaseId == originalReleaseId 
+                .Where(releaseRole => releaseRole.ReleaseId == originalReleaseId
                                       && releaseRole.Role != ReleaseRole.PrereleaseViewer)
                 .Select(releaseRole => releaseRole.CopyForAmendment(amendment))
                 .ToList();
@@ -313,7 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(block => block.ReleaseId == release.Id)
                 .OfType<DataBlock>()
                 .ToListAsync();
-            
+
             var (amendment, amendedDataBlocks) = release.CreateAmendment(dataBlocks, DateTime.UtcNow, _userService.GetUserId());
             await _context.Releases.AddAsync(amendment);
             await _context.ContentBlocks.AddRangeAsync(amendedDataBlocks);
@@ -462,7 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(role => role.UserId == userId && role.Role == ReleaseRole.Approver)
                 .Select(role => role.ReleaseId)
                 .ToListAsync();
-            
+
             var indirectReleasesWithApprovalRole = await _context
                 .UserPublicationRoles
                 .Where(role => role.UserId == userId && role.Role == PublicationRole.Approver)
@@ -476,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releasesForApproval = await _context
                 .Releases
                 .Include(release => release.Publication)
-                .Where(release => 
+                .Where(release =>
                     release.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview
                     && releaseIdsForApproval.Contains(release.Id))
                 .ToListAsync();
@@ -544,7 +541,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
         }
 
-        private async Task CreateGenericContentFromTemplate(Guid templateReleaseId, Release.CloneContext context)
+        private async Task CreateGenericContentFromTemplate(Guid templateReleaseId, Release newRelease)
         {
             var templateRelease = await _context
                 .Releases
@@ -552,27 +549,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(release => release.Content)
                 .FirstAsync(r => r.Id == templateReleaseId);
 
-            templateRelease.CreateGenericContentFromTemplate(context);
+            newRelease.Content = templateRelease
+                .Content
+                .Where(section => section.Type == ContentSectionType.Generic)
+                .Select(section => CloneContentSectionFromReleaseTemplate(section, newRelease))
+                .ToList();
         }
 
-        // TODO EES-4467 - this can be incorporated back into Release as the newly fashioned
-        // DataBlock / DataBlockVersions tables when tackling EES-4467. For the time being though,
-        // this will need to be done separately from the cloning of the main Release entity.
-        private async Task<List<DataBlock>> CopyDataBlocksFromTemplateRelease(
-            Guid templateReleaseId, 
-            Release.CloneContext context)
+        private ContentSection CloneContentSectionFromReleaseTemplate(
+            ContentSection originalSection,
+            Release newRelease)
         {
-            var templateDataBlocks = await _context
-                .ContentBlocks
-                .AsNoTracking()
-                .Where(block => block.ReleaseId == templateReleaseId)
-                .OfType<DataBlock>()
-                .ToListAsync();
+            // Create a like-for-like copy of the template ContentSection.
+            var copy = originalSection.MemberwiseClone();
 
-            return templateDataBlocks
-                .Select(dataBlock => dataBlock.Clone(context))
-                .Cast<DataBlock>()
-                .ToList();
+            // Assign a new Id for the new ContentSection.
+            copy.Id = Guid.NewGuid();
+
+            // Assign the new ContentSection to the new Release.
+            copy.Release = newRelease;
+            copy.ReleaseId = newRelease.Id;
+
+            // Do not copy over any existing Content from the original template ContentSection.
+            copy.Content = new List<ContentBlock>();
+
+            return copy;
         }
 
         public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
