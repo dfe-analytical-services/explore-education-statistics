@@ -273,4 +273,49 @@ describe('PublicationForm', () => {
       });
     });
   });
+
+  test('can submit without a contact tel no', async () => {
+    const handleSubmit = jest.fn();
+
+    render(<PublicationForm topicId="topic-id" onSubmit={handleSubmit} />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
+
+    await userEvent.type(
+      screen.getByLabelText('Publication title'),
+      'Test title',
+    );
+
+    await userEvent.type(
+      screen.getByLabelText('Publication summary'),
+      'Test summary',
+    );
+
+    await userEvent.type(screen.getByLabelText('Team name'), 'Test team');
+    await userEvent.type(
+      screen.getByLabelText('Team email address'),
+      'team@test.com',
+    );
+    await userEvent.type(screen.getByLabelText('Contact name'), 'John Smith');
+
+    expect(handleSubmit).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Save publication' }));
+
+    await waitFor(() => {
+      expect(publicationService.createPublication).toHaveBeenCalledWith({
+        title: 'Test title',
+        summary: 'Test summary',
+        topicId: 'topic-id',
+        contact: {
+          teamName: 'Test team',
+          teamEmail: 'team@test.com',
+          contactName: 'John Smith',
+          contactTelNo: undefined,
+        },
+      });
+    });
+  });
 });

@@ -1,16 +1,19 @@
-import FormCharacterCount from '@common/components/form/FormCharacterCount';
 import FormGroup from '@common/components/form/FormGroup';
+import FormCharacterCount from '@common/components/form/FormCharacterCount';
 import FormBaseTextArea, {
   FormTextAreaProps,
 } from '@common/components/form/FormBaseTextArea';
 import React from 'react';
+import { useWatch } from 'react-hook-form';
 
-export default function FormTextArea({
+export default function RHFFormTextArea({
   id,
   maxLength,
-  value,
+  name,
   ...props
 }: FormTextAreaProps) {
+  const value = useWatch({ name });
+
   if (!!maxLength && maxLength > 0) {
     return (
       <div className="govuk-character-count">
@@ -19,13 +22,15 @@ export default function FormTextArea({
             {...props}
             id={id}
             maxLength={maxLength}
-            value={value}
+            name={name}
           />
-          <FormCharacterCount id={id} maxLength={maxLength} value={value} />
         </FormGroup>
+        <FormCharacterCount id={id} maxLength={maxLength} value={value} />
       </div>
     );
   }
 
-  return <FormBaseTextArea {...props} id={id} value={value} />;
+  return (
+    <FormBaseTextArea {...props} id={id} maxLength={maxLength} name={name} />
+  );
 }

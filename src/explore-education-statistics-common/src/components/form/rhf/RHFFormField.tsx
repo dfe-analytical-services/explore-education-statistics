@@ -71,6 +71,7 @@ export default function RHFFormField<
     onBlur: fieldOnBlur,
     onChange: fieldOnChange,
   } = useRegister(name, register);
+
   const { fieldId } = useFormIdContext();
 
   const error = getErrorMessage(errors, name, showError);
