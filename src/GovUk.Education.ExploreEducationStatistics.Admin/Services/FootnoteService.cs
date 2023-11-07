@@ -431,6 +431,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static bool AllSpecifiedSubjectsAreLinkedToRelease(IReadOnlySet<Guid> subjectIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
+            if (!subjectIds.Any())
+            {
+                return true;
+            }
+
             IReadOnlyList<Guid> releaseSubjectIds = releaseSubjects
                 .Select(rs => rs.SubjectId)
                 .ToList();
@@ -440,6 +445,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static bool AllSpecifiedFiltersAreLinkedToRelease(IReadOnlySet<Guid> filterIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
+            if (!filterIds.Any())
+            {
+                return true;
+            }
+
             IReadOnlyList<Guid> releaseFilterIds = releaseSubjects
                 .SelectMany(rs => rs.Subject.Filters)
                 .Select(f => f.Id)
@@ -450,6 +460,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static bool AllSpecifiedFilterGroupsAreLinkedToRelease(IReadOnlySet<Guid> filterGroupIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
+            if (!filterGroupIds.Any())
+            {
+                return true;
+            }
+
             IReadOnlyList<Guid> releaseFilterGroupIds = releaseSubjects
                 .SelectMany(rs => rs.Subject.Filters)
                 .SelectMany(f => f.FilterGroups)
@@ -461,6 +476,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static bool AllSpecifiedFilterItemsAreLinkedToRelease(IReadOnlySet<Guid> filterItemIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
+            if (!filterItemIds.Any())
+            {
+                return true;
+            }
+
             IReadOnlyList<Guid> releaseFilterItemIds = releaseSubjects
                 .SelectMany(rs => rs.Subject.Filters)
                 .SelectMany(f => f.FilterGroups)
@@ -473,6 +493,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static bool AllSpecifiedIndicatorsAreLinkedToRelease(IReadOnlySet<Guid> indicatorIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
+            if (!indicatorIds.Any())
+            {
+                return true;
+            }
+
             IReadOnlyList<Guid> releaseIndicatorIds = releaseSubjects
                 .SelectMany(rs => rs.Subject.IndicatorGroups)
                 .SelectMany(ig => ig.Indicators)
