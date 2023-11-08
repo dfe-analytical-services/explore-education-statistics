@@ -238,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 methodologyRepository.Object,
                 new AuthorizationHandlerService(
                     InMemoryApplicationDbContext(),
-                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
                     userPublicationRoleRepository.Object,
                     Mock.Of<IPreReleaseService>(Strict)));
 

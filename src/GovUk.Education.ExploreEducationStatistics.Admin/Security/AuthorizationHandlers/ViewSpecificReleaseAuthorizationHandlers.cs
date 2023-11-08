@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
@@ -8,14 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
 public class ViewSpecificReleaseAuthorizationHandler : AuthorizationHandler<ViewReleaseRequirement, Release>
 {
-    private readonly IPreReleaseService _preReleaseService;
     private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public ViewSpecificReleaseAuthorizationHandler(
-        IPreReleaseService preReleaseService,
         AuthorizationHandlerService authorizationHandlerService)
     {
-        _preReleaseService = preReleaseService;
         _authorizationHandlerService = authorizationHandlerService;
     }
 

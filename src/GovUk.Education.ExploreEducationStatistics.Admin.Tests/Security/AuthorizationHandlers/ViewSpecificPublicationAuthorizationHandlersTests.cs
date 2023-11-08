@@ -33,9 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             // Assert that any users with the "AccessAllPublications" claim can view an arbitrary Publication
             // (and no other claim allows this)
-            //
-            // Note that we're deliberately using the "All RELEASES" claim rather than having to have a separate
-            // "All PUBLICATIONS" claim, as they're effectively the same
             await AssertHandlerSucceedsWithCorrectClaims<Publication, ViewSpecificPublicationRequirement>(
                 context => CreateHandler(context),
                 _publication,

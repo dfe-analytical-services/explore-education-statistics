@@ -194,7 +194,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             IPreReleaseService? preReleaseService = null)
         {
             return new ViewSpecificReleaseAuthorizationHandler(
-                Mock.Of<IPreReleaseService>(),
                 new AuthorizationHandlerService(
                     contentDbContext,
                     new UserReleaseRoleRepository(contentDbContext),
