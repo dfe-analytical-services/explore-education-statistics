@@ -690,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(release => release.DataBlockVersions)
                 .Include(release => release.DataBlockVersions)
                 .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
-                .ThenInclude(dataBlockParent => dataBlockParent.LatestVersion)
+                .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
                 .Include(release => release.DataBlockVersions)
                 .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)

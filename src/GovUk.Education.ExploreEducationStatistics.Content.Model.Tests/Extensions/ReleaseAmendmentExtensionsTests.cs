@@ -272,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             // Assert that the DataBlock in the amendment Content is the same as the one linked directly to the amended
             // Release.
             var amendmentDataBlockFromContent = Assert.Single(amendmentContentSection2.Content);
-            Assert.Equal(amendmentDataBlockFromContent, amendmentDataBlockInContentParent.LatestVersion!.ContentBlock);
+            Assert.Equal(amendmentDataBlockFromContent, amendmentDataBlockInContentParent.LatestDraftVersion!.ContentBlock);
         }
 
         private static void AssertExistingDataBlockVersionCopiedOk(
@@ -300,7 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
             // Assert that a new DataBlockVersion has been created as a part of creating the Release amendment.
             var amendmentDataBlockOriginalVersion = amendmentDataBlockParent.LatestPublishedVersion!;
-            var amendmentDataBlockNewVersion = amendmentDataBlockParent.LatestVersion!;
+            var amendmentDataBlockNewVersion = amendmentDataBlockParent.LatestDraftVersion!;
 
             // Assert that most of the information from the old DataBlockVersion is carried into the new version.
             amendmentDataBlockNewVersion.AssertDeepEqualTo(originalDataBlockVersion,

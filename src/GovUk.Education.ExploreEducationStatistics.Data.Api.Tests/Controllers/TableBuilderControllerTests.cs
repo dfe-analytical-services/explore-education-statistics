@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
         private static readonly DataBlockParent DataBlockParentWithNoPublishedVersion = Fixture
             .DefaultDataBlockParent()
-            .WithLatestVersion(Fixture
+            .WithLatestDraftVersion(Fixture
                 .DefaultDataBlockVersion()
                 .WithRelease(Release)
                 .Generate())

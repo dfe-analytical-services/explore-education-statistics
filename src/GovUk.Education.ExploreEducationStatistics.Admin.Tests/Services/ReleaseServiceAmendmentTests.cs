@@ -458,7 +458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ThenInclude(section => (section as EmbedBlockLink)!.EmbedBlock)
                     .Include(release => release.DataBlockVersions)
                     .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
-                    .ThenInclude(dataBlockParent => dataBlockParent.LatestVersion)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
                     .Include(release => release.DataBlockVersions)
                     .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
                     .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
@@ -533,7 +533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(3, amendmentDataBlockVersions.Count);
 
                 // Assert that each DataBlock has a new version created by the amendment process.
-                // The new DataBlockVersion should now be the LatestVersion of its parent but not
+                // The new DataBlockVersion should now be the LatestDraftVersion of its parent but not
                 // the LatestPublishedVersion (which should not have changed).
                 amendmentDataBlockVersions.ForEach(dataBlockVersion =>
                 {
@@ -546,7 +546,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Assert.Equal(0, dataBlockVersionsForParent[0].Version);
                     Assert.Equal(1, dataBlockVersionsForParent[1].Version);
 
-                    Assert.Equal(dataBlockVersion, dataBlockVersion.DataBlockParent.LatestVersion);
+                    Assert.Equal(dataBlockVersion, dataBlockVersion.DataBlockParent.LatestDraftVersion);
                     Assert.NotEqual(dataBlockVersion, dataBlockVersion.DataBlockParent.LatestPublishedVersion);
                 });
 
@@ -556,9 +556,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var amendmentKeyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(amendment
                     .KeyStatistics.Find(ks => ks.GetType() == typeof(KeyStatisticDataBlock)));
-                Assert.Equal(dataBlock3Parent.LatestVersion.Name, amendmentKeyStatDataBlock.DataBlock.Name);
+                Assert.Equal(dataBlock3Parent.LatestDraftVersion.Name, amendmentKeyStatDataBlock.DataBlock.Name);
                 Assert.NotEqual(originalRelease.KeyStatistics[1].Id, amendmentKeyStatDataBlock.Id);
-                Assert.NotEqual(dataBlock3Parent.LatestVersion.Id, amendmentKeyStatDataBlock.DataBlockId);
+                Assert.NotEqual(dataBlock3Parent.LatestDraftVersion.Id, amendmentKeyStatDataBlock.DataBlockId);
                 Assert.Equal(amendmentContentBlock3.Id, amendmentKeyStatDataBlock.DataBlockId);
 
                 var amendmentContentBlock1InContent = amendment.Content[0].Content[0];
@@ -568,15 +568,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // additional "Release.ContentBlocks" relationship (which is used to determine which Data Blocks
                 // belong to which Release when a Data Block has not yet been - or is removed from - the Release's
                 // Content
-                Assert.NotEqual(dataBlock1Parent.LatestVersion.Id, amendmentContentBlock1.Id);
-                Assert.Equal(dataBlock1Parent.LatestVersion.Name, amendmentContentBlock1.Name);
+                Assert.NotEqual(dataBlock1Parent.LatestDraftVersion.Id, amendmentContentBlock1.Id);
+                Assert.Equal(dataBlock1Parent.LatestDraftVersion.Name, amendmentContentBlock1.Name);
                 Assert.Equal(amendmentContentBlock1, amendmentContentBlock1InContent);
 
                 // and check that the Data Block that is not yet included in any content is copied across OK still
-                Assert.NotEqual(dataBlock2Parent.LatestVersion.Id, amendmentContentBlock2.Id);
+                Assert.NotEqual(dataBlock2Parent.LatestDraftVersion.Id, amendmentContentBlock2.Id);
 
                 // and check DataBlock previously associated with key stat is copied correctly
-                Assert.NotEqual(dataBlock3Parent.LatestVersion.Id, amendmentContentBlock3.Id);
+                Assert.NotEqual(dataBlock3Parent.LatestDraftVersion.Id, amendmentContentBlock3.Id);
 
                 var amendmentEmbedBlocks = amendmentContentBlocks.OfType<EmbedBlockLink>().ToList();
                 var amendmentContentBlock4 = Assert.Single(amendmentEmbedBlocks);
@@ -646,7 +646,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static DataBlock GetMatchingDataBlock(List<DataBlockVersion> amendmentDataBlockVersions, DataBlockParent dataBlockToFind)
         {
             return amendmentDataBlockVersions
-                .Where(dataBlockVersion => dataBlockVersion.Name == dataBlockToFind.LatestVersion.Name)
+                .Where(dataBlockVersion => dataBlockVersion.Name == dataBlockToFind.LatestDraftVersion.Name)
                 .Select(dataBlockParent => dataBlockParent.ContentBlock)
                 .Single();
         }

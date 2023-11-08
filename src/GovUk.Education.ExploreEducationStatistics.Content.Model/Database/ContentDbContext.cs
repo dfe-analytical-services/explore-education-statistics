@@ -698,9 +698,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .ToTable("DataBlocks");
 
             modelBuilder.Entity<DataBlockParent>()
-                .HasOne(dataBlock => dataBlock.LatestVersion)
+                .HasOne(dataBlock => dataBlock.LatestDraftVersion)
                 .WithOne()
-                .HasForeignKey<DataBlockParent>(version => version.LatestVersionId);
+                .HasForeignKey<DataBlockParent>(version => version.LatestDraftVersionId);
 
             modelBuilder.Entity<DataBlockParent>()
                 .HasOne(dataBlock => dataBlock.LatestPublishedVersion)

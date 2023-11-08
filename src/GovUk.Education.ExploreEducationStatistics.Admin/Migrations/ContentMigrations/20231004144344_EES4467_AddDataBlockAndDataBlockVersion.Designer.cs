@@ -181,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("LatestPublishedVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("LatestVersionId")
+                    b.Property<Guid>("LatestDraftVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsUnique()
                         .HasFilter("[LatestPublishedVersionId] IS NOT NULL");
 
-                    b.HasIndex("LatestVersionId")
+                    b.HasIndex("LatestDraftVersionId")
                         .IsUnique();
 
                     b.ToTable("DataBlocks", (string)null);
@@ -1423,15 +1423,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .WithOne()
                         .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "LatestPublishedVersionId");
 
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", "LatestVersion")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", "LatestDraftVersion")
                         .WithOne()
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "LatestVersionId")
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "LatestDraftVersionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("LatestPublishedVersion");
 
-                    b.Navigation("LatestVersion");
+                    b.Navigation("LatestDraftVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", b =>

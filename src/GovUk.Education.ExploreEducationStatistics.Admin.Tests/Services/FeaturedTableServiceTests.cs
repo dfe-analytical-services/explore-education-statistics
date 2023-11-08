@@ -35,12 +35,12 @@ public class FeaturedTableServiceTests
 
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestVersion(dataBlockVersion)
+            .WithLatestDraftVersion(dataBlockVersion)
             .Generate();
 
         var release = _fixture
             .DefaultRelease()
-            .WithDataBlockVersions(ListOf(dataBlockParent.LatestVersion!))
+            .WithDataBlockVersions(ListOf(dataBlockParent.LatestDraftVersion!))
             .Generate();
 
         var featuredTable = _fixture
@@ -195,7 +195,7 @@ public class FeaturedTableServiceTests
 
         var unassociatedRelease = _fixture
             .DefaultRelease()
-            .WithDataBlockVersions(ListOf(unassociatedDataBlockParent.LatestVersion!))
+            .WithDataBlockVersions(ListOf(unassociatedDataBlockParent.LatestDraftVersion!))
             .Generate();
 
         var unassociatedFeaturedTable = new FeaturedTable
@@ -318,14 +318,14 @@ public class FeaturedTableServiceTests
     {
         var dataBlockParent = _fixture
             .DefaultDataBlockParent()
-            .WithLatestVersion(_fixture
+            .WithLatestDraftVersion(_fixture
                 .DefaultDataBlockVersion()
                 .Generate())
             .Generate();
 
         var release = _fixture
             .DefaultRelease()
-            .WithDataBlockVersions(ListOf(dataBlockParent.LatestVersion!))
+            .WithDataBlockVersions(ListOf(dataBlockParent.LatestDraftVersion!))
             .Generate();
 
         var contextId = Guid.NewGuid().ToString();

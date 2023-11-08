@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.DataBlockVersions.AddAsync(dataBlockVersion);
                     await _context.SaveChangesAsync();
 
-                    dataBlockVersion.DataBlockParent.LatestVersion = dataBlockVersion;
+                    dataBlockVersion.DataBlockParent.LatestDraftVersion = dataBlockVersion;
                     _context.DataBlockParents.Update(dataBlockVersion.DataBlockParent);
                     await _context.SaveChangesAsync();
 
@@ -391,10 +391,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .ToList();
 
-            // Set all of the DataBlockParents' "latest" versions to null, to indicate that these Data Blocks are no
-            // longer a part of this Release (or amendment).
-            dataBlockParents.ForEach(dataBlockParent => dataBlockParent.LatestVersionId = null);
-            _context.DataBlockParents.UpdateRange(dataBlockParents);
+            // Set all of the DataBlockParents' "LatestDraftVersion" versions to null, to indicate that these Data
+            // Blocks are no longer a part of this Release (or amendment).
+            dataBlockParents.ForEach(dataBlockParent => dataBlockParent.LatestDraftVersionId = null);
 
             await _context.SaveChangesAsync();
 
