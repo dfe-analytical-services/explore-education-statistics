@@ -2,6 +2,8 @@ import React, { ReactNode } from 'react';
 import { Contact } from '@common/services/publicationService';
 import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import ButtonText from '@common/components/ButtonText';
+import InfoIcon from '@common/components/InfoIcon';
 
 interface Props {
   contactDetails?: Contact;
@@ -30,6 +32,18 @@ const TableToolInfo = ({
       )}
 
       <ul className="govuk-list">
+        {releaseType && (
+          <li>
+            Release type: {releaseTypes[releaseType]}{' '}
+            <ReleaseTypesModal
+              triggerButton={
+                <ButtonText>
+                  <InfoIcon description="What are release types" />
+                </ButtonText>
+              }
+            />
+          </li>
+        )}
         {releaseLink && <li>Publication: {releaseLink}</li>}
         {methodologyLinks?.map((methodologyLink, index) => (
           // eslint-disable-next-line react/no-array-index-key
