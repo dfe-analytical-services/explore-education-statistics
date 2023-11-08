@@ -28,6 +28,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             ignoreProperties?.ForEach(compareLogic.Config.IgnoreProperty);
             var comparison = compareLogic.Compare(actual, expected);
             Assert.True(comparison.AreEqual, comparison.DifferencesString);
+            ignoreProperties?.ForEach(ignore =>
+            {
+                var fieldGetter = ignore.Compile();
+                var expectedIgnoredField = fieldGetter.Invoke(expected);
+                var actualIgnoredField = fieldGetter.Invoke(actual);
+                Assert.NotEqual(expectedIgnoredField, actualIgnoredField);
+            });
             return true;
         }
 
