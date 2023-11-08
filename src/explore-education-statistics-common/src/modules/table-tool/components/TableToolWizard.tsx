@@ -38,7 +38,6 @@ import tableBuilderService, {
 } from '@common/services/tableBuilderService';
 import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
-import { ReleaseType } from '@common/services/types/releaseType';
 
 export interface InitialTableToolState {
   initialStep: number;
@@ -51,7 +50,6 @@ export interface InitialTableToolState {
     table: FullTable;
     tableHeaders: TableHeadersConfig;
   };
-  releaseType?: ReleaseType;
 }
 
 interface TableToolState extends InitialTableToolState {
@@ -134,7 +132,6 @@ export default function TableToolWizard({
       filters: [],
       locationIds: [],
     },
-    releaseType: undefined,
     ...initialState,
   });
   const [reorderedTableHeaders, setReorderedTableHeaders] =
