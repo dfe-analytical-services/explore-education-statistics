@@ -329,7 +329,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             dataBlockParents.ForEach(dataBlockParent =>
             {
-                dataBlockParent.LatestVersionId = null;
+                dataBlockParent.LatestDraftVersionId = null;
                 dataBlockParent.LatestPublishedVersionId = null;
             });
 

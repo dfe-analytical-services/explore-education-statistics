@@ -102,14 +102,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             latestDataBlockParents.ForEach(latestDataBlockParent =>
             {
-                // Promote the latest "draft" version as the newly published version.
-                latestDataBlockParent.LatestPublishedVersion = latestDataBlockParent.LatestVersion;
-                latestDataBlockParent.LatestPublishedVersionId = latestDataBlockParent.LatestVersionId;
+                // Promote the LatestDraftVersion as the newly published version.
+                latestDataBlockParent.LatestPublishedVersion = latestDataBlockParent.LatestDraftVersion;
+                latestDataBlockParent.LatestPublishedVersionId = latestDataBlockParent.LatestDraftVersionId;
                 latestDataBlockParent.LatestPublishedVersion!.Published = DateTime.UtcNow;
 
-                // Remove the "draft" version completely until such a point in the future as a Release Amendment is
-                // created that will contain this Data Block.
-                latestDataBlockParent.LatestVersionId = null;
+                // Remove the LatestDraftVersion completely until such a point in the future as a Release Amendment is
+                // created that will contain this Data Block as a Draft.
+                latestDataBlockParent.LatestDraftVersionId = null;
             });
 
             // Find all DataBlockVersions that were part of the previously published Release, if any, and update them

@@ -899,7 +899,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataBlockParent = _fixture
                 .DefaultDataBlockParent()
-                .WithLatestVersion(_fixture
+                .WithLatestDraftVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithCharts(ListOf<IChart>(
                         new InfographicChart
@@ -913,7 +913,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Generate())
                 .Generate();
 
-            var dataBlockVersion = dataBlockParent.LatestVersion!;
+            var dataBlockVersion = dataBlockParent.LatestDraftVersion!;
 
             release.KeyStatistics = new List<KeyStatistic>
             {
@@ -1011,7 +1011,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataBlockParent = _fixture
                 .DefaultDataBlockParent()
-                .WithLatestVersion(_fixture
+                .WithLatestDraftVersion(_fixture
                     .DefaultDataBlockVersion()
                     .WithCharts(ListOf<IChart>(
                         new InfographicChart
@@ -1030,7 +1030,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Generate())
                 .Generate();
 
-            var draftDataBlockVersion = dataBlockParent.LatestVersion!;
+            var draftDataBlockVersion = dataBlockParent.LatestDraftVersion!;
             var publishedDataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             release.KeyStatistics = new List<KeyStatistic>
@@ -1135,7 +1135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // The latest draft DataBlockVersion will be set to null, as there is no longer a draft version as part
                 // of this Release Amendment.
-                Assert.Null(remainingDataBlockParent.LatestVersionId);
+                Assert.Null(remainingDataBlockParent.LatestDraftVersionId);
 
                 var remainingFeaturedTable = Assert.Single(context.FeaturedTables.ToList());
                 Assert.Equal(publishedDataBlockVersion.Id, remainingFeaturedTable.DataBlockId);
@@ -1284,21 +1284,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataBlocks = context.DataBlocks.ToList();
 
                 // Validate that we have a new "DataBlockParent" to keep track of the various DataBlockVersions.
-                // Assert as well that it does not currently have a published DataBlockVersion as this is a new
-                // DataBlock.
+                // Assert as well that it does not currently have a LatestPublishedVersion as this is a new
+                // DataBlock but instead has a LatestDraftVersion.
                 var dataBlockParent = Assert.Single(dataBlockParents);
                 Assert.Null(dataBlockParent.LatestPublishedVersionId);
-                Assert.NotEqual(Guid.Empty, dataBlockParent.LatestVersionId);
+                Assert.NotEqual(Guid.Empty, dataBlockParent.LatestDraftVersionId);
 
                 // Validate that we have a single "version 0" DataBlockVersion for this new DataBlock. Assert that it
-                // is attached to its parent correctly, that is recognised as the latest version, and that it is
+                // is attached to its parent correctly, that is recognised as the LatestDraftVersion, and that it is
                 // attached to the underlying ContentBlock successfully.
                 var dataBlockVersion = Assert.Single(dataBlockVersions);
                 var dataBlock = Assert.Single(dataBlocks);
                 Assert.Equal(0, dataBlockVersion.Version);
                 Assert.Equal(dataBlock.Id, dataBlockVersion.ContentBlockId);
                 Assert.Equal(dataBlockParent.Id, dataBlockVersion.DataBlockParentId);
-                Assert.Equal(dataBlockParent.LatestVersionId, dataBlockVersion.Id);
+                Assert.Equal(dataBlockParent.LatestDraftVersionId, dataBlockVersion.Id);
 
                 // Assert that the new DataBlock is connected correctly to its owning Release.
                 Assert.Equal(release.Id, dataBlockVersion.ReleaseId);

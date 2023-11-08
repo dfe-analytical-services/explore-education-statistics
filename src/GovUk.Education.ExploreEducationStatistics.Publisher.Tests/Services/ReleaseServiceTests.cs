@@ -222,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var originalDataBlockParents = _fixture
                 .DefaultDataBlockParent()
-                .WithLatestVersion(() => _fixture
+                .WithLatestDraftVersion(() => _fixture
                     .DefaultDataBlockVersion()
                     .WithRelease(release)
                     .Generate())
@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var actualDataBlockParents = await contentDbContext
                     .DataBlockParents
-                    .Include(dataBlockParent => dataBlockParent.LatestVersion)
+                    .Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
                     .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
                     .ToListAsync();
 
@@ -270,14 +270,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     var originalParent = originalDataBlockParents.Single(p => p.Id == parent.Id);
 
-                    // The "Published" version is now the one that was previously just the "Latest".  Its "Published"
-                    // date should have just been set as well.
-                    Assert.Equal(originalParent.LatestVersionId, parent.LatestPublishedVersionId);
-                    Assert.Null(originalParent.LatestVersion!.Published);
+                    // The LatestPublishedVersion version is now the one that was previously the LatestDraftVersion.
+                    // Its "Published" date should have just been set as well.
+                    Assert.Equal(originalParent.LatestDraftVersionId, parent.LatestPublishedVersionId);
+                    Assert.Null(originalParent.LatestDraftVersion!.Published);
                     parent.LatestPublishedVersion!.Published.AssertUtcNow();
 
-                    // The "Latest" is now set to null, until a Release amendment is created.
-                    Assert.Null(parent.LatestVersionId);
+                    // The LatestDraftVersion is now set to null, until a Release amendment is created in the future.
+                    Assert.Null(parent.LatestDraftVersionId);
                 });
             }
         }
@@ -306,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .DefaultDataBlockVersion()
                     .WithRelease(previousRelease)
                     .Generate())
-                .WithLatestVersion(() => _fixture
+                .WithLatestDraftVersion(() => _fixture
                     .DefaultDataBlockVersion()
                     .WithRelease(release)
                     .Generate())
@@ -337,14 +337,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var actualDataBlockParents = await contentDbContext
                     .DataBlockParents
-                    .Include(dataBlockParent => dataBlockParent.LatestVersion)
+                    .Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
                     .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
                     .ToListAsync();
 
                 Assert.Equal(2, actualDataBlockParents.Count);
 
-                // Assert that the original DataBlockParents pointed to a LatestPublishedVersion and LatestVersion.
-                originalDataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestVersionId));
+                // Assert that the original DataBlockParents pointed to a LatestPublishedVersion and LatestDraftVersion.
+                originalDataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestDraftVersionId));
                 originalDataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestPublishedVersionId));
 
                 // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
@@ -353,15 +353,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 {
                     var originalParent = originalDataBlockParents.Single(p => p.Id == parent.Id);
 
-                    // The "Published" version is now the one that was previously just the "Latest".  Its "Published"
-                    // date should have just been set as well, and we'll double-check that it didn't just inherit that
-                    // from the original "latest" DataBlockVersion.
-                    Assert.Equal(originalParent.LatestVersionId, parent.LatestPublishedVersionId);
-                    Assert.Null(originalParent.LatestVersion!.Published);
+                    // The LatestPublishedVersion is now the one that was previously the LatestDraftVersion.
+                    // Its "Published" date should have just been set as well, and we'll double-check that it didn't
+                    // just inherit that date from the original LatestDraftVersion DataBlockVersion, as it should not
+                    // have been set until it was published.
+                    Assert.Equal(originalParent.LatestDraftVersionId, parent.LatestPublishedVersionId);
+                    Assert.Null(originalParent.LatestDraftVersion!.Published);
                     parent.LatestPublishedVersion!.Published.AssertUtcNow();
 
-                    // The "Latest" is now set to null, until a Release amendment is created.
-                    Assert.Null(parent.LatestVersionId);
+                    // The LatestDraftVersion is now set to null, until a Release amendment is created in the future.
+                    Assert.Null(parent.LatestDraftVersionId);
                 });
             }
         }
@@ -392,7 +393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .Generate())
                 // This time Data Blocks have been removed from the latest Release amendment, and so they now have no
                 // "latest" version.
-                .WithLatestVersion((DataBlockVersion) null!)
+                .WithLatestDraftVersion((DataBlockVersion) null!)
                 .GenerateList(2);
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -420,16 +421,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var actualDataBlockParents = await contentDbContext
                     .DataBlockParents
-                    .Include(dataBlockParent => dataBlockParent.LatestVersion)
+                    .Include(dataBlockParent => dataBlockParent.LatestDraftVersion)
                     .Include(dataBlockParent => dataBlockParent.LatestPublishedVersion)
                     .ToListAsync();
 
                 // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
-                // be null so that this Data Block is effectively no longer publicly visible.
+                // be null so that this Data Block is effectively no longer publicly visible. Their LatestDraftVersions
+                // are also null for this DataBlockParent as this Data Block no longer has a Draft version being worked
+                // on as a part of this Release / amendment.
                 actualDataBlockParents.ForEach(parent =>
                 {
                      Assert.Null(parent.LatestPublishedVersionId);
-                     Assert.Null(parent.LatestVersionId);
+                     Assert.Null(parent.LatestDraftVersionId);
                 });
             }
         }

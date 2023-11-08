@@ -25,15 +25,19 @@ GRANT UPDATE ON DataBlockVersions TO [publisher];
 -- Query, but this isn't guaranteed and is a very low value exercise.
 
 -- This creates a single overarching DataBlock for each ContentBlock of type "DataBlock".
--- If the original ContentBlock that it's based on is published, we also link it to the new
--- overarching DataBlock as its "LatestPublishedVersion"
-INSERT INTO DataBlocks (Id, LatestVersionId, LatestPublishedVersionId)
+-- If the original ContentBlock that it's based on is published, we link it to the new
+-- overarching DataBlock as its "LatestPublishedVersion". If it is still unpublished, we link
+-- it to the parent as its "LatestDraftVersion".
+INSERT INTO DataBlocks (Id, LatestDraftVersionId, LatestPublishedVersionId)
 SELECT ContentBlock.Id AS Id,
-       ContentBlock.Id AS LatestVersionId,
-       CASE
-           WHEN Releases.Published IS NOT NULL THEN ContentBlock.Id
-           ELSE NULL
-       END AS LatestPublishedVersionId
+    CASE
+       WHEN Releases.Published IS NULL THEN ContentBlock.Id
+       ELSE NULL
+       END AS LatestDraftVersionId,
+    CASE
+       WHEN Releases.Published IS NOT NULL THEN ContentBlock.Id
+       ELSE NULL
+    END AS LatestPublishedVersionId
 FROM ContentBlock
 JOIN Releases ON ContentBlock.ReleaseId = Releases.Id
 WHERE ContentBlock.[Type] = 'DataBlock';

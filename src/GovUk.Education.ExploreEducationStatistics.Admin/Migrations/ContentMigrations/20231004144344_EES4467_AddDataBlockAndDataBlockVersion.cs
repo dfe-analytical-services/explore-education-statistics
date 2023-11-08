@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LatestVersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    LatestDraftVersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     LatestPublishedVersionId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
@@ -70,11 +70,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 filter: "[LatestPublishedVersionId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataBlocks_LatestVersionId",
+                name: "IX_DataBlocks_LatestDraftVersionId",
                 table: "DataBlocks",
-                column: "LatestVersionId",
+                column: "LatestDraftVersionId",
                 unique: true,
-                filter: "[LatestVersionId] IS NOT NULL");
+                filter: "[LatestDraftVersionId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataBlockVersions_ContentBlockId",
@@ -104,9 +104,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 onDelete: ReferentialAction.NoAction);
 
             migrationBuilder.AddForeignKey(
-                name: "FK_DataBlocks_DataBlockVersions_LatestVersionId",
+                name: "FK_DataBlocks_DataBlockVersions_LatestDraftVersionId",
                 table: "DataBlocks",
-                column: "LatestVersionId",
+                column: "LatestDraftVersionId",
                 principalTable: "DataBlockVersions",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.NoAction);
@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 table: "DataBlocks");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_DataBlocks_DataBlockVersions_LatestVersionId",
+                name: "FK_DataBlocks_DataBlockVersions_LatestDraftVersionId",
                 table: "DataBlocks");
 
             migrationBuilder.DropTable(

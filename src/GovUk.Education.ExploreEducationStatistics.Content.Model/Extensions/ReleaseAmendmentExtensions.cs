@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             amendment.Version = originalRelease.Version + 1;
             amendment.PreviousVersionId = originalRelease.Id;
 
-            // Create new DataBlockVersions for each DataBlockParent and for each, replace the "LatestVersion"
+            // Create new DataBlockVersions for each DataBlockParent and for each, replace the "LatestDraftVersion"
             // with the new DataBlockVersion.
             amendment.DataBlockVersions = amendment
                 .DataBlockVersions
@@ -41,8 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                     var clonedDataBlockVersion = originalDataBlockVersion.Clone(amendment);
                     clonedDataBlockVersion.DataBlockParent.LatestPublishedVersion = originalDataBlockVersion;
                     clonedDataBlockVersion.DataBlockParent.LatestPublishedVersionId = originalDataBlockVersion.Id;
-                    clonedDataBlockVersion.DataBlockParent.LatestVersion = clonedDataBlockVersion;
-                    clonedDataBlockVersion.DataBlockParent.LatestVersionId = clonedDataBlockVersion.Id;
+                    clonedDataBlockVersion.DataBlockParent.LatestDraftVersion = clonedDataBlockVersion;
+                    clonedDataBlockVersion.DataBlockParent.LatestDraftVersionId = clonedDataBlockVersion.Id;
                     return clonedDataBlockVersion;
                 })
                 .ToList();
@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
                 .ToDictionary(
                     dataBlockParent => dataBlockParent.LatestPublishedVersion!.ContentBlock,
-                    dataBlockParent => dataBlockParent.LatestVersion!.ContentBlock);
+                    dataBlockParent => dataBlockParent.LatestDraftVersion!.ContentBlock);
 
             var allClonedBlocks = originalToClonedContentBlocks
                 .ToDictionary(kv => kv.Key, kv => kv.Value);
