@@ -6,14 +6,17 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.SignalR;
 using Moq;
 using Xunit;
@@ -25,6 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ContentServiceTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task GetContentBlocks_NoContentSections()
         {
@@ -349,6 +354,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var contentSectionId = Guid.NewGuid();
             var contentBlockId = Guid.NewGuid();
+
+            var dataBlockVersionId = Guid.NewGuid();
+            var dataBlockVersion = new DataBlockVersion
+            {
+                Id = dataBlockVersionId,
+                ContentBlock = new DataBlock
+                {
+                    Id = dataBlockVersionId,
+                    Order = 1
+                },
+                DataBlockParentId = Guid.NewGuid()
+            };
+
             var contentSection = new ContentSection
             {
                 Id = contentSectionId,
@@ -359,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Id = contentBlockId,
                         Order = 0,
                     },
-                    new DataBlock { Order = 1 },
+                    dataBlockVersion.ContentBlock,
                     new HtmlBlock { Order = 2 },
                 },
                 Release = new Release()
@@ -369,6 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.ContentSections.AddRangeAsync(contentSection);
+                await contentDbContext.DataBlockVersions.AddRangeAsync(dataBlockVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -563,6 +582,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task AttachDataBlock()
+        {
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithOrder(1)
+                    .WithRelease(release))
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+
+            release.Content = _fixture
+                .DefaultContentSection()
+                .WithContentBlocks(_fixture
+                    .DefaultHtmlBlock()
+                    .ForIndex(0, s => s.SetOrder(1))
+                    .ForIndex(1, s => s.SetOrder(3))
+                    .ForIndex(2, s => s.SetOrder(5))
+                    .GenerateList())
+                .GenerateList(1);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.DataBlockParents.AddRangeAsync(dataBlockParent);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupContentService(contentDbContext: contentDbContext);
+                var result = await service.AttachDataBlock(release.Id, release.Content[0].Id, new DataBlockAttachRequest
+                {
+                    ContentBlockId = dataBlockVersion.Id,
+                    Order = 3
+                });
+
+                var DataBlockViewModel = result.AssertRight();
+                Assert.Equal(dataBlockVersion.Id, DataBlockViewModel.Id);
+                Assert.Equal(dataBlockParent.Id, DataBlockViewModel.DataBlockParentId);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                // Assert that the DataBlock's requested attachment Order has been updated to reflect its new position.
+                var dataBlock = Assert.Single(contentDbContext.DataBlocks);
+                Assert.Equal(3, dataBlock.Order);
+
+                // Assert that the existing HtmlBlocks' Orders are updated where appropriate.
+                var htmlBlocks = contentDbContext.HtmlBlocks.ToList();
+                Assert.Equal(3, htmlBlocks.Count);
+
+                // An HtmlBlock before the inserted DataBlock should not have its Order changed.
+                Assert.Equal(1, htmlBlocks[0].Order);
+
+                // HtmlBlocks with Orders the same as or greater than the DataBlock's should have their Orders
+                // incremented.
+                Assert.Equal(4, htmlBlocks[1].Order);
+                Assert.Equal(6, htmlBlocks[2].Order);
+            }
+        }
+
         private static ContentService SetupContentService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
@@ -578,7 +665,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentBlockService ?? new ContentBlockService(contentDbContext),
                 hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(MockBehavior.Strict),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                AdminMapper()
+                AdminMapper(contentDbContext)
             );
         }
     }

@@ -3,10 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
@@ -19,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
     public class ReleaseServiceTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task GetFiles()
         {
@@ -208,13 +213,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
-        public async Task SetPublishedDate_FirstVersion()
+        public async Task CompletePublishing_FirstVersion()
         {
-            var release = new Release
-            {
-                PreviousVersionId = null,
-                Version = 0
-            };
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .Generate())
+                .GenerateList(2);
 
             var actualPublishedDate = DateTime.UtcNow;
 
@@ -229,22 +240,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext);
-                await service.SetPublishedDate(release.Id, actualPublishedDate);
+                await service.CompletePublishing(release.Id, actualPublishedDate);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var actual = await contentDbContext
+                var actualRelease = await contentDbContext
                     .Releases
                     .SingleAsync(r => r.Id == release.Id);
 
                 // Expect the published date to have been updated with the actual published date
-                Assert.Equal(actualPublishedDate, actual.Published);
+                Assert.Equal(actualPublishedDate, actualRelease.Published);
+
+                var actualDataBlockParents = await contentDbContext
+                    .DataBlockParents
+                    .ToListAsync();
+
+                Assert.Equal(2, actualDataBlockParents.Count);
+
+                // Assert that the original DataBlockParents did not point to a LatestPublishedVersion.
+                dataBlockParents.ForEach(parent => Assert.Null(parent.LatestPublishedVersionId));
+
+                // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
+                // reference the newly published DataBlockVersion.
+                actualDataBlockParents.ForEach(parent =>
+                {
+                    var originalParent = dataBlockParents.Single(p => p.Id == parent.Id);
+
+                    // The "Published" version is now the one that was previously just the "Latest".
+                    Assert.Equal(originalParent.LatestVersionId, parent.LatestPublishedVersionId);
+
+                    // The "Latest" is now set to null, until a Release amendment is created.
+                    Assert.Null(parent.LatestVersionId);
+                });
             }
         }
 
         [Fact]
-        public async Task SetPublishedDate_AmendedRelease()
+        public async Task CompletePublishing_AmendedRelease()
         {
             var previousRelease = new Release
             {
@@ -260,6 +293,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Version = 1
             };
 
+            // Generate Data Blocks for both the previous Release version and for the new Amendment.
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(previousRelease)
+                    .Generate())
+                .WithLatestVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .Generate())
+                .GenerateList(2);
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -271,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext);
-                await service.SetPublishedDate(release.Id, DateTime.UtcNow);
+                await service.CompletePublishing(release.Id, DateTime.UtcNow);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -280,13 +326,104 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     .Releases
                     .SingleAsync(r => r.Id == release.Id);
 
-                // Expect the published date to have been copied from the previous version 
+                // Expect the published date to have been copied from the previous version
                 Assert.Equal(previousRelease.Published, actual.Published);
+
+                var actualDataBlockParents = await contentDbContext
+                    .DataBlockParents
+                    .ToListAsync();
+
+                Assert.Equal(2, actualDataBlockParents.Count);
+
+                // Assert that the original DataBlockParents pointed to a LatestPublishedVersion and LatestVersion.
+                dataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestVersionId));
+                dataBlockParents.ForEach(parent => Assert.NotNull(parent.LatestPublishedVersionId));
+
+                // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
+                // reference the newly published DataBlockVersion.
+                actualDataBlockParents.ForEach(parent =>
+                {
+                    var originalParent = dataBlockParents.Single(p => p.Id == parent.Id);
+
+                    // The "Published" version is now the one that was previously just the "Latest".
+                    Assert.Equal(originalParent.LatestVersionId, parent.LatestPublishedVersionId);
+
+                    // The "Latest" is now set to null, until a Release amendment is created.
+                    Assert.Null(parent.LatestVersionId);
+                });
             }
         }
 
         [Fact]
-        public async Task SetPublishedDate_AmendedReleaseAndUpdatePublishedDateIsTrue()
+        public async Task CompletePublishing_AmendedRelease_DataBlockRemoved()
+        {
+            var previousRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                Published = DateTime.UtcNow.AddDays(-1),
+                PreviousVersionId = null,
+                Version = 0
+            };
+
+            var release = new Release
+            {
+                PreviousVersionId = previousRelease.Id,
+                Version = 1
+            };
+
+            // Generate Data Blocks for both the previous Release version and for the new Amendment.
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(previousRelease)
+                    .Generate())
+                // This time Data Blocks have been removed from the latest Release amendment, and so they now have no
+                // "latest" version.
+                .WithLatestVersion((DataBlockVersion) null!)
+                .GenerateList(2);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(previousRelease, release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(contentDbContext: contentDbContext);
+                await service.CompletePublishing(release.Id, DateTime.UtcNow);
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var actual = await contentDbContext
+                    .Releases
+                    .SingleAsync(r => r.Id == release.Id);
+
+                // Expect the published date to have been copied from the previous version
+                Assert.Equal(previousRelease.Published, actual.Published);
+
+                var actualDataBlockParents = await contentDbContext
+                    .DataBlockParents
+                    .ToListAsync();
+
+                Assert.Equal(2, actualDataBlockParents.Count);
+
+                // Assert that all DataBlockParents have had their LatestPublishedVersion pointers updated to
+                // be null.
+                actualDataBlockParents.ForEach(parent =>
+                {
+                     Assert.Null(parent.LatestPublishedVersionId);
+                     Assert.Null(parent.LatestVersionId);
+                });
+            }
+        }
+
+        [Fact]
+        public async Task CompletePublishing_AmendedReleaseAndUpdatePublishedDateIsTrue()
         {
             var previousRelease = new Release
             {
@@ -317,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildReleaseService(contentDbContext: contentDbContext);
-                await service.SetPublishedDate(release.Id, actualPublishedDate);
+                await service.CompletePublishing(release.Id, actualPublishedDate);
             }
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))

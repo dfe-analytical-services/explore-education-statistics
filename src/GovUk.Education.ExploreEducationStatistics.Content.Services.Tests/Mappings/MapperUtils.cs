@@ -19,7 +19,7 @@ public class MapperUtils
     public static IMapper ContentMapper(ContentDbContext? contentDbContext = null)
     {
         var services = new ServiceCollection();
-        services.AddTransient(_ => new DataBlockVersionViewModelPostMappingAction(contentDbContext));
+        services.AddTransient(_ => new DataBlockViewModelPostMappingAction(contentDbContext));
         services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfiles>(), Array.Empty<Assembly>());
 
         var serviceProvider = services.BuildServiceProvider();

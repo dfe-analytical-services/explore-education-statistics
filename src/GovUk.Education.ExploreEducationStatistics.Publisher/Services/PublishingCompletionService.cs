@@ -80,7 +80,7 @@ public class PublishingCompletionService : IPublishingCompletionService
 
         await releaseIdsToUpdate
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(releaseId => _releaseService.SetPublishedDate(releaseId, DateTime.UtcNow));
+            .ForEachAwaitAsync(releaseId => _releaseService.CompletePublishing(releaseId, DateTime.UtcNow));
 
         await releaseIdsToUpdate
             .ToAsyncEnumerable()

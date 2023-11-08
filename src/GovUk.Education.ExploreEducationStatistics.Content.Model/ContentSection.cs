@@ -32,19 +32,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore] public ContentSectionType Type { get; set; }
 
+        // TODO EES-4637 - we need to decide on how we're being consistent with Created dates in Release Amendments.
         // TODO EES-4639 - rewrite Release Amendment generation code to be localised to
         // ReleaseAmendmentExtensions.CreateAmendment() or ReleaseService.CreateBasicReleaseAmendment().
-        public ContentSection Clone(Release.CloneContext context)
+        public ContentSection Clone(
+            Release amendment,
+            Dictionary<ContentBlock, ContentBlock> originalToAmendmentContentBlocks)
         {
             var copy = MemberwiseClone();
             copy.Id = Guid.NewGuid();
 
-            copy.Release = context.NewRelease;
-            copy.ReleaseId = context.NewRelease.Id;
+            copy.Release = amendment;
+            copy.ReleaseId = amendment.Id;
 
+            // Using the originalToAmendmentContentBlocks Dictionary, replace the original
+            // ContentBlocks with their cloned equivalents.
             copy.Content = copy
                 .Content?
-                .Select(content => content.Clone(context, copy))
+                .Select(originalBlock =>
+                {
+                    var clonedContentBlock = originalToAmendmentContentBlocks[originalBlock];
+                    clonedContentBlock.ContentSection = copy;
+                    clonedContentBlock.ContentSectionId = copy.Id;
+                    return clonedContentBlock;
+                })
                 .ToList();
 
             return copy;

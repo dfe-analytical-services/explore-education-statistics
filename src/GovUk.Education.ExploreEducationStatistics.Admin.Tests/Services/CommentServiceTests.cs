@@ -206,8 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var viewModel = result.AssertRight();
                 Assert.Equal("Existing comment", viewModel.Content);
-                Assert.NotNull(viewModel.Resolved);
-                Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Resolved!.Value).Milliseconds, 0, 1500);
+                viewModel.Resolved.AssertUtcNow();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -332,8 +331,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var viewModel = result.AssertRight();
                 Assert.Equal("Existing comment updated", viewModel.Content);
-                Assert.NotNull(viewModel.Updated);
-                Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Updated!.Value).Milliseconds, 0, 1500);
+                viewModel.Updated.AssertUtcNow();
                 Assert.Null(viewModel.Resolved);
                 Assert.Null(viewModel.ResolvedBy);
             }
@@ -344,8 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(comments);
                 Assert.Equal("Existing comment updated", comments[0].Content);
                 Assert.Equal(comment.CreatedById, comments[0].CreatedById);
-                Assert.NotNull(comments[0].Updated);
-                Assert.InRange(DateTime.UtcNow.Subtract(comments[0].Updated!.Value).Milliseconds, 0, 1500);
+                comments[0].Updated.AssertUtcNow();
                 Assert.Null(comments[0].ResolvedById);
             }
         }

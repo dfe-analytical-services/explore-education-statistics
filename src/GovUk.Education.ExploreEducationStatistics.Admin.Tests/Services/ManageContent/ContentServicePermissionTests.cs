@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                         return service.AttachDataBlock(
                             _release.Id,
                             ContentSectionId,
-                            new ContentBlockAttachRequest());
+                            new DataBlockAttachRequest());
                     }
                 );
         }

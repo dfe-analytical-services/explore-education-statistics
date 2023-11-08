@@ -211,11 +211,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(r => publicationIds.Contains(r.PublicationId))
                 .Select(release => new IdAndPreviousVersionIdPair<string>(release.Id.ToString(), release.PreviousVersionId != null ? release.PreviousVersionId.ToString() : null))
                 .ToList();
-            
+
             var releaseIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
                 .Sort(releasesIdsToDelete)
                 .Select(ids => Guid.Parse(ids.Id));
-                
+
             return await releaseIdsInDeleteOrder
                 .Select(DeleteContentAndStatsRelease)
                 .OnSuccessAll()
@@ -243,14 +243,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessDo(() => DeleteCachedReleaseContent(releaseId))
                 .OnSuccessVoid(async () =>
                 {
+                    await RemoveReleaseDependencies(releaseId);
                     _contentContext.Releases.Remove(contentRelease);
-
-                    var keyStats = _contentContext.KeyStatistics
-                        .Where(ks => ks.ReleaseId == releaseId);
-                    _contentContext.KeyStatistics.RemoveRange(keyStats);
-
-                    await _contentContext.SaveChangesAsync();
-
                     await DeleteStatsDbRelease(releaseId);
                 });
         }
@@ -268,6 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             if (contentRelease != null)
             {
+                await RemoveReleaseDependencies(releaseId);
                 _contentContext.Releases.Remove(contentRelease);
                 await _contentContext.SaveChangesAsync();
             }
@@ -311,6 +306,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static IQueryable<Topic> HydrateTopicForTopicViewModel(IQueryable<Topic> values)
         {
             return values.Include(p => p.Publications);
+        }
+
+        private async Task RemoveReleaseDependencies(Guid releaseId)
+        {
+            var keyStats = _contentContext
+                .KeyStatistics
+                .Where(ks => ks.ReleaseId == releaseId);
+
+            _contentContext.KeyStatistics.RemoveRange(keyStats);
+
+            var dataBlockVersions = await _contentContext
+                .DataBlockVersions
+                .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .Where(dataBlockVersion => dataBlockVersion.ReleaseId == releaseId)
+                .ToListAsync();
+
+            var dataBlockParents = dataBlockVersions
+                .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .Distinct()
+                .ToList();
+
+            dataBlockParents.ForEach(dataBlockParent =>
+            {
+                dataBlockParent.LatestVersionId = null;
+                dataBlockParent.LatestPublishedVersionId = null;
+            });
+
+            _contentContext.DataBlockParents.UpdateRange(dataBlockParents);
+            await _contentContext.SaveChangesAsync();
+
+            _contentContext.DataBlockVersions.RemoveRange(dataBlockVersions);
+            _contentContext.DataBlockParents.RemoveRange(dataBlockParents);
+
+            await _contentContext.SaveChangesAsync();
         }
     }
 }

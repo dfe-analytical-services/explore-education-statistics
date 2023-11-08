@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public static IMapper AdminMapper(ContentDbContext? contentDbContext = null)
         {
             var services = new ServiceCollection();
-            services.AddTransient(_ => new DataBlockVersionViewModelPostMappingAction(contentDbContext));
+            services.AddTransient(_ => new DataBlockViewModelPostMappingAction(contentDbContext));
             services.AddAutoMapper(cfg => cfg.AddProfile<MappingProfiles>(), Array.Empty<Assembly>());
 
             var serviceProvider = services.BuildServiceProvider();

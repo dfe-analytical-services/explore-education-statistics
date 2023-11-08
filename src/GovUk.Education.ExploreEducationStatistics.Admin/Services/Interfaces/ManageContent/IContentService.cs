@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, IContentBlockViewModel>> UpdateTextBasedContentBlock(
             Guid releaseId, Guid contentSectionId, Guid contentBlockId, ContentBlockUpdateRequest request);
 
-        Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(
-            Guid releaseId, Guid contentSectionId, ContentBlockAttachRequest request);
+        Task<Either<ActionResult, DataBlockViewModel>> AttachDataBlock(
+            Guid releaseId, Guid contentSectionId, DataBlockAttachRequest request);
     }
 }

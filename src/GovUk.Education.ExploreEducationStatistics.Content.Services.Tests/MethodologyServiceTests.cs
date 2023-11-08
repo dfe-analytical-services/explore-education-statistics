@@ -3,14 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Moq;
 using Xunit;
@@ -700,13 +698,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         private static MethodologyService SetupMethodologyService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IMethodologyVersionRepository? methodologyVersionRepository = null,
-            IMapper? mapper = null)
+            IMethodologyVersionRepository? methodologyVersionRepository = null)
         {
             return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                mapper ?? MapperUtils.MapperForProfile<MappingProfiles>(),
+                MapperUtils.ContentMapper(contentDbContext),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict)
             );
         }

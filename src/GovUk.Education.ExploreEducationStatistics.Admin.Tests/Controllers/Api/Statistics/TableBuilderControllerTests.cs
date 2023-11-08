@@ -2,24 +2,24 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Net.Http.Headers;
 using Moq;
@@ -37,6 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         CacheServiceTestFixture, IClassFixture<TestApplicationFactory<TestStartup>>
     {
         private readonly WebApplicationFactory<TestStartup> _testApp;
+
+        private readonly DataFixture _fixture = new();
 
         public TableBuilderControllerTests(TestApplicationFactory<TestStartup> testApp)
         {
@@ -151,23 +153,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var cancellationToken = new CancellationToken();
 
-            var dataBlock = new DataBlock
-            {
-                Id = _dataBlockId,
-                Query = _query,
-                Charts = new List<IChart>(),
-                ReleaseId = ReleaseId
-            };
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseId(ReleaseId)
+                    .WithQuery(_query))
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            SetupCall<ContentDbContext, ContentBlock>(mocks.persistenceHelper, dataBlock);
-
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlock)),
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
                     typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
+                .ReturnsAsync(null!);
+
+            mocks.dataBlockService
+                .Setup(s => s.GetDataBlockVersionForRelease(ReleaseId, dataBlockVersion.Id))
+                .ReturnsAsync(dataBlockVersion);
 
             mocks.tableBuilderService
                 .Setup(
@@ -184,11 +190,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             mocks.cacheService
                 .Setup(s => s.SetItemAsync<object>(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlock)),
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(dataBlockVersion)),
                     _tableBuilderResults))
                 .Returns(Task.CompletedTask);
 
-            var result = await controller.QueryForDataBlock(ReleaseId, _dataBlockId, cancellationToken);
+            var result = await controller.QueryForDataBlock(ReleaseId, dataBlockVersion.Id, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(_tableBuilderResults);
@@ -199,28 +205,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            SetupCall<ContentDbContext, ContentBlock>(mocks.persistenceHelper, null);
+            mocks.dataBlockService
+                .Setup(s => s.GetDataBlockVersionForRelease(ReleaseId, _dataBlockId))
+                .ReturnsAsync(new NotFoundResult());
 
             var result = await controller.QueryForDataBlock(ReleaseId, _dataBlockId);
             VerifyAllMocks(mocks);
 
-            result.AssertNotFoundResult();
-        }
-
-        [Fact]
-        public async Task QueryForDataBlock_NotDataBlockType()
-        {
-            var htmlBlock = new HtmlBlock
-            {
-                Id = Guid.NewGuid(),
-                ReleaseId = ReleaseId
-            };
-
-            var (controller, mocks) = BuildControllerAndDependencies();
-
-            SetupCall<ContentDbContext, ContentBlock>(mocks.persistenceHelper, htmlBlock);
-
-            var result = await controller.QueryForDataBlock(ReleaseId, htmlBlock.Id);
             result.AssertNotFoundResult();
         }
 
@@ -235,26 +226,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             (
             Mock<ITableBuilderService> tableBuilderService,
             Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
+            Mock<IDataBlockService> dataBlockService,
             Mock<IBlobCacheService> cacheService) mocks)
             BuildControllerAndDependencies()
         {
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
             var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
             var userService = AlwaysTrueUserService();
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
 
             var controller = new TableBuilderController(
                 tableBuilderService.Object,
                 persistenceHelper.Object,
-                userService.Object
+                userService.Object,
+                dataBlockService.Object
             );
 
-            return (controller, (tableBuilderService, persistenceHelper, BlobCacheService));
+            return (controller, (tableBuilderService, persistenceHelper, dataBlockService, BlobCacheService));
         }
 
         private WebApplicationFactory<TestStartup> SetupApp(
             ITableBuilderService? tableBuilderService = null)
         {
-            return _testApp.ConfigureServices(services => 
+            return _testApp.ConfigureServices(services =>
                 services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
         }
     }

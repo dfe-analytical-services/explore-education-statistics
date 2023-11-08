@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -64,17 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Last();
         }
 
-        public async Task SetPublishedDate(Guid releaseId, DateTime actualPublishedDate)
-        {
-            var release = await _contentDbContext.Releases
-                .SingleAsync(r => r.Id == releaseId);
-
-            _contentDbContext.Releases.Update(release);
-            release.Published = await _releaseRepository.GetPublishedDate(release.Id, actualPublishedDate);
-
-            await _contentDbContext.SaveChangesAsync();
-        }
-
         public async Task<List<File>> GetFiles(Guid releaseId, params FileType[] types)
         {
             return await _contentDbContext
@@ -84,6 +74,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Select(rf => rf.File)
                 .Where(file => types.Contains(file.Type))
                 .ToListAsync();
+        }
+
+        public async Task CompletePublishing(Guid releaseId, DateTime actualPublishedDate)
+        {
+            var release = await _contentDbContext
+                .Releases
+                .Include(release => release.DataBlockVersions)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .SingleAsync(r => r.Id == releaseId);
+
+            _contentDbContext.Releases.Update(release);
+            release.Published = await _releaseRepository.GetPublishedDate(release.Id, actualPublishedDate);
+
+            await UpdatePublishedDataBlockVersions(release);
+
+            await _contentDbContext.SaveChangesAsync();
+        }
+
+        private async Task UpdatePublishedDataBlockVersions(Release release)
+        {
+            // Update all of the DataBlockParents to point their "LatestPublishedVersions" to the "latest" versions
+            // on the Release. Mark the "latest" version as null until a Release Amendment is created.
+            var latestDataBlockParents = release
+                .DataBlockVersions
+                .Select(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .ToList();
+
+            latestDataBlockParents.ForEach(latestDataBlockParent =>
+            {
+                latestDataBlockParent.LatestPublishedVersionId = latestDataBlockParent.LatestVersionId;
+                latestDataBlockParent.LatestVersionId = null;
+            });
+
+            // Find all DataBlockVersions that were part of the previously published Release, if any, and update them
+            // to no longer have a Published version.
+            if (release.PreviousVersionId != null)
+            {
+                var latestDataBlockParentIds = latestDataBlockParents.Select(dataBlockParent => dataBlockParent.Id);
+
+                var removedDataBlockVersions = await _contentDbContext
+                    .DataBlockVersions
+                    .Where(dataBlockVersion => dataBlockVersion.ReleaseId == release.PreviousVersionId &&
+                                               !latestDataBlockParentIds.Contains(dataBlockVersion.DataBlockParentId))
+                    .Include(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ToListAsync();
+
+                // Update all of the removed DataBlockVersions' DataBlockParents to point their
+                // "LatestPublishedVersions" to null, as they should no longer be publicly accessible.
+                removedDataBlockVersions.ForEach(latestDataBlockVersion =>
+                {
+                    var parent = latestDataBlockVersion.DataBlockParent;
+                    parent.LatestPublishedVersionId = null;
+                });
+
+                _contentDbContext.DataBlockVersions.UpdateRange(removedDataBlockVersions);
+            }
         }
     }
 }
