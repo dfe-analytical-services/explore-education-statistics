@@ -9,7 +9,7 @@ import _dataBlockService, {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import _tableBuilderService, {
   SubjectMeta,
   TableDataResponse,
@@ -21,10 +21,10 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
+import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/publicationService');
-jest.mock('@admin/services/releaseService');
 jest.mock('@common/services/tableBuilderService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
@@ -33,7 +33,6 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
@@ -295,7 +294,6 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 1 with subjects and featured tables', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    releaseService.getRelease.mockResolvedValue(testRelease);
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
     tableBuilderService.listReleaseFeaturedTables.mockResolvedValue(
       testFeaturedTables,
@@ -323,7 +321,6 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 1 without featured tables', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    releaseService.getRelease.mockResolvedValue(testRelease);
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
     tableBuilderService.listReleaseFeaturedTables.mockResolvedValue([]);
 
@@ -349,7 +346,6 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 5 with `dataBlockId` route param', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
-    releaseService.getRelease.mockResolvedValue(testRelease);
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
 
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
@@ -416,10 +412,12 @@ describe('PreReleaseTableToolPage', () => {
   ) => {
     return render(
       <MemoryRouter initialEntries={initialEntries}>
-        <Route
-          component={PreReleaseTableToolPage}
-          path={preReleaseTableToolRoute.path}
-        />
+        <ReleaseContextProvider release={testRelease}>
+          <Route
+            component={PreReleaseTableToolPage}
+            path={preReleaseTableToolRoute.path}
+          />
+        </ReleaseContextProvider>
       </MemoryRouter>,
     );
   };

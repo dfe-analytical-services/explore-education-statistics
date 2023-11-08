@@ -20,7 +20,7 @@ import tableBuilderService from '@common/services/tableBuilderService';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { generatePath } from 'react-router-dom';
-import releaseService from '@admin/services/releaseService';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 
 const PreReleaseTableToolPage = ({
   match,
@@ -32,13 +32,14 @@ const PreReleaseTableToolPage = ({
     [publicationId],
   );
 
+  const { release } = useReleaseContext();
+
   const { value: tableToolState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
   >(async () => {
-    const [featuredTables, subjects, release] = await Promise.all([
+    const [featuredTables, subjects] = await Promise.all([
       tableBuilderService.listReleaseFeaturedTables(releaseId),
       tableBuilderService.listReleaseSubjects(releaseId),
-      releaseService.getRelease(releaseId),
     ]);
 
     if (dataBlockId) {
@@ -137,7 +138,6 @@ const PreReleaseTableToolPage = ({
                         publication={publication}
                         query={query}
                         releaseId={releaseId}
-                        releaseType={tableToolState.releaseType}
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}
