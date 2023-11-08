@@ -30,18 +30,18 @@ interface Model {
 interface ReleasePreviewTableToolFinalStepProps {
   publication: Publication;
   query: ReleaseTableDataQuery;
+  releaseType: ReleaseType;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
-  releaseType: ReleaseType;
 }
 const ReleasePreviewTableToolFinalStep = ({
   publication,
   query,
+  releaseType,
   table,
   tableHeaders,
   onReorderTableHeaders,
-  releaseType,
 }: ReleasePreviewTableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
 

@@ -114,10 +114,10 @@ const ReleasePreviewTableTool = ({
                       <ReleasePreviewTableToolFinalStep
                         publication={publication as Publication}
                         query={query}
+                        releaseType={releaseType}
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}
-                        releaseType={releaseType}
                       />
                     )}
                   </>
