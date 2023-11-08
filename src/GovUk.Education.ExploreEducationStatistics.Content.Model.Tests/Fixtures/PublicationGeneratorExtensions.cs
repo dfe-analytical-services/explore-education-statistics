@@ -20,22 +20,32 @@ public static class PublicationGeneratorExtensions
             .SetDefault(p => p.Slug)
             .SetDefault(p => p.Summary)
             .SetDefault(p => p.Title);
-    
+
     public static Generator<Publication> WithReleases(
         this Generator<Publication> generator,
         IEnumerable<Release> releases)
         => generator.ForInstance(s => s.SetReleases(releases));
-    
+
     public static Generator<Publication> WithReleases(
         this Generator<Publication> generator,
         Func<SetterContext, IEnumerable<Release>> releases)
         => generator.ForInstance(s => s.SetReleases(releases.Invoke));
-    
+
+    public static Generator<Publication> WithTopicId(
+        this Generator<Publication> generator,
+        Guid topicId)
+        => generator.ForInstance(s => s.SetTopicId(topicId));
+
+    public static Generator<Publication> WithTopic(
+        this Generator<Publication> generator,
+        Topic topic)
+        => generator.ForInstance(s => s.SetTopic(topic));
+
     public static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
-        IEnumerable<Release> releases) 
+        IEnumerable<Release> releases)
         => setters.SetReleases(_ => releases);
-    
+
     private static InstanceSetters<Publication> SetReleases(
         this InstanceSetters<Publication> setters,
         Func<SetterContext, IEnumerable<Release>> releases)
@@ -50,4 +60,14 @@ public static class PublicationGeneratorExtensions
                 return list;
             }
         );
+
+    private static InstanceSetters<Publication> SetTopicId(
+        this InstanceSetters<Publication> setters,
+        Guid topicId)
+        => setters.Set(p => p.TopicId, topicId);
+
+    private static InstanceSetters<Publication> SetTopic(
+        this InstanceSetters<Publication> setters,
+        Topic topic)
+        => setters.Set(p => p.Topic, topic);
 }
