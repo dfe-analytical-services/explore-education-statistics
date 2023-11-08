@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf<Guid>(),
                 SetOf(Guid.NewGuid()));
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf<Guid>(),
                 SetOf<Guid>());
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf<Guid>(),
                 SetOf<Guid>());
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -210,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf<Guid>(),
                 SetOf<Guid>());
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -263,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf(Guid.NewGuid()),
                 SetOf<Guid>());
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -373,7 +373,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
                 SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -397,7 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf<Guid>(),
                 SetOf(Guid.NewGuid()));
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -451,7 +451,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf<Guid>(),
                 SetOf<Guid>());
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -507,7 +507,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf<Guid>(),
                 SetOf<Guid>());
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -565,7 +565,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf<Guid>(),
                 SetOf<Guid>());
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -622,7 +622,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf(Guid.NewGuid()),
                 SetOf<Guid>());
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]
@@ -738,7 +738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
                 SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
 
-            result.AssertBadRequest(FootnoteSpecificationsAreInvalid);
+            result.AssertInternalServerError();
         }
 
         [Fact]

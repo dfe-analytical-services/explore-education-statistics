@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.ComparerUtils;
@@ -389,29 +390,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             IReadOnlyList<ReleaseSubject> releaseSubjects = await _releaseSubjectRepository.FindAll(releaseId, HydrateReleaseSubjects);
 
-            if (!AllSpecifiedSubjectsAreLinkedToRelease(subjectIds, releaseSubjects))
+            if (!AllSpecifiedSubjectsAreLinkedToRelease(subjectIds, releaseSubjects)
+                || !AllSpecifiedFiltersAreLinkedToRelease(filterIds, releaseSubjects)
+                || !AllSpecifiedFilterGroupsAreLinkedToRelease(filterGroupIds, releaseSubjects)
+                || !AllSpecifiedFilterItemsAreLinkedToRelease(filterItemIds, releaseSubjects)
+                || !AllSpecifiedIndicatorsAreLinkedToRelease(indicatorIds, releaseSubjects))
             {
-                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
-            }
-
-            if (!AllSpecifiedFiltersAreLinkedToRelease(filterIds, releaseSubjects))
-            {
-                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
-            }
-
-            if (!AllSpecifiedFilterGroupsAreLinkedToRelease(filterGroupIds, releaseSubjects))
-            {
-                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
-            }
-
-            if (!AllSpecifiedFilterItemsAreLinkedToRelease(filterItemIds, releaseSubjects))
-            {
-                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
-            }
-
-            if (!AllSpecifiedIndicatorsAreLinkedToRelease(indicatorIds, releaseSubjects))
-            {
-                return ValidationResult(ValidationErrorMessages.FootnoteSpecificationsAreInvalid);
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
             }
 
             return Unit.Instance;
