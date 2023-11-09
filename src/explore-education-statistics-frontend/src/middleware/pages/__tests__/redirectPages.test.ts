@@ -14,11 +14,11 @@ describe('redirectPages', () => {
   const nextSpy = jest.spyOn(NextResponse, 'next');
 
   const testRedirects: Redirects = {
-    methodology: [
+    methodologies: [
       { fromSlug: 'original-slug-1', toSlug: 'updated-slug-1' },
       { fromSlug: 'original-slug-2', toSlug: 'updated-slug-2' },
     ],
-    publication: [
+    publications: [
       { fromSlug: 'original-slug-3', toSlug: 'updated-slug-3' },
       { fromSlug: 'original-slug-4', toSlug: 'updated-slug-4' },
     ],

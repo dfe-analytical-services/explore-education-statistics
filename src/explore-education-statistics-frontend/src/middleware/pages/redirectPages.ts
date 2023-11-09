@@ -15,9 +15,9 @@ let cachedRedirects: CachedRedirects | undefined;
 // The middleware only runs on paths defined in the config
 // in middleware.ts, that will also need to be
 // updated if any other paths are added here.
-export const redirectPaths = {
-  methodology: '/methodology',
-  publication: '/find-statistics',
+const redirectPaths = {
+  methodologies: '/methodology',
+  publications: '/find-statistics',
 };
 
 export default async function redirectPages(request: NextRequest) {
