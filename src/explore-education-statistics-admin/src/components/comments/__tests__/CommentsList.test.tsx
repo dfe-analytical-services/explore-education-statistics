@@ -14,18 +14,18 @@ describe('CommentsList', () => {
       <CommentsContextProvider
         comments={testComments}
         markersOrder={testMarkersOrder}
-        onDelete={noop}
+        onDelete={() => Promise.resolve()}
         onCreate={jest.fn()}
-        onUpdate={noop}
+        onUpdate={() => Promise.resolve()}
         onPendingDelete={noop}
         onPendingDeleteUndo={noop}
       >
-        <CommentsList />
+        <CommentsList type="inline" />
       </CommentsContextProvider>,
     );
 
     const unresolvedComments = within(
-      screen.getByTestId('unresolvedComments'),
+      screen.getByTestId('comments-unresolved'),
     ).getAllByTestId('comment');
 
     expect(unresolvedComments).toHaveLength(3);
@@ -39,13 +39,13 @@ describe('CommentsList', () => {
       <CommentsContextProvider
         comments={testComments}
         markersOrder={testMarkersOrder}
-        onDelete={noop}
+        onDelete={() => Promise.resolve()}
         onCreate={jest.fn()}
-        onUpdate={noop}
+        onUpdate={() => Promise.resolve()}
         onPendingDelete={noop}
         onPendingDeleteUndo={noop}
       >
-        <CommentsList />
+        <CommentsList type="inline" />
       </CommentsContextProvider>,
     );
 
@@ -60,7 +60,7 @@ describe('CommentsList', () => {
     ).toBeInTheDocument();
 
     const resolvedComments = within(
-      screen.getByTestId('resolvedComments'),
+      screen.getByTestId('comments-resolved'),
     ).getAllByTestId('comment');
 
     expect(resolvedComments).toHaveLength(2);

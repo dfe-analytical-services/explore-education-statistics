@@ -780,14 +780,14 @@ user waits until modal is not visible
 
 user gets resolved comments
     [Arguments]    ${parent}=css:body
-    user waits until parent contains element    ${parent}    testid:resolvedComments
-    ${comments}=    get child element    ${parent}    testid:resolvedComments
+    user waits until parent contains element    ${parent}    testid:comments-resolved
+    ${comments}=    get child element    ${parent}    testid:comments-resolved
     [Return]    ${comments}
 
 user gets unresolved comments
     [Arguments]    ${parent}=css:body
-    user waits until parent contains element    ${parent}    testid:unresolvedComments
-    ${comments}=    get child element    ${parent}    testid:unresolvedComments
+    user waits until parent contains element    ${parent}    testid:comments-unresolved
+    ${comments}=    get child element    ${parent}    testid:comments-unresolved
     [Return]    ${comments}
 
 user gets unresolved comment
