@@ -1,11 +1,8 @@
-using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
@@ -18,15 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateSpecificReleaseAuthorizationHandler
         : AuthorizationHandler<UpdateSpecificReleaseRequirement, Release>
     {
-        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public UpdateSpecificReleaseAuthorizationHandler(
-            IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
-            _releasePublishingStatusRepository = releasePublishingStatusRepository;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -34,13 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             UpdateSpecificReleaseRequirement requirement,
             Release release)
         {
-            var statuses = await _releasePublishingStatusRepository.GetAllByOverallStage(
-                release.Id,
-                ReleasePublishingStatusOverallStage.Started,
-                ReleasePublishingStatusOverallStage.Complete
-            );
-
-            if (statuses.Any() || release.Published != null)
+            if (release.ApprovalStatus == Approved)
             {
                 return;
             }
@@ -50,16 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 context.Succeed(requirement);
                 return;
             }
-            
-            var allowedPublicationRoles = release.ApprovalStatus == Approved
-                ? ListOf(PublicationRole.Approver)
-                : ListOf(PublicationRole.Owner, PublicationRole.Approver);
-            
-            var allowedReleaseRoles = release.ApprovalStatus == Approved
-                ? ListOf(ReleaseRole.Approver)
-                : ReleaseEditorAndApproverRoles;
 
-            if (await _authorizationHandlerResourceRoleService
+            var allowedPublicationRoles = ListOf(PublicationRole.Owner, PublicationRole.Approver);
+            var allowedReleaseRoles = ReleaseEditorAndApproverRoles;
+
+            if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
                         context.User.GetUserId(),
                         release.PublicationId,

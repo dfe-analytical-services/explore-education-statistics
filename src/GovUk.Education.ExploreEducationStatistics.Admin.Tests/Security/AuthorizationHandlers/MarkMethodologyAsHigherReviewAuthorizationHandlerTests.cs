@@ -8,10 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
@@ -418,9 +419,11 @@ public class MarkMethodologyAsHigherReviewAuthorizationHandlerTests
         var handler = new MarkMethodologyAsHigherLevelReviewAuthorizationHandler(
             methodologyVersionRepository.Object,
             methodologyRepository.Object,
-            new AuthorizationHandlerResourceRoleService(
+            new AuthorizationHandlerService(
+                InMemoryApplicationDbContext(),
                 userReleaseRoleRepository.Object,
-                userPublicationRoleRepository.Object)
+                userPublicationRoleRepository.Object,
+                Mock.Of<IPreReleaseService>(Strict))
         );
 
         return (

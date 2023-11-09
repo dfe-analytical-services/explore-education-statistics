@@ -14,12 +14,12 @@ public class ViewSpecificPublicationReleaseTeamAccessRequirement : IAuthorizatio
 public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler :
     AuthorizationHandler<ViewSpecificPublicationReleaseTeamAccessRequirement, Publication>
 {
-    private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler(
-        AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+        AuthorizationHandlerService authorizationHandlerService)
     {
-        _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
     protected override async Task HandleRequirementAsync(
@@ -33,7 +33,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler :
             return;
         }
 
-        if (await _authorizationHandlerResourceRoleService
+        if (await _authorizationHandlerService
                 .HasRolesOnPublication(
                     context.User.GetUserId(),
                     publication.Id,

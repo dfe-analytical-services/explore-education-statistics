@@ -14,12 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class
         PublishSpecificReleaseAuthorizationHandler : AuthorizationHandler<PublishSpecificReleaseRequirement, Release>
     {
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public PublishSpecificReleaseAuthorizationHandler(
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
                         context.User.GetUserId(),
                         release.PublicationId,

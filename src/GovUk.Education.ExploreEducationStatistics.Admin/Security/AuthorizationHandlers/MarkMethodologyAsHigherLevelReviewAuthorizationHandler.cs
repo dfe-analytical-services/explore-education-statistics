@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
 
@@ -21,16 +21,16 @@ public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : Authorizat
 {
     private readonly IMethodologyVersionRepository _methodologyVersionRepository;
     private readonly IMethodologyRepository _methodologyRepository;
-    private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public MarkMethodologyAsHigherLevelReviewAuthorizationHandler(
         IMethodologyVersionRepository methodologyVersionRepository,
         IMethodologyRepository methodologyRepository,
-        AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+        AuthorizationHandlerService authorizationHandlerService)
     {
         _methodologyVersionRepository = methodologyVersionRepository;
         _methodologyRepository = methodologyRepository;
-        _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -59,7 +59,7 @@ public class MarkMethodologyAsHigherLevelReviewAuthorizationHandler : Authorizat
         var owningPublication =
             await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
-        if (await _authorizationHandlerResourceRoleService
+        if (await _authorizationHandlerService
                 .HasRolesOnPublicationOrAnyRelease(
                     context.User.GetUserId(),
                     owningPublication.Id,

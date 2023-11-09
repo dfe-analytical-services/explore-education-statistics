@@ -8,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.
-    AuthorizationHandlerResourceRoleService;
+    AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using IPublicationRepository =
     GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
@@ -26,20 +26,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IPreReleaseService _preReleaseService;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public ViewSpecificMethodologyAuthorizationHandler(
             IMethodologyRepository methodologyRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IPreReleaseService preReleaseService,
             IPublicationRepository publicationRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
             _methodologyRepository = methodologyRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _preReleaseService = preReleaseService;
             _publicationRepository = publicationRepository;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             // If the user is a Publication Owner or Approver of the Publication that owns this Methodology, they can
             // view it.  Additionally, if the user is an Editor (Contributor, Lead) or an Approver of any
             // (Live or non-Live) Release of the owning Publication of this Methodology, they can view it.
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrAnyRelease(
                         context.User.GetUserId(),
                         owningPublication.Id,

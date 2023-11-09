@@ -14,6 +14,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -81,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
-                    // the user's Publication Roles.  
+                    // the user's Publication Roles.
                     if (!expectClaimToSucceed)
                     {
                         methodologyRepository.Setup(s =>
@@ -141,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         ) = CreateHandlerAndDependencies();
 
                     // If the Claim given to the handler isn't enough to make the handler succeed, it'll go on to check
-                    // the user's Publication Roles.  
+                    // the user's Publication Roles.
                     if (!expectClaimToSucceed)
                     {
                         methodologyRepository.Setup(s =>
@@ -342,9 +343,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             var handler = new DeleteSpecificMethodologyAuthorizationHandler(
                 methodologyRepository.Object,
-                new AuthorizationHandlerResourceRoleService(
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    userPublicationRoleRepository.Object));
+                new AuthorizationHandlerService(
+                    InMemoryApplicationDbContext(),
+                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    userPublicationRoleRepository.Object,
+                    Mock.Of<IPreReleaseService>(Strict)));
 
             return (handler, methodologyRepository, userPublicationRoleRepository);
         }

@@ -115,7 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
-                .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.ApprovalStatus))
                 .OnSuccessDo(() => ValidatePublishDate(request))
                 .OnSuccess(async release =>

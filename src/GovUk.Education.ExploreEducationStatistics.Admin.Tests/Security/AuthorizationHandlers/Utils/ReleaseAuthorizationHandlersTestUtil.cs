@@ -17,66 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     public static class ReleaseAuthorizationHandlersTestUtil
     {
         /**
-         * Assert that the given handler succeeds when a user has any of the "claimsExpectedToSucceed" and is tested
-         * against an arbitrary Release, and fails otherwise
-         */
-        public static async Task AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
-            IAuthorizationHandler handler,
-            params SecurityClaimTypes[] claimsExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
-            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handler, release,
-                claimsExpectedToSucceed);
-        }
-
-        public static async Task AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            params SecurityClaimTypes[] claimsExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
-            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handlerSupplier, release,
-                claimsExpectedToSucceed);
-        }
-
-        public static async Task AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Release release,
-            params SecurityClaimTypes[] claimsExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handlerSupplier, release,
-                claimsExpectedToSucceed);
-        }
-
-        /**
-         * Assert that the given handler succeeds when a user has any of the "rolesExpectedToSucceed" on an arbitrary
-         * Release, and fails otherwise
-         */
-        public static async Task AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            params ReleaseRole[] rolesExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var release = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
-            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(handlerSupplier, release,
-                rolesExpectedToSucceed);
-        }
-
-        /**
          * Assert that the given handler succeeds when a user has any of the "rolesExpectedToSucceed" on the supplied
          * Release, and fails otherwise
          */
@@ -322,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             var contextId = Guid.NewGuid().ToString();
 
-            using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 if (scenario.UserPublicationRoles != null)
                 {
@@ -337,7 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await context.SaveChangesAsync();
             }
 
-            using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var handler = handlerSupplier(context);
                 await AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario);
