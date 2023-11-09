@@ -29,7 +29,7 @@ const TableToolInfo = ({
             <ReleaseTypesModal
               triggerButton={
                 <ButtonText>
-                  <InfoIcon description="What are release types" />
+                  <InfoIcon description="What are release types?" />
                 </ButtonText>
               }
             />

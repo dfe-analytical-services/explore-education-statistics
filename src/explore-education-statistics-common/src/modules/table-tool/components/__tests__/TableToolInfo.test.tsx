@@ -18,7 +18,7 @@ describe('TableToolInfo', () => {
     render(<TableToolInfo releaseType={testReleaseType} />);
 
     expect(
-      screen.getByText('Release Type: Official statistics'),
+      screen.getByText('Release type: Official statistics'),
     ).toBeInTheDocument();
 
     expect(

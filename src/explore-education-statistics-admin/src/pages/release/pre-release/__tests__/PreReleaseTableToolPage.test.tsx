@@ -10,7 +10,7 @@ import _dataBlockService, {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import { Release } from '@admin/services/releaseService';
+import _releaseService, { Release } from '@admin/services/releaseService';
 import _tableBuilderService, {
   SubjectMeta,
   TableDataResponse,
@@ -25,6 +25,7 @@ import { generatePath } from 'react-router-dom';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/publicationService');
+jest.mock('@admin/services/releaseService');
 jest.mock('@common/services/tableBuilderService');
 
 const dataBlockService = _dataBlockService as jest.Mocked<
@@ -33,6 +34,7 @@ const dataBlockService = _dataBlockService as jest.Mocked<
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
+const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
 >;
@@ -186,6 +188,28 @@ describe('PreReleaseTableToolPage', () => {
     ],
   };
 
+  const testRelease: Release = {
+    id: '123',
+    slug: '123',
+    approvalStatus: 'Draft',
+    updatePublishedDate: false,
+    latestRelease: true,
+    live: true,
+    amendment: false,
+    publicationId: '123',
+    publicationTitle: 'Test Publication Title',
+    publicationSlug: 'test-publication-title-slug',
+    timePeriodCoverage: {
+      value: 'test',
+      label: 'test',
+    },
+    title: 'test title',
+    type: 'NationalStatistics',
+    preReleaseAccessList: 'test',
+    year: 2023,
+    yearTitle: '2023',
+  };
+
   const testPublication: Publication = {
     id: 'publication-1',
     title: 'Pupil absence',
@@ -324,6 +348,7 @@ describe('PreReleaseTableToolPage', () => {
 
   test('renders correctly on step 5 with `dataBlockId` route param', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
+    releaseService.getRelease.mockResolvedValue(testRelease);
     dataBlockService.getDataBlock.mockResolvedValue(testDataBlock);
 
     tableBuilderService.listReleaseSubjects.mockResolvedValue(testSubjects);
