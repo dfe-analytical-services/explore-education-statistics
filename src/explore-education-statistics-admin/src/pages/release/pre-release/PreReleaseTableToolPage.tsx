@@ -140,12 +140,12 @@ const PreReleaseTableToolPage = ({
                       Explore data
                     </WizardStepHeading>
 
-                    {table && tableHeaders && query && (
+                    {table && tableHeaders && query && release && (
                       <PreReleaseTableToolFinalStep
                         publication={publication}
                         query={query}
                         releaseId={releaseId}
-                        releaseType={release?.type}
+                        releaseType={release.type}
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}

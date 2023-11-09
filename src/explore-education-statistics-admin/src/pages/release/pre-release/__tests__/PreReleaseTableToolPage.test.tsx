@@ -186,28 +186,6 @@ describe('PreReleaseTableToolPage', () => {
     ],
   };
 
-  const testRelease: Release = {
-    id: '123',
-    slug: '123',
-    approvalStatus: 'Draft',
-    updatePublishedDate: false,
-    latestRelease: true,
-    live: true,
-    amendment: false,
-    publicationId: '123',
-    publicationTitle: 'Test Publication Title',
-    publicationSlug: 'test-publication-title-slug',
-    timePeriodCoverage: {
-      value: 'test',
-      label: 'test',
-    },
-    title: 'test title',
-    type: 'NationalStatistics',
-    preReleaseAccessList: 'test',
-    year: 2023,
-    yearTitle: '2023',
-  };
-
   const testPublication: Publication = {
     id: 'publication-1',
     title: 'Pupil absence',

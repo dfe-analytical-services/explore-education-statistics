@@ -24,7 +24,7 @@ interface TableToolFinalStepProps {
   publication?: Publication;
   query: ReleaseTableDataQuery;
   releaseId: string;
-  releaseType?: ReleaseType;
+  releaseType: ReleaseType;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
