@@ -6,7 +6,6 @@ import {
   PreReleaseTableToolRouteParams,
 } from '@admin/routes/preReleaseRoutes';
 import dataBlockService from '@admin/services/dataBlockService';
-import publicationService from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import TableToolWizard, {
@@ -20,75 +19,83 @@ import tableBuilderService from '@common/services/tableBuilderService';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import { generatePath } from 'react-router-dom';
-import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import releaseQueries from '@admin/queries/releaseQueries';
+import publicationQueries from '@admin/queries/publicationQueries';
+import { useQuery } from '@tanstack/react-query';
 
 const PreReleaseTableToolPage = ({
   match,
 }: RouteComponentProps<PreReleaseTableToolRouteParams>) => {
   const { publicationId, releaseId, dataBlockId } = match.params;
 
-  const { value: publication } = useAsyncHandledRetry(
-    () => publicationService.getPublication(publicationId),
-    [publicationId],
+  const { data: publication, isLoading: isPublicationLoading } = useQuery(
+    publicationQueries.get(publicationId),
   );
 
-  const { release } = useReleaseContext();
+  const { data: release, isLoading: isReleaseLoading } = useQuery(
+    releaseQueries.get(releaseId),
+  );
 
-  const { value: tableToolState, isLoading } = useAsyncHandledRetry<
-    InitialTableToolState | undefined
-  >(async () => {
-    const [featuredTables, subjects] = await Promise.all([
-      tableBuilderService.listReleaseFeaturedTables(releaseId),
-      tableBuilderService.listReleaseSubjects(releaseId),
-    ]);
-
-    if (dataBlockId) {
-      const { table, query } = await dataBlockService.getDataBlock(dataBlockId);
-
-      const [subjectMeta, tableData] = await Promise.all([
-        tableBuilderService.getSubjectMeta(query.subjectId, releaseId),
-        tableBuilderService.getTableData({
-          releaseId,
-          ...query,
-        }),
+  const { value: tableToolState, isLoading: isTableToolStateLoading } =
+    useAsyncHandledRetry<InitialTableToolState | undefined>(async () => {
+      const [featuredTables, subjects] = await Promise.all([
+        tableBuilderService.listReleaseFeaturedTables(releaseId),
+        tableBuilderService.listReleaseSubjects(releaseId),
       ]);
 
-      const fullTable = mapFullTable(tableData);
-      const tableHeaders = mapTableHeadersConfig(table.tableHeaders, fullTable);
+      if (dataBlockId) {
+        const { table, query } = await dataBlockService.getDataBlock(
+          dataBlockId,
+        );
+
+        const [subjectMeta, tableData] = await Promise.all([
+          tableBuilderService.getSubjectMeta(query.subjectId, releaseId),
+          tableBuilderService.getTableData({
+            releaseId,
+            ...query,
+          }),
+        ]);
+
+        const fullTable = mapFullTable(tableData);
+        const tableHeaders = mapTableHeadersConfig(
+          table.tableHeaders,
+          fullTable,
+        );
+
+        return {
+          initialStep: 5,
+          subjects,
+          featuredTables,
+          query: {
+            ...query,
+            publicationId,
+            releaseId,
+          },
+          subjectMeta,
+          response: {
+            table: fullTable,
+            tableHeaders,
+          },
+        };
+      }
 
       return {
-        initialStep: 5,
+        initialStep: 1,
         subjects,
         featuredTables,
         query: {
-          ...query,
           publicationId,
           releaseId,
+          subjectId: '',
+          indicators: [],
+          filters: [],
+          locationIds: [],
         },
-        subjectMeta,
-        response: {
-          table: fullTable,
-          tableHeaders,
-        },
-        releaseType: release.type,
       };
-    }
+    }, [publicationId, releaseId, dataBlockId]);
 
-    return {
-      initialStep: 1,
-      subjects,
-      featuredTables,
-      query: {
-        publicationId,
-        releaseId,
-        subjectId: '',
-        indicators: [],
-        filters: [],
-        locationIds: [],
-      },
-      releaseType: release.type,
-    };
-  }, [publicationId, releaseId, dataBlockId]);
+  const isLoading =
+    isReleaseLoading || isTableToolStateLoading || isPublicationLoading;
 
   return (
     <>
@@ -138,6 +145,7 @@ const PreReleaseTableToolPage = ({
                         publication={publication}
                         query={query}
                         releaseId={releaseId}
+                        releaseType={release?.type}
                         table={table}
                         tableHeaders={tableHeaders}
                         onReorderTableHeaders={onReorder}

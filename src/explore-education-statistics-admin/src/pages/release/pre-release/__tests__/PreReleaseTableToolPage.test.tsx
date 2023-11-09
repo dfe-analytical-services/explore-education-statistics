@@ -1,3 +1,4 @@
+import render from '@common-test/render';
 import PreReleaseTableToolPage from '@admin/pages/release/pre-release/PreReleaseTableToolPage';
 import {
   preReleaseTableToolRoute,
@@ -16,12 +17,11 @@ import _tableBuilderService, {
   FeaturedTable,
   Subject,
 } from '@common/services/tableBuilderService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
-import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 
 jest.mock('@admin/services/dataBlockService');
 jest.mock('@admin/services/publicationService');
@@ -412,12 +412,10 @@ describe('PreReleaseTableToolPage', () => {
   ) => {
     return render(
       <MemoryRouter initialEntries={initialEntries}>
-        <ReleaseContextProvider release={testRelease}>
-          <Route
-            component={PreReleaseTableToolPage}
-            path={preReleaseTableToolRoute.path}
-          />
-        </ReleaseContextProvider>
+        <Route
+          component={PreReleaseTableToolPage}
+          path={preReleaseTableToolRoute.path}
+        />
       </MemoryRouter>,
     );
   };
