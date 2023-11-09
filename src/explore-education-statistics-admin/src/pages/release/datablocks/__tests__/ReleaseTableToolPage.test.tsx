@@ -7,7 +7,7 @@ import {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import _tableBuilderService from '@common/services/tableBuilderService';
 import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -16,13 +16,11 @@ import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseCon
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/permissionService');
-jest.mock('@admin/services/releaseService');
 jest.mock('@common/services/tableBuilderService');
 
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
-const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 const tableBuilderService = _tableBuilderService as jest.Mocked<
   typeof _tableBuilderService
@@ -63,7 +61,6 @@ describe('ReleaseTableToolPage', () => {
   test('renders correctly on step 1', async () => {
     publicationService.getPublication.mockResolvedValue(testPublication);
 
-    releaseService.getRelease.mockResolvedValue(testRelease);
     tableBuilderService.listReleaseFeaturedTables.mockResolvedValue([]);
     tableBuilderService.listReleaseSubjects.mockResolvedValue([
       {
