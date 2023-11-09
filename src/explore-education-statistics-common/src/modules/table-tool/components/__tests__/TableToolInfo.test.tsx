@@ -12,7 +12,7 @@ describe('TableToolInfo', () => {
     ).toBeInTheDocument();
   });
 
-  test('Displays Release Type and helper modal if one is provided', () => {
+  test('displays Release Type and helper modal if one is provided', () => {
     const testReleaseType: ReleaseType = 'OfficialStatistics';
 
     render(<TableToolInfo releaseType={testReleaseType} />);
@@ -32,7 +32,7 @@ describe('TableToolInfo', () => {
     ).toBeInTheDocument();
   });
 
-  test('Does not display the helper modal if no Release Type is given, but still displays the regulation text', () => {
+  test('does not display the helper modal if no Release Type is given, but still displays the regulation text', () => {
     render(<TableToolInfo releaseType={undefined} />);
 
     expect(
