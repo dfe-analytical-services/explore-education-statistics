@@ -22,15 +22,6 @@ const TableToolInfo = ({
     <>
       <h3>Related information</h3>
 
-      {releaseType && (
-        <>
-          <p>Release Type: {releaseTypes[releaseType]}</p>
-          <div className="govuk-hint">
-            <ReleaseTypesModal />
-          </div>
-        </>
-      )}
-
       <ul className="govuk-list">
         {releaseType && (
           <li>
