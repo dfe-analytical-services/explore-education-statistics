@@ -101,7 +101,7 @@ export const MethodologyContentPageInternal = () => {
           </div>
 
           <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
+            <div className="govuk-grid-column-full">
               <section
                 className={
                   editingMode === 'edit'

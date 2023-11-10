@@ -11,10 +11,12 @@ const ContactUsSection = ({
   return (
     <>
       <h3 id="contact-us">Contact us</h3>
+
       <p>
         If you have a specific enquiry about {publicationTitle} statistics and
         data:
       </p>
+
       <h4 className="govuk-heading-s govuk-!-margin-bottom-0">
         {publicationContact.teamName}
       </h4>
