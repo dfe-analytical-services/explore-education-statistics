@@ -1,6 +1,6 @@
 export interface Redirects {
-  methodology: Redirect[];
-  publication: Redirect[];
+  methodologies: Redirect[];
+  publications: Redirect[];
 }
 
 export type RedirectType = keyof Redirects;

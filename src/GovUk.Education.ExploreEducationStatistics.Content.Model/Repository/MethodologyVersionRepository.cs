@@ -35,8 +35,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 PublishingStrategy = Immediately,
                 Methodology = new Methodology
                 {
-                    Slug = publication.Slug,
+                    Slug = publication.Slug, // Remove EES-4627
                     OwningPublicationTitle = publication.Title,
+                    OwningPublicationSlug = publication.Slug,
                     Publications = new List<PublicationMethodology>
                     {
                         new()
@@ -87,74 +88,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return await _contentDbContext
                 .MethodologyVersions
                 .Where(mv =>
-                    mv.Methodology.Slug == slug
-                    && mv.Methodology.LatestPublishedVersionId == mv.Id)
+                    mv.Methodology.LatestPublishedVersionId == mv.Id
+                    // EF cannot translate mv.Slug into a Queryable, so we have to do this...
+                    && slug == (mv.AlternativeSlug ?? mv.Methodology.OwningPublicationSlug))
                 .SingleOrDefaultAsync();
         }
 
         public async Task<MethodologyVersion?> GetLatestPublishedVersion(Guid methodologyId)
         {
-            var methodology = await _contentDbContext.Methodologies
+            return await _contentDbContext.Methodologies
+                .Include(m => m.LatestPublishedVersion)
                 .AsQueryable()
-                .SingleAsync(mp => mp.Id == methodologyId);
-
-            return await GetLatestPublishedByMethodology(methodology);
+                .Where(mp => mp.Id == methodologyId)
+                .Select(m => m.LatestPublishedVersion)
+                .SingleAsync();
         }
 
         public async Task<List<MethodologyVersion>> GetLatestPublishedVersionByPublication(Guid publicationId)
         {
             var methodologies = await _methodologyRepository.GetByPublication(publicationId);
-            return (await methodologies
-                    .SelectAsync(async methodology =>
-                        await GetLatestPublishedByMethodology(methodology)))
+
+            var methodologyVersions = await methodologies
+                .SelectAsync(async methodology =>
+                {
+                    await _contentDbContext.Entry(methodology)
+                        .Reference(m => m.LatestPublishedVersion)
+                        .LoadAsync();
+
+                    return methodology.LatestPublishedVersion;
+                });
+
+            return methodologyVersions
                 .WhereNotNull()
                 .ToList();
-        }
-
-        private async Task<MethodologyVersion?> GetLatestPublishedByMethodology(Methodology methodology)
-        {
-            await _contentDbContext.Entry(methodology)
-                .Collection(m => m.Versions)
-                .LoadAsync();
-
-            return methodology
-                .Versions
-                .SingleOrDefault(mv => methodology.LatestPublishedVersionId == mv.Id);
-        }
-
-        // This method is responsible for keeping Methodology Titles and Slugs in sync with their owning Publications
-        // where appropriate.  Methodologies always keep track of their owning Publication's title for
-        // optimisation purposes, but Methodology.Slug is used for the actual Slug for all of its Methodology
-        // Versions.  It's therefore important to keep it up-to-date with changes to its owning Publication's Slug too, 
-        // but only if none of its Versions are yet publicly accessible.
-        public async Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle,
-            string updatedSlug)
-        {
-            var slugChanged = originalSlug != updatedSlug;
-
-            // If the Publication Title changed, also change the OwningPublicationTitles of any Methodologies
-            // that are owned by this Publication
-            var ownedMethodologies = await _contentDbContext
-                .PublicationMethodologies
-                .Include(m => m.Methodology)
-                .Where(m => m.PublicationId == publicationId && m.Owner)
-                .Select(m => m.Methodology)
-                .ToListAsync();
-
-            ownedMethodologies
-                .ForEach(methodology =>
-            {
-                methodology.OwningPublicationTitle = updatedTitle;
-
-                if (slugChanged && methodology.Slug == originalSlug &&
-                    methodology.LatestPublishedVersionId == null)
-                {
-                    methodology.Slug = updatedSlug;
-                }
-            });
-
-            _contentDbContext.Methodologies.UpdateRange(ownedMethodologies);
-            await _contentDbContext.SaveChangesAsync();
         }
 
         public async Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion)
@@ -166,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return methodologyVersion.Id == methodologyVersion.Methodology.LatestPublishedVersionId;
         }
 
-        // TODO: Move IsToBePublished to MethodologyApprovalService and change to private after MethodologyMigrationController has been removed
+        // TODO: EES-4613 Move IsToBePublished to MethodologyApprovalService and change to private after MethodologyMigrationController has been removed
         public async Task<bool> IsToBePublished(MethodologyVersion methodologyVersion)
         {
             // A version that's not approved can't be publicly accessible
@@ -243,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Collection(mp => mp.Versions)
                 .LoadAsync();
 
-            // TODO EES-2672 SingleOrDefault here is susceptible to bug EES-2672 which is allowing multiple amendments
+            // TODO EES-4628 SingleOrDefault here is susceptible to bug EES-2672 which is allowing multiple amendments
             // of the same version to be created. If there is a next version there should only be one.
             return methodologyVersion.Methodology.Versions.SingleOrDefault(mv =>
                 mv.PreviousVersionId == methodologyVersion.Id);

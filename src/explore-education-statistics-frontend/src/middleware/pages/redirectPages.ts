@@ -10,24 +10,19 @@ interface CachedRedirects {
   fetchedAt: number;
 }
 
+const cacheTime = getCacheTime();
+
 let cachedRedirects: CachedRedirects | undefined;
 
 // The middleware only runs on paths defined in the config
 // in middleware.ts, that will also need to be
 // updated if any other paths are added here.
-export const redirectPaths = {
-  methodology: '/methodology',
-  publication: '/find-statistics',
+const redirectPaths = {
+  methodologies: '/methodology',
+  publications: '/find-statistics',
 };
 
 export default async function redirectPages(request: NextRequest) {
-  // Cache the redirect paths for 10 seconds on local and dev,
-  // 60 seconds on other envs.
-  const cacheTime =
-    process.env.APP_ENV === 'Local' || process.env.APP_ENV === 'Development'
-      ? 10_000
-      : 60_0000;
-
   const shouldRefetch =
     !cachedRedirects || cachedRedirects.fetchedAt + cacheTime < Date.now();
 
@@ -63,4 +58,18 @@ export default async function redirectPages(request: NextRequest) {
   }
 
   return NextResponse.next();
+}
+
+// Cache the redirect paths for 2 seconds on Local,
+// 10 seconds on Development, and 60 seconds in all other
+// environments.
+function getCacheTime(): number {
+  switch (process.env.APP_ENV) {
+    case 'Local':
+      return 2_000;
+    case 'Development':
+      return 10_000;
+    default:
+      return 60_000;
+  }
 }

@@ -158,17 +158,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
         }
 
         [Fact]
-        public void GetSlug()
+        public void GetSlug_OwningPublicationSlug()
         {
-            var methodology = new MethodologyVersion
+            var methodologyVersion = new MethodologyVersion
             {
+                AlternativeSlug = null,
                 Methodology = new Methodology
                 {
-                    Slug = "owning-publication-slug"
-                }
+                    OwningPublicationSlug = "owning-publication-slug",
+                },
             };
 
-            Assert.Equal(methodology.Methodology.Slug, methodology.Slug);
+            Assert.Equal(methodologyVersion.Methodology.OwningPublicationSlug, methodologyVersion.Slug);
+        }
+
+        [Fact]
+        public void GetSlug_AlternativeSlug()
+        {
+            var methodologyVersion = new MethodologyVersion
+            {
+                AlternativeSlug = "alternativeSlug",
+                Methodology = new Methodology
+                {
+                    OwningPublicationSlug = "owning-publication-slug",
+                },
+            };
+
+            Assert.Equal(methodologyVersion.AlternativeSlug, methodologyVersion.Slug);
         }
 
         [Fact]

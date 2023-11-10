@@ -13,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -1022,13 +1023,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var newSupersededById = Guid.NewGuid();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+                var methodologyService = new Mock<IMethodologyService>(Strict);
 
                 var publicationService = BuildPublicationService(context,
-                    methodologyVersionRepository: methodologyVersionRepository.Object);
+                    methodologyService: methodologyService.Object);
 
-                methodologyVersionRepository
-                    .Setup(s => s.PublicationTitleChanged(
+                methodologyService
+                    .Setup(s => s.PublicationTitleOrSlugChanged(
                         publication.Id,
                         publication.Slug,
                         "New title",
@@ -1047,7 +1048,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                VerifyAllMocks(methodologyVersionRepository);
+                VerifyAllMocks(methodologyService);
 
                 var viewModel = result.AssertRight();
 
@@ -1134,7 +1135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+                var methodologyService = new Mock<IMethodologyService>(Strict);
                 var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
                 var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
 
@@ -1152,13 +1153,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         new List<AllMethodologiesThemeViewModel>()));
 
                 var publicationService = BuildPublicationService(context,
-                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    methodologyService: methodologyService.Object,
                     publicationCacheService: publicationCacheService.Object,
                     methodologyCacheService: methodologyCacheService.Object);
 
                 // Expect the title to change but not the slug, as the Publication is already published.
-                methodologyVersionRepository
-                    .Setup(s => s.PublicationTitleChanged(
+                methodologyService
+                    .Setup(s => s.PublicationTitleOrSlugChanged(
                         publication.Id,
                         publication.Slug,
                         "New title",
@@ -1177,7 +1178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                VerifyAllMocks(methodologyVersionRepository,
+                VerifyAllMocks(methodologyService,
                     methodologyCacheService,
                     publicationCacheService);
 
@@ -1219,6 +1220,119 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdatePublication_TitleChangeLeavesPubAndMethodologySlugsUnchanged()
+        {
+            var publication = new Publication
+            {
+                Slug = "old-title",
+                Title = "Old title",
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                },
+                Contact = new Contact
+                {
+                    ContactName = "Old name",
+                    ContactTelNo = "0987654321",
+                    TeamName = "Old team",
+                    TeamEmail = "old.smith@test.com",
+                },
+                LatestPublishedRelease = new Release(),
+            };
+
+            var methodologyVersionId = Guid.NewGuid();
+            var publicationMethodology = new PublicationMethodology
+            {
+                Publication = publication,
+                Owner = true,
+                Methodology = new Methodology
+                {
+                    LatestPublishedVersionId = methodologyVersionId,
+                    Versions = ListOf(new MethodologyVersion
+                    {
+                        Id = methodologyVersionId,
+                    }),
+                    OwningPublicationTitle = "Old title",
+                    OwningPublicationSlug = "old-title",
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.PublicationMethodologies.AddRange(publicationMethodology);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var methodologyService = new Mock<IMethodologyService>(Strict);
+                var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
+
+                publicationCacheService.Setup(mock => mock.UpdatePublication(publication.Slug))
+                    .ReturnsAsync(new PublicationCacheViewModel());
+
+                publicationCacheService.Setup(mock => mock.UpdatePublicationTree())
+                    .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
+
+                methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
+                    .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
+                        new List<AllMethodologiesThemeViewModel>()));
+
+                var publicationService = BuildPublicationService(context,
+                    methodologyService: methodologyService.Object,
+                    publicationCacheService: publicationCacheService.Object,
+                    methodologyCacheService: methodologyCacheService.Object);
+
+                methodologyService
+                    .Setup(s => s.PublicationTitleOrSlugChanged(
+                        publication.Id,
+                        publication.Slug,
+                        "New title",
+                        publication.Slug)) // methodology slug isn't changing
+                    .Returns(Task.CompletedTask);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveRequest
+                    {
+                        TopicId = publication.TopicId,
+                        Title = "New title",
+                        Summary = "New summary",
+                    }
+                );
+
+                VerifyAllMocks(methodologyService,
+                    methodologyCacheService,
+                    publicationCacheService);
+
+                var viewModel = result.AssertRight();
+
+                Assert.Equal("New title", viewModel.Title);
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var updatedPublication = await context.Publications
+                    .Include(p => p.Contact)
+                    .Include(p => p.Topic)
+                    .SingleAsync(p => p.Title == "New title");
+
+                Assert.True(updatedPublication.Live);
+                Assert.True(updatedPublication.Updated.HasValue);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
+
+                // Slug remains unchanged
+                Assert.Equal("old-title", updatedPublication.Slug);
+                Assert.Equal("New title", updatedPublication.Title);
+
+                // We don't check whether methodology titles/slugs have changed, because this is done by
+                // PublicationTitleOrSlugChanged, which has been mocked.
+            }
+        }
+
+        [Fact]
         public async void UpdatePublication_NoTitleOrSupersededByChange()
         {
             var topic = new Topic
@@ -1231,7 +1345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Old title",
                 Summary = "Old summary",
-                Slug = "old-slug",
+                Slug = "old-title",
                 Topic = new Topic
                 {
                     Title = "Old topic"
@@ -1258,13 +1372,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                // Expect no calls to be made on this Mock as the Publication's Title hasn't changed.
-                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+                // Expect no calls to be made on this Mock as the Publication's Title and Slug haven't changed.
+                var methodologyService = new Mock<IMethodologyService>(Strict);
 
                 var publicationService = BuildPublicationService(context,
-                    methodologyVersionRepository: methodologyVersionRepository.Object);
+                    methodologyService: methodologyService.Object);
 
-                // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
                     new PublicationSaveRequest
@@ -1276,7 +1389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                VerifyAllMocks(methodologyVersionRepository);
+                VerifyAllMocks(methodologyService);
 
                 var viewModel = result.AssertRight();
 
@@ -2444,7 +2557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
-            IMethodologyVersionRepository? methodologyVersionRepository = null,
+            IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null)
         {
@@ -2454,7 +2567,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? new PublicationRepository(context),
-                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
+                methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
         }

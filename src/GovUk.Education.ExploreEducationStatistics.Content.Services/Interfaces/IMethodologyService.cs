@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -12,4 +13,10 @@ public interface IMethodologyService
     public Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug);
 
     public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetSummariesTree();
+
+    public Task PublicationTitleOrSlugChanged(
+        Guid publicationId,
+        string originalSlug,
+        string updatedTitle,
+        string updatedSlug);
 }

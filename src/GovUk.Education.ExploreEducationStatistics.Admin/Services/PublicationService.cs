@@ -5,24 +5,23 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using IPublicationRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationRepository;
+using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -33,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
+        private readonly IMethodologyService _methodologyService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IMethodologyCacheService _methodologyCacheService;
 
@@ -43,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IPublicationRepository publicationRepository,
-            IMethodologyVersionRepository methodologyVersionRepository,
+            IMethodologyService methodologyService,
             IPublicationCacheService publicationCacheService,
             IMethodologyCacheService methodologyCacheService)
         {
@@ -52,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _publicationRepository = publicationRepository;
-            _methodologyVersionRepository = methodologyVersionRepository;
+            _methodologyService = methodologyService;
             _publicationCacheService = publicationCacheService;
             _methodologyCacheService = methodologyCacheService;
         }
@@ -211,9 +210,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await _context.SaveChangesAsync();
 
-                    if (originalTitle != publication.Title)
+                    if (originalTitle != publication.Title || originalSlug != publication.Slug)
                     {
-                        await _methodologyVersionRepository.PublicationTitleChanged(publicationId,
+                        await _methodologyService.PublicationTitleOrSlugChanged(publicationId,
                             originalSlug,
                             publication.Title,
                             publication.Slug);

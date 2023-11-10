@@ -855,6 +855,147 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
+        public async Task GetLatestPublishedVersionBySlug_AlternativeSlug()
+        {
+            var latestPublishedVersionId = Guid.NewGuid();
+            var methodology = new Methodology
+            {
+                LatestPublishedVersionId = latestPublishedVersionId,
+                OwningPublicationSlug = "not-like-this",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        AlternativeSlug = "not-like-this",
+                        Version = 1,
+                        PreviousVersionId = latestPublishedVersionId,
+                    },
+                    new()
+                    {
+                        Id = latestPublishedVersionId,
+                        AlternativeSlug = "slug",
+                        Version = 0,
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyVersionRepository(
+                    contentDbContext: contentDbContext);
+
+                var result = await service
+                    .GetLatestPublishedVersionBySlug("slug");
+
+                VerifyAllMocks(methodologyRepository);
+
+                Assert.NotNull(result);
+                Assert.Equal(latestPublishedVersionId, result.Id);
+                Assert.Equal("slug", result.Slug);
+            }
+        }
+
+        [Fact]
+        public async Task GetLatestPublishedVersionBySlug_OwningPublicationSlug()
+        {
+            var latestPublishedVersionId = Guid.NewGuid();
+            var methodology = new Methodology
+            {
+                LatestPublishedVersionId = latestPublishedVersionId,
+                OwningPublicationSlug = "slug",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        AlternativeSlug = "not-like-this",
+                        Version = 1,
+                        PreviousVersionId = latestPublishedVersionId,
+                    },
+                    new()
+                    {
+                        Id = latestPublishedVersionId,
+                        AlternativeSlug = null,
+                        Version = 0,
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyVersionRepository(
+                    contentDbContext: contentDbContext);
+
+                var result = await service
+                    .GetLatestPublishedVersionBySlug("slug");
+
+                VerifyAllMocks(methodologyRepository);
+
+                Assert.NotNull(result);
+                Assert.Equal(latestPublishedVersionId, result.Id);
+                Assert.Null(result.AlternativeSlug);
+                // doesn't return result.Methodology, so cannot check result.Slug/result.Methodology.OwningPublicationSlug
+            }
+        }
+
+        [Fact]
+        public async Task GetLatestPublishedVersionBySlug_UnpublishedMethodology()
+        {
+            var methodology = new Methodology
+            {
+                LatestPublishedVersionId = null,
+                OwningPublicationSlug = "owning-publication-slug",
+                Versions = new List<MethodologyVersion>
+                {
+                    new()
+                    {
+                        AlternativeSlug = "alternative-slug",
+                        Version = 0,
+                    },
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Methodologies.AddAsync(methodology);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildMethodologyVersionRepository(
+                    contentDbContext: contentDbContext);
+
+                var result = await service
+                    .GetLatestPublishedVersionBySlug("slug");
+
+                VerifyAllMocks(methodologyRepository);
+
+                Assert.Null(result);
+            }
+        }
+
+        [Fact]
         public async Task IsToBePublished_ApprovedAndPublishedImmediately()
         {
             var methodologyVersion = new MethodologyVersion
@@ -1451,272 +1592,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                     service.IsToBePublished(methodologyVersion));
             }
         }
-
-        [Fact]
-        public async Task PublicationTitleChanged()
-        {
-            var publicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = new PublicationMethodology
-                {
-                    PublicationId = publicationId,
-                    Owner = true,
-                    Methodology = new Methodology
-                    {
-                        Versions = ListOf(new MethodologyVersion
-                        {
-                            Status = Draft
-                        }),
-                        Slug = "original-slug",
-                        OwningPublicationTitle = "Original Title"
-                    }
-                };
-
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildMethodologyVersionRepository(contentDbContext);
-                await service.PublicationTitleChanged(publicationId, "original-slug", "New Title", "new-slug");
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = await contentDbContext
-                    .PublicationMethodologies
-                    .Include(m => m.Methodology)
-                    .SingleAsync(m => m.PublicationId == publicationId);
-
-                // As the Publication's Title and Slug changed and as this Methodology is not yet publicly accessible
-                // and is still inheriting the Publication's Slug at this point, this change will be reflected in the
-                // Methodology's Slug also.
-                Assert.Equal("New Title", publicationMethodology.Methodology.OwningPublicationTitle);
-                Assert.Equal("new-slug", publicationMethodology.Methodology.Slug);
-            }
-        }
-
-        [Fact]
-        public async Task PublicationTitleChanged_DoesNotAffectUnrelatedMethodologies()
-        {
-            var publicationId = Guid.NewGuid();
-            var unrelatedPublicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = new PublicationMethodology
-                {
-                    PublicationId = publicationId,
-                    Owner = true,
-                    Methodology = new Methodology
-                    {
-                        Versions = ListOf(new MethodologyVersion
-                        {
-                            Status = Draft
-                        }),
-                        Slug = "original-slug",
-                        OwningPublicationTitle = "Original Title"
-                    }
-                };
-
-                var unrelatedPublicationMethodology = new PublicationMethodology
-                {
-                    PublicationId = unrelatedPublicationId,
-                    Owner = true,
-                    Methodology = new Methodology
-                    {
-                        Versions = ListOf(new MethodologyVersion
-                        {
-                            Status = Draft
-                        }),
-                        Slug = "original-slug",
-                        OwningPublicationTitle = "Original Title"
-                    }
-                };
-
-                await contentDbContext.PublicationMethodologies.AddRangeAsync(
-                    publicationMethodology,
-                    unrelatedPublicationMethodology);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildMethodologyVersionRepository(contentDbContext);
-                await service.PublicationTitleChanged(publicationId, "original-slug", "New Title", "new-slug");
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = await contentDbContext
-                    .PublicationMethodologies
-                    .Include(m => m.Methodology)
-                    .SingleAsync(m => m.PublicationId == unrelatedPublicationId);
-
-                // This Methodology was not related to the Publication being updated, and so was not affected by the update.
-                Assert.Equal("Original Title", publicationMethodology.Methodology.OwningPublicationTitle);
-                Assert.Equal("original-slug", publicationMethodology.Methodology.Slug);
-            }
-        }
-
-        [Fact]
-        public async Task PublicationTitleChanged_DoesNotAffectUnownedMethodologies()
-        {
-            var publicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = new PublicationMethodology
-                {
-                    PublicationId = publicationId,
-                    Owner = false,
-                    Methodology = new Methodology
-                    {
-                        Versions = ListOf(new MethodologyVersion
-                        {
-                            Status = Draft
-                        }),
-                        Slug = "original-slug",
-                        OwningPublicationTitle = "Original Title"
-                    }
-                };
-
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildMethodologyVersionRepository(contentDbContext);
-                await service.PublicationTitleChanged(publicationId, "original-slug", "New Title", "new-slug");
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = await contentDbContext
-                    .PublicationMethodologies
-                    .Include(m => m.Methodology)
-                    .SingleAsync(m => m.PublicationId == publicationId);
-
-                // This Methodology was not owned by the Publication being updated, and so was not affected by the update.
-                Assert.Equal("Original Title", publicationMethodology.Methodology.OwningPublicationTitle);
-                Assert.Equal("original-slug", publicationMethodology.Methodology.Slug);
-            }
-        }
-
-        [Fact]
-        public async Task PublicationTitleChanged_MethodologySlugHasAlreadyBeenAmendedByAlternativeTitle()
-        {
-            var publicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = new PublicationMethodology
-                {
-                    PublicationId = publicationId,
-                    Owner = true,
-                    Methodology = new Methodology
-                    {
-                        Versions = ListOf(new MethodologyVersion
-                        {
-                            Status = Draft
-                        }),
-                        Slug = "alternative-slug",
-                        OwningPublicationTitle = "Original title"
-                    }
-                };
-
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildMethodologyVersionRepository(contentDbContext);
-                await service.PublicationTitleChanged(publicationId, "original-slug", "New Title", "new-slug");
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = await contentDbContext
-                    .PublicationMethodologies
-                    .Include(m => m.Methodology)
-                    .SingleAsync(m => m.PublicationId == publicationId);
-
-                // The Methodology has already had an alternative Slug set by virtue of one of its Versions'
-                // Alternative Titles being updated, and so changing the Publication's Title and Slug won't override
-                // this more specific Slug change.
-                Assert.Equal("New Title", publicationMethodology.Methodology.OwningPublicationTitle);
-                Assert.Equal("alternative-slug", publicationMethodology.Methodology.Slug);
-            }
-        }
-
-        [Fact]
-        public async Task PublicationTitleChanged_MethodologyAlreadyPubliclyAvailable()
-        {
-            var publicationId = Guid.NewGuid();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var methodologyVersionId = Guid.NewGuid();
-                var publicationMethodology = new PublicationMethodology
-                {
-                    Publication = new Publication
-                    {
-                        Id = publicationId,
-                        LatestPublishedRelease = new Release()
-                    },
-                    Owner = true,
-                    Methodology = new Methodology
-                    {
-                        LatestPublishedVersionId = Guid.NewGuid(),
-                        Versions = ListOf(new MethodologyVersion
-                        {
-                            Id = methodologyVersionId,
-                            Status = Approved,
-                            PublishingStrategy = Immediately,
-                        }),
-                        Slug = "original-slug",
-                        OwningPublicationTitle = "Original title"
-                    }
-                };
-
-                await contentDbContext.PublicationMethodologies.AddAsync(publicationMethodology);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildMethodologyVersionRepository(contentDbContext);
-                await service.PublicationTitleChanged(publicationId, "original-slug", "New Title", "new-slug");
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var publicationMethodology = await contentDbContext
-                    .PublicationMethodologies
-                    .Include(m => m.Methodology)
-                    .SingleAsync(m => m.PublicationId == publicationId);
-
-                Assert.Equal("New Title", publicationMethodology.Methodology.OwningPublicationTitle);
-                // The Methodology has LatestPublishedVersionId set - i.e. is live - and so its Slug does not update.
-                Assert.Equal("original-slug", publicationMethodology.Methodology.Slug);
-            }
-        }
-
         private static MethodologyVersionRepository BuildMethodologyVersionRepository(
             ContentDbContext contentDbContext,
             IMethodologyRepository? methodologyRepository = null)
