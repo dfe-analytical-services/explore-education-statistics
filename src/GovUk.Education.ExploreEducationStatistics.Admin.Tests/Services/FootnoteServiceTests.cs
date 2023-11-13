@@ -78,9 +78,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 subjectIds: SetOf(subject.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.Subjects);
-            Assert.Equal(subject.Id, result.Right.Subjects.Single().SubjectId);
+            Footnote footnote = result.AssertRight();
+            SubjectFootnote subjectFootnote = Assert.Single(footnote.Subjects);
+            Assert.Equal(subject.Id, subjectFootnote.SubjectId);
         }
 
         [Fact]
@@ -138,9 +138,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 filterIds: SetOf(filter.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.Filters);
-            Assert.Equal(filter.Id, result.Right.Filters.Single().FilterId);
+            Footnote footnote = result.AssertRight();
+            FilterFootnote filterFootnote = Assert.Single(footnote.Filters);
+            Assert.Equal(filter.Id, filterFootnote.FilterId);
         }
 
         [Fact]
@@ -206,9 +206,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 filterGroupIds: SetOf(filterGroup.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.FilterGroups);
-            Assert.Equal(filterGroup.Id, result.Right.FilterGroups.Single().FilterGroupId);
+            Footnote footnote = result.AssertRight();
+            FilterGroupFootnote filterGroupFootnote = Assert.Single(footnote.FilterGroups);
+            Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
         }
 
         [Fact]
@@ -282,9 +282,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 filterItemIds: SetOf(filterItem.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.FilterItems);
-            Assert.Equal(filterItem.Id, result.Right.FilterItems.Single().FilterItemId);
+            Footnote footnote = result.AssertRight();
+            FilterItemFootnote filterItemFootnote = Assert.Single(footnote.FilterItems);
+            Assert.Equal(filterItem.Id, filterItemFootnote.FilterItemId);
         }
 
         [Fact]
@@ -346,9 +346,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 indicatorIds: SetOf(indicator.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.Indicators);
-            Assert.Equal(indicator.Id, result.Right.Indicators.Single().IndicatorId);
+            Footnote footnote = result.AssertRight();
+            IndicatorFootnote indicatorFootnote = Assert.Single(footnote.Indicators);
+            Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
         }
 
         [Fact]
@@ -412,17 +412,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 indicatorIds: SetOf(indicator.Id),
                 subjectIds: SetOf(subject2.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.Subjects);
-            Assert.Equal(subject2.Id, result.Right.Subjects.Single().SubjectId);
-            Assert.Single(result.Right.Filters);
-            Assert.Equal(filter.Id, result.Right.Filters.Single().FilterId);
-            Assert.Single(result.Right.FilterGroups);
-            Assert.Equal(filterGroup.Id, result.Right.FilterGroups.Single().FilterGroupId);
-            Assert.Single(result.Right.FilterItems);
-            Assert.Equal(filterItem.Id, result.Right.FilterItems.Single().FilterItemId);
-            Assert.Single(result.Right.Indicators);
-            Assert.Equal(indicator.Id, result.Right.Indicators.Single().IndicatorId);
+            Footnote footnote = result.AssertRight();
+            SubjectFootnote subjectFootnote = Assert.Single(footnote.Subjects);
+            FilterFootnote filterFootnote = Assert.Single(footnote.Filters);
+            FilterGroupFootnote filterGroupFootnote = Assert.Single(footnote.FilterGroups);
+            FilterItemFootnote filterItemFootnote = Assert.Single(footnote.FilterItems);
+            IndicatorFootnote indicatorFootnote = Assert.Single(footnote.Indicators);
+            Assert.Equal(subject2.Id, subjectFootnote.SubjectId);
+            Assert.Equal(filter.Id, filterFootnote.FilterId);
+            Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
+            Assert.Equal(filterItem.Id, filterItemFootnote.FilterItemId);
+            Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
         }
 
         [Theory]
@@ -555,9 +555,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 subjectIds: SetOf(subject.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.Subjects);
-            Assert.Equal(subject.Id, result.Right.Subjects.Single().SubjectId);
+            Footnote updatedFootnote = result.AssertRight();
+            SubjectFootnote subjectFootnote = Assert.Single(updatedFootnote.Subjects);
+            Assert.Equal(subject.Id, subjectFootnote.SubjectId);
         }
 
         [Fact]
@@ -633,9 +633,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 filterIds: SetOf(filter.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.Filters);
-            Assert.Equal(filter.Id, result.Right.Filters.Single().FilterId);
+            Footnote updatedFootnote = result.AssertRight();
+            FilterFootnote filterFootnote = Assert.Single(updatedFootnote.Filters);
+            Assert.Equal(filter.Id, filterFootnote.FilterId);
         }
 
         [Fact]
@@ -719,9 +719,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 filterGroupIds: SetOf(filterGroup.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.FilterGroups);
-            Assert.Equal(filterGroup.Id, result.Right.FilterGroups.Single().FilterGroupId);
+            Footnote updatedFootnote = result.AssertRight();
+            FilterGroupFootnote filterGroupFootnote = Assert.Single(updatedFootnote.FilterGroups);
+            Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
         }
 
         [Fact]
@@ -813,9 +813,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 filterItemIds: SetOf(filterItem.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.FilterItems);
-            Assert.Equal(filterItem.Id, result.Right.FilterItems.Single().FilterItemId);
+            Footnote updatedFootnote = result.AssertRight();
+            FilterItemFootnote filteritemFootnote = Assert.Single(updatedFootnote.FilterItems);
+            Assert.Equal(filterItem.Id, filteritemFootnote.FilterItemId);
         }
 
         [Fact]
@@ -895,9 +895,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contextId,
                 indicatorIds: SetOf(indicator.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.Indicators);
-            Assert.Equal(indicator.Id, result.Right.Indicators.Single().IndicatorId);
+            Footnote updatedFootnote = result.AssertRight();
+            IndicatorFootnote indicatorFootnote = Assert.Single(updatedFootnote.Indicators);
+            Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
         }
 
         [Fact]
@@ -966,17 +966,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 indicatorIds: SetOf(indicator.Id),
                 subjectIds: SetOf(subject2.Id));
 
-            result.AssertRight();
-            Assert.Single(result.Right.Subjects);
-            Assert.Equal(subject2.Id, result.Right.Subjects.Single().SubjectId);
-            Assert.Single(result.Right.Filters);
-            Assert.Equal(filter.Id, result.Right.Filters.Single().FilterId);
-            Assert.Single(result.Right.FilterGroups);
-            Assert.Equal(filterGroup.Id, result.Right.FilterGroups.Single().FilterGroupId);
-            Assert.Single(result.Right.FilterItems);
-            Assert.Equal(filterItem.Id, result.Right.FilterItems.Single().FilterItemId);
-            Assert.Single(result.Right.Indicators);
-            Assert.Equal(indicator.Id, result.Right.Indicators.Single().IndicatorId);
+            Footnote updatedFootnote = result.AssertRight();
+            SubjectFootnote subjectFootnote = Assert.Single(updatedFootnote.Subjects);
+            FilterFootnote filterFootnote = Assert.Single(updatedFootnote.Filters);
+            FilterGroupFootnote filterGroupFootnote = Assert.Single(updatedFootnote.FilterGroups);
+            FilterItemFootnote filterItemFootnote = Assert.Single(updatedFootnote.FilterItems);
+            IndicatorFootnote indicatorFootnote = Assert.Single(updatedFootnote.Indicators);
+            Assert.Equal(subject2.Id, subjectFootnote.SubjectId);
+            Assert.Equal(filter.Id, filterFootnote.FilterId);
+            Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
+            Assert.Equal(filterItem.Id, filterItemFootnote.FilterItemId);
+            Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
         }
 
         [Theory]
