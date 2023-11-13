@@ -1,3 +1,4 @@
+import render from '@common-test/render';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { MethodologyContextProvider } from '@admin/pages/methodology/contexts/MethodologyContext';
 import PreReleaseMethodologyPage from '@admin/pages/release/pre-release/PreReleaseMethodologyPage';
@@ -9,7 +10,7 @@ import _methodologyContentService, {
   MethodologyContent,
 } from '@admin/services/methodologyContentService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Route } from 'react-router';

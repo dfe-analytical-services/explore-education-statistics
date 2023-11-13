@@ -4,19 +4,18 @@ import _methodologyContentService from '@admin/services/methodologyContentServic
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
 import {
   MethodologyRouteParams,
-  methodologySummaryRoute,
+  methodologyContentRoute,
 } from '@admin/routes/methodologyRoutes';
 import { methodologyRoute } from '@admin/routes/routes';
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
-import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Route } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
 import testMethodology, {
   testMethodologyContent,
-} from '../../__tests__/__data__/test-data';
+} from '@admin/pages/methodology/edit-methodology/__tests__/__data__/testMethodologyVersionsAmendmentsAndContents';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');
@@ -39,7 +38,9 @@ describe('MethodologyContentPage', () => {
       testMethodologyContent,
     );
     permissionService.canUpdateMethodology.mockResolvedValue(true);
+  });
 
+  test('Help and Support section renders', async () => {
     renderPage();
 
     await waitFor(() => {
@@ -48,10 +49,8 @@ describe('MethodologyContentPage', () => {
       );
     });
 
-    userEvent.click(screen.getByRole('link', { name: 'Manage content' }));
-  });
+    expect(methodologyService.getMethodology).toHaveBeenCalled();
 
-  test('Help and Support section renders', () => {
     expect(
       within(
         screen.getByRole('navigation', { name: 'Related information' }),
@@ -92,7 +91,7 @@ describe('MethodologyContentPage', () => {
 
   const renderPage = () => {
     const path = generatePath<MethodologyRouteParams>(
-      methodologySummaryRoute.path,
+      methodologyContentRoute.path,
       {
         methodologyId: 'm1',
       },
