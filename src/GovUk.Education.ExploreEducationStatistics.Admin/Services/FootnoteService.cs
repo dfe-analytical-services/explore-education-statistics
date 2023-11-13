@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
+                .OnSuccessDo(() => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
                     releaseId,
                     subjectIds,
                     filterIds,
@@ -473,7 +473,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlyList<Guid> releaseFilterGroupIds = releaseSubjects
                 .SelectMany(rs => rs.Subject.Filters)
                 .SelectMany(f => f.FilterGroups)
-                .Select(f => f.Id)
+                .Select(fg => fg.Id)
                 .ToList();
 
             return releaseFilterGroupIds.ContainsAll(filterGroupIds);
@@ -492,7 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .SelectMany(rs => rs.Subject.Filters)
                 .SelectMany(f => f.FilterGroups)
                 .SelectMany(fg => fg.FilterItems)
-                .Select(f => f.Id)
+                .Select(fi => fi.Id)
                 .ToList();
 
             return releaseFilterItemIds.ContainsAll(filterItemIds);
@@ -510,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlyList<Guid> releaseIndicatorIds = releaseSubjects
                 .SelectMany(rs => rs.Subject.IndicatorGroups)
                 .SelectMany(ig => ig.Indicators)
-                .Select(f => f.Id)
+                .Select(i => i.Id)
                 .ToList();
 
             return releaseIndicatorIds.ContainsAll(indicatorIds);
