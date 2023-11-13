@@ -65,7 +65,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(releaseId, subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds))
+                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
+                    releaseId,
+                    subjectIds,
+                    filterIds,
+                    filterGroupIds,
+                    filterItemIds,
+                    indicatorIds))
                 .OnSuccess(async () =>
                 {
                     var releaseHasFootnotes = await _context.ReleaseFootnote
@@ -157,7 +163,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentPersistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(releaseId, subjectIds, filterIds, filterGroupIds, filterItemIds, indicatorIds))
+                .OnSuccess(_ => CheckSubjectsFiltersAndIndicatorsAreLinkedToRelease(
+                    releaseId,
+                    subjectIds,
+                    filterIds,
+                    filterGroupIds,
+                    filterItemIds,
+                    indicatorIds))
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(footnoteId, HydrateFootnote)
                 .OnSuccess(async footnote =>
                 {
@@ -180,8 +192,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return await _footnoteRepository.GetFootnote(footnoteId);
                     }
 
-                    // TODO EES-2979 Remove this delete link and create call once all footnotes only belong to one release
-                    // If this amendment of the footnote affects other release then break the link with the old
+                    // TODO EES-2979 Remove this delete link and create call once all footnotes only belong to one
+                    // release If this amendment of the footnote affects other release then break the link with the old
                     // and create a new one
                     await _footnoteRepository.DeleteReleaseFootnoteLink(releaseId, footnote.Id);
 
@@ -388,7 +400,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReadOnlySet<Guid> filterItemIds,
             IReadOnlySet<Guid> indicatorIds)
         {
-            IReadOnlyList<ReleaseSubject> releaseSubjects = await _releaseSubjectRepository.FindAll(releaseId, HydrateReleaseSubjects);
+            IReadOnlyList<ReleaseSubject> releaseSubjects = await _releaseSubjectRepository.FindAll(
+                releaseId,
+                HydrateReleaseSubjects);
 
             if (!AllSpecifiedSubjectsAreLinkedToRelease(subjectIds, releaseSubjects)
                 || !AllSpecifiedFiltersAreLinkedToRelease(filterIds, releaseSubjects)
@@ -414,7 +428,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(fg => fg.FilterItems);
         }
 
-        private static bool AllSpecifiedSubjectsAreLinkedToRelease(IReadOnlySet<Guid> subjectIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
+        private static bool AllSpecifiedSubjectsAreLinkedToRelease(
+            IReadOnlySet<Guid> subjectIds,
+            IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
             if (!subjectIds.Any())
             {
@@ -428,7 +444,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseSubjectIds.ContainsAll(subjectIds);
         }
 
-        private static bool AllSpecifiedFiltersAreLinkedToRelease(IReadOnlySet<Guid> filterIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
+        private static bool AllSpecifiedFiltersAreLinkedToRelease(
+            IReadOnlySet<Guid> filterIds,
+            IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
             if (!filterIds.Any())
             {
@@ -443,7 +461,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseFilterIds.ContainsAll(filterIds);
         }
 
-        private static bool AllSpecifiedFilterGroupsAreLinkedToRelease(IReadOnlySet<Guid> filterGroupIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
+        private static bool AllSpecifiedFilterGroupsAreLinkedToRelease(
+            IReadOnlySet<Guid> filterGroupIds,
+            IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
             if (!filterGroupIds.Any())
             {
@@ -459,7 +479,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseFilterGroupIds.ContainsAll(filterGroupIds);
         }
 
-        private static bool AllSpecifiedFilterItemsAreLinkedToRelease(IReadOnlySet<Guid> filterItemIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
+        private static bool AllSpecifiedFilterItemsAreLinkedToRelease(
+            IReadOnlySet<Guid> filterItemIds,
+            IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
             if (!filterItemIds.Any())
             {
@@ -476,7 +498,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return releaseFilterItemIds.ContainsAll(filterItemIds);
         }
 
-        private static bool AllSpecifiedIndicatorsAreLinkedToRelease(IReadOnlySet<Guid> indicatorIds, IReadOnlyList<ReleaseSubject> releaseSubjects)
+        private static bool AllSpecifiedIndicatorsAreLinkedToRelease(
+            IReadOnlySet<Guid> indicatorIds,
+            IReadOnlyList<ReleaseSubject> releaseSubjects)
         {
             if (!indicatorIds.Any())
             {

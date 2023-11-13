@@ -25,7 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             _subjectDeleter = subjectDeleter ?? new SubjectDeleter();
         }
 
-        public async Task<IReadOnlyList<ReleaseSubject>> FindAll(Guid releaseId, Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null)
+        public async Task<IReadOnlyList<ReleaseSubject>> FindAll(
+            Guid releaseId,
+            Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null)
         {
             IQueryable<ReleaseSubject> query = _statisticsDbContext.ReleaseSubject
                 .Where(rs => rs.ReleaseId == releaseId);

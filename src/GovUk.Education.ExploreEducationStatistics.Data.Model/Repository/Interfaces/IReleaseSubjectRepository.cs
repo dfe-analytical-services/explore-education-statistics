@@ -8,7 +8,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 
 public interface IReleaseSubjectRepository
 {
-    Task<IReadOnlyList<ReleaseSubject>> FindAll(Guid releaseId, Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null);
+    Task<IReadOnlyList<ReleaseSubject>> FindAll(
+        Guid releaseId,
+        Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null);
 
     Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = true);
 
