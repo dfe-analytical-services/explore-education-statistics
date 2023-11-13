@@ -18,16 +18,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyRepository _methodologyRepository;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public MakeAmendmentOfSpecificMethodologyAuthorizationHandler(
             IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyRepository methodologyRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
             _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyRepository = methodologyRepository;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             
             // If the user is a Publication Owner of the Publication that owns this Methodology, they can create 
             // an Amendment of this Methodology.
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         owningPublication.Id,

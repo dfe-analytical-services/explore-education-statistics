@@ -5,6 +5,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
@@ -101,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await handler.HandleAsync(authContext);
                 VerifyAllMocks(userPublicationRoleRepository);
 
-                // Verify that the user can't create a Methodology for this Publication because they don't have 
+                // Verify that the user can't create a Methodology for this Publication because they don't have
                 // Publication Owner role on it
                 Assert.False(authContext.HasSucceeded);
             }
@@ -121,9 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
             var handler = new ManageExternalMethodologyForSpecificPublicationAuthorizationHandler(
-                new AuthorizationHandlerResourceRoleService(
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    userPublicationRoleRepository.Object));
+                new AuthorizationHandlerService(
+                    InMemoryApplicationDbContext(),
+                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    userPublicationRoleRepository.Object,
+                    Mock.Of<IPreReleaseService>(Strict)));
 
             return (handler, userPublicationRoleRepository);
         }

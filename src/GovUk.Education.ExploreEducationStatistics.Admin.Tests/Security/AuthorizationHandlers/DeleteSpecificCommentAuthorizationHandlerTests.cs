@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
 using Xunit;
@@ -46,10 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 contentDbContext => contentDbContext.Add(release),
                 contentDbContext => new DeleteSpecificCommentAuthorizationHandler(
                     contentDbContext,
-                    new ReleasePublishingStatusRepository(Mock.Of<IPublisherTableStorageService>()),
-                    new AuthorizationHandlerResourceRoleService(
+                    new AuthorizationHandlerService(
+                        contentDbContext,
                         new UserReleaseRoleRepository(contentDbContext),
-                        new UserPublicationRoleRepository(contentDbContext))),
+                        new UserPublicationRoleRepository(contentDbContext),
+                        Mock.Of<IPreReleaseService>(Strict))),
                 ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
         }
     }

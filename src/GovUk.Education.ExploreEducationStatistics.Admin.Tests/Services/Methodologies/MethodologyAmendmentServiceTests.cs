@@ -32,11 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Id = Guid.NewGuid(),
                 Status = Approved,
                 Published = DateTime.Today,
-                Methodology = new Methodology
-                {
-                    Slug = "methodology-slug",
-                    OwningPublicationTitle = "Owning Publication Title"
-                },
+                Methodology = new Methodology(),
+                Version = 0,
                 MethodologyContent = new MethodologyVersionContent {
                     Content = new List<ContentSection>
                     {
@@ -104,7 +101,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     .Include(m => m.MethodologyContent)
                     .SingleAsync(m => m.Id == amendmentId);
 
+                Assert.Equal(originalVersion.MethodologyId, amendment.MethodologyId);
+
                 Assert.Equal(originalVersion.Id, amendment.PreviousVersionId);
+                Assert.Equal(originalVersion.Version + 1, amendment.Version);
 
                 var contentSection = Assert.Single(amendment.MethodologyContent.Content);
                 Assert.NotNull(contentSection);
@@ -129,8 +129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Published = DateTime.Today,
                 Methodology = new Methodology
                 {
-                    Slug = "methodology-slug",
-                    OwningPublicationTitle = "Owning Publication Title"
+                    OwningPublicationTitle = "Owning Publication Title",
+                    OwningPublicationSlug = "owning-publication-slug",
                 },
                 MethodologyContent = new MethodologyVersionContent {
                     Content = AsList(new ContentSection

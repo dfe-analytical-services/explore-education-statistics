@@ -11,7 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -32,6 +34,10 @@ using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Co
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
+using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
+using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -108,7 +114,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IIndicatorRepository, IndicatorRepository>()
                 .AddScoped<IPublishingCompletionService, PublishingCompletionService>()
                 .AddScoped<IPublicationRepository, PublicationRepository>()
-                .AddScoped<IReleaseRepository, ReleaseRepository>();
+                .AddScoped<IReleaseRepository, ReleaseRepository>()
+                .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
+                .AddScoped<IRedirectsService, RedirectsService>();
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);

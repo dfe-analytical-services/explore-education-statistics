@@ -14,6 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers;
 
@@ -138,13 +140,15 @@ public class CreateReleaseForSpecificPublicationAuthorizationHandlerTests
         Mock<IUserPublicationRoleRepository>)
         CreateHandlerAndDependencies()
     {
-        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(MockBehavior.Strict);
-        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(MockBehavior.Strict);
+        var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+        var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
         var handler = new CreateReleaseForSpecificPublicationAuthorizationHandler(
-            new AuthorizationHandlerResourceRoleService(
+            new AuthorizationHandlerService(
+                InMemoryApplicationDbContext(),
                 userReleaseRoleRepository.Object,
-                userPublicationRoleRepository.Object)
+                userPublicationRoleRepository.Object,
+                Mock.Of<IPreReleaseService>(Strict))
         );
 
         return (handler, userPublicationRoleRepository);

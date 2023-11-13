@@ -2,12 +2,16 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseAuthorizationHandlersTestUtil;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -19,14 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task ViewReleaseStatusHistoryAuthorizationHandler_ReleaseRoles()
             {
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<ViewReleaseStatusHistoryRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, ViewReleaseStatusHistoryRequirement>(
                     CreateHandler,
                     new Release(),
                     AccessAllReleases
                 );
             }
-        }        
-        
+        }
+
         public class ReleaseRoleTests
         {
             [Fact]
@@ -41,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     ReleaseRole.Lead
                 );
             }
-        }        
-        
+        }
+
         public class PublicationRoleTests
         {
             [Fact]
@@ -63,9 +67,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static ViewReleaseStatusHistoryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
             return new ViewReleaseStatusHistoryAuthorizationHandler(
-                new AuthorizationHandlerResourceRoleService(
+                new AuthorizationHandlerService(
+                    contentDbContext,
                     new UserReleaseRoleRepository(contentDbContext),
-                    new UserPublicationRoleRepository(contentDbContext)));
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 }

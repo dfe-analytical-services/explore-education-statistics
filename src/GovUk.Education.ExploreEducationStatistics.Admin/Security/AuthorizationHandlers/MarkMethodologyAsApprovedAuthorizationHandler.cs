@@ -19,16 +19,16 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
 {
     private readonly IMethodologyVersionRepository _methodologyVersionRepository;
     private readonly IMethodologyRepository _methodologyRepository;
-    private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public MarkMethodologyAsApprovedAuthorizationHandler(
         IMethodologyVersionRepository methodologyVersionRepository,
         IMethodologyRepository methodologyRepository,
-        AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+        AuthorizationHandlerService authorizationHandlerService)
     {
         _methodologyVersionRepository = methodologyVersionRepository;
         _methodologyRepository = methodologyRepository;
-        _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -53,7 +53,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
 
         // If the user is a Publication Approver that owns this Methodology, they can approve it.
         // Additionally, if they're an Approver for any Releases on the owning Publication, they can approve it.
-        if (await _authorizationHandlerResourceRoleService
+        if (await _authorizationHandlerService
                 .HasRolesOnPublicationOrAnyRelease(
                     context.User.GetUserId(),
                     owningPublication.Id,

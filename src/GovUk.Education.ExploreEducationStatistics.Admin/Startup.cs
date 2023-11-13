@@ -500,6 +500,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
             services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
             services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
+            services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
+            services.AddTransient<IRedirectsService, RedirectsService>();
 
             services.AddTransient<INotificationClient>(s =>
             {
@@ -570,7 +572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
             AddPersistenceHelper<UsersAndRolesDbContext>(services);
-            services.AddTransient<AuthorizationHandlerResourceRoleService>();
+            services.AddTransient<AuthorizationHandlerService>();
             services.AddScoped<DateTimeProvider>();
 
             // This service handles the generation of the JWTs for users after they log in
@@ -732,9 +734,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             //
             // This Regex is case insensitive.
             rewriteOptions.AddRewrite(
-                    @"^(?i)identity/(?!account/(login|externallogin|inviteexpired))",
-                    replacement: "/",
-                    skipRemainingRules: true);
+                @"^(?i)identity/(?!account/(login|externallogin|inviteexpired))",
+                replacement: "/",
+                skipRemainingRules: true);
 
             rewriteOptions.Add(new LowercasePathRule());
             app.UseRewriter(rewriteOptions);
