@@ -511,6 +511,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("LatestPublishedVersionId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("OwningPublicationSlug")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("OwningPublicationTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -588,6 +592,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("MethodologyNotes");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyRedirect", b =>
+                {
+                    b.Property<Guid>("MethodologyVersionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Slug")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime>("Created")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("MethodologyVersionId", "Slug");
+
+                    b.ToTable("MethodologyRedirects");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus", b =>
                 {
                     b.Property<Guid>("Id")
@@ -624,6 +644,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AlternativeSlug")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AlternativeTitle")
                         .HasColumnType("nvarchar(max)");
@@ -1543,6 +1566,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("MethodologyVersion");
 
                     b.Navigation("UpdatedBy");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyRedirect", b =>
+                {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", "MethodologyVersion")
+                        .WithMany()
+                        .HasForeignKey("MethodologyVersionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("MethodologyVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus", b =>

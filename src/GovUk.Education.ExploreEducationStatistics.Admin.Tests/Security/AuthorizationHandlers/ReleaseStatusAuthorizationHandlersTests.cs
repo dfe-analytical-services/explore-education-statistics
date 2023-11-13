@@ -13,7 +13,9 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
@@ -204,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             private static MarkReleaseAsDraftAuthorizationHandler CreateHandler(
-                Mock<IReleasePublishingStatusRepository> releaseStatusRepository, 
+                Mock<IReleasePublishingStatusRepository> releaseStatusRepository,
                 ContentDbContext context)
             {
                 return BuildMarkReleaseAsDraftHandler(
@@ -353,7 +355,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
-                                    Owner, 
+                                    Owner,
                                     Approver
                                 );
                             }
@@ -395,7 +397,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             private static MarkReleaseAsHigherLevelReviewAuthorizationHandler CreateHandler(
-                Mock<IReleasePublishingStatusRepository> releaseStatusRepository, 
+                Mock<IReleasePublishingStatusRepository> releaseStatusRepository,
                 ContentDbContext context)
             {
                 return BuildMarkReleaseAsHigherLevelReviewHandler(
@@ -541,7 +543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             private static MarkReleaseAsApprovedAuthorizationHandler CreateHandler(
-                Mock<IReleasePublishingStatusRepository> releaseStatusRepository, 
+                Mock<IReleasePublishingStatusRepository> releaseStatusRepository,
                 ContentDbContext context)
             {
                 return BuildMarkReleaseAsApprovedHandler(
@@ -577,7 +579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         // Assert that users with the specified claims can update the
                         // Release status if it has not started publishing
-                        await AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(context =>
+                        await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(context =>
                             {
                                 context.Add(release);
                                 context.SaveChanges();
@@ -630,7 +632,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             );
 
                         // Assert that no users can update a Release status once it has started publishing
-                        await AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(context =>
+                        await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(context =>
                             {
                                 context.Add(release);
                                 context.SaveChanges();
@@ -677,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                             .ReturnsAsync(new List<ReleasePublishingStatus>());
 
                         // Assert that no users can update a Release status once it has been published
-                        await AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(context =>
+                        await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(context =>
                             {
                                 context.Add(release);
                                 context.SaveChanges();
@@ -822,22 +824,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
             return new MarkReleaseAsDraftAuthorizationHandler(
-                releasePublishingStatusRepository, 
-                new AuthorizationHandlerResourceRoleService(
+                releasePublishingStatusRepository,
+                new AuthorizationHandlerService(
+                    InMemoryApplicationDbContext(),
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository));
+                    userPublicationRoleRepository,
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
-        
+
         private static MarkReleaseAsHigherLevelReviewAuthorizationHandler BuildMarkReleaseAsHigherLevelReviewHandler(
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
             return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
-                releasePublishingStatusRepository, 
-                new AuthorizationHandlerResourceRoleService(
+                releasePublishingStatusRepository,
+                new AuthorizationHandlerService(
+                    InMemoryApplicationDbContext(),
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository));
+                    userPublicationRoleRepository,
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
 
         private static MarkReleaseAsApprovedAuthorizationHandler BuildMarkReleaseAsApprovedHandler(
@@ -846,10 +852,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
             return new MarkReleaseAsApprovedAuthorizationHandler(
-                releasePublishingStatusRepository, 
-                new AuthorizationHandlerResourceRoleService(
+                releasePublishingStatusRepository,
+                new AuthorizationHandlerService(
+                    InMemoryApplicationDbContext(),
                     userReleaseRoleRepository,
-                    userPublicationRoleRepository));
+                    userPublicationRoleRepository,
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 }

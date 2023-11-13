@@ -10,6 +10,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
@@ -209,9 +210,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             var handler = new UpdateSpecificMethodologyAuthorizationHandler(
                 methodologyRepository.Object,
-                new AuthorizationHandlerResourceRoleService(
+                new AuthorizationHandlerService(
+                    InMemoryApplicationDbContext(),
                     userReleaseRoleRepository.Object,
-                    userPublicationRoleRepository.Object)
+                    userPublicationRoleRepository.Object,
+                    Mock.Of<IPreReleaseService>(Strict))
                 );
 
             return (

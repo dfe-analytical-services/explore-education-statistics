@@ -23,6 +23,7 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IPublicationRepository _publicationRepository;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
+    private readonly IRedirectsCacheService _redirectsCacheService;
 
     public PublishingCompletionService(ContentDbContext contentDbContext,
         IContentService contentService,
@@ -31,7 +32,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         IReleasePublishingStatusService releasePublishingStatusService,
         IPublicationRepository publicationRepository,
         IPublicationCacheService publicationCacheService,
-        IReleaseService releaseService)
+        IReleaseService releaseService,
+        IRedirectsCacheService redirectsCacheService)
     {
         _contentDbContext = contentDbContext;
         _contentService = contentService;
@@ -41,6 +43,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         _publicationCacheService = publicationCacheService;
         _releaseService = releaseService;
         _publicationRepository = publicationRepository;
+        _redirectsCacheService = redirectsCacheService;
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -140,6 +143,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         // Update the cached trees in case any methodologies/publications
         // are now accessible for the first time after publishing these releases
         await _contentService.UpdateCachedTaxonomyBlobs();
+
+        await _redirectsCacheService.UpdateRedirects();
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,142 +9,206 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
+using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.ViewSpecificReleaseAuthorizationHandler;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class ViewSpecificReleaseAuthorizationHandlersTests
     {
-        [Fact]
-        public async Task CanSeeAllReleasesAuthorizationHandler()
+        private static readonly Release Release = new()
         {
-            // Assert that any users with the "AccessAllReleases" claim can view an arbitrary Release
-            // (and no other claim allows this)
-            await AssertReleaseHandlerSucceedsWithCorrectClaims<ViewReleaseRequirement>(
-                new CanSeeAllReleasesAuthorizationHandler(), AccessAllReleases);
-        }
-
-        [Fact]
-        public async Task HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler()
-        {
-            // Assert that a User who has any unrestricted viewer role on a Release can view the Release
-            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
-                contentDbContext =>
-                    new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(
-                        new AuthorizationHandlerResourceRoleService(
-                            new UserReleaseRoleRepository(contentDbContext),
-                            new UserPublicationRoleRepository(contentDbContext))),
-                ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver);
-        }
-
-        [Fact]
-        public async Task HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler()
-        {
-            var publication = new Publication
+            Id = Guid.NewGuid(),
+            Publication = new Publication
             {
                 Id = Guid.NewGuid()
-            };
-            await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
-                contentDbContext => new HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler(
-                        new AuthorizationHandlerResourceRoleService(
-                            Mock.Of<IUserReleaseRoleRepository>(Strict),
-                            new UserPublicationRoleRepository(contentDbContext))),
-                new Release
-                {
-                    PublicationId = publication.Id,
-                    Publication = publication
-                },
-                PublicationRole.Owner, PublicationRole.Approver);
-        }
+            }
+        };
 
-        [Fact]
-        public async Task HasPreReleaseRoleWithinAccessWindowAuthorizationHandler()
+        public class ClaimsTests
         {
-            var release = new Release();
-
-            var preReleaseService = new Mock<IPreReleaseService>();
-
-            preReleaseService
-                .Setup(s => s.GetPreReleaseWindowStatus(release, It.IsAny<DateTime>()))
-                .Returns(new PreReleaseWindowStatus
-                {
-                    Access = PreReleaseAccess.Within
-                });
-
-            // Assert that a User who specifically has the Pre Release role will cause this handler to pass
-            // IF the Pre Release window is open
-            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
-                contentDbContext =>
-                    new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
-                        preReleaseService.Object,
-                        new AuthorizationHandlerResourceRoleService(
-                            new UserReleaseRoleRepository(contentDbContext),
-                            new UserPublicationRoleRepository(contentDbContext))),
-                release,
-                ReleaseRole.PrereleaseViewer);
-        }
-
-        [Fact]
-        public async Task HasPreReleaseRoleWithinAccessWindowAuthorizationHandler_PreReleaseWindowNotOpen()
-        {
-            var release = new Release
+            [Fact]
+            public async Task HasAccessAllReleasesClaim()
             {
-                Id = Guid.NewGuid()
-            };
-
-            var preReleaseService = new Mock<IPreReleaseService>();
-
-            var userId = Guid.NewGuid();
-
-            var failureScenario = new ReleaseHandlerTestScenario
-            {
-                Entity = release,
-                User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
-                UserReleaseRoles = new List<UserReleaseRole>
-                {
-                    new UserReleaseRole
+                // Assert that any users with the "AccessAllReleases" claim can view an arbitrary Release
+                // (and no other claim allows this)
+                await AssertHandlerSucceedsWithCorrectClaims<Release, ViewReleaseRequirement>(
+                    contentDbContext =>
                     {
-                        ReleaseId = release.Id,
-                        UserId = userId,
-                        Role = ReleaseRole.PrereleaseViewer
-                    }
-                },
-                ExpectedToPass = false,
-                UnexpectedPassMessage = "Expected the test to fail because the Pre Release window is not open at the " +
-                                        "current time"
-            };
+                        contentDbContext.Attach(Release);
+                        return CreateHandler(contentDbContext);
+                    },
+                    Release,
+                    claimsExpectedToSucceed: AccessAllReleases);
+            }
+        }
 
-            await GetEnumValues<PreReleaseAccess>()
-                .Where(value => value != PreReleaseAccess.Within)
-                .ToList()
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async access =>
+        public class PublicationRoleTests
+        {
+            [Fact]
+            public async Task HasOwnerOrApproverRoleOnParentPublication()
+            {
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Attach(Release);
+                        return CreateHandler(contentDbContext);
+                    },
+                    Release,
+                    rolesExpectedToSucceed: new [] {
+                        PublicationRole.Owner,
+                        PublicationRole.Approver
+                    });
+            }
+        }
+
+        public class ReleaseRoleTests
+        {
+            [Fact]
+            public async Task UnrestrictedViewerRoleOnRelease()
+            {
+                // Assert that a User who has any unrestricted viewer role on a Release can view the Release
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
+                    contentDbContext =>
+                    {
+                        contentDbContext.Attach(Release);
+                        return CreateHandler(contentDbContext);
+                    },
+                    Release,
+                    rolesExpectedToSucceed: new[]
+                    {
+                        ReleaseRole.Viewer,
+                        ReleaseRole.Lead,
+                        ReleaseRole.Contributor,
+                        ReleaseRole.Approver
+                    });
+            }
+
+            [Fact]
+            public async Task PreReleaseUser_WithinPreReleaseAccessWindow()
+            {
+                var userId = Guid.NewGuid();
+
+                var successScenario = new ReleaseHandlerTestScenario
                 {
-                    preReleaseService
-                        .Setup(s => s.GetPreReleaseWindowStatus(release, It.IsAny<DateTime>()))
-                        .Returns(new PreReleaseWindowStatus
+                    Entity = Release,
+                    User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
+                    UserReleaseRoles = new List<UserReleaseRole>
+                    {
+                        new()
                         {
-                            Access = access
-                        });
+                            ReleaseId = Release.Id,
+                            UserId = userId,
+                            Role = ReleaseRole.PrereleaseViewer
+                        }
+                    },
+                    ExpectedToPass = true,
+                    UnexpectedFailMessage =
+                        "Expected the test to succeed because the Pre Release window is currently open"
+                };
 
-                    // Assert that a User who specifically has the Pre Release role will cause this handler to fail
-                    // IF the Pre Release window is NOT open
-                    await AssertReleaseHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
-                        contentDbContext =>
-                            new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
-                                preReleaseService.Object,
-                                new AuthorizationHandlerResourceRoleService(
-                                    new UserReleaseRoleRepository(contentDbContext),
-                                    new UserPublicationRoleRepository(contentDbContext))),
-                        failureScenario);
-                });
+                var preReleaseService = new Mock<IPreReleaseService>(Strict);
+
+                preReleaseService
+                    .Setup(s => s.GetPreReleaseWindowStatus(Release, It.IsAny<DateTime>()))
+                    .Returns(new PreReleaseWindowStatus
+                    {
+                        Access = PreReleaseAccess.Within
+                    });
+
+                // Assert that a User who specifically has the Pre Release role will cause this handler to succeed
+                // if the Pre Release window is currently open.
+                await AssertReleaseHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
+                    contentDbContext => CreateHandler(contentDbContext, preReleaseService.Object),
+                    successScenario);
+
+                VerifyAllMocks(preReleaseService);
+            }
+
+            [Fact]
+            public async Task PreReleaseUser_OutsidePreReleaseAccessWindow()
+            {
+                var userId = Guid.NewGuid();
+
+                var failureScenario = new ReleaseHandlerTestScenario
+                {
+                    Entity = Release,
+                    User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
+                    UserReleaseRoles = new List<UserReleaseRole>
+                    {
+                        new()
+                        {
+                            ReleaseId = Release.Id,
+                            UserId = userId,
+                            Role = ReleaseRole.PrereleaseViewer
+                        }
+                    },
+                    ExpectedToPass = false,
+                    UnexpectedPassMessage =
+                        "Expected the test to fail because the Pre Release window is not open at the " +
+                        "current time"
+                };
+
+                await GetEnumValues<PreReleaseAccess>()
+                    .Where(value => value != PreReleaseAccess.Within)
+                    .ToList()
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(async access =>
+                    {
+                        var preReleaseService = new Mock<IPreReleaseService>(Strict);
+
+                        preReleaseService
+                            .Setup(s => s.GetPreReleaseWindowStatus(Release, It.IsAny<DateTime>()))
+                            .Returns(new PreReleaseWindowStatus
+                            {
+                                Access = access
+                            });
+
+                        // Assert that a User who specifically has the Pre Release role will cause this handler to fail
+                        // IF the Pre Release window is NOT open
+                        await AssertReleaseHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
+                            contentDbContext =>
+                            {
+                                contentDbContext.Attach(Release);
+                                return CreateHandler(contentDbContext, preReleaseService.Object);
+                            },
+                            failureScenario);
+
+                        VerifyAllMocks(preReleaseService);
+                    });
+            }
+        }
+
+        private static ViewSpecificReleaseAuthorizationHandler CreateHandler(
+            ContentDbContext contentDbContext,
+            IPreReleaseService? preReleaseService = null)
+        {
+            return new ViewSpecificReleaseAuthorizationHandler(
+                new AuthorizationHandlerService(
+                    contentDbContext,
+                    new UserReleaseRoleRepository(contentDbContext),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    preReleaseService ?? new PreReleaseService(Options.Create(new PreReleaseOptions
+                    {
+                        PreReleaseAccess = new PreReleaseAccessOptions
+                        {
+                            AccessWindow = new AccessWindowOptions
+                            {
+                                MinutesBeforeReleaseTimeEnd = 100,
+                                MinutesBeforeReleaseTimeStart = 200,
+                            }
+                        }
+                    }))));
         }
     }
 }

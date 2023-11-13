@@ -36,9 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static UpdatePublicationSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
             return new UpdatePublicationSummaryAuthorizationHandler(
-                new AuthorizationHandlerResourceRoleService(
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext)));
+                new AuthorizationHandlerService(
+                    contentDbContext,
+                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 }

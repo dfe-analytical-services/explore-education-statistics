@@ -11,6 +11,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
@@ -98,9 +99,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         )
         {
             return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
-                new AuthorizationHandlerResourceRoleService(
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)));
+                new AuthorizationHandlerService(
+                    InMemoryApplicationDbContext(),
+                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 }

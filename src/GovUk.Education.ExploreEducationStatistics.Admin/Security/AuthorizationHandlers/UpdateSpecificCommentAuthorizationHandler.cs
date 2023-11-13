@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -19,16 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : AuthorizationHandler<UpdateSpecificCommentRequirement, Comment>
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public UpdateSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
-            IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
             _contentDbContext = contentDbContext;
-            _releasePublishingStatusRepository = releasePublishingStatusRepository;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -38,9 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var release = GetRelease(_contentDbContext, resource);
             var updateSpecificReleaseContext = new AuthorizationHandlerContext(
                 new[] {new UpdateSpecificReleaseRequirement()}, context.User, release);
-            await new UpdateSpecificReleaseAuthorizationHandler(
-                    _releasePublishingStatusRepository,
-                    _authorizationHandlerResourceRoleService)
+
+            await new UpdateSpecificReleaseAuthorizationHandler(_authorizationHandlerService)
                 .HandleAsync(updateSpecificReleaseContext);
 
             if (!updateSpecificReleaseContext.HasSucceeded)
@@ -50,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             var canUpdateOwnCommentContext =
                 new AuthorizationHandlerContext(new[] {requirement}, context.User, resource);
-            
+
             await new CanUpdateOwnCommentAuthorizationHandler().HandleAsync(canUpdateOwnCommentContext);
 
             if (canUpdateOwnCommentContext.HasSucceeded)

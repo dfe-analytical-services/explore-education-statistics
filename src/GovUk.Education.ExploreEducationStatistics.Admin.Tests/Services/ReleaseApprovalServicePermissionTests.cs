@@ -56,7 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateReleaseStatus_Draft()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
                 .SetupResourceCheckToFail(_release, CanMarkSpecificReleaseAsDraft)
                 .AssertForbidden(
                     userService =>
@@ -77,7 +76,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateReleaseStatus_HigherLevelReview()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
                 .SetupResourceCheckToFail(_release, CanSubmitSpecificReleaseToHigherReview)
                 .AssertForbidden(
                     userService =>
@@ -98,7 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task UpdateReleaseStatus_Approve()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(_release, CanUpdateSpecificRelease)
                 .SetupResourceCheckToFail(_release, CanApproveSpecificRelease)
                 .AssertForbidden(
                     userService =>
@@ -129,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IReleaseFileRepository>(),
                 Mock.Of<IReleaseFileService>(),
                 Mock.Of<IReleaseRepository>(),
-                Options.Create(new ReleaseApprovalOptions()), 
+                Options.Create(new ReleaseApprovalOptions()),
                 Mock.Of<IUserReleaseRoleService>(),
                 Mock.Of<IEmailTemplateService>()
             );

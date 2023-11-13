@@ -162,6 +162,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IGlossaryCacheService, GlossaryCacheService>();
             services.AddTransient<IGlossaryService, GlossaryService>();
             services.AddTransient<IThemeService, ThemeService>();
+            services.AddTransient<IRedirectsCacheService, RedirectsCacheService>();
+            services.AddTransient<IRedirectsService, RedirectsService>();
 
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
             StartupSecurityConfiguration.ConfigureResourceBasedAuthorization(services);

@@ -126,7 +126,7 @@ user navigates to scheduled release page from dashboard
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user navigates to release page from dashboard
     ...    publication-scheduled-releases
-    ...    Edit
+    ...    View
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}

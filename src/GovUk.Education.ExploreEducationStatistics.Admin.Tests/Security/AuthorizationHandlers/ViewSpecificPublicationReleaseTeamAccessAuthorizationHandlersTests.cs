@@ -10,6 +10,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
@@ -24,7 +25,7 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
     {
         Id = Guid.NewGuid()
     };
-    
+
     [Fact]
     public async Task ViewSpecificPublicationReleaseTeamAccess_SucceedsWithAccessAllPublicationsClaim()
     {
@@ -42,17 +43,17 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
                     .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                     .ReturnsAsync(new List<PublicationRole>());
             }
-            
+
             var handler = CreateHandler(userPublicationRoleRepository.Object);
 
             var user = CreateClaimsPrincipal(UserId, claim);
-            
+
             var authContext =
                 CreateAuthorizationHandlerContext<ViewSpecificPublicationReleaseTeamAccessRequirement, Publication>
                     (user, Publication);
 
             await handler.HandleAsync(authContext);
-            
+
             VerifyAllMocks(userPublicationRoleRepository);
 
             Assert.Equal(expectedToPassByClaimAlone, authContext.HasSucceeded);
@@ -63,13 +64,13 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
     public async Task ViewSpecificPublicationReleaseTeamAccess_SucceedsWithPublicationRoles()
     {
         await ForEachPublicationRoleAsync(async role =>
-        {            
+        {
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
             userPublicationRoleRepository
                 .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
                 .ReturnsAsync(ListOf(role));
-            
+
             var handler = CreateHandler(userPublicationRoleRepository.Object);
 
             var user = CreateClaimsPrincipal(UserId);
@@ -79,11 +80,11 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
                     (user, Publication);
 
             await handler.HandleAsync(authContext);
-            
+
             VerifyAllMocks(userPublicationRoleRepository);
 
             Assert.Equal(
-                ListOf(PublicationRole.Owner, PublicationRole.Approver).Contains(role), 
+                ListOf(PublicationRole.Owner, PublicationRole.Approver).Contains(role),
                 authContext.HasSucceeded);
         });
     }
@@ -92,8 +93,10 @@ public class ViewSpecificPublicationReleaseTeamAccessAuthorizationHandlersTests
         IUserPublicationRoleRepository? userPublicationRoleRepository = null)
     {
         return new ViewSpecificPublicationReleaseTeamAccessAuthorizationHandler(
-            new AuthorizationHandlerResourceRoleService(
+            new AuthorizationHandlerService(
+                InMemoryApplicationDbContext(),
                 Mock.Of<IUserReleaseRoleRepository>(Strict),
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)));
+                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+                Mock.Of<IPreReleaseService>(Strict)));
     }
 }

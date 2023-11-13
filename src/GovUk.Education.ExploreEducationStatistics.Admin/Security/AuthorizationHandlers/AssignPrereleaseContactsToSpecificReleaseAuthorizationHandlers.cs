@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerService;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
@@ -15,12 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler
         : AuthorizationHandler<AssignPrereleaseContactsToSpecificReleaseRequirement, Release>
     {
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublicationOrRelease(
                         context.User.GetUserId(),
                         release.PublicationId,

@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -17,16 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : AuthorizationHandler<DeleteSpecificCommentRequirement, Comment>
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public DeleteSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
-            IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
             _contentDbContext = contentDbContext;
-            _releasePublishingStatusRepository = releasePublishingStatusRepository;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -37,8 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var updateSpecificReleaseContext = new AuthorizationHandlerContext(
                 new[] {new UpdateSpecificReleaseRequirement()}, context.User, release);
             await new UpdateSpecificReleaseAuthorizationHandler(
-                    _releasePublishingStatusRepository,
-                    _authorizationHandlerResourceRoleService)
+                    _authorizationHandlerService)
                 .HandleAsync(updateSpecificReleaseContext);
 
             if (updateSpecificReleaseContext.HasSucceeded)

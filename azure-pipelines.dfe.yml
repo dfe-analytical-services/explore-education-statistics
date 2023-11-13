@@ -10,7 +10,7 @@ variables:
   BuildConfiguration: 'Release'
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
-  NODE_VERSION: 18.17.0
+  NODE_VERSION: 18.18.2
   DOTNET_VERSION: 6.0.x
 
 trigger:
@@ -20,7 +20,7 @@ trigger:
       - dev
   paths:
     exclude:
-    - infrastructure/
+      - infrastructure/
 pr:
   - master
   - dev

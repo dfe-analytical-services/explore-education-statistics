@@ -36,9 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static UpdateContactAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
             return new UpdateContactAuthorizationHandler(
-                new AuthorizationHandlerResourceRoleService(
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext)));
+                new AuthorizationHandlerService(
+                    contentDbContext,
+                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 }

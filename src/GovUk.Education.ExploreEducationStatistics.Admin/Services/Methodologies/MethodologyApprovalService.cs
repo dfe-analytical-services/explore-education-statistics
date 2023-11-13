@@ -36,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IUserReleaseRoleService _userReleaseRoleService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IEmailTemplateService _emailTemplateService;
+        private readonly IRedirectsCacheService _redirectsCacheService;
 
         public MethodologyApprovalService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -48,7 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IUserService userService,
             IUserReleaseRoleService userReleaseRoleService,
             IMethodologyCacheService methodologyCacheService,
-            IEmailTemplateService emailTemplateService)
+            IEmailTemplateService emailTemplateService,
+            IRedirectsCacheService redirectsCacheService)
         {
             _persistenceHelper = persistenceHelper;
             _context = context;
@@ -61,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _userReleaseRoleService = userReleaseRoleService;
             _methodologyCacheService = methodologyCacheService;
             _emailTemplateService = emailTemplateService;
+            _redirectsCacheService = redirectsCacheService;
         }
 
         public async Task<Either<ActionResult, MethodologyVersion>> UpdateApprovalStatus(
@@ -123,8 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         if (isToBePublished)
                         {
-                            // Update the 'All Methodologies' cache item
                             await _methodologyCacheService.UpdateSummariesTree();
+                            await _redirectsCacheService.UpdateRedirects();
                         }
 
                         if (request.Status == MethodologyApprovalStatus.HigherLevelReview)

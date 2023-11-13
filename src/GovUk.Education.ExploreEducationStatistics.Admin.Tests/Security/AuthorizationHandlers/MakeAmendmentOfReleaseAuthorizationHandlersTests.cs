@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that no users can amend a draft Release that is the only version
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Add(release);
@@ -54,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the only version
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Add(release);
@@ -87,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that no users can amend an amendment Release if it is not yet approved
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Add(publication);
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that no users can amend an amendment Release if it is not the latest version
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Add(publication);
@@ -153,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 };
 
                 // Assert that users with the "MakeAmendmentOfAllReleases" claim can amend a published Release that is the latest version
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<MakeAmendmentOfSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, MakeAmendmentOfSpecificReleaseRequirement>(
                     contentDbContext =>
                     {
                         contentDbContext.Add(publication);
@@ -496,9 +497,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static MakeAmendmentOfSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
             return new MakeAmendmentOfSpecificReleaseAuthorizationHandler(contentDbContext,
-                new AuthorizationHandlerResourceRoleService(
-                    Mock.Of<IUserReleaseRoleRepository>(Strict),
-                    new UserPublicationRoleRepository(contentDbContext)));
+                new AuthorizationHandlerService(
+                    contentDbContext,
+                     Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 }

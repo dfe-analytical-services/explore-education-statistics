@@ -12,11 +12,12 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -25,87 +26,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
     {
         public class ClaimTests
         {
+            // Test that Releases that are in any approval state other than Approved can be updated
+            // if the current user has the "UpdateAllReleases" Claim.
             [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishingNotStarted()
+            public async Task UpdateAllReleases_ClaimSucceedsIfNotApproved()
             {
-                // Assert that only users with the "UpdateAllReleases" claim can
-                // update an arbitrary Release if it has not started publishing
                 await GetEnumValues<ReleaseApprovalStatus>()
+                    .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-                        async status =>
+                    .ForEachAwaitAsync(async status =>
+                    {
+                        var release = new Release
                         {
-                            var release = new Release
-                            {
-                                Id = Guid.NewGuid(),
-                                ApprovalStatus = status
-                            };
+                            Id = Guid.NewGuid(),
+                            ApprovalStatus = status
+                        };
 
-                            await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
-                                HandlerSupplier(release),
-                                release,
-                                SecurityClaimTypes.UpdateAllReleases
-                            );
-                        }
-                    );
+                        await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
+                            HandlerSupplier(release),
+                            release,
+                            SecurityClaimTypes.UpdateAllReleases
+                        );
+                    });
             }
 
+            // Test that Releases that are Approved cannot be updated by a user having any Claim.
             [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishing()
+            public async Task AllClaimsFailIfApproved()
             {
-                // Assert that no users can update an arbitrary Release
-                // if it has started publishing
-                await GetEnumValues<ReleaseApprovalStatus>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-                        async status =>
-                        {
-                            var release = new Release
-                            {
-                                Id = Guid.NewGuid(),
-                                ApprovalStatus = status,
-                            };
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    ApprovalStatus = Approved
+                };
 
-                            await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
-                                HandlerSupplierWhenPublishing(release),
-                                release
-                            );
-                        }
-                    );
-            }
-
-            [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublished()
-            {
-                // Assert that no users can update an arbitrary
-                // Release if it has been published
-                await GetEnumValues<ReleaseApprovalStatus>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-                        async status =>
-                        {
-                            var release = new Release
-                            {
-                                Id = Guid.NewGuid(),
-                                ApprovalStatus = status,
-                                Published = DateTime.UtcNow
-                            };
-
-                            await AssertReleaseHandlerSucceedsWithCorrectClaims<UpdateSpecificReleaseRequirement>(
-                                HandlerSupplier(release),
-                                release
-                            );
-                        }
-                    );
+                await AssertHandlerSucceedsWithCorrectClaims<Release, UpdateSpecificReleaseRequirement>(
+                    HandlerSupplier(release),
+                    release,
+                    claimsExpectedToSucceed: Array.Empty<SecurityClaimTypes>());
             }
         }
 
         public class PublicationRoleTests
         {
             [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishingNotStarted()
+            public async Task PublicationOwnerAndApproversCanUpdateUnapprovedRelease()
             {
                 await GetEnumValues<ReleaseApprovalStatus>()
+                    .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
@@ -121,97 +89,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 ApprovalStatus = status
                             };
 
-                            // Assert that a User who has the Publication Owner or Approver role
-                            // can update it if it is not Approved
-                            if (status != Approved)
-                            {
-                                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
-                                    UpdateSpecificReleaseRequirement>(
-                                    HandlerSupplier(release),
-                                    release,
-                                    Owner, Approver
-                                );
-                            }
-                            else
-                            {
-                                // Assert that a User who has the Publication Approver role
-                                // can update it even if it is Approved
-                                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
-                                    UpdateSpecificReleaseRequirement>(
-                                    HandlerSupplier(release),
-                                    release,
-                                    Approver
-                                );
-                            }
-                        }
-                    );
-            }
-
-            [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishing()
-            {
-                await GetEnumValues<ReleaseApprovalStatus>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-                        async status =>
-                        {
-                            var release = new Release
-                            {
-                                Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
-                                Published = null,
-                                ApprovalStatus = status
-                            };
-
-                            // Assert that no User Publication roles will allow updating a Release once it has started publishing
-                            await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
-                                UpdateSpecificReleaseRequirement>(
-                                HandlerSupplierWhenPublishing(release),
-                                release
-                            );
-                        }
-                    );
-            }
-
-            [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublished()
-            {
-                await GetEnumValues<ReleaseApprovalStatus>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-                        async status =>
-                        {
-                            var release = new Release
-                            {
-                                Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
-                                ApprovalStatus = status,
-                                Published = DateTime.UtcNow
-                            };
-
-                            // Assert that no User Publication roles will allow updating a Release once it has been published
+                            // Assert that a Publication Owner or Approver can update the Release in any approval
+                            // state other than Admin
                             await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
                                 UpdateSpecificReleaseRequirement>(
                                 HandlerSupplier(release),
-                                release
-                            );
+                                release,
+                                rolesExpectedToSucceed: new []
+                                {
+                                    PublicationRole.Owner,
+                                    PublicationRole.Approver
+                                });
                         }
                     );
+            }
+
+            [Fact]
+            public async Task NoRolesCanUpdateApprovedRelease()
+            {
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = new Publication
+                    {
+                        Id = Guid.NewGuid()
+                    },
+                    Published = null,
+                    ApprovalStatus = Approved
+                };
+
+                // Assert that no Publication Role can update the Release if it is Approved.
+                await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
+                    UpdateSpecificReleaseRequirement>(
+                    HandlerSupplier(release),
+                    release,
+                    rolesExpectedToSucceed: Array.Empty<PublicationRole>());
             }
         }
 
         public class ReleaseRoleTests
         {
             [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishingNotStarted()
+            public async Task EditorsCanUpdateUnapprovedRelease()
             {
                 await GetEnumValues<ReleaseApprovalStatus>()
+                    .Where(releaseStatus => releaseStatus != Approved)
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         async status =>
@@ -227,100 +149,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 ApprovalStatus = status
                             };
 
-                            // Assert that a User who has the "Contributor", "Lead" or "Approver" role on a
-                            // Release can update it if it is not Approved
-                            if (status != Approved)
-                            {
-                                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
-                                    UpdateSpecificReleaseRequirement>(
-                                    HandlerSupplier(release),
-                                    release,
+                            // Assert that a Release Editor (Contributor, Lead, Approver) can update the Release
+                            // in any approval state other than Approved.
+                            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                                UpdateSpecificReleaseRequirement>(
+                                HandlerSupplier(release),
+                                release,
+                                rolesExpectedToSucceed: new[]
+                                {
                                     ReleaseRole.Contributor,
                                     ReleaseRole.Lead,
                                     ReleaseRole.Approver
-                                );
-                            }
-                            else
-                            {
-                                // Assert that a User who has the "Approver" role on a
-                                // Release can update it if it is Approved
-                                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
-                                    UpdateSpecificReleaseRequirement>(
-                                    HandlerSupplier(release),
-                                    release,
-                                    ReleaseRole.Approver
-                                );
-                            }
+                                });
                         }
                     );
             }
 
             [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublishing()
+            public async Task NoRolesCanUpdateApprovedRelease()
             {
-                await GetEnumValues<ReleaseApprovalStatus>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-                        async status =>
-                        {
-                            var release = new Release
-                            {
-                                Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
-                                Published = null,
-                                ApprovalStatus = status
-                            };
+                var release = new Release
+                {
+                    Id = Guid.NewGuid(),
+                    Publication = new Publication
+                    {
+                        Id = Guid.NewGuid()
+                    },
+                    Published = null,
+                    ApprovalStatus = Approved
+                };
 
-                            // Assert that no User Release roles will allow updating a Release once it has started publishing
-                            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<UpdateSpecificReleaseRequirement>(
-                                HandlerSupplierWhenPublishing(release),
-                                release
-                            );
-                        }
-                    );
+                // Assert that no Publication Role can update the Release if it is Approved.
+                await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
+                    UpdateSpecificReleaseRequirement>(
+                    HandlerSupplier(release),
+                    release,
+                    rolesExpectedToSucceed: Array.Empty<ReleaseRole>());
             }
-
-            [Fact]
-            public async Task UpdateSpecificReleaseAuthorizationHandler_ReleasePublished()
-            {
-                await GetEnumValues<ReleaseApprovalStatus>()
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(
-                        async status =>
-                        {
-                            var release = new Release
-                            {
-                                Id = Guid.NewGuid(),
-                                Publication = new Publication
-                                {
-                                    Id = Guid.NewGuid()
-                                },
-                                ApprovalStatus = status,
-                                Published = DateTime.UtcNow
-                            };
-
-                            // Assert that no User Release roles will allow updating a Release once it has been published
-                            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<UpdateSpecificReleaseRequirement>(
-                                HandlerSupplier(release),
-                                release
-                            );
-                        }
-                    );
-            }
-        }
-
-        private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplierWhenPublishing(
-            Release release)
-        {
-            var statusListWhenPublishing = new List<ReleasePublishingStatus>
-            {
-                new()
-            };
-
-            return HandlerSupplier(release, statusListWhenPublishing);
         }
 
         private static Func<ContentDbContext, UpdateSpecificReleaseAuthorizationHandler> HandlerSupplier(
@@ -344,10 +209,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 contentDbContext.SaveChanges();
 
                 return new UpdateSpecificReleaseAuthorizationHandler(
-                    releaseStatusRepository.Object,
-                    new AuthorizationHandlerResourceRoleService(
+                    new AuthorizationHandlerService(
+                        contentDbContext,
                         new UserReleaseRoleRepository(contentDbContext),
-                        new UserPublicationRoleRepository(contentDbContext)));
+                        new UserPublicationRoleRepository(contentDbContext),
+                        Mock.Of<IPreReleaseService>(Strict)));
             };
         }
     }

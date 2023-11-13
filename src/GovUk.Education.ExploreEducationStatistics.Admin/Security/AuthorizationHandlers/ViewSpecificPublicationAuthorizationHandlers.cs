@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -13,78 +14,51 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     }
 
     public class
-        ViewSpecificPublicationAuthorizationHandler : CompoundAuthorizationHandler<ViewSpecificPublicationRequirement,
+        ViewSpecificPublicationAuthorizationHandler : AuthorizationHandler<ViewSpecificPublicationRequirement,
             Publication>
     {
+        private readonly ContentDbContext _contentDbContext;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
+
         public ViewSpecificPublicationAuthorizationHandler(
             ContentDbContext contentDbContext,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) 
-            : base(
-                new CanSeeAllPublicationsAuthorizationHandler(),
-                new HasOwnerOrApproverRoleOnPublicationAuthorizationHandler(authorizationHandlerResourceRoleService),
-                new HasRoleOnAnyChildReleaseAuthorizationHandler(contentDbContext))
+            AuthorizationHandlerService authorizationHandlerService)
         {
+            _contentDbContext = contentDbContext;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
-        public class CanSeeAllPublicationsAuthorizationHandler : HasClaimAuthorizationHandler<
-            ViewSpecificPublicationRequirement>
+        protected override async Task HandleRequirementAsync(
+            AuthorizationHandlerContext context,
+            ViewSpecificPublicationRequirement requirement,
+            Publication publication)
         {
-            public CanSeeAllPublicationsAuthorizationHandler()
-                : base(SecurityClaimTypes.AccessAllReleases)
+            // If the user has the "AccessAllPublications" Claim, they can see any Publication.
+            if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.AccessAllPublications))
             {
-            }
-        }
-
-        public class HasRoleOnAnyChildReleaseAuthorizationHandler
-            : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
-        {
-            private readonly ContentDbContext _context;
-
-            public HasRoleOnAnyChildReleaseAuthorizationHandler(ContentDbContext context)
-            {
-                _context = context;
+                context.Succeed(requirement);
+                return;
             }
 
-            protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext,
-                ViewSpecificPublicationRequirement requirement, Publication publication)
+            // If the user has any PublicationRole on the Publication, they can see it.
+            if (await _authorizationHandlerService
+                    .HasRolesOnPublication(
+                        context.User.GetUserId(),
+                        publication.Id,
+                        EnumUtil.GetEnumValuesAsArray<PublicationRole>()))
             {
-                var userId = authContext.User.GetUserId();
+                context.Succeed(requirement);
+                return;
+            }
 
-                if (await _context
+            // If the user has any ReleaseRoles on any of the Publication's Releases, they can see it.
+            if (await _contentDbContext
                     .UserReleaseRoles
                     .Include(r => r.Release)
-                    .Where(r => r.UserId == userId)
+                    .Where(r => r.UserId == context.User.GetUserId())
                     .AnyAsync(r => r.Release.PublicationId == publication.Id))
-                {
-                    authContext.Succeed(requirement);
-                }
-            }
-        }
-
-        public class HasOwnerOrApproverRoleOnPublicationAuthorizationHandler
-            : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
-        {
-            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
-
-            public HasOwnerOrApproverRoleOnPublicationAuthorizationHandler(
-                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
-                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
-            }
-
-            protected override async Task HandleRequirementAsync(
-                AuthorizationHandlerContext context, 
-                ViewSpecificPublicationRequirement requirement,
-                Publication publication)
-            {
-                if (await _authorizationHandlerResourceRoleService
-                        .HasRolesOnPublication(
-                            context.User.GetUserId(),
-                            publication.Id,
-                            PublicationRole.Owner, PublicationRole.Approver))
-                {
-                    context.Succeed(requirement);
-                }
+                context.Succeed(requirement);
             }
         }
     }
