@@ -294,11 +294,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
         public static bool ContainsAll<T>(this IEnumerable<T> source, IEnumerable<T> values)
         {
-            if (source.IsNullOrEmpty() || values.IsNullOrEmpty())
-            {
-                return false;
-            }
-
             return values.All(id => source.Contains(id));
         }
     }

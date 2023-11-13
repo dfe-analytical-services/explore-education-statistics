@@ -191,14 +191,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
 
         [Fact]
-        public void ContainsAll_BothEmptyLists_ReturnsFalse()
+        public void ContainsAll_BothEmptyLists_ReturnsTrue()
         {
             var source = Enumerable.Empty<string>();
             var values = Enumerable.Empty<string>();
 
             bool containsAll = source.ContainsAll(values);
 
-            Assert.False(containsAll);
+            Assert.True(containsAll);
         }
 
         [Fact]
@@ -213,47 +213,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
 
         [Fact]
-        public void ContainsAll_ValuesListIsEmpty_ReturnsFalse()
+        public void ContainsAll_ValuesListIsEmpty_ReturnsTrue()
         {
             var source = new List<string>() { "" };
             var values = Enumerable.Empty<string>();
 
             bool containsAll = source.ContainsAll(values);
 
-            Assert.False(containsAll);
+            Assert.True(containsAll);
         }
 
         [Fact]
-        public void ContainsAll_BothNullLists_ReturnsFalse()
+        public void ContainsAll_BothNullLists_ThrowsArgumentNullException()
         {
             IEnumerable<string> source = null;
             IEnumerable<string> values = null;
 
-            bool containsAll = source.ContainsAll(values);
-
-            Assert.False(containsAll);
+            Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
         }
 
         [Fact]
-        public void ContainsAll_SourceListIsNull_ReturnsFalse()
+        public void ContainsAll_SourceListIsNull_ThrowsArgumentNullException()
         {
             IEnumerable<string> source = null;
             var values = new List<string>() { "" };
 
-            bool containsAll = source.ContainsAll(values);
-
-            Assert.False(containsAll);
+            Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
         }
 
         [Fact]
-        public void ContainsAll_ValuesListIsNull_ReturnsFalse()
+        public void ContainsAll_ValuesListIsNull_ThrowsArgumentNullException()
         {
             var source = new List<string>() { "" };
             IEnumerable<string> values = null;
 
-            bool containsAll = source.ContainsAll(values);
-
-            Assert.False(containsAll);
+            Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
         }
 
         [Fact]
