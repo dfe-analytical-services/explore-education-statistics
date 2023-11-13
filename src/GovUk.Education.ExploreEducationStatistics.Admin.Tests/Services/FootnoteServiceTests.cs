@@ -49,12 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(Guid.NewGuid()));
+                subjectIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -81,12 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(subject.Id));
+                subjectIds: SetOf(subject.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.Subjects);
@@ -115,12 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf(Guid.NewGuid()),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -151,12 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf(filter.Id),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterIds: SetOf(filter.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.Filters);
@@ -189,12 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf(Guid.NewGuid()),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterGroupIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -229,12 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf(filterGroup.Id),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterGroupIds: SetOf(filterGroup.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.FilterGroups);
@@ -271,12 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(Guid.NewGuid()),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterItemIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -315,12 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(filterItem.Id),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterItemIds: SetOf(filterItem.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.FilterItems);
@@ -349,12 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(Guid.NewGuid()),
-                SetOf<Guid>());
+                indicatorIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -389,12 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(indicator.Id),
-                SetOf<Guid>());
+                indicatorIds: SetOf(indicator.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.Indicators);
@@ -456,12 +406,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf(filter.Id),
-                SetOf(filterGroup.Id),
-                SetOf(filterItem.Id),
-                SetOf(indicator.Id),
-                SetOf(subject2.Id));
+                filterIds: SetOf(filter.Id),
+                filterGroupIds: SetOf(filterGroup.Id),
+                filterItemIds: SetOf(filterItem.Id),
+                indicatorIds: SetOf(indicator.Id),
+                subjectIds: SetOf(subject2.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.Subjects);
@@ -541,12 +490,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
-                string.Empty,
-                SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
-                SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
-                SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
-                SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
-                SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
+                filterIds: SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
+                filterGroupIds: SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
+                filterItemIds: SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
+                indicatorIds: SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
+                subjectIds: SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
 
             result.AssertInternalServerError();
         }
@@ -569,12 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(Guid.NewGuid()));
+                subjectIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -610,12 +553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(subject.Id));
+                subjectIds: SetOf(subject.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.Subjects);
@@ -653,12 +591,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf(Guid.NewGuid()),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -698,12 +631,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf(filter.Id),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterIds: SetOf(filter.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.Filters);
@@ -745,12 +673,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf(Guid.NewGuid()),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterGroupIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -794,12 +717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf(filterGroup.Id),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterGroupIds: SetOf(filterGroup.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.FilterGroups);
@@ -845,12 +763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(Guid.NewGuid()),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterItemIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -898,12 +811,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(filterItem.Id),
-                SetOf<Guid>(),
-                SetOf<Guid>());
+                filterItemIds: SetOf(filterItem.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.FilterItems);
@@ -941,12 +849,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(Guid.NewGuid()),
-                SetOf<Guid>());
+                indicatorIds: SetOf(Guid.NewGuid()));
 
             result.AssertInternalServerError();
         }
@@ -990,12 +893,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf<Guid>(),
-                SetOf(indicator.Id),
-                SetOf<Guid>());
+                indicatorIds: SetOf(indicator.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.Indicators);
@@ -1062,12 +960,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf(filter.Id),
-                SetOf(filterGroup.Id),
-                SetOf(filterItem.Id),
-                SetOf(indicator.Id),
-                SetOf(subject2.Id));
+                filterIds: SetOf(filter.Id),
+                filterGroupIds: SetOf(filterGroup.Id),
+                filterItemIds: SetOf(filterItem.Id),
+                indicatorIds: SetOf(indicator.Id),
+                subjectIds: SetOf(subject2.Id));
 
             result.AssertRight();
             Assert.Single(result.Right.Subjects);
@@ -1152,12 +1049,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 release.Id,
                 footnote.Id,
                 contextId,
-                string.Empty,
-                SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
-                SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
-                SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
-                SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
-                SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
+                filterIds: SetOf(filterMissing ? Guid.NewGuid() : filter.Id),
+                filterGroupIds: SetOf(filterGroupMissing ? Guid.NewGuid() : filterGroup.Id),
+                filterItemIds: SetOf(filterItemMissing ? Guid.NewGuid() : filterItem.Id),
+                indicatorIds: SetOf(indicatorMissing ? Guid.NewGuid() : indicator.Id),
+                subjectIds: SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
 
             result.AssertInternalServerError();
         }
@@ -2341,7 +2237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             string contextId,
             Release release,
             IReadOnlyList<Subject>? subjects = null,
-            IReadOnlyList<ReleaseSubject> releaseSubjects = null,
+            IReadOnlyList<ReleaseSubject>? releaseSubjects = null,
             IReadOnlyList<Footnote>? footnotes = null)
         {
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
@@ -2377,13 +2273,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static async Task<Either<ActionResult, Footnote>> CreateFootnoteWithConfiguration(
             Guid releaseId,
             string contextId,
-            string content,
-            IReadOnlySet<Guid> filterIds,
-            IReadOnlySet<Guid> filterGroupIds,
-            IReadOnlySet<Guid> filterItemIds,
-            IReadOnlySet<Guid> indicatorIds,
-            IReadOnlySet<Guid> subjectIds)
+            string? content = null,
+            IReadOnlySet<Guid>? filterIds = null,
+            IReadOnlySet<Guid>? filterGroupIds = null,
+            IReadOnlySet<Guid>? filterItemIds = null,
+            IReadOnlySet<Guid>? indicatorIds = null,
+            IReadOnlySet<Guid>? subjectIds = null)
         {
+            content ??= string.Empty;
+            filterIds ??= SetOf<Guid>();
+            filterGroupIds ??= SetOf<Guid>();
+            filterItemIds ??= SetOf<Guid>();
+            indicatorIds ??= SetOf<Guid>();
+            subjectIds ??= SetOf<Guid>();
+
             var dataBlockService = new Mock<IDataBlockService>();
             dataBlockService
                 .Setup(dbs => dbs.InvalidateCachedDataBlocks(releaseId))
@@ -2412,13 +2315,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid releaseId,
             Guid footnoteId,
             string contextId,
-            string content,
-            IReadOnlySet<Guid> filterIds,
-            IReadOnlySet<Guid> filterGroupIds,
-            IReadOnlySet<Guid> filterItemIds,
-            IReadOnlySet<Guid> indicatorIds,
-            IReadOnlySet<Guid> subjectIds)
+            string? content = null,
+            IReadOnlySet<Guid>? filterIds = null,
+            IReadOnlySet<Guid>? filterGroupIds = null,
+            IReadOnlySet<Guid>? filterItemIds = null,
+            IReadOnlySet<Guid>? indicatorIds = null,
+            IReadOnlySet<Guid>? subjectIds = null)
         {
+            content ??= string.Empty;
+            filterIds ??= SetOf<Guid>();
+            filterGroupIds ??= SetOf<Guid>();
+            filterItemIds ??= SetOf<Guid>();
+            indicatorIds ??= SetOf<Guid>();
+            subjectIds ??= SetOf<Guid>();
+
             var dataBlockService = new Mock<IDataBlockService>();
             dataBlockService
                 .Setup(dbs => dbs.InvalidateCachedDataBlocks(releaseId))
