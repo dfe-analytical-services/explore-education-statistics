@@ -17,7 +17,7 @@ import render from '@common-test/render';
 import testMethodology, {
   testMethodologyAmendment,
   testMethodologyContent,
-} from './__data__/test-data';
+} from '@admin/pages/methodology/edit-methodology/__tests__/__data__/testMethodologyVersionsAmendmentsAndContents';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');

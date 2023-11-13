@@ -1,7 +1,7 @@
 import { MethodologyContent } from '@admin/services/methodologyContentService';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 
-const testMethodology: MethodologyVersion = {
+const testMethodologyVersion: MethodologyVersion = {
   id: 'm1',
   amendment: false,
   methodologyId: 'm-1',
@@ -46,8 +46,8 @@ const testMethodology: MethodologyVersion = {
   published: '',
 };
 
-export const testMethodologyAmendment = {
-  ...testMethodology,
+export const testMethodologyAmendment: MethodologyVersion = {
+  ...testMethodologyVersion,
   amendment: true,
 };
 
@@ -61,4 +61,4 @@ export const testMethodologyContent: MethodologyContent = {
   notes: [],
 };
 
-export default testMethodology;
+export default testMethodologyVersion;
