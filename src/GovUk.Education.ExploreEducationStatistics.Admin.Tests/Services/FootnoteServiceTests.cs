@@ -406,6 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Either<ActionResult, Footnote> result = await CreateFootnoteWithConfiguration(
                 release.Id,
                 contextId,
+                content: "Test footnote",
                 filterIds: SetOf(filter.Id),
                 filterGroupIds: SetOf(filterGroup.Id),
                 filterItemIds: SetOf(filterItem.Id),
@@ -423,6 +424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
             Assert.Equal(filterItem.Id, filterItemFootnote.FilterItemId);
             Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
+            Assert.Equal("Test footnote", footnote.Content);
         }
 
         [Theory]
@@ -1056,142 +1058,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 subjectIds: SetOf(subjectMissing ? Guid.NewGuid() : subject2.Id));
 
             result.AssertInternalServerError();
-        }
-
-        [Fact]
-        public async Task CreateFootnote()
-        {
-            Release release = _fixture.DefaultStatsRelease().Generate();
-
-            IEnumerable<Subject> subjects = _fixture
-                .DefaultSubject()
-                .ForIndex(1, s => s
-                    .SetFilters(_fixture
-                        .DefaultFilter(filterGroupCount: 1, filterItemCount: 1)
-                        .Generate(3))
-                    .SetIndicatorGroups(_fixture.DefaultIndicatorGroup()
-                        .WithIndicators(_fixture.DefaultIndicator().Generate(1))
-                        .Generate(1)))
-                .Generate(2);
-
-            List<ReleaseSubject> releaseSubjects = _fixture
-                .DefaultReleaseSubject()
-                .WithRelease(release)
-                .WithSubjects(subjects)
-                .GenerateList();
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                await statisticsDbContext.Release.AddAsync(release);
-                await statisticsDbContext.Subject.AddRangeAsync(subjects);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubjects);
-                await statisticsDbContext.SaveChangesAsync();
-
-                await contentDbContext.AddAsync(new Content.Model.Release
-                {
-                    Id = release.Id
-                });
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataBlockService = new Mock<IDataBlockService>(Strict);
-
-            dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(release.Id))
-                .Returns(Task.CompletedTask);
-
-            // Footnote can be applied to the entire dataset with a subject link
-            // or to specific data with links to filters/filter groups/filter items/indicators
-            // Get the target references which the created footnote will be applied to
-            var subject = releaseSubjects[0].Subject;
-            var filter = releaseSubjects[1].Subject
-                .Filters.First();
-            var filterGroup = releaseSubjects[1].Subject
-                .Filters[0]
-                .FilterGroups.First();
-            var filterItem = releaseSubjects[1].Subject
-                .Filters[0]
-                .FilterGroups[0]
-                .FilterItems.First();
-            var indicator = releaseSubjects[1].Subject.IndicatorGroups.First().Indicators.First();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = SetupFootnoteService(contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    dataBlockService: dataBlockService.Object);
-
-                var result = (await service.CreateFootnote(
-                    releaseId: release.Id,
-                    "Test footnote",
-                    filterIds: SetOf(filter.Id),
-                    filterGroupIds: SetOf(filterGroup.Id),
-                    filterItemIds: SetOf(filterItem.Id),
-                    indicatorIds: SetOf(indicator.Id),
-                    subjectIds: SetOf(subject.Id)
-                )).AssertRight();
-
-                VerifyAllMocks(dataBlockService);
-
-                Assert.Equal("Test footnote", result.Content);
-                Assert.Equal(0, result.Order);
-
-                var releaseFootnote = Assert.Single(result.Releases);
-                Assert.Equal(release.Id, releaseFootnote.ReleaseId);
-
-                var subjectFootnote = Assert.Single(result.Subjects);
-                Assert.Equal(subject.Id, subjectFootnote.SubjectId);
-
-                var filterFootnote = Assert.Single(result.Filters);
-                Assert.Equal(filter.Id, filterFootnote.FilterId);
-
-                var filterGroupFootnote = Assert.Single(result.FilterGroups);
-                Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
-
-                var filterItemFootnote = Assert.Single(result.FilterItems);
-                Assert.Equal(filterItem.Id, filterItemFootnote.FilterItemId);
-
-                var indicatorFootnote = Assert.Single(result.Indicators);
-                Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
-            {
-                var footnotes = await statisticsDbContext.Footnote
-                    .Include(f => f.Releases)
-                    .Include(f => f.Subjects)
-                    .Include(f => f.Filters)
-                    .Include(f => f.FilterGroups)
-                    .Include(f => f.FilterItems)
-                    .Include(f => f.Indicators)
-                    .ToListAsync();
-
-                var savedFootnote = Assert.Single(footnotes);
-
-                Assert.Equal("Test footnote", savedFootnote.Content);
-                Assert.Equal(0, savedFootnote.Order);
-
-                var releaseFootnote = Assert.Single(savedFootnote.Releases);
-                Assert.Equal(release.Id, releaseFootnote.ReleaseId);
-
-                var subjectFootnote = Assert.Single(savedFootnote.Subjects);
-                Assert.Equal(subject.Id, subjectFootnote.SubjectId);
-
-                var filterFootnote = Assert.Single(savedFootnote.Filters);
-                Assert.Equal(filter.Id, filterFootnote.FilterId);
-
-                var filterGroupFootnote = Assert.Single(savedFootnote.FilterGroups);
-                Assert.Equal(filterGroup.Id, filterGroupFootnote.FilterGroupId);
-
-                var filterItemFootnote = Assert.Single(savedFootnote.FilterItems);
-                Assert.Equal(filterItem.Id, filterItemFootnote.FilterItemId);
-
-                var indicatorFootnote = Assert.Single(savedFootnote.Indicators);
-                Assert.Equal(indicator.Id, indicatorFootnote.IndicatorId);
-            }
         }
 
         [Fact]
