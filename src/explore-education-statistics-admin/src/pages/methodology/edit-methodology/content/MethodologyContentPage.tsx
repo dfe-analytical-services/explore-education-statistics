@@ -160,7 +160,9 @@ const MethodologyContentPage = ({
 
   return (
     <LoadingSpinner loading={isLoading}>
-      {methodologyContent && methodologyVersion && canUpdateMethodology ? (
+      {methodologyContent &&
+      methodologyVersion &&
+      canUpdateMethodology !== undefined ? (
         <MethodologyContentProvider
           value={{
             methodology: methodologyContent,

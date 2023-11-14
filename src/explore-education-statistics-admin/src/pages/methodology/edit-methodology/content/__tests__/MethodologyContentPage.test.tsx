@@ -13,7 +13,7 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
-import testMethodology, {
+import testMethodologyVersion, {
   testMethodologyContent,
 } from '@admin/pages/methodology/edit-methodology/__tests__/__data__/testMethodologyVersionsAmendmentsAndContents';
 
@@ -33,24 +33,16 @@ const permissionService = _permissionService as jest.Mocked<
 
 describe('MethodologyContentPage', () => {
   beforeEach(async () => {
-    methodologyService.getMethodology.mockResolvedValue(testMethodology);
+    methodologyService.getMethodology.mockResolvedValue(testMethodologyVersion);
     methodologyContentService.getMethodologyContent.mockResolvedValue(
       testMethodologyContent,
     );
     permissionService.canUpdateMethodology.mockResolvedValue(true);
+
+    await renderPage();
   });
 
   test('Help and Support section renders', async () => {
-    renderPage();
-
-    await waitFor(() => {
-      expect(screen.getByTestId('page-title-caption')).toHaveTextContent(
-        'Edit methodology',
-      );
-    });
-
-    expect(methodologyService.getMethodology).toHaveBeenCalled();
-
     expect(
       within(
         screen.getByRole('navigation', { name: 'Related information' }),
@@ -89,7 +81,7 @@ describe('MethodologyContentPage', () => {
     ).not.toBeUndefined();
   });
 
-  const renderPage = () => {
+  const renderPage = async () => {
     const path = generatePath<MethodologyRouteParams>(
       methodologyContentRoute.path,
       {
@@ -104,5 +96,13 @@ describe('MethodologyContentPage', () => {
         </TestConfigContextProvider>
       </MemoryRouter>,
     );
+
+    // Since we're only mocking underlying services, not react-query itself,
+    // we need to introduce some async waits and wait for the results to return
+    await waitFor(() => {
+      expect(
+        screen.getByRole('navigation', { name: 'Related information' }),
+      ).toBeInTheDocument();
+    });
   };
 });
