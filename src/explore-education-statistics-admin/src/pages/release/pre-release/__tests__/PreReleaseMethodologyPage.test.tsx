@@ -9,7 +9,9 @@ import {
 import _methodologyContentService, {
   MethodologyContent,
 } from '@admin/services/methodologyContentService';
-import { MethodologyVersion } from '@admin/services/methodologyService';
+import _methodologyService, {
+  MethodologyVersion,
+} from '@admin/services/methodologyService';
 import { screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -17,8 +19,14 @@ import { MemoryRouter, Route } from 'react-router';
 import { generatePath } from 'react-router-dom';
 
 jest.mock('@admin/services/methodologyContentService');
+jest.mock('@admin/services/methodologyService');
+
 const methodologyContentService = _methodologyContentService as jest.Mocked<
   typeof _methodologyContentService
+>;
+
+const methodologyService = _methodologyService as jest.Mocked<
+  typeof _methodologyService
 >;
 
 describe('PreReleaseMethodologyPage', () => {
@@ -42,7 +50,7 @@ describe('PreReleaseMethodologyPage', () => {
     title: 'Pupil absence statistics: methodology',
   };
 
-  const testMethodology: MethodologyContent = {
+  const testMethodologyContent: MethodologyContent = {
     id: 'methodology-1',
     title: 'Pupil absence statistics: methodology',
     published: '2021-02-16T15:32:01',
@@ -147,8 +155,9 @@ describe('PreReleaseMethodologyPage', () => {
   };
 
   test('renders the basic info', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodologyVersion);
     methodologyContentService.getMethodologyContent.mockResolvedValue(
-      testMethodology,
+      testMethodologyContent,
     );
     renderPage();
 
@@ -172,8 +181,9 @@ describe('PreReleaseMethodologyPage', () => {
   });
 
   test('renders the content', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodologyVersion);
     methodologyContentService.getMethodologyContent.mockResolvedValue(
-      testMethodology,
+      testMethodologyContent,
     );
     renderPage();
 
@@ -213,8 +223,9 @@ describe('PreReleaseMethodologyPage', () => {
   });
 
   test('renders the annexes', async () => {
+    methodologyService.getMethodology.mockResolvedValue(testMethodologyVersion);
     methodologyContentService.getMethodologyContent.mockResolvedValue(
-      testMethodology,
+      testMethodologyContent,
     );
     renderPage();
 
@@ -271,8 +282,11 @@ describe('PreReleaseMethodologyPage', () => {
 
   describe('update notes', () => {
     test(`renders 'TBA' for 'Last updated' if there are no notes`, async () => {
+      methodologyService.getMethodology.mockResolvedValue(
+        testMethodologyVersion,
+      );
       methodologyContentService.getMethodologyContent.mockResolvedValue({
-        ...testMethodology,
+        ...testMethodologyContent,
         notes: [],
       });
       renderPage();
@@ -285,8 +299,11 @@ describe('PreReleaseMethodologyPage', () => {
     });
 
     test(`renders 'Last updated' with the date of the most recent note`, async () => {
+      methodologyService.getMethodology.mockResolvedValue(
+        testMethodologyVersion,
+      );
       methodologyContentService.getMethodologyContent.mockResolvedValue(
-        testMethodology,
+        testMethodologyContent,
       );
       renderPage();
 
@@ -300,8 +317,11 @@ describe('PreReleaseMethodologyPage', () => {
     });
 
     test(`renders the list of all notes`, async () => {
+      methodologyService.getMethodology.mockResolvedValue(
+        testMethodologyVersion,
+      );
       methodologyContentService.getMethodologyContent.mockResolvedValue(
-        testMethodology,
+        testMethodologyContent,
       );
       renderPage();
 
