@@ -3,7 +3,6 @@ import datetime
 import json
 import os
 import re
-import time
 from typing import Union
 from urllib.parse import urlparse
 
@@ -249,7 +248,8 @@ def capture_large_screenshot_and_prompt_to_continue():
     prompt_to_continue()
 
 
-def capture_large_screenshot_and_html():
+def capture_screenshots_and_html():
+    visual.capture_screenshot()
     visual.capture_large_screenshot()
     capture_html()
 
