@@ -97,8 +97,6 @@ describe('MethodologyContentPage', () => {
       </MemoryRouter>,
     );
 
-    // Since we're only mocking underlying services, not react-query itself,
-    // we need to introduce some async waits and wait for the results to return
     await waitFor(() => {
       expect(
         screen.getByRole('navigation', { name: 'Related information' }),
