@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import * as ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import MethodologyHelpAndSupportSection from '@common/modules/methodology/components/MethodologyHelpAndSupportSection';
 import { PublicationSummary } from '@common/services/publicationService';
-import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/test-data';
+import mockContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
 
 jest.mock('@common/modules/find-statistics/components/ContactUsSection');
 

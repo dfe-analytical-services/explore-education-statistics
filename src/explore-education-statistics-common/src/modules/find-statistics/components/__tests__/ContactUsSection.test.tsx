@@ -1,7 +1,7 @@
 import React from 'react';
 import { Matcher, render, screen } from '@testing-library/react';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
-import testContact from '@common/modules/find-statistics/components/__tests__/__data__/test-data';
+import testContact from '@common/modules/find-statistics/components/__tests__/__data__/testContact';
 
 describe('ContactUsSection', () => {
   test('renders', () => {
