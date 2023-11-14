@@ -2139,14 +2139,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static async Task<Either<ActionResult, Footnote>> CreateFootnoteWithConfiguration(
             Guid releaseId,
             string contextId,
-            string? content = null,
+            string? content = "",
             IReadOnlySet<Guid>? filterIds = null,
             IReadOnlySet<Guid>? filterGroupIds = null,
             IReadOnlySet<Guid>? filterItemIds = null,
             IReadOnlySet<Guid>? indicatorIds = null,
             IReadOnlySet<Guid>? subjectIds = null)
         {
-            content ??= string.Empty;
             filterIds ??= SetOf<Guid>();
             filterGroupIds ??= SetOf<Guid>();
             filterItemIds ??= SetOf<Guid>();
@@ -2181,14 +2180,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Guid releaseId,
             Guid footnoteId,
             string contextId,
-            string? content = null,
+            string? content = "",
             IReadOnlySet<Guid>? filterIds = null,
             IReadOnlySet<Guid>? filterGroupIds = null,
             IReadOnlySet<Guid>? filterItemIds = null,
             IReadOnlySet<Guid>? indicatorIds = null,
             IReadOnlySet<Guid>? subjectIds = null)
         {
-            content ??= string.Empty;
             filterIds ??= SetOf<Guid>();
             filterGroupIds ??= SetOf<Guid>();
             filterItemIds ??= SetOf<Guid>();
