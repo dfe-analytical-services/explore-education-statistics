@@ -23,7 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
 public class ReleaseAmendmentService : IReleaseAmendmentService
 {
     private readonly ContentDbContext _context;
-    private readonly IReleaseService _releaseService;
     private readonly IFootnoteService _footnoteService;
     private readonly StatisticsDbContext _statisticsDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
@@ -31,7 +30,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
     public ReleaseAmendmentService(
         ContentDbContext context,
-        IReleaseService releaseService,
         IPersistenceHelper<ContentDbContext> persistenceHelper,
         IUserService userService,
         IFootnoteService footnoteService,
@@ -42,10 +40,9 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
         _userService = userService;
         _footnoteService = footnoteService;
         _statisticsDbContext = statisticsDbContext;
-        _releaseService = releaseService;
     }
 
-    public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId)
+    public async Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseId)
     {
         return await _persistenceHelper
             .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
@@ -56,7 +53,7 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
                     .OnSuccess(amendment => CopyReleaseRoles(releaseId, amendment))
                     .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
                     .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
-                    .OnSuccess(amendment => _releaseService.GetRelease(amendment.Id)));
+                    .OnSuccess(amendment => new IdViewModel(amendment.Id)));
     }
 
     private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release originalRelease)
@@ -155,16 +152,21 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             return amendmentKeyStatistic;
         }).ToList();
 
-        amendment.FeaturedTables = amendment.FeaturedTables.Select(originalFeaturedTable =>
-        {
-            var amendmentFeaturedTable = originalFeaturedTable.Clone(amendment);
+        amendment.FeaturedTables = amendment
+            .FeaturedTables
+            .Select(originalFeaturedTable =>
+            {
+                var amendmentFeaturedTable = originalFeaturedTable.Clone(amendment);
 
-            var amendmentDataBlock = originalToClonedDataBlocks[originalFeaturedTable.DataBlock];
-            amendmentFeaturedTable.DataBlock = amendmentDataBlock;
-            amendmentFeaturedTable.DataBlockId = amendmentDataBlock.Id;
+                var amendmentDataBlock = originalToClonedDataBlocks[originalFeaturedTable.DataBlock];
+                amendmentFeaturedTable.DataBlock = amendmentDataBlock;
+                amendmentFeaturedTable.DataBlockId = amendmentDataBlock.Id;
+                amendmentFeaturedTable.Release = amendment;
+                amendmentFeaturedTable.ReleaseId = amendment.Id;
 
-            return amendmentFeaturedTable;
-        }).ToList();
+                return amendmentFeaturedTable;
+            })
+            .ToList();
 
         amendment.RelatedInformation = amendment
             .RelatedInformation
@@ -309,7 +311,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
             .Include(release => release.KeyStatistics)
             .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
             .Include(release => release.FeaturedTables)
-            .Include(release => release.DataBlockVersions)
             .Include(release => release.DataBlockVersions)
             .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
             .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
