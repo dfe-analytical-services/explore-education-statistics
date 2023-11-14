@@ -64,6 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     release.DataGuidance = request.Content;
                     await _contentDbContext.SaveChangesAsync();
 
+                    // TODO EES-4661 Change to use data file references instead of subjects,
+                    // making release data files the source of the data guidance content.
                     await UpdateSubjects(releaseId, request.Subjects);
                 })
                 .OnSuccess(BuildViewModel);
@@ -95,6 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             List<DataGuidanceUpdateSubjectViewModel> subjects)
         {
+            // TODO EES-4661 Change to use data file references instead of subjects,
+            // making release data files the source of the data guidance content.
+            // Following this change, drop ReleaseSubject.DataGuidance. 
+
             if (!subjects.Any())
             {
                 return;
@@ -106,8 +112,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
             var subjectIds = subjects.Select(s => s.Id);
 
+            // Until we switch over data guidance and data catalogue to use ReleaseFiles as the source for content,
+            // ensure it is updated on both ReleaseSubject and ReleaseFile
+            var matchingReleaseFiles = await _contentDbContext
+                .ReleaseFiles
+                .Include(releaseFile => releaseFile.File)
+                .Where(rf => rf.File.SubjectId.HasValue && subjectIds.Contains(rf.File.SubjectId.Value))
+                .ToListAsync();
+
+            matchingReleaseFiles.ForEach(
+                releaseFile =>
+                {
+                    var content = contentById.GetValueOrDefault(releaseFile.File.SubjectId!.Value);
+
+                    if (content.IsNullOrEmpty())
+                    {
+                        return;
+                    }
+
+                    releaseFile.Summary = content;
+                    _contentDbContext.Update(releaseFile);
+                });
+
+            await _contentDbContext.SaveChangesAsync();
+            
             var matchingSubjects = await _statisticsDbContext.ReleaseSubject
-                .AsQueryable()
                 .Where(
                     releaseSubject => releaseSubject.ReleaseId == releaseId
                                       && subjectIds.Contains(releaseSubject.SubjectId)
