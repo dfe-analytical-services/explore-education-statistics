@@ -2181,7 +2181,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var publication = new Publication
             {
                 Title = "Test publication",
-                Slug = "test-publication"
+                Slug = "test-publication",
+                Contact = MockContact,
             };
 
             var versionWithRedirectId = Guid.NewGuid();
@@ -2281,8 +2282,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Methodology = new Methodology
                 {
                     Id = Guid.NewGuid(),
-                    OwningPublicationTitle = publication.Title,
-                    OwningPublicationSlug = publication.Slug,
+                    OwningPublicationTitle = MockPublication.Title,
+                    OwningPublicationSlug = MockPublication.Slug,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
