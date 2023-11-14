@@ -43,9 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     userService =>
                     {
-                        using var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendmentAsync");
+                        using var contentDbContext = InMemoryApplicationDbContext();
                         contentDbContext.Attach(_release);
-                        var service = BuildReleaseService(
+                        var service = BuildService(
                             userService.Object,
                             contentDbContext);
                         return service.CreateReleaseAmendment(_release.Id);
@@ -53,14 +53,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
-        private ReleaseAmendmentService BuildReleaseService(
+        private ReleaseAmendmentService BuildService(
             IUserService userService,
-            ContentDbContext? context = null,
-            IReleaseService? releaseService = null)
+            ContentDbContext? context = null)
         {
             return new ReleaseAmendmentService(
                 context ?? Mock.Of<ContentDbContext>(),
-                releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
                 DefaultPersistenceHelperMock().Object,
                 userService,
                 Mock.Of<IFootnoteService>(MockBehavior.Strict),
