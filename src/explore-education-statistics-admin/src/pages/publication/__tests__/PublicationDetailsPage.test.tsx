@@ -101,7 +101,7 @@ describe('PublicationDetailsPage', () => {
     },
   ];
 
-  const mockPublication: Publication = {
+  const testPublicationWithSummaries: Publication = {
     ...testPublicationSummaries[1],
     summary: '',
     theme: {
@@ -117,7 +117,9 @@ describe('PublicationDetailsPage', () => {
   beforeEach(() => {
     themeService.getTheme.mockResolvedValue(testThemes[0]);
     themeService.getThemes.mockResolvedValue(testThemes);
-    publicationService.getPublication.mockResolvedValue(mockPublication);
+    publicationService.getPublication.mockResolvedValue(
+      testPublicationWithSummaries,
+    );
     publicationService.getPublicationSummaries.mockResolvedValue(
       testPublicationSummaries,
     );
