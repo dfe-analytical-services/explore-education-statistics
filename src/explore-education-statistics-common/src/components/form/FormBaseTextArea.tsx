@@ -9,6 +9,7 @@ import React, {
   ReactNode,
   Ref,
   memo,
+  useCallback,
 } from 'react';
 
 export interface FormTextAreaProps
@@ -22,6 +23,7 @@ export interface FormTextAreaProps
   maxLength?: number;
   name: string;
   rows?: number;
+  trimValue?: boolean;
   value?: string;
   onBlur?: FocusEventHandler<HTMLTextAreaElement>;
   onChange?: ChangeEventHandler<HTMLTextAreaElement>;
@@ -41,12 +43,26 @@ function FormBaseTextArea({
   maxLength,
   name,
   rows = 5,
+  trimValue = true,
   value,
   onBlur,
   onChange,
   onClick,
   onKeyPress,
 }: FormTextAreaProps) {
+  const handleBlur: FocusEventHandler<HTMLTextAreaElement> = useCallback(
+    event => {
+      if (trimValue) {
+        // eslint-disable-next-line no-param-reassign
+        event.target.value = event.target.value.trim();
+        onChange?.(event);
+      }
+
+      onBlur?.(event);
+    },
+    [onBlur, onChange, trimValue],
+  );
+
   return (
     <>
       <FormLabel id={id} label={label} hideLabel={hideLabel} />
@@ -74,7 +90,7 @@ function FormBaseTextArea({
         id={id}
         name={name}
         ref={inputRef}
-        onBlur={onBlur}
+        onBlur={handleBlur}
         onChange={onChange}
         onClick={onClick}
         onKeyPress={onKeyPress}
