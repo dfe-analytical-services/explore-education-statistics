@@ -333,7 +333,7 @@ describe('PublicationPublishedReleases', () => {
 
     releaseService.createReleaseAmendment.mockResolvedValue({
       id: 'release-amendment-id',
-    } as Release);
+    });
 
     baseRender(
       <Router history={history}>

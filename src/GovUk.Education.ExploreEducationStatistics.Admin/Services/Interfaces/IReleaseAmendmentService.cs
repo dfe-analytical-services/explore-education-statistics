@@ -12,5 +12,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 
 public interface IReleaseAmendmentService
 {
-    Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId);
+    Task<Either<ActionResult, IdViewModel>> CreateReleaseAmendment(Guid releaseId);
 }

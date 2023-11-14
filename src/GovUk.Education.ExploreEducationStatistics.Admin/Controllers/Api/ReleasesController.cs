@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseId:guid}/amendment")]
-        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId)
+        public async Task<ActionResult<IdViewModel>> CreateReleaseAmendment(Guid releaseId)
         {
             return await _releaseAmendmentService
                 .CreateReleaseAmendment(releaseId)

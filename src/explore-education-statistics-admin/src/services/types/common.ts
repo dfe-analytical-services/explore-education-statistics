@@ -1,3 +1,7 @@
+export interface IdResponse {
+  id: string;
+}
+
 export interface IdTitlePair {
   id: string;
   title: string;

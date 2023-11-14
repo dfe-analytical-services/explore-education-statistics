@@ -363,16 +363,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var originalReleaseId = Guid.NewGuid();
 
-            var amendment = new ReleaseViewModel
-            {
-                Id = Guid.NewGuid()
-            };
+            var amendmentCreatedResponse = new IdViewModel(Guid.NewGuid());
 
             var releaseAmendmentService = new Mock<IReleaseAmendmentService>(Strict);
 
             releaseAmendmentService
                 .Setup(s => s.CreateReleaseAmendment(originalReleaseId))
-                .ReturnsAsync(amendment);
+                .ReturnsAsync(amendmentCreatedResponse);
 
             var controller = BuildController(
                 releaseAmendmentService: releaseAmendmentService.Object);
@@ -380,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.CreateReleaseAmendment(originalReleaseId);
             VerifyAllMocks(releaseAmendmentService);
 
-            result.AssertOkResult(amendment);
+            result.AssertOkResult(amendmentCreatedResponse);
         }
 
         private static IFormFile MockFile(string fileName)
