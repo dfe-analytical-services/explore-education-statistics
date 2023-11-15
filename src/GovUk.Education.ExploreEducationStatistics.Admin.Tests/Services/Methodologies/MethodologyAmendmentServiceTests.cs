@@ -34,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 // general fields
                 Id = Guid.NewGuid(),
                 AlternativeTitle = "Alternative Title",
+                AlternativeSlug = "alternative-slug",
 
                 // creation and update fields
                 Created = DateTime.Today.AddDays(-2),
@@ -105,6 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.NotEqual(Guid.Empty, amendment.Id);
                 Assert.NotEqual(originalVersion.Id, amendment.Id);
                 Assert.Equal(originalVersion.AlternativeTitle, amendment.AlternativeTitle);
+                Assert.Equal(originalVersion.AlternativeSlug, amendment.AlternativeSlug);
 
                 // Check creation and update fields.
                 amendment.Created.AssertUtcNow();
@@ -433,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
-        private static void AssertMethodologyNoteAmendedCorrectly(
+        private void AssertMethodologyNoteAmendedCorrectly(
             MethodologyNote amendmentNote,
             MethodologyNote originalNote,
             MethodologyVersion amendment)
@@ -448,11 +450,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             // Check the other fields are the same
             Assert.Equal(originalNote.Content, amendmentNote.Content);
-            Assert.Equal(originalNote.Created, amendmentNote.Created);
-            Assert.Equal(originalNote.CreatedById, amendmentNote.CreatedById);
+            amendmentNote.Created.AssertUtcNow();
+            Assert.Equal(_userId, amendmentNote.CreatedById);
             Assert.Equal(originalNote.DisplayDate, amendmentNote.DisplayDate);
-            Assert.Equal(originalNote.Updated, amendmentNote.Updated);
-            Assert.Equal(originalNote.UpdatedById, amendmentNote.UpdatedById);
+            Assert.NotNull(originalNote.Updated);
+            Assert.NotNull(originalNote.UpdatedById);
+            Assert.Null(amendmentNote.Updated);
+            Assert.Null(amendmentNote.UpdatedById);
         }
 
         [Fact]
