@@ -56,23 +56,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [ConcurrencyCheck]
         public Guid? LockedById { get; set; }
 
-        // EES-4637 - we need to decide on how we're being consistent with Created dates in Release Amendments.
-        public ContentBlock Clone(Release amendment)
-        {
-            var copy = (MemberwiseClone() as ContentBlock)!;
-            copy.Id = Guid.NewGuid();
-
-            copy.ContentSection = null;
-            copy.ContentSectionId = null;
-            copy.Release = amendment;
-            copy.ReleaseId = amendment.Id;
-
-            // Start a new amendment with no comments.
-            copy.Comments = new List<Comment>();
-
-            return copy;
-        }
-
         public ContentBlock Clone(DateTime createdDate)
         {
             var copy = MemberwiseClone() as ContentBlock;
