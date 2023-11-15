@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 {
     public class MethodologyAmendmentServiceTests
     {
-        public readonly Guid _userId = Guid.NewGuid();
+        private readonly Guid _userId = Guid.NewGuid();
         
         [Fact]
         public async Task CreateMethodologyAmendment_ClonesBasicFields()
@@ -438,7 +438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             }
         }
 
-        private static void AssertMethodologyNoteAmendedCorrectly(
+        private void AssertMethodologyNoteAmendedCorrectly(
             MethodologyNote amendmentNote,
             MethodologyNote originalNote,
             MethodologyVersion amendment)
@@ -453,11 +453,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             // Check the other fields are the same
             Assert.Equal(originalNote.Content, amendmentNote.Content);
-            Assert.Equal(originalNote.Created, amendmentNote.Created);
-            Assert.Equal(originalNote.CreatedById, amendmentNote.CreatedById);
+            amendmentNote.Created.AssertUtcNow();
+            Assert.Equal(_userId, amendmentNote.CreatedById);
             Assert.Equal(originalNote.DisplayDate, amendmentNote.DisplayDate);
-            Assert.Equal(originalNote.Updated, amendmentNote.Updated);
-            Assert.Equal(originalNote.UpdatedById, amendmentNote.UpdatedById);
+            Assert.NotNull(originalNote.Updated);
+            Assert.NotNull(originalNote.UpdatedById);
+            Assert.Null(amendmentNote.Updated);
+            Assert.Null(amendmentNote.UpdatedById);
         }
 
         [Fact]
