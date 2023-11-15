@@ -42,7 +42,7 @@ const EditableKeyStatDataBlockForm = ({
     async values => {
       await onSubmit({
         ...values,
-        guidanceTitle: values.guidanceTitle.trim(),
+        guidanceTitle: values.guidanceTitle,
         guidanceText: toMarkdown(values.guidanceText),
       });
     },

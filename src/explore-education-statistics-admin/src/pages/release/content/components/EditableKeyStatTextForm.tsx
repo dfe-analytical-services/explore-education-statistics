@@ -42,7 +42,7 @@ export default function EditableKeyStatTextForm({
   const handleSubmit = useFormSubmit<KeyStatTextFormValues>(async values => {
     await onSubmit({
       ...values,
-      guidanceTitle: values.guidanceTitle.trim(),
+      guidanceTitle: values.guidanceTitle,
       guidanceText: toMarkdown(values.guidanceText),
     });
   });

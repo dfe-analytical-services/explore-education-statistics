@@ -31,6 +31,13 @@ describe('PublicationAdoptMethodologyPage', () => {
     owningPublication: {
       id: 'publication-2',
       title: 'Publication 2',
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
+      slug: 'mock-slug',
+      owner: false,
     },
   };
   const testMethodology2: MethodologyVersion = {
@@ -45,6 +52,13 @@ describe('PublicationAdoptMethodologyPage', () => {
     owningPublication: {
       id: 'publication-3',
       title: 'Publication 3',
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
+      slug: 'mock-slug',
+      owner: false,
     },
   };
   const testMethodology3: MethodologyVersion = {
@@ -59,6 +73,13 @@ describe('PublicationAdoptMethodologyPage', () => {
     owningPublication: {
       id: 'publication-4',
       title: 'Publication 4',
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
+      slug: 'mock-slug',
+      owner: false,
     },
   };
 

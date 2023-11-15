@@ -4,6 +4,7 @@ import { ConfiguredTable } from '@common/services/types/table';
 import { Dictionary } from '@common/types';
 import { AxiosRequestConfig } from 'axios';
 import { Feature, Geometry } from 'geojson';
+import { ReleaseType } from '@common/services/types/releaseType';
 
 export interface FilterOption {
   label: string;
@@ -201,6 +202,7 @@ export interface FastTrackTable extends ConfiguredTable {
 export interface FastTrackTableAndReleaseMeta extends FastTrackTable {
   releaseId: string;
   releaseSlug: string;
+  releaseType: ReleaseType;
   latestData: boolean;
   latestReleaseTitle: string;
 }

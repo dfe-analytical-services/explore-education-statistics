@@ -38,6 +38,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             Id = Guid.NewGuid()
         };
 
+        private static readonly Contact MockContact = new()
+        {
+            TeamName = "Mock Team Name",
+            TeamEmail = "mockteam@mockteam.com",
+            ContactName = "Mock Contact Name",
+        };
+
+
+        private static readonly Publication MockPublication = new()
+        {
+            Title = "Test publication",
+            Slug = "test-publication",
+            Contact = MockContact
+        };
+        
         [Fact]
         public async Task AdoptMethodology()
         {
@@ -62,6 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -127,6 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -171,6 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -226,6 +244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -298,6 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.SaveChangesAsync();
             }
 
@@ -319,17 +339,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task CreateMethodology()
         {
-            var publication = new Publication
-            {
-                Title = "Test publication",
-                Slug = "test-publication",
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await context.Publications.AddAsync(publication);
+                await context.Publications.AddAsync(MockPublication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.SaveChangesAsync();
             }
 
@@ -347,14 +362,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Methodology = new Methodology
                     {
                         Id = Guid.NewGuid(),
-                        OwningPublicationTitle = publication.Title,
-                        OwningPublicationSlug = publication.Slug,
+                        OwningPublicationSlug = MockPublication.Slug,
+                        Slug = "test-publication",
+                        OwningPublicationTitle = MockPublication.Title,
                         Publications = new List<PublicationMethodology>
                         {
                             new()
                             {
                                 Owner = true,
-                                Publication = publication
+                                Publication = MockPublication
                             }
                         }
                     },
@@ -362,16 +378,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 };
 
                 methodologyVersionRepository
-                    .Setup(s => s.CreateMethodologyForPublication(publication.Id, User.Id))
+                    .Setup(s => s.CreateMethodologyForPublication(MockPublication.Id, User.Id))
                     .ReturnsAsync(createdMethodology);
 
                 methodologyVersionRepository
-                    .Setup(mock => mock.GetLatestPublishedVersionBySlug(publication.Slug))
+                    .Setup(mock => mock.GetLatestPublishedVersionBySlug(MockPublication.Slug))
                     .ReturnsAsync((MethodologyVersion?)null);
 
                 context.Attach(createdMethodology);
 
-                var viewModel = (await service.CreateMethodology(publication.Id)).AssertRight();
+                var viewModel = (await service.CreateMethodology(MockPublication.Id)).AssertRight();
                 VerifyAllMocks(methodologyVersionRepository);
 
                 Assert.Equal(createdMethodology.Id, viewModel.Id);
@@ -384,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(MethodologyApprovalStatus.Draft, viewModel.Status);
                 Assert.Equal("Test publication", viewModel.Title);
 
-                Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
+                Assert.Equal(MockPublication.Id, viewModel.OwningPublication.Id);
                 Assert.Equal("Test publication", viewModel.OwningPublication.Title);
                 Assert.Empty(viewModel.OtherPublications);
             }
@@ -475,6 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -539,6 +556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -614,6 +632,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.SaveChangesAsync();
             }
 
@@ -649,7 +668,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Methodology = methodology,
                         Owner = true
                     }
-                }
+                },
+                Contact = MockContact
             };
 
             var methodologyVersion = new MethodologyVersion
@@ -669,13 +689,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 ApprovalStatus = MethodologyApprovalStatus.Approved,
             };
 
-            var adoptingPublication = new Publication();
+            var adoptingPublication = new Publication()
+                                      {
+                                          Contact = MockContact
+                                      };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddRangeAsync(publication, adoptingPublication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.Methodologies.AddAsync(methodology);
                 await context.MethodologyVersions.AddAsync(methodologyVersion);
                 await context.MethodologyStatus.AddAsync(methodologyStatus);
@@ -762,6 +786,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddRangeAsync(publication, adoptingPublication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.Methodologies.AddAsync(methodology);
                 await context.SaveChangesAsync();
             }
@@ -796,6 +821,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.Publications.AddAsync(publication);
+                await context.Contacts.AddAsync(MockContact);
                 await context.SaveChangesAsync();
             }
 
@@ -839,7 +865,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Methodology = methodology,
                         Owner = true
                     }
-                }
+                },
+                Contact = MockContact
             };
 
             var adoptingPublication1 = new Publication
@@ -852,7 +879,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Methodology = methodology,
                         Owner = false
                     }
-                )
+                ),
+                Contact = MockContact
             };
 
             var adoptingPublication2 = new Publication
@@ -865,7 +893,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                         Methodology = methodology,
                         Owner = false
                     }
-                )
+                ),
+                Contact = MockContact
             };
 
             var methodologyVersion = new MethodologyVersion
@@ -897,6 +926,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 await context.Methodologies.AddAsync(methodology);
                 await context.Publications.AddRangeAsync(owningPublication, adoptingPublication1, adoptingPublication2);
+                await context.Contacts.AddAsync(MockContact);
                 await context.MethodologyVersions.AddAsync(methodologyVersion);
                 await context.MethodologyStatus.AddAsync(methodologyStatus);
                 await context.SaveChangesAsync();
@@ -1025,6 +1055,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
+                await contentDbContext.Contacts.AddAsync(MockContact);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1118,6 +1149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
+                await contentDbContext.Contacts.AddAsync(MockContact);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1186,6 +1218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
                 await contentDbContext.Publications.AddRangeAsync(owningPublication, adoptingPublication);
+                await contentDbContext.Contacts.AddAsync(MockContact);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1314,6 +1347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Contacts.AddAsync(MockContact);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1483,6 +1517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Contacts.AddAsync(MockContact);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1554,6 +1589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Contacts.AddAsync(MockContact);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1605,7 +1641,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var publication = new Publication
             {
                 Title = "Test publication",
-                Slug = "test-publication"
+                Slug = "test-publication",
+                Contact = MockContact
             };
 
             var methodologyVersion = new MethodologyVersion
@@ -1691,12 +1728,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodology_UpdatingAmendmentSlugChangesAndCreatesRedirect()
         {
-            var publication = new Publication
-            {
-                Title = "Test publication",
-                Slug = "test-publication"
-            };
-
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
@@ -1709,7 +1740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = publication
+                        Publication = MockPublication
                     })
                 },
                 PreviousVersionId = Guid.NewGuid()
@@ -1754,8 +1785,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
-                Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
-                Assert.Equal(publication.Title, viewModel.OwningPublication.Title);
+                Assert.Equal(MockPublication.Id, viewModel.OwningPublication.Id);
+                Assert.Equal(MockPublication.Title, viewModel.OwningPublication.Title);
                 Assert.Empty(viewModel.OtherPublications);
             }
 
@@ -1787,12 +1818,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodology_UpdatingTitleSlugToMatchPublicationUnsetsAlternativeTitleSlug()
         {
-            var publication = new Publication
-            {
-                Title = "Test publication",
-                Slug = "test-publication"
-            };
-
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
@@ -1807,7 +1832,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = publication
+                        Publication = MockPublication
                     })
                 }
             };
@@ -1850,8 +1875,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(viewModel.ScheduledWithRelease);
                 Assert.Equal(request.Status, viewModel.Status);
                 Assert.Equal(request.Title, viewModel.Title);
-                Assert.Equal(publication.Id, viewModel.OwningPublication.Id);
-                Assert.Equal(publication.Title, viewModel.OwningPublication.Title);
+                Assert.Equal(MockPublication.Id, viewModel.OwningPublication.Id);
+                Assert.Equal(MockPublication.Title, viewModel.OwningPublication.Title);
                 Assert.Empty(viewModel.OtherPublications);
             }
 
@@ -1864,9 +1889,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodologyVersion.Status);
-                Assert.Equal(MethodologyPublishingStrategy.Immediately,
-                    updatedMethodologyVersion.PublishingStrategy);
-                Assert.Equal(publication.Title, updatedMethodologyVersion.Title);
+                Assert.Equal(MethodologyPublishingStrategy.Immediately, updatedMethodologyVersion.PublishingStrategy);
+                Assert.Equal(MockPublication.Title, updatedMethodologyVersion.Title);
 
                 // Test explicitly that AlternativeTitle has been unset.
                 Assert.Null(updatedMethodologyVersion.AlternativeTitle);
@@ -1883,9 +1907,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var publication = new Publication
             {
                 Title = "Test publication",
-                Slug = "test-publication"
+                Slug = "test-publication",
+                Contact = MockContact
             };
-
+            
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
@@ -1919,6 +1944,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await context.MethodologyVersions.AddAsync(methodologyVersion);
+                await context.Contacts.AddAsync(MockContact);
                 await context.SaveChangesAsync();
             }
 
@@ -1932,7 +1958,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 var service = SetupMethodologyService(context,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var viewModel = (await service.UpdateMethodology(methodologyVersion.Id, request)).AssertRight();
+                var response = await service.UpdateMethodology(methodologyVersion.Id, request);
+                var viewModel = response.AssertRight();
 
                 VerifyAllMocks(methodologyVersionRepository);
 
@@ -1959,7 +1986,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(MethodologyApprovalStatus.Draft, updatedMethodologyVersion.Status);
                 Assert.Equal(MethodologyPublishingStrategy.Immediately, updatedMethodologyVersion.PublishingStrategy);
-                Assert.Equal(publication.Title, updatedMethodologyVersion.Title);
+                Assert.Equal(MockPublication.Title, updatedMethodologyVersion.Title);
 
                 // Test that the AlternativeTitle has explicitly be set to null.
                 Assert.Null(updatedMethodologyVersion.AlternativeTitle);
@@ -2154,7 +2181,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var publication = new Publication
             {
                 Title = "Test publication",
-                Slug = "test-publication"
+                Slug = "test-publication",
+                Contact = MockContact,
             };
 
             var versionWithRedirectId = Guid.NewGuid();
@@ -2246,12 +2274,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         [Fact]
         public async Task UpdateMethodology_StatusUpdate()
         {
-            var publication = new Publication
-            {
-                Title = "Test publication",
-                Slug = "test-publication"
-            };
-
             var methodologyVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
@@ -2260,12 +2282,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Methodology = new Methodology
                 {
                     Id = Guid.NewGuid(),
-                    OwningPublicationTitle = publication.Title,
-                    OwningPublicationSlug = publication.Slug,
+                    OwningPublicationTitle = MockPublication.Title,
+                    OwningPublicationSlug = MockPublication.Slug,
                     Publications = ListOf(new PublicationMethodology
                     {
                         Owner = true,
-                        Publication = publication
+                        Publication = MockPublication
                     })
                 }
             };
@@ -2841,8 +2863,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .Generate();
-
+                
                 var methodology = _fixture
                     .DefaultMethodology()
                     .WithOwningPublication(publication)
@@ -2863,6 +2886,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     await context.Methodologies.AddRangeAsync(methodology);
+                    await context.Contacts.AddAsync(MockContact);
                     await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
                     await context.SaveChangesAsync();
                 }
@@ -2887,6 +2911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .Generate();
 
                 // Generate 2 Methodologies that are not in Higher Review.
@@ -2914,6 +2939,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     await context.Methodologies.AddRangeAsync(methodologies);
+                    await context.Contacts.AddAsync(MockContact);
                     await context.UserPublicationRoles.AddRangeAsync(publicationRoleForUser);
                     await context.SaveChangesAsync();
                 }
@@ -2931,6 +2957,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .Generate();
 
                 // Create a Methodology that has only been adopted by the User's Publication.
@@ -2972,6 +2999,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .Generate();
 
                 var methodology = _fixture
@@ -3015,6 +3043,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .Generate();
 
                 var methodology = _fixture
@@ -3061,6 +3090,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .WithReleases(ListOf(release))
                     .Generate();
 
@@ -3115,6 +3145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .WithReleases(releases)
                     .Generate();
 
@@ -3138,6 +3169,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await using (var context = InMemoryApplicationDbContext(contentDbContextId))
                 {
                     await context.Methodologies.AddRangeAsync(methodology);
+                    await context.Publications.AddAsync(publication);
+                    await context.Contacts.AddAsync(MockContact);
                     await context.UserReleaseRoles.AddRangeAsync(releaseRoleForUserOnOldRelease);
                     await context.SaveChangesAsync();
                 }
@@ -3163,6 +3196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .Generate();
 
                 // Generate 2 Methodologies that are not in Higher Review.
@@ -3209,6 +3243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .Generate();
 
                 // Create a Methodology that has only been adopted by the User's Publication.
@@ -3297,6 +3332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .Generate();
 
                 var methodology = _fixture
@@ -3338,6 +3374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var publication = _fixture
                     .DefaultPublication()
+                    .WithContact(MockContact)
                     .WithReleases(ListOf(release))
                     .Generate();
 

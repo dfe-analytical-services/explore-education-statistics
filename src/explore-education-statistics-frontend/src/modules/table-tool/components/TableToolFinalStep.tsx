@@ -180,6 +180,7 @@ const TableToolFinalStep = ({
             )}
           </>
         }
+        releaseType={selectedPublication.selectedRelease.type}
       />
     </div>
   );

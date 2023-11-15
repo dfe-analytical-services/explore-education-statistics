@@ -295,6 +295,7 @@ export const getServerSideProps: GetServerSideProps<
           latestData: selectedRelease.latestRelease,
           slug: selectedRelease.slug,
           title: selectedRelease.title,
+          type: selectedRelease.type,
         },
         latestRelease: {
           title: latestRelease.title,
