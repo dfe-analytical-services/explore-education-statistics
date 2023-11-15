@@ -91,31 +91,31 @@ function getRowHeadersInfo(rowHeaders: Header[]): {
 
   rowHeaders.forEach(header => {
     const { maxCrossSpan } = header;
+    const stack = [header];
 
-    let current: Header | undefined = header;
+    while (stack.length > 0) {
+      const current = stack.shift();
 
-    while (current) {
-      const { depth } = current;
-
-      if (current.parent) {
-        const isCollapsibleRowHeaderLevel =
-          current.hasSiblings() &&
-          current.parent.children.every(child =>
-            child.hasSingleMatchingChild(),
-          );
-
-        collapsibleLevels[depth] =
-          (collapsibleLevels[depth] ?? true) && isCollapsibleRowHeaderLevel;
+      if (!current) {
+        break;
       }
 
-      current = current.getFirstChild();
-    }
+      if (current.hasChildren()) {
+        const { depth } = current;
 
+        if (current.parent && collapsibleLevels[depth] !== false) {
+          collapsibleLevels[depth] =
+            current.hasSiblings() &&
+            current.parent.children.every(child =>
+              child.hasSingleMatchingChild(),
+            );
+        }
+
+        stack.unshift(...current.children);
+      }
+    }
     maxDepth = maxCrossSpan > maxDepth ? maxCrossSpan : maxDepth;
   });
 
-  return {
-    maxDepth,
-    collapsibleLevels,
-  };
+  return { maxDepth, collapsibleLevels };
 }
