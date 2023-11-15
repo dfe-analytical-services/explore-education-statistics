@@ -32,11 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
                 Type = TableHeaderType.Location
             };
         }
-
-        public TableHeader Clone()
-        {
-            return (TableHeader)MemberwiseClone();
-        }
     }
 
     public enum TableHeaderType
