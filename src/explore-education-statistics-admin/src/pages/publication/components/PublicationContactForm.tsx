@@ -38,7 +38,7 @@ export default function PublicationContactForm({
   const handleSubmit = async (values: FormValues) => {
     const contact = values;
 
-    if (!contact.contactTelNo?.trim()) {
+    if (!contact.contactTelNo) {
       contact.contactTelNo = undefined;
     }
 
@@ -58,7 +58,6 @@ export default function PublicationContactForm({
         .email('Enter a valid team email'),
       contactName: Yup.string().required('Enter a contact name'),
       contactTelNo: Yup.string()
-        .trim()
         .matches(/^0[0-9\s]*$/, {
           excludeEmptyString: true,
           message:

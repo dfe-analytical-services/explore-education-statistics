@@ -74,6 +74,7 @@ const FormSearchBar = ({
         label={label}
         labelSize={labelSize}
         name={name}
+        trimValue={false}
         type="search"
         value={searchTerm}
         onChange={event => {

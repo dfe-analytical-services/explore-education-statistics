@@ -96,7 +96,6 @@ export default function AncillaryFileForm({
       onSubmit={handleSubmit}
       validationSchema={Yup.object<AncillaryFileFormValues>({
         title: Yup.string()
-          .trim()
           .required('Enter a title')
           .test({
             name: 'unique',
