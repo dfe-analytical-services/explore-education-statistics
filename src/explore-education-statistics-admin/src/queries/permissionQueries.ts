@@ -8,6 +8,12 @@ const permissionQueries = createQueryKeys('releaseDataBlocks', {
       queryFn: () => permissionService.canUpdateRelease(releaseId),
     };
   },
+  canUpdateMethodology(methodologyId: string) {
+    return {
+      queryKey: [methodologyId],
+      queryFn: () => permissionService.canUpdateMethodology(methodologyId),
+    };
+  },
   getMethodologyApprovalPermissions(methodologyId: string) {
     return {
       queryKey: [methodologyId],

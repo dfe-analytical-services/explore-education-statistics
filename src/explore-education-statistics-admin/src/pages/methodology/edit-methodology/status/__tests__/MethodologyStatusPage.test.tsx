@@ -35,19 +35,42 @@ describe('MethodologyStatusPage', () => {
     owningPublication: {
       id: 'p1',
       title: 'Owning publication title',
+      contact: {
+        teamName: 'Mock Contact Team Name',
+        teamEmail: 'Mock Contact Team Email',
+        contactName: 'Mock Contact Name',
+      },
+      slug: 'mock-slug',
+      owner: true,
     },
-  } as MethodologyVersion;
+    status: 'Draft',
+    methodologyId: '',
+  };
 
-  const testMethodologyWithOtherPublications = {
+  const testMethodologyWithOtherPublications: MethodologyVersion = {
     ...testMethodology,
     otherPublications: [
       {
         id: 'p2',
         title: 'Other publication 1',
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
+        slug: 'mock-slug',
+        owner: false,
       },
       {
         id: 'p3',
         title: 'Other publication 2',
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
+        slug: 'mock-slug',
+        owner: false,
       },
     ],
   };

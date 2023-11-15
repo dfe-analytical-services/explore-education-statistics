@@ -4,17 +4,13 @@ import PageTitle from '@admin/components/PageTitle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
-import methodologyContentService from '@admin/services/methodologyContentService';
-import permissionService from '@admin/services/permissionService';
 import FormattedDate from '@common/components/FormattedDate';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import PageSearchForm from '@common/components/PageSearchForm';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import MethodologyAccordion from '@admin/pages/methodology/edit-methodology/content/components/MethodologyAccordion';
 import MethodologyNotesSection from '@admin/pages/methodology/edit-methodology/content/components/MethodologyNotesSection';
 import {
-  MethodologyContextState,
   MethodologyContentProvider,
   useMethodologyContentState,
 } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
@@ -22,10 +18,20 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import MethodologyHelpAndSupportSection from '@common/modules/methodology/components/MethodologyHelpAndSupportSection';
+import RelatedInformation from '@common/components/RelatedInformation';
+import { useQuery } from '@tanstack/react-query';
+import methodologyQueries from '@admin/queries/methodologyQueries';
+import methodologyContentQueries from '@admin/queries/methodologyContentQueries';
+import permissionQueries from '@admin/queries/permissionQueries';
 
 export const MethodologyContentPageInternal = () => {
-  const { methodology, canUpdateMethodology, isPreRelease } =
-    useMethodologyContentState();
+  const {
+    methodology,
+    methodologyVersion,
+    canUpdateMethodology,
+    isPreRelease,
+  } = useMethodologyContentState();
 
   const canUpdateContent = !isPreRelease && canUpdateMethodology;
 
@@ -36,48 +42,77 @@ export const MethodologyContentPageInternal = () => {
           {canUpdateContent && <EditablePageModeToggle />}
 
           <div className="govuk-width-container">
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-two-thirds">
+                <section
+                  className={
+                    editingMode === 'edit'
+                      ? 'dfe-page-editing'
+                      : 'dfe-page-preview'
+                  }
+                >
+                  {editingMode === 'edit' && (
+                    <BrowserWarning>
+                      <ul>
+                        <li>Editing text blocks</li>
+                      </ul>
+                    </BrowserWarning>
+                  )}
+
+                  {isPreRelease ? (
+                    <PageTitle
+                      caption="Methodology"
+                      title={methodology.title}
+                    />
+                  ) : (
+                    <h2
+                      aria-hidden
+                      className="govuk-heading-lg"
+                      data-testid="page-title"
+                    >
+                      {methodology.title}
+                    </h2>
+                  )}
+
+                  <SummaryList>
+                    <SummaryListItem term="Publish date">
+                      {methodology.published ? (
+                        <FormattedDate>{methodology.published}</FormattedDate>
+                      ) : (
+                        'Not yet published'
+                      )}
+                    </SummaryListItem>
+                    <MethodologyNotesSection methodology={methodology} />
+                  </SummaryList>
+                  {editingMode !== 'edit' && (
+                    <>
+                      <PageSearchForm inputLabel="Search in this methodology page." />
+                      <PrintThisPage />
+                    </>
+                  )}
+                </section>
+              </div>
+              <div className="govuk-grid-column-one-third">
+                <RelatedInformation>
+                  <h3 className="govuk-heading-s" id="related-pages">
+                    Help and support
+                  </h3>
+                  <ul className="govuk-list">
+                    <li>
+                      <a href="#contact-us">Contact us</a>
+                    </li>
+                  </ul>
+                </RelatedInformation>
+              </div>
+            </div>
+          </div>
+
+          <div className="govuk-width-container">
             <section
               className={
                 editingMode === 'edit' ? 'dfe-page-editing' : 'dfe-page-preview'
               }
             >
-              {editingMode === 'edit' && (
-                <BrowserWarning>
-                  <ul>
-                    <li>Editing text blocks</li>
-                  </ul>
-                </BrowserWarning>
-              )}
-
-              {isPreRelease ? (
-                <PageTitle caption="Methodology" title={methodology.title} />
-              ) : (
-                <h2
-                  aria-hidden
-                  className="govuk-heading-lg"
-                  data-testid="page-title"
-                >
-                  {methodology.title}
-                </h2>
-              )}
-
-              <SummaryList>
-                <SummaryListItem term="Publish date">
-                  {methodology.published ? (
-                    <FormattedDate>{methodology.published}</FormattedDate>
-                  ) : (
-                    'Not yet published'
-                  )}
-                </SummaryListItem>
-                <MethodologyNotesSection methodology={methodology} />
-              </SummaryList>
-              {editingMode !== 'edit' && (
-                <>
-                  <PageSearchForm inputLabel="Search in this methodology page." />
-                  <PrintThisPage />
-                </>
-              )}
-
               <MethodologyAccordion
                 methodology={methodology}
                 sectionKey="content"
@@ -90,6 +125,10 @@ export const MethodologyContentPageInternal = () => {
                 methodology={methodology}
                 sectionKey="annexes"
                 title="Annexes"
+              />
+
+              <MethodologyHelpAndSupportSection
+                owningPublication={methodologyVersion.owningPublication}
               />
             </section>
           </div>
@@ -104,25 +143,34 @@ const MethodologyContentPage = ({
 }: RouteComponentProps<MethodologyRouteParams>) => {
   const { methodologyId } = match.params;
 
-  const { value, isLoading } =
-    useAsyncHandledRetry<MethodologyContextState>(async () => {
-      const methodology = await methodologyContentService.getMethodologyContent(
-        methodologyId,
-      );
-      const canUpdateMethodology = await permissionService.canUpdateMethodology(
-        methodologyId,
-      );
+  const { data: methodologyVersion, isLoading: isMethodologyVersionLoading } =
+    useQuery(methodologyQueries.get(methodologyId));
 
-      return {
-        methodology,
-        canUpdateMethodology,
-      };
-    }, [methodologyId]);
+  const { data: methodologyContent, isLoading: isMethodologyContentLoading } =
+    useQuery(methodologyContentQueries.get(methodologyId));
+
+  const {
+    data: canUpdateMethodology,
+    isLoading: isCanUpdateMethodologyLoading,
+  } = useQuery(permissionQueries.canUpdateMethodology(methodologyId));
+
+  const isLoading =
+    isMethodologyVersionLoading ||
+    isMethodologyContentLoading ||
+    isCanUpdateMethodologyLoading;
 
   return (
     <LoadingSpinner loading={isLoading}>
-      {value ? (
-        <MethodologyContentProvider value={value}>
+      {methodologyContent &&
+      methodologyVersion &&
+      canUpdateMethodology !== undefined ? (
+        <MethodologyContentProvider
+          value={{
+            methodology: methodologyContent,
+            methodologyVersion,
+            canUpdateMethodology,
+          }}
+        >
           <MethodologyContentPageInternal />
         </MethodologyContentProvider>
       ) : (
