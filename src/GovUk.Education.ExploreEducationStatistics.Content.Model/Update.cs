@@ -1,34 +1,28 @@
 #nullable enable
 using System;
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+public class Update : ICreatedTimestamp<DateTime?>
 {
-    public class Update
-    {
-        [Key] [Required] public Guid Id { get; set; }
+    [Key] [Required] public Guid Id { get; set; }
 
-        public Guid ReleaseId { get; set; }
+    public Guid ReleaseId { get; set; }
 
-        public Release Release { get; set; } = null!;
+    public Release Release { get; set; } = null!;
 
-        public DateTime? Created { get; set; }
+    // TODO - Can this be non-nullable?
+    public DateTime? Created { get; set; }
 
-        public User? CreatedBy { get; set; }
+    // TODO - Can this be non-nullable?
+    public User? CreatedBy { get; set; }
 
-        public Guid? CreatedById { get; set; }
+    // TODO - Can this be non-nullable?
+    public Guid? CreatedById { get; set; }
 
-        [Required] public DateTime On { get; set; }
+    [Required] public DateTime On { get; set; }
 
-        [Required] public string Reason { get; set; } = null!;
-
-        public Update Clone(Release newRelease)
-        {
-            var copy = MemberwiseClone() as Update;
-            copy.Id = Guid.NewGuid();
-            copy.Release = newRelease;
-            copy.ReleaseId = newRelease.Id;
-            return copy;
-        }
-    }
+    [Required] public string Reason { get; set; } = null!;
 }
