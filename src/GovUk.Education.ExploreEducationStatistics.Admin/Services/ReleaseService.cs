@@ -488,24 +488,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public static IQueryable<Release> HydrateRelease(IQueryable<Release> values)
-        {
-            // Require publication / release graph to be able to work out:
-            // If the release is the latest
-            return values
-                .Include(r => r.Publication)
-                .Include(r => r.ReleaseStatuses);
-        }
-
-        private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)
-        {
-            return _context
-                .MethodologyVersions
-                .Include(m => m.Methodology)
-                .Where(m => releaseId == m.ScheduledWithReleaseId)
-                .ToList();
-        }
-
         private async Task<Either<ActionResult, Release>> CheckReleaseExists(Guid releaseId)
         {
             return await _context
@@ -562,20 +544,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentSection originalSection,
             Release newRelease)
         {
-            // Create a like-for-like copy of the template ContentSection.
-            var copy = originalSection.MemberwiseClone();
+            // Create a new ContentSection based upon the original template.
+            return new ContentSection
+            {
+                // Assign a new Id.
+                Id = Guid.NewGuid(),
 
-            // Assign a new Id for the new ContentSection.
-            copy.Id = Guid.NewGuid();
+                // Assign it to the new Release.
+                ReleaseId = newRelease.Id,
 
-            // Assign the new ContentSection to the new Release.
-            copy.Release = newRelease;
-            copy.ReleaseId = newRelease.Id;
-
-            // Do not copy over any existing Content from the original template ContentSection.
-            copy.Content = new List<ContentBlock>();
-
-            return copy;
+                // Copy certain fields from the original.
+                Caption = originalSection.Caption,
+                Heading = originalSection.Heading,
+                Order = originalSection.Order,
+                Type = originalSection.Type
+            };
         }
 
         private async Task<bool> CanUpdateDataFiles(Guid releaseId)
@@ -600,6 +583,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return Unit.Instance;
+        }
+
+        public static IQueryable<Release> HydrateRelease(IQueryable<Release> values)
+        {
+            // Require publication / release graph to be able to work out:
+            // If the release is the latest
+            return values
+                .Include(r => r.Publication)
+                .Include(r => r.ReleaseStatuses);
+        }
+
+        private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)
+        {
+            return _context
+                .MethodologyVersions
+                .Include(m => m.Methodology)
+                .Where(m => releaseId == m.ScheduledWithReleaseId)
+                .ToList();
         }
     }
 
