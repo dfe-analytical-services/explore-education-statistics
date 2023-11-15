@@ -16,11 +16,4 @@ public class EmbedBlock : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     public DateTime Created { get; set; }
 
     public DateTime? Updated { get; set; }
-
-    public EmbedBlock Clone()
-    {
-        var copy = MemberwiseClone() as EmbedBlock;
-        copy.Id = Guid.NewGuid();
-        return copy;
-    }
 }
