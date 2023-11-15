@@ -41,95 +41,96 @@ export const MethodologyContentPageInternal = () => {
         <>
           {canUpdateContent && <EditablePageModeToggle />}
 
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              <section
-                className={
-                  editingMode === 'edit'
-                    ? 'dfe-page-editing'
-                    : 'dfe-page-preview'
-                }
-              >
-                {editingMode === 'edit' && (
-                  <BrowserWarning>
-                    <ul>
-                      <li>Editing text blocks</li>
-                    </ul>
-                  </BrowserWarning>
-                )}
+          <div className="govuk-width-container">
+            <div className="govuk-grid-row">
+              <div className="govuk-grid-column-two-thirds">
+                <section
+                  className={
+                    editingMode === 'edit'
+                      ? 'dfe-page-editing'
+                      : 'dfe-page-preview'
+                  }
+                >
+                  {editingMode === 'edit' && (
+                    <BrowserWarning>
+                      <ul>
+                        <li>Editing text blocks</li>
+                      </ul>
+                    </BrowserWarning>
+                  )}
 
-                {isPreRelease ? (
-                  <PageTitle caption="Methodology" title={methodology.title} />
-                ) : (
-                  <h2
-                    aria-hidden
-                    className="govuk-heading-lg"
-                    data-testid="page-title"
-                  >
-                    {methodology.title}
-                  </h2>
-                )}
+                  {isPreRelease ? (
+                    <PageTitle
+                      caption="Methodology"
+                      title={methodology.title}
+                    />
+                  ) : (
+                    <h2
+                      aria-hidden
+                      className="govuk-heading-lg"
+                      data-testid="page-title"
+                    >
+                      {methodology.title}
+                    </h2>
+                  )}
 
-                <SummaryList>
-                  <SummaryListItem term="Publish date">
-                    {methodology.published ? (
-                      <FormattedDate>{methodology.published}</FormattedDate>
-                    ) : (
-                      'Not yet published'
-                    )}
-                  </SummaryListItem>
-                  <MethodologyNotesSection methodology={methodology} />
-                </SummaryList>
-                {editingMode !== 'edit' && (
-                  <>
-                    <PageSearchForm inputLabel="Search in this methodology page." />
-                    <PrintThisPage />
-                  </>
-                )}
-              </section>
-            </div>
-            <div className="govuk-grid-column-one-third">
-              <RelatedInformation>
-                <h3 className="govuk-heading-s" id="related-pages">
-                  Help and support
-                </h3>
-                <ul className="govuk-list">
-                  <li>
-                    <a href="#contact-us">Contact us</a>
-                  </li>
-                </ul>
-              </RelatedInformation>
+                  <SummaryList>
+                    <SummaryListItem term="Publish date">
+                      {methodology.published ? (
+                        <FormattedDate>{methodology.published}</FormattedDate>
+                      ) : (
+                        'Not yet published'
+                      )}
+                    </SummaryListItem>
+                    <MethodologyNotesSection methodology={methodology} />
+                  </SummaryList>
+                  {editingMode !== 'edit' && (
+                    <>
+                      <PageSearchForm inputLabel="Search in this methodology page." />
+                      <PrintThisPage />
+                    </>
+                  )}
+                </section>
+              </div>
+              <div className="govuk-grid-column-one-third">
+                <RelatedInformation>
+                  <h3 className="govuk-heading-s" id="related-pages">
+                    Help and support
+                  </h3>
+                  <ul className="govuk-list">
+                    <li>
+                      <a href="#contact-us">Contact us</a>
+                    </li>
+                  </ul>
+                </RelatedInformation>
+              </div>
             </div>
           </div>
 
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-full">
-              <section
-                className={
-                  editingMode === 'edit'
-                    ? 'dfe-page-editing'
-                    : 'dfe-page-preview'
-                }
-              >
-                <MethodologyAccordion
-                  methodology={methodology}
-                  sectionKey="content"
-                  title="Content"
-                />
-                {editingMode !== 'edit' && methodology.annexes.length ? (
-                  <h2>Annexes</h2>
-                ) : null}
-                <MethodologyAccordion
-                  methodology={methodology}
-                  sectionKey="annexes"
-                  title="Annexes"
-                />
+          <div className="govuk-width-container">
+            <section
+              className={
+                editingMode === 'edit' ? 'dfe-page-editing' : 'dfe-page-preview'
+              }
+            >
+              <MethodologyAccordion
+                methodology={methodology}
+                sectionKey="content"
+                title="Content"
+              />
+              {editingMode !== 'edit' && methodology.annexes.length ? (
+                <h2>Annexes</h2>
+              ) : null}
+              <MethodologyAccordion
+                methodology={methodology}
+                sectionKey="annexes"
+                title="Annexes"
+              />
 
-                <MethodologyHelpAndSupportSection
-                  owningPublication={methodologyVersion.owningPublication}
-                />
-              </section>
-            </div>
+              <MethodologyHelpAndSupportSection
+                owningPublication={methodologyVersion.owningPublication}
+              />
+            </section>
           </div>
         </>
       )}
