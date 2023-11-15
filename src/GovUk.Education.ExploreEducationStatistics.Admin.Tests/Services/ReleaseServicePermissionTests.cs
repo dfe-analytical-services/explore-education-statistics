@@ -19,7 +19,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
@@ -312,9 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IReleaseDataFileService>(),
                 Mock.Of<IReleaseFileService>(),
                 Mock.Of<IDataImportService>(),
-                Mock.Of<IFootnoteService>(),
                 Mock.Of<IFootnoteRepository>(),
-                Mock.Of<StatisticsDbContext>(),
                 Mock.Of<IDataBlockService>(),
                 Mock.Of<IReleaseSubjectRepository>(),
                 new SequentialGuidGenerator(),

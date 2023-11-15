@@ -20,7 +20,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
@@ -69,9 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
             IDataImportService dataImportService,
-            IFootnoteService footnoteService,
             IFootnoteRepository footnoteRepository,
-            StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
             IGuidGenerator guidGenerator,
@@ -467,20 +464,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ContentSection originalSection,
             Release newRelease)
         {
-            // Create a like-for-like copy of the template ContentSection.
-            var copy = originalSection.MemberwiseClone();
+            // Create a new ContentSection based upon the original template.
+            return new ContentSection
+            {
+                // Assign a new Id.
+                Id = Guid.NewGuid(),
 
-            // Assign a new Id for the new ContentSection.
-            copy.Id = Guid.NewGuid();
+                // Assign it to the new Release.
+                ReleaseId = newRelease.Id,
 
-            // Assign the new ContentSection to the new Release.
-            copy.Release = newRelease;
-            copy.ReleaseId = newRelease.Id;
-
-            // Do not copy over any existing Content from the original template ContentSection.
-            copy.Content = new List<ContentBlock>();
-
-            return copy;
+                // Copy certain fields from the original.
+                Caption = originalSection.Caption,
+                Heading = originalSection.Heading,
+                Order = originalSection.Order,
+                Type = originalSection.Type
+            };
         }
 
         public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
