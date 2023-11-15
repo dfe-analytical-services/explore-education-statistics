@@ -166,6 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 Query = new TableBuilderQueryViewModel(release.PublicationId, dataBlock.Query),
                 ReleaseId = release.Id,
                 ReleaseSlug = release.Slug,
+                ReleaseType = release.Type,
                 LatestData = latestRelease.Id == release.Id,
                 LatestReleaseTitle = latestRelease.Title
             };

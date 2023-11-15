@@ -94,6 +94,7 @@ const ReleaseContentPageLoaded = () => {
                 {editingMode === 'table-preview' && (
                   <ReleasePreviewTableTool
                     releaseId={release.id}
+                    releaseType={release.type}
                     publication={release.publication}
                   />
                 )}
