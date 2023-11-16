@@ -56,8 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         /**
          * Pre Release management
          */
-        CanViewPrereleaseContacts,
-        CanAssignPrereleaseContactsToSpecificRelease,
+        CanAssignPreReleaseUsersToSpecificRelease,
 
         /**
          * Publication management
