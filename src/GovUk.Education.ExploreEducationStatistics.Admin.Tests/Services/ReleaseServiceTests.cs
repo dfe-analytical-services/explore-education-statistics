@@ -1885,8 +1885,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseSubjectRepository? releaseSubjectRepository = null,
             IBlobCacheService? cacheService = null)
         {
-            contentDbContext ??= Mock.Of<ContentDbContext>(Strict);
-
             var userService = AlwaysTrueUserService();
 
             userService
