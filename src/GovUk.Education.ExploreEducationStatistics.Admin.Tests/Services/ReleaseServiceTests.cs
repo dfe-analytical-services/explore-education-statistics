@@ -57,11 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = ReleaseType.ExperimentalStatistics,
             };
 
-            ReleaseService releaseService = BuildReleaseService();
+            ReleaseService releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
 
             Either<ActionResult, ReleaseViewModel> result = await releaseService.CreateRelease(releaseCreateRequest);
 
-            result.AssertBadRequest(ReleaseType.ExperimentalStatistics);
+            result.AssertBadRequest(ReleaseTypeInvalid);
         }
 
         [Fact]
@@ -72,11 +72,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = ReleaseType.ExperimentalStatistics,
             };
 
-            ReleaseService releaseService = BuildReleaseService();
+            ReleaseService releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
 
             Either<ActionResult, ReleaseViewModel> result = await releaseService.UpdateRelease(It.IsAny<Guid>(), releaseUpdateRequest);
 
-            result.AssertBadRequest(ReleaseType.ExperimentalStatistics);
+            result.AssertBadRequest(ReleaseTypeInvalid);
         }
 
         [Fact]
@@ -1870,7 +1870,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static ReleaseService BuildReleaseService(
-            ContentDbContext? contentDbContext = null,
+            ContentDbContext contentDbContext,
             StatisticsDbContext? statisticsDbContext = null,
             IReleaseRepository? releaseRepository = null,
             IReleaseCacheService? releaseCacheService = null,
@@ -1885,6 +1885,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseSubjectRepository? releaseSubjectRepository = null,
             IBlobCacheService? cacheService = null)
         {
+            contentDbContext ??= Mock.Of<ContentDbContext>(Strict);
+
             var userService = AlwaysTrueUserService();
 
             userService
@@ -1892,7 +1894,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(User.Id);
 
             return new ReleaseService(
-                contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
+                contentDbContext,
                 AdminMapper(),
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService.Object,
