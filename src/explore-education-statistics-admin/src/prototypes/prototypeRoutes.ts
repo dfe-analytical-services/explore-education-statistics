@@ -51,6 +51,9 @@ import PrototypeReleaseNav from './PrototypeReleaseNavigation';
 import PrototypeReleaseNav2 from './PrototypeReleaseNavigation2';
 import PrototypeReleaseNav3 from './PrototypeReleaseNavigation3';
 import PrototypeReleaseNav4 from './PrototypeReleaseNavigation4';
+import PrototypeReleaseNav5 from './PrototypeReleaseNavigation5';
+import PrototypeReleaseNav6 from './PrototypeReleaseNavigation6';
+import PrototypeReleaseNav7 from './PrototypeReleaseNavigation7';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -362,6 +365,21 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Release navigation 4',
     path: '/prototypes/release-nav4',
     component: PrototypeReleaseNav4,
+  },
+  {
+    name: 'Release navigation 5',
+    path: '/prototypes/release-nav5',
+    component: PrototypeReleaseNav5,
+  },
+  {
+    name: 'Release navigation 6',
+    path: '/prototypes/release-nav6',
+    component: PrototypeReleaseNav6,
+  },
+  {
+    name: 'Release navigation 7',
+    path: '/prototypes/release-nav7',
+    component: PrototypeReleaseNav7,
   },
 ];
 

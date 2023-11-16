@@ -7,7 +7,7 @@
     display: none !important;
   }
   :global(.govuk-width-container) {
-    @include govuk-media-query($from: 1280px) {
+    @include govuk-media-query($from: 1260px) {
       max-width: 1220px;
 
       ul,
@@ -49,7 +49,7 @@
 .prototypeCardContainerGrid {
   display: grid;
   grid-column-gap: 2rem;
-  grid-template-columns: 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   @include govuk-media-query($from: tablet) {
     grid-template-columns: 1fr 1fr;
   }
@@ -106,13 +106,17 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 1rem;
+  padding: 0.75rem 1rem 1rem;
   position: relative;
 
   em {
     font-size: 1.5rem;
     font-style: normal;
     font-weight: 900;
+  }
+
+  p {
+    margin-bottom: 0;
   }
 }
 .prototypeCardChevron {
@@ -485,7 +489,7 @@
 .stickyLinksContainer {
   top: 1rem;
 
-  @include govuk-media-query($from: tablet) {
+  @include govuk-media-query($from: desktop) {
     height: calc(100vh - 3rem);
     overflow: auto;
     margin-right: 1rem;
@@ -517,17 +521,24 @@
 }
 
 .releaseContainer {
-  @include govuk-media-query($from: desktop) {
-    display: flex;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  //flex-direction: column-reverse;
 }
 
 .releaseNav {
-  flex: 1 0 25%;
+  flex: 1 0 100%;
+  @include govuk-media-query($from: desktop) {
+    flex: 1 0 25%;
+  }
 }
 
 .releaseMainContent {
-  flex: 1 0 75%;
+  flex: 1 0 100%;
+  margin-top: 0.5rem;
+  @include govuk-media-query($from: desktop) {
+    flex: 1 0 75%;
+  }
 }
 
 .contentsMobile {
@@ -627,6 +638,9 @@
 
 html {
   scroll-padding-top: 1rem;
+  @include govuk-media-query($until: tablet) {
+    scroll-padding-top: 2.5rem;
+  }
 }
 
 .stickyBackToTop {
@@ -644,4 +658,130 @@ html {
 .prototypeHeaderLinks {
   min-width: 275px;
   text-align: right;
+}
+
+.prototypeQuickLinks {
+  align-items: center;
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  max-width: 100% !important;
+
+  @include govuk-media-query($until: tablet) {
+    gap: 1rem 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    font-size: 14px;
+  }
+}
+
+.prototypeHeaderHr {
+  border-width: 4px;
+  border-color: govuk-colour('blue');
+}
+
+.prototypeActionLink {
+  display: flex;
+
+  &:before {
+    content: '';
+    display: table-cell;
+    width: 27px;
+    height: 27px;
+    background: (url('images/action-link-arrow.svg')),
+      linear-gradient(transparent, transparent) 50% 50%;
+    background-repeat: no-repeat;
+    margin-right: 0.5rem;
+
+    @include govuk-media-query($until: tablet) {
+      background-size: 16px;
+      margin-right: 0.3rem;
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.prototypeDownloadLink {
+  &:before {
+    width: 27px;
+    height: 27px;
+    background: (url('images/download-link-arrow.svg')),
+      linear-gradient(transparent, transparent) 50% 50%;
+
+    @include govuk-media-query($until: tablet) {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.prototypeActionLinkWrapper {
+  background-image: url(https://www.gov.uk/assets/frontend/govuk_publishing_components/action-link-arrow--light-f58b707cfd62c1d0fd8fec7d160351debafe0e8a8767691836a3c967835188bb.svg);
+}
+
+.prototypeConstrainWidth {
+  max-width: 960px;
+}
+
+.prototypeKeyStatsContainer {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  margin-bottom: 2rem;
+}
+
+.prototypeKeyStatIndividual {
+  display: flex;
+  flex-direction: column;
+}
+
+.prototypeKeyStatHelp {
+  flex: 1 1 100%;
+}
+
+.prototypeKeyStatHelpLink {
+  background: govuk-colour('light-grey');
+  display: flex;
+  font-size: 16px !important;
+  //justify-content: space-between;
+  padding: 0.5rem 1rem;
+  margin-bottom: 0;
+
+  :global(.govuk-details__summary) {
+    padding-left: 20px;
+  }
+
+  :global(.govuk-details__text) {
+    padding-right: 1rem;
+  }
+
+  span:first-child {
+    padding-right: 0.5rem;
+  }
+}
+
+.prototypeKeyStatHelpDialog {
+  background: govuk-colour('light-grey');
+  font-size: 16px;
+  padding: 1rem;
+}
+
+.prototypeStatsTypeLogo {
+  width: 60px;
+  height: 60px;
+
+  @include govuk-media-query($from: desktop) {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+.prototypeMobileContents {
+  margin-top: 1rem;
+  :global(.govuk-body-s) {
+    font-size: 1rem !important;
+  }
+  li {
+    margin-bottom: 1rem;
+  }
 }
