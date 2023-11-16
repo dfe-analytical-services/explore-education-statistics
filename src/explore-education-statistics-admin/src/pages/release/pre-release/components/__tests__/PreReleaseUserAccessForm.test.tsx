@@ -157,7 +157,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
 
       // now exceed the limit
-      await userEvent.type(emailsTextarea, `test@test.com`);
+      await userEvent.type(emailsTextarea, `{enter}test@test.com`);
       userEvent.tab();
 
       await waitFor(() => {

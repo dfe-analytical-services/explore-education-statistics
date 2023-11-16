@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -60,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .Entry(latestPublishedVersion)
                         .Collection(m => m.Notes)
                         .LoadAsync();
-                    
+
                     await _contentDbContext
                         .Entry(latestPublishedVersion)
                         .Reference(m => m.MethodologyContent)
@@ -68,9 +69,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
                     var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
                     
-                    viewModel.Publications =
-                        await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
-
+                    viewModel.Publications = await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
+                    
                     return viewModel;
                 });
         }
@@ -114,15 +114,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private async Task<List<PublicationSummaryViewModel>> GetPublishedPublicationsForMethodology(Guid methodologyId)
         {
-            var publicationsWithPublishedReleases = await _contentDbContext.PublicationMethodologies
+            return await _contentDbContext.PublicationMethodologies
                 .Include(pm => pm.Publication)
-                .Where(pm => pm.MethodologyId == methodologyId 
+                .ThenInclude(p => p.Contact)
+                .Where(pm => pm.MethodologyId == methodologyId
                              && pm.Publication.LatestPublishedReleaseId != null)
-                .Select(pm => pm.Publication)
-                .OrderBy(p => p.Title)
+                .Select(pm => new PublicationSummaryViewModel()
+                {
+                    Id = pm.PublicationId,
+                    Title = pm.Publication.Title,
+                    Slug = pm.Publication.Slug,
+                    Owner = pm.Owner,
+                    Contact = _mapper.Map<ContactViewModel>(pm.Publication.Contact)
+                })
+                .OrderBy(pvm => pvm.Title)
                 .ToListAsync();
-
-            return _mapper.Map<List<PublicationSummaryViewModel>>(publicationsWithPublishedReleases);
         }
 
         private async Task<List<MethodologyVersionSummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)

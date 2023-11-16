@@ -99,6 +99,7 @@ describe('DataSetStep', () => {
     title: 'Release 1',
     slug: 'release-1',
     latestData: true,
+    type: 'OfficialStatistics',
   };
 
   test('renders radios with details if no `renderFeaturedTableLink `', () => {

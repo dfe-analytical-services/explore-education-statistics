@@ -1,7 +1,8 @@
-﻿#nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+#nullable enable
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record ContactViewModel
 {
@@ -22,6 +23,6 @@ public record ContactViewModel
         TeamName = contact.TeamName;
         TeamEmail = contact.TeamEmail;
         ContactName = contact.ContactName;
-        ContactTelNo = contact.ContactTelNo;
+        ContactTelNo = contact.ContactTelNo ?? string.Empty;
     }
 }

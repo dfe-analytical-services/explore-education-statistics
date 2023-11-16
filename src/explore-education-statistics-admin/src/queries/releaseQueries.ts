@@ -14,6 +14,12 @@ const releaseQueries = createQueryKeys('release', {
     queryKey: null,
     queryFn: () => releaseService.listReleasesForApproval(),
   },
+  get(releaseId: string) {
+    return {
+      queryKey: [releaseId],
+      queryFn: () => releaseService.getRelease(releaseId),
+    };
+  },
 });
 
 export default releaseQueries;

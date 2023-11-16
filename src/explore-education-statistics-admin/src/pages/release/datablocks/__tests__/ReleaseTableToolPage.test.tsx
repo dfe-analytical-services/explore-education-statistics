@@ -1,3 +1,4 @@
+import render from '@common-test/render';
 import ReleaseTableToolPage from '@admin/pages/release/datablocks/ReleaseTableToolPage';
 import {
   ReleaseRouteParams,
@@ -6,10 +7,12 @@ import {
 import _publicationService, {
   Publication,
 } from '@admin/services/publicationService';
+import { Release } from '@admin/services/releaseService';
 import _tableBuilderService from '@common/services/tableBuilderService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { generatePath, MemoryRouter, Route } from 'react-router-dom';
+import { ReleaseContextProvider } from '@admin/pages/release/contexts/ReleaseContext';
 
 jest.mock('@admin/services/publicationService');
 jest.mock('@admin/services/permissionService');
@@ -30,6 +33,28 @@ const testPublication: Publication = {
   slug: 'pupil-absence',
   theme: { id: 'theme-1', title: 'Test theme' },
   topic: { id: 'topic-1', title: 'Test topic' },
+};
+
+const testRelease: Release = {
+  id: '123',
+  slug: '123',
+  approvalStatus: 'Draft',
+  updatePublishedDate: false,
+  latestRelease: true,
+  live: true,
+  amendment: false,
+  publicationId: '123',
+  publicationTitle: 'Test Publication Title',
+  publicationSlug: 'test-publication-title-slug',
+  timePeriodCoverage: {
+    value: 'test',
+    label: 'test',
+  },
+  title: 'test title',
+  type: 'NationalStatistics',
+  preReleaseAccessList: 'test',
+  year: 2023,
+  yearTitle: '2023',
 };
 
 describe('ReleaseTableToolPage', () => {
@@ -109,10 +134,12 @@ describe('ReleaseTableToolPage', () => {
           }),
         ]}
       >
-        <Route
-          component={ReleaseTableToolPage}
-          path={releaseTableToolRoute.path}
-        />
+        <ReleaseContextProvider release={testRelease}>
+          <Route
+            component={ReleaseTableToolPage}
+            path={releaseTableToolRoute.path}
+          />
+        </ReleaseContextProvider>
       </MemoryRouter>,
     );
   };

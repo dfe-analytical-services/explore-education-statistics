@@ -31,6 +31,12 @@ describe('ScheduledReleasesTable', () => {
         id: 'publication-1',
         slug: 'publication-1-slug',
         title: 'Publication 1',
+        owner: true,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       permissions: {
         canViewRelease: true,
@@ -60,6 +66,12 @@ describe('ScheduledReleasesTable', () => {
         id: 'publication-2',
         slug: 'publication-2-slug',
         title: 'Publication 2',
+        owner: false,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       permissions: {
         canViewRelease: true,
@@ -89,6 +101,12 @@ describe('ScheduledReleasesTable', () => {
         id: 'publication-1',
         slug: 'publication-1-slug',
         title: 'Publication 1',
+        owner: false,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       permissions: {
         canViewRelease: true,
@@ -118,6 +136,12 @@ describe('ScheduledReleasesTable', () => {
         id: 'publication-3',
         slug: 'publication-3-slug',
         title: 'Publication 3',
+        owner: false,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       permissions: {
         canViewRelease: true,

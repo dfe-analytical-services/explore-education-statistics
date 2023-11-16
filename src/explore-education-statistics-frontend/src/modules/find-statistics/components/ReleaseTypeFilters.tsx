@@ -1,7 +1,7 @@
 import Button from '@common/components/Button';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import { releaseTypes, ReleaseType } from '@common/services/types/releaseType';
-import { ReleaseTypesModal } from '@frontend/modules/find-statistics/components/FilterModals';
+import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
 import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/FiltersDesktop';
 import React from 'react';
 

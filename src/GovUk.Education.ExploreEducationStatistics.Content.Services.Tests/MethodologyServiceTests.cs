@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -61,6 +62,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Methodology = methodology,
                         Owner = true
                     }
+                },
+                Contact = new Contact()
+                {
+                    TeamEmail = "team-email",
+                    TeamName = "team-name",
+                    ContactName = "contact-name",
+                    ContactTelNo = "contact-tel-no"
                 }
             };
 
@@ -93,6 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(publication.Id, result.Publications[0].Id);
                 Assert.Equal(publication.Slug, result.Publications[0].Slug);
                 Assert.Equal(publication.Title, result.Publications[0].Title);
+                Assert.True(result.Publications[0].Owner);
+                Assert.NotNull(result.Publications[0].Contact);
             }
         }
 
@@ -128,8 +138,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     new()
                     {
                         Methodology = methodology,
-                        Owner = true
+                        Owner = true,
                     }
+                },
+                Contact = new Contact()
+                {
+                    TeamEmail = "team-email",
+                    TeamName = "team-name",
+                    ContactName = "contact-name",
+                    ContactTelNo = "contact-tel-no"
                 }
             };
 
@@ -161,7 +178,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 contentDbContext.Attach(methodology.Versions[0]);
-
+                contentDbContext.Attach(publicationA);
+                
                 var service = SetupMethodologyService(contentDbContext);
 
 
