@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly Release _release = new()
         {
             Id = Guid.NewGuid(),
-            Publication= new Publication(),
+            Publication = new Publication(),
             Published = DateTime.Now,
             TimePeriodCoverage = TimeIdentifier.April
         };

@@ -57,8 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _contentDbContext
                 .Releases
                 .HydrateReleaseForChecklist()
-                .SingleOrDefaultAsync(r => r.Id == releaseId)
-                .OrNotFound()
+                .SingleOrNotFoundAsync(r => r.Id == releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(
                     async release => new ReleaseChecklistViewModel(

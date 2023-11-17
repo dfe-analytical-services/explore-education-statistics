@@ -1468,11 +1468,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SingleAsync(r => r.Id == release.Id);
 
                 // Assert that the failure to send emails prevented the Release from completing approval.
-                // The Release should remain unchanged from the original Release, as changes to it were rolled back.
+                // The Release should remain unchanged from the original Release.
                 // Additionally, no new ReleaseStatus entries were added.
                 saved.AssertDeepEqualTo(release);
 
-                // Futhermore, we have proven that the Publisher was not informed of the Release change, as it
+                // Furthermore, we have proven that the Publisher was not informed of the Release change, as it
                 // did not complete.
             }
         }
@@ -1583,7 +1583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SingleAsync(r => r.Id == release.Id);
 
                 // Assert that the failure to notify the Publisher prevented the Release from completing approval.
-                // The Release should remain unchanged from the original Release, as changes to it were rolled back.
+                // The Release should remain unchanged from the original Release.
                 // Additionally, no new ReleaseStatus entries were added.
                 saved.AssertDeepEqualTo(release);
 

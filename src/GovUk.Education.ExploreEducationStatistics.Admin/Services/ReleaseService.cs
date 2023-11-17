@@ -345,8 +345,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _context
                 .Releases
                 .HydrateReleaseForChecklist()
-                .SingleOrDefaultAsync(r => r.Id == releaseId)
-                .OrNotFound()
+                .SingleOrNotFoundAsync(r => r.Id == releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
                 .OnSuccess(async release =>
