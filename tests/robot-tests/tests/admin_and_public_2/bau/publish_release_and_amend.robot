@@ -426,7 +426,32 @@ Verify Dates data block table has footnotes
     ...    Applies to all data 2
     ...    ${data_block_table}
 
+Verify Dates data block Fast Track page
+
+    ${release_url}=    user gets url
+
+    user clicks link by visible text    Explore data    testid:Data block - Dates data block name-table-tab
+
+    user waits until page contains title    Create your own tables
+    user waits until page contains    This is the latest data
+
+    user checks table column heading contains    1    1    2020 Week 13
+    user checks headed table body row cell contains    Number of open settings    1    22,900
+    user checks headed table body row cell contains    Proportion of settings open    1    1%
+
+    user checks list has x items    testid:footnotes    2
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+
+    ${url}=    user gets url
+    set suite variable    ${FAST_TRACK_URL}    ${url}
+
+    go to    ${release_url}
+
 Verify Test text accordion section contains correct text
+    user waits until page contains accordion section    Test text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
     user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text!"]
@@ -886,7 +911,39 @@ Verify amendment Dates data block table has footnotes
     ...    Applies to all data 3
     ...    ${data_block_table}
 
+Verify amendment Dates data block Fast Track page
+
+    ${release_url}=    user gets url
+
+    user clicks link by visible text    Explore data    testid:Data block - Dates data block name-table-tab
+
+    user waits until page contains title    Create your own tables
+    user waits until page contains    This is the latest data
+
+    # Check to ensure that the new version of the Data Block is still accessible on the same link as before.
+    user checks url equals    ${FAST_TRACK_URL}
+
+    user checks table column heading contains    1    1    2020 Week 13
+    user checks headed table body row cell contains    Number of open settings    1    23,000
+    user checks headed table body row cell contains    Proportion of settings open    1    2%
+    user checks headed table body row cell contains    Number of open settings    1    23,600
+    user checks headed table body row cell contains    Proportion of settings open    1    1%
+
+    user checks list has x items    testid:footnotes    2
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+
+    user clicks button    Show 1 more footnote
+    user checks list has x items    testid:footnotes    3
+    user checks list item contains    testid:footnotes    3
+    ...    Applies to all data 3
+
+    go to    ${release_url}
+
 Verify amendment Test text accordion section contains correct text
+    user waits until page contains accordion section    Test text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
     user checks element contains    ${section}    Amended test text!
@@ -932,6 +989,20 @@ Add release note to second amendment
     user enters text into element    id:createReleaseNoteForm-reason    Test release note two
     user clicks button    Save note
 
+Remove the data block from the second amendment
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks
+    user clicks button    Delete block
+    user waits until modal is visible    Delete data block
+    user clicks button    Confirm
+    user waits until modal is not visible    Delete data block
+
+Remove the content section that originally contained the deleted data block
+    user clicks link    Content
+    user waits until page contains accordion section    Dates data block
+    user opens accordion section    Dates data block    id:releaseMainContent
+    user deletes editable accordion section    Dates data block    id:releaseMainContent
+
 Approve release amendment for scheduled publication and update published date
     ${days_until_release}=    set variable    2
     ${publish_date_day}=    get current datetime    %-d    ${days_until_release}
@@ -963,3 +1034,7 @@ Verify public published date has been updated
 
 Validate next update date
     user checks summary list contains    Next update    August 4001
+
+Verify that the Dates data block is no longer available
+    go to    ${FAST_TRACK_URL}
+    user waits until page contains title   Page not found

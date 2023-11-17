@@ -33,11 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonIgnore] public ContentSection? ContentSection { get; set; }
 
         [JsonIgnore] public Guid? ContentSectionId { get; set; }
-        
+
         public Guid ReleaseId { get; set; }
 
         public Release Release { get; set; }
-        
+
         public int Order { get; set; }
 
         public DateTime? Created { get; set; }
@@ -56,20 +56,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [ConcurrencyCheck]
         public Guid? LockedById { get; set; }
 
-        public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection = null)
+        // EES-4637 - we need to decide on how we're being consistent with Created dates in Release Amendments.
+        public ContentBlock Clone(Release amendment)
         {
-            var copy = MemberwiseClone() as ContentBlock;
+            var copy = (MemberwiseClone() as ContentBlock)!;
             copy.Id = Guid.NewGuid();
 
-            copy.ContentSection = newContentSection;
-            copy.ContentSectionId = newContentSection?.Id;
-            copy.Release = context.NewRelease;
-            copy.ReleaseId = context.NewRelease.Id;
+            copy.ContentSection = null;
+            copy.ContentSectionId = null;
+            copy.Release = amendment;
+            copy.ReleaseId = amendment.Id;
 
-            // start a new amendment with no comments
+            // Start a new amendment with no comments.
             copy.Comments = new List<Comment>();
-
-            context.OriginalToAmendmentContentBlockMap.Add(this, copy);
 
             return copy;
         }

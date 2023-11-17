@@ -11,10 +11,10 @@ export default TableToolPage;
 
 export const getServerSideProps: GetServerSideProps<TableToolPageProps> =
   withAxiosHandler(async ({ query }) => {
-    const { dataBlockId } = query as Dictionary<string>;
+    const { dataBlockParentId } = query as Dictionary<string>;
 
     const [fastTrack, themeMeta] = await Promise.all([
-      tableBuilderService.getFastTrackTableAndReleaseMeta(dataBlockId),
+      tableBuilderService.getFastTrackTableAndReleaseMeta(dataBlockParentId),
       publicationService.getPublicationTree({
         publicationFilter: 'FastTrack',
       }),

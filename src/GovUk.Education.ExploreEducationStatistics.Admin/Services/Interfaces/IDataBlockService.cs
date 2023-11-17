@@ -1,31 +1,27 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Microsoft.AspNetCore.Mvc;
-using ContentSectionId = System.Guid;
-using DataBlockId = System.Guid;
-using ReleaseId = System.Guid;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IDataBlockService
     {
-        Task<Either<ActionResult, DataBlockViewModel>> Create(ReleaseId releaseId, DataBlockCreateViewModel dataBlockCreate);
+        Task<Either<ActionResult, DataBlockViewModel>> Create(Guid releaseId, DataBlockCreateViewModel dataBlockCreate);
 
-        Task<Either<ActionResult, Unit>> Delete(ReleaseId releaseId, DataBlockId id);
+        Task<Either<ActionResult, Unit>> Delete(Guid releaseId, Guid id);
 
-        Task<Either<ActionResult, DataBlockViewModel>> Get(DataBlockId id);
+        Task<Either<ActionResult, DataBlockViewModel>> Get(Guid dataBlockVersionId);
 
-        Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(ReleaseId releaseId);
+        Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(Guid releaseId);
 
-        Task<Either<ActionResult, DataBlockViewModel>> Update(DataBlockId id, DataBlockUpdateViewModel dataBlockUpdate);
+        Task<Either<ActionResult, DataBlockViewModel>> Update(Guid id, DataBlockUpdateViewModel dataBlockUpdate);
 
         Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
 
@@ -39,8 +35,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId);
 
-        Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlock dataBlock);
+        Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlockVersion dataBlockVersion);
 
         Task<List<DataBlock>> ListDataBlocks(Guid releaseId);
+
+        Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
+            Guid releaseId,
+            Guid dataBlockParentId);
     }
 }

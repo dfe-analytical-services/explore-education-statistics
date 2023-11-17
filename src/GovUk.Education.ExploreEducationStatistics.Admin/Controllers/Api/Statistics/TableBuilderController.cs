@@ -1,8 +1,8 @@
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -10,14 +10,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
@@ -28,17 +25,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
     public class TableBuilderController : ControllerBase
     {
         private readonly ITableBuilderService _tableBuilderService;
-        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserService _userService;
+        private readonly IDataBlockService _dataBlockService;
 
         public TableBuilderController(
             ITableBuilderService tableBuilderService,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IUserService userService)
+            IUserService userService,
+            IDataBlockService dataBlockService)
         {
             _tableBuilderService = tableBuilderService;
-            _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
+            _dataBlockService = dataBlockService;
         }
 
         [HttpPost("data/tablebuilder/release/{releaseId:guid}")]
@@ -72,33 +69,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             await result.ExecuteResultAsync(ControllerContext);
         }
 
-        [HttpGet("data/tablebuilder/release/{releaseId:guid}/data-block/{dataBlockId:guid}")]
+        [HttpGet("data/tablebuilder/release/{releaseId:guid}/data-block/{dataBlockParentId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
-            Guid dataBlockId,
+            Guid dataBlockParentId,
             CancellationToken cancellationToken = default)
         {
-            return await _contentPersistenceHelper
-                .CheckEntityExists<ContentBlock>(
-                    query => query
-                        .Include(block => block.Release)
-                        .OfType<DataBlock>()
-                        .Where(block =>
-                            block.ReleaseId == releaseId
-                            && block.Id == dataBlockId))
-                .OnSuccess(block => block is DataBlock dataBlock ? dataBlock : new Either<ActionResult,DataBlock>(new NotFoundResult()))
-                .OnSuccess(dataBlock => GetReleaseDataBlockResults(dataBlock, cancellationToken))
+            return await _dataBlockService
+                .GetDataBlockVersionForRelease(releaseId: releaseId, dataBlockParentId: dataBlockParentId)
+                .OnSuccess(dataBlockVersion => GetReleaseDataBlockResults(dataBlockVersion, cancellationToken))
                 .HandleFailuresOrOk();
         }
 
         [BlobCache(typeof(DataBlockTableResultCacheKey))]
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
-            DataBlock dataBlock,
+            DataBlockVersion dataBlockVersion,
             CancellationToken cancellationToken)
         {
             return await _userService
-                .CheckCanViewRelease(dataBlock.Release)
-                .OnSuccess(_ => _tableBuilderService.Query(dataBlock.ReleaseId, dataBlock.Query, cancellationToken));
+                .CheckCanViewRelease(dataBlockVersion.Release)
+                .OnSuccess(_ => _tableBuilderService.Query(dataBlockVersion.ReleaseId, dataBlockVersion.Query, cancellationToken));
         }
     }
 }

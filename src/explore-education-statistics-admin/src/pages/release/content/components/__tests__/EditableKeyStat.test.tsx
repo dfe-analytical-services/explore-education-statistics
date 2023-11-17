@@ -145,7 +145,7 @@ describe('EditableKeyStat', () => {
       guidanceText: 'Guidance text',
       order: 0,
       created: '2023-01-01',
-      dataBlockId: 'block-1',
+      dataBlockParentId: 'block-1',
     };
 
     test('renders correctly', async () => {

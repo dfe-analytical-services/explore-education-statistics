@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -20,27 +22,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
     public class DataBlockServiceTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task GetDataBlockTableResult()
         {
             var subjectId = Guid.NewGuid();
 
-            var release = new Release();
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
 
-            var dataBlock = new DataBlock
-            {
-                Query = new ObservationQueryContext
-                {
-                    SubjectId = subjectId
-                },
-                Release = release
-            };
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.ContentBlocks.AddRangeAsync(dataBlock);
+                await contentDbContext.DataBlockParents.AddRangeAsync(dataBlockParent);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -60,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .Setup(
                         s =>
                             s.Query(
-                                dataBlock.ReleaseId,
+                                dataBlockVersion.ReleaseId,
                                 It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId),
                                 default
                             )
@@ -68,8 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     .ReturnsAsync(tableBuilderResults);
 
                 var result = (await service.GetDataBlockTableResult(
-                    dataBlock.ReleaseId,
-                    dataBlock.Id)).AssertRight();
+                    dataBlockVersion.ReleaseId,
+                    dataBlockVersion.Id)).AssertRight();
 
                 VerifyAllMocks(tableBuilderService);
 
@@ -85,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 Release = new Release()
             };
-            
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.ContentBlocks.AddRangeAsync(htmlBlock);

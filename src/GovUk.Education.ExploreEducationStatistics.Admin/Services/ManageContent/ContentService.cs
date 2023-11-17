@@ -270,8 +270,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccessDo(block => _hubContext.Clients.Group(releaseId.ToString()).ContentBlockUpdated(block));
         }
 
-        public Task<Either<ActionResult, IContentBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,
-            ContentBlockAttachRequest request)
+        public Task<Either<ActionResult, DataBlockViewModel>> AttachDataBlock(Guid releaseId, Guid contentSectionId,
+            DataBlockAttachRequest request)
         {
             return CheckContentSectionExists(releaseId, contentSectionId)
                 .OnSuccess(CheckCanUpdateRelease)
@@ -279,25 +279,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 {
                     var (_, section) = tuple;
 
-                    var blockToAttach =
-                        _context.ContentBlocks.FirstOrDefault(block => block.Id == request.ContentBlockId);
+                    var dataBlockVersion = _context
+                        .DataBlockVersions
+                        .FirstOrDefault(block => block.Id == request.ContentBlockId);
 
-                    if (blockToAttach == null)
+                    if (dataBlockVersion == null)
                     {
-                        return NotFound<IContentBlockViewModel>();
+                        return NotFound<DataBlockViewModel>();
                     }
 
-                    if (!(blockToAttach is DataBlock dataBlock))
-                    {
-                        return ValidationActionResult(IncorrectContentBlockTypeForAttach);
-                    }
-
-                    if (dataBlock.ContentSectionId.HasValue)
+                    if (dataBlockVersion.ContentSectionId.HasValue)
                     {
                         return ValidationActionResult(ContentBlockAlreadyAttachedToContentSection);
                     }
 
-                    return await AddContentBlockToContentSectionAndSave(request.Order, section, dataBlock);
+                    return await AddContentBlockToContentSectionAndSave(
+                            request.Order, section, dataBlockVersion.ContentBlock)
+                        .OnSuccess(contentBlockViewModel => contentBlockViewModel as DataBlockViewModel);
                 });
         }
 

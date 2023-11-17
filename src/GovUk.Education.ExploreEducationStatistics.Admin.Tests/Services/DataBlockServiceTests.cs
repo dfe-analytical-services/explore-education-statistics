@@ -15,9 +15,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -33,57 +35,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class DataBlockServiceTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task Get()
         {
             var subjectId = Guid.NewGuid();
 
-            var release = new Release();
-            
-            var dataBlock = new DataBlock
-            {
-                Release = release,
-                Heading = "Test heading",
-                Name = "Test name",
-                Source = "Test source",
-                Order = 5,
-                Query = new ObservationQueryContext
-                {
-                    SubjectId = subjectId,
-                    Filters = new List<Guid>
-                    {
-                        Guid.NewGuid(),
-                    },
-                    Indicators = new List<Guid>
-                    {
-                        Guid.NewGuid(),
-                    },
-                },
-                Table = new TableBuilderConfiguration
-                {
-                    TableHeaders = new TableHeaders
-                    {
-                        Rows = new List<TableHeader>
-                        {
-                            new (Guid.NewGuid().ToString(), TableHeaderType.Indicator)
-                        },
-                        Columns = new List<TableHeader>
-                        {
-                            new (Guid.NewGuid().ToString(), TableHeaderType.Filter)
-                        }
-                    }
-                },
-                Charts = new List<IChart>
-                {
-                    new LineChart
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(ListOf<IChart>(new LineChart
                     {
                         Title = "Test chart",
                         Height = 400,
                         Width = 500,
-                    }
-                },
-                
-            };
+                    }))
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             var releaseFile = new ReleaseFile
             {
@@ -102,27 +80,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Name = "Featured table name",
                 Description = "Featured table description",
-                DataBlock = dataBlock,
+                DataBlock = dataBlockVersion.ContentBlock,
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, releaseFile, dataBlock, featuredTable);
+                await context.AddRangeAsync(release, releaseFile, dataBlockVersion, featuredTable);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
-                var result = await service.Get(dataBlock.Id);
+                var result = await service.Get(dataBlockVersion.Id);
 
                 var retrievedResult = result.AssertRight();
 
-                Assert.Equal(dataBlock.Heading, retrievedResult.Heading);
-                Assert.Equal(dataBlock.Name, retrievedResult.Name);
-                Assert.Equal(dataBlock.Source, retrievedResult.Source);
-                Assert.Equal(dataBlock.Order, retrievedResult.Order);
+                Assert.Equal(dataBlockVersion.Heading, retrievedResult.Heading);
+                Assert.Equal(dataBlockVersion.Name, retrievedResult.Name);
+                Assert.Equal(dataBlockVersion.Source, retrievedResult.Source);
+                Assert.Equal(dataBlockVersion.Order, retrievedResult.Order);
 
                 Assert.Equal(featuredTable.Name, retrievedResult.HighlightName);
                 Assert.Equal(featuredTable.Description, retrievedResult.HighlightDescription);
@@ -130,9 +108,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(subjectId, retrievedResult.DataSetId);
                 Assert.Equal("test release file", retrievedResult.DataSetName);
 
-                dataBlock.Query.AssertDeepEqualTo(retrievedResult.Query);
-                dataBlock.Table.AssertDeepEqualTo(retrievedResult.Table);
-                dataBlock.Charts.AssertDeepEqualTo(retrievedResult.Charts);
+                dataBlockVersion.Query.AssertDeepEqualTo(retrievedResult.Query);
+                dataBlockVersion.Table.AssertDeepEqualTo(retrievedResult.Table);
+                dataBlockVersion.Charts.AssertDeepEqualTo(retrievedResult.Charts);
             }
         }
 
@@ -141,17 +119,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var release = new Release();
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
 
-            var dataBlock = new DataBlock
-            {
-                Release = release,
-                Name = "Test name",
-                Query = new ObservationQueryContext
-                {
-                    SubjectId = subjectId
-                }
-            };
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             var releaseFile = new ReleaseFile
             {
@@ -168,18 +149,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(release, releaseFile, dataBlock);                
+                await context.AddRangeAsync(release, releaseFile, dataBlockVersion);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
-                var result = await service.Get(dataBlock.Id);
+                var result = await service.Get(dataBlockVersion.Id);
 
                 var retrievedResult = result.AssertRight();
 
-                Assert.Equal(dataBlock.Name, retrievedResult.Name);
+                Assert.Equal(dataBlockVersion.Name, retrievedResult.Name);
 
                 Assert.Null(retrievedResult.HighlightName);
                 Assert.Null(retrievedResult.HighlightDescription);
@@ -191,25 +172,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var release = new Release();
-            
-            var dataBlock = new DataBlock
-            {
-                Release = release,
-                Heading = "Test name",
-                Charts = new List<IChart>
-                {
-                    new LineChart
-                    {
-                        Height = 400,
-                        Width = 500,
-                    }
-                },
-                Query = new ObservationQueryContext
-                {
-                    SubjectId = subjectId
-                }
-            };
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    // Set the name to null
+                    .WithName(null)
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             var releaseFile = new ReleaseFile
             {
@@ -222,24 +200,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Type = FileType.Data
                 }
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
 
-                await context.AddRangeAsync(dataBlock, releaseFile);
+                await context.AddRangeAsync(dataBlockVersion, releaseFile);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
-                var result = await service.Get(dataBlock.Id);
-                
+                var result = await service.Get(dataBlockVersion.Id);
+
                 var retrievedResult = result.AssertRight();
-                
-                Assert.Equal(dataBlock.Heading, retrievedResult.Heading);
-                
+
+                Assert.Equal(dataBlockVersion.Heading, retrievedResult.Heading);
+
                 Assert.Equal(subjectId, retrievedResult.DataSetId);
                 Assert.Equal(string.Empty, retrievedResult.DataSetName);
             }
@@ -250,8 +228,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var release = new Release();
-            
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(ListOf<IChart>(new LineChart
+                    {
+                        // No title
+                        Height = 400,
+                        Width = 500,
+                    }))
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+
             var releaseFile = new ReleaseFile
             {
                 Name = "test release file",
@@ -265,71 +262,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var dataBlock = new DataBlock
-            {
-                Heading = "Test heading",
-                Charts = new List<IChart>
-                {
-                    new LineChart
-                    {
-                        // No title
-                        Height = 400,
-                        Width = 500,
-                    }
-                },
-                Query = new ObservationQueryContext
-                {
-                    SubjectId  = subjectId
-                },
-                Release = release
-            };
-
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(dataBlock, releaseFile);
+                await context.AddRangeAsync(dataBlockVersion, releaseFile);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
-                var result = await service.Get(dataBlock.Id);
+                var result = await service.Get(dataBlockVersion.Id);
 
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(dataBlock.Heading, viewModel.Heading);
-                dataBlock.Charts.AssertDeepEqualTo(viewModel.Charts);
+                Assert.Equal(dataBlockVersion.Heading, viewModel.Heading);
+                dataBlockVersion.Charts.AssertDeepEqualTo(viewModel.Charts);
 
                 Assert.Single(viewModel.Charts);
-                Assert.Equal(dataBlock.Heading, viewModel.Charts[0].Title);
+                Assert.Equal(dataBlockVersion.Heading, viewModel.Charts[0].Title);
             }
         }
 
         [Fact]
-        public async Task Get_ReleaseContentBlockWithReleaseFileReturnsDataSetName()
+        public async Task Get_ContentBlockWithReleaseFileReturnsDataSetName()
         {
             var subjectId = Guid.NewGuid();
-            
-            var release = new Release();
-            
-            var dataBlock = new DataBlock
-            {
-                Heading = "Test heading",
-                Charts = new List<IChart>
-                {
-                    new LineChart
-                    {
-                        Height = 400,
-                        Width = 500,
-                    }
-                },
-                Query = new ObservationQueryContext
-                {
-                    SubjectId = subjectId
-                },
-                Release = release
-            };
+
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .Generate())
+                .Generate();
 
             var releaseFile = new ReleaseFile
             {
@@ -337,25 +308,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = release,
                 File = new File
                 {
-                    
+
                     Id = Guid.NewGuid(),
                     SubjectId = subjectId,
                     Filename = "test filename",
                     Type = FileType.Data
                 }
             };
-            
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(dataBlock, releaseFile);
+                await context.AddRangeAsync(dataBlockVersion, releaseFile);
                 await context.SaveChangesAsync();
             }
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
-                var result = await service.Get(dataBlock.Id);
+                var result = await service.Get(dataBlockVersion.Id);
 
                 var retrievedResult = result.AssertRight();
 
@@ -672,28 +645,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetDeletePlan()
         {
-            var release = new Release();
             var fileId = Guid.NewGuid();
 
-            var dataBlock = new DataBlock
-            {
-                Name = "Test name",
-                Charts = new List<IChart>
-                {
-                    new InfographicChart
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithCharts(ListOf<IChart>(new InfographicChart
                     {
                         Title = "Test chart",
                         FileId = fileId.ToString(),
                         Height = 400,
                         Width = 500,
-                    }
-                },
-                ContentSection = new ContentSection
-                {
-                    Heading = "Test heading"
-                },
-                Release = release
-            };
+                    }))
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+
+            release.Content = _fixture
+                .DefaultContentSection()
+                .WithContentBlocks(ListOf<ContentBlock>(dataBlockVersion.ContentBlock))
+                .GenerateList(1);
+
             var file = new File
             {
                 Id = fileId,
@@ -704,7 +683,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(dataBlock);
+                await context.AddAsync(dataBlockVersion);
                 await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
@@ -712,19 +691,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
-                var result = await service.GetDeletePlan(release.Id, dataBlock.Id);
+                var result = await service.GetDeletePlan(release.Id, dataBlockVersion.Id);
 
                 var deletePlan = result.AssertRight();
-                
+
                 Assert.Equal(release.Id, deletePlan.ReleaseId);
 
                 var dependentBlocks = deletePlan.DependentDataBlocks;
 
                 Assert.Single(dependentBlocks);
 
-                Assert.Equal(dataBlock.Id, dependentBlocks[0].Id);
-                Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
-                Assert.Equal(dataBlock.ContentSection.Heading, dependentBlocks[0].ContentSectionHeading);
+                Assert.Equal(dataBlockVersion.Id, dependentBlocks[0].Id);
+                Assert.Equal(dataBlockVersion.Name, dependentBlocks[0].Name);
+                Assert.Equal(dataBlockVersion.ContentSection!.Heading, dependentBlocks[0].ContentSectionHeading);
                 Assert.False(dependentBlocks[0].IsKeyStatistic);
                 Assert.Null(dependentBlocks[0].FeaturedTable);
 
@@ -738,22 +717,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetDeletePlan_DependentDataBlockIsKeyStatistic()
         {
-            var release = new Release();
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
 
-            var dataBlock = new DataBlock
-            {
-                Release = release
-            };
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             var keyStatistic = new KeyStatisticDataBlock
             {
-                DataBlock = dataBlock,
+                DataBlock = dataBlockVersion.ContentBlock,
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(dataBlock);
+                await context.AddAsync(dataBlockVersion);
                 await context.KeyStatisticsDataBlock.AddAsync(keyStatistic);
                 await context.SaveChangesAsync();
             }
@@ -761,7 +747,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
-                var result = await service.GetDeletePlan(release.Id, dataBlock.Id);
+                var result = await service.GetDeletePlan(release.Id, dataBlockVersion.Id);
 
                 var deletePlan = result.AssertRight();
 
@@ -771,9 +757,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(dependentBlocks);
 
-                Assert.Equal(dataBlock.Id, dependentBlocks[0].Id);
-                Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
-                Assert.Null(dataBlock.ContentSection);
+                Assert.Equal(dataBlockVersion.Id, dependentBlocks[0].Id);
+                Assert.Equal(dataBlockVersion.Name, dependentBlocks[0].Name);
+                Assert.Null(dataBlockVersion.ContentSection);
                 Assert.True(dependentBlocks[0].IsKeyStatistic);
             }
         }
@@ -781,24 +767,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetDeletePlan_DependentDataBlockIncludesFeaturedTableDetails()
         {
-            var release = new Release();
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
 
-            var dataBlock = new DataBlock
-            {
-                Release = release
-            };
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             var featuredTable = new FeaturedTable
             {
                 Name = "Featured table name",
                 Description = "Featured table description",
-                DataBlock = dataBlock,
+                DataBlock = dataBlockVersion.ContentBlock,
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(dataBlock);
+                await context.AddAsync(dataBlockVersion);
                 await context.FeaturedTables.AddAsync(featuredTable);
                 await context.SaveChangesAsync();
             }
@@ -806,7 +799,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildDataBlockService(context);
-                var result = await service.GetDeletePlan(release.Id, dataBlock.Id);
+                var result = await service.GetDeletePlan(release.Id, dataBlockVersion.Id);
 
                 var deletePlan = result.AssertRight();
 
@@ -816,9 +809,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(dependentBlocks);
 
-                Assert.Equal(dataBlock.Id, dependentBlocks[0].Id);
-                Assert.Equal(dataBlock.Name, dependentBlocks[0].Name);
-                Assert.Null(dataBlock.ContentSection);
+                Assert.Equal(dataBlockVersion.Id, dependentBlocks[0].Id);
+                Assert.Equal(dataBlockVersion.Name, dependentBlocks[0].Name);
+                Assert.Null(dataBlockVersion.ContentSection);
                 Assert.NotNull(dependentBlocks[0].FeaturedTable);
                 Assert.Equal(featuredTable.Name, dependentBlocks[0].FeaturedTable!.Name);
                 Assert.Equal(featuredTable.Description, dependentBlocks[0].FeaturedTable!.Description);
@@ -898,49 +891,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Delete()
         {
-            var dataBlockId = Guid.NewGuid();
-            var keyStatId = Guid.NewGuid();
-
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication    = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                },
-                KeyStatistics = new List<KeyStatistic>
-                {
-                    new KeyStatisticDataBlock
-                    {
-                        Id = keyStatId,
-                        DataBlockId = dataBlockId,
-                    },
-                },
-            };
-
             var fileId = Guid.NewGuid();
 
-            var dataBlock = new DataBlock
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestDraftVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithCharts(ListOf<IChart>(
+                        new InfographicChart
+                        {
+                            Title = "Test chart",
+                            FileId = fileId.ToString(),
+                            Height = 400,
+                            Width = 500,
+                        }))
+                    .WithRelease(release)
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestDraftVersion!;
+
+            release.KeyStatistics = new List<KeyStatistic>
             {
-                Id = dataBlockId,
-                Name = "Test name",
-                Charts = new List<IChart>
+                new KeyStatisticDataBlock
                 {
-                    new InfographicChart
-                    {
-                        Title = "Test chart",
-                        FileId = fileId.ToString(),
-                        Height = 400,
-                        Width = 500,
-                    }
+                    DataBlockId = dataBlockVersion.Id
                 },
-                ContentSection = new ContentSection
-                {
-                    Heading = "Test heading"
-                },
-                Release = release
             };
-            
+
+            release.FeaturedTables = ListOf(new FeaturedTable
+            {
+                DataBlockId = dataBlockVersion.Id
+            });
+
             var file = new File
             {
                 Id = fileId,
@@ -951,9 +938,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(dataBlock);
+                await context.AddAsync(dataBlockParent);
                 await context.AddAsync(file);
                 await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                Assert.NotEmpty(context.DataBlocks.ToList());
+                Assert.NotEmpty(context.DataBlockVersions.ToList());
+                Assert.NotEmpty(context.DataBlockParents.ToList());
+                Assert.NotEmpty(context.FeaturedTables.ToList());
+                Assert.NotEmpty(context.KeyStatistics.ToList());
             }
 
             await using (var context = InMemoryContentDbContext(contextId))
@@ -969,10 +965,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlock);
-                
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+
                 cacheKeyService
-                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
+                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
                 var cacheService = new Mock<IBlobCacheService>(Strict);
@@ -982,12 +978,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
-                    context, 
+                    context,
                     releaseFileService: releaseFileService.Object,
                     cacheKeyService: cacheKeyService.Object,
                     cacheService: cacheService.Object);
-                
-                var result = await service.Delete(release.Id, dataBlock.Id);
+
+                var result = await service.Delete(release.Id, dataBlockVersion.Id);
 
                 VerifyAllMocks(releaseFileService, cacheKeyService, cacheService);
 
@@ -997,8 +993,155 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 Assert.Empty(context.DataBlocks.ToList());
-                Assert.Empty(context.ContentBlocks.ToList());
+                Assert.Empty(context.DataBlockVersions.ToList());
+                Assert.Empty(context.DataBlockParents.ToList());
+                Assert.Empty(context.FeaturedTables.ToList());
                 Assert.Empty(context.KeyStatistics.ToList());
+            }
+        }
+
+        [Fact]
+        public async Task Delete_WithVersionAlreadyPublished()
+        {
+            var fileId = Guid.NewGuid();
+
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestDraftVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithCharts(ListOf<IChart>(
+                        new InfographicChart
+                        {
+                            Title = "Test chart",
+                            FileId = fileId.ToString(),
+                            Height = 400,
+                            Width = 500,
+                        }))
+                    .WithRelease(release)
+                    .Generate())
+                // In this test, the DataBlockParent also has an already-published DataBlockVersion which cannot be
+                // deleted, and thus the parent will also not be deleted.
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .Generate())
+                .Generate();
+
+            var draftDataBlockVersion = dataBlockParent.LatestDraftVersion!;
+            var publishedDataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+
+            release.KeyStatistics = new List<KeyStatistic>
+            {
+                new KeyStatisticDataBlock
+                {
+                    DataBlockId = draftDataBlockVersion.Id
+                },
+                new KeyStatisticDataBlock
+                {
+                    DataBlockId = publishedDataBlockVersion.Id
+                }
+            };
+
+            release.FeaturedTables = ListOf(
+                new FeaturedTable
+                {
+                    DataBlockId = draftDataBlockVersion.Id
+                },
+                new FeaturedTable
+                {
+                    DataBlockId = publishedDataBlockVersion.Id
+                }
+            );
+
+            var file = new File
+            {
+                Id = fileId,
+                Filename = "test-infographic.jpg"
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(dataBlockParent);
+                await context.AddAsync(file);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                Assert.NotEmpty(context.DataBlocks.ToList());
+                Assert.NotEmpty(context.DataBlockVersions.ToList());
+                Assert.NotEmpty(context.DataBlockParents.ToList());
+                Assert.NotEmpty(context.FeaturedTables.ToList());
+                Assert.NotEmpty(context.KeyStatistics.ToList());
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var releaseFileService = new Mock<IReleaseFileService>(Strict);
+
+                releaseFileService
+                    .Setup(
+                        s =>
+                            s.Delete(release.Id, new List<Guid> {fileId}, false)
+                    )
+                    .ReturnsAsync(Unit.Instance);
+
+                var cacheKeyService = new Mock<ICacheKeyService>(Strict);
+
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(draftDataBlockVersion);
+
+                cacheKeyService
+                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, draftDataBlockVersion.Id))
+                    .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
+
+                var cacheService = new Mock<IBlobCacheService>(Strict);
+
+                cacheService
+                    .Setup(s => s.DeleteItemAsync(dataBlockCacheKey))
+                    .Returns(Task.CompletedTask);
+
+                var service = BuildDataBlockService(
+                    context,
+                    releaseFileService: releaseFileService.Object,
+                    cacheKeyService: cacheKeyService.Object,
+                    cacheService: cacheService.Object);
+
+                var result = await service.Delete(release.Id, draftDataBlockVersion.Id);
+
+                VerifyAllMocks(releaseFileService, cacheKeyService, cacheService);
+
+                result.AssertRight();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var remainingDataBlock = Assert.Single(context.DataBlocks.ToList());
+                Assert.Equal(publishedDataBlockVersion.Id, remainingDataBlock.Id);
+
+                var remainingDataBlockVersion = Assert.Single(context.DataBlockVersions.ToList());
+                Assert.Equal(publishedDataBlockVersion.Id, remainingDataBlockVersion.Id);
+
+                var remainingDataBlockParent = Assert.Single(context.DataBlockParents.ToList());
+
+                // The already-published DataBlockVersion will remain unchanged until at such a point in time where this
+                // Release Amendment is published, at which point it will be updated to null to indicate that this
+                // Data Block is no longer publicly visible.
+                Assert.Equal(publishedDataBlockVersion.Id, remainingDataBlockParent.LatestPublishedVersionId);
+
+                // The latest draft DataBlockVersion will be set to null, as there is no longer a draft version as part
+                // of this Release Amendment.
+                Assert.Null(remainingDataBlockParent.LatestDraftVersionId);
+
+                var remainingFeaturedTable = Assert.Single(context.FeaturedTables.ToList());
+                Assert.Equal(publishedDataBlockVersion.Id, remainingFeaturedTable.DataBlockId);
+
+                var remainingKeyStatistic = Assert.IsType<KeyStatisticDataBlock>(Assert.Single(context.KeyStatistics.ToList()));
+                Assert.Equal(publishedDataBlockVersion.Id, remainingKeyStatistic.DataBlockId);
             }
         }
 
@@ -1136,13 +1279,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
+                var dataBlockParents = context.DataBlockParents.ToList();
+                var dataBlockVersions = context.DataBlockVersions.ToList();
                 var dataBlocks = context.DataBlocks.ToList();
 
-                var dataBlock = Assert.Single(dataBlocks);
+                // Validate that we have a new "DataBlockParent" to keep track of the various DataBlockVersions.
+                // Assert as well that it does not currently have a LatestPublishedVersion as this is a new
+                // DataBlock but instead has a LatestDraftVersion.
+                var dataBlockParent = Assert.Single(dataBlockParents);
+                Assert.Null(dataBlockParent.LatestPublishedVersionId);
+                Assert.NotEqual(Guid.Empty, dataBlockParent.LatestDraftVersionId);
 
-                // Validate Created date is in the DB, even if not returned in result
-                Assert.True(dataBlock.Created.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created.Value).Milliseconds, 0, 1500);
+                // Validate that we have a single "version 0" DataBlockVersion for this new DataBlock. Assert that it
+                // is attached to its parent correctly, that is recognised as the LatestDraftVersion, and that it is
+                // attached to the underlying ContentBlock successfully.
+                var dataBlockVersion = Assert.Single(dataBlockVersions);
+                var dataBlock = Assert.Single(dataBlocks);
+                Assert.Equal(0, dataBlockVersion.Version);
+                Assert.Equal(dataBlock.Id, dataBlockVersion.ContentBlockId);
+                Assert.Equal(dataBlockParent.Id, dataBlockVersion.DataBlockParentId);
+                Assert.Equal(dataBlockParent.LatestDraftVersionId, dataBlockVersion.Id);
+
+                // Assert that the new DataBlock is connected correctly to its owning Release.
+                Assert.Equal(release.Id, dataBlockVersion.ReleaseId);
+                Assert.Equal(release.Id, dataBlock.ReleaseId);
+
+                // Assert that the DataBlockVersion has a Created date, but no Updated or Published dates at this time.
+                dataBlockVersion.Created.AssertUtcNow();
+                Assert.Null(dataBlockVersion.Updated);
+                Assert.Null(dataBlockVersion.Published);
+
+                dataBlock.Created.AssertUtcNow();
+                Assert.Null(dataBlock.Updated);
 
                 Assert.Equal(createRequest.Heading, dataBlock.Heading);
                 Assert.Equal(createRequest.Name, dataBlock.Name);
@@ -1186,7 +1354,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Type = FileType.Data
                 }
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
@@ -1270,15 +1438,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
-            
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(ListOf<IChart>(
+                        new LineChart
+                        {
+                            Title = "Old chart",
+                            Height = 400,
+                            Width = 500,
+                        }))
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+
             var releaseFile = new ReleaseFile
             {
                 Name = "test file",
@@ -1292,55 +1473,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var dataBlock = new DataBlock
-            {
-                Heading = "Old heading",
-                Name = "Old name",
-                Source = "Old source",
-                Order = 5,
-                Query = new ObservationQueryContext
-                {
-                    SubjectId = subjectId,
-                    Filters = new List<Guid>
-                    {
-                        Guid.NewGuid(),
-                    },
-                    Indicators = new List<Guid>
-                    {
-                        Guid.NewGuid(),
-                    },
-                },
-                Table = new TableBuilderConfiguration
-                {
-                    TableHeaders = new TableHeaders
-                    {
-                        Rows = new List<TableHeader>
-                        {
-                            new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
-                        },
-                        Columns = new List<TableHeader>
-                        {
-                            new(Guid.NewGuid().ToString(), TableHeaderType.Filter)
-                        }
-                    }
-                },
-                Charts = new List<IChart>
-                {
-                    new LineChart
-                    {
-                        Title = "Old chart",
-                        Height = 400,
-                        Width = 500,
-                    }
-                },
-                Release = release
-            };
-            
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(dataBlock, releaseFile);
+                await context.AddRangeAsync(dataBlockVersion, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -1368,10 +1505,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlock);
-                
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+
                 cacheKeyService
-                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
+                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
                 var cacheService = new Mock<IBlobCacheService>(Strict);
@@ -1381,21 +1518,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
-                    context, 
-                    cacheKeyService: cacheKeyService.Object, 
+                    context,
+                    cacheKeyService: cacheKeyService.Object,
                     cacheService: cacheService.Object);
-                
-                var result = await service.Update(dataBlock.Id, updateRequest);
-                
+
+                var result = await service.Update(dataBlockVersion.Id, updateRequest);
+
                 VerifyAllMocks(cacheKeyService, cacheService);
-                
+
                 var updateResult = result.AssertRight();
 
-                Assert.Equal(dataBlock.Id, updateResult.Id);
+                Assert.Equal(dataBlockVersion.Id, updateResult.Id);
                 Assert.Equal(updateRequest.Heading, updateResult.Heading);
                 Assert.Equal(updateRequest.Name, updateResult.Name);
                 Assert.Equal(updateRequest.Source, updateResult.Source);
-                Assert.Equal(dataBlock.Order, updateResult.Order);
+                Assert.Equal(dataBlockVersion.Order, updateResult.Order);
                 Assert.Equal(subjectId, updateResult.DataSetId);
                 Assert.Equal("test file", updateResult.DataSetName);
 
@@ -1406,7 +1543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
+                var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlockVersion.Id);
 
                 Assert.NotNull(updatedDataBlock);
                 Assert.Equal(updateRequest.Heading, updatedDataBlock.Heading);
@@ -1424,14 +1561,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var subjectId = Guid.NewGuid();
 
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(ListOf<IChart>(
+                        new LineChart
+                        {
+                            // No title
+                            Height = 400,
+                            Width = 500,
+                        }))
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
+
             var releaseFile = new ReleaseFile
             {
                 Release = release,
@@ -1441,32 +1592,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     SubjectId = subjectId,
                     Filename = "test filename",
                     Type = FileType.Data
-                }            
+                }
             };
 
-            var dataBlock = new DataBlock
-            {
-                Query = new ObservationQueryContext
-                {
-                    SubjectId = subjectId
-                },
-                Heading = "Old heading",
-                Charts = new List<IChart>
-                {
-                    new LineChart
-                    {
-                        // No title
-                        Height = 400,
-                        Width = 500,
-                    }
-                },
-                Release = release
-            };
-            
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(dataBlock, releaseFile);
+                await context.AddRangeAsync(dataBlockVersion, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -1492,10 +1624,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlock);
-                
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+
                 cacheKeyService
-                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
+                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
                 var cacheService = new Mock<IBlobCacheService>(Strict);
@@ -1505,17 +1637,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
-                    context, 
-                    cacheKeyService: cacheKeyService.Object, 
+                    context,
+                    cacheKeyService: cacheKeyService.Object,
                     cacheService: cacheService.Object);
-                
-                var result = await service.Update(dataBlock.Id, updateRequest);
-                
+
+                var result = await service.Update(dataBlockVersion.Id, updateRequest);
+
                 VerifyAllMocks(cacheKeyService, cacheService);
 
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(dataBlock.Id, viewModel.Id);
+                Assert.Equal(dataBlockVersion.Id, viewModel.Id);
                 Assert.Equal(updateRequest.Heading, viewModel.Heading);
                 Assert.Equal(updateRequest.Charts, viewModel.Charts);
 
@@ -1525,7 +1657,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
+                var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlockVersion.Id);
 
                 Assert.Equal(updateRequest.Heading, updatedDataBlock!.Heading);
                 updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
@@ -1552,16 +1684,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task Update_RemoveOldInfographic()
         {
             var subjectId = Guid.NewGuid();
-
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
             var fileId = Guid.NewGuid();
+
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
+
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .WithSubjectId(subjectId)
+                    .WithCharts(ListOf<IChart>(
+                        new InfographicChart
+                        {
+                            Title = "Old chart",
+                            FileId = fileId.ToString(),
+                            Height = 400,
+                            Width = 500,
+                        }))
+                    .Generate())
+                .Generate();
+
+            var dataBlockVersion = dataBlockParent.LatestPublishedVersion!;
 
             var releaseFile = new ReleaseFile
             {
@@ -1575,25 +1721,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var dataBlock = new DataBlock
-            {
-                Query = new ObservationQueryContext
-                {
-                    SubjectId = subjectId
-                },
-                Charts = new List<IChart>
-                {
-                    new InfographicChart
-                    {
-                        Title = "Old chart",
-                        FileId = fileId.ToString(),
-                        Height = 400,
-                        Width = 500,
-                    }
-                },
-                Release = release
-            };
-            
             var file = new File
             {
                 Id = fileId,
@@ -1604,7 +1731,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddRangeAsync(dataBlock, file, releaseFile);
+                await context.AddRangeAsync(dataBlockVersion, file, releaseFile);
                 await context.SaveChangesAsync();
             }
 
@@ -1632,13 +1759,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseFileService
                     .Setup(s => s.Delete(release.Id, fileId, false))
                     .ReturnsAsync(Unit.Instance);
-                
+
                 var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlock);
-                
+                var dataBlockCacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
+
                 cacheKeyService
-                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
+                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlockVersion.Id))
                     .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
 
                 var cacheService = new Mock<IBlobCacheService>(Strict);
@@ -1648,13 +1775,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
 
                 var service = BuildDataBlockService(
-                    context, 
+                    context,
                     releaseFileService: releaseFileService.Object,
-                    cacheKeyService: cacheKeyService.Object, 
+                    cacheKeyService: cacheKeyService.Object,
                     cacheService: cacheService.Object);
 
-                var result = await service.Update(dataBlock.Id, updateRequest);
-                
+                var result = await service.Update(dataBlockVersion.Id, updateRequest);
+
                 VerifyAllMocks(releaseFileService, cacheKeyService, cacheService);
 
                 var updateResult = result.AssertRight();
@@ -1666,58 +1793,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetUnattachedDataBlocks()
         {
-            var release = new Release();
+            var release = _fixture
+                .DefaultRelease()
+                .Generate();
 
-            var unattachedDataBlock1Id = Guid.NewGuid();
-            var unattachedDataBlock2Id = Guid.NewGuid();
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .WithRelease(release)
+                    .Generate())
+                .GenerateList(4);
 
-            var attachedDataBlock1Id = Guid.NewGuid();
+            var unattachedDataBlockVersion1 = dataBlockParents[0].LatestPublishedVersion!;
+            var unattachedDataBlockVersion2 = dataBlockParents[1].LatestPublishedVersion!;
+            var attachedDataBlockVersion1 = dataBlockParents[2].LatestPublishedVersion!;
+            var attachedDataBlockVersion2 = dataBlockParents[3].LatestPublishedVersion!;
+
             var keyStat = new KeyStatisticDataBlock
             {
                 Release = release,
-                DataBlockId = attachedDataBlock1Id,
+                // This Data Block is "attached" because it's used with a Key Stat.
+                DataBlock = attachedDataBlockVersion1.ContentBlock,
             };
 
-            var contentBlocks = ListOf<ContentBlock>(
-                new DataBlock
-                {
-                    Id = attachedDataBlock1Id, // attached to key stat
-                    Name = "Attached 1",
-                    ContentSection = new ContentSection(),
-                    Release = release
-                },
-                new DataBlock
-                {
-                    Id = unattachedDataBlock1Id,
-                    Name = "Unattached 1",
-                    ContentSection = null,
-                    Release = release
-                },
-                new HtmlBlock(),
-                new DataBlock
-                {
-                    Id = unattachedDataBlock2Id,
-                    Name = "Unattached 2",
-                    ContentSection = null,
-                    Release = release
-                },
-                new DataBlock
-                {
-                    Name = "Attached 2", // because has content section
-                    ContentSection = new ContentSection(),
-                    Release = release
-                },
-                new DataBlock
-                {
-                    Name = "Unattached for different Release", // because different release
-                    ContentSection = null,
-                    Release = new Release()
-                });
+            release.Content = _fixture
+                .DefaultContentSection()
+                .WithContentBlocks(ListOf<ContentBlock>(
+                    // This Data Block is "attached" because it's used within Release Content.
+                    attachedDataBlockVersion2.ContentBlock,
+                    new HtmlBlock()
+                ))
+                .GenerateList(1);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.ContentBlocks.AddRangeAsync(contentBlocks);
+                // Add an unrelated Data Block.
+                await contentDbContext.ContentBlocks.AddRangeAsync(new DataBlock
+                {
+                    Name = "Unattached for different Release",
+                    ContentSection = null,
+                    Release = new Release()
+                });
+                await contentDbContext.DataBlockParents.AddRangeAsync(dataBlockParents);
                 await contentDbContext.KeyStatisticsDataBlock.AddRangeAsync(keyStat);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -1732,10 +1851,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, unattachedDataBlocks.Count);
 
-                Assert.Equal(unattachedDataBlock1Id, unattachedDataBlocks[0].Id);
-                Assert.Equal("Unattached 1", unattachedDataBlocks[0].Name);
-                Assert.Equal(unattachedDataBlock2Id, unattachedDataBlocks[1].Id);
-                Assert.Equal("Unattached 2", unattachedDataBlocks[1].Name);
+                Assert.Equal(unattachedDataBlockVersion1.Id, unattachedDataBlocks[0].Id);
+                Assert.Equal(unattachedDataBlockVersion1.Name, unattachedDataBlocks[0].Name);
+                Assert.Equal(unattachedDataBlockVersion2.Id, unattachedDataBlocks[1].Id);
+                Assert.Equal(unattachedDataBlockVersion2.Name, unattachedDataBlocks[1].Name);
             }
         }
 

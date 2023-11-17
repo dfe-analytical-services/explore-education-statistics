@@ -32,6 +32,8 @@ public abstract record KeyStatisticViewModel
 public record KeyStatisticDataBlockViewModel : KeyStatisticViewModel
 {
     public Guid DataBlockId { get; set; }
+
+    public Guid DataBlockParentId { get; set; }
 }
 
 [JsonKnownThisType(nameof(KeyStatisticText))]
