@@ -22,6 +22,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
@@ -34,6 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private readonly Guid _userId = Guid.NewGuid();
 
         private readonly DataFixture _fixture = new();
+
+        // TODO DW - there are currently no test equivalents for:
+        // CreateAmendment_CopiesFeaturedTables
+        // CreateAmendment_FiltersCommentsFromContent
+        // CreateAmendment_NullHtmlBlockBody
 
         [Fact]
         public async Task CreateReleaseAmendment()
@@ -381,9 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
                 contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
                 contentDbContext.ReleaseFiles.AddRange(releaseFiles);
-                // contentDbContext.DataBlockParents.AddRange(dataBlock1Parent, dataBlock2Parent, dataBlock3Parent);
-                // contentDbContext.ContentBlocks.AddRange(embedBlockLink);
-                contentDbContext.SaveChanges();
+                await contentDbContext.SaveChangesAsync();
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -477,13 +481,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
                     .First(r => r.Id == capturedAmendmentId);
 
-                var amendmentContentBlocks = contentDbContext
-                    .ContentBlocks
-                    .Where(block => block.ReleaseId == amendment.Id)
-                    .ToList();
+                // TODO DW - CreateAmendment_CorrectBasicDetails
 
-                // check fields that should be set to new values for an amendment, rather than copied from its original
-                // Release
+                // Check the values that we expect to have been copied over successfully from the original Release.
+                amendment.AssertDeepEqualTo(originalRelease, Ignoring<Release>(
+                    r => r.Id,
+                    r => r.Amendment,
+                    r => r.Publication,
+                    r => r.Content,
+                    r => r.RelatedDashboardsSection,
+                    r => r.PreviousVersion!,
+                    r => r.PreviousVersionId!,
+                    r => r.Version,
+                    r => r.Published!,
+                    r => r.PublishScheduled!,
+                    r => r.Live,
+                    r => r.ApprovalStatus,
+                    r => r.Created,
+                    r => r.CreatedById,
+                    r => r.NotifiedOn!,
+                    r => r.NotifySubscribers,
+                    r => r.UpdatePublishedDate));
+
+                // Check fields that should be set to new values for an amendment, rather than copied from the original
+                // Release.
                 Assert.Null(amendment.NotifiedOn);
                 Assert.False(amendment.NotifySubscribers);
                 Assert.False(amendment.UpdatePublishedDate);
@@ -497,44 +518,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_userId, amendment.CreatedById);
                 amendment.Created.AssertUtcNow(withinMillis: 1500);
 
-                Assert.Equal(ReleaseType.OfficialStatistics, amendment.Type);
-                Assert.Equal(nextReleaseDate, amendment.NextReleaseDate);
-                Assert.Equal(releaseName, amendment.ReleaseName);
-                Assert.Equal(timePeriodCoverage, amendment.TimePeriodCoverage);
-                Assert.Equal(publicationId, amendment.PublicationId);
-
+                // TODO DW - CreateAmendment_ClonesRelatedInformation
                 Assert.Equal(originalRelease.RelatedInformation.Count, amendment.RelatedInformation.Count);
-                amendment.RelatedInformation.ForEach(amended =>
+                amendment.RelatedInformation.ForEach(amendedLink =>
                 {
-                    var index = amendment.RelatedInformation.IndexOf(amended);
-                    var previous = originalRelease.RelatedInformation[index];
-                    AssertAmendedLinkCorrect(amended, previous);
+                    var index = amendment.RelatedInformation.IndexOf(amendedLink);
+                    var originalLink = originalRelease.RelatedInformation[index];
+                    AssertAmendedLinkCorrect(amendedLink, originalLink);
                 });
 
+                // TODO DW - CreateAmendment_ClonesUpdates
                 Assert.Equal(originalRelease.Updates.Count, amendment.Updates.Count);
-                amendment.Updates.ForEach(amended =>
+                amendment.Updates.ForEach(amendedUpdate =>
                 {
-                    var index = amendment.Updates.IndexOf(amended);
-                    var previous = originalRelease.Updates[index];
-                    AssertAmendedUpdateCorrect(amended, previous, amendment);
+                    var index = amendment.Updates.IndexOf(amendedUpdate);
+                    var originalUpdate = originalRelease.Updates[index];
+                    AssertAmendedUpdateCorrect(amendedUpdate, originalUpdate, amendment);
                 });
 
+                // TODO DW - CreateAmendment_ClonesContentBlocks, but does it go in-depth enough with
+                // DataBlockVersions?
                 Assert.Equal(originalRelease.Content.Count, amendment.Content.Count);
-                amendment.Content.ForEach(amended =>
+                amendment.Content.ForEach(amendedContentSection =>
                 {
-                    var index = amendment.Content.IndexOf(amended);
-                    var previous = originalRelease.Content[index];
-                    AssertAmendedContentSectionCorrect(amendment, amended, previous);
+                    var index = amendment.Content.IndexOf(amendedContentSection);
+                    var originalContentSection = originalRelease.Content[index];
+                    AssertAmendedContentSectionCorrect(amendment, amendedContentSection, originalContentSection);
                 });
 
+                // TODO DW - CreateAmendment_CopiesKeyStatistics, but does it go in-depth enough with
+                // DataBlockVersions?
                 Assert.Equal(2, amendment.KeyStatistics.Count);
-
                 var amendmentKeyStatText = Assert.IsType<KeyStatisticText>(amendment
                     .KeyStatistics.Find(ks => ks.GetType() == typeof(KeyStatisticText)));
                 Assert.Equal((
                     originalRelease.KeyStatistics[0] as KeyStatisticText)!.Title, amendmentKeyStatText.Title);
                 Assert.NotEqual(originalRelease.KeyStatistics[0].Id, amendmentKeyStatText.Id);
-                Assert.Equal(8, amendmentContentBlocks.Count);
 
                 // Assert that the original DataBlocks are cloned into the Release Amendment.
                 var amendmentDataBlockVersions = amendment.DataBlockVersions.ToList();
@@ -586,13 +605,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // and check DataBlock previously associated with key stat is copied correctly
                 Assert.NotEqual(dataBlock3Parent.LatestDraftVersion.Id, amendmentContentBlock3.Id);
 
-                var amendmentEmbedBlocks = amendmentContentBlocks.OfType<EmbedBlockLink>().ToList();
-                var amendmentContentBlock4 = Assert.Single(amendmentEmbedBlocks);
+                var amendmentEmbedBlockLink = await contentDbContext
+                    .ContentBlocks
+                    .Where(block => block.ReleaseId == amendment.Id)
+                    .OfType<EmbedBlockLink>()
+                    .SingleAsync();
 
-                Assert.NotEqual(embedBlockLink.Id, amendmentContentBlock4.Id);
-                Assert.NotEqual(embedBlockLink.EmbedBlockId, amendmentContentBlock4.EmbedBlockId);
-                Assert.Equal(embedBlockLink.EmbedBlock.Title, amendmentContentBlock4.EmbedBlock.Title);
-                Assert.Equal(embedBlockLink.EmbedBlock.Url, amendmentContentBlock4.EmbedBlock.Url);
+                Assert.NotEqual(embedBlockLink.Id, amendmentEmbedBlockLink.Id);
+                Assert.NotEqual(embedBlockLink.EmbedBlockId, amendmentEmbedBlockLink.EmbedBlockId);
+                Assert.Equal(embedBlockLink.EmbedBlock.Title, amendmentEmbedBlockLink.EmbedBlock.Title);
+                Assert.Equal(embedBlockLink.EmbedBlock.Url, amendmentEmbedBlockLink.EmbedBlock.Url);
 
                 var amendmentReleaseRoles = contentDbContext
                     .UserReleaseRoles
@@ -637,7 +659,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(amendment.Amendment);
             }
 
-            using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var releaseSubjectLinks = statisticsDbContext
                     .ReleaseSubject
@@ -659,22 +681,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Single();
         }
 
-        private static void AssertAmendedLinkCorrect(Link amended, Link previous)
+        private static void AssertAmendedLinkCorrect(Link amendedLink, Link originalLink)
         {
-            Assert.True(amended.Id != Guid.Empty);
-            Assert.NotEqual(previous.Id, amended.Id);
-            Assert.Equal(previous.Description, amended.Description);
-            Assert.Equal(previous.Url, amended.Url);
+            amendedLink.AssertDeepEqualTo(originalLink,
+                Ignoring<Link>(
+                    l => l.Id));
         }
 
-        private static void AssertAmendedUpdateCorrect(Update amendedUpdate, Update previousUpdate, Release amendment)
+        private static void AssertAmendedUpdateCorrect(Update amendedUpdate, Update originalUpdate, Release amendment)
         {
-            Assert.True(amendedUpdate.Id != Guid.Empty);
-            Assert.NotEqual(previousUpdate.Id, amendedUpdate.Id);
-            Assert.Equal(previousUpdate.On, amendedUpdate.On);
-            Assert.Equal(previousUpdate.Reason, amendedUpdate.Reason);
-            Assert.Equal(previousUpdate.Created, amendedUpdate.Created);
-            Assert.Equal(previousUpdate.CreatedById, amendedUpdate.CreatedById);
+            amendedUpdate.AssertDeepEqualTo(originalUpdate,
+                Ignoring<Update>(
+                    u => u.Id,
+                    u => u.Release,
+                    u => u.ReleaseId));
+
+            Assert.Equal(amendment, amendedUpdate.Release);
             Assert.Equal(amendment.Id, amendedUpdate.ReleaseId);
         }
 
@@ -682,23 +704,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static void AssertAmendedContentSectionCorrect(
             Release amendment,
             ContentSection amendedSection,
-            ContentSection previousSection)
+            ContentSection originalSection)
         {
             Assert.Equal(amendment, amendedSection.Release);
             Assert.Equal(amendment.Id, amendedSection.ReleaseId);
             Assert.True(amendedSection.Id != Guid.Empty);
-            Assert.NotEqual(previousSection.Id, amendedSection.Id);
+            Assert.NotEqual(originalSection.Id, amendedSection.Id);
 
-            Assert.NotEqual(previousSection.Id, amendedSection.Id);
-            Assert.Equal(previousSection.Caption, amendedSection.Caption);
-            Assert.Equal(previousSection.Heading, amendedSection.Heading);
-            Assert.Equal(previousSection.Order, amendedSection.Order);
-            Assert.Equal(previousSection.Type, amendedSection.Type);
-            Assert.Equal(previousSection.Content.Count, amendedSection.Content.Count);
+            Assert.NotEqual(originalSection.Id, amendedSection.Id);
+            Assert.Equal(originalSection.Caption, amendedSection.Caption);
+            Assert.Equal(originalSection.Heading, amendedSection.Heading);
+            Assert.Equal(originalSection.Order, amendedSection.Order);
+            Assert.Equal(originalSection.Type, amendedSection.Type);
+            Assert.Equal(originalSection.Content.Count, amendedSection.Content.Count);
 
             amendedSection.Content.ForEach(amendedBlock =>
             {
-                var previousBlock = previousSection.Content.Find(b => b.Order == amendedBlock.Order);
+                var previousBlock = originalSection.Content.Find(b => b.Order == amendedBlock.Order);
                 AssertAmendedContentBlockCorrect(previousBlock, amendedBlock, amendedSection);
             });
         }
