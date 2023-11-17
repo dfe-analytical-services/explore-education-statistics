@@ -134,10 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 /**
                  * Pre Release management
                  */
-                options.AddPolicy(SecurityPolicies.CanViewPrereleaseContacts.ToString(), policy =>
-                    policy.RequireClaim(SecurityClaimTypes.CanViewPrereleaseContacts.ToString()));
-
-                options.AddPolicy(SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease.ToString(), policy =>
+                options.AddPolicy(SecurityPolicies.CanAssignPreReleaseUsersToSpecificRelease.ToString(), policy =>
                     policy.Requirements.Add(new AssignPrereleaseContactsToSpecificReleaseRequirement()));
 
                 /**

@@ -14,9 +14,9 @@ logger = get_logger(__name__)
 sl = BuiltIn().get_library_instance("SeleniumLibrary")
 
 
-def raise_assertion_error(self, err_msg):
+def raise_assertion_error(err_msg):
     sl.failure_occurred()
-    self.logger.warn(err_msg)
+    logger.warn(err_msg)
     raise AssertionError(err_msg)
 
 
