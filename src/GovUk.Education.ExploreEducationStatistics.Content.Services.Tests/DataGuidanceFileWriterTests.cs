@@ -5,7 +5,6 @@ using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -14,7 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Snapshooter.Xunit;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static Moq.MockBehavior;
 using File = System.IO.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
@@ -59,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task WriteToStream_NoSubjects()
+        public async Task WriteToStream_ListDataSetsReturnsNotFound()
         {
             var release = new Release
             {
@@ -81,10 +82,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
                 .ReturnsAsync(new NotFoundResult());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -93,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 var path = GenerateFilePath();
@@ -103,14 +104,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     async () => { await writer.WriteToStream(stream, release); }
                 );
 
-                Assert.Equal($"Could not find subjects for release: {release.Id}", exception.Message);
+                Assert.Equal($"Could not find data sets for release: {release.Id}", exception.Message);
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
-        public async Task WriteToStream_MultipleDataFiles()
+        public async Task WriteToStream_MultipleDataSets()
         {
             var release = new Release
             {
@@ -124,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -151,8 +152,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     },
                     Footnotes = new List<FootnoteViewModel>
                     {
-                        new(Guid.NewGuid(), "Subject 1 Footnote 1"),
-                        new(Guid.NewGuid(), "Subject 1 Footnote 2"),
+                        new(Guid.NewGuid(), "Data set 1 footnote 1"),
+                        new(Guid.NewGuid(), "Data set 1 footnote 2"),
                     }
                 },
                 new()
@@ -178,10 +179,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     },
                     Footnotes = new List<FootnoteViewModel>
                     {
-                        new(Guid.NewGuid(), "Subject 2 Footnote 1"),
-                        new(Guid.NewGuid(), "Subject 2 Footnote 2"),
-                        new(Guid.NewGuid(), "Subject 2 Footnote 3"),
-                        new(Guid.NewGuid(), "Subject 2 Footnote 4"),
+                        new(Guid.NewGuid(), "Data set 2 footnote 1"),
+                        new(Guid.NewGuid(), "Data set 2 footnote 2"),
+                        new(Guid.NewGuid(), "Data set 2 footnote 3"),
+                        new(Guid.NewGuid(), "Data set 2 footnote 4"),
                     }
                 }
             };
@@ -194,11 +195,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -206,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -215,11 +216,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
-        public async Task WriteToStream_SingleDataFile()
+        public async Task WriteToStream_SingleDataSet()
         {
             var release = new Release
             {
@@ -233,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -274,11 +275,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -286,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -295,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -313,7 +314,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 },
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -349,11 +350,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -361,7 +362,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -370,11 +371,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
-        public async Task WriteToStream_NoDataFiles()
+        public async Task WriteToStream_EmptyDataSets()
         {
             var release = new Release
             {
@@ -388,7 +389,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestDataGuidance
             };
 
-
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
@@ -397,11 +397,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(new List<DataGuidanceSubjectViewModel>());
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -409,7 +409,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -418,7 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -436,7 +436,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestBasicDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -467,11 +467,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -479,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -488,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -506,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestBasicDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -523,11 +523,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -535,7 +535,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -544,7 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -562,7 +562,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestBasicDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -583,11 +583,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -595,7 +595,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -604,7 +604,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -622,7 +622,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestBasicDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -640,11 +640,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -652,7 +652,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -661,7 +661,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -679,7 +679,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestBasicDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -701,11 +701,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -713,7 +713,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -722,7 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -740,7 +740,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestBasicDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -785,11 +785,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -797,7 +797,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -806,7 +806,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -824,7 +824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestBasicDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -855,11 +855,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -867,7 +867,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -876,7 +876,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -894,7 +894,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 DataGuidance = TestBasicDataGuidance
             };
 
-            var subjects = new List<DataGuidanceSubjectViewModel>
+            var dataSets = new List<DataGuidanceDataSetViewModel>
             {
                 new()
                 {
@@ -922,11 +922,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(subjects);
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(dataSets);
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -934,7 +934,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 await using var stream = new MemoryStream();
@@ -943,7 +943,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Snapshot.Match(stream.ReadToEnd());
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         [Fact]
@@ -969,11 +969,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceSubjectService
-                .Setup(s => s.GetSubjects(release.Id, null))
-                .ReturnsAsync(new List<DataGuidanceSubjectViewModel>());
+            dataGuidanceDataSetService
+                .Setup(s => s.ListDataSets(release.Id, null, default))
+                .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
@@ -981,7 +981,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var writer = BuildDataGuidanceFileWriter(
                     contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object
                 );
 
                 var path = GenerateFilePath();
@@ -994,7 +994,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Contains("Test publication", text);
             }
 
-            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+            VerifyAllMocks(dataGuidanceDataSetService);
         }
 
         private string GenerateFilePath()
@@ -1007,11 +1007,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private static DataGuidanceFileWriter BuildDataGuidanceFileWriter(
             ContentDbContext contentDbContext,
-            IDataGuidanceSubjectService? dataGuidanceSubjectService = null)
+            IDataGuidanceDataSetService? dataGuidanceDataSetService = null)
         {
             return new DataGuidanceFileWriter(
                 contentDbContext,
-                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>()
+                dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(Strict)
             );
         }
     }

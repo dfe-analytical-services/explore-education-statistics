@@ -143,10 +143,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     rf => rf.ReleaseId == releaseId
                           && rf.File.Type == Data
                           && rf.File.ReplacingId == null
-                          && rf.File.SubjectId.HasValue
                 )
                 .OrderBy(rf => rf.Order)
-                .ThenBy(rf => rf.Name) // For subjects existing before ordering was added
+                .ThenBy(rf => rf.Name) // For data sets existing before ordering was added
                 .Select(rf => rf.File);
         }
     }

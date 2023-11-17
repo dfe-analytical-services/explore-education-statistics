@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(true);
 
                 dataGuidanceService
-                    .Setup(s => s.Validate(release.Id))
+                    .Setup(s => s.Validate(release.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 var service = BuildReleaseChecklistService(
@@ -224,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<File>());
 
                 dataGuidanceService
-                    .Setup(s => s.Validate(release.Id))
+                    .Setup(s => s.Validate(release.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 var service = BuildReleaseChecklistService(
@@ -312,7 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 dataGuidanceService
-                    .Setup(s => s.Validate(release.Id))
+                    .Setup(s => s.Validate(release.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 footnoteRepository
@@ -412,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<File>());
 
                 dataGuidanceService
-                    .Setup(s => s.Validate(release.Id))
+                    .Setup(s => s.Validate(release.Id, default))
                     .ReturnsAsync(ValidationActionResult(PublicDataGuidanceRequired));
 
                 var service = BuildReleaseChecklistService(
@@ -598,7 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ReturnsAsync(new List<File>());
 
                 dataGuidanceService
-                    .Setup(s => s.Validate(release.Id))
+                    .Setup(s => s.Validate(release.Id, default))
                     .ReturnsAsync(Unit.Instance);
 
                 footnoteRepository

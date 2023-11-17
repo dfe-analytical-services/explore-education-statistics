@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
-            IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
+            IDataGuidanceDataSetService? dataGuidanceDataSetService = null,
             ITimePeriodService? timePeriodService = null)
         {
             return new ReleaseService(
@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? Mock.Of<IUserService>(),
-                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
+                dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(),
                 timePeriodService ?? Mock.Of<ITimePeriodService>()
             );
         }

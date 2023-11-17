@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
@@ -217,8 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
-                    Type = FileType.Data,
-                    SubjectId = Guid.NewGuid()
+                    Type = FileType.Data
                 }
             };
             var releaseFile2 = new ReleaseFile
@@ -253,11 +253,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test ancillary blob");
 
-            var subjectIds = releaseFiles
-                .Where(rf => rf.File.SubjectId.HasValue)
-                .Select(rf => rf.File.SubjectId.GetValueOrDefault())
-                .ToList();
-
             var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
             dataGuidanceFileWriter
@@ -265,10 +260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     s => s.WriteToStream(
                         It.IsAny<Stream>(),
                         It.Is<Release>(r => r.Id == release.Id),
-                        It.Is<IEnumerable<Guid>>(
-                            ids => ids.All(id => subjectIds.Contains(id))
-                        )
-                    )
+                        ListOf(releaseFile1.FileId))
                 )
                 .Returns<Stream, Release, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
                 .Callback<Stream, Release, IEnumerable<Guid>?>(
@@ -332,8 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "data-1.csv",
-                    Type = FileType.Data,
-                    SubjectId = Guid.NewGuid()
+                    Type = FileType.Data
                 }
             };
             var releaseFile2 = new ReleaseFile
@@ -343,8 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "data-2.csv",
-                    Type = FileType.Data,
-                    SubjectId = Guid.NewGuid()
+                    Type = FileType.Data
                 }
             };
             var releaseFiles = ListOf(releaseFile1, releaseFile2);
@@ -369,11 +359,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             publicBlobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test data 2 blob");
 
-            var subjectIds = releaseFiles
-                .Where(rf => rf.File.SubjectId.HasValue)
-                .Select(rf => rf.File.SubjectId.GetValueOrDefault())
-                .ToList();
-
             var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
             dataGuidanceFileWriter
@@ -381,10 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     s => s.WriteToStream(
                         It.IsAny<Stream>(),
                         It.Is<Release>(r => r.Id == release.Id),
-                        It.Is<IEnumerable<Guid>>(
-                            ids => ids.All(id => subjectIds.Contains(id))
-                        )
-                    )
+                        ListOf(releaseFile1.FileId, releaseFile2.FileId))
                 )
                 .Returns<Stream, Release, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
                 .Callback<Stream, Release, IEnumerable<Guid>?>(
@@ -933,8 +915,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
-                    Type = FileType.Data,
-                    SubjectId = Guid.NewGuid()
+                    Type = FileType.Data
                 }
             };
             var releaseFile2 = new ReleaseFile
@@ -990,11 +971,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 )
                 .Returns(Task.CompletedTask);
 
-            var subjectIds = releaseFiles
-                .Where(rf => rf.File.SubjectId.HasValue)
-                .Select(rf => rf.File.SubjectId.GetValueOrDefault())
-                .ToList();
-
             var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
 
             dataGuidanceFileWriter
@@ -1002,10 +978,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     s => s.WriteToStream(
                         It.IsAny<Stream>(),
                         It.Is<Release>(r => r.Id == release.Id),
-                        It.Is<IEnumerable<Guid>>(
-                            ids => ids.All(id => subjectIds.Contains(id))
-                        )
-                    )
+                        ListOf(releaseFile1.FileId))
                 )
                 .Returns<Stream, Release, IEnumerable<Guid>?>((stream, _, _) => Task.FromResult(stream))
                 .Callback<Stream, Release, IEnumerable<Guid>?>(
