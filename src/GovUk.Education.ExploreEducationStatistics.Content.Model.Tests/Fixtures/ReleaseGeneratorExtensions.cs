@@ -15,6 +15,11 @@ public static class ReleaseGeneratorExtensions
     public static Generator<Release> WithDefaults(this Generator<Release> generator)
         => generator.ForInstance(release => release.SetDefaults());
 
+    public static Generator<Release> WithId(
+        this Generator<Release> generator,
+        Guid id)
+        => generator.ForInstance(release => release.SetId(id));
+
     public static Generator<Release> WithPublication(
         this Generator<Release> generator,
         Publication publication)
@@ -62,6 +67,11 @@ public static class ReleaseGeneratorExtensions
             .SetDefault(p => p.Title)
             .SetDefault(p => p.DataGuidance)
             .Set(p => p.ReleaseName, (_, _, context) => $"{2000 + context.Index}");
+
+    public static InstanceSetters<Release> SetId(
+        this InstanceSetters<Release> setters,
+        Guid id)
+        => setters.Set(r => r.Id, id);
 
     public static InstanceSetters<Release> SetPublication(
         this InstanceSetters<Release> setters,

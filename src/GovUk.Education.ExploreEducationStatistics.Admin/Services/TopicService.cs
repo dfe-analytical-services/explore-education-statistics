@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -176,7 +177,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
 
                     return await DeleteMethodologiesForPublications(publicationIdsToDelete)
-                        .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete));
+                        .OnSuccess(() => DeleteReleasesForPublications(publicationIdsToDelete))
+                        .OnSuccess(() => DeletePublications(publicationIdsToDelete));
                 })
                 .OnSuccess(async topic =>
                 {
@@ -203,9 +205,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> DeleteReleasesForPublications(IEnumerable<Guid> publicationIds)
         {
+            var publications = await _contentContext
+                .Publications
+                .Where(publication => publicationIds.Contains(publication.Id))
+                .ToListAsync();
+
+            publications.ForEach(publication =>
+            {
+                publication.LatestPublishedRelease = null;
+                publication.LatestPublishedReleaseId = null;
+            });
+
+            await _contentContext.SaveChangesAsync();
+
             // Some Content Db Releases may be soft-deleted and therefore not visible.
             // Ignore the query filter to make sure they are found
-            var releasesIdsToDelete = _contentContext
+            var releaseIdsToDelete = _contentContext
                 .Releases
                 .IgnoreQueryFilters()
                 .Where(r => publicationIds.Contains(r.PublicationId))
@@ -213,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
 
             var releaseIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
-                .Sort(releasesIdsToDelete)
+                .Sort(releaseIdsToDelete)
                 .Select(ids => Guid.Parse(ids.Id));
 
             return await releaseIdsInDeleteOrder
@@ -222,31 +237,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid();
         }
 
+        private async Task<Either<ActionResult, Unit>> DeletePublications(IEnumerable<Guid> publicationIds)
+        {
+            var publications = await _contentContext
+                .Publications
+                .Where(publication => publicationIds.Contains(publication.Id))
+                .ToListAsync();
+
+            _contentContext.Publications.RemoveRange(publications);
+            await _contentContext.SaveChangesAsync();
+            return Unit.Instance;
+        }
+
+
         private async Task<Either<ActionResult, Unit>> DeleteContentAndStatsRelease(Guid releaseId)
         {
             var contentRelease = await _contentContext
                 .Releases
-                .AsQueryable()
-                .SingleOrDefaultAsync(r => r.Id == releaseId);
+                .IgnoreQueryFilters()
+                .SingleAsync(r => r.Id == releaseId);
 
-            if (contentRelease == null)
+            if (!contentRelease.SoftDeleted)
             {
-                // The Content Db Release may already be soft-deleted and therefore not visible.
-                // Attempt to hard delete the Content Db Release by ignoring the query filter
-                await DeleteSoftDeletedContentDbRelease(releaseId);
-                await DeleteStatsDbRelease(releaseId);
-                return Unit.Instance;
+                var removeReleaseFilesAndCachedContent =
+                    await _releaseDataFileService.DeleteAll(releaseId, forceDelete: true)
+                        .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseId, forceDelete: true))
+                        .OnSuccessDo(() => DeleteCachedReleaseContent(releaseId));
+
+                if (removeReleaseFilesAndCachedContent.IsLeft)
+                {
+                    return removeReleaseFilesAndCachedContent;
+                }
             }
 
-            return await _releaseDataFileService.DeleteAll(releaseId, forceDelete: true)
-                .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseId, forceDelete: true))
-                .OnSuccessDo(() => DeleteCachedReleaseContent(releaseId))
-                .OnSuccessVoid(async () =>
-                {
-                    await RemoveReleaseDependencies(releaseId);
-                    _contentContext.Releases.Remove(contentRelease);
-                    await DeleteStatsDbRelease(releaseId);
-                });
+            await RemoveReleaseDependencies(releaseId);
+            await DeleteStatsDbRelease(releaseId);
+
+            _contentContext.Releases.Remove(contentRelease);
+            await _contentContext.SaveChangesAsync();
+
+            return Unit.Instance;
         }
 
         private Task DeleteCachedReleaseContent(Guid releaseId)
@@ -327,18 +357,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Distinct()
                 .ToList();
 
+            // Unset the DataBlockVersion references from the DataBlockParent.
             dataBlockParents.ForEach(dataBlockParent =>
             {
                 dataBlockParent.LatestDraftVersionId = null;
                 dataBlockParent.LatestPublishedVersionId = null;
             });
 
-            _contentContext.DataBlockParents.UpdateRange(dataBlockParents);
             await _contentContext.SaveChangesAsync();
 
+            // Then remove the now-unreferenced DataBlockVersions.
             _contentContext.DataBlockVersions.RemoveRange(dataBlockVersions);
-            _contentContext.DataBlockParents.RemoveRange(dataBlockParents);
 
+            // And finally, delete the DataBlockParents.
+            _contentContext.DataBlockParents.RemoveRange(dataBlockParents);
             await _contentContext.SaveChangesAsync();
         }
     }
