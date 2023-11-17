@@ -3,16 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Moq;
@@ -138,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     new()
                     {
                         Methodology = methodology,
-                        Owner = true,
+                        Owner = true
                     }
                 },
                 Contact = new Contact()
@@ -1247,7 +1244,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
-            IMapper? mapper = null,
             IRedirectsCacheService? redirectsCacheService = null)
         {
             return new(
