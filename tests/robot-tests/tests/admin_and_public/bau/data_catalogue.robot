@@ -107,6 +107,7 @@ User checks search filters publications properly
     user clears element text    id:publicationForm-publicationIdSearch
 
 Choose publication
+    user reloads page
     user clicks radio    Test theme
     user clicks radio    UI tests - data catalogue %{RUN_IDENTIFIER}
     user clicks button    Next step
