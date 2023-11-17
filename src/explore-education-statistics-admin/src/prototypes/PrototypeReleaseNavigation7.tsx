@@ -110,8 +110,8 @@ const PrototypeReleaseData = () => {
         <div ref={headerRef}>
           <PrototypeSectionExamples sectionExample="header9" />
           <div className="govuk-!-margin-top-3">
-            <section className="govuk-!-margin-bottom-">
-              <h2 className="govuk-body govuk-visually-hidden">Quicklinks</h2>
+            <nav className="govuk-!-margin-bottom-0" aria-label="Useful links">
+              <h2 className="govuk-body govuk-visually-hidden">Useful links</h2>
 
               <ol
                 className={classNames(styles.prototypeQuickLinks, 'govuk-list')}
@@ -281,26 +281,13 @@ const PrototypeReleaseData = () => {
                   </div>
                 </li>
               </ol>
-            </section>
+            </nav>
           </div>
 
           <hr />
         </div>
 
         <div>
-          {!showMainRelease && (
-            <a
-              href="#"
-              className="govuk-back-link"
-              onClick={e => {
-                e.preventDefault();
-                setShowOtherReleases(false);
-                setShowMainRelease(true);
-              }}
-            >
-              Back to release
-            </a>
-          )}
           {isMobileMedia && showMainRelease && (
             <div className={styles.stickyNavToggle}>
               <h2 className="govuk-body govuk-!-margin-bottom-0">
@@ -322,18 +309,30 @@ const PrototypeReleaseData = () => {
               [styles.releaseContainer]: !isMobileMedia,
             })}
           >
-            {(!isMobileMedia || showContents) && (
-              <div className={styles.releaseNav}>
-                <div className={styles.stickyLinksContainer}>
-                  {showMainRelease && (
-                    <>
-                      {!isMobileMedia && (
-                        <h2 id="contents" className="govuk-body">
-                          Contents
-                        </h2>
-                      )}
+            <div className={styles.releaseNav}>
+              <div className={styles.stickyLinksContainer}>
+                {!showMainRelease && (
+                  <a
+                    href="#"
+                    className="govuk-back-link"
+                    onClick={e => {
+                      e.preventDefault();
+                      setShowOtherReleases(false);
+                      setShowMainRelease(true);
+                    }}
+                  >
+                    Back to release
+                  </a>
+                )}
+                {showMainRelease && (
+                  <>
+                    {!isMobileMedia && (
+                      <h2 id="contents" className="govuk-body">
+                        Contents
+                      </h2>
+                    )}
 
-                      {/*
+                    {/*
                         <div className="govuk-body-s govuk-!-margin-bottom-6">
                           <a
                             href="#"
@@ -347,17 +346,20 @@ const PrototypeReleaseData = () => {
                           </a>
                         </div>
                       */}
+                    <nav
+                      className={classNames(styles.stickyLinks)}
+                      style={{ border: 'none' }}
+                      aria-label="Page contents"
+                    >
                       <div
-                        className={classNames(styles.stickyLinks)}
-                        style={{ border: 'none' }}
+                        className="dfe-flex dfe-justify-content--space-between"
+                        style={{
+                          flexDirection: 'column',
+                        }}
                       >
-                        <div
-                          className="dfe-flex dfe-justify-content--space-between"
-                          style={{
-                            flexDirection: 'column',
-                          }}
-                        >
+                        {(!isMobileMedia || showContents) && (
                           <ul
+                            role="navigation"
                             className={classNames(
                               'govuk-list',
                               'govuk-list--spaced',
@@ -585,21 +587,29 @@ const PrototypeReleaseData = () => {
                               </a>
                             </li>
                           </ul>
-                        </div>
+                        )}
                       </div>
-                    </>
-                  )}
-                </div>
+                    </nav>
+                  </>
+                )}
               </div>
-            )}
+            </div>
 
             <div className={styles.releaseMainContent}>
               {showMainRelease && (
                 <>
-                  <section id="Headlines" ref={headlinesRef}>
+                  <section
+                    id="Headlines"
+                    ref={headlinesRef}
+                    aria-label="Headline facts and figures"
+                  >
                     <PrototypeSectionExamples sectionExample="headlines2" />
                   </section>
-                  <section id="ExploreData" ref={exploreRef}>
+                  <section
+                    id="ExploreData"
+                    ref={exploreRef}
+                    aria-label="Explore data and files used in this release"
+                  >
                     <PrototypeSectionExamples sectionExample="explore2" />
                   </section>{' '}
                   {isMobileMedia ? (
@@ -652,46 +662,67 @@ const PrototypeReleaseData = () => {
                       <div className={styles.stickyBackToTop}>
                         <a href="#">Back to top</a>
                       </div>
-                      <section id="About" ref={aboutRef}>
+                      <section
+                        id="About"
+                        ref={aboutRef}
+                        aria-label="About these statistics"
+                      >
                         <PrototypeSectionExamples sectionExample="about" />
                       </section>
-                      <section id="Supplement" ref={supplementRef}>
+                      <section
+                        id="Supplement"
+                        ref={supplementRef}
+                        aria-label="How to find data and supplementary tables"
+                      >
                         <PrototypeSectionExamples sectionExample="supplement" />
                       </section>
                       <section
                         id="FullYearApprenticeship"
                         ref={fullYearApprenticeshipRef}
+                        aria-label="Full year apprenticeships data"
                       >
                         <PrototypeSectionExamples sectionExample="fullYearApprenticeship" />
                       </section>
                       <section
                         id="FullYearTraineeship"
                         ref={fullYearTraineeshiphRef}
+                        aria-label="Full year traineeships data"
                       >
                         <PrototypeSectionExamples sectionExample="fullYearTraineeship" />
                       </section>
                       <section
                         id="LatestApprenticeship"
                         ref={latestApprenticeshipRef}
+                        aria-label="Latest Apprenticeships in year data"
                       >
                         <PrototypeSectionExamples sectionExample="latestApprenticeship" />
                       </section>
                       <section
                         id="LatestTraineeship"
                         ref={latestTraineeshipRef}
+                        aria-label="Latest Traineeships in year data"
                       >
                         <PrototypeSectionExamples sectionExample="latestTraineeship" />
                       </section>
-                      <section id="interactiveTool" ref={interactiveToolRef}>
+                      <section
+                        id="interactiveTool"
+                        ref={interactiveToolRef}
+                        aria-label="Interactive data visualisation tool"
+                      >
                         <PrototypeSectionExamples sectionExample="interactiveTool" />
                       </section>
                       <section
                         id="pubSectorApprenrticeship"
                         ref={pubSectorApprenticeshipRef}
+                        aria-label="Public sector apprenticeships 2022-23"
                       >
                         <PrototypeSectionExamples sectionExample="pubSectorApprenticeship" />
                       </section>
-                      <section id="additionalData" ref={addtionalDataRef}>
+                      <section
+                        id="additionalData"
+                        ref={addtionalDataRef}
+                        aria-label="Additional analysis and transparency data"
+                      >
                         <PrototypeSectionExamples sectionExample="additionalData" />
                       </section>
                       <section id="Summary" ref={summaryRef}>
@@ -699,7 +730,11 @@ const PrototypeReleaseData = () => {
                       </section>
                     </>
                   )}
-                  <section id="Help" ref={helpRef}>
+                  <section
+                    id="Help"
+                    ref={helpRef}
+                    aria-label="Help and support"
+                  >
                     <PrototypeSectionExamples sectionExample="help" />
                   </section>
                 </>

@@ -24,6 +24,7 @@ const ExampleSection = ({ sectionExample }: Props) => {
   const [showHelp1, setShowHelp1] = useToggle(false);
   const [showHelp2, setShowHelp2] = useToggle(false);
   const [showHelp3, setShowHelp3] = useToggle(false);
+  const [showReleaseTypeModal, toggleReleaseTypeModal] = useToggle(false);
   return (
     <>
       {sectionExample === 'header1' && (
@@ -641,9 +642,12 @@ const ExampleSection = ({ sectionExample }: Props) => {
               </p>
               <a
                 href="#"
+                onClick={() => {
+                  toggleReleaseTypeModal(true);
+                }}
                 className="govuk-body-s govuk-link--no-underline govuk-link--no-visited-state"
               >
-                National statistics{' '}
+                National statistics?{' '}
                 <InfoIcon description="What are national statistics?" />
               </a>{' '}
               <p
@@ -661,13 +665,94 @@ const ExampleSection = ({ sectionExample }: Props) => {
               className="dfe-flex dfe-align-items--center"
               style={{ flexDirection: 'column' }}
             >
-              <img
-                src="/assets/images/UKSA-quality-mark.jpg"
-                className={styles.prototypeStatsTypeLogo}
-                alt="UK statistics authority quality mark"
-              />
+              <a
+                href="#"
+                aria-label="What are national statistics?"
+                onClick={() => {
+                  toggleReleaseTypeModal(true);
+                }}
+              >
+                <img
+                  src="/assets/images/UKSA-quality-mark.jpg"
+                  className={styles.prototypeStatsTypeLogo}
+                  alt="UK statistics authority quality mark"
+                />
+              </a>
             </div>
           </div>
+          <Modal
+            open={showReleaseTypeModal}
+            title="What are National Statistics?"
+            className="govuk-!-width-one-half"
+          >
+            <div>
+              <p>
+                These accredited official statistics have been independently
+                reviewed by the{' '}
+                <a href="https://osr.statisticsauthority.gov.uk/what-we-do/">
+                  Office for Statistics Regulation
+                </a>{' '}
+                (OSR). They comply with the standards of trustworthiness,
+                quality and value in the{' '}
+                <a href="https://code.statisticsauthority.gov.uk/the-code/">
+                  Code of Practice for Statistics
+                </a>
+                . Accredited official statistics are called National Statistics
+                in the{' '}
+                <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+                  Statistics and Registration Service Act 2007
+                </a>
+                .
+              </p>
+              <p>
+                Accreditation signifies their compliance with the authority's{' '}
+                <a href="https://code.statisticsauthority.gov.uk/the-code/">
+                  Code of Practice for Statistics
+                </a>{' '}
+                which broadly means these statistics are:
+              </p>
+              <ul className="govuk-list govuk-list--bullet">
+                <li>
+                  managed impartially and objectively in the public interest
+                </li>
+                <li>meet identified user needs</li>
+                <li>produced according to sound methods</li>
+                <li>well explained and readily accessible</li>
+              </ul>
+              <p>
+                Our statistical practice is regulated by the Office for
+                Statistics Regulation (OSR).
+              </p>
+              <p>
+                OSR sets the standards of trustworthiness, quality and value in
+                the{' '}
+                <a href="https://code.statisticsauthority.gov.uk/the-code/">
+                  Code of Practice for Statistics
+                </a>{' '}
+                that all producers of official statistics should adhere to.
+              </p>
+              <p>
+                You are welcome to contact us directly with any comments about
+                how we meet these standards. Alternatively, you can contact OSR
+                by emailing{' '}
+                <a href="mailto:regulation@statistics.gov.uk">
+                  regulation@statistics.gov.uk
+                </a>{' '}
+                or via the{' '}
+                <a href="https://osr.statisticsauthority.gov.uk/">
+                  OSR website
+                </a>
+                .
+              </p>
+            </div>
+            <Button
+              onClick={() => {
+                toggleReleaseTypeModal(false);
+              }}
+            >
+              Close
+            </Button>
+          </Modal>
         </>
       )}
       {sectionExample === 'quickLinks' && (
