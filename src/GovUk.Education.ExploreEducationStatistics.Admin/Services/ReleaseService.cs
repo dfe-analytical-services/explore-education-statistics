@@ -305,15 +305,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release release)
         {
-            var dataBlocks = await _context
-                .ContentBlocks
-                .Where(block => block.ReleaseId == release.Id)
-                .OfType<DataBlock>()
-                .ToListAsync();
-
-            var (amendment, amendedDataBlocks) = release.CreateAmendment(dataBlocks, DateTime.UtcNow, _userService.GetUserId());
+            var amendment = release.CreateAmendment(DateTime.UtcNow, _userService.GetUserId());
             await _context.Releases.AddAsync(amendment);
-            await _context.ContentBlocks.AddRangeAsync(amendedDataBlocks);
             await _context.SaveChangesAsync();
             return amendment;
         }
@@ -693,7 +686,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(release => release.Content)
                 .Include(release => release.KeyStatistics)
                 .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
-                .Include(release => release.FeaturedTables);
+                .Include(release => release.FeaturedTables)
+                .Include(release => release.DataBlockVersions)
+                .Include(release => release.DataBlockVersions)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .ThenInclude(dataBlockParent => dataBlockParent.LatestVersion)
+                .Include(release => release.DataBlockVersions)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion != null ? dataBlockVersion.ContentBlock : null);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)

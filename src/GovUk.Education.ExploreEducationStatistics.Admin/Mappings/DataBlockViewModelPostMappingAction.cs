@@ -26,11 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 /// model and absorbed into DataBlockVersion, but for now this is the safest way to ensure that we catch every place in
 /// the code where we're able to map a DataBlock into a DataBlockViewModel using AutoMapper, no matter the depth.
 /// </summary>
-public class DataBlockVersionViewModelPostMappingAction : IMappingAction<DataBlock, DataBlockViewModel>
+public class DataBlockViewModelPostMappingAction : IMappingAction<DataBlock, DataBlockViewModel>
 {
     private readonly ContentDbContext _context;
 
-    public DataBlockVersionViewModelPostMappingAction(ContentDbContext context)
+    public DataBlockViewModelPostMappingAction(ContentDbContext context)
     {
         _context = context;
     }

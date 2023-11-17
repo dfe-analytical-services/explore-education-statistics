@@ -81,8 +81,14 @@ public class FeaturedTableService : IFeaturedTableService
             })
             .OnSuccess(async _ =>
             {
+                var dataBlockParentId = _contentDbContext
+                    .DataBlockVersions
+                    .First(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId)
+                    .DataBlockParentId;
+
                 var featuredTable = _mapper.Map<FeaturedTable>(request);
                 featuredTable.ReleaseId = releaseId;
+                featuredTable.DataBlockParentId = dataBlockParentId;
                 featuredTable.CreatedById = _userService.GetUserId();
 
                 var featuredTableList = await ListFeaturedTables(releaseId);

@@ -223,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
             // destination DataBlockViewModel that the DataBlock itself does not contain. When DataBlock is
             // removed from the ContentBlock model, this can go too.
             CreateMap<DataBlock, DataBlockViewModel>()
-                .AfterMap<DataBlockVersionViewModelPostMappingAction>();
+                .AfterMap<DataBlockViewModelPostMappingAction>();
 
             CreateMap<DataBlockVersion, DataBlockViewModel>();
 

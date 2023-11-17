@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> Delete(ReleaseId releaseId, DataBlockId id);
 
-        Task<Either<ActionResult, DataBlockViewModel>> Get(DataBlockId id);
+        Task<Either<ActionResult, DataBlockViewModel>> Get(DataBlockId dataBlockVersionId);
 
         Task<Either<ActionResult, List<DataBlockSummaryViewModel>>> List(ReleaseId releaseId);
 
@@ -39,8 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<DataBlockViewModel>>> GetUnattachedDataBlocks(Guid releaseId);
 
-        Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlock dataBlock);
+        Task<bool> IsUnattachedDataBlock(Guid releaseId, DataBlockVersion dataBlockVersion);
 
         Task<List<DataBlock>> ListDataBlocks(Guid releaseId);
+
+        Task<Either<ActionResult, DataBlockVersion>> GetDataBlockVersionForRelease(
+            Guid releaseId,
+            Guid dataBlockParentId);
     }
 }

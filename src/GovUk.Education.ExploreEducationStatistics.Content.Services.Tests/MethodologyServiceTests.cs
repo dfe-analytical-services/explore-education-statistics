@@ -1253,7 +1253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                mapper ?? MapperUtils.MapperForProfile<MappingProfiles>(),
+                MapperUtils.ContentMapper(contentDbContext),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(MockBehavior.Strict),
                 redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(MockBehavior.Strict)
             );
