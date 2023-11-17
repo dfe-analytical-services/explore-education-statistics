@@ -18,6 +18,10 @@ public class FeaturedTable : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public DataBlock DataBlock { get; set; } = null!;
 
+    public Guid DataBlockParentId { get; set; }
+
+    public DataBlockParent DataBlockParent { get; set; } = null!;
+
     public Guid ReleaseId { get; set; }
 
     public Release Release { get; set; } = null!;

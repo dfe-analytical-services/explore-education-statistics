@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231019203009_EES4467_AddDataBlockParentToFeaturedTable")]
+    partial class EES4467_AddDataBlockParentToFeaturedTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -580,10 +582,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid?>("LatestPublishedVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("OwningPublicationSlug")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("OwningPublicationTitle")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -661,22 +659,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.ToTable("MethodologyNotes");
                 });
 
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyRedirect", b =>
-                {
-                    b.Property<Guid>("MethodologyVersionId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Slug")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("MethodologyVersionId", "Slug");
-
-                    b.ToTable("MethodologyRedirects");
-                });
-
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus", b =>
                 {
                     b.Property<Guid>("Id")
@@ -713,9 +695,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("AlternativeSlug")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AlternativeTitle")
                         .HasColumnType("nvarchar(max)");
@@ -1353,12 +1332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("DataBlockId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("DataBlockParentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasIndex("DataBlockId");
-
-                    b.HasIndex("DataBlockParentId");
 
                     b.ToTable("KeyStatisticsDataBlock", (string)null);
                 });
@@ -1690,17 +1664,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("MethodologyVersion");
 
                     b.Navigation("UpdatedBy");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyRedirect", b =>
-                {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyVersion", "MethodologyVersion")
-                        .WithMany()
-                        .HasForeignKey("MethodologyVersionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("MethodologyVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus", b =>
@@ -2044,12 +2007,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "DataBlockParent")
-                        .WithMany()
-                        .HasForeignKey("DataBlockParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatistic", null)
                         .WithOne()
                         .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatisticDataBlock", "Id")
@@ -2057,8 +2014,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired();
 
                     b.Navigation("DataBlock");
-
-                    b.Navigation("DataBlockParent");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.KeyStatisticText", b =>

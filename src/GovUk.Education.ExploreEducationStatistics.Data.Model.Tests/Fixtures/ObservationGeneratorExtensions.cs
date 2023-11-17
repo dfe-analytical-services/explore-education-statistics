@@ -27,8 +27,14 @@ public static class ObservationGeneratorExtensions
 
     public static Generator<Observation> WithMeasures(
         this Generator<Observation> generator,
-        IEnumerable<Indicator> measures)
-        => generator.ForInstance(s => s.SetMeasures(measures));
+        IEnumerable<Indicator> indicators)
+        => generator.ForInstance(s => s.SetMeasures(indicators));
+
+    public static Generator<Observation> WithMeasures(
+        this Generator<Observation> generator,
+        IEnumerable<Indicator> indicators,
+        IEnumerable<string> measures)
+        => generator.ForInstance(s => s.SetMeasures(indicators, measures));
 
     public static InstanceSetters<Observation> SetDefaults(this InstanceSetters<Observation> setters)
         => setters
@@ -90,6 +96,15 @@ public static class ObservationGeneratorExtensions
             o => o.Measures,
             f => indicators.ToDictionary(i => i.Id, _ => f.Random.Short().ToString())
         );
+
+    public static InstanceSetters<Observation> SetMeasures(
+        this InstanceSetters<Observation> setters,
+        IEnumerable<Indicator> indicators,
+        IEnumerable<string> measures)
+        => setters.Set(o => o.Measures, indicators
+            .Select(i => i.Id)
+            .Zip(measures)
+            .ToDictionary(pair => pair.First, pair => pair.Second));
 
     public static InstanceSetters<Observation> SetTimePeriod(
         this InstanceSetters<Observation> setters,

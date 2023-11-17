@@ -218,7 +218,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Comments,
                     m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));
 
-            CreateMap<DataBlock, DataBlockViewModel>();
+            // EES-4640 - we include an AfterMap configuration here to ensure that any time we create a
+            // DataBlockViewModel from a plain DataBlock, we also include the DataBlockParentId on the
+            // destination DataBlockViewModel that the DataBlock itself does not contain. When DataBlock is
+            // removed from the ContentBlock model, this can go too.
+            CreateMap<DataBlock, DataBlockViewModel>()
+                .AfterMap<DataBlockVersionViewModelPostMappingAction>();
+
+            CreateMap<DataBlockVersion, DataBlockViewModel>();
 
             CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
                 .ForMember(dest => dest.Title,
