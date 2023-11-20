@@ -78,6 +78,33 @@ describe('ContentHtml', () => {
     });
   });
 
+  test('transforms featured table links when `transformFeaturedTableLinks` is provided', () => {
+    render(
+      <ContentHtml
+        html="<a href='/data-table/fast-track/124356575?featuredTable=true' data-featured-table>Featured table</a>"
+        transformFeaturedTableLinks={() => {
+          return <span>I am transformed</span>;
+        }}
+      />,
+    );
+
+    expect(screen.getByText('I am transformed')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Featured table' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not transform featured table links when `transformFeaturedTableLinks` is not provided', () => {
+    render(
+      <ContentHtml html="<a href='/data-table/fast-track/124356575?featuredTable=true' data-featured-table>Featured table</a>" />,
+    );
+
+    expect(screen.queryByText('I am transformed')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Featured table' }),
+    ).toBeInTheDocument();
+  });
+
   test('fixes inaccessible table markup from CKEditor', () => {
     const html = `
       <figure class="table">

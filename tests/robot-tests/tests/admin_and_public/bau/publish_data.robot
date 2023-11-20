@@ -452,7 +452,7 @@ Edit footnote
 Check footnote was updated on data block
     # set focus to 'data blocks' link to ensure the click doesn't set focus to the data blocks link
     # This results in a failure whereby the tests stay on the footnote page
-    user sets focus to element    link:Data blocks   xpath://*[@aria-label="Release"]
+    user sets focus to element    link:Data blocks    xpath://*[@aria-label="Release"]
     user clicks link    Data blocks
 
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
@@ -494,6 +494,27 @@ Add headline text block to Content page again
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
+
+Add an accordion section to release content
+    user clicks button    Add new section
+    user changes accordion section title    1    Test section
+
+Add text block with link to a featured table to accordion section
+    user adds text block to editable accordion section    Test section    id:releaseMainContent
+    ${block}=    user starts editing accordion section text block    Test section    1    id:releaseMainContent
+    ${toolbar}=    get editor toolbar    ${block}
+    ${insert}=    user gets button element    Insert    ${toolbar}
+    user clicks element    ${insert}
+    ${button}=    user gets button element    Insert featured table link    ${toolbar}
+    user clicks element    ${button}
+    ${modal}=    user waits until modal is visible    Insert featured table link
+    user enters text into element    id:featuredTablesSearch-input    tes
+    user waits until page contains element    id:featuredTablesSearch-options
+    user clicks element    id:featuredTablesSearch-option-0
+    user clicks button    Insert    ${modal}
+    user waits until modal is not visible    Insert featured table link
+    user saves autosaving text block    ${block}
+    user waits until element contains link    ${block}    Test highlight name 2
 
 Add public prerelease access list again
     user clicks link    Pre-release access
@@ -787,3 +808,18 @@ Validate data guidance document footnotes
     ...    ${subject_2_content}
     user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL}    ${subject_2_content}
     user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}
+
+Go back to release page
+    user clicks link    ${PUBLICATION_NAME}
+
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until page contains title caption    ${RELEASE_2_NAME}
+
+Validate featured table link
+    user opens accordion section    Test section    css:#content
+    user waits until page contains link    Test highlight name 2
+    user clicks link    Test highlight name 2
+    user waits until h1 is visible    Create your own tables
+    user waits until results table appears    %{WAIT_LONG}
+    user waits until page contains element
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for 'UI test subject 2' for Not specified in Bolton 001 between 2009 and 2017"]

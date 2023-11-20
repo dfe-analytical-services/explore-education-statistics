@@ -1,6 +1,5 @@
 import ButtonView from '@ckeditor/ckeditor5-ui/src/button/buttonview';
 import Plugin from '@ckeditor/ckeditor5-core/src/plugin';
-import GlossaryIcon from './glossary-icon.svg';
 
 export default class GlossaryUI extends Plugin {
   init() {
@@ -12,9 +11,8 @@ export default class GlossaryUI extends Plugin {
       const buttonView = new ButtonView(locale);
 
       buttonView.set({
-        label: editor.t('Add glossary entry'),
-        tooltip: true,
-        icon: GlossaryIcon,
+        label: editor.t('Insert glossary link'),
+        withText: true,
       });
 
       // Bind the state of the button to the command.
