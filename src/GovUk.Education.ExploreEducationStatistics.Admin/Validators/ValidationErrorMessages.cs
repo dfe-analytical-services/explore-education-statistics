@@ -99,6 +99,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
         SummarySectionContainsEmptyHtmlBlock,
 
+        // Data guidance
+        DataGuidanceDataSetNotAttachedToRelease,
+
         // Release checklist warnings
         NoMethodology,
         NoNextReleaseDate,

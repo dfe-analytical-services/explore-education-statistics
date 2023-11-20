@@ -2,52 +2,52 @@ import Details from '@common/components/Details';
 import ContentHtml from '@common/components/ContentHtml';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import { SubjectDataGuidance } from '@common/services/releaseDataGuidanceService';
+import { DataSetDataGuidance } from '@common/services/releaseDataGuidanceService';
 import React, { ReactNode, useMemo } from 'react';
 import styles from './ReleaseDataGuidanceDataFile.module.scss';
 
 interface Props {
-  subject: SubjectDataGuidance;
-  renderContent?: (subject: SubjectDataGuidance) => ReactNode;
+  dataSet: DataSetDataGuidance;
+  renderContent?: (dataSet: DataSetDataGuidance) => ReactNode;
 }
 
-const ReleaseDataGuidanceDataFile = ({ subject, renderContent }: Props) => {
-  const { filename, variables, footnotes } = subject;
+const ReleaseDataGuidanceDataFile = ({ dataSet, renderContent }: Props) => {
+  const { filename, variables, footnotes } = dataSet;
 
   const geographicLevels = useMemo(
-    () => subject.geographicLevels.sort().join('; '),
-    [subject.geographicLevels],
+    () => dataSet.geographicLevels.sort().join('; '),
+    [dataSet.geographicLevels],
   );
 
   const timePeriod = useMemo(() => {
-    const { from, to } = subject.timePeriods;
+    const { from, to } = dataSet.timePeriods;
 
     if (from && to) {
       return from === to ? from : `${from} to ${to}`;
     }
 
     return from || to;
-  }, [subject.timePeriods]);
+  }, [dataSet.timePeriods]);
 
   const contentItem = useMemo(() => {
     if (typeof renderContent === 'function') {
       return (
         <SummaryListItem term="Content">
-          {renderContent(subject)}
+          {renderContent(dataSet)}
         </SummaryListItem>
       );
     }
 
-    if (!subject.content) {
+    if (!dataSet.content) {
       return null;
     }
 
     return (
       <SummaryListItem term="Content">
-        <ContentHtml html={subject.content} testId="fileGuidanceContent" />
+        <ContentHtml html={dataSet.content} testId="fileGuidanceContent" />
       </SummaryListItem>
     );
-  }, [renderContent, subject]);
+  }, [renderContent, dataSet]);
 
   return (
     <>

@@ -71,7 +71,7 @@ const ReleaseDataGuidancePage = ({
                   </Link>
                 )
               }
-              subjects={model.dataGuidance.subjects}
+              dataSets={model.dataGuidance.dataSets}
             />
           </>
         )}

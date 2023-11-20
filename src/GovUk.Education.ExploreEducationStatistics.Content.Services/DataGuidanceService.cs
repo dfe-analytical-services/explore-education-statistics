@@ -12,20 +12,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
     public class DataGuidanceService : IDataGuidanceService
     {
-        private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
+        private readonly IDataGuidanceDataSetService _dataGuidanceDataSetService;
         private readonly IPublicationCacheService _publicationCacheService;
         private readonly IReleaseCacheService _releaseCacheService;
 
-        public DataGuidanceService(IDataGuidanceSubjectService dataGuidanceSubjectService,
+        public DataGuidanceService(IDataGuidanceDataSetService dataGuidanceDataSetService,
             IPublicationCacheService publicationCacheService,
             IReleaseCacheService releaseCacheService)
         {
-            _dataGuidanceSubjectService = dataGuidanceSubjectService;
+            _dataGuidanceDataSetService = dataGuidanceDataSetService;
             _publicationCacheService = publicationCacheService;
             _releaseCacheService = releaseCacheService;
         }
 
-        public async Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationSlug,
+        public async Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(string publicationSlug,
             string? releaseSlug = null)
         {
             return await _publicationCacheService.GetPublication(publicationSlug)
@@ -33,11 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccess(publicationAndRelease =>
                 {
                     var (publication, release) = publicationAndRelease;
-                    return _dataGuidanceSubjectService.GetSubjects(release.Id)
-                        .OnSuccess(subjects => new DataGuidanceViewModel(
+                    return _dataGuidanceDataSetService.ListDataSets(release.Id)
+                        .OnSuccess(dataSets => new DataGuidanceViewModel(
                             release,
                             publication,
-                            subjects
+                            dataSets
                         ));
                 });
         }
