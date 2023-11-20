@@ -75,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         MetaFileIsIncorrectlyNamed,
 
         // Data replacement
-        ReplacementFileTypesMustBeData,
         ReplacementMustBeValid,
 
         // Release
