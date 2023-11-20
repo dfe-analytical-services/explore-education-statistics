@@ -12,30 +12,43 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseChecklistPermissionServiceTests
     {
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
-            Id = Guid.NewGuid()
+            Id = Guid.NewGuid(),
+            Publication = new Publication()
         };
-
 
         [Fact]
         public async Task GetChecklist()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
+                .SetupResourceCheckToFailWithMatcher<Release>(
+                    r => r.Id == _release.Id,
+                    ContentSecurityPolicies.CanViewSpecificRelease)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContextId = Guid.NewGuid().ToString();
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        var service = BuildReleaseChecklistService(userService: userService.Object);
-                        return service.GetChecklist(_release.Id);
+                        await contentDbContext.AddRangeAsync(_release);
+                        await contentDbContext.SaveChangesAsync();
                     }
-                );
+
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        var service = BuildReleaseChecklistService(
+                            contentDbContext: contentDbContext,
+                            userService: userService.Object);
+                        return await service.GetChecklist(_release.Id);
+                    }
+                });
         }
 
         private ReleaseChecklistService BuildReleaseChecklistService(
@@ -52,7 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             return new(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
-                persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 dataImportService ?? new Mock<IDataImportService>().Object,
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 dataGuidanceService ?? new Mock<IDataGuidanceService>().Object,
@@ -61,13 +73,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 footnoteRepository ?? new Mock<IFootnoteRepository>().Object,
                 dataBlockService ?? new Mock<IDataBlockService>().Object
             );
-        }
-
-        private Mock<IPersistenceHelper<ContentDbContext>> DefaultPersistenceHelperMock()
-        {
-            var mock = MockUtils.MockPersistenceHelper<ContentDbContext, Release>();
-            MockUtils.SetupCall(mock, _release.Id, _release);
-            return mock;
         }
     }
 }
