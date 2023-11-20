@@ -57,9 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = ReleaseType.ExperimentalStatistics,
             };
 
-            ReleaseService releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
 
-            Either<ActionResult, ReleaseViewModel> result = await releaseService.CreateRelease(releaseCreateRequest);
+            var result = await releaseService.CreateRelease(releaseCreateRequest);
 
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
@@ -72,9 +72,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Type = ReleaseType.ExperimentalStatistics,
             };
 
-            ReleaseService releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
 
-            Either<ActionResult, ReleaseViewModel> result = await releaseService.UpdateRelease(It.IsAny<Guid>(), releaseUpdateRequest);
+            var result = await releaseService.UpdateRelease(It.IsAny<Guid>(), releaseUpdateRequest);
 
             result.AssertBadRequest(ReleaseTypeInvalid);
         }
