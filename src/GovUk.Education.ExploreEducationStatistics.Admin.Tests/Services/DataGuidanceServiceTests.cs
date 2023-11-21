@@ -203,7 +203,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Filename = "file1.csv",
                     Type = FileType.Data
-                }
+                },
+                Summary = "Data set 1 guidance"
             };
 
             var releaseFile2 = new ReleaseFile
@@ -213,7 +214,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Filename = "file2.csv",
                     Type = FileType.Data
-                }
+                },
+                Summary = "Data set 2 guidance"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -255,11 +257,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                // Assert no changes have been made
+                // Assert no changes have been made to the release or any of the data sets
                 var actualRelease = await contentDbContext.Releases
                     .FirstAsync(r => r.Id == release1.Id);
 
                 Assert.Equal("Release 1 guidance", actualRelease.DataGuidance);
+
+                var actualReleaseFile1 = await contentDbContext.ReleaseFiles
+                    .FirstAsync(rf => rf.ReleaseId == release1.Id
+                                      && rf.FileId == releaseFile1.FileId);
+
+                Assert.Equal("Data set 1 guidance", actualReleaseFile1.Summary);
+
+                var actualReleaseFile2 = await contentDbContext.ReleaseFiles
+                    .FirstAsync(rf => rf.ReleaseId == release2.Id
+                                      && rf.FileId == releaseFile2.FileId);
+
+                Assert.Equal("Data set 2 guidance", actualReleaseFile2.Summary);
             }
         }
 
@@ -295,7 +309,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Filename = "file1.csv",
                     Type = FileType.Data,
                     SubjectId = subject1.Id
-                }
+                },
+                Summary = "Data set 1 guidance"
             };
 
             var releaseFile2 = new ReleaseFile
@@ -306,7 +321,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Filename = "file2.csv",
                     Type = FileType.Data,
                     SubjectId = subject2.Id
-                }
+                },
+                Summary = "Data set 2 guidance"
             };
 
             var releaseSubject1 = new ReleaseSubject
@@ -394,16 +410,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Data set 1 guidance updated", actualSubject1.DataGuidance);
 
+                var actualReleaseFile1 = await contentDbContext.ReleaseFiles
+                    .FirstAsync(rf => rf.ReleaseId == contentRelease.Id
+                                      && rf.FileId == releaseFile1.FileId);
+
+                Assert.Equal("Data set 1 guidance updated", actualReleaseFile1.Summary);
+
                 var actualSubject2 = await statisticsDbContext.ReleaseSubject
                     .FirstAsync(rs => rs.ReleaseId == statsRelease.Id
                                       && rs.SubjectId == releaseSubject2.Subject.Id);
 
                 Assert.Equal("Data set 2 guidance", actualSubject2.DataGuidance);
+
+                var actualReleaseFile2 = await contentDbContext.ReleaseFiles
+                    .FirstAsync(rf => rf.ReleaseId == contentRelease.Id
+                                      && rf.FileId == releaseFile2.FileId);
+
+                Assert.Equal("Data set 2 guidance", actualReleaseFile2.Summary);
             }
         }
 
         [Fact]
-        public async Task UpdateDataGuidance_WithSubjects_AmendedRelease()
+        public async Task UpdateDataGuidance_WithDataSets_AmendedRelease()
         {
             var contentReleaseVersion1 = new Release
             {
@@ -449,7 +477,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Filename = "file1.csv",
                     Type = FileType.Data,
                     SubjectId = subject1.Id
-                }
+                },
+                Summary = "Version 1 data set 1 guidance"
             };
 
             var releaseVersion2File1 = new ReleaseFile
@@ -460,7 +489,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Filename = "file1.csv",
                     Type = FileType.Data,
                     SubjectId = subject1.Id
-                }
+                },
+                Summary = "Version 2 data set 1 guidance"
             };
 
             var releaseVersion2File2 = new ReleaseFile
@@ -471,7 +501,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Filename = "file2.csv",
                     Type = FileType.Data,
                     SubjectId = subject2.Id
-                }
+                },
+                Summary = "Version 2 data set 2 guidance"
             };
 
             var releaseVersion1Subject1 = new ReleaseSubject
@@ -574,6 +605,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Version 1 data set 1 guidance", actualReleaseVersion1Subject1.DataGuidance);
 
+                var actualReleaseVersion1File1 = await contentDbContext.ReleaseFiles
+                    .FirstAsync(rf => rf.ReleaseId == contentReleaseVersion1.Id
+                                      && rf.FileId == releaseVersion1File1.FileId);
+
+                Assert.Equal("Version 1 data set 1 guidance", actualReleaseVersion1File1.Summary);
+
                 // Assert only one data set on version 2 has been updated
                 var actualReleaseVersion2Subject1 = await statisticsDbContext.ReleaseSubject
                     .FirstAsync(rs => rs.ReleaseId == statsReleaseVersion2.Id
@@ -581,11 +618,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Version 2 data set 1 guidance updated", actualReleaseVersion2Subject1.DataGuidance);
 
+                var actualReleaseVersion2File1 = await contentDbContext.ReleaseFiles
+                    .FirstAsync(rf => rf.ReleaseId == contentReleaseVersion2.Id
+                                      && rf.FileId == releaseVersion2File1.FileId);
+
+                Assert.Equal("Version 2 data set 1 guidance updated", actualReleaseVersion2File1.Summary);
+
                 var actualReleaseVersion2Subject2 = await statisticsDbContext.ReleaseSubject
                     .FirstAsync(rs => rs.ReleaseId == statsReleaseVersion2.Id
                                       && rs.SubjectId == subject2.Id);
 
                 Assert.Equal("Version 2 data set 2 guidance", actualReleaseVersion2Subject2.DataGuidance);
+
+                var actualReleaseVersion2File2 = await contentDbContext.ReleaseFiles
+                    .FirstAsync(rf => rf.ReleaseId == contentReleaseVersion2.Id
+                                      && rf.FileId == releaseVersion2File2.FileId);
+
+                Assert.Equal("Version 2 data set 2 guidance", actualReleaseVersion2File2.Summary);
             }
         }
 
