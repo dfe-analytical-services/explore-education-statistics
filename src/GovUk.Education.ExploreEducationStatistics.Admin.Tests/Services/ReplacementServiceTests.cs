@@ -2755,34 +2755,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var originalReleaseFile1 = new ReleaseFile
             {
                 Release = contentReleaseVersion1,
-                File = originalFile
+                File = originalFile,
+                Summary = "Version 1 original data set guidance"
             };
 
             var originalReleaseFile2 = new ReleaseFile
             {
-                Id = Guid.NewGuid(),
                 Release = contentReleaseVersion2,
-                File = originalFile
+                File = originalFile,
+                Summary = "Version 2 original data set guidance"
             };
 
             var replacementReleaseFile = new ReleaseFile
             {
                 Release = contentReleaseVersion2,
-                File = replacementFile
+                File = replacementFile,
+                Summary = null
             };
 
             var originalReleaseSubject1 = new ReleaseSubject
             {
                 Release = statsReleaseVersion1,
                 Subject = originalSubject,
-                DataGuidance = "Original guidance version 1"
+                DataGuidance = "Version 1 original data set guidance"
             };
 
             var originalReleaseSubject2 = new ReleaseSubject
             {
                 Release = statsReleaseVersion2,
                 Subject = originalSubject,
-                DataGuidance = "Original guidance version 2"
+                DataGuidance = "Version 2 original data set guidance"
             };
 
             var replacementReleaseSubject = new ReleaseSubject
@@ -3191,7 +3193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(replacementFileUpdated);
                 Assert.Null(replacementFileUpdated.ReplacingId);
 
-                var replacedDataBlock = await contentDbContext.DataBlocks.SingleAsync(db => db.Id == dataBlock.Id);
+                var replacedDataBlock = await contentDbContext.DataBlocks
+                    .FirstAsync(db => db.Id == dataBlock.Id);
                 Assert.Equal(dataBlock.Name, replacedDataBlock.Name);
                 Assert.Equal(replacementSubject.Id, replacedDataBlock.Query.SubjectId);
 
@@ -3209,7 +3212,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(replacedDataBlock.Query.TimePeriod);
                 timePeriod.AssertDeepEqualTo(replacedDataBlock.Query.TimePeriod);
 
-                Assert.Equal(2, replacedDataBlock.Table.TableHeaders.Columns.Count());
+                Assert.Equal(2, replacedDataBlock.Table.TableHeaders.Columns.Count);
                 Assert.Equal(TableHeaderType.TimePeriod, replacedDataBlock.Table.TableHeaders.Columns.First().Type);
                 Assert.Equal("2019_CY", replacedDataBlock.Table.TableHeaders.Columns.First().Value);
                 Assert.Equal(TableHeaderType.TimePeriod,
@@ -3323,16 +3326,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(replacementSubject.Id, replacedFootnoteForSubject.Subjects.First().Subject.Id);
 
-                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
-                    .SingleAsync(rs => rs.ReleaseId == statsReleaseVersion2.Id
-                                       && rs.SubjectId == replacementSubject.Id);
+                // Check the original data guidance has been retained on the replacement
+                var updatedReleaseFile = await contentDbContext.ReleaseFiles
+                    .FirstAsync(rf => rf.ReleaseId == contentReleaseVersion2.Id
+                                       && rf.FileId == replacementFile.Id);
 
-                // Check the original guidance has been retained on the replacement
-                Assert.Equal("Original guidance version 2", replacedReleaseSubject.DataGuidance);
+                Assert.Equal("Version 2 original data set guidance", updatedReleaseFile.Summary);
 
                 // Check the sequence of filters and indicators remains untouched
+                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
+                    .FirstAsync(rs => rs.ReleaseId == statsReleaseVersion2.Id
+                                       && rs.SubjectId == replacementSubject.Id);
+
                 Assert.Null(replacedReleaseSubject.FilterSequence);
                 Assert.Null(replacedReleaseSubject.IndicatorSequence);
+
+                // TODO EES-4661 Remove this
+                Assert.Equal("Version 2 original data set guidance", replacedReleaseSubject.DataGuidance);
             }
         }
 
@@ -3697,7 +3707,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var replacedDataBlock = await contentDbContext.DataBlocks.SingleAsync(db => db.Id == dataBlock.Id);
+                var replacedDataBlock = await contentDbContext.DataBlocks
+                    .FirstAsync(db => db.Id == dataBlock.Id);
 
                 var mapChart = Assert.IsType<MapChart>(replacedDataBlock.Charts[0]);
 

@@ -110,12 +110,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid replacementFileId)
         {
             return await GetReplacementPlan(releaseId, originalFileId, replacementFileId)
-                .OnSuccess(async plan =>
+                .OnSuccessDo<ActionResult, DataReplacementPlanViewModel, Unit>(plan =>
+                    !plan.Valid ? ValidationActionResult(ReplacementMustBeValid) : Unit.Instance)
+                .OnSuccessCombineWith(_ => CheckReleaseFilesExist(releaseId, originalFileId, replacementFileId))
+                .OnSuccess(async planAndReleaseFiles =>
                 {
-                    if (!plan.Valid)
-                    {
-                        return ValidationActionResult(ReplacementMustBeValid);
-                    }
+                    var (plan, (originalReleaseFile, replacementReleaseFile)) = planAndReleaseFiles;
 
                     var originalSubjectId = plan.OriginalSubjectId;
                     var replacementSubjectId = plan.ReplacementSubjectId;
@@ -134,6 +134,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
 
                     await ReplaceReleaseSubject(releaseId, originalSubjectId, replacementSubjectId);
+
+                    // Replace data guidance
+                    replacementReleaseFile.Summary = originalReleaseFile.Summary;
 
                     await _contentDbContext.SaveChangesAsync();
                     await _statisticsDbContext.SaveChangesAsync();
@@ -1096,6 +1099,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             _statisticsDbContext.Update(replacementReleaseSubject);
 
+            // TODO EES-4661 Remove this now that we replace data guidance on the ReleaseFile instead
             replacementReleaseSubject.DataGuidance = originalReleaseSubject.DataGuidance;
 
             replacementReleaseSubject.FilterSequence =
