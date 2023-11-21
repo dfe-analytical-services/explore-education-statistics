@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -121,8 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(releaseCreate.PublicationId)
+            return await ReleaseCreateRequestValidator.Validate(releaseCreate)
+                .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
                 .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
                 .OnSuccess(async () =>
@@ -342,8 +343,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
             Guid releaseId, ReleaseUpdateRequest request)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
+            return await ReleaseUpdateRequestValidator.Validate(request)
+                .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist))
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
                 .OnSuccess(async release =>

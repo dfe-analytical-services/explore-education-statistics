@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -26,6 +25,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -37,6 +37,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static Moq.MockBehavior;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
+using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -47,6 +48,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid()
         };
+
+        [Fact]
+        public async Task CreateRelease_ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
+        {
+            var releaseCreateRequest = new ReleaseCreateRequest
+            {
+                Type = ReleaseType.ExperimentalStatistics,
+            };
+
+            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+
+            var result = await releaseService.CreateRelease(releaseCreateRequest);
+
+            result.AssertBadRequest(ReleaseTypeInvalid);
+        }
+
+        [Fact]
+        public async Task UpdateRelease_ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
+        {
+            var releaseUpdateRequest = new ReleaseUpdateRequest
+            {
+                Type = ReleaseType.ExperimentalStatistics,
+            };
+
+            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+
+            var result = await releaseService.UpdateRelease(It.IsAny<Guid>(), releaseUpdateRequest);
+
+            result.AssertBadRequest(ReleaseTypeInvalid);
+        }
 
         [Fact]
         public async Task CreateReleaseNoTemplate()
