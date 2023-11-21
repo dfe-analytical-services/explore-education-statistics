@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -131,6 +132,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             releaseFiles.ForEach(releaseFile =>
             {
                 var content = updateRequestsByFileId[releaseFile.FileId].Content;
+
+                _contentDbContext.Update(releaseFile);
+                releaseFile.Summary = content;
+
+                // Until we switch over data guidance and data catalogue to use ReleaseFiles as the
+                // source for content, ensure data guidance content is still updated for each corresponding
+                // ReleaseSubject.
+                // TODO EES-4661 Once the change to migrate data guidance from ReleaseSubject to ReleaseFile has been
+                // a success, drop ReleaseSubject.DataGuidance.
 
                 var releaseSubject = releaseSubjectsBySubjectId[releaseFile.File.SubjectId!.Value];
                 _statisticsDbContext.Update(releaseSubject);

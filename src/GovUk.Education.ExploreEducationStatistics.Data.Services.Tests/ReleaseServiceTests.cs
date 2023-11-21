@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 1"
+                DataGuidance = "Data set 1 guidance"
 
             };
 
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 2"
+                DataGuidance = "Data set 2 guidance"
             };
 
             var subject1Filter1 = new Filter
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile1 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 1",
+                Name = "Data set 1",
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -124,19 +124,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
                 },
+                Summary = "Data set 1 guidance"
             };
 
             var releaseFile2 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 2",
+                Name = "Data set 2",
                 File = new File
                 {
                     Filename = "data2.csv",
                     ContentLength = 20480,
                     Type = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
-                }
+                },
+                Summary = "Data set 2 guidance"
             };
 
             var import1 = new DataImport
@@ -605,7 +607,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 1",
                 FilterSequence = new List<FilterSequenceEntry>
                 {
                     new (subject1Filter2Id, new List<FilterGroupSequenceEntry>()),
@@ -744,7 +745,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 1",
                 IndicatorSequence = new List<IndicatorGroupSequenceEntry>
                 {
                     new(Guid.NewGuid(), new List<Guid> { subject1Indicator2.Id, subject1Indicator1.Id, }),

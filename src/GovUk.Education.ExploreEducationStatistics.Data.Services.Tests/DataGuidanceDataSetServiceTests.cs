@@ -76,14 +76,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = subject1,
-                DataGuidance = "Subject 1 Guidance"
+                DataGuidance = "Data set 1 guidance"
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
                 Subject = subject2,
-                DataGuidance = "Subject 2 Guidance"
+                DataGuidance = "Data set 2 guidance"
             };
 
             var subject1Observation1 = new Observation
@@ -281,6 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Filename = "file1.csv",
                     Type = FileType.Data,
                 },
+                Summary = "Data set 1 guidance"
             };
 
             var releaseFile2 = new ReleaseFile
@@ -293,6 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Filename = "file2.csv",
                     Type = FileType.Data,
                 },
+                Summary = "Data set 2 guidance"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -317,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(2, result.Count);
 
                 Assert.Equal(releaseFile1.FileId, result[0].FileId);
-                Assert.Equal("Subject 1 Guidance", result[0].Content);
+                Assert.Equal("Data set 1 guidance", result[0].Content);
                 Assert.Equal("file1.csv", result[0].Filename);
                 Assert.Equal("Subject 1", result[0].Name);
 
@@ -345,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(subject1Footnote3.FootnoteId, result[0].Footnotes[2].Id);
 
                 Assert.Equal(releaseFile2.FileId, result[1].FileId);
-                Assert.Equal("Subject 2 Guidance", result[1].Content);
+                Assert.Equal("Data set 2 guidance", result[1].Content);
                 Assert.Equal("file2.csv", result[1].Filename);
                 Assert.Equal("Subject 2", result[1].Name);
 
@@ -379,20 +381,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject(),
-                DataGuidance = "Subject 1 Guidance"
+                Subject = new Subject()
             };
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject(),
-                DataGuidance = "Subject 2 Guidance"
+                Subject = new Subject()
             };
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject(),
-                DataGuidance = "Subject 3 Guidance"
+                Subject = new Subject()
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -483,22 +482,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject(),
-                DataGuidance = "Data set 1 guidance"
+                Subject = new Subject()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject(),
-                DataGuidance = "Data set 2 guidance"
+                Subject = new Subject()
             };
 
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
-                Subject = new Subject(),
-                DataGuidance = "Data set 3 guidance"
+                Subject = new Subject()
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -573,28 +569,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     releaseFile1.FileId, releaseFile3.FileId
                 });
 
-                // Assert only the specified Subjects are returned
+                // Assert only the specified data sets are returned
                 var viewModels = result.AssertRight();
 
                 Assert.Equal(2, viewModels.Count);
 
                 Assert.Equal(releaseFile1.FileId, viewModels[0].FileId);
-                Assert.Equal("Data set 1 guidance", viewModels[0].Content);
-                Assert.Equal("file1.csv", viewModels[0].Filename);
-                Assert.Equal("Data set 1", viewModels[0].Name);
-                Assert.Empty(viewModels[0].TimePeriods.From);
-                Assert.Empty(viewModels[0].TimePeriods.To);
-                Assert.Empty(viewModels[0].GeographicLevels);
-                Assert.Empty(viewModels[0].Variables);
-
                 Assert.Equal(releaseFile3.FileId, viewModels[1].FileId);
-                Assert.Equal("Data set 3 guidance", viewModels[1].Content);
-                Assert.Equal("file3.csv", viewModels[1].Filename);
-                Assert.Equal("Data set 3", viewModels[1].Name);
-                Assert.Empty(viewModels[1].TimePeriods.From);
-                Assert.Empty(viewModels[1].TimePeriods.To);
-                Assert.Empty(viewModels[1].GeographicLevels);
-                Assert.Empty(viewModels[1].Variables);
             }
         }
 
@@ -712,21 +693,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = contentReleaseVersion1,
                 File = file1,
-                Name = "Version 1 data set 1"
+                Name = "Version 1 data set 1",
+                Summary = "Version 1 data set 1 guidance"
             };
 
             var releaseVersion2File1 = new ReleaseFile
             {
                 Release = contentReleaseVersion2,
                 File = file1,
-                Name = "Version 2 data set 1"
+                Name = "Version 2 data set 1",
+                Summary = "Version 2 data set 1 guidance"
             };
 
             var releaseVersion2File2 = new ReleaseFile
             {
                 Release = contentReleaseVersion2,
                 File = file2,
-                Name = "Version 2 data set 2"
+                Name = "Version 2 data set 2",
+                Summary = "Version 2 data set 2 guidance"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -911,8 +895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject = new ReleaseSubject
             {
                 Release = release,
-                Subject = subject,
-                DataGuidance = "Subject 1 Guidance"
+                Subject = subject
             };
 
             var subjectObservation1 = new Observation
@@ -985,8 +968,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject = new ReleaseSubject
             {
                 Release = release,
-                Subject = subject,
-                DataGuidance = "Subject 1 Guidance"
+                Subject = subject
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();

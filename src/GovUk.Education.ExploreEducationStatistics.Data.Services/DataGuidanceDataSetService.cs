@@ -64,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .ToAsyncEnumerable()
                         .SelectAwait(async releaseFile =>
                         {
+                            // TODO EES-4661 Remove this and switch to using ReleaseFile for content
                             var subjectId = releaseFile.File.SubjectId!.Value;
 
                             var releaseSubject = await _statisticsDbContext.ReleaseSubject
@@ -93,6 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public async Task<Either<ActionResult, Unit>> Validate(Guid releaseId,
             CancellationToken cancellationToken = default)
         {
+            // TODO EES-4661 Switch to using ReleaseFile once we know the migration of all existing data set guidance
+            // has been a success. Inline this method with the validation that's already in DataGuidanceService 
             var releaseSubjects = _statisticsDbContext
                 .ReleaseSubject
                 .Where(rs => rs.ReleaseId == releaseId);
@@ -159,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new DataGuidanceDataSetViewModel
             {
                 FileId = releaseFile.FileId,
-                Content = content ?? "",
+                Content = content ?? "", // TODO EES-4661 Update this to be releaseFile.Summary
                 Filename = releaseFile.File.Filename,
                 Order = releaseFile.Order,
                 Name = releaseFile.Name ?? "",
