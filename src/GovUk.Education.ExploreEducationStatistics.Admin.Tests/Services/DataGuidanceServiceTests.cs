@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
@@ -21,8 +20,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
-using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -140,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
-            dataGuidanceDataSetService.Setup(s => 
+            dataGuidanceDataSetService.Setup(s =>
                     s.ListDataSets(release.Id, null, default))
                 .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
 
@@ -472,12 +469,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var actualReleaseVersion1 = await contentDbContext.Releases
-                    .FirstAsync(r => r.Id == releaseVersion1.Id); 
+                    .FirstAsync(r => r.Id == releaseVersion1.Id);
 
                 Assert.Equal("Version 1 release guidance", actualReleaseVersion1.DataGuidance);
 
                 var actualReleaseVersion2 = await contentDbContext.Releases
-                    .FirstAsync(r => r.Id == releaseVersion2.Id); 
+                    .FirstAsync(r => r.Id == releaseVersion2.Id);
 
                 Assert.Equal("Version 2 release guidance updated", actualReleaseVersion2.DataGuidance);
 
@@ -504,18 +501,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Validate_NoRelease()
+        public async Task ValidateForReleaseChecklist_NoRelease()
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
             var service = SetupService(contentDbContext: contentDbContext);
 
-            var result = await service.Validate(Guid.NewGuid());
+            var result = await service.ValidateForReleaseChecklist(Guid.NewGuid());
 
             result.AssertNotFound();
         }
 
         [Fact]
-        public async Task Validate_NoDataFiles()
+        public async Task ValidateForReleaseChecklist_SucceedsWithNoDataSets()
         {
             var release = new Release();
 
@@ -527,30 +524,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
-
-            releaseDataFileRepository.Setup(s => s.HasAnyDataFiles(release.Id))
-                .ReturnsAsync(false);
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupService(contentDbContext: contentDbContext,
-                    releaseDataFileRepository: releaseDataFileRepository.Object);
+                var service = SetupService(contentDbContext: contentDbContext);
 
-                var result = await service.Validate(release.Id);
-
-                VerifyAllMocks(releaseDataFileRepository);
+                var result = await service.ValidateForReleaseChecklist(release.Id);
 
                 result.AssertRight();
             }
         }
 
-        [Fact]
-        public async Task Validate_DataGuidancePopulated()
+        [Theory]
+        [InlineData(null, "Data set 1 guidance", false)]
+        [InlineData("", "Data set 1 guidance", false)]
+        [InlineData(" ", "Data set 1 guidance", false)]
+        [InlineData("Release guidance", null, false)]
+        [InlineData("Release guidance", "", false)]
+        [InlineData("Release guidance", " ", false)]
+        [InlineData("Release guidance", "Data set 1 guidance", true)]
+        public async Task ValidateForReleaseChecklist(string releaseGuidance,
+            string dataSet1Guidance,
+            bool expectedValidResult)
         {
             var release = new Release
             {
-                DataGuidance = "Release guidance"
+                DataGuidance = releaseGuidance
+            };
+
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Filename = "file1.csv",
+                    Type = FileType.Data
+                },
+                Summary = dataSet1Guidance
+            };
+
+            // Create an second data set which always has valid data guidance
+            var releaseFile2 = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    Filename = "file2.csv",
+                    Type = FileType.Data
+                },
+                Summary = "Data set 2 guidance"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -558,103 +579,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile1, releaseFile2);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService.Setup(s => s.Validate(release.Id, default))
-                .ReturnsAsync(Unit.Instance);
-
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
-
-            releaseDataFileRepository.Setup(s => s.HasAnyDataFiles(release.Id))
-                .ReturnsAsync(true);
-
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupService(contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
-                    releaseDataFileRepository: releaseDataFileRepository.Object);
+                var service = SetupService(contentDbContext: contentDbContext);
 
-                var result = await service.Validate(release.Id);
+                var result = await service.ValidateForReleaseChecklist(release.Id);
 
-                VerifyAllMocks(dataGuidanceDataSetService,
-                    releaseDataFileRepository);
-
-                result.AssertRight();
-            }
-        }
-
-        [Fact]
-        public async Task Validate_ReleaseDataGuidanceNotPopulated()
-        {
-            var release = new Release
-            {
-                DataGuidance = null
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddRangeAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
-
-            releaseDataFileRepository.Setup(s => s.HasAnyDataFiles(release.Id))
-                .ReturnsAsync(true);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupService(contentDbContext: contentDbContext,
-                    releaseDataFileRepository: releaseDataFileRepository.Object);
-
-                var result = await service.Validate(release.Id);
-
-                result.AssertBadRequest(PublicDataGuidanceRequired);
-            }
-        }
-
-        [Fact]
-        public async Task Validate_DataSetDataGuidanceNotPopulated()
-        {
-            var release = new Release
-            {
-                DataGuidance = "Release guidance"
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(release);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
-
-            dataGuidanceDataSetService.Setup(s => s.Validate(release.Id, default))
-                .ReturnsAsync(ValidationUtils.ValidationResult(PublicDataGuidanceRequired));
-
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(Strict);
-
-            releaseDataFileRepository.Setup(s => s.HasAnyDataFiles(release.Id))
-                .ReturnsAsync(true);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupService(contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
-                    releaseDataFileRepository: releaseDataFileRepository.Object);
-
-                var result = await service.Validate(release.Id);
-
-                VerifyAllMocks(dataGuidanceDataSetService);
-
-                result.AssertBadRequest(PublicDataGuidanceRequired);
+                if (expectedValidResult)
+                {
+                    result.AssertRight();
+                }
+                else
+                {
+                    result.AssertBadRequest(PublicDataGuidanceRequired);
+                }
             }
         }
 

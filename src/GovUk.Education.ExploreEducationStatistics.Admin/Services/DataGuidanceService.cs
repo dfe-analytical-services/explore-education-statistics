@@ -65,23 +65,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseAndDataSets => BuildViewModel(releaseAndDataSets.Item1, releaseAndDataSets.Item2));
         }
 
-        public async Task<Either<ActionResult, Unit>> Validate(Guid releaseId,
+        public async Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(Guid releaseId,
             CancellationToken cancellationToken = default)
         {
             return await _contentDbContext.Releases
                 .FirstOrNotFoundAsync(release => release.Id == releaseId, cancellationToken)
-                .OnSuccess(async release =>
+                .OnSuccess<ActionResult, Release, Unit>(async release =>
                 {
-                    if (await _releaseDataFileRepository.HasAnyDataFiles(release.Id))
+                    var releaseFilesQueryable = _contentDbContext.ReleaseFiles
+                        .Where(rf => rf.ReleaseId == releaseId 
+                                     && rf.File.Type == FileType.Data);
+
+                    if (await releaseFilesQueryable.AnyAsync(cancellationToken))
                     {
                         if (string.IsNullOrWhiteSpace(release.DataGuidance))
                         {
                             return ValidationResult(PublicDataGuidanceRequired);
                         }
 
-                        // TODO EES-4661 Inline this validation into this service as soon as we
-                        // only need to check release files rather than subjects.
-                        return await _dataGuidanceDataSetService.Validate(releaseId, cancellationToken);
+                        if (await releaseFilesQueryable.AnyAsync(rf =>
+                                string.IsNullOrWhiteSpace(rf.Summary), cancellationToken))
+                        {
+                            return ValidationResult(PublicDataGuidanceRequired);
+                        }
                     }
 
                     return Unit.Instance;
