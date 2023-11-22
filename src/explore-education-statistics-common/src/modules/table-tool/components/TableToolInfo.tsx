@@ -43,8 +43,11 @@ const TableToolInfo = ({
       </ul>
 
       <p>
-        Our statistical practice is regulated by the Office for Statistics
-        Regulation (OSR).
+        Our statistical practice is regulated by the{' '}
+        <a href="https://osr.statisticsauthority.gov.uk/what-we-do/">
+          Office for Statistics Regulation
+        </a>{' '}
+        (OSR)
       </p>
 
       {contactDetails && (

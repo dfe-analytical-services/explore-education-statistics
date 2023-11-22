@@ -26,9 +26,7 @@ describe('TableToolInfo', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByText(
-        'Our statistical practice is regulated by the Office for Statistics Regulation (OSR).',
-      ),
+      screen.getByRole('link', { name: /Office for Statistics Regulation/ }),
     ).toBeInTheDocument();
   });
 
@@ -40,9 +38,7 @@ describe('TableToolInfo', () => {
     ).not.toBeInTheDocument();
 
     expect(
-      screen.getByText(
-        'Our statistical practice is regulated by the Office for Statistics Regulation (OSR).',
-      ),
+      screen.getByRole('link', { name: /Office for Statistics Regulation/ }),
     ).toBeInTheDocument();
   });
 });
