@@ -57,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, HydrateReleaseQuery)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccessCombineWith(release => _dataBlockService.GetUnattachedDataBlocks(releaseId))
-                .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
+                .OnSuccessCombineWith(_ => _dataBlockService.GetUnattachedDataBlocks(releaseId))
+                .OnSuccessCombineWith(_ => _releaseFileService.ListAll(
                     releaseId,
                     Ancillary,
                     FileType.Data))

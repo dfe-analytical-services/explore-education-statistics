@@ -50,26 +50,19 @@ public class KeyStatisticService : IKeyStatisticService
     {
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanUpdateRelease)
-            .OnSuccess(async _ =>
-                await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
-            .OnSuccess(async dataBlock =>
-                await _context
-                    .ContentBlocks
-                    .AnyAsync(block =>
-                        block.ReleaseId == releaseId
-                        && block.Id == dataBlock.Id)
-                    ? new Either<ActionResult, DataBlock>(dataBlock)
-                      : ValidationActionResult(ContentBlockNotAttachedToRelease)
-            )
-            .OnSuccess(async dataBlock =>
-                await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlock)
+            .OnSuccess(_ => _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
+                query.Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
+                                                && dataBlockVersion.ReleaseId == releaseId)))
+            .OnSuccessDo(async dataBlockVersion =>
+                await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlockVersion)
                     ? new Either<ActionResult, Unit>(Unit.Instance)
                     : ValidationActionResult(DataBlockShouldBeUnattached))
-            .OnSuccess(async _ =>
+            .OnSuccess(async dataBlockVersion =>
             {
                 var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
                 keyStatisticDataBlock.ReleaseId = releaseId;
                 keyStatisticDataBlock.CreatedById = _userService.GetUserId();
+                keyStatisticDataBlock.DataBlockParentId = dataBlockVersion.DataBlockParentId;
 
                 var currentMaxOrder = await _context.KeyStatistics
                     .Where(ks => ks.ReleaseId == releaseId)

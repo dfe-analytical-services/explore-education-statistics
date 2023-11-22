@@ -56,7 +56,7 @@ export const testEditableRelease: EditableRelease = {
     {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-1',
-      dataBlockId: 'dataBlock-1',
+      dataBlockParentId: 'dataBlock-1-parent',
       trend: 'keyStat-1 trend',
       order: 0,
       created: '2023-01-01',
@@ -75,7 +75,7 @@ export const testEditableRelease: EditableRelease = {
     {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-3',
-      dataBlockId: 'dataBlock-2',
+      dataBlockParentId: 'dataBlock-2-parent',
       guidanceText: 'KeyStat-3 guidanceText',
       order: 2,
       created: '2023-01-03',
@@ -145,6 +145,7 @@ export const testEditableRelease: EditableRelease = {
           table: emptyTable,
           type: 'DataBlock',
           id: '69a9522d-501d-441a-9ee5-260ede5cd85c',
+          dataBlockParentId: 'dataBlock-1-parent',
           order: 1,
           comments: [],
         },
@@ -221,6 +222,7 @@ export const testEditableRelease: EditableRelease = {
         dataSetId: 'dataSet-1',
         dataSetName: 'My Pub',
         id: 'a3197018-66b6-4ce5-97fa-da2355270c40',
+        dataBlockParentId: 'dataBlock-2-parent',
         order: 0,
         comments: [],
       },

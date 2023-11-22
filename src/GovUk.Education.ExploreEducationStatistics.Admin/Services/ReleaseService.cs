@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -122,8 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
-            return await ReleaseCreateRequestValidator.Validate(releaseCreate)
-                .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(releaseCreate.PublicationId)
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
                 .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
                 .OnSuccess(async () =>
@@ -306,15 +305,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release release)
         {
-            var dataBlocks = await _context
-                .ContentBlocks
-                .Where(block => block.ReleaseId == release.Id)
-                .OfType<DataBlock>()
-                .ToListAsync();
-
-            var (amendment, amendedDataBlocks) = release.CreateAmendment(dataBlocks, DateTime.UtcNow, _userService.GetUserId());
+            var amendment = release.CreateAmendment(DateTime.UtcNow, _userService.GetUserId());
             await _context.Releases.AddAsync(amendment);
-            await _context.ContentBlocks.AddRangeAsync(amendedDataBlocks);
             await _context.SaveChangesAsync();
             return amendment;
         }
@@ -343,8 +335,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
             Guid releaseId, ReleaseUpdateRequest request)
         {
-            return await ReleaseUpdateRequestValidator.Validate(request)
-                .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist))
+            return await _context
+                .Releases
+                .HydrateReleaseForChecklist()
+                .SingleOrNotFoundAsync(r => r.Id == releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
                 .OnSuccess(async release =>
@@ -694,7 +688,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(release => release.Content)
                 .Include(release => release.KeyStatistics)
                 .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
-                .Include(release => release.FeaturedTables);
+                .Include(release => release.FeaturedTables)
+                .Include(release => release.DataBlockVersions)
+                .Include(release => release.DataBlockVersions)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
+                .Include(release => release.DataBlockVersions)
+                .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+                .ThenInclude(dataBlockVersion => dataBlockVersion != null ? dataBlockVersion.ContentBlock : null);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)

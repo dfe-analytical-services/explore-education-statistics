@@ -29,6 +29,7 @@ const emptyTable: Table = {
 
 const basicDataBlock: DataBlock = {
   id: 'datablock-0',
+  dataBlockParentId: 'datablock-0-parent',
   dataSetId: 'dataSetId',
   dataSetName: 'Test data set',
   order: 1,
@@ -309,6 +310,7 @@ describe('ReleaseContentContext', () => {
         dataSetId: 'cpih01',
         dataSetName: 'CPIH01',
         id: '69a9522d-501d-441a-9ee5-260ede5cd85c',
+        dataBlockParentId: 'datablock-1-parent',
         order: 0,
         comments: [],
       },
@@ -637,7 +639,7 @@ describe('ReleaseContentContext', () => {
     const newKeyStat: KeyStatisticDataBlock = {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-4',
-      dataBlockId: 'dataBlock-0',
+      dataBlockParentId: 'dataBlock-0',
       trend: 'keyStat-4 trend',
       guidanceTitle: 'keyStat-4 guidanceTitle',
       guidanceText: 'keyStat-4 guidanceText',

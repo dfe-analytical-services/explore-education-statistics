@@ -20,7 +20,7 @@ export interface ReleaseDataBlockSummary {
 export type UpdateReleaseDataBlock = ReleaseDataBlock;
 export type CreateReleaseDataBlock = OmitStrict<
   DataBlock,
-  'id' | 'order' | 'type'
+  'id' | 'order' | 'type' | 'dataBlockParentId'
 >;
 
 export interface DependentDataBlock {

@@ -223,6 +223,7 @@ describe('PreReleaseTableToolPage', () => {
     {
       id: 'block-1',
       dataBlockId: 'block-1',
+      dataBlockParentId: 'block-1-parent',
       name: 'Test highlight',
       description: 'Test highlight description',
       subjectId: 'subject-1',
@@ -254,6 +255,7 @@ describe('PreReleaseTableToolPage', () => {
 
   const testDataBlock: ReleaseDataBlock = {
     id: 'block-1',
+    dataBlockParentId: 'block-1-parent',
     dataSetId: 'data-set-1',
     dataSetName: 'Test data set',
     name: 'Test block',

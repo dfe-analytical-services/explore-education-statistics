@@ -106,7 +106,7 @@ export type KeyStatisticType =
 
 export interface KeyStatisticDataBlock extends KeyStatisticBase {
   type: 'KeyStatisticDataBlock';
-  dataBlockId: string;
+  dataBlockParentId: string;
 }
 
 export interface KeyStatisticText extends KeyStatisticBase {

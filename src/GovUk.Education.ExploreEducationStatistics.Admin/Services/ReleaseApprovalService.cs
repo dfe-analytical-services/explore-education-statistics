@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -31,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseApprovalService : IReleaseApprovalService
     {
         private readonly ContentDbContext _context;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly DateTimeProvider _dateTimeProvider;
         private readonly IUserService _userService;
         private readonly IPublishingService _publishingService;
@@ -44,10 +42,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ReleaseApprovalOptions _options;
         private readonly IUserReleaseRoleService _userReleaseRoleService;
         private readonly IEmailTemplateService _emailTemplateService;
+        private readonly IUserRepository _userRepository;
 
         public ReleaseApprovalService(
             ContentDbContext context,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
             DateTimeProvider dateTimeProvider,
             IUserService userService,
             IPublishingService publishingService,
@@ -59,11 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseRepository releaseRepository,
             IOptions<ReleaseApprovalOptions> options,
             IUserReleaseRoleService userReleaseRoleService,
-            IEmailTemplateService emailTemplateService
-        )
+            IEmailTemplateService emailTemplateService,
+            IUserRepository userRepository)
         {
             _context = context;
-            _persistenceHelper = persistenceHelper;
             _dateTimeProvider = dateTimeProvider;
             _userService = userService;
             _publishingService = publishingService;
@@ -75,16 +72,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseRepository = releaseRepository;
             _userReleaseRoleService = userReleaseRoleService;
             _emailTemplateService = emailTemplateService;
+            _userRepository = userRepository;
             _options = options.Value;
         }
 
         public async Task<Either<ActionResult, List<ReleaseStatusViewModel>>> GetReleaseStatuses(
             Guid releaseId)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, release =>
-                    release.Include(r => r.ReleaseStatuses)
-                        .ThenInclude(rs => rs.CreatedBy))
+            return await _context
+                .Releases
+                .Include(r => r.ReleaseStatuses)
+                .ThenInclude(rs => rs.CreatedBy)
+                .SingleOrNotFoundAsync(r => r.Id == releaseId)
                 .OnSuccess(_userService.CheckCanViewReleaseStatusHistory)
                 .OnSuccess(async release =>
                 {
@@ -113,8 +112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             ReleaseStatusCreateRequest request)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
+            return await _context
+                .Releases
+                .HydrateReleaseForChecklist()
+                .SingleOrNotFoundAsync(r => r.Id == releaseId)
                 .OnSuccessDo(release => _userService.CheckCanUpdateReleaseStatus(release, request.ApprovalStatus))
                 .OnSuccessDo(() => ValidatePublishDate(request))
                 .OnSuccess(async release =>
@@ -136,67 +137,120 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     var releaseStatus = new ReleaseStatus
                     {
+                        Id = Guid.NewGuid(),
                         Release = release,
                         InternalReleaseNote = request.InternalReleaseNote,
                         ApprovalStatus = request.ApprovalStatus,
                         CreatedById = _userService.GetUserId()
                     };
 
-                    return await ValidateReleaseWithChecklist(release)
-                        .OnSuccessDo(() => RemoveUnusedImages(release.Id))
-                        .OnSuccessVoid(async () =>
-                        {
-                            _context.Releases.Update(release);
-                            await _context.AddAsync(releaseStatus);
-                            await _context.SaveChangesAsync();
+                    return await
+                        ValidateReleaseWithChecklist(release)
+                        .OnSuccess(() => RemoveUnusedImages(release.Id))
 
-                            // Only need to inform Publisher if changing release approval status to or from Approved
-                            if (oldStatus == ReleaseApprovalStatus.Approved ||
-                                request.ApprovalStatus == ReleaseApprovalStatus.Approved)
+                        .OnSuccess(() =>
+                            SendEmailNotificationsAndInvites(request, release)
+                            .OnSuccess(() => NotifyPublisher(releaseId, request, oldStatus, releaseStatus))
+                            .OnSuccessDo(async () =>
                             {
-                                await _publishingService.ReleaseChanged(
-                                    releaseId,
-                                    releaseStatus.Id,
-                                    request.PublishMethod == PublishMethod.Immediate
-                                );
-                            }
-
-                            switch (request.ApprovalStatus)
-                            {
-                                case ReleaseApprovalStatus.Approved:
-                                    if (request.PublishMethod == PublishMethod.Scheduled)
-                                    {
-                                        await _preReleaseUserService.SendPreReleaseUserInviteEmails(release.Id);
-                                    }
-                                    break;
-
-                                case ReleaseApprovalStatus.HigherLevelReview:
-                                    var userReleaseRoles =
-                                        await _userReleaseRoleService.ListUserReleaseRolesByPublication(
-                                            ReleaseRole.Approver,
-                                            release.Publication.Id);
-
-                                    var userPublicationRoles = await _context.UserPublicationRoles
-                                        .Include(upr => upr.User)
-                                        .Where(upr => upr.PublicationId == release.PublicationId
-                                                      && upr.Role == PublicationRole.Approver)
-                                        .ToListAsync();
-
-                                    var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
-                                    if (notifyHigherReviewers)
-                                    {
-                                        userReleaseRoles.Select(urr => urr.User.Email)
-                                            .Concat(userPublicationRoles.Select(upr => upr.User.Email))
-                                            .Distinct()
-                                            .ForEach(email =>
-                                            {
-                                                _emailTemplateService.SendReleaseHigherReviewEmail(email, release);
-                                            });
-                                    }
-                                    break;
-                            }
-                        });
+                                _context.Releases.Update(release);
+                                await _context.AddAsync(releaseStatus);
+                                await _context.SaveChangesAsync();
+                            }));
                 });
+        }
+
+        private async Task<Either<ActionResult, Unit>> NotifyPublisher(
+            Guid releaseId,
+            ReleaseStatusCreateRequest request,
+            ReleaseApprovalStatus oldStatus,
+            ReleaseStatus releaseStatus)
+        {
+            // Only need to inform Publisher if changing release approval status to or from Approved
+            if (oldStatus == ReleaseApprovalStatus.Approved ||
+                request.ApprovalStatus == ReleaseApprovalStatus.Approved)
+            {
+                return await _publishingService.ReleaseChanged(
+                    releaseId,
+                    releaseStatus.Id,
+                    request.PublishMethod == PublishMethod.Immediate);
+            }
+
+            return Unit.Instance;
+        }
+
+        private async Task<Either<ActionResult, Unit>> SendEmailNotificationsAndInvites(
+            ReleaseStatusCreateRequest request,
+            Release release)
+        {
+            if (request.ApprovalStatus == ReleaseApprovalStatus.Approved
+                && request.PublishMethod == PublishMethod.Scheduled)
+            {
+                return await SendPreReleaseUserInviteEmails(release);
+            }
+
+            if (request.ApprovalStatus == ReleaseApprovalStatus.HigherLevelReview)
+            {
+                return await SendHigherLevelReviewNotificationEmails(release);
+            }
+
+            return Unit.Instance;
+        }
+
+        private async Task<Either<ActionResult, Unit>> SendHigherLevelReviewNotificationEmails(Release release)
+        {
+            var userReleaseRoles =
+                await _userReleaseRoleService.ListUserReleaseRolesByPublication(
+                    ReleaseRole.Approver,
+                    release.Publication.Id);
+
+            var userPublicationRoles = await _context
+                .UserPublicationRoles
+                .Include(upr => upr.User)
+                .Where(upr =>
+                    upr.PublicationId == release.PublicationId
+                    && upr.Role == PublicationRole.Approver)
+                .ToListAsync();
+
+            var notifyHigherReviewers = userReleaseRoles.Any() || userPublicationRoles.Any();
+
+            if (notifyHigherReviewers)
+            {
+                return userReleaseRoles
+                    .Select(urr => urr.User.Email)
+                    .Concat(userPublicationRoles.Select(upr => upr.User.Email))
+                    .Distinct()
+                    .Select(email => _emailTemplateService.SendReleaseHigherReviewEmail(email, release))
+                    .OnSuccessAllReturnVoid();
+            }
+
+            return Unit.Instance;
+        }
+
+        private async Task<Either<ActionResult, Unit>> SendPreReleaseUserInviteEmails(Release release)
+        {
+            var unsentUserReleaseInvites = await _context
+                .UserReleaseInvites
+                .Where(i =>
+                    i.ReleaseId == release.Id
+                    && i.Role == ReleaseRole.PrereleaseViewer
+                    && !i.EmailSent)
+                .ToListAsync();
+
+            var emailResults = await unsentUserReleaseInvites
+                .ToAsyncEnumerable()
+                .SelectAwait(async invite =>
+                {
+                    var user = await _userRepository.FindByEmail(invite.Email);
+                    return await _preReleaseUserService.SendPreReleaseInviteEmail(
+                            release,
+                            invite.Email.ToLower(),
+                            isNewUser: user == null)
+                        .OnSuccessDo(() => _preReleaseUserService.MarkInviteEmailAsSent(invite));
+                })
+                .ToListAsync();
+
+            return emailResults.OnSuccessAllReturnVoid();
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveUnusedImages(Guid releaseId)

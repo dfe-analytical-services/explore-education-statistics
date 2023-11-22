@@ -1,0 +1,99 @@
+#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
+
+public static class FeaturedTableGeneratorExtensions
+{
+    public static Generator<FeaturedTable> DefaultFeaturedTable(this DataFixture fixture)
+        => fixture.Generator<FeaturedTable>().WithDefaults();
+
+    public static Generator<FeaturedTable> WithDefaults(this Generator<FeaturedTable> generator)
+        => generator.ForInstance(s => s.SetDefaults());
+
+    public static Generator<FeaturedTable> WithOrder(
+        this Generator<FeaturedTable> generator,
+        int order)
+        => generator.ForInstance(s => s.SetOrder(order));
+
+    public static Generator<FeaturedTable> WithRelease(
+        this Generator<FeaturedTable> generator,
+        Release release)
+        => generator.ForInstance(s => s.SetRelease(release));
+
+    public static Generator<FeaturedTable> WithDataBlock(
+        this Generator<FeaturedTable> generator,
+        DataBlock dataBlock)
+        => generator.ForInstance(s => s.SetDataBlock(dataBlock));
+
+    public static Generator<FeaturedTable> WithDataBlockParent(
+        this Generator<FeaturedTable> generator,
+        DataBlockParent dataBlockParent)
+        => generator.ForInstance(s => s.SetDataBlockParent(dataBlockParent));
+
+    public static Generator<FeaturedTable> WithCreated(
+        this Generator<FeaturedTable> generator,
+        DateTime created,
+        Guid? createdById = null)
+        => generator.ForInstance(s => s.SetCreated(created, createdById));
+
+    public static Generator<FeaturedTable> WithUpdated(
+        this Generator<FeaturedTable> generator,
+        DateTime updated,
+        Guid? updatedById = null)
+        => generator.ForInstance(s => s.SetUpdated(updated, updatedById));
+
+    public static InstanceSetters<FeaturedTable> SetDefaults(this InstanceSetters<FeaturedTable> setters)
+        => setters
+            .SetDefault(featuredTable => featuredTable.Id)
+            .SetDefault(featuredTable => featuredTable.Name)
+            .SetDefault(featuredTable => featuredTable.Description)
+            .SetDefault(featuredTable => featuredTable.Order, offset: 1)
+            .Set(featuredTable => featuredTable.Created, DateTime.UtcNow.AddDays(-1))
+            .SetDefault(featuredTable => featuredTable.CreatedById);
+
+    public static InstanceSetters<FeaturedTable> SetOrder(
+        this InstanceSetters<FeaturedTable> setters,
+        int order)
+        => setters.Set(s => s.Order, order);
+
+    public static InstanceSetters<FeaturedTable> SetRelease(
+        this InstanceSetters<FeaturedTable> setters,
+        Release release)
+        => setters
+            .Set(s => s.Release, release)
+            .Set(s => s.ReleaseId, release.Id);
+    public static InstanceSetters<FeaturedTable> SetDataBlock(
+        this InstanceSetters<FeaturedTable> setters,
+        DataBlock dataBlock)
+        => setters
+            .Set(s => s.DataBlock, dataBlock)
+            .Set(s => s.DataBlockId, dataBlock.Id);
+
+    public static InstanceSetters<FeaturedTable> SetDataBlockParent(
+        this InstanceSetters<FeaturedTable> setters,
+        DataBlockParent dataBlockParent)
+        => setters
+            .Set(s => s.DataBlockParent, dataBlockParent)
+            .Set(s => s.DataBlockParentId, dataBlockParent.Id);
+
+    public static InstanceSetters<FeaturedTable> SetUpdated(
+        this InstanceSetters<FeaturedTable> setters,
+        DateTime updated,
+        Guid? updatedById = null)
+        => setters
+            .Set(s => s.Updated, updated)
+            .Set(s => s.UpdatedById, (_, featuredTable, _) => updatedById ?? featuredTable.UpdatedById);
+
+    public static InstanceSetters<FeaturedTable> SetCreated(
+        this InstanceSetters<FeaturedTable> setters,
+        DateTime created,
+        Guid? createdById = null)
+        => setters
+            .Set(s => s.Created, created)
+            .Set(s => s.CreatedById, (_, featuredTable, _) => createdById ?? featuredTable.CreatedById);
+}

@@ -2900,6 +2900,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = contentReleaseVersion2
             };
 
+            var dataBlockVersion = new DataBlockVersion
+            {
+                Id = dataBlock.Id,
+                ContentBlock = dataBlock
+            };
+
             var footnoteForFilter = CreateFootnote(statsReleaseVersion2,
                 "Test footnote for Filter",
                 filterFootnotes: new List<FilterFootnote>
@@ -2969,7 +2975,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile1,
                     originalReleaseFile2,
                     replacementReleaseFile);
-                await contentDbContext.DataBlocks.AddRangeAsync(dataBlock);
+                await contentDbContext.DataBlockVersions.AddRangeAsync(dataBlockVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2992,7 +2998,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                 contentReleaseVersion2.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
 
-            var cacheKey = new DataBlockTableResultCacheKey(dataBlock);
+            var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
 
             mocks.cacheKeyService
                 .Setup(service => service
@@ -3457,6 +3463,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = contentRelease
             };
 
+            var dataBlockVersion = new DataBlockVersion
+            {
+                Id = dataBlock.Id,
+                ContentBlock = dataBlock
+            };
+
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
@@ -3503,7 +3515,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                 contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
 
-            var cacheKey = new DataBlockTableResultCacheKey(dataBlock);
+            var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
 
             mocks.cacheKeyService
                 .Setup(service => service
@@ -3767,6 +3779,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Release = contentRelease
             };
 
+            var dataBlockVersion = new DataBlockVersion
+            {
+                Id = dataBlock.Id,
+                ContentBlock = dataBlock
+            };
+
             var mocks = Mocks();
 
             mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
@@ -3810,7 +3828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                 contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
 
-            var cacheKey = new DataBlockTableResultCacheKey(dataBlock);
+            var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
 
             mocks.cacheKeyService
                 .Setup(service => service
@@ -3862,7 +3880,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_FilterSequenceIsReplaced()
         {
-            // Basic test replacing a filter sequence, exercising the service with in-memory data and dependencies.  
+            // Basic test replacing a filter sequence, exercising the service with in-memory data and dependencies.
             // See ReplaceServiceHelperTests.ReplaceFilterSequence for a more comprehensive test of the actual replacement.
 
             var originalSubject = new Subject
@@ -4098,7 +4116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_IndicatorSequenceIsReplaced()
         {
-            // Basic test replacing an indicator sequence, exercising the service with in-memory data and dependencies.  
+            // Basic test replacing an indicator sequence, exercising the service with in-memory data and dependencies.
             // See ReplaceServiceHelperTests.ReplaceIndicatorSequence for a more comprehensive test of the actual replacement.
 
             var originalSubject = new Subject

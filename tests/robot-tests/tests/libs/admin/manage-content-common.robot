@@ -504,7 +504,7 @@ get editor toolbar
 
 get editor
     [Arguments]    ${block}
-    ${editor}=    lookup or return webelement    css:[aria-label="Rich Text Editor, main"]    ${block}
+    ${editor}=    lookup or return webelement    css:[aria-label="Editor editing area: main"]    ${block}
     [Return]    ${editor}
 
 get comments sidebar
