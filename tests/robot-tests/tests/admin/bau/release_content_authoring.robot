@@ -12,8 +12,10 @@ Test Setup          fail test fast if required
 ${RELEASE_NAME}=        Academic year Q1 2020/21
 ${PUBLICATION_NAME}=    UI tests - release content authoring %{RUN_IDENTIFIER}
 ${SECTION_1_TITLE}=     First content section
+${SECTION_2_TITLE}=     Second content section
 ${BLOCK_1_CONTENT}=     Block 1 content
 ${BLOCK_2_CONTENT}=     Block 2 content
+${DATABLOCK_NAME}=      Dates data block name
 
 
 *** Test Cases ***
@@ -26,6 +28,18 @@ Create publication
 Create new release
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
     user creates release from publication page    ${PUBLICATION_NAME}    Academic year Q1    2020
+
+Upload a subject
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+
+    user uploads subject    Dates test subject    dates.csv    dates.meta.csv
+
+Create a data block
+    user creates data block for dates csv
+    ...    Dates test subject
+    ...    ${DATABLOCK_NAME}
+    ...    Data Block 1 title
 
 Give analyst1 publication owner permissions to work on release
     user gives analyst publication owner access    ${PUBLICATION_NAME}
@@ -88,8 +102,8 @@ Switch to bau1 to add review comments for first text block
     user presses keys    CTRL+a
     user adds comment to selected text    ${block}    Test comment 1
 
-    user checks list has x items    testid:unresolvedComments    1    ${block}
-    user checks list item contains    testid:unresolvedComments    1    Test comment 1    ${block}
+    user checks list has x items    testid:comments-unresolved    1    ${block}
+    user checks list item contains    testid:comments-unresolved    1    Test comment 1    ${block}
 
     ${editor}=    get editor    ${block}
     user sets focus to element    ${editor}
@@ -99,9 +113,9 @@ Switch to bau1 to add review comments for first text block
     sleep    0.1    # Prevent intermittent failure where toolbar button is disabled
     user adds comment to selected text    ${block}    Test comment 2
 
-    user checks list has x items    testid:unresolvedComments    2    ${block}
-    user checks list item contains    testid:unresolvedComments    1    Test comment 1    ${block}
-    user checks list item contains    testid:unresolvedComments    2    Test comment 2    ${block}
+    user checks list has x items    testid:comments-unresolved    2    ${block}
+    user checks list item contains    testid:comments-unresolved    1    Test comment 1    ${block}
+    user checks list item contains    testid:comments-unresolved    2    Test comment 2    ${block}
 
     user saves autosaving text block    ${block}
 
@@ -115,8 +129,8 @@ Add review comment for second text block as bau1
     user presses keys    CTRL+a
     user adds comment to selected text    ${block}    Test comment 3
 
-    user checks list has x items    testid:unresolvedComments    1    ${block}
-    user checks list item contains    testid:unresolvedComments    1    Test comment 3    ${block}
+    user checks list has x items    testid:comments-unresolved    1    ${block}
+    user checks list item contains    testid:comments-unresolved    1    Test comment 3    ${block}
 
 Switch to analyst1 to check second text block is locked
     user switches to analyst1 browser
@@ -162,9 +176,9 @@ Switch to analyst1 to resolve comment for first text block
     user switches to analyst1 browser
     ${block}=    get accordion section block    First content section    1    id:releaseMainContent
 
-    user checks list has x items    testid:unresolvedComments    2    ${block}
-    user checks list item contains    testid:unresolvedComments    1    Test comment 1    ${block}
-    user checks list item contains    testid:unresolvedComments    2    Test comment 2    ${block}
+    user checks list has x items    testid:comments-unresolved    2    ${block}
+    user checks list item contains    testid:comments-unresolved    1    Test comment 1    ${block}
+    user checks list item contains    testid:comments-unresolved    2    Test comment 2    ${block}
 
     ${comment}=    user gets unresolved comment    Test comment 1    ${block}
     ${author}=    get child element    ${comment}    testid:comment-author
@@ -181,13 +195,13 @@ Switch to analyst1 to resolve comment for first text block
     ...    ${block}
     ...    testid:Expand Details Section Resolved comments (1)    10
 
-    user checks list has x items    testid:unresolvedComments    1    ${block}
-    user checks list item contains    testid:unresolvedComments    1    Test comment 2    ${block}
+    user checks list has x items    testid:comments-unresolved    1    ${block}
+    user checks list item contains    testid:comments-unresolved    1    Test comment 2    ${block}
 
     user opens details dropdown    Resolved comments (1)    ${block}
 
-    user checks list has x items    testid:resolvedComments    1    ${block}
-    user checks list item contains    testid:resolvedComments    1    Test comment 1    ${block}
+    user checks list has x items    testid:comments-resolved    1    ${block}
+    user checks list item contains    testid:comments-resolved    1    Test comment 1    ${block}
 
     ${comment}=    user gets resolved comment    Test comment 1    ${block}
     user waits until element contains    ${comment}    Resolved by Analyst1 User1
@@ -210,8 +224,8 @@ Switch back to analyst1 to resolve second text block
     # avoid set page view box getting in the way
     user scrolls down    600
 
-    user checks list has x items    testid:unresolvedComments    1    ${block}
-    user checks list item contains    testid:unresolvedComments    1    Test comment 3    ${block}
+    user checks list has x items    testid:comments-unresolved    1    ${block}
+    user checks list item contains    testid:comments-unresolved    1    Test comment 3    ${block}
 
     ${comment}=    user gets unresolved comment    Test comment 3    ${block}
     ${author}=    get child element    ${comment}    testid:comment-author
@@ -225,11 +239,11 @@ Switch back to analyst1 to resolve second text block
     ...    ${block}
     ...    testid:Expand Details Section Resolved comments (1)    10
 
-    user waits until parent does not contain element    ${block}    testid:unresolvedComments
+    user waits until parent does not contain element    ${block}    testid:comments-unresolved
     user opens details dropdown    Resolved comments (1)    ${block}
 
-    user checks list has x items    testid:resolvedComments    1    ${block}
-    user checks list item contains    testid:resolvedComments    1    Test comment 3    ${block}
+    user checks list has x items    testid:comments-resolved    1    ${block}
+    user checks list item contains    testid:comments-resolved    1    Test comment 3    ${block}
 
     ${comment}=    user gets resolved comment    Test comment 3    ${block}
     user waits until element contains    ${comment}    Resolved by Analyst1 User1
@@ -253,9 +267,51 @@ Delete unresolved comment as bau1
     ${block}=    get accordion section block    First content section    1    id:releaseMainContent
     ${comment}=    user gets unresolved comment    Test updated comment 2    ${block}
     user clicks button    Delete    ${comment}
-    user waits until parent does not contain element    ${block}    testid:unresolvedComments
+    user waits until parent does not contain element    ${block}    testid:comments-unresolved
 
     user saves autosaving text block    ${block}
+
+Add second content section as analyst1
+    user switches to analyst1 browser
+    user scrolls to element    xpath://button[text()="Add new section"]
+    user waits until button is enabled    Add new section
+    user clicks button    Add new section
+    user changes accordion section title    2    ${SECTION_2_TITLE}    id:releaseMainContent
+
+Add data block
+    user adds data block to editable accordion section    ${SECTION_2_TITLE}    ${DATABLOCK_NAME}
+    ...    id:releaseMainContent
+    ${block}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
+    user waits until page contains element    ${block}    %{WAIT_SMALL}
+
+Add review comment for data block as bau1
+    user switches to bau1 browser
+    user reloads page
+    user opens accordion section    ${SECTION_2_TITLE}    id:releaseMainContent
+    ${block}=    set variable    xpath://*[@data-testid="data-block-comments-${DATABLOCK_NAME}"]
+    user adds comment to data block    ${block}    Test data block comment
+
+    user checks list has x items    testid:comments-unresolved    1    ${block}
+    user checks list item contains    testid:comments-unresolved    1    Test data block comment    ${block}
+
+Resolve comment for data block as analyst1
+    user switches to analyst1 browser
+    user reloads page
+    user closes Set Page View box
+    user opens accordion section    ${SECTION_2_TITLE}    id:releaseMainContent
+    user scrolls down    400
+    ${block}=    set variable    xpath://*[@data-testid="data-block-comments-${DATABLOCK_NAME}"]
+    ${comment}=    user gets unresolved comment    Test data block comment    ${block}
+
+    user clicks button    Resolve    ${comment}
+
+    user waits until parent contains element
+    ...    ${block}
+    ...    testid:Expand Details Section Resolved comments (1)    10
+
+    user opens details dropdown    Resolved comments (1)    ${block}
+    user checks list has x items    testid:comments-resolved    1    ${block}
+    user checks list item contains    testid:comments-resolved    1    Test data block comment    ${block}
 
 
 *** Keywords ***
@@ -271,3 +327,9 @@ user adds comment to selected text
     ${textarea}=    get child element    ${comments}    label:Comment
     user enters text into element    ${textarea}    ${text}
     user clicks button    Add comment    ${comments}
+
+user adds comment to data block
+    [Arguments]    ${block}    ${text}
+    user clicks button    Add comment    ${block}
+    user enters text into element    label:Comment    ${text}
+    user clicks button    Add comment    ${block}

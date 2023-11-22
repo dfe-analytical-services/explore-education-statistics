@@ -22,7 +22,12 @@ interface Props {
   onSave: () => void;
 }
 
-const CommentAddForm = ({ baseId, containerRef, onCancel, onSave }: Props) => {
+export default function CommentAddForm({
+  baseId,
+  containerRef,
+  onCancel,
+  onSave,
+}: Props) {
   const { addComment, setCurrentInteraction } = useCommentsContext();
 
   const ref = useRef<HTMLDivElement>(null);
@@ -46,7 +51,11 @@ const CommentAddForm = ({ baseId, containerRef, onCancel, onSave }: Props) => {
   };
 
   return (
-    <div className={classNames(styles.container, positionStyle)} ref={ref}>
+    <div
+      className={classNames(styles.container, positionStyle)}
+      data-testid="comment-add-form"
+      ref={ref}
+    >
       <FormProvider
         initialValues={{
           content: '',
@@ -73,6 +82,7 @@ const CommentAddForm = ({ baseId, containerRef, onCancel, onSave }: Props) => {
                 <Button type="submit" disabled={formState.isSubmitting}>
                   Add comment
                 </Button>
+
                 <ButtonText
                   onClick={() => {
                     setCurrentInteraction?.({
@@ -91,6 +101,4 @@ const CommentAddForm = ({ baseId, containerRef, onCancel, onSave }: Props) => {
       </FormProvider>
     </div>
   );
-};
-
-export default CommentAddForm;
+}

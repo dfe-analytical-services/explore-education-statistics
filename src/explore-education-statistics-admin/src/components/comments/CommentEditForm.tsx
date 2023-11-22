@@ -21,7 +21,12 @@ interface Props {
   onSubmit: () => void;
 }
 
-const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
+export default function CommentEditForm({
+  comment,
+  id,
+  onCancel,
+  onSubmit,
+}: Props) {
   const { content } = comment;
 
   const { updateComment } = useCommentsContext();
@@ -74,6 +79,4 @@ const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
       }}
     </FormProvider>
   );
-};
-
-export default CommentEditForm;
+}

@@ -223,9 +223,9 @@ describe('EditableContentForm', () => {
       render(
         <CommentsContextProvider
           comments={testComments}
-          onDelete={noop}
+          onDelete={() => Promise.resolve()}
           onCreate={jest.fn()}
-          onUpdate={noop}
+          onUpdate={() => Promise.resolve()}
           onPendingDelete={noop}
           onPendingDeleteUndo={noop}
         >
@@ -241,7 +241,7 @@ describe('EditableContentForm', () => {
       );
 
       const unresolvedComments = within(
-        screen.getByTestId('unresolvedComments'),
+        screen.getByTestId('comments-unresolved'),
       ).getAllByTestId('comment');
 
       expect(unresolvedComments).toHaveLength(3);
@@ -250,7 +250,7 @@ describe('EditableContentForm', () => {
       expect(unresolvedComments[2]).toHaveTextContent('Comment 4 content');
 
       const resolvedComments = within(
-        screen.getByTestId('resolvedComments'),
+        screen.getByTestId('comments-resolved'),
       ).getAllByTestId('comment');
 
       expect(resolvedComments).toHaveLength(2);
@@ -262,9 +262,9 @@ describe('EditableContentForm', () => {
       render(
         <CommentsContextProvider
           comments={testComments}
-          onDelete={noop}
+          onDelete={() => Promise.resolve()}
           onCreate={jest.fn()}
-          onUpdate={noop}
+          onUpdate={() => Promise.resolve()}
           onPendingDelete={noop}
           onPendingDeleteUndo={noop}
         >
@@ -279,9 +279,9 @@ describe('EditableContentForm', () => {
       );
 
       expect(
-        screen.queryByTestId('unresolvedComments'),
+        screen.queryByTestId('comments-unresolved'),
       ).not.toBeInTheDocument();
-      expect(screen.queryByTestId('resolvedComments')).not.toBeInTheDocument();
+      expect(screen.queryByTestId('comments-resolved')).not.toBeInTheDocument();
     });
 
     test('calls `onPendingDelete` handler when a comment delete button is clicked', async () => {
@@ -295,9 +295,9 @@ describe('EditableContentForm', () => {
         >
           <CommentsContextProvider
             comments={testComments}
-            onDelete={noop}
+            onDelete={() => Promise.resolve()}
             onCreate={jest.fn()}
-            onUpdate={noop}
+            onUpdate={() => Promise.resolve()}
             onPendingDelete={handlePendingDelete}
             onPendingDeleteUndo={noop}
           >
@@ -316,7 +316,7 @@ describe('EditableContentForm', () => {
       expect(handlePendingDelete).not.toHaveBeenCalled();
 
       const unresolvedComments = within(
-        screen.getByTestId('unresolvedComments'),
+        screen.getByTestId('comments-unresolved'),
       ).getAllByTestId('comment');
 
       userEvent.click(
@@ -342,7 +342,7 @@ describe('EditableContentForm', () => {
         >
           <CommentsContextProvider
             comments={testComments}
-            onDelete={noop}
+            onDelete={() => Promise.resolve()}
             onCreate={jest.fn()}
             onUpdate={handleUpdate}
             onPendingDelete={noop}
@@ -363,7 +363,7 @@ describe('EditableContentForm', () => {
       expect(handleUpdate).not.toHaveBeenCalled();
 
       const unresolvedComments = within(
-        screen.getByTestId('unresolvedComments'),
+        screen.getByTestId('comments-unresolved'),
       ).getAllByTestId('comment');
 
       const comment = within(unresolvedComments[0]);
@@ -397,7 +397,7 @@ describe('EditableContentForm', () => {
         >
           <CommentsContextProvider
             comments={testComments}
-            onDelete={noop}
+            onDelete={() => Promise.resolve()}
             onCreate={jest.fn()}
             onUpdate={handleUpdate}
             onPendingDelete={noop}
@@ -418,7 +418,7 @@ describe('EditableContentForm', () => {
       expect(handleUpdate).not.toHaveBeenCalled();
 
       const unresolvedComments = within(
-        screen.getByTestId('unresolvedComments'),
+        screen.getByTestId('comments-unresolved'),
       ).getAllByTestId('comment');
 
       const comment = within(unresolvedComments[0]);
@@ -445,7 +445,7 @@ describe('EditableContentForm', () => {
         >
           <CommentsContextProvider
             comments={testComments}
-            onDelete={noop}
+            onDelete={() => Promise.resolve()}
             onCreate={jest.fn()}
             onUpdate={handleUpdate}
             onPendingDelete={noop}
@@ -466,7 +466,7 @@ describe('EditableContentForm', () => {
       expect(handleUpdate).not.toHaveBeenCalled();
 
       const resolvedComments = within(
-        screen.getByTestId('resolvedComments'),
+        screen.getByTestId('comments-resolved'),
       ).getAllByTestId('comment');
 
       const comment = within(resolvedComments[0]);

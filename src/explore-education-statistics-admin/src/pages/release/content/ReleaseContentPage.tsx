@@ -8,6 +8,7 @@ import {
   ReleaseContentContextState,
   useReleaseContentState,
 } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import styles from '@admin/pages/release/content/ReleaseContentPage.module.scss';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import permissionService from '@admin/services/permissionService';
 import releaseContentService from '@admin/services/releaseContentService';
@@ -67,7 +68,7 @@ const ReleaseContentPageLoaded = () => {
 
             <div
               className={classNames({
-                'govuk-!-margin-right-0': editingMode === 'edit',
+                [styles.container]: editingMode === 'edit',
                 'govuk-width-container': editingMode !== 'table-preview',
               })}
             >

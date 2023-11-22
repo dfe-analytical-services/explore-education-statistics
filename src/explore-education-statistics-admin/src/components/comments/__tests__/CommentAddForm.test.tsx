@@ -47,9 +47,9 @@ describe('CommentAddForm', () => {
     render(
       <CommentsContextProvider
         comments={[]}
-        onDelete={noop}
+        onDelete={() => Promise.resolve()}
         onCreate={handleSaveComment}
-        onUpdate={noop}
+        onUpdate={() => Promise.resolve()}
         onPendingDelete={noop}
         onPendingDeleteUndo={noop}
       >

@@ -45,13 +45,3 @@ $locked-border-width: 4px;
   position: absolute;
   right: -#{$locked-border-width};
 }
-
-.commentsButtonContainer {
-  margin-left: -$dfe-comments-width;
-  position: absolute;
-  width: $dfe-comments-width - $dfe-comments-gutter;
-
-  button {
-    width: 100%;
-  }
-}
