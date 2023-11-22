@@ -15,8 +15,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public Guid ReleaseId { get; set; }
 
-        public string? DataGuidance { get; set; }
-
         public List<FilterSequenceEntry>? FilterSequence { get; set; }
 
         public List<IndicatorGroupSequenceEntry>? IndicatorSequence { get; set; }
