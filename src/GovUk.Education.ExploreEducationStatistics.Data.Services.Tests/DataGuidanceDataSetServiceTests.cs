@@ -580,6 +580,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
+        public async Task ListDataSets_ReplacementInProgressIsIgnored()
+        {
+            var release = new Release();
+
+            var originalSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject()
+            };
+
+            var replacementSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = new Subject()
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.Release.AddRangeAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(originalSubject,
+                    replacementSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var contentRelease = new Content.Model.Release
+            {
+                Id = release.Id
+            };
+
+            var originalFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = new File
+                {
+                    Filename = "file1.csv",
+                    Type = FileType.Data,
+                    SubjectId = originalSubject.SubjectId
+                }
+            };
+
+            var replacementFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = new File
+                {
+                    Filename = "file1.csv",
+                    Type = FileType.Data,
+                    SubjectId = replacementSubject.SubjectId,
+                    Replacing = originalFile.File
+                }
+            };
+
+           originalFile.File.ReplacedBy = replacementFile.File;
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(contentRelease);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = SetupService(contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext);
+
+                var result = await service.ListDataSets(contentRelease.Id);
+
+                var viewModels = result.AssertRight();
+
+                // Replacement data sets should not be included when the replacement is still in progress
+                Assert.Single(viewModels);
+                Assert.Equal(originalFile.FileId, viewModels[0].FileId);
+            }
+        }
+
+        [Fact]
         public async Task ListDataSets_NoRelease()
         {
             var service = SetupService();
