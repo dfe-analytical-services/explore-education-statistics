@@ -99,6 +99,7 @@ user opens chrome headlessly
     Create Webdriver    Chrome    ${alias}    options=${c_opts}
 
     ${all_opts}=    Call Method    ${c_opts}    to_capabilities
+    log to console  >>>>>>>>>>>>>>>>>>>>opened
 
 user opens chrome visually
     [Arguments]    ${alias}=chrome
@@ -113,6 +114,7 @@ user opens chrome visually
     Call Method    ${c_opts}    add_experimental_option    prefs    ${prefs}
     Create Webdriver    Chrome    ${alias}    options=${c_opts}
     ${all_opts}=    Call Method    ${c_opts}    to_capabilities
+    log to console  >>>>>>>>>>>>>>>>>>>>opened
 
     maximize browser window
 

@@ -6,14 +6,37 @@ should continue to run or if they should fail immediately and therefore fail the
 """
 from robot.libraries.BuiltIn import BuiltIn
 from tests.libs.logger import get_logger
+from tests.libs.selenium_elements import sl
+import traceback
 
-sl = BuiltIn().get_library_instance("SeleniumLibrary")
 FAILING_SUITES = set()
+
 logger = get_logger(__name__)
+
+for line in traceback.format_stack():
+    logger.warn(line.strip())
+
+logger.warn('FAAAAAAAAAIL FAAAAAAAAAAAAST')
+
+def remove_failing_suite():
+    logger.warn(_get_current_test_suite())
+    if current_test_suite_failing_fast():
+        FAILING_SUITES.remove(_get_current_test_suite())
+        logger.warn('REMOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+
+    if current_test_suite_failing_fast():
+        logger.warn('NOT REMOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+
+
+    logger.warn('NOTHING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11')
+
+def _get_current_test_suite() -> str:
+    return BuiltIn().get_variable_value("${SUITE SOURCE}")
 
 
 def current_test_suite_failing_fast() -> bool:
     test_suite = _get_current_test_suite()
+    logger.warn(FAILING_SUITES)
     return test_suite in FAILING_SUITES
 
 
@@ -35,5 +58,5 @@ def _get_current_test_suite() -> str:
 
 
 def _raise_assertion_error(err_msg):
-    sl.failure_occurred()
+    sl().failure_occurred()
     raise AssertionError(err_msg)

@@ -244,6 +244,8 @@ if args.rerun_failed_suites:
 if args.tags:
     robotArgs += ["--include", args.tags]
 
+robotArgs += ["--listener", "listeners/SuiteEndedListener.py"]
+
 if args.print_keywords:
     robotArgs += ["--listener", "listeners/KeywordListener.py"]
 
