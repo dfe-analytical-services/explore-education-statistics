@@ -25,6 +25,7 @@ from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
 from tests.libs.logger import get_logger
 from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.slack import SlackService
+from tests.libs.fail_fast import failing_suites_filename
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
@@ -244,8 +245,6 @@ if args.rerun_failed_suites:
 if args.tags:
     robotArgs += ["--include", args.tags]
 
-robotArgs += ["--listener", "listeners/SuiteEndedListener.py"]
-
 if args.print_keywords:
     robotArgs += ["--listener", "listeners/KeywordListener.py"]
 
@@ -357,13 +356,7 @@ if args.tests and "general_public" not in args.tests:
 
     # Tests that alter data only occur on local and dev environments
     if args.env in ["local", "dev"]:
-        # add randomness to prevent multiple simultaneous run_tests.py generating the same runIdentifier value
-        randomStr = "".join([random.choice(string.ascii_lowercase + string.digits) for n in range(6)])
-        runIdentifier = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S-" + randomStr)
-
-        os.environ["RUN_IDENTIFIER"] = runIdentifier
-        logger.info(f"Starting tests with RUN_IDENTIFIER: {runIdentifier}")
-
+        
         get_themes_resp = get_test_themes()
         test_theme_id = None
         test_theme_name = "Test theme"
@@ -378,8 +371,6 @@ if args.tests and "general_public" not in args.tests:
 
         os.environ["TEST_THEME_NAME"] = test_theme_name
         os.environ["TEST_THEME_ID"] = test_theme_id
-
-        create_test_topic()
 
 if args.env == "local":
     robotArgs += ["--include", "Local"]
@@ -457,23 +448,42 @@ if not os.path.exists("test-results/downloads"):
 
 try:
     # Run tests
-    if args.interp == "robot":
-        exitCode = robot_run_cli(robotArgs, exit=False)
-    elif args.interp == "pabot":
-        robotArgs = ["--processes", str(args.processes)] + robotArgs
-        exitCode = pabot_run_cli(robotArgs)
+    # if args.interp == "robot":
+    #     exitCode = robot_run_cli(robotArgs, exit=False)
+    # elif args.interp == "pabot":
+    #     robotArgs = ["--processes", str(args.processes)] + robotArgs
+    #     exitCode = pabot_run_cli(robotArgs)
 
-    rerun_attempt = 0
-    while exitCode != 0 and args.rerun_attempts - rerun_attempt > 0:
-        rerun_attempt += 1
-        os.rename("test-results/output.xml", f"test-results/attempt_{str(rerun_attempt)}.xml")
+    test_run = 0
+    while args.rerun_attempts is None or test_run <= args.rerun_attempts:
+        test_run += 1
+        rerunning_failed_suites = robotArgs[0] == "--rerunfailedsuites" or test_run > 1
 
+        # if rerunning_failed_suites and test_run == 1:
+            
+        
+        if os.path.isfile(failing_suites_filename):
+            os.remove(failing_suites_filename)
+        
+        if os.path.isfile('.pabotsuitenames'):
+            os.remove('.pabotsuitenames')
+
+        # add randomness to prevent multiple simultaneous run_tests.py generating the same runIdentifier value
+        randomStr = "".join([random.choice(string.ascii_lowercase + string.digits) for n in range(6)])
+        runIdentifier = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S-" + randomStr + str(test_run))
+
+        os.environ["RUN_IDENTIFIER"] = runIdentifier
+        logger.info(f"Starting tests with RUN_IDENTIFIER: {runIdentifier}")
+
+        create_test_topic()
+
+        if test_run > 1:
+            os.rename("test-results/output.xml", f"test-results/attempt_{str(test_run)}.xml")
+        
         # We want to add arguments on the first rerun attempt, but on subsequent attempts, we just want
         # to change rerunfailedsuites xml file we use
-        if robotArgs[0] != "--rerunfailedsuites":
-            robotArgs = ["--rerunfailedsuites", f"test-results/attempt_{str(rerun_attempt)}.xml"] + robotArgs
-        else:
-            robotArgs[1] = f"test-results/attempt_{str(rerun_attempt)}.xml"
+        if rerunning_failed_suites:
+            robotArgs = ["--rerunfailedsuites", f"test-results/attempt_{str(test_run)}.xml"] + robotArgs
 
         if args.interp == "robot":
             exitCode = robot_run_cli(robotArgs, exit=False)
@@ -484,7 +494,7 @@ try:
             "--prerebotmodifier",
             "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
             "--merge",
-            f"test-results/attempt_{str(rerun_attempt)}.xml",
+            f"test-results/attempt_{str(test_run)}.xml",
             "test-results/output.xml",
         ]
         robot_rebot_cli(mergeArgs, exit=False)
@@ -509,8 +519,14 @@ finally:
         ]
         robot_rebot_cli(merge_options, exit=False)
 
-    logger.info(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
+    logger.info(f"Log available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
     logger.info(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
+
+    if os.path.isfile(failing_suites_filename):
+        logger.info(f"Failing suites:")
+        failing_suites = open(failing_suites_filename, "r").readlines()
+        [logger.info(r"  * file://" + suite) for suite in failing_suites]     
+    
     logger.info("\nTests finished!")
 
     if args.enable_slack_notifications:

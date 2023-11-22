@@ -7,28 +7,12 @@ should continue to run or if they should fail immediately and therefore fail the
 from robot.libraries.BuiltIn import BuiltIn
 from tests.libs.logger import get_logger
 from tests.libs.selenium_elements import sl
-import traceback
+import os.path
 
-FAILING_SUITES = set()
+failing_suites_filename = '.failing_suites';
 
 logger = get_logger(__name__)
 
-for line in traceback.format_stack():
-    logger.warn(line.strip())
-
-logger.warn('FAAAAAAAAAIL FAAAAAAAAAAAAST')
-
-def remove_failing_suite():
-    logger.warn(_get_current_test_suite())
-    if current_test_suite_failing_fast():
-        FAILING_SUITES.remove(_get_current_test_suite())
-        logger.warn('REMOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-
-    if current_test_suite_failing_fast():
-        logger.warn('NOT REMOVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
-
-
-    logger.warn('NOTHING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11')
 
 def _get_current_test_suite() -> str:
     return BuiltIn().get_variable_value("${SUITE SOURCE}")
@@ -36,8 +20,11 @@ def _get_current_test_suite() -> str:
 
 def current_test_suite_failing_fast() -> bool:
     test_suite = _get_current_test_suite()
-    logger.warn(FAILING_SUITES)
-    return test_suite in FAILING_SUITES
+    if os.path.isfile(failing_suites_filename):
+        file = open(failing_suites_filename, "r")
+        failing_suites = file.readlines()
+        return test_suite in failing_suites
+    return False
 
 
 def record_failing_test_suite():
@@ -45,7 +32,8 @@ def record_failing_test_suite():
     logger.warn(
         f"Recording test suite '{test_suite}' as failing - subsequent tests will automatically fail in this suite"
     )
-    FAILING_SUITES.add(test_suite)
+    file = open(failing_suites_filename, "w")
+    file.writelines([test_suite])
 
 
 def fail_test_fast_if_required():
