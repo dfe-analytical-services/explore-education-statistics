@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
@@ -64,7 +63,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static DataGuidanceService SetupService(
             ContentDbContext? contentDbContext = null,
-            StatisticsDbContext? statisticsDbContext = null,
             IDataGuidanceDataSetService? dataGuidanceDataSetService = null,
             IUserService? userService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null)
@@ -72,7 +70,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new DataGuidanceService(
                 contentDbContext ?? new Mock<ContentDbContext>().Object,
                 dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(),
-                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? Mock.Of<IUserService>(),
                 releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>());
         }

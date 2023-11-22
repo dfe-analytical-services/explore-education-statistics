@@ -12,8 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.EntityFrameworkCore;
@@ -22,7 +20,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -134,7 +131,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -149,11 +145,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new List<DataGuidanceDataSetViewModel>());
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = SetupService(contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
-                    statisticsDbContext: statisticsDbContext);
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object);
 
                 var result = await service.UpdateDataGuidance(
                     release.Id,
@@ -280,98 +274,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateDataGuidance_WithDataSets()
         {
-            var contentRelease = new Release
+            var release = new Release
             {
                 Id = Guid.NewGuid(),
                 DataGuidance = "Release guidance"
             };
 
-            var statsRelease = new Data.Model.Release
-            {
-                Id = contentRelease.Id,
-            };
-
-            var subject1 = new Subject
-            {
-                Id = Guid.NewGuid(),
-            };
-
-            var subject2 = new Subject
-            {
-                Id = Guid.NewGuid(),
-            };
-
             var releaseFile1 = new ReleaseFile
             {
-                Release = contentRelease,
+                Release = release,
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Type = FileType.Data,
-                    SubjectId = subject1.Id
+                    Type = FileType.Data
                 },
                 Summary = "Data set 1 guidance"
             };
 
             var releaseFile2 = new ReleaseFile
             {
-                Release = contentRelease,
+                Release = release,
                 File = new File
                 {
                     Filename = "file2.csv",
-                    Type = FileType.Data,
-                    SubjectId = subject2.Id
+                    Type = FileType.Data
                 },
                 Summary = "Data set 2 guidance"
             };
 
-            var releaseSubject1 = new ReleaseSubject
-            {
-                Release = statsRelease,
-                Subject = subject1,
-                DataGuidance = "Data set 1 guidance"
-            };
-
-            var releaseSubject2 = new ReleaseSubject
-            {
-                Release = statsRelease,
-                Subject = subject2,
-                DataGuidance = "Data set 2 guidance"
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(contentRelease);
+                await contentDbContext.Releases.AddRangeAsync(release);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFile1, releaseFile2);
                 await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Release.AddRangeAsync(statsRelease);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.SaveChangesAsync();
             }
 
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService.Setup(s =>
-                    s.ListDataSets(statsRelease.Id, null, default))
+                    s.ListDataSets(release.Id, null, default))
                 .ReturnsAsync(DataGuidanceDataSets);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = SetupService(contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
-                    statisticsDbContext: statisticsDbContext);
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object);
 
                 // Update release and data set 1
                 var result = await service.UpdateDataGuidance(
-                    contentRelease.Id,
+                    release.Id,
                     new DataGuidanceUpdateRequest
                     {
                         Content = "Release guidance updated",
@@ -390,40 +343,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(contentRelease.Id, viewModel.Id);
+                Assert.Equal(release.Id, viewModel.Id);
                 Assert.Equal("Release guidance updated", viewModel.Content);
                 Assert.Equal(DataGuidanceDataSets, viewModel.DataSets);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var actualRelease = await contentDbContext.Releases
-                    .FirstAsync(r => r.Id == contentRelease.Id);
+                    .FirstAsync(r => r.Id == release.Id);
 
                 Assert.Equal("Release guidance updated", actualRelease.DataGuidance);
 
                 // Assert only one data set has been updated
-                var actualSubject1 = await statisticsDbContext.ReleaseSubject
-                    .FirstAsync(rs => rs.ReleaseId == statsRelease.Id
-                                && rs.SubjectId == releaseSubject1.Subject.Id);
-
-                Assert.Equal("Data set 1 guidance updated", actualSubject1.DataGuidance);
-
                 var actualReleaseFile1 = await contentDbContext.ReleaseFiles
-                    .FirstAsync(rf => rf.ReleaseId == contentRelease.Id
+                    .FirstAsync(rf => rf.ReleaseId == release.Id
                                       && rf.FileId == releaseFile1.FileId);
 
                 Assert.Equal("Data set 1 guidance updated", actualReleaseFile1.Summary);
 
-                var actualSubject2 = await statisticsDbContext.ReleaseSubject
-                    .FirstAsync(rs => rs.ReleaseId == statsRelease.Id
-                                      && rs.SubjectId == releaseSubject2.Subject.Id);
-
-                Assert.Equal("Data set 2 guidance", actualSubject2.DataGuidance);
-
                 var actualReleaseFile2 = await contentDbContext.ReleaseFiles
-                    .FirstAsync(rf => rf.ReleaseId == contentRelease.Id
+                    .FirstAsync(rf => rf.ReleaseId == release.Id
                                       && rf.FileId == releaseFile2.FileId);
 
                 Assert.Equal("Data set 2 guidance", actualReleaseFile2.Summary);
@@ -433,135 +373,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateDataGuidance_WithDataSets_AmendedRelease()
         {
-            var contentReleaseVersion1 = new Release
+            var releaseVersion1 = new Release
             {
                 Id = Guid.NewGuid(),
                 PreviousVersionId = null,
                 DataGuidance = "Version 1 release guidance"
             };
 
-            var contentReleaseVersion2 = new Release
+            var releaseVersion2 = new Release
             {
                 Id = Guid.NewGuid(),
-                PreviousVersionId = contentReleaseVersion1.Id,
+                PreviousVersionId = releaseVersion1.Id,
                 DataGuidance = "Version 2 release guidance"
-            };
-
-            var statsReleaseVersion1 = new Data.Model.Release
-            {
-                Id = contentReleaseVersion1.Id
-            };
-
-            var statsReleaseVersion2 = new Data.Model.Release
-            {
-                Id = contentReleaseVersion2.Id
-            };
-
-            var subject1 = new Subject
-            {
-                Id = Guid.NewGuid(),
-            };
-
-            var subject2 = new Subject
-            {
-                Id = Guid.NewGuid(),
             };
 
             // Version 1 has one data set, version 2 adds another data set
 
             var releaseVersion1File1 = new ReleaseFile
             {
-                Release = contentReleaseVersion1,
+                Release = releaseVersion1,
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Type = FileType.Data,
-                    SubjectId = subject1.Id
+                    Type = FileType.Data
                 },
                 Summary = "Version 1 data set 1 guidance"
             };
 
             var releaseVersion2File1 = new ReleaseFile
             {
-                Release = contentReleaseVersion2,
+                Release = releaseVersion2,
                 File = new File
                 {
                     Filename = "file1.csv",
-                    Type = FileType.Data,
-                    SubjectId = subject1.Id
+                    Type = FileType.Data
                 },
                 Summary = "Version 2 data set 1 guidance"
             };
 
             var releaseVersion2File2 = new ReleaseFile
             {
-                Release = contentReleaseVersion2,
+                Release = releaseVersion2,
                 File = new File
                 {
                     Filename = "file2.csv",
-                    Type = FileType.Data,
-                    SubjectId = subject2.Id
+                    Type = FileType.Data
                 },
                 Summary = "Version 2 data set 2 guidance"
             };
 
-            var releaseVersion1Subject1 = new ReleaseSubject
-            {
-                Release = statsReleaseVersion1,
-                Subject = subject1,
-                DataGuidance = "Version 1 data set 1 guidance"
-            };
-
-            var releaseVersion2Subject1 = new ReleaseSubject
-            {
-                Release = statsReleaseVersion2,
-                Subject = subject1,
-                DataGuidance = "Version 2 data set 1 guidance"
-            };
-
-            var releaseVersion2Subject2 = new ReleaseSubject
-            {
-                Release = statsReleaseVersion2,
-                Subject = subject2,
-                DataGuidance = "Version 2 data set 2 guidance"
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.Releases.AddRangeAsync(contentReleaseVersion1, contentReleaseVersion2);
+                await contentDbContext.Releases.AddRangeAsync(releaseVersion1, releaseVersion2);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(releaseVersion1File1, releaseVersion2File1,
                     releaseVersion2File2);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Release.AddRangeAsync(statsReleaseVersion1, statsReleaseVersion2);
-                await statisticsDbContext.Subject.AddRangeAsync(subject1, subject2);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseVersion1Subject1, releaseVersion2Subject1,
-                    releaseVersion2Subject2);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
             var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
 
             dataGuidanceDataSetService.Setup(s =>
-                    s.ListDataSets(statsReleaseVersion2.Id, null, default))
+                    s.ListDataSets(releaseVersion2.Id, null, default))
                 .ReturnsAsync(DataGuidanceDataSets);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = SetupService(contentDbContext: contentDbContext,
-                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
-                    statisticsDbContext: statisticsDbContext);
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object);
 
                 // Update release and data set 1 on version 2
                 var result = await service.UpdateDataGuidance(
-                    contentReleaseVersion2.Id,
+                    releaseVersion2.Id,
                     new DataGuidanceUpdateRequest
                     {
                         Content = "Version 2 release guidance updated",
@@ -580,58 +464,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(dataGuidanceDataSetService);
 
-                Assert.Equal(contentReleaseVersion2.Id, viewModel.Id);
+                Assert.Equal(releaseVersion2.Id, viewModel.Id);
                 Assert.Equal("Version 2 release guidance updated", viewModel.Content);
                 Assert.Equal(DataGuidanceDataSets, viewModel.DataSets);
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var actualReleaseVersion1 = await contentDbContext.Releases
-                    .FirstAsync(r => r.Id == contentReleaseVersion1.Id); 
+                    .FirstAsync(r => r.Id == releaseVersion1.Id); 
 
                 Assert.Equal("Version 1 release guidance", actualReleaseVersion1.DataGuidance);
 
                 var actualReleaseVersion2 = await contentDbContext.Releases
-                    .FirstAsync(r => r.Id == contentReleaseVersion2.Id); 
+                    .FirstAsync(r => r.Id == releaseVersion2.Id); 
 
                 Assert.Equal("Version 2 release guidance updated", actualReleaseVersion2.DataGuidance);
 
                 // Assert the same data set on version 1 hasn't been affected
-                var actualReleaseVersion1Subject1 = await statisticsDbContext.ReleaseSubject
-                    .FirstAsync(rs => rs.ReleaseId == statsReleaseVersion1.Id
-                                      && rs.SubjectId == subject1.Id);
-
-                Assert.Equal("Version 1 data set 1 guidance", actualReleaseVersion1Subject1.DataGuidance);
-
                 var actualReleaseVersion1File1 = await contentDbContext.ReleaseFiles
-                    .FirstAsync(rf => rf.ReleaseId == contentReleaseVersion1.Id
+                    .FirstAsync(rf => rf.ReleaseId == releaseVersion1.Id
                                       && rf.FileId == releaseVersion1File1.FileId);
 
                 Assert.Equal("Version 1 data set 1 guidance", actualReleaseVersion1File1.Summary);
 
                 // Assert only one data set on version 2 has been updated
-                var actualReleaseVersion2Subject1 = await statisticsDbContext.ReleaseSubject
-                    .FirstAsync(rs => rs.ReleaseId == statsReleaseVersion2.Id
-                                      && rs.SubjectId == subject1.Id);
-
-                Assert.Equal("Version 2 data set 1 guidance updated", actualReleaseVersion2Subject1.DataGuidance);
-
                 var actualReleaseVersion2File1 = await contentDbContext.ReleaseFiles
-                    .FirstAsync(rf => rf.ReleaseId == contentReleaseVersion2.Id
+                    .FirstAsync(rf => rf.ReleaseId == releaseVersion2.Id
                                       && rf.FileId == releaseVersion2File1.FileId);
 
                 Assert.Equal("Version 2 data set 1 guidance updated", actualReleaseVersion2File1.Summary);
 
-                var actualReleaseVersion2Subject2 = await statisticsDbContext.ReleaseSubject
-                    .FirstAsync(rs => rs.ReleaseId == statsReleaseVersion2.Id
-                                      && rs.SubjectId == subject2.Id);
-
-                Assert.Equal("Version 2 data set 2 guidance", actualReleaseVersion2Subject2.DataGuidance);
-
                 var actualReleaseVersion2File2 = await contentDbContext.ReleaseFiles
-                    .FirstAsync(rf => rf.ReleaseId == contentReleaseVersion2.Id
+                    .FirstAsync(rf => rf.ReleaseId == releaseVersion2.Id
                                       && rf.FileId == releaseVersion2File2.FileId);
 
                 Assert.Equal("Version 2 data set 2 guidance", actualReleaseVersion2File2.Summary);
@@ -795,7 +660,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static DataGuidanceService SetupService(
             ContentDbContext contentDbContext,
-            StatisticsDbContext? statisticsDbContext = null,
             IDataGuidanceDataSetService? dataGuidanceDataSetService = null,
             IUserService? userService = null,
             IReleaseDataFileRepository? releaseDataFileRepository = null)
@@ -803,7 +667,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new DataGuidanceService(
                 contentDbContext,
                 dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(Strict),
-                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? AlwaysTrueUserService().Object,
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext)
             );
