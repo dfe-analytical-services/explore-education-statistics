@@ -199,10 +199,13 @@ function getCategoryFilters(
  * Create a map of data sets to their respective key
  * so they can be used in the chart data.
  */
-function createKeyedDataSets(
-  dataSets: Pair<ChildDataSet, number>[],
-  filter: Filter,
-): DataSetCategory['dataSets'] {
+function createKeyedDataSets({
+  dataSets,
+  filter,
+}: {
+  dataSets: Pair<ChildDataSet, number>[];
+  filter?: Filter;
+}): DataSetCategory['dataSets'] {
   return dataSets.reduce<DataSetCategory['dataSets']>(
     (acc, [childDataSet, value]) => {
       const { dataSet } = childDataSet;
@@ -278,8 +281,8 @@ function getSortedDataSetCategoryRange(
 interface Options {
   axisConfiguration: AxisConfiguration;
   data: TableDataResult[];
-  meta: FullTableMeta;
   includeNonNumericData?: boolean;
+  meta: FullTableMeta;
 }
 
 /**
@@ -318,8 +321,8 @@ interface Options {
 export default function createDataSetCategories({
   axisConfiguration,
   data,
-  meta,
   includeNonNumericData = false,
+  meta,
 }: Options): DataSetCategory[] {
   const categoryFilters = getCategoryFilters(axisConfiguration, meta);
   const childDataSets = getChildDataSets(axisConfiguration, meta);
@@ -334,14 +337,19 @@ export default function createDataSetCategories({
   >((acc, childDataSet) => {
     const { dataSet } = childDataSet;
     const rawValue = get(measuresByDataSet, getIndicatorPath(dataSet));
-    const value = Number(rawValue);
+
+    if (!rawValue) {
+      return acc;
+    }
+    // Remove commas which are added in the backend,
+    // see EES-4616 for explanation.
+    const value = Number(rawValue.replace(/,/g, ''));
 
     if (!Number.isNaN(value)) {
       acc.push([childDataSet, value]);
     } else if (includeNonNumericData && rawValue) {
       acc.push([childDataSet, rawValue]);
     }
-
     return acc;
   }, []);
 
@@ -373,7 +381,10 @@ export default function createDataSetCategories({
 
       return {
         filter,
-        dataSets: createKeyedDataSets(matchingDataSets, filter),
+        dataSets: createKeyedDataSets({
+          dataSets: matchingDataSets,
+          filter: !axisConfiguration.groupByFilterGroups ? filter : undefined,
+        }),
       };
     })
     .filter(category => Object.values(category.dataSets).length > 0);

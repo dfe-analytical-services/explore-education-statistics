@@ -1,0 +1,44 @@
+version: "3"
+services:
+  data-storage:
+    image: mcr.microsoft.com/azure-storage/azurite:3.24.0
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - data-storage-data:/data
+  db:
+    build:
+      context: ./docker/mssql-server
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./data/ees-mssql:/var/opt/mssql/data
+      - ./data/sql-scripts:/scripts/
+    environment:
+      SA_PASSWORD: "Your_Password123"
+      ACCEPT_EULA: "Y"
+    command:
+      - /bin/bash
+      - -c
+      - |
+        # Launch MSSQL and send to background
+        /opt/mssql/bin/sqlservr &
+        # Wait 30 seconds for it to be available
+        sleep 30
+
+        # Run the setup script to create the two databases
+        /opt/mssql-tools/bin/sqlcmd -U sa -P $$SA_PASSWORD -l 30 -e -i /scripts/setup-db.sql
+
+        # So that the container doesn't shut down, sleep this thread
+        sleep infinity
+  idp:
+    container_name: ees-idp
+    build:
+      context: ./docker/keycloak
+    ports:
+      - "5030:8080"
+
+volumes:
+  data-storage-data:

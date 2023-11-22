@@ -1,6 +1,4 @@
-import PublicationDetailsForm, {
-  PublicationDetailsFormValues,
-} from '@admin/pages/publication/components/PublicationDetailsForm';
+import PublicationDetailsForm from '@admin/pages/publication/components/PublicationDetailsForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
@@ -25,13 +23,6 @@ const PublicationDetailsPage = () => {
 
       return publicationService.getPublication(supersededById);
     }, [supersededById]);
-
-  const handleSubmit = async (values: PublicationDetailsFormValues) => {
-    await publicationService.updatePublication(publication.id, {
-      ...values,
-    });
-    onReload();
-  };
 
   return (
     <LoadingSpinner loading={isLoading}>
@@ -70,7 +61,7 @@ const PublicationDetailsPage = () => {
           }}
           publicationId={id}
           onCancel={toggleReadOnly.on}
-          onSubmit={handleSubmit}
+          onSubmit={onReload}
         />
       )}
     </LoadingSpinner>

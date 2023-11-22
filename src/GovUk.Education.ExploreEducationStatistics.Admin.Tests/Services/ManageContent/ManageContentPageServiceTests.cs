@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -87,15 +88,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 TimePeriodCoverage = AcademicYear,
                 Type = ReleaseType.OfficialStatistics,
                 Updates = new List<Update>(),
-                KeyStatistics = new List<KeyStatistic>
+            };
+
+            var unattachedDataBlockParent = new DataBlockParent
+            {
+                LatestPublishedVersion = new DataBlockVersion
                 {
-                    new KeyStatisticText { Order = 1 },
-                    new KeyStatisticDataBlock
+                    ReleaseId = release.Id,
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var keyStatDataBlockParent = new DataBlockParent
+            {
+                LatestPublishedVersion = new DataBlockVersion
+                {
+                    ReleaseId = release.Id,
+                    Id = Guid.NewGuid(),
+                }
+            };
+
+            var inContentDataBlockVersionId = Guid.NewGuid();
+
+            var inContentDataBlockParent = new DataBlockParent
+            {
+                LatestPublishedVersion = new DataBlockVersion
+                {
+                    ReleaseId = release.Id,
+                    Id = inContentDataBlockVersionId,
+                    ContentBlock = new DataBlock
                     {
-                        Order = 0,
-                        DataBlockId = Guid.NewGuid(),
-                    },
-                },
+                        Id = inContentDataBlockVersionId,
+                        Order = 1
+                    }
+                }
+            };
+
+            release.KeyStatistics = new List<KeyStatistic>
+            {
+                new KeyStatisticText {Order = 1},
+                new KeyStatisticDataBlock
+                {
+                    Order = 0,
+                    DataBlockId = keyStatDataBlockParent.LatestPublishedVersion!.Id
+                }
             };
 
             var otherRelease = new Release
@@ -110,9 +146,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var unattachedDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
+            var unattachedDataBlocks = new List<DataBlockViewModel>
             {
                 new()
+                {
+                    Id = unattachedDataBlockParent.LatestPublishedVersion!.Id
+                }
             };
 
             var ancillaryFileId = Guid.NewGuid();
@@ -141,12 +180,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    AlternativeTitle = "Methodology 1 title"
+                    AlternativeTitle = "Methodology 1 title",
+                    Status = MethodologyApprovalStatus.Approved,
                 },
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    AlternativeTitle = "Methodology 2 title"
+                    AlternativeTitle = "Methodology 2 title",
+                    Status = MethodologyApprovalStatus.Draft,
                 }
             );
 
@@ -158,55 +199,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 {
                     new HtmlBlock
                     {
+                        Order = 0,
                         Body = "Test block 1"
-                    }
-                }
+                    },
+                    inContentDataBlockParent.LatestPublishedVersion!.ContentBlock
+                },
+                Release = release
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddRangeAsync(release, otherRelease);
-                await contentDbContext.ReleaseContentSections.AddRangeAsync(
-                    new ReleaseContentSection
+                await contentDbContext.Releases.AddRangeAsync(release, otherRelease);
+                await contentDbContext.DataBlockParents.AddRangeAsync(
+                    unattachedDataBlockParent, keyStatDataBlockParent, inContentDataBlockParent);
+                await contentDbContext.ContentSections.AddRangeAsync(
+                    new ContentSection
                     {
                         Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.Headlines
-                        }
+                        Type = ContentSectionType.Headlines
                     },
-                    new ReleaseContentSection
+                    new ContentSection
                     {
                         Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.KeyStatisticsSecondary
-                        }
+                        Type = ContentSectionType.KeyStatisticsSecondary
                     },
-                    new ReleaseContentSection
+                    new ContentSection
                     {
                         Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.ReleaseSummary
-                        }
+                        Type = ContentSectionType.ReleaseSummary
                     },
-                    new()
+                    new ContentSection
                     {
                         Release = release,
-                        ContentSection = new()
-                        {
-                            Type = ContentSectionType.RelatedDashboards
-                        }
+                        Type = ContentSectionType.RelatedDashboards
                     },
-                    new ReleaseContentSection
-                    {
-                        Release = release,
-                        ContentSection = genericContentSection
-                    });
+                    genericContentSection);
+
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -235,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 var result = await service.GetManageContentPageViewModel(release.Id);
 
-                Assert.True(result.IsRight);
+                var viewModel = result.AssertRight();
 
                 dataBlockService.Verify(mock =>
                     mock.GetUnattachedDataBlocks(release.Id), Times.Once);
@@ -243,9 +273,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
 
-                Assert.Equal(unattachedDataBlocks, result.Right.UnattachedDataBlocks);
+                Assert.Equal(unattachedDataBlocks, viewModel.UnattachedDataBlocks);
 
-                var contentRelease = result.Right.Release;
+                var contentRelease = viewModel.Release;
 
                 Assert.NotNull(contentRelease);
                 Assert.Equal(release.Id, contentRelease.Id);
@@ -256,10 +286,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(2, contentRelease.KeyStatistics.Count);
                 Assert.Equal(release.KeyStatistics[1].Id, contentRelease.KeyStatistics[0].Id);
                 Assert.Equal(0, contentRelease.KeyStatistics[0].Order);
-                var keyStatDataBlock = Assert.IsType<KeyStatisticDataBlockViewModel>(contentRelease.KeyStatistics[0]);
+                var originalKeyStatDataBlock = (release.KeyStatistics[1] as KeyStatisticDataBlock)!;
+                var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(contentRelease.KeyStatistics[0]);
+                Assert.Equal(originalKeyStatDataBlock.DataBlockId, keyStatDataBlockViewModel.DataBlockId);
                 Assert.Equal(
-                    (release.KeyStatistics[1] as KeyStatisticDataBlock)!.DataBlockId,
-                    keyStatDataBlock.DataBlockId);
+                    keyStatDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
+                    keyStatDataBlockViewModel.DataBlockParentId);
 
                 Assert.Equal(release.KeyStatistics[0].Id, contentRelease.KeyStatistics[1].Id);
                 Assert.Equal(1, contentRelease.KeyStatistics[1].Order);
@@ -305,15 +337,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Related 1", contentRelatedInformation[0].Description);
                 Assert.Equal("https://related-1", contentRelatedInformation[0].Url);
 
-                var contentReleaseContent = contentRelease.Content;
-                Assert.Single(contentReleaseContent);
-                Assert.Equal(genericContentSection.Id, contentReleaseContent[0].Id);
-                Assert.Equal("Test section 1", contentReleaseContent[0].Heading);
+                var contentSections = contentRelease.Content;
+                Assert.Single(contentSections);
+                Assert.Equal(genericContentSection.Id, contentSections[0].Id);
+                Assert.Equal("Test section 1", contentSections[0].Heading);
 
-                Assert.Single(contentReleaseContent[0].Content);
+                Assert.Equal(2, contentSections[0].Content.Count);
 
-                var contentBlock = Assert.IsType<HtmlBlockViewModel>(contentReleaseContent[0].Content[0]);
-                Assert.Equal("Test block 1", contentBlock.Body);
+                var htmlBlockViewModel = Assert.IsType<HtmlBlockViewModel>(contentSections[0].Content[0]);
+                Assert.Equal("Test block 1", htmlBlockViewModel.Body);
+
+                var dataBlockViewModel = Assert.IsType<DataBlockViewModel>(contentSections[0].Content[1]);
+                Assert.Equal(inContentDataBlockVersionId, dataBlockViewModel.Id);
+                Assert.Equal(
+                    inContentDataBlockParent.LatestPublishedVersion!.DataBlockParentId,
+                    dataBlockViewModel.DataBlockParentId);
 
                 var contentPublication = contentRelease.Publication;
 
@@ -348,6 +386,153 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Methodology 1 title", contentPublication.Methodologies[0].Title);
                 Assert.Equal(methodologies[1].Id, contentPublication.Methodologies[1].Id);
                 Assert.Equal("Methodology 2 title", contentPublication.Methodologies[1].Title);
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
+        }
+
+        [Fact]
+        public async Task GetManageContentPageViewModel_IsPrerelease()
+        {
+            var publication = new Publication
+            {
+                Contact = new Contact(),
+                Slug = "test-publication",
+                Title = "Publication",
+                Topic = new Topic
+                {
+                    Theme = new Theme(),
+                }
+            };
+
+            var release = new Release
+            {
+                NextReleaseDate = new PartialDate {Day = "9", Month = "9", Year = "2040"},
+                PreReleaseAccessList = "Test access list",
+                Publication = publication,
+                PublishScheduled = DateTime.Parse("2020-09-08T23:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
+                Published = null,
+                ReleaseName = "2020",
+                Slug = "2020-21",
+                TimePeriodCoverage = AcademicYear,
+                Type = ReleaseType.OfficialStatistics,
+            };
+
+            var previousMethodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 3 title",
+                // Previous versions should always be approved - so no status set
+            };
+
+            var methodologyVersions = AsList(
+                new MethodologyVersion
+                {
+                    // in result because approved
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology 1 title",
+                    Status = MethodologyApprovalStatus.Approved,
+                },
+                new MethodologyVersion
+                {
+                    // in result because approved
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology 2 title",
+                    Status = MethodologyApprovalStatus.Approved,
+                },
+                previousMethodologyVersion, // in result because amendment of this version is not Approved
+                new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology should be filtered 1",
+                    Status = MethodologyApprovalStatus.Draft,
+                    PreviousVersion = previousMethodologyVersion,
+                },
+                new MethodologyVersion
+                {
+                    // not in result because not Approved and no previous version
+                    Id = Guid.NewGuid(),
+                    AlternativeTitle = "Methodology should be filtered 2",
+                    Status = MethodologyApprovalStatus.HigherLevelReview,
+                    PreviousVersion = null,
+                }
+            );
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.MethodologyVersions.AddRangeAsync(methodologyVersions);
+                await contentDbContext.ContentSections.AddRangeAsync(
+                    new()
+                    {
+                        Type = ContentSectionType.Headlines,
+                        Release = release
+                    },
+                    new()
+                    {
+                        Type = ContentSectionType.KeyStatisticsSecondary,
+                        Release = release
+                    },
+                    new()
+                    {
+                        Type = ContentSectionType.ReleaseSummary,
+                        Release = release
+                    },
+                    new()
+                    {
+                        Type = ContentSectionType.RelatedDashboards,
+                        Release = release
+                    },
+                    new()
+                    {
+                        Type = ContentSectionType.Generic,
+                        Release = release
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
+            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+
+            dataBlockService.Setup(mock =>
+                    mock.GetUnattachedDataBlocks(release.Id))
+                .ReturnsAsync(new List<DataBlockViewModel>());
+
+            methodologyVersionRepository.Setup(mock =>
+                    mock.GetLatestVersionByPublication(publication.Id))
+                .ReturnsAsync(methodologyVersions);
+
+            releaseFileService.Setup(mock =>
+                    mock.ListAll(release.Id, Ancillary, FileType.Data))
+                .ReturnsAsync(new List<FileInfo>());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupManageContentPageService(contentDbContext: contentDbContext,
+                    dataBlockService: dataBlockService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object,
+                    releaseFileService: releaseFileService.Object);
+
+                var result = await service.GetManageContentPageViewModel(
+                    release.Id, isPrerelease: true);
+
+                var viewModel = result.AssertRight();
+
+                var contentRelease = viewModel.Release;
+
+                var contentPublication = contentRelease.Publication;
+                Assert.NotNull(contentPublication);
+
+                Assert.Equal(3, contentPublication.Methodologies.Count);
+                Assert.Equal(methodologyVersions[0].Id, contentPublication.Methodologies[0].Id);
+                Assert.Equal("Methodology 1 title", contentPublication.Methodologies[0].Title);
+                Assert.Equal(methodologyVersions[1].Id, contentPublication.Methodologies[1].Id);
+                Assert.Equal("Methodology 2 title", contentPublication.Methodologies[1].Title);
+                Assert.Equal(methodologyVersions[2].Id, contentPublication.Methodologies[2].Id);
+                Assert.Equal("Methodology 3 title", contentPublication.Methodologies[2].Title);
             }
 
             MockUtils.VerifyAllMocks(dataBlockService, methodologyVersionRepository, releaseFileService);
@@ -399,13 +584,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Type = ReleaseType.OfficialStatistics,
             };
 
-            var unattachedDataBlocks = new List<Admin.ViewModels.DataBlockViewModel>
-            {
-                new()
-            };
-
             var summaryContentSection = new ContentSection
             {
+                Release = release,
                 Type = ContentSectionType.ReleaseSummary,
                 Content = new List<ContentBlock>
                 {
@@ -433,6 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             };
             var genericContentSection = new ContentSection
             {
+                Release = release,
                 Heading = "Test section 1",
                 Type = ContentSectionType.Generic,
                 Content = new List<ContentBlock>
@@ -452,18 +634,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.AddRangeAsync(release);
-                await contentDbContext.ReleaseContentSections.AddRangeAsync(
-                    new ReleaseContentSection
-                    {
-                        Release = release,
-                        ContentSection = summaryContentSection
-                    },
-                    new ReleaseContentSection
-                    {
-                        Release = release,
-                        ContentSection = genericContentSection
-                    }
-                );
+                await contentDbContext.ContentSections.AddRangeAsync(
+                    summaryContentSection, genericContentSection);
+
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -473,7 +646,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
             dataBlockService.Setup(mock =>
                     mock.GetUnattachedDataBlocks(release.Id))
-                .ReturnsAsync(unattachedDataBlocks);
+                .ReturnsAsync(new List<DataBlockViewModel>());
 
             methodologyVersionRepository.Setup(mock =>
                     mock.GetLatestVersionByPublication(publication.Id))
@@ -493,7 +666,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
 
                 var result = await service.GetManageContentPageViewModel(release.Id);
 
-                Assert.True(result.IsRight);
+                var viewModel = result.AssertRight();
 
                 dataBlockService.Verify(mock =>
                     mock.GetUnattachedDataBlocks(release.Id), Times.Once);
@@ -501,9 +674,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 releaseFileService.Verify(mock =>
                     mock.ListAll(release.Id, Ancillary, FileType.Data), Times.Once);
 
-                Assert.Equal(unattachedDataBlocks, result.Right.UnattachedDataBlocks);
-
-                var contentRelease = result.Right.Release;
+                var contentRelease = viewModel.Release;
 
                 var contentReleaseSummary = contentRelease.SummarySection;
 
@@ -567,8 +738,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
             IUserService? userService = null)
         {
             return new(
+                contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                mapper ?? MapperUtils.AdminMapper(),
+                mapper ?? MapperUtils.AdminMapper(contentDbContext),
                 dataBlockService ?? new Mock<IDataBlockService>().Object,
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object,
                 releaseFileService ?? new Mock<IReleaseFileService>().Object,

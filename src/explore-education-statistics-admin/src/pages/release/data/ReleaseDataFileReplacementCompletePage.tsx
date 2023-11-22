@@ -11,6 +11,7 @@ import dataReplacementService from '@admin/services/dataReplacementService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import sanitizeHtml from '@common/utils/sanitizeHtml';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
@@ -102,7 +103,7 @@ const ReleaseDataFileReplacementCompletePage = ({
                           },
                         )}
                       >
-                        {footnote.content}
+                        {sanitizeHtml(footnote.content, { allowedTags: [] })}
                       </Link>
                     </li>
                   ))}

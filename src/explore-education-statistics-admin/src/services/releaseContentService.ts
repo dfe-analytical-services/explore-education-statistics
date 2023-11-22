@@ -37,8 +37,10 @@ export interface ContentBlockAttachRequest {
 }
 
 const releaseContentService = {
-  getContent(releaseId: string): Promise<ReleaseContent> {
-    return client.get<ReleaseContent>(`/release/${releaseId}/content`);
+  getContent(releaseId: string, isPrerelease = false): Promise<ReleaseContent> {
+    return client.get<ReleaseContent>(`/release/${releaseId}/content`, {
+      params: { isPrerelease },
+    });
   },
   addContentSection(
     releaseId: string,

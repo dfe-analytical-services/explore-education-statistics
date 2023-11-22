@@ -45,10 +45,19 @@ def highlight_element(element: WebElement):
     sl.driver.execute_script("arguments[0].style.border = 'red 4px solid';", element)
 
 
+def capture_screenshot():
+    screenshot_location = sl.capture_page_screenshot()
+    logger.warn(
+        f"Captured current screenshot at URL '{sl.get_location()}' Screenshot saved to file://{screenshot_location}"
+    )
+
+
 @with_maximised_browser
 def capture_large_screenshot():
     screenshot_location = sl.capture_page_screenshot()
-    logger.warn(f"Captured a screenshot at URL '{sl.get_location()}' Screenshot saved to file://{screenshot_location}")
+    logger.warn(
+        f"Captured enlarged screenshot at URL '{sl.get_location()}' Screenshot saved to file://{screenshot_location}"
+    )
 
 
 @with_no_overflow

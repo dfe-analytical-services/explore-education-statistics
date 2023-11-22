@@ -18,14 +18,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : AuthorizationHandler<CreateMethodologyForSpecificPublicationRequirement, Publication>
     {
         private readonly ContentDbContext _context;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public CreateMethodologyForSpecificPublicationAuthorizationHandler(
             ContentDbContext context,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
             _context = context;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -40,8 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             // If a publication owns a methodology already, they cannot own another
-            if (await _context.PublicationMethodologies
-                .AnyAsync(pm => pm.PublicationId == publication.Id && pm.Owner))
+            if (await _context
+                    .PublicationMethodologies
+                    .AnyAsync(pm => pm.PublicationId == publication.Id && pm.Owner))
             {
                 return;
             }
@@ -52,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         publication.Id,

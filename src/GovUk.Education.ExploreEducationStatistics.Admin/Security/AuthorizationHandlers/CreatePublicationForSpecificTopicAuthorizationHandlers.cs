@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 
@@ -5,18 +6,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 {
     public class CreatePublicationForSpecificTopicRequirement : IAuthorizationRequirement
     {}
-    
-    public class CreatePublicationForSpecificTopicAuthorizationHandler : CompoundAuthorizationHandler<
-        CreatePublicationForSpecificTopicRequirement, Topic>
+
+    public class CreatePublicationForSpecificTopicAuthorizationHandler :
+        AuthorizationHandler<CreatePublicationForSpecificTopicRequirement, Topic>
     {
-        public CreatePublicationForSpecificTopicAuthorizationHandler() 
-            : base(new CanCreateForAnyTopicAuthorizationHandler()) {}
-        
-        public class CanCreateForAnyTopicAuthorizationHandler : HasClaimAuthorizationHandler<
-            CreatePublicationForSpecificTopicRequirement>
+        protected override Task HandleRequirementAsync(AuthorizationHandlerContext context,
+            CreatePublicationForSpecificTopicRequirement requirement, Topic resource)
         {
-            public CanCreateForAnyTopicAuthorizationHandler() 
-                : base(SecurityClaimTypes.CreateAnyPublication) {}
+            if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.CreateAnyPublication))
+            {
+                context.Succeed(requirement);
+            }
+
+            return Task.CompletedTask;
         }
     }
 }

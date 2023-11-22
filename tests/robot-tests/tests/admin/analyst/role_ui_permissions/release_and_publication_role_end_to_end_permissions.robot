@@ -41,7 +41,7 @@ Check publication owner can update methodology summary
 
 Check publication owner cannot approve methodology for publication
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks button    Edit status
 
     user waits until h2 is visible    Edit methodology status
@@ -64,14 +64,14 @@ Check publication owner can add data guidance to ${SUBJECT_NAME}
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' page
-    user waits for page to finish loading
+    user waits until page finishes loading
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
 Check publication owner can add a footnote to ${SUBJECT_NAME}
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks footnote subject radio    ${SUBJECT_NAME}    Applies to all data
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content    test footnote from the publication owner! (analyst)
@@ -85,12 +85,12 @@ Add headline text block to Content page
 
 Add public prerelease access list
     user clicks link    Pre-release access
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user creates public prerelease access list    Test public access list
 
 Go to "Sign off" page
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks button    Edit release status
 
 Check publication owner can edit release status to "Ready for higher review"
@@ -162,7 +162,7 @@ Check release approver can approve methodology for publication
     user navigates to methodology    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} - Updated methodology
 
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks button    Edit status
 
     user waits until h2 is visible    Edit methodology status

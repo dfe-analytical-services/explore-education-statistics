@@ -70,10 +70,16 @@ Validate page has Print this page link
 
 Search for "pupil"
     [Documentation]    EES-807
+
+    # This is the number of text matches found when using the in-browser javascript search.
+    # This number can vary depending on the data itself as it will scan all the html on the page.
+    ${expected_occurrences_of_pupil}=    Set Variable    128
+
     user verifies accordion is closed    1. Overview of absence statistics
 
     user enters text into element    id:pageSearchForm-input    pupil
-    user waits until element contains    id:pageSearchForm-resultsLabel    Found 127 results
+    user waits until element contains    id:pageSearchForm-resultsLabel
+    ...    Found ${expected_occurrences_of_pupil} results
     user clicks element    id:pageSearchForm-option-0
 
     user verifies accordion is open    1. Overview of absence statistics
@@ -82,11 +88,17 @@ Search for "pupil"
 
 Search for "specific enquiry"
     [Documentation]    EES-807
+
+    # The words "specific inquiry" occur once in the Contact Us Section,
+    # and once in some custom text the user has uploaded to the editor
+    ${expected_occurrences_of_specific_inquiry}=    Set Variable    2
+
     user verifies accordion is closed    7. Contacts
 
     user clears element text    id:pageSearchForm-input
     user enters text into element    id:pageSearchForm-input    specific enquiry
-    user waits until element contains    id:pageSearchForm-resultsLabel    Found 1 result
+    user waits until element contains    id:pageSearchForm-resultsLabel
+    ...    Found ${expected_occurrences_of_specific_inquiry} results
     user clicks element    id:pageSearchForm-option-0
 
     user verifies accordion is open    7. Contacts

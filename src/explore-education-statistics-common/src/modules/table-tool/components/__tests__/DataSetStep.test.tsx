@@ -62,6 +62,7 @@ describe('DataSetStep', () => {
       description: 'Test featured description 1',
       subjectId: 'subject-1',
       dataBlockId: 'dataBlock-1',
+      dataBlockParentId: 'dataBlock-1-parent',
       order: 0,
     },
     {
@@ -70,6 +71,7 @@ describe('DataSetStep', () => {
       description: 'Test featured description 2 find me',
       subjectId: 'subject-1',
       dataBlockId: 'dataBlock-2',
+      dataBlockParentId: 'dataBlock-2-parent',
       order: 1,
     },
     {
@@ -78,6 +80,7 @@ describe('DataSetStep', () => {
       description: 'Test featured description 3',
       subjectId: 'subject-3',
       dataBlockId: 'dataBlock-3',
+      dataBlockParentId: 'dataBlock-3-parent',
       order: 3,
     },
   ];
@@ -99,6 +102,7 @@ describe('DataSetStep', () => {
     title: 'Release 1',
     slug: 'release-1',
     latestData: true,
+    type: 'OfficialStatistics',
   };
 
   test('renders radios with details if no `renderFeaturedTableLink `', () => {

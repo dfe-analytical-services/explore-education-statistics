@@ -157,7 +157,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
 
       // now exceed the limit
-      await userEvent.type(emailsTextarea, `test@test.com`);
+      await userEvent.type(emailsTextarea, `{enter}test@test.com`);
       userEvent.tab();
 
       await waitFor(() => {
@@ -342,7 +342,8 @@ describe('PreReleaseUserAccessForm', () => {
           'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com{enter}' +
           'test@test.co.uk{enter}' +
           'test@test.uk{enter}' +
-          'test@education.gov.uk',
+          'test@education.gov.uk{enter}' +
+          'test@gov.wales',
       );
       userEvent.tab();
 
@@ -357,6 +358,7 @@ describe('PreReleaseUserAccessForm', () => {
             'test@test.co.uk',
             'test@test.uk',
             'test@education.gov.uk',
+            'test@gov.wales',
           ],
         );
       });

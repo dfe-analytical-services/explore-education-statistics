@@ -1,4 +1,4 @@
-import { Editor } from '@admin/types/ckeditor';
+import { Editor, PluginName, PluginClass } from '@admin/types/ckeditor';
 import CustomUploadAdapter, {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -9,7 +9,11 @@ export default function customUploadAdapterPlugin(
   onUpload: ImageUploadHandler,
   onCancel?: ImageUploadCancelHandler,
 ) {
-  return class CustomUploadAdapterPlugin {
+  return class CustomUploadAdapterPlugin implements PluginClass {
+    get pluginName(): PluginName {
+      return 'CustomUploadAdapter';
+    }
+
     constructor(editor: Editor) {
       const fileRepository =
         editor.plugins.get<FileRepository>('FileRepository');

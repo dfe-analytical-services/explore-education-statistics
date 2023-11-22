@@ -5,8 +5,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
+using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
+using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
+using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -35,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ContactViewModel>> GetContact(Guid publicationId);
 
-        Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, Contact updatedContact);
+        Task<Either<ActionResult, ContactViewModel>> UpdateContact(Guid publicationId, ContactSaveRequest updatedContact);
 
         Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,

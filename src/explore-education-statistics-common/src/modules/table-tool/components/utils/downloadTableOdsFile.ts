@@ -1,6 +1,7 @@
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Footnote } from '@common/services/types/footnotes';
 import { Dictionary } from '@common/types';
+import sanitizeHtml from '@common/utils/sanitizeHtml';
 import last from 'lodash/last';
 import sum from 'lodash/sum';
 import { CellObject, utils, WorkSheet, writeFile } from 'xlsx';
@@ -108,6 +109,10 @@ export function appendFootnotes(
   sheet: WorkSheet,
   footnotes: FullTableMeta['footnotes'],
 ): WorkSheet {
+  // Storing linkHref as sanitize-html's API doesn't
+  // provide text in the transformTags callback.
+  let linkHref: string;
+
   utils.sheet_add_json(
     sheet,
     [
@@ -120,7 +125,26 @@ export function appendFootnotes(
       ...footnotes.map((footnote, index) => [
         {
           t: 's',
-          v: `(${index + 1}) ${footnote.label}`,
+          // Footnotes can have links in so we want to remove the
+          // tags and append the urls after the link text.
+          v: `(${index + 1}) ${sanitizeHtml(footnote.label, {
+            allowedTags: [],
+            transformTags: {
+              a: (tagName, attribs) => {
+                linkHref = attribs.href;
+                return {
+                  tagName,
+                  attribs,
+                };
+              },
+            },
+            textFilter(text, tagName) {
+              const updatedText =
+                tagName !== 'a' || !linkHref ? text : `${text} (${linkHref})`;
+              linkHref = '';
+              return updatedText;
+            },
+          })}`,
         },
       ]),
     ],

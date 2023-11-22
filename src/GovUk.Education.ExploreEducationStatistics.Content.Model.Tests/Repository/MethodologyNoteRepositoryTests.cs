@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Microsoft.EntityFrameworkCore;
@@ -150,8 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Assert.Equal(methodologyNote.CreatedById, updatedNote.CreatedById);
                 Assert.Equal(displayDate, updatedNote.DisplayDate);
                 Assert.Equal(methodologyNote.MethodologyVersion.Id, updatedNote.MethodologyVersionId);
-                Assert.NotNull(updatedNote.Updated);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedNote.Updated!.Value).Milliseconds, 0, 1500);
+                updatedNote.Updated.AssertUtcNow();
                 Assert.Equal(updatedById, updatedNote.UpdatedById);
             }
         }

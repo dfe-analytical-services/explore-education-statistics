@@ -1,22 +1,24 @@
-import ModalConfirm from '@common/components/ModalConfirm';
-import React from 'react';
 import { IdTitlePair } from '@admin/services/types/common';
+import ModalConfirm from '@common/components/ModalConfirm';
+import React, { ReactNode } from 'react';
 
 interface Props {
-  scheduledMethodologies: IdTitlePair[];
+  scheduledMethodologies?: IdTitlePair[];
+  triggerButton: ReactNode;
   onCancel: () => void;
   onConfirm: () => void;
 }
 
 const CancelAmendmentModal = ({
   scheduledMethodologies,
+  triggerButton,
   onCancel,
   onConfirm,
 }: Props) => {
   return (
     <ModalConfirm
-      open
       title="Confirm you want to cancel this amended release"
+      triggerButton={triggerButton}
       onCancel={onCancel}
       onConfirm={onConfirm}
       onExit={onCancel}
@@ -25,14 +27,14 @@ const CancelAmendmentModal = ({
         By cancelling the amendments you will lose any changes made, and the
         original release will remain unchanged.
       </p>
-      {scheduledMethodologies.length > 0 && (
+      {scheduledMethodologies && scheduledMethodologies.length > 0 && (
         <>
           <p>
             The following methodologies are scheduled to be published with this
             amended release:
           </p>
           <ul>
-            {scheduledMethodologies.map(methodology => (
+            {scheduledMethodologies?.map(methodology => (
               <li key={methodology.id}>{methodology.title}</li>
             ))}
           </ul>

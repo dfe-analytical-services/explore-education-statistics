@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.Serialization;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -35,6 +34,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [JsonIgnore] public Guid? ContentSectionId { get; set; }
 
+        public Guid ReleaseId { get; set; }
+
+        public Release Release { get; set; }
+
         public int Order { get; set; }
 
         public DateTime? Created { get; set; }
@@ -53,18 +56,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [ConcurrencyCheck]
         public Guid? LockedById { get; set; }
 
-        public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection = null)
+        // EES-4637 - we need to decide on how we're being consistent with Created dates in Release Amendments.
+        public ContentBlock Clone(Release amendment)
         {
-            var copy = MemberwiseClone() as ContentBlock;
+            var copy = (MemberwiseClone() as ContentBlock)!;
             copy.Id = Guid.NewGuid();
 
-            copy.ContentSection = newContentSection;
-            copy.ContentSectionId = newContentSection?.Id;
+            copy.ContentSection = null;
+            copy.ContentSectionId = null;
+            copy.Release = amendment;
+            copy.ReleaseId = amendment.Id;
 
-            // start a new amendment with no comments
+            // Start a new amendment with no comments.
             copy.Comments = new List<Comment>();
-
-            context.OriginalToAmendmentContentBlockMap.Add(this, copy);
 
             return copy;
         }
@@ -109,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid EmbedBlockId { get; set; }
 
-        [JsonIgnore, IgnoreMap]
+        [JsonIgnore]
         public EmbedBlock EmbedBlock { get; set; }
     }
 

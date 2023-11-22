@@ -7,7 +7,7 @@ on:
     # twice a year (at the start and end of daylight saving time) 
     # to account for daylight saving time in the UK
     # This action is intended to run at 9:35AM, 12:35PM & 4:35PM
-    - cron: '35 8,11,15 * * 1-5'
+    - cron: '35 9,12,16 * * 1-5'
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
@@ -27,7 +27,7 @@ jobs:
         run: sudo ethtool -K eth0 tx off rx off
 
       - name: checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup python
         uses: actions/setup-python@v4
@@ -67,7 +67,7 @@ jobs:
           branch: chore/update-test-snapshots
           add-paths: |
             tests/robot-tests/tests/snapshots
-          reviewers: rmbielby, lauraselby, cjrace, chfoster, twilliams24
+          reviewers: rmbielby, lauraselby, cjrace, chfoster, jen-machin
           title: ${{ steps.vars.outputs.pr_title }}
           body: ${{ steps.vars.outputs.pr_body }}
           draft: false

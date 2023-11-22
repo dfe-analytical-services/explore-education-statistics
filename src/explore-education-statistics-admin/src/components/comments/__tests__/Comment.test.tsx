@@ -21,98 +21,203 @@ describe('Comment', () => {
     permissions: {} as GlobalPermissions,
   };
 
-  test('renders an unresolved comment correctly', () => {
-    render(<Comment comment={testComments[2]} />);
+  describe('inline comments', () => {
+    test('renders an unresolved comment correctly', () => {
+      render(<Comment type="inline" comment={testComments[2]} />);
 
-    const comment = screen.getByTestId('comment');
-    expect(comment).toHaveTextContent('Comment 3');
-    expect(comment).toHaveTextContent('User Two');
-    expect(comment).toHaveTextContent('30 Nov 2021, 13:55');
+      const comment = screen.getByTestId('comment');
+      expect(comment).toHaveTextContent('Comment 3');
+      expect(comment).toHaveTextContent('User Two');
+      expect(comment).toHaveTextContent('30 Nov 2021, 13:55');
 
-    expect(screen.getByRole('button', { name: 'Resolve' })).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Unresolve' }),
-    ).not.toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Resolve' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Unresolve' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('renders the edit and delete buttons if the user created the comment', () => {
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser2,
+          }}
+        >
+          <Comment type="inline" comment={testComments[2]} />,
+        </AuthContext.Provider>,
+      );
+
+      expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Delete' }),
+      ).toBeInTheDocument();
+    });
+
+    test('does not render the edit and delete buttons if the user did not create the comment', () => {
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser1,
+          }}
+        >
+          <Comment type="inline" comment={testComments[2]} />,
+        </AuthContext.Provider>,
+      );
+
+      expect(
+        screen.queryByRole('button', { name: 'Edit' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete' }),
+      ).not.toBeInTheDocument();
+    });
+
+    test('renders an updated comment correctly', () => {
+      const updatedComment = {
+        ...testComments[2],
+        updated: '2021-11-30T14:00',
+      };
+      render(<Comment type="inline" comment={updatedComment} />);
+
+      const comment = screen.getByTestId('comment');
+      expect(comment).toHaveTextContent('Comment 3');
+      expect(comment).toHaveTextContent('30 Nov 2021, 13:55');
+      expect(comment).toHaveTextContent('(Updated 30 Nov 2021, 14:00)');
+    });
+
+    test('renders a resolved comment correctly', () => {
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser1,
+          }}
+        >
+          <Comment type="inline" comment={testComments[0]} />
+        </AuthContext.Provider>,
+      );
+
+      const comment = screen.getByTestId('comment');
+      expect(comment).toHaveTextContent('Comment 1');
+      expect(comment).toHaveTextContent('User One');
+      expect(comment).toHaveTextContent('29 Nov 2021, 13:55');
+      expect(comment).toHaveTextContent(
+        'Resolved by User Two on 30 Nov 2021, 13:55',
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Unresolve' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Resolve' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Edit' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete' }),
+      ).not.toBeInTheDocument();
+    });
   });
 
-  test('renders the edit and delete buttons if the user created the comment', () => {
-    render(
-      <AuthContext.Provider
-        value={{
-          user: testUser2,
-        }}
-      >
-        <Comment comment={testComments[2]} />,
-      </AuthContext.Provider>,
-    );
+  describe('block comments', () => {
+    test('renders an unresolved comment correctly', () => {
+      render(<Comment type="block" comment={testComments[2]} />);
 
-    expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Delete' })).toBeInTheDocument();
-  });
+      const comment = screen.getByTestId('comment');
+      expect(comment).toHaveTextContent('Comment 3');
+      expect(comment).toHaveTextContent('User Two');
+      expect(comment).toHaveTextContent('30 Nov 2021, 13:55');
 
-  test('does not render the edit and delete buttons if the user did not create the comment', () => {
-    render(
-      <AuthContext.Provider
-        value={{
-          user: testUser1,
-        }}
-      >
-        <Comment comment={testComments[2]} />,
-      </AuthContext.Provider>,
-    );
+      expect(
+        screen.getByRole('button', { name: 'Resolve' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Unresolve' }),
+      ).not.toBeInTheDocument();
+    });
 
-    expect(
-      screen.queryByRole('button', { name: 'Edit' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Delete' }),
-    ).not.toBeInTheDocument();
-  });
+    test('renders the edit and delete buttons if the user created the comment', () => {
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser2,
+          }}
+        >
+          <Comment type="block" comment={testComments[2]} />,
+        </AuthContext.Provider>,
+      );
 
-  test('renders an updated comment correctly', () => {
-    const updatedComment = {
-      ...testComments[2],
-      updated: '2021-11-30T14:00',
-    };
-    render(<Comment comment={updatedComment} />);
+      expect(screen.getByRole('button', { name: 'Edit' })).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Delete' }),
+      ).toBeInTheDocument();
+    });
 
-    const comment = screen.getByTestId('comment');
-    expect(comment).toHaveTextContent('Comment 3');
-    expect(comment).toHaveTextContent(
-      '30 Nov 2021, 13:55(Updated 30 Nov 2021, 14:00)',
-    );
-  });
+    test('does not render the edit and delete buttons if the user did not create the comment', () => {
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser1,
+          }}
+        >
+          <Comment type="block" comment={testComments[2]} />,
+        </AuthContext.Provider>,
+      );
 
-  test('renders a resolved comment correctly', () => {
-    render(
-      <AuthContext.Provider
-        value={{
-          user: testUser1,
-        }}
-      >
-        <Comment comment={testComments[0]} />
-      </AuthContext.Provider>,
-    );
+      expect(
+        screen.queryByRole('button', { name: 'Edit' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete' }),
+      ).not.toBeInTheDocument();
+    });
 
-    const comment = screen.getByTestId('comment');
-    expect(comment).toHaveTextContent('Comment 1');
-    expect(comment).toHaveTextContent('User One');
-    expect(comment).toHaveTextContent('29 Nov 2021, 13:55');
-    expect(comment).toHaveTextContent(
-      'Resolved by User Two on 30 Nov 2021, 13:55',
-    );
+    test('renders an updated comment correctly', () => {
+      const updatedComment = {
+        ...testComments[2],
+        updated: '2021-11-30T14:00',
+      };
+      render(<Comment type="block" comment={updatedComment} />);
 
-    expect(
-      screen.getByRole('button', { name: 'Unresolve' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Resolve' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Edit' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Delete' }),
-    ).not.toBeInTheDocument();
+      const comment = screen.getByTestId('comment');
+      expect(comment).toHaveTextContent('Comment 3');
+      expect(comment).toHaveTextContent('30 Nov 2021, 13:55');
+      expect(comment).toHaveTextContent('(Updated 30 Nov 2021, 14:00)');
+    });
+
+    test('renders a resolved comment correctly', () => {
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser1,
+          }}
+        >
+          <Comment type="block" comment={testComments[0]} />
+        </AuthContext.Provider>,
+      );
+
+      const comment = screen.getByTestId('comment');
+      expect(comment).toHaveTextContent('Comment 1');
+      expect(comment).toHaveTextContent('User One');
+      expect(comment).toHaveTextContent('29 Nov 2021, 13:55');
+      expect(comment).toHaveTextContent(
+        'Resolved by User Two on 30 Nov 2021, 13:55',
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Unresolve' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Resolve' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Edit' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete' }),
+      ).not.toBeInTheDocument();
+    });
   });
 });

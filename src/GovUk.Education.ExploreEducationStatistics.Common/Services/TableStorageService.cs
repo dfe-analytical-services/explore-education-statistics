@@ -4,21 +4,22 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.Cosmos.Table;
+using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
-    public class TableStorageService : ITableStorageService
+    public abstract class TableStorageService : ITableStorageService
     {
         private readonly CloudTableClient _client;
-        private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil;
+        private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil = new();
 
-        public TableStorageService(
-            string connectionString, 
-            StorageInstanceCreationUtil storageInstanceCreationUtil)
+        protected TableStorageService(
+            IConfiguration configuration,
+            string connectionStringKey)
         {
+            var connectionString = configuration.GetValue<string>(connectionStringKey);
             var account = CloudStorageAccount.Parse(connectionString);
             _client = account.CreateCloudTableClient();
-            _storageInstanceCreationUtil = storageInstanceCreationUtil;
         }
 
         /// <summary>

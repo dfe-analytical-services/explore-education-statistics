@@ -9,7 +9,7 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import {
   TableHeader,
   UnmappedTableHeadersConfig,
-} from '@common/services/permalinkSnapshotService';
+} from '@common/services/permalinkService';
 
 const mapToTableHeaders = (filters: Filter[]): TableHeader[] => {
   return filters.map<TableHeader>(filter => {

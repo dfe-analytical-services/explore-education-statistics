@@ -41,14 +41,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IMapper mapper = null,
             IUserService userService = null,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            ITableStorageService publisherTableStorageService = null)
+            IPublisherTableStorageService publisherTableStorageService = null)
         {
             return new ReleasePublishingStatusService(
                 mapper ?? MapperUtils.AdminMapper(),
                 userService ?? new Mock<IUserService>().Object,
                 persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Release>(_release.Id, _release)
                     .Object,
-                publisherTableStorageService ?? new Mock<ITableStorageService>().Object
+                publisherTableStorageService ?? new Mock<IPublisherTableStorageService>().Object
             );
         }
     }

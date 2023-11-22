@@ -1,7 +1,8 @@
 import CollapsibleList from '@common/components/CollapsibleList';
+import ContentHtml from '@common/components/ContentHtml';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { Footnote } from '@common/services/types/footnotes';
 import React from 'react';
-import VisuallyHidden from './VisuallyHidden';
 
 interface Props {
   footnotes: Footnote[];
@@ -27,7 +28,9 @@ const FigureFootnotes = ({ footnotes, headingHiddenText, id }: Props) => {
         testId="footnotes"
       >
         {footnotes.map(footnote => (
-          <li key={footnote.id}>{footnote.label}</li>
+          <li key={footnote.id}>
+            <ContentHtml html={footnote.label} />
+          </li>
         ))}
       </CollapsibleList>
     </>

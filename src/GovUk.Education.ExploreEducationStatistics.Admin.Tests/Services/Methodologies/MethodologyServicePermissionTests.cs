@@ -46,6 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             Id = Guid.NewGuid(),
             AlternativeTitle = "Title",
+            AlternativeSlug = "title",
             Status = Draft
         };
 

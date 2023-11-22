@@ -152,7 +152,9 @@ const ReleaseFootnotesPage = ({
         </p>
       </InsetText>
       {!canUpdateRelease && (
-        <p>This release has been approved, and can no longer be updated.</p>
+        <WarningMessage>
+          This release has been approved, and can no longer be updated.
+        </WarningMessage>
       )}
 
       <LoadingSpinner loading={isFootnotesLoading || isFootnoteMetaLoading}>

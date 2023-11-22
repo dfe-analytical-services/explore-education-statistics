@@ -1,12 +1,19 @@
 import {
   alignmentOptions,
+  corePlugins,
   headingOptions,
   imageToolbar,
   resizeOptions,
   tableContentToolbar,
-  toolbarConfigs,
+  toolbarConfigFull,
 } from '@admin/config/ckEditorConfig';
-import { Editor, EditorConfig } from '@admin/types/ckeditor';
+import {
+  Editor as EditorType,
+  EditorConfig,
+  PluginName,
+  ToolbarOption,
+} from '@admin/types/ckeditor';
+import Editor from 'explore-education-statistics-ckeditor';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import {
   ImageUploadCancelHandler,
@@ -19,7 +26,8 @@ const useCKEditorConfig = ({
   allowComments,
   allowedHeadings,
   editorInstance,
-  toolbarConfig = toolbarConfigs.full,
+  includePlugins,
+  toolbarConfig = toolbarConfigFull,
   onAutoSave,
   onCancelComment,
   onClickAddComment,
@@ -29,13 +37,14 @@ const useCKEditorConfig = ({
 }: {
   allowComments?: boolean;
   allowedHeadings?: string[];
-  editorInstance?: MutableRefObject<Editor | undefined>;
+  editorInstance?: MutableRefObject<EditorType | undefined>;
   glossaryItems?: {
     title: string;
     slug: string;
     body: string;
   }[];
-  toolbarConfig?: string[];
+  includePlugins?: ReadonlySet<PluginName> | Set<PluginName>;
+  toolbarConfig?: ReadonlyArray<ToolbarOption> | Array<ToolbarOption>;
   onAutoSave?: (content: string) => void;
   onCancelComment?: () => void;
   onClickAddComment?: () => void;
@@ -93,6 +102,13 @@ const useCKEditorConfig = ({
               types: ['jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg+xml'],
             },
           }
+        : undefined,
+      removePlugins: includePlugins
+        ? Editor.builtinPlugins?.filter(
+            plugin =>
+              !corePlugins.has(plugin.pluginName) &&
+              !includePlugins.has(plugin.pluginName),
+          )
         : undefined,
       table: {
         contentToolbar: tableContentToolbar,
@@ -196,6 +212,7 @@ const useCKEditorConfig = ({
     allowedHeadings,
     editorInstance,
     hasImageUpload,
+    includePlugins,
     onAutoSave,
     onCancelComment,
     onClickAddComment,

@@ -9,9 +9,12 @@ import React, {
   memo,
   MouseEventHandler,
   ReactNode,
+  Ref,
+  useCallback,
 } from 'react';
 
-export interface FormBaseInputProps extends FormLabelProps {
+export interface FormBaseInputProps
+  extends Pick<FormLabelProps, 'hideLabel' | 'label' | 'labelSize'> {
   addOn?: ReactNode;
   addOnContainerClassName?: string;
   className?: string;
@@ -20,8 +23,10 @@ export interface FormBaseInputProps extends FormLabelProps {
   hint?: string;
   id: string;
   inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
+  inputRef?: Ref<HTMLInputElement>;
   list?: string;
   name: string;
+  trimValue?: boolean;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
   onBlur?: FocusEventHandler<HTMLInputElement>;
   onChange?: ChangeEventHandler<HTMLInputElement>;
@@ -35,7 +40,7 @@ interface HiddenProps {
   value?: string | number;
 }
 
-const FormBaseInput = ({
+function FormBaseInput({
   addOn,
   addOnContainerClassName,
   className,
@@ -44,12 +49,41 @@ const FormBaseInput = ({
   hideLabel,
   id,
   inputMode,
+  inputRef,
   label,
   labelSize,
+  trimValue = true,
   width,
   type = 'text',
+  onBlur,
+  onChange,
+  onKeyPress,
   ...props
-}: FormBaseInputProps & HiddenProps) => {
+}: FormBaseInputProps & HiddenProps) {
+  const handleBlur: FocusEventHandler<HTMLInputElement> = useCallback(
+    event => {
+      if (trimValue) {
+        // eslint-disable-next-line no-param-reassign
+        event.target.value = event.target.value.trim();
+        onChange?.(event);
+      }
+
+      onBlur?.(event);
+    },
+    [onBlur, onChange, trimValue],
+  );
+
+  const handleKeyPress: KeyboardEventHandler<HTMLInputElement> = useCallback(
+    event => {
+      if (trimValue && event.key === 'Enter') {
+        (event.currentTarget as HTMLInputElement)?.blur();
+      }
+
+      onKeyPress?.(event);
+    },
+    [onKeyPress, trimValue],
+  );
+
   const input = (
     <input
       // eslint-disable-next-line react/jsx-props-no-spreading
@@ -66,7 +100,11 @@ const FormBaseInput = ({
       })}
       id={id}
       inputMode={inputMode}
+      ref={inputRef}
       type={type}
+      onBlur={handleBlur}
+      onChange={onChange}
+      onKeyPress={handleKeyPress}
     />
   );
 
@@ -96,6 +134,6 @@ const FormBaseInput = ({
       )}
     </>
   );
-};
+}
 
 export default memo(FormBaseInput);

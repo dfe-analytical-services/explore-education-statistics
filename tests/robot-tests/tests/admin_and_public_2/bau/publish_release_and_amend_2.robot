@@ -62,7 +62,7 @@ Add footnote to second Subject
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
     user clicks footnote subject radio    ${SECOND_SUBJECT}    Applies to all data
-    user enters text into element    label:Footnote    Footnote 1 ${SECOND_SUBJECT}
+    user enters text into element    id:footnoteForm-content    Footnote 1 ${SECOND_SUBJECT}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -73,7 +73,7 @@ Add second footnote to second Subject
     user clicks footnote subject radio    ${SECOND_SUBJECT}    Applies to specific data
     user opens footnote subject dropdown    ${SECOND_SUBJECT}    Indicators
     user clicks footnote subject checkbox    ${SECOND_SUBJECT}    Indicators    Admission Numbers
-    user enters text into element    label:Footnote    Footnote 2 ${SECOND_SUBJECT}
+    user enters text into element    id:footnoteForm-content    Footnote 2 ${SECOND_SUBJECT}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -82,7 +82,7 @@ Add footnote to subject
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
     user clicks footnote subject radio    ${SUBJECT_NAME}    Applies to all data
-    user enters text into element    label:Footnote    Footnote 1 ${SUBJECT_NAME}
+    user enters text into element    id:footnoteForm-content    Footnote 1 ${SUBJECT_NAME}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -94,7 +94,7 @@ Add second footnote to subject
     user opens footnote subject dropdown    ${SUBJECT_NAME}    Cheese
     user clicks footnote subject checkbox    ${SUBJECT_NAME}    Cheese    Stilton
     user clicks footnote subject checkbox    ${SUBJECT_NAME}    Cheese    Feta
-    user enters text into element    label:Footnote    Footnote 2 ${SUBJECT_NAME}
+    user enters text into element    id:footnoteForm-content    Footnote 2 ${SUBJECT_NAME}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -114,9 +114,8 @@ Approve release
 Go to public Table Tool page
     user navigates to data tables page on public frontend
 
-Select "Test Topic" publication
+Select "Test theme" publication
     environment variable should be set    TEST_THEME_NAME
-    environment variable should be set    TEST_TOPIC_NAME
     user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
@@ -410,16 +409,16 @@ Add footnote to "upload file test filter" subject file
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
     user clicks footnote subject radio    ${THIRD_SUBJECT}    Applies to all data
-    user clicks element    label:Footnote
-    user enters text into element    label:Footnote    upload file test filter footnote
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content    upload file test filter footnote
     user clicks button    Save footnote
     user waits until page contains element    testid:Footnote - upload file test filter footnote
     user waits until h2 is visible    Footnotes
 
 Update Seven filters footnote
     user clicks link    Edit footnote    testid:Footnote - Footnote 1 ${SUBJECT_NAME}
-    user clicks element    label:Footnote
-    user enters text into element    label:Footnote    Updating ${SUBJECT_NAME} footnote
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content    Updating ${SUBJECT_NAME} footnote
     user clicks button    Save footnote
     user waits until page contains element    testid:Footnote - Updating ${SUBJECT_NAME} footnote
 

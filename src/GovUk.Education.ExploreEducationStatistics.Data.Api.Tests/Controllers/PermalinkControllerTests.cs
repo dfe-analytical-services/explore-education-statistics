@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
@@ -18,8 +19,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
 
@@ -36,12 +35,16 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     public async Task CreatePermalink()
     {
         var createRequest = new PermalinkCreateRequest();
-        var expectedResult = new PermalinkViewModel();
+        var expectedResult = new PermalinkViewModel
+        {
+            Id = Guid.NewGuid()
+        };
 
-        var permalinkService = new Mock<IPermalinkService>(Strict);
+        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
 
         permalinkService
-            .Setup(s => s.CreatePermalink(It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest)),
+            .Setup(s => s.CreatePermalink(It.Is<PermalinkCreateRequest>(r => r
+                    .IsDeepEqualTo(createRequest, null)),
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(expectedResult);
 
@@ -49,38 +52,12 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.PostAsync(
-            requestUri: "/api/permalink-snapshot",
+            requestUri: "/api/permalink",
             content: new JsonNetContent(createRequest));
 
-        VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(permalinkService);
 
-        response.AssertOk(expectedResult);
-    }
-
-    [Fact]
-    public async Task CreatePermalink_WithReleaseId()
-    {
-        var releaseId = Guid.NewGuid();
-        var createRequest = new PermalinkCreateRequest();
-        var expectedResult = new PermalinkViewModel();
-
-        var permalinkService = new Mock<IPermalinkService>(Strict);
-
-        permalinkService
-            .Setup(s => s.CreatePermalink(releaseId, It.Is<PermalinkCreateRequest>(r => r.IsDeepEqualTo(createRequest)),
-                It.IsAny<CancellationToken>()))
-            .ReturnsAsync(expectedResult);
-
-        var client = SetupApp(permalinkService: permalinkService.Object)
-            .CreateClient();
-
-        var response = await client.PostAsync(
-            requestUri: $"/api/permalink-snapshot/release/{releaseId}",
-            content: new JsonNetContent(createRequest));
-
-        VerifyAllMocks(permalinkService);
-
-        response.AssertOk(expectedResult);
+        response.AssertCreated(expectedResult, $"http://localhost/api/permalink/{expectedResult.Id}");
     }
 
     [Fact]
@@ -92,7 +69,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             Id = permalinkId
         };
 
-        var permalinkService = new Mock<IPermalinkService>(Strict);
+        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
 
         permalinkService
             .Setup(s => s.GetPermalink(permalinkId, It.IsAny<CancellationToken>()))
@@ -102,14 +79,14 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.GetAsync(
-            uri: $"/api/permalink-snapshot/{permalinkId}",
+            uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
                 { HeaderNames.Accept, "application/json" }
             }
         );
 
-        VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(permalinkService);
 
         response.AssertOk(permalink);
     }
@@ -119,7 +96,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     {
         var permalinkId = Guid.NewGuid();
 
-        var permalinkService = new Mock<IPermalinkService>(Strict);
+        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
 
         permalinkService
             .Setup(s => s.GetPermalink(permalinkId, It.IsAny<CancellationToken>()))
@@ -129,14 +106,14 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.GetAsync(
-            uri: $"/api/permalink-snapshot/{permalinkId}",
+            uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
                 { HeaderNames.Accept, "application/json" }
             }
         );
 
-        VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(permalinkService);
 
         response.AssertNotFound();
     }
@@ -145,7 +122,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     public async Task GetPermalink_Csv()
     {
         var permalinkId = Guid.NewGuid();
-        var permalinkService = new Mock<IPermalinkService>(Strict);
+        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
 
         permalinkService
             .Setup(s => s
@@ -159,14 +136,14 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.GetAsync(
-            uri: $"/api/permalink-snapshot/{permalinkId}",
+            uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
                 { HeaderNames.Accept, ContentTypes.Csv }
             }
         );
 
-        VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(permalinkService);
 
         response.AssertOk("Test csv");
     }
@@ -176,7 +153,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     {
         var permalinkId = Guid.NewGuid();
 
-        var permalinkService = new Mock<IPermalinkService>(Strict);
+        var permalinkService = new Mock<IPermalinkService>(MockBehavior.Strict);
 
         permalinkService
             .Setup(s => s
@@ -187,14 +164,14 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
             .CreateClient();
 
         var response = await client.GetAsync(
-            uri: $"/api/permalink-snapshot/{permalinkId}",
+            uri: $"/api/permalink/{permalinkId}",
             headers: new Dictionary<string, string>
             {
                 { HeaderNames.Accept, ContentTypes.Csv }
             }
         );
 
-        VerifyAllMocks(permalinkService);
+        MockUtils.VerifyAllMocks(permalinkService);
 
         response.AssertNotFound();
     }
@@ -204,7 +181,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     {
         var client = SetupApp().CreateClient();
 
-        var response = await client.GetAsync("/api/permalink-snapshot/not-a-guid");
+        var response = await client.GetAsync("/api/permalink/not-a-guid");
 
         response.AssertNotFound();
     }
@@ -212,7 +189,10 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
     private WebApplicationFactory<TestStartup> SetupApp(IPermalinkService? permalinkService = null)
     {
         return _testApp.ConfigureServices(
-            services => { services.AddTransient(_ => permalinkService ?? Mock.Of<IPermalinkService>(Strict)); }
+            services =>
+            {
+                services.AddTransient(_ => permalinkService ?? Mock.Of<IPermalinkService>(MockBehavior.Strict));
+            }
         );
     }
 }

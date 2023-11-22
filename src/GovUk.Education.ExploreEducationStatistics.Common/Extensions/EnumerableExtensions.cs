@@ -219,6 +219,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return source.Where(item => item is not null)!;
         }
 
+        public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T?> source)
+            where T: class
+        {
+            return source.Where(item => item is not null)!;
+        }
+
         public static IEnumerable<(T item, int index)> WithIndex<T>(this IEnumerable<T> self) =>
             self.Select((item, index) => (item, index));
 
@@ -284,6 +290,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
             
             return new Tuple<T, T, T>(list[0], list[1], list[2]);
+        }
+
+        public static bool ContainsAll<T>(this IEnumerable<T> source, IEnumerable<T> values)
+        {
+            return values.All(id => source.Contains(id));
         }
     }
 }

@@ -14,7 +14,6 @@ interface Props {
 
 const AddSecondaryStats = ({ release, updating = false }: Props) => {
   const [isFormOpen, setIsFormOpen] = useState<boolean>(false);
-  const [showConfirmation, setShowConfirmation] = useState<boolean>(false);
   const { editingMode } = useEditingContext();
 
   const { attachContentSectionBlock, deleteContentSectionBlock } =
@@ -36,47 +35,35 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
           {`${updating ? 'Change' : 'Add'} secondary stats`}
         </Button>
         {updating && (
-          <Button
-            className="govuk-!-margin-top-4 govuk-!-margin-bottom-4 govuk-button--warning"
-            onClick={() => {
-              setShowConfirmation(true);
+          <ModalConfirm
+            title="Remove secondary statistics section"
+            triggerButton={
+              <Button className="govuk-!-margin-top-4 govuk-!-margin-bottom-4 govuk-button--warning">
+                Remove secondary stats
+              </Button>
+            }
+            onConfirm={async () => {
+              await Promise.all(
+                release.keyStatisticsSecondarySection.content.map(
+                  async content => {
+                    if (release.keyStatisticsSecondarySection?.content) {
+                      await deleteContentSectionBlock({
+                        releaseId: release.id,
+                        sectionId: release.keyStatisticsSecondarySection.id,
+                        blockId: content.id,
+                        sectionKey: 'keyStatisticsSecondarySection',
+                      });
+                    }
+                  },
+                ),
+              );
             }}
           >
-            Remove secondary stats
-          </Button>
+            <p>
+              Are you sure you want to remove this this secondary stats section?
+            </p>
+          </ModalConfirm>
         )}
-
-        <ModalConfirm
-          onConfirm={async () => {
-            await Promise.all(
-              release.keyStatisticsSecondarySection.content.map(
-                async content => {
-                  if (release.keyStatisticsSecondarySection?.content) {
-                    await deleteContentSectionBlock({
-                      releaseId: release.id,
-                      sectionId: release.keyStatisticsSecondarySection.id,
-                      blockId: content.id,
-                      sectionKey: 'keyStatisticsSecondarySection',
-                    });
-                  }
-                },
-              ),
-            );
-            setShowConfirmation(false);
-          }}
-          onExit={() => {
-            setShowConfirmation(false);
-          }}
-          onCancel={() => {
-            setShowConfirmation(false);
-          }}
-          title="Remove secondary statistics section"
-          open={showConfirmation}
-        >
-          <p>
-            Are you sure you want to remove this this secondary stats section?
-          </p>
-        </ModalConfirm>
       </ButtonGroup>
     );
   }

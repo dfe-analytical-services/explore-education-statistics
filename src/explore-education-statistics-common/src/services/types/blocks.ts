@@ -4,7 +4,7 @@ import {
   AxisType,
 } from '@common/modules/charts/types/chart';
 import { DataSet } from '@common/modules/charts/types/dataSet';
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkSnapshotService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import { OmitStrict } from '@common/types';
 
@@ -74,6 +74,7 @@ export interface DataBlock extends BaseBlock {
   query: TableDataQuery;
   charts: Chart[];
   table: Table;
+  dataBlockParentId: string;
 }
 
 export interface EmbedBlock extends BaseBlock {

@@ -4,6 +4,7 @@ import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer } from 'use-immer';
 import { MethodologyDispatchAction } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
+import { MethodologyVersion } from '@admin/services/methodologyService';
 
 export type MethodologyContextDispatch = (
   action: MethodologyDispatchAction,
@@ -11,6 +12,7 @@ export type MethodologyContextDispatch = (
 
 export type MethodologyContextState = {
   methodology: MethodologyContent;
+  methodologyVersion: MethodologyVersion;
   canUpdateMethodology: boolean;
   isPreRelease?: boolean;
 };

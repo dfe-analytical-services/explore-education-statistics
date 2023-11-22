@@ -2,8 +2,6 @@ import { ProtectedRouteProps } from '@admin/components/ProtectedRoute';
 import AdminDashboardPage from '@admin/pages/admin-dashboard/AdminDashboardPage';
 import ContactUsPage from '@admin/pages/ContactUsPage';
 import MethodologyPage from '@admin/pages/methodology/edit-methodology/MethodologyPage';
-import AdoptMethodologyPage from '@admin/pages/methodology/adopt-methodology/AdoptMethodologyPage';
-import ExternalMethodologyPage from '@admin/pages/methodology/external-methodology/ExternalMethodologyPage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
@@ -22,7 +20,6 @@ import {
   preReleaseContentRoute,
   preReleaseTableToolRoute,
 } from '@admin/routes/preReleaseRoutes';
-import PublicationReleaseContributorsPage from '@admin/pages/publication/PublicationReleaseContributorsPage';
 
 export type PublicationRouteParams = {
   publicationId: string;
@@ -106,28 +103,9 @@ export const publicationRoute: ProtectedRouteProps = {
   component: PublicationPageContainer,
 };
 
-export const publicationReleaseContributorsRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/add-contributors',
-  component: PublicationReleaseContributorsPage,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-  exact: true,
-};
-
 export const methodologyRoute: ProtectedRouteProps = {
   path: '/methodology/:methodologyId',
   component: MethodologyPage,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-};
-
-export const methodologyAdoptRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/adopt-methodology',
-  component: AdoptMethodologyPage,
-  protectionAction: user => user.permissions.canAccessAnalystPages,
-};
-
-export const externalMethodologyEditRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/external-methodology',
-  component: ExternalMethodologyPage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
 };
 
@@ -176,10 +154,7 @@ const routes = {
   topicCreateRoute,
   topicEditRoute,
   publicationCreateRoute,
-  publicationReleaseContributorsRoute,
   methodologyRoute,
-  methodologyAdoptRoute,
-  externalMethodologyEditRoute,
   preReleaseRoute,
   preReleaseContentRoute,
   preReleaseTableToolRoute,

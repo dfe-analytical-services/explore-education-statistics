@@ -6,6 +6,7 @@ import {
   methodologyReducer as originalMethodologyReducer,
 } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
 import { MethodologyDispatchAction } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
+import testMethodologyVersion from '@admin/pages/methodology/edit-methodology/__tests__/__data__/testMethodologyVersionsAmendmentsAndContents';
 
 const basicMethodology: MethodologyContent = {
   id: 'methodology-0',
@@ -85,6 +86,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: true,
       },
       {
@@ -119,6 +121,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: true,
       },
       {
@@ -152,6 +155,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: true,
       },
       {
@@ -187,6 +191,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: true,
       },
       {
@@ -226,6 +231,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: false,
       },
       {
@@ -266,6 +272,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: true,
       },
       {
@@ -295,6 +302,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: true,
       },
       {
@@ -328,6 +336,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: true,
       },
       {
@@ -349,6 +358,7 @@ describe('MethodologyContext', () => {
     const { methodology } = methodologyReducer(
       {
         methodology: basicMethodology,
+        methodologyVersion: testMethodologyVersion,
         canUpdateMethodology: true,
       },
       {

@@ -2078,7 +2078,7 @@
         "NEXT_CONFIG_MODE": "server",
         "NODE_ENV": "production",
         "PUBLIC_URL": "[concat(variables('publicAppUrl'), '/')]",
-        "WEBSITE_NODE_DEFAULT_VERSION": "18.17.0",
+        "WEBSITE_NODE_DEFAULT_VERSION": "18.18.2",
         "WEBSITES_PORT": 3000
       }
     },

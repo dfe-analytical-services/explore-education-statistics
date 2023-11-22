@@ -281,6 +281,10 @@ describe('LegacyReleasesTable', () => {
         testLegacyReleases[0].id,
       );
 
+      await waitFor(() => {
+        expect(screen.queryByText('Confirm')).not.toBeInTheDocument();
+      });
+
       const table = within(screen.getByRole('table'));
       await waitFor(() => {
         expect(table.queryByText('Legacy release 3')).not.toBeInTheDocument();

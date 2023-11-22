@@ -278,16 +278,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(release, SecurityPolicies.CanMakeAmendmentOfSpecificRelease);
         }
 
-        public static Task<Either<ActionResult, Unit>> CheckCanViewPrereleaseContactsList(
-            this IUserService userService)
-        {
-            return userService.CheckPolicy(SecurityPolicies.CanViewPrereleaseContacts);
-        }
-
         public static Task<Either<ActionResult, Release>> CheckCanAssignPrereleaseContactsToRelease(
             this IUserService userService, Release release)
         {
-            return userService.CheckPolicy(release, SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease);
+            return userService.CheckPolicy(release, SecurityPolicies.CanAssignPreReleaseUsersToSpecificRelease);
         }
 
         public static Task<Either<ActionResult, Release>> CheckCanViewPreReleaseSummary(

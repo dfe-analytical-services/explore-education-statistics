@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -46,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, result.ReleaseId);
                 Assert.Equal(Contributor, result.Role);
                 Assert.Equal(createdByUser.Id, result.CreatedById);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
+                result.Created.AssertUtcNow();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -84,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(releaseId, result.ReleaseId);
                 Assert.Equal(Contributor, result.Role);
                 Assert.Equal(createdById, result.CreatedById);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
+                result.Created.AssertUtcNow();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -400,7 +401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(updatedReleaseRole);
                 Assert.Equal(userReleaseRole.ReleaseId, updatedReleaseRole!.ReleaseId);
                 Assert.Equal(userReleaseRole.Role, updatedReleaseRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedReleaseRole.Deleted!.Value).Milliseconds, 0, 1500);
+                updatedReleaseRole.Deleted.AssertUtcNow();
                 Assert.Equal(deletedById, updatedReleaseRole.DeletedById);
             }
         }
@@ -524,19 +525,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userReleaseRole1.Id, userReleaseRoles[0].Id);
                 Assert.Equal(userReleaseRole1.ReleaseId, userReleaseRoles[0].ReleaseId);
                 Assert.Equal(userReleaseRole1.Role, userReleaseRoles[0].Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[0].Deleted!.Value).Milliseconds, 0, 1500);
+                userReleaseRoles[0].Deleted.AssertUtcNow();
                 Assert.Equal(deletedById, userReleaseRoles[0].DeletedById);
 
                 Assert.Equal(userReleaseRole2.Id, userReleaseRoles[1].Id);
                 Assert.Equal(userReleaseRole2.ReleaseId, userReleaseRoles[1].ReleaseId);
                 Assert.Equal(userReleaseRole2.Role, userReleaseRoles[1].Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[1].Deleted!.Value).Milliseconds, 0, 1500);
+                userReleaseRoles[1].Deleted.AssertUtcNow();
                 Assert.Equal(deletedById, userReleaseRoles[1].DeletedById);
 
                 Assert.Equal(userReleaseRole3.Id, userReleaseRoles[2].Id);
                 Assert.Equal(userReleaseRole3.ReleaseId, userReleaseRoles[2].ReleaseId);
                 Assert.Equal(userReleaseRole3.Role, userReleaseRoles[2].Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[2].Deleted!.Value).Milliseconds, 0, 1500);
+                userReleaseRoles[2].Deleted.AssertUtcNow();
                 Assert.Equal(deletedById, userReleaseRoles[2].DeletedById);
 
                 Assert.Equal(notDeletedUserReleaseRole.Id, userReleaseRoles[3].Id);
@@ -689,7 +690,92 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(Lead, result[1]);
             }
         }
-        
+
+        [Fact]
+        public async Task GetAllRolesByUserAndPublication()
+        {
+            var user = new User();
+            var publication = new Publication();
+
+            var userReleaseRolesForPublication = new List<UserReleaseRole>
+            {
+                new()
+                {
+                    User = user,
+                    Release = new Release
+                    {
+                        Publication = publication
+                    },
+                    Role = Contributor
+                },
+                new()
+                {
+                    User = user,
+                    Release = new Release
+                    {
+                        Publication = publication
+                    },
+                    Role = Lead
+                },
+                // Add a duplicate ReleaseRole to ensure duplicates are removed by the method under test
+                new()
+                {
+                    User = user,
+                    Release = new Release
+                    {
+                        Publication = publication
+                    },
+                    Role = Lead
+                }
+            };
+
+            var otherPublication = new Publication();
+            var otherUserReleaseRoles = new List<UserReleaseRole>
+            {
+                // Role for different Publication
+                new()
+                {
+                    User = user,
+                    Release = new Release
+                    {
+                        Publication = otherPublication
+                    },
+                    Role = Approver
+                },
+                // Role for same Publication but different user
+                new()
+                {
+                    User = new User(),
+                    Release = new Release
+                    {
+                        Publication = publication
+                    },
+                    Role = Approver
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRolesForPublication);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(otherUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                var result = await service.GetAllRolesByUserAndPublication(user.Id, publication.Id);
+
+                Assert.Equal(2, result.Count);
+                Assert.Equal(Contributor, result[0]);
+                Assert.Equal(Lead, result[1]);
+            }
+        }
+
         [Fact]
         public async Task GetDistinctRolesByUser()
         {

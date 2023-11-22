@@ -36,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IUserReleaseRoleService _userReleaseRoleService;
         private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IEmailTemplateService _emailTemplateService;
+        private readonly IRedirectsCacheService _redirectsCacheService;
 
         public MethodologyApprovalService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -48,7 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IUserService userService,
             IUserReleaseRoleService userReleaseRoleService,
             IMethodologyCacheService methodologyCacheService,
-            IEmailTemplateService emailTemplateService)
+            IEmailTemplateService emailTemplateService,
+            IRedirectsCacheService redirectsCacheService)
         {
             _persistenceHelper = persistenceHelper;
             _context = context;
@@ -61,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _userReleaseRoleService = userReleaseRoleService;
             _methodologyCacheService = methodologyCacheService;
             _emailTemplateService = emailTemplateService;
+            _redirectsCacheService = redirectsCacheService;
         }
 
         public async Task<Either<ActionResult, MethodologyVersion>> UpdateApprovalStatus(
@@ -95,15 +98,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         methodologyVersion.ScheduledWithReleaseId = WithRelease == request.PublishingStrategy
                             ? request.WithReleaseId
                             : null;
-                        methodologyVersion.InternalReleaseNote = request.LatestInternalReleaseNote;
 
                         methodologyVersion.Updated = DateTime.UtcNow;
 
-                        var isPubliclyAccessible = await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id);
+                        // We cannot rely on Methodology.LatestPublishedVersionId, as it may now be incorrect,
+                        // if we are approving and publishing this methodology version.
+                        var isToBePublished = await _methodologyVersionRepository.IsToBePublished(methodologyVersion);
 
-                        if (isPubliclyAccessible)
+                        if (isToBePublished)
                         {
                             methodologyVersion.Published = DateTime.UtcNow;
+                            methodologyVersion.Methodology.LatestPublishedVersionId = methodologyVersion.Id;
 
                             await _publishingService.PublishMethodologyFiles(methodologyVersion.Id);
                         }
@@ -119,10 +124,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         await _context.SaveChangesAsync();
 
-                        if (isPubliclyAccessible)
+                        if (isToBePublished)
                         {
-                            // Update the 'All Methodologies' cache item
                             await _methodologyCacheService.UpdateSummariesTree();
+                            await _redirectsCacheService.UpdateRedirects();
                         }
 
                         if (request.Status == MethodologyApprovalStatus.HigherLevelReview)
@@ -138,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             var owningPublicationId = await _context.PublicationMethodologies
                 .Where(pm => pm.MethodologyId == methodologyVersion.MethodologyId
-                && pm.Owner)
+                             && pm.Owner)
                 .Select(pm => pm.PublicationId)
                 .SingleAsync();
 

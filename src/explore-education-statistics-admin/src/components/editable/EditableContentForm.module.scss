@@ -1,31 +1,7 @@
 @import '~govuk-frontend/govuk/base';
 @import '@admin/styles/variables';
 
-.container {
-  display: flex;
-  margin-left: -$dfe-comments-width;
-  position: relative;
-}
-
-.commentsList {
-  bottom: 0;
-  margin-right: $dfe-comments-gutter;
-  max-height: 100%;
-  overflow-y: auto;
-  padding: 2px;
-  position: absolute;
-  top: 0;
-  width: $dfe-comments-width - $dfe-comments-gutter;
-
-  &.padTop {
-    margin-top: 200px;
-  }
-}
-
 .form {
-  margin-left: $dfe-comments-width;
-  width: 100%;
-
   // stylelint-disable-next-line selector-no-qualifying-type
   img:not([alt]),
   img[alt=''] {

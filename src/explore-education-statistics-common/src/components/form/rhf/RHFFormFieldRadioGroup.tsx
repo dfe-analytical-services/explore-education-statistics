@@ -4,7 +4,7 @@ import FormRadioGroup, {
 import useRegister from '@common/components/form/rhf/hooks/useRegister';
 import { useFormIdContext } from '@common/components/form/contexts/FormIdContext';
 import { RadioChangeEventHandler } from '@common/components/form/FormRadio';
-import get from 'lodash/get';
+import getErrorMessage from '@common/components/form/rhf/util/getErrorMessage';
 import React, { memo, useCallback } from 'react';
 import { FieldValues, Path, useFormContext, useWatch } from 'react-hook-form';
 
@@ -56,7 +56,7 @@ function RHFFormFieldRadioGroup<TFormValues extends FieldValues>({
     <FormRadioGroup
       {...props}
       {...field}
-      error={showError ? (get(errors, name)?.message as string) : ''}
+      error={getErrorMessage(errors, name, showError)}
       id={id}
       inputRef={inputRef}
       value={selectedValue}
@@ -65,4 +65,4 @@ function RHFFormFieldRadioGroup<TFormValues extends FieldValues>({
   );
 }
 
-export default memo(RHFFormFieldRadioGroup);
+export default memo(RHFFormFieldRadioGroup) as typeof RHFFormFieldRadioGroup;

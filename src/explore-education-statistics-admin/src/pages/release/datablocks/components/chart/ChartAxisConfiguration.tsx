@@ -35,7 +35,6 @@ import { OmitStrict } from '@common/types';
 import parseNumber from '@common/utils/number/parseNumber';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
@@ -47,12 +46,13 @@ type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
 interface Props {
   axesConfiguration: AxesConfiguration;
   buttons?: ReactNode;
-  id: string;
-  type: AxisType;
   definition: ChartDefinition;
   data: TableDataResult[];
-  meta: FullTableMeta;
+  id: string;
   includeNonNumericData?: boolean;
+  meta: FullTableMeta;
+  stacked?: boolean;
+  type: AxisType;
   onChange: (configuration: AxisConfiguration) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -62,9 +62,10 @@ const ChartAxisConfiguration = ({
   buttons,
   definition,
   id,
+  includeNonNumericData,
   data,
   meta,
-  includeNonNumericData,
+  stacked,
   type,
   onChange,
   onSubmit,
@@ -100,6 +101,26 @@ const ChartAxisConfiguration = ({
   const minorAxisDomain = axesConfiguration.minor
     ? calculateMinorAxisDomainValues(chartData, axesConfiguration.minor)
     : undefined;
+
+  const isGroupedByFilterWithGroups = useMemo(() => {
+    if (!stacked || axisConfiguration?.groupBy !== 'filters') {
+      return false;
+    }
+
+    const filters = Object.values(meta.filters);
+    const groupedByName =
+      axisConfiguration.groupByFilter ??
+      (filters.length === 1 ? filters[0].name : undefined);
+
+    return filters
+      .find(filter => filter.name === groupedByName)
+      ?.options.some(item => item.group !== 'Default');
+  }, [
+    axisConfiguration?.groupBy,
+    axisConfiguration?.groupByFilter,
+    meta.filters,
+    stacked,
+  ]);
 
   const groupByOptions = useMemo<RadioOption<AxisGroupBy>[]>(() => {
     const options: RadioOption<AxisGroupBy>[] = [
@@ -142,17 +163,25 @@ const ChartAxisConfiguration = ({
       label: 'Filters',
       value: 'filters',
       conditional: (
-        <FormFieldSelect<AxisConfiguration>
-          label="Select a filter"
-          name="groupByFilter"
-          options={categories}
-          order={[]}
-        />
+        <>
+          <FormFieldSelect<AxisConfiguration>
+            label="Select a filter"
+            name="groupByFilter"
+            options={categories}
+            order={[]}
+          />
+          {isGroupedByFilterWithGroups && (
+            <FormFieldCheckbox<FormValues>
+              name="groupByFilterGroups"
+              label="Group by filter groups"
+            />
+          )}
+        </>
       ),
     });
 
     return options;
-  }, [meta.filters]);
+  }, [isGroupedByFilterWithGroups, meta.filters]);
 
   // TODO EES-721: Figure out how we should sort data
   // const sortOptions = useMemo<SelectOption[]>(() => {
@@ -283,10 +312,20 @@ const ChartAxisConfiguration = ({
     type,
   ]);
 
-  const initialValues = useMemo<FormValues>(
-    () => pick(axisConfiguration, Object.keys(validationSchema.fields)),
-    [axisConfiguration, validationSchema.fields],
-  );
+  const initialValues = useMemo<FormValues>(() => {
+    return type === 'major' && isGroupedByFilterWithGroups && stacked
+      ? {
+          ...pick(axisConfiguration, Object.keys(validationSchema.fields)),
+          groupByFilterGroups: axisConfiguration?.groupByFilterGroups,
+        }
+      : pick(axisConfiguration, Object.keys(validationSchema.fields));
+  }, [
+    axisConfiguration,
+    isGroupedByFilterWithGroups,
+    stacked,
+    type,
+    validationSchema.fields,
+  ]);
 
   const handleSubmit = useCallback(
     async (values: FormValues) => {
@@ -533,19 +572,8 @@ const ChartAxisConfiguration = ({
               dataSetCategories={dataSetCategories}
               lines={form.values.referenceLines ?? []}
               minorAxisDomain={minorAxisDomain}
-              onAddLine={line => {
-                form.setFieldValue('referenceLines', [
-                  ...(form.values.referenceLines ?? []),
-                  line,
-                ]);
-              }}
-              onRemoveLine={line => {
-                form.setFieldValue(
-                  'referenceLines',
-                  form.values.referenceLines?.filter(
-                    refLine => !isEqual(refLine, line),
-                  ),
-                );
+              onChange={updatedReferenceLines => {
+                form.setFieldValue('referenceLines', updatedReferenceLines);
               }}
             />
           )}

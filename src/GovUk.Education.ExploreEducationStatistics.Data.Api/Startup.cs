@@ -1,12 +1,11 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Http.Headers;
 using System.Text;
 using AutoMapper;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -14,7 +13,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -70,25 +70,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             services.AddApplicationInsightsTelemetry()
                 .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
-            
+
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new OperationCancelledExceptionFilter());
                     options.RespectBrowserAcceptHeader = true;
                     options.ReturnHttpNotAcceptable = true;
                     options.EnableEndpointRouting = false;
-
                 })
                 .AddNewtonsoftJson(options => {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
 
-            services.AddControllers(
-                options =>
-                {
-                    options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
-                }
-            );
+            services.AddControllers(options =>
+            {
+                options.AddCommaSeparatedQueryModelBinderProvider();
+                options.AddTrimStringBinderProvider();
+            });
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
@@ -235,6 +233,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
             }
 
+            var rewriteOptions = new RewriteOptions()
+                .Add(new LowercasePathRule());
+
             if(Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
@@ -244,10 +245,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     c.RoutePrefix = "docs";
                 });
 
-                var option = new RewriteOptions();
-                option.AddRedirect("^$", "docs");
-                app.UseRewriter(option);
+                rewriteOptions.AddRedirect("^$", "docs");
             }
+
+            app.UseRewriter(rewriteOptions);
 
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
@@ -265,11 +266,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             app.UseMvc();
             app.UseHealthChecks("/api/health");
 
-            var serverAddressesFeature = app.ServerFeatures.Get<IServerAddressesFeature>();
-            foreach (var address in serverAddressesFeature.Addresses)
-            {
-                Console.WriteLine($"Server listening on address: {address}");
-            }
+            app.ServerFeatures.Get<IServerAddressesFeature>()
+                ?.Addresses
+                .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
         }
 
         private record PublicAppOptions

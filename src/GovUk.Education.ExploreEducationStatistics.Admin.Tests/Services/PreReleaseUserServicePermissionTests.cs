@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPreReleaseUsers()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanAssignPrereleaseContactsToSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanAssignPreReleaseUsersToSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task GetPreReleaseUsersInvitePlan()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanAssignPrereleaseContactsToSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanAssignPreReleaseUsersToSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -66,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task InvitePreReleaseUsers()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanAssignPrereleaseContactsToSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanAssignPreReleaseUsersToSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
@@ -84,28 +84,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task RemovePreReleaseUser()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanAssignPrereleaseContactsToSpecificRelease)
+                .SetupResourceCheckToFail(_release, CanAssignPreReleaseUsersToSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
                         var service = SetupPreReleaseUserService(
                             userService: userService.Object);
                         return service.RemovePreReleaseUser(_release.Id, "test@test.com");
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task SendPreReleaseUserInviteEmails()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = SetupPreReleaseUserService(
-                            userService: userService.Object);
-                        return service.SendPreReleaseUserInviteEmails(_release.Id);
                     }
                 );
         }

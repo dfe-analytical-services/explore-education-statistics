@@ -34,7 +34,7 @@ describe('MethodologySummaryForm', () => {
       <MethodologySummaryForm
         id="id"
         initialValues={{
-          title: '',
+          title: 'the publication title',
           titleType: 'default',
         }}
         defaultTitle="the publication title"
@@ -45,7 +45,7 @@ describe('MethodologySummaryForm', () => {
     );
 
     userEvent.click(screen.getByLabelText('Set an alternative title'));
-    userEvent.click(screen.getByLabelText('Enter methodology title'));
+    userEvent.clear(screen.getByLabelText('Enter methodology title'));
     userEvent.tab();
 
     await waitFor(() => {
@@ -63,7 +63,7 @@ describe('MethodologySummaryForm', () => {
       <MethodologySummaryForm
         id="id"
         initialValues={{
-          title: '',
+          title: 'the publication title',
           titleType: 'default',
         }}
         defaultTitle="the publication title"
@@ -74,6 +74,7 @@ describe('MethodologySummaryForm', () => {
     );
 
     userEvent.click(screen.getByLabelText('Set an alternative title'));
+    userEvent.clear(screen.getByLabelText('Enter methodology title'));
     await userEvent.type(
       screen.getByLabelText('Enter methodology title'),
       'an alternative title',
@@ -82,10 +83,7 @@ describe('MethodologySummaryForm', () => {
     userEvent.click(screen.getByRole('button', { name: 'Update methodology' }));
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith({
-        title: 'an alternative title',
-        titleType: 'alternative',
-      });
+      expect(handleSubmit).toHaveBeenCalledWith('an alternative title');
     });
   });
 
@@ -95,7 +93,7 @@ describe('MethodologySummaryForm', () => {
       <MethodologySummaryForm
         id="id"
         initialValues={{
-          title: '',
+          title: 'the publication title',
           titleType: 'default',
         }}
         defaultTitle="the publication title"
@@ -108,10 +106,32 @@ describe('MethodologySummaryForm', () => {
     userEvent.click(screen.getByRole('button', { name: 'Update methodology' }));
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith({
-        title: 'the publication title',
-        titleType: 'default',
-      });
+      expect(handleSubmit).toHaveBeenCalledWith('the publication title');
+    });
+  });
+
+  test('submits successfully when change back to publication title from an alternative title', async () => {
+    const handleSubmit = jest.fn();
+    render(
+      <MethodologySummaryForm
+        id="id"
+        initialValues={{
+          title: 'the alternative title',
+          titleType: 'alternative',
+        }}
+        defaultTitle="the publication title"
+        submitText="Update methodology"
+        onCancel={noop}
+        onSubmit={handleSubmit}
+      />,
+    );
+
+    userEvent.click(screen.getByLabelText('Use publication title'));
+
+    userEvent.click(screen.getByRole('button', { name: 'Update methodology' }));
+
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledWith('the publication title');
     });
   });
 });

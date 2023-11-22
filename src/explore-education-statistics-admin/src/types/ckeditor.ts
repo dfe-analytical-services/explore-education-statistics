@@ -76,6 +76,11 @@ export interface EditorConfig {
 
 export interface PluginCollection {
   get<T extends Plugin>(key: string): T;
+  has<T extends Plugin>(key: string): T;
+}
+
+export interface PluginClass {
+  get pluginName(): PluginName;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
@@ -224,3 +229,50 @@ export interface RootElement extends Element {
   getChild(index: number): Element;
   getChildren(): Iterable<Element>;
 }
+
+export type PluginName =
+  | 'Alignment'
+  | 'Autoformat'
+  | 'Autosave'
+  | 'BlockQuote'
+  | 'Bold'
+  | 'Comments'
+  | 'CustomUploadAdapter'
+  | 'Essentials'
+  | 'Glossary'
+  | 'Heading'
+  | 'Image'
+  | 'ImageCaption'
+  | 'ImageResize'
+  | 'ImageStyle'
+  | 'ImageToolbar'
+  | 'ImageUpload'
+  | 'Indent'
+  | 'Italic'
+  | 'Link'
+  | 'List'
+  | 'MediaEmbed'
+  | 'Paragraph'
+  | 'PasteFromOffice'
+  | 'Table'
+  | 'TableToolbar'
+  | 'TableCaption'
+  | 'TextTransformation';
+
+export type ToolbarOption =
+  | '|'
+  | 'alignment'
+  | 'blockQuote'
+  | 'bold'
+  | 'bulletedList'
+  | 'comment'
+  | 'glossary'
+  | 'heading'
+  | 'imageUpload'
+  | 'insertTable'
+  | 'italic'
+  | 'link'
+  | 'numberedList'
+  | 'redo'
+  | 'toggleTableCaption'
+  | 'undo';

@@ -302,10 +302,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 FiltersDifferFromSubject).OnSuccess(_ =>
             {
                 var requestMap = requestFilters.ToDictionary(filter => filter.Id);
-                return filters.Select(filter =>
+                return filters
+                    .Select(filter =>
                         ValidateFilterGroupsForSubject(filter, requestMap[filter.Id].FilterGroups))
-                    .OnSuccessAll()
-                    .OnSuccessVoid();
+                    .OnSuccessAllReturnVoid();
             });
         }
 
@@ -321,13 +321,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccess(_ =>
                 {
                     var requestMap = requestFilterGroups.ToDictionary(filterGroup => filterGroup.Id);
-                    return filter.FilterGroups.Select(filterGroup =>
+                    return filter
+                        .FilterGroups
+                        .Select(filterGroup =>
                             AssertCollectionsAreSameIgnoringOrder(
                                 filterGroup.FilterItems.Select(filterItem => filterItem.Id),
                                 requestMap[filterGroup.Id].FilterItems,
                                 FilterItemsDifferFromSubject))
-                        .OnSuccessAll()
-                        .OnSuccessVoid();
+                        .OnSuccessAllReturnVoid();
                 });
         }
 
@@ -349,8 +350,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                 indicatorGroup.Indicators.Select(indicator => indicator.Id),
                                 requestMap[indicatorGroup.Id].Indicators,
                                 IndicatorsDifferFromSubject))
-                        .OnSuccessAll()
-                        .OnSuccessVoid();
+                        .OnSuccessAllReturnVoid();
                 });
         }
 

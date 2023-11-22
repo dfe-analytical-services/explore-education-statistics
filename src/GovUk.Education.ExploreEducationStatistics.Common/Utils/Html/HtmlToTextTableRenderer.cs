@@ -13,9 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
         private const string Separator = "  |  ";
         private const string EmptySeparator = "     ";
 
-        private readonly List<List<TableCell>> _headerRows = new List<List<TableCell>>();
-        private readonly List<List<TableCell>> _bodyRows = new List<List<TableCell>>();
-        private readonly List<int> _columnWidths = new List<int>();
+        private readonly List<List<TableCell>> _headerRows = new();
+        private readonly List<List<TableCell>> _bodyRows = new();
+        private readonly List<int> _columnWidths = new();
 
         private class TableCell
         {

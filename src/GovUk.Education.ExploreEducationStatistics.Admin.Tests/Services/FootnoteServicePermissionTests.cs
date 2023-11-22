@@ -55,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper,
                 dataBlockService,
                 footnoteService,
-                statisticsPersistenceHelper
+                statisticsPersistenceHelper,
+                releaseSubjectRepository
                 ) = Mocks();
 
             var sourceRelease = new Release
@@ -86,6 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService.Object,
                             dataBlockService.Object,
                             footnoteService.Object,
+                            releaseSubjectRepository.Object,
                             statisticsPersistenceHelper.Object
                         );
 
@@ -103,7 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper,
                 dataBlockService,
                 footnoteService,
-                statisticsPersistenceHelper
+                statisticsPersistenceHelper,
+                releaseSubjectRepository
                 ) = Mocks();
 
             var sourceRelease = new Release
@@ -130,6 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService.Object,
                             dataBlockService.Object,
                             footnoteService.Object,
+                            releaseSubjectRepository.Object,
                             statisticsPersistenceHelper.Object
                         );
 
@@ -242,7 +246,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper,
                 dataBlockService,
                 footnoteService,
-                statisticsPersistenceHelper
+                statisticsPersistenceHelper,
+                releaseSubjectRepository
                 ) = Mocks();
 
             return PermissionTestUtils.PolicyCheckBuilder<TPolicy>()
@@ -256,6 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService.Object,
                             dataBlockService.Object,
                             footnoteService.Object,
+                            releaseSubjectRepository.Object,
                             statisticsPersistenceHelper.Object
                         );
 
@@ -268,13 +274,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IDataBlockService>,
             Mock<IFootnoteRepository>,
-            Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
+            Mock<IPersistenceHelper<StatisticsDbContext>>,
+            Mock<IReleaseSubjectRepository>) Mocks()
         {
             return (
                 MockPersistenceHelper<ContentDbContext, Release>(Release.Id, Release),
                 new Mock<IDataBlockService>(),
                 new Mock<IFootnoteRepository>(),
-                MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote));
+                MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),
+                new Mock<IReleaseSubjectRepository>());
         }
     }
 }

@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 
@@ -20,16 +19,16 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
 {
     private readonly IMethodologyVersionRepository _methodologyVersionRepository;
     private readonly IMethodologyRepository _methodologyRepository;
-    private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+    private readonly AuthorizationHandlerService _authorizationHandlerService;
 
     public MarkMethodologyAsApprovedAuthorizationHandler(
         IMethodologyVersionRepository methodologyVersionRepository,
         IMethodologyRepository methodologyRepository,
-        AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+        AuthorizationHandlerService authorizationHandlerService)
     {
         _methodologyVersionRepository = methodologyVersionRepository;
         _methodologyRepository = methodologyRepository;
-        _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+        _authorizationHandlerService = authorizationHandlerService;
     }
 
     protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -38,7 +37,7 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
     {
         // If the Methodology is already public, it cannot be approved
         // An approved Methodology that isn't public can be approved to change attributes associated with approval
-        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
+        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             return;
         }
@@ -53,12 +52,12 @@ public class MarkMethodologyAsApprovedAuthorizationHandler :
             await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
         // If the user is a Publication Approver that owns this Methodology, they can approve it.
-        // Additionally, if they're an Approver for Releases on the owning Publication, they can approve it.
-        if (await _authorizationHandlerResourceRoleService
-                .HasRolesOnPublicationOrLatestRelease(
+        // Additionally, if they're an Approver for any Releases on the owning Publication, they can approve it.
+        if (await _authorizationHandlerService
+                .HasRolesOnPublicationOrAnyRelease(
                     context.User.GetUserId(),
                     owningPublication.Id,
-                    ListOf(Approver),
+                    ListOf(PublicationRole.Approver),
                     ListOf(ReleaseRole.Approver)))
         {
             context.Succeed(requirement);

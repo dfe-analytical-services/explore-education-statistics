@@ -93,7 +93,7 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
             "topicId": chosen_topic_id,
             "contact": {
                 "contactName": "UI test contact name",
-                "contactTelNo": "1234 1234",
+                "contactTelNo": "0123 4567",
                 "teamEmail": "ui_test@test.com",
                 "teamName": "UI test team name",
             },

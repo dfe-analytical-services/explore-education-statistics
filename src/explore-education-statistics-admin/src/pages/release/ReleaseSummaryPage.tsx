@@ -41,20 +41,6 @@ const ReleaseSummaryPage = () => {
             These details will be shown to users to help identify this release.
           </p>
 
-          <h3>Publication details</h3>
-          <SummaryList>
-            <SummaryListItem term="Publication title">
-              {release.publicationTitle}
-            </SummaryListItem>
-            <SummaryListItem term="Publication summary">
-              {release.publicationSummary}
-            </SummaryListItem>
-            <SummaryListItem term="Lead statistician">
-              {release.contact?.contactName}
-            </SummaryListItem>
-          </SummaryList>
-
-          <h3>Release summary</h3>
           <SummaryList>
             <SummaryListItem term="Time period">
               {release.timePeriodCoverage.label}

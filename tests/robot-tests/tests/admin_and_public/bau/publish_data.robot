@@ -67,7 +67,6 @@ Create another release for the same publication
 Verify new release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
-    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
     user checks summary list contains    Time period    Financial year
     user checks summary list contains    Release period    3001-02
     user checks summary list contains    Release type    National statistics
@@ -86,7 +85,7 @@ Create footnote for both subjects
 
     user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to all data
     user clicks footnote subject radio    ${SUBJECT_2_NAME}    Applies to all data
-    user enters text into element    label:Footnote    ${FOOTNOTE_ALL}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -103,7 +102,7 @@ Create footnote for both subject indicators
     user opens footnote subject dropdown    ${SUBJECT_2_NAME}    Indicators
     user clicks footnote subject checkbox    ${SUBJECT_2_NAME}    Indicators    Admission Numbers
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_INDICATOR}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_INDICATOR}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -119,7 +118,7 @@ Create footnote for both subject filters
     user opens footnote subject dropdown    ${SUBJECT_2_NAME}    Random Filter
     user clicks footnote subject checkbox    ${SUBJECT_2_NAME}    Random Filter    Select all
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_FILTER}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_FILTER}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -129,7 +128,7 @@ Create footnote for subject 1
 
     user clicks footnote subject radio    ${SUBJECT_1_NAME}    Applies to all data
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -142,7 +141,7 @@ Create footnote for subject 1 indicators
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Authorised absence rate
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Indicators    Number of persistent absentees
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_INDICATOR}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_INDICATOR}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -158,7 +157,7 @@ Create footnote for subject 1 filters
     user opens footnote subject dropdown    ${SUBJECT_1_NAME}    Colour
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Select all
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -172,7 +171,7 @@ Create footnote for subject 1 filter groups
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Combined
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    School type    Individual
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -191,7 +190,7 @@ Create footnote for subject 1 filter items
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Blue
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Orange
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -215,7 +214,7 @@ Create footnote for subject 1 with mixture of indicators and filters
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Blue
     user clicks footnote subject checkbox    ${SUBJECT_1_NAME}    Colour    Orange
 
-    user enters text into element    label:Footnote    ${FOOTNOTE_SUBJECT_1_MIXTURE}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_SUBJECT_1_MIXTURE}
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
@@ -383,31 +382,31 @@ Create another new data block
     user waits until h2 is visible    Create data block
     user waits until table tool wizard step is available    1    Select a data set
 
-Select subject "${SUBJECT_2_NAME}"
+Select subject "${SUBJECT_2_NAME}" again
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
     user waits until button is enabled    Next step    %{WAIT_SMALL}
     user clicks button    Next step
 
-Select locations
+Select locations again
     user waits until table tool wizard step is available    2    Choose locations
     user opens details dropdown    Opportunity area
     user clicks checkbox    Bolton 001
     user waits until button is enabled    Next step    %{WAIT_SMALL}
     user clicks button    Next step
 
-Select time period
+Select time period again
     user waits until table tool wizard step is available    3    Choose time period
     user chooses select option    id:timePeriodForm-start    2009
     user chooses select option    id:timePeriodForm-end    2017
     user waits until button is enabled    Next step    %{WAIT_SMALL}
     user clicks button    Next step
 
-Create table
+Create table again
     user waits until button is enabled    Create table
     user clicks button    Create table
 
-Save data block as a featured table
+Save data block as a featured table again
     user enters text into element    label:Name    UI Test data block name 2
     user enters text into element    label:Table title    UI Test table title 2
     user enters text into element    label:Source    UI Test source 2
@@ -445,7 +444,7 @@ Edit footnote
     user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_ALL_INDICATOR}
 
     user waits until h2 is visible    Edit footnote
-    user enters text into element    label:Footnote    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user clicks button    Save footnote
     user waits until page contains    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks page does not contain    ${FOOTNOTE_ALL_INDICATOR}
@@ -453,7 +452,7 @@ Edit footnote
 Check footnote was updated on data block
     # set focus to 'data blocks' link to ensure the click doesn't set focus to the data blocks link
     # This results in a failure whereby the tests stay on the footnote page
-    user sets focus to element    //a[text()="Data blocks"]    //*[@aria-label="Release"]
+    user sets focus to element    link:Data blocks   xpath://*[@aria-label="Release"]
     user clicks link    Data blocks
 
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
@@ -480,7 +479,7 @@ Reorder footnotes
     user clicks button    Save order
 
 Check footnotes were reordered on data block
-    user sets focus to element    //a[text()="Data blocks"]    //*[@aria-label="Release"]
+    user sets focus to element    link:Data blocks    xpath://*[@aria-label="Release"]
     user clicks link    Data blocks
 
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
@@ -491,12 +490,12 @@ Check footnotes were reordered on data block
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL}
 
-Add headline text block to Content page
+Add headline text block to Content page again
     user navigates to content page    ${PUBLICATION_NAME}
     user adds headlines text block
     user adds content to headlines text block    Headline text block text
 
-Add public prerelease access list for release
+Add public prerelease access list again
     user clicks link    Pre-release access
     user creates public prerelease access list    Test public access list
 

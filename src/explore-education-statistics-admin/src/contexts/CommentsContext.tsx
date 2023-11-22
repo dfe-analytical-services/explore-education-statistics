@@ -11,6 +11,7 @@ import React, {
 } from 'react';
 import noop from 'lodash/noop';
 
+// TO DO maybe rename the interaction stuff to be more obviously ckeditor related
 export type CurrentCommentInteraction =
   | { type: 'adding' | 'removing' | 'resolving' | 'unresolving'; id: string }
   | undefined;
@@ -24,12 +25,13 @@ export interface CommentsContextState {
   comments: Comment[];
   currentInteraction: CurrentCommentInteraction;
   clearPendingDeletions: () => void;
+  deleteComment: (commentId: string) => Promise<void>;
   markersOrder: string[];
   pendingDeletions: Comment[];
   reAddComment: MutableRefObject<(commentId: string) => void>;
   removeComment: MutableRefObject<(commentId: string) => void>;
   resolveComment: MutableRefObject<
-    (commentId: string, updateMarker?: boolean) => void
+    (commentId: string, updateMarker?: boolean) => Promise<void>
   >;
   selectedComment: SelectedComment;
   setCurrentInteraction: (
@@ -38,7 +40,7 @@ export interface CommentsContextState {
   setMarkersOrder: (order: string[]) => void;
   setSelectedComment: (selectedComment: SelectedComment) => void;
   unresolveComment: MutableRefObject<
-    (commentId: string, updateMarker?: boolean) => void
+    (commentId: string, updateMarker?: boolean) => Promise<void>
   >;
   updateComment: (comment: Comment) => void;
 }
@@ -48,16 +50,17 @@ export const CommentsContext = createContext<CommentsContextState>({
   comments: [],
   currentInteraction: undefined,
   clearPendingDeletions: noop,
+  deleteComment: () => Promise.resolve(),
   markersOrder: [],
   pendingDeletions: [],
   reAddComment: { current: noop },
   removeComment: { current: noop },
-  resolveComment: { current: noop },
+  resolveComment: { current: () => Promise.resolve() },
   selectedComment: { id: '' },
   setCurrentInteraction: noop,
   setMarkersOrder: noop,
   setSelectedComment: noop,
-  unresolveComment: { current: noop },
+  unresolveComment: { current: () => Promise.resolve() },
   updateComment: noop,
 });
 
@@ -67,10 +70,10 @@ export interface CommentsContextProviderProps {
   markersOrder?: string[];
   pendingDeletions?: Comment[];
   onCreate: (comment: CommentCreate) => Promise<Comment>;
-  onDelete: (commentId: string) => void;
+  onDelete: (commentId: string) => Promise<void>;
   onPendingDelete: (commentId: string) => void;
   onPendingDeleteUndo: (commentId: string) => void;
-  onUpdate: (comment: Comment) => void;
+  onUpdate: (comment: Comment) => Promise<void>;
 }
 
 export const CommentsContextProvider = ({
@@ -215,11 +218,17 @@ export const CommentsContextProvider = ({
         await onUpdate(comment);
       };
 
+    const deleteComment: CommentsContextState['deleteComment'] =
+      async commentId => {
+        await onDelete(commentId);
+      };
+
     return {
       addComment,
       comments,
       currentInteraction,
       clearPendingDeletions,
+      deleteComment,
       markersOrder,
       pendingDeletions,
       reAddComment,

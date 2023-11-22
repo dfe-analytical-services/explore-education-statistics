@@ -4,7 +4,7 @@ import {
   releaseDataRoute,
 } from '@admin/routes/releaseRoutes';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
 import React from 'react';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
@@ -26,7 +26,7 @@ const ReleaseDataFilePage = ({
     params: { publicationId, releaseId, fileId },
   },
 }: RouteComponentProps<ReleaseDataFileRouteParams>) => {
-  const { value: dataFile, isLoading: dataFileLoading } = useAsyncHandledRetry(
+  const { value: dataFile, isLoading: dataFileLoading } = useAsyncRetry(
     () => releaseDataFileService.getDataFile(releaseId, fileId),
     [releaseId, fileId],
   );

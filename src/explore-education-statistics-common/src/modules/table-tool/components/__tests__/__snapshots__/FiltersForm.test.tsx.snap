@@ -9,7 +9,7 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
     data-testid="Indicators"
   >
     <dt
-      class="govuk-summary-list__key"
+      class="govuk-summary-list__key key"
       data-testid="Indicators-key"
     >
       Indicators
@@ -33,7 +33,7 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
     data-testid="School type"
   >
     <dt
-      class="govuk-summary-list__key"
+      class="govuk-summary-list__key key"
       data-testid="School type-key"
     >
       School type
@@ -57,7 +57,7 @@ exports[`FiltersForm renders a read-only view of selected options when no longer
     data-testid="Characteristic"
   >
     <dt
-      class="govuk-summary-list__key"
+      class="govuk-summary-list__key key"
       data-testid="Characteristic-key"
     >
       Characteristic

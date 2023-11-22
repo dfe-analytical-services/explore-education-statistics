@@ -13,12 +13,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 
         Task<List<MethodologyVersion>> GetLatestVersionByPublication(Guid publicationId);
 
+        Task<MethodologyVersion?> GetLatestPublishedVersionBySlug(string slug);
+
         Task<MethodologyVersion?> GetLatestPublishedVersion(Guid methodologyId);
 
         Task<List<MethodologyVersion>> GetLatestPublishedVersionByPublication(Guid publicationId);
 
-        Task<bool> IsPubliclyAccessible(Guid methodologyVersionId);
+        Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion);
 
-        Task PublicationTitleChanged(Guid publicationId, string originalSlug, string updatedTitle, string updatedSlug);
+        Task<bool> IsToBePublished(MethodologyVersion methodologyVersion);
     }
 }

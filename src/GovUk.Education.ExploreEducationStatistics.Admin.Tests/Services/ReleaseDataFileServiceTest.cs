@@ -24,6 +24,7 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
@@ -1737,7 +1738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, result.Right.UserName);
                 Assert.Null(result.Right.Rows);
                 Assert.Equal("10 Kb", result.Right.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created!.Value).Milliseconds, 0, 1500);
+                result.Right.Created.AssertUtcNow();
                 Assert.Equal(QUEUED, result.Right.Status);
             }
 
@@ -1903,7 +1904,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, dataFileInfo.UserName);
                 Assert.Null(dataFileInfo.Rows);
                 Assert.Equal("10 Kb", dataFileInfo.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(dataFileInfo.Created!.Value).Milliseconds, 0, 1500);
+                dataFileInfo.Created.AssertUtcNow();
                 Assert.Equal(QUEUED, dataFileInfo.Status);
             }
 
@@ -2240,7 +2241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, result.UserName);
                 Assert.Null(result.Rows);
                 Assert.Equal("1 Mb", result.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
+                result.Created.AssertUtcNow();
                 Assert.Equal(QUEUED, result.Status);
             }
 
@@ -2575,7 +2576,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, result.UserName);
                 Assert.Null(result.Rows);
                 Assert.Equal("1 Mb", result.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
+                result.Created.AssertUtcNow();
                 Assert.Equal(QUEUED, result.Status);
             }
 
@@ -2674,7 +2675,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseRepository ?? new ReleaseRepository(
                     contentDbContext,
                     statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
-                    Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
+                    AdminMapper()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),

@@ -4,7 +4,7 @@ import downloadService from '@common/services/downloadService';
 import { Subject } from '@common/services/tableBuilderService';
 import React, { useEffect, useMemo, useRef } from 'react';
 import {
-  FormValues,
+  FiltersFormValues,
   TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
 import { useWatch } from 'react-hook-form';
@@ -15,7 +15,7 @@ interface Props {
   showDownloadOption?: boolean;
   subject: Subject;
   errorCode: TableQueryErrorCode;
-  previousValues?: FormValues;
+  previousValues?: FiltersFormValues;
 }
 
 interface ErrorMessageText {

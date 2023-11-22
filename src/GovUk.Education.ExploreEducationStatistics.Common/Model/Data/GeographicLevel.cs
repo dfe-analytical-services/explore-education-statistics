@@ -1,3 +1,4 @@
+#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
@@ -15,6 +16,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 
         [EnumLabelValue("Local enterprise partnership", "LEP")]
         LocalEnterprisePartnership,
+
+        [EnumLabelValue("Local skills improvement plan area", "LSIP")]
+        LocalSkillsImprovementPlanArea,
 
         [EnumLabelValue("Institution", "INS")] Institution,
 
@@ -43,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
         [EnumLabelValue("Sponsor", "SPO")] Sponsor,
 
         [EnumLabelValue("Ward", "WAR")] Ward,
-        
+
         [EnumLabelValue("Planning area", "PA")] PlanningArea
     }
 }

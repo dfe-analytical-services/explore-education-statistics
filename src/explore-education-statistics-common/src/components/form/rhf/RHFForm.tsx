@@ -5,10 +5,7 @@ import { FormIdContextProvider } from '@common/components/form/contexts/FormIdCo
 import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
-import logger from '@common/services/logger';
-import isErrorLike from '@common/utils/error/isErrorLike';
 import camelCase from 'lodash/camelCase';
-import isEqual from 'lodash/isEqual';
 import React, {
   FormEvent,
   ReactNode,
@@ -16,7 +13,6 @@ import React, {
   useEffect,
   useMemo,
   useRef,
-  useState,
 } from 'react';
 import { FieldValues, useFormContext, useWatch } from 'react-hook-form';
 
@@ -25,9 +21,8 @@ interface Props<TFormValues extends FieldValues> {
   id: string;
   submitId?: string;
   showErrorSummary?: boolean;
-  showSubmitError?: boolean;
   visuallyHiddenErrorSummary?: boolean;
-  onSubmit: (values: TFormValues) => Promise<void>;
+  onSubmit: (values: TFormValues) => Promise<void> | void;
 }
 
 /**
@@ -52,7 +47,6 @@ export default function RHFForm<TFormValues extends FieldValues>({
   id,
   submitId = `${id}-submit`,
   showErrorSummary = true,
-  showSubmitError = false,
   visuallyHiddenErrorSummary = false,
   onSubmit,
 }: Props<TFormValues>) {
@@ -61,7 +55,7 @@ export default function RHFForm<TFormValues extends FieldValues>({
   const {
     formState: { errors, submitCount, touchedFields, isSubmitted },
     handleSubmit: submit,
-  } = useFormContext();
+  } = useFormContext<TFormValues>();
 
   const values = useWatch();
   const previousValues = useRef(values);
@@ -73,38 +67,33 @@ export default function RHFForm<TFormValues extends FieldValues>({
     isSubmitted,
   });
   const [hasSummaryFocus, toggleSummaryFocus] = useToggle(false);
-  const [submitError, setSubmitError] = useState<ErrorSummaryMessage>();
+
+  const allErrors = useMemo<ErrorSummaryMessage[]>(() => {
+    return Object.entries(getAllErrors()).map(([field, message]) => {
+      return {
+        id:
+          field !== 'root' && !field.startsWith('root.')
+            ? `${id}-${camelCase(field)}`
+            : submitId,
+        message: typeof message === 'string' ? message : '',
+      };
+    });
+  }, [getAllErrors, id, submitId]);
 
   useEffect(() => {
     if (!isMounted.current) {
       return;
     }
 
-    if (submitError && !isEqual(values, previousValues.current)) {
-      setSubmitError(undefined);
-    }
-
     previousValues.current = values;
-  }, [isSubmitted, submitError, submitCount, values, isMounted]);
-
-  const allErrors = useMemo(() => {
-    const summaryErrors: ErrorSummaryMessage[] = Object.entries(
-      getAllErrors(),
-    ).map(([errorName, message]) => ({
-      id: `${id}-${camelCase(errorName)}`,
-      message: typeof message === 'string' ? message : '',
-    }));
-
-    return submitError && isSubmitted
-      ? [...summaryErrors, submitError]
-      : summaryErrors;
-  }, [getAllErrors, id, submitError, isSubmitted]);
+  }, [isSubmitted, submitCount, values, isMounted]);
 
   useEffect(() => {
-    if (
-      (isMounted && allErrors.length,
-      submitCount !== previousSubmitCount.current)
-    ) {
+    if (!isMounted.current) {
+      return;
+    }
+
+    if (allErrors.length && submitCount !== previousSubmitCount.current) {
       toggleSummaryFocus.on();
       previousSubmitCount.current = submitCount;
     }
@@ -115,36 +104,9 @@ export default function RHFForm<TFormValues extends FieldValues>({
       event.preventDefault();
       toggleSummaryFocus.off();
 
-      await submit(async () => {
-        setSubmitError(undefined);
-
-        try {
-          await onSubmit(values as TFormValues);
-        } catch (error) {
-          if (showSubmitError && isErrorLike(error)) {
-            logger.error(error);
-
-            if (isMounted.current) {
-              setSubmitError({
-                id: submitId,
-                message: error.message ?? error,
-              });
-            }
-          } else {
-            throw error;
-          }
-        }
-      })(event);
+      await submit(async data => onSubmit(data))(event);
     },
-    [
-      toggleSummaryFocus,
-      submit,
-      onSubmit,
-      values,
-      showSubmitError,
-      isMounted,
-      submitId,
-    ],
+    [submit, toggleSummaryFocus, onSubmit],
   );
 
   return (

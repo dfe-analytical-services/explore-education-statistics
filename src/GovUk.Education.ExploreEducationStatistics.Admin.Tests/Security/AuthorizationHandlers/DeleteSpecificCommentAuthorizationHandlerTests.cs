@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -26,22 +26,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Id = Guid.NewGuid(),
                 ApprovalStatus = ReleaseApprovalStatus.Draft,
-                Content = new List<ReleaseContentSection>
-                {
-                    new ReleaseContentSection
+                Content = ListOf(
+                    new ContentSection
                     {
-                        ContentSection = new ContentSection
+                        Content = new List<ContentBlock>
                         {
-                            Content = new List<ContentBlock>
+                            new DataBlock
                             {
-                                new DataBlock
-                                {
-                                    Comments = new List<Comment> { comment },
-                                }
+                                Comments = new List<Comment> { comment },
                             }
                         }
-                    }
-                }
+                    })
             };
 
             await AssertHandlerOnlySucceedsWithReleaseRoles<DeleteSpecificCommentRequirement, Comment>(
@@ -50,11 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 contentDbContext => contentDbContext.Add(release),
                 contentDbContext => new DeleteSpecificCommentAuthorizationHandler(
                     contentDbContext,
-                    new ReleasePublishingStatusRepository(Mock.Of<ITableStorageService>()),
-                    new AuthorizationHandlerResourceRoleService(
+                    new AuthorizationHandlerService(
+                        contentDbContext,
                         new UserReleaseRoleRepository(contentDbContext),
                         new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict))),
+                        Mock.Of<IPreReleaseService>(Strict))),
                 ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
         }
     }

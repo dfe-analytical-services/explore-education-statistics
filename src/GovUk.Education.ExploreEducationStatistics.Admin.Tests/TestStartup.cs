@@ -1,83 +1,119 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
+using System.Security.Claims;
+using System.Text.Encodings.Web;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests;
 
 /// <summary>
-/// Generic test application startup for use in integration tests.
+/// Test application Startup for use in Admin integration tests.
+///
+/// This startup inherits from the real production <see cref="Startup"/> process to make available as realistic a
+/// set of services as possible, but mocks out services that interact with Azure services and registers in-memory
+/// DbContexts in place of the real DbContexts. It also suppresses the applying of migrations to the DbContexts,
+/// which is not compatible with in-memory databases.
+///
+/// Additionally this startup configuration does not attempt to start up the SPA, which requires NPM and needs a
+/// more involved and lengthy startup process that is not useful for integration tests.
 /// </summary>
 /// <remarks>
 /// Use in combination with <see cref="TestApplicationFactory{TStartup}"/>
 /// as a test class fixture.
 /// </remarks>
-public class TestStartup
+// ReSharper disable once ClassNeverInstantiated.Global
+public class TestStartup : Startup
 {
-    public void ConfigureServices(IServiceCollection services)
+    public TestStartup(
+        IConfiguration configuration,
+        IHostEnvironment hostEnvironment) : base(
+        configuration, 
+        hostEnvironment)
     {
-        services.AddMvcCore(options => { options.EnableEndpointRouting = false; })
-            .AddNewtonsoftJson(
-                options => { options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore; }
-            );
-
-        StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
-        // TODO: EES-4338 Emulate non-test authentication/authorisation
-        services.AddAuthorization(options =>
-        {
-            var policy = new AuthorizationPolicyBuilder()
-                .RequireAssertion(c => true)
-                .Build();
-
-            options.DefaultPolicy = policy;
-        });
-
-        services.AddControllers(
-                options => { options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")); }
-            )
-            .AddApplicationPart(typeof(Startup).Assembly);
-
-        services.AddDbContext<StatisticsDbContext>(
-            options =>
-                options.UseInMemoryDatabase(
-                    "TestStatisticsDb",
-                    b => b.EnableNullChecks(false)));
-
-        services.AddDbContext<ContentDbContext>(
-            options =>
-                options.UseInMemoryDatabase(
-                    "TestContentDb",
-                    b => b.EnableNullChecks(false)
-                )
-        );
-
-        AddPersistenceHelper<ContentDbContext>(services);
-        AddPersistenceHelper<StatisticsDbContext>(services);
     }
 
-    public void Configure(IApplicationBuilder app)
+    public override void ConfigureServices(IServiceCollection services)
     {
-        app.UseMvc();
+        base.ConfigureServices(services);
+
+        services
+            .UseInMemoryDbContext<ContentDbContext>()
+            .UseInMemoryDbContext<StatisticsDbContext>()
+            .UseInMemoryDbContext<UsersAndRolesDbContext>()
+            .MockService<IStorageQueueService>()
+            .MockService<ICoreTableStorageService>()
+            .MockService<IPublisherTableStorageService>()
+            .MockService<IPrivateBlobStorageService>()
+            .MockService<IPublicBlobStorageService>()
+            .RegisterControllers<Startup>();
+
+        services
+            .AddAuthentication(TestAuthHandler.AuthenticationScheme)
+            .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(TestAuthHandler.AuthenticationScheme, _ => { });
     }
 }
 
 public static class TestStartupExtensions
 {
-    public static WebApplicationFactory<TestStartup> ResetDbContexts(this WebApplicationFactory<TestStartup> testApp)
+    /// <summary>
+    /// This method adds an authenticated User in the form of a ClaimsPrincipal to the HttpContext.
+    ///
+    /// This User will subsequently be available for the Identity Framework as well as our own UserService, and any
+    /// other production code that looks up the User from the current HttpContext.
+    /// </summary>
+    /// <param name="testApp"></param>
+    /// <param name="user"></param>
+    /// <returns></returns>
+    public static WebApplicationFactory<TestStartup> SetUser(
+        this WebApplicationFactory<TestStartup> testApp, 
+        ClaimsPrincipal user)
     {
-        return testApp
-            .ResetContentDbContext()
-            .ResetStatisticsDbContext();
+        return testApp.WithWebHostBuilder(builder => builder
+            .ConfigureServices(services => services.AddScoped(_ => user)));
+    }
+}
+
+/// <summary>
+/// An AuthenticationHandler that allows the tests to make a ClaimsPrincipal available in the HttpContext
+/// for authentication and authorization mechanisms to use. 
+/// </summary>
+internal class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+{
+    public const string AuthenticationScheme = "TestAuthenticationScheme";
+
+    private readonly ClaimsPrincipal? _claimsPrincipal;
+        
+    public TestAuthHandler(
+        IOptionsMonitor<AuthenticationSchemeOptions> options, 
+        ILoggerFactory logger, 
+        UrlEncoder encoder, 
+        ISystemClock clock, 
+        ClaimsPrincipal? claimsPrincipal = null) : base(options, logger, encoder, clock)
+    {
+        _claimsPrincipal = claimsPrincipal;
+    }
+ 
+    protected override Task<AuthenticateResult> HandleAuthenticateAsync()
+    {
+        if (_claimsPrincipal == null)
+        {
+            return Task.FromResult(AuthenticateResult.NoResult());
+        }
+            
+        var ticket = new AuthenticationTicket(_claimsPrincipal, AuthenticationScheme);
+        var result = AuthenticateResult.Success(ticket);
+        return Task.FromResult(result);
     }
 }

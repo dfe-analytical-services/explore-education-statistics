@@ -1,15 +1,18 @@
 import { Axis, AxisType } from '@common/modules/charts/types/chart';
 import { ChartData } from '@common/modules/charts/types/dataSet';
+import styles from '@common/modules/charts/components/CustomReferenceLineLabel.module.scss';
 import getReferenceLineLabelPosition from '@common/modules/charts/components/utils/getReferenceLineLabelPosition';
 import React, { memo } from 'react';
 import parseNumber from '@common/utils/number/parseNumber';
 import { AxisDomainItem, CartesianViewBox } from 'recharts/types/util/types';
+import { Text } from 'recharts';
 
 interface Props {
   axis: Axis;
   axisType: AxisType;
   chartData: ChartData[];
   label: string;
+  labelWidth?: number;
   otherAxisDomain?: [AxisDomainItem, AxisDomainItem];
   otherAxisPosition?: number;
   position: string | number;
@@ -21,6 +24,7 @@ const CustomReferenceLineLabel = ({
   axisType,
   chartData,
   label,
+  labelWidth,
   otherAxisDomain,
   otherAxisPosition,
   position,
@@ -66,15 +70,16 @@ const CustomReferenceLineLabel = ({
   };
 
   return (
-    <text
-      className="govuk-!-font-size-16"
+    <Text
+      className={styles.text}
       dy={axis === 'y' ? -4 : 0}
       x={labelPosition.x}
       y={labelPosition.y}
       textAnchor={getTextAnchor()}
+      width={labelWidth}
     >
-      <tspan>{label}</tspan>
-    </text>
+      {label}
+    </Text>
   );
 };
 

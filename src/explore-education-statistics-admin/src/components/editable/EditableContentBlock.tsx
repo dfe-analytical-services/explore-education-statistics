@@ -1,5 +1,6 @@
 import EditableBlockLockedMessage from '@admin/components/editable/EditableBlockLockedMessage';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
+import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentForm, {
   AltTextWarningMessage,
@@ -12,7 +13,6 @@ import {
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import toHtml from '@admin/utils/markdown/toHtml';
-import Button from '@common/components/Button';
 import ContentHtml from '@common/components/ContentHtml';
 import Tooltip from '@common/components/Tooltip';
 import useToggle from '@common/hooks/useToggle';
@@ -160,36 +160,19 @@ const EditableContentBlock = ({
 
   const isEditable = editable && !isLoading && !lockedBy;
 
-  const disabledTooltip = lockedBy
+  const blockLockedMessage = lockedBy
     ? `This block is being edited by ${lockedBy?.displayName}`
     : undefined;
 
   return (
-    <>
-      {allowComments && comments.length > 0 && (
-        <div className={styles.commentsButtonContainer}>
-          <Tooltip text={disabledTooltip} enabled={!!disabledTooltip}>
-            {({ ref }) => (
-              <Button
-                ariaDisabled={!!disabledTooltip}
-                ref={ref}
-                testId="view-comments"
-                variant="secondary"
-                onClick={onEditing}
-              >
-                View comments
-                <br />
-                <span className="govuk-!-margin-top-1 govuk-body-s">
-                  {`(${
-                    comments.filter(comment => !comment.resolved).length
-                  } unresolved)`}
-                </span>
-              </Button>
-            )}
-          </Tooltip>
-        </div>
-      )}
-
+    <CommentsWrapper
+      allowComments={allowComments}
+      commentType="inline"
+      blockLockedMessage={blockLockedMessage}
+      id={id}
+      showCommentsList={false}
+      onViewComments={onEditing}
+    >
       {showAltTextMessage && <AltTextWarningMessage />}
 
       {locked && lockedBy && (
@@ -202,7 +185,7 @@ const EditableContentBlock = ({
         onEdit={editable ? onEditing : undefined}
         onDelete={editable ? onDelete : undefined}
       >
-        <Tooltip enabled={!!lockedBy} followMouse text={disabledTooltip}>
+        <Tooltip enabled={!!lockedBy} followMouse text={blockLockedMessage}>
           {({ ref }) => (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
             <div
@@ -230,7 +213,7 @@ const EditableContentBlock = ({
           )}
         </Tooltip>
       </EditableBlockWrapper>
-    </>
+    </CommentsWrapper>
   );
 };
 

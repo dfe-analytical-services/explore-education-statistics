@@ -1,7 +1,8 @@
 ﻿#nullable enable
 using System;
+using System.IO;
+using System.Reflection;
 using AutoMapper;
-using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -10,7 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -31,6 +34,10 @@ using IContentPublicationService = GovUk.Education.ExploreEducationStatistics.Co
 using ContentPublicationService = GovUk.Education.ExploreEducationStatistics.Content.Services.PublicationService;
 using IContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IReleaseService;
 using ContentReleaseService = GovUk.Education.ExploreEducationStatistics.Content.Services.ReleaseService;
+using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
+using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
+using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
+using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -81,10 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
                         publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>()
-                .AddScoped<ITableStorageService, TableStorageService>(provider =>
-                    new TableStorageService(
-                        GetConfigurationValue(provider, "PublisherStorage"),
-                        new StorageInstanceCreationUtil()))
+                .AddScoped<IPublisherTableStorageService, PublisherTableStorageService>()
                 .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                 .AddScoped<IMethodologyRepository, MethodologyRepository>()
                 .AddScoped<IMethodologyService, MethodologyService>()
@@ -110,10 +114,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IIndicatorRepository, IndicatorRepository>()
                 .AddScoped<IPublishingCompletionService, PublishingCompletionService>()
                 .AddScoped<IPublicationRepository, PublicationRepository>()
-                .AddScoped<IReleaseRepository, ReleaseRepository>();
+                .AddScoped<IReleaseRepository, ReleaseRepository>()
+                .AddScoped<IRedirectsCacheService, RedirectsCacheService>()
+                .AddScoped<IRedirectsService, RedirectsService>();
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
+        }
+
+        public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
+        {
+            var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var rootDir = Path.GetFullPath(Path.Combine(binDir!, ".."));
+
+            builder.ConfigurationBuilder
+                .AddJsonFile($"{rootDir}/appsettings.Local.json", optional: true, reloadOnChange: true);
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)

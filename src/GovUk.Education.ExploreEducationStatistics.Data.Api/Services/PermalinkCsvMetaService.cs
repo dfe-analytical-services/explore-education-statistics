@@ -264,6 +264,8 @@ public class PermalinkCsvMetaService : IPermalinkCsvMetaService
                 new LocalAuthorityDistrict(viewModel.Value, viewModel.Label),
             GeographicLevel.LocalEnterprisePartnership =>
                 new LocalEnterprisePartnership(viewModel.Value, viewModel.Label),
+            GeographicLevel.LocalSkillsImprovementPlanArea =>
+                new LocalSkillsImprovementPlanArea(viewModel.Value, viewModel.Label),
             GeographicLevel.Institution =>
                 new Institution(viewModel.Value, viewModel.Label),
             GeographicLevel.MayoralCombinedAuthority =>

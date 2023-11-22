@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -13,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using Xunit;
@@ -526,7 +528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = BuildPublicationService(
                         context: contentDbContext,
                         userService: userService.Object);
-                    return await service.UpdateContact(publication.Id, new Contact());
+                    return await service.UpdateContact(publication.Id, new ContactSaveRequest());
                 });
         }
 
@@ -564,7 +566,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext? context = null,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
-            IMethodologyVersionRepository? methodologyVersionRepository = null,
+            IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
             IMethodologyCacheService? methodologyCacheService = null)
         {
@@ -576,7 +578,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
-                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
+                methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
         }

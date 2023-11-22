@@ -80,11 +80,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             // Note this method is allowed to return an unpublished Release so that Publisher can use it
             // to cache a release in advance of it going live.
 
-            var release = _contentDbContext.Releases
-                .Include(r => r.Content)
-                .ThenInclude(releaseContentSection => releaseContentSection.ContentSection)
+            var release = _contentDbContext
+                .Releases
+                .Include(release => release.Content)
                 .ThenInclude(section => section.Content)
-                .ThenInclude(contentBlock => (contentBlock as EmbedBlockLink)!.EmbedBlock)
+                .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
                 .Include(r => r.Updates)
                 .Include(r => r.KeyStatistics)
                 .Single(r => r.Id == releaseId);

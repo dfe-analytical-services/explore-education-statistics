@@ -1,45 +1,57 @@
 import {
   AlignmentConfig,
   HeadingOption,
+  PluginName,
   ResizeOption,
+  ToolbarOption,
 } from '@admin/types/ckeditor';
-import { Dictionary } from '@admin/types';
 
-export const toolbarConfigs: Dictionary<string[]> = {
-  full: [
-    'heading',
-    '|',
-    'bold',
-    'italic',
-    'link',
-    '|',
-    'bulletedList',
-    'numberedList',
-    '|',
-    'blockQuote',
-    'insertTable',
-    'toggleTableCaption',
-    'imageUpload',
-    'alignment',
-    '|',
-    'redo',
-    'undo',
-    '|',
-    'comment',
-    'glossary',
-  ],
-  simple: [
-    'bold',
-    'italic',
-    'link',
-    '|',
-    'bulletedList',
-    'numberedList',
-    '|',
-    'redo',
-    'undo',
-  ],
-};
+export const toolbarConfigFull: ReadonlyArray<ToolbarOption> = [
+  'heading',
+  '|',
+  'bold',
+  'italic',
+  'link',
+  '|',
+  'bulletedList',
+  'numberedList',
+  '|',
+  'blockQuote',
+  'insertTable',
+  'toggleTableCaption',
+  'imageUpload',
+  'alignment',
+  '|',
+  'redo',
+  'undo',
+  '|',
+  'comment',
+  'glossary',
+];
+export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
+  'bold',
+  'italic',
+  'link',
+  '|',
+  'bulletedList',
+  'numberedList',
+  '|',
+  'redo',
+  'undo',
+];
+export const toolbarConfigLinkOnly: ReadonlyArray<ToolbarOption> = ['link'];
+
+export const corePlugins: ReadonlySet<PluginName> = new Set<PluginName>([
+  'Essentials',
+  'Paragraph',
+]);
+
+export const pluginsConfigLinksOnly: ReadonlySet<PluginName> =
+  new Set<PluginName>(['Link']);
+
+export const pluginsConfigSimple: ReadonlySet<PluginName> = new Set<PluginName>(
+  ['Bold', 'Italic', 'Link', 'List'],
+);
 
 export const defaultAllowedHeadings: string[] = ['h3', 'h4', 'h5'];
 

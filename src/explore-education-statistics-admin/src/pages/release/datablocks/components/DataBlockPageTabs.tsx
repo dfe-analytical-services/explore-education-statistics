@@ -377,7 +377,6 @@ const DataBlockPageTabs = ({
           <TabsSection title="Data source" id="dataBlockTabs-dataSource">
             {!isLoading && tableState && (
               <DataBlockSourceWizard
-                key={saveNumber}
                 dataBlock={dataBlock}
                 tableToolState={tableState}
                 onSave={handleDataBlockSourceSave}

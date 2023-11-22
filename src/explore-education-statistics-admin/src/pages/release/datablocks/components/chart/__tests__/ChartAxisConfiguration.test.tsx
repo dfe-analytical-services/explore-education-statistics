@@ -89,8 +89,12 @@ describe('ChartAxisConfiguration', () => {
   };
   const testMinorAxisConfiguration: AxisConfiguration = {
     dataSets: [],
-    type: 'minor',
+    max: undefined,
+    min: undefined,
     referenceLines: [],
+    size: 50,
+    tickSpacing: 1,
+    type: 'minor',
     visible: true,
   };
 
@@ -504,6 +508,147 @@ describe('ChartAxisConfiguration', () => {
           },
         };
         expect(handleSubmit).toHaveBeenCalledWith(formValues);
+      });
+    });
+
+    test('does not show the `Group by filter groups` option when data is not grouped by a filter with filter groups and bars are not stacked', async () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-major"
+            type="major"
+            axesConfiguration={{
+              ...testAxesConfiguration,
+              major: {
+                ...testMajorAxisConfiguration,
+                groupBy: 'filters',
+                groupByFilter: 'school_type',
+              },
+            }}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      expect(
+        screen.queryByLabelText('Group by filter groups'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('does not show the `Group by filter groups` option when data is grouped by a filter with filter groups but bars are not stacked', () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-major"
+            type="major"
+            axesConfiguration={{
+              ...testAxesConfiguration,
+              major: {
+                ...testMajorAxisConfiguration,
+                groupBy: 'filters',
+                groupByFilter: 'characteristic',
+              },
+            }}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      expect(
+        screen.queryByLabelText('Group by filter groups'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('shows the `Group by filter groups` option when data is grouped by a filter with filter groups and bars are stacked', async () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-major"
+            type="major"
+            axesConfiguration={{
+              ...testAxesConfiguration,
+              major: {
+                ...testMajorAxisConfiguration,
+                groupBy: 'filters',
+                groupByFilter: 'characteristic',
+              },
+            }}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            stacked
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      expect(
+        screen.getByLabelText('Group by filter groups'),
+      ).toBeInTheDocument();
+    });
+
+    test('setting `Group by filter groups`', async () => {
+      const handleSubmit = jest.fn();
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-major"
+            type="major"
+            axesConfiguration={{
+              ...testAxesConfiguration,
+              major: {
+                ...testMajorAxisConfiguration,
+                groupBy: 'filters',
+                groupByFilter: 'characteristic',
+              },
+            }}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            stacked
+            onChange={noop}
+            onSubmit={handleSubmit}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      userEvent.click(screen.getByLabelText('Group by filter groups'));
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith({
+          dataSets: testMajorAxisConfiguration.dataSets,
+          groupBy: 'filters',
+          groupByFilter: 'characteristic',
+          groupByFilterGroups: true,
+          min: 0,
+          max: undefined,
+          referenceLines: [],
+          showGrid: true,
+          size: 50,
+          sortAsc: true,
+          sortBy: 'name',
+          tickConfig: 'default',
+          tickSpacing: 1,
+          type: 'major',
+          visible: true,
+          unit: '',
+          label: {
+            text: '',
+          },
+        });
       });
     });
   });

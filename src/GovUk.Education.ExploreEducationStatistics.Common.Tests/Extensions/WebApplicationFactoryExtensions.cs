@@ -33,4 +33,19 @@ public static class WebApplicationFactoryExtensions
     {
         return app.WithWebHostBuilder(builder => builder.AddTestData(testData));
     }
+    
+    /// <summary>
+    /// This method registers all Controllers found in the <see cref="TStartup"/> class's assembly.
+    /// 
+    /// Typically, <see cref="TEntrypoint"/> will be the TestStartup type, and <see cref="TStartup"/> will be the
+    /// production Startup type.
+    /// </summary>
+    public static WebApplicationFactory<TEntrypoint> RegisterControllers<TEntrypoint, TStartup>(
+        this WebApplicationFactory<TEntrypoint> app
+    )
+        where TEntrypoint : class
+        where TStartup : class
+    {
+        return app.ConfigureServices(services => services.RegisterControllers<TStartup>());
+    }
 }

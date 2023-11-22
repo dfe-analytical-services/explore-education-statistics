@@ -4,9 +4,10 @@ import parseContentDisposition from '@common/utils/http/parseContentDisposition'
 
 const releaseFileService = {
   downloadAllFilesZip(releaseId: string): Promise<void> {
-    return client.axios
+    return client
       .get<Blob>(`/release/${releaseId}/files`, {
         responseType: 'blob',
+        rawResponse: true,
       })
       .then(({ data, headers }) => {
         const disposition = parseContentDisposition(

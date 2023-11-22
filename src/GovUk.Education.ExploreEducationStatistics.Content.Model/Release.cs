@@ -76,11 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         [JsonIgnore]
-        public List<ReleaseContentSection> Content { get; set; } = new();
-
-        // TODO: EES-1568 This should be DataBlocks
-        [JsonIgnore]
-        public List<ReleaseContentBlock> ContentBlocks { get; set; } = new();
+        public List<ContentSection> Content { get; set; } = new();
 
         public List<KeyStatistic> KeyStatistics { get; set; } = new();
 
@@ -112,39 +108,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 }
 
                 return Content
-                    .Where(rcs => rcs.ContentSection.Type == ContentSectionType.Generic)
-                    .Select(rcs => rcs.ContentSection)
+                    .Where(section => section.Type == ContentSectionType.Generic)
                     .ToImmutableList();
             }
             set => ReplaceContentSectionsOfType(ContentSectionType.Generic, value);
-        }
-
-        public void AddGenericContentSection(ContentSection section)
-        {
-            Content.Add(new ReleaseContentSection
-            {
-                Release = this,
-                ContentSection = section
-            });
-        }
-
-        public void RemoveGenericContentSection(ContentSection section)
-        {
-            Content.Remove(Content.Find(join => join.ContentSection == section));
-        }
-
-        public void AddContentBlock(ContentBlock contentBlock)
-        {
-            if (ContentBlocks == null)
-            {
-                ContentBlocks = new List<ReleaseContentBlock>();
-            }
-
-            ContentBlocks.Add(new ReleaseContentBlock
-            {
-                Release = this,
-                ContentBlock = contentBlock
-            });
         }
 
         [NotMapped]
@@ -175,32 +142,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, new List<ContentSection> { value });
         }
 
+        public List<DataBlockVersion> DataBlockVersions { get; set; } = new();
+
         private ContentSection FindSingleSectionByType(ContentSectionType type)
         {
             if (Content == null)
             {
-                Content = new List<ReleaseContentSection>();
+                Content = new List<ContentSection>();
             }
 
             return Content
-                .Select(join => join.ContentSection)
-                .ToList()
-                .Find(section => section.Type == type);
+                .SingleOrDefault(section => section.Type == type);
         }
 
         private void ReplaceContentSectionsOfType(ContentSectionType type, IEnumerable<ContentSection> replacementSections)
         {
             if (Content == null)
             {
-                Content = new List<ReleaseContentSection>();
+                Content = new List<ContentSection>();
             }
 
-            Content.RemoveAll(join => join.ContentSection.Type == type);
-            Content.AddRange(replacementSections.Select(section => new ReleaseContentSection
-            {
-                Release = this,
-                ContentSection = section,
-            }));
+            Content.RemoveAll(section => section.Type == type);
+            Content.AddRange(replacementSections);
         }
 
         public ReleaseType Type { get; set; }
@@ -237,23 +200,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Release Clone()
         {
             return MemberwiseClone() as Release;
-        }
-
-        public record CloneContext
-        {
-            // Maps old content block references to new content blocks
-            // Ideally we want to try and get rid of this completely as we
-            // shouldn't have to deal with the same content blocks being
-            // referenced in multiple places.
-            // TODO: EES-1306 may be possible to remove this as part of this ticket
-            public Dictionary<ContentBlock, ContentBlock> OriginalToAmendmentContentBlockMap { get; } = new();
-
-            public Release NewRelease { get; }
-
-            public CloneContext(Release newRelease)
-            {
-                NewRelease = newRelease;
-            }
         }
     }
 }

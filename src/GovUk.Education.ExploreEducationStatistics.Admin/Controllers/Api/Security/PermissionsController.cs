@@ -25,28 +25,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
         private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
         private readonly IPreReleaseService _preReleaseService;
+        private readonly IUserPublicationRoleRepository _publicationRoleRepository;
+        private readonly IUserReleaseRoleRepository _releaseRoleRepository;
 
-        public PermissionsController(IPersistenceHelper<ContentDbContext> persistenceHelper,
+        public PermissionsController(
+            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseFileService releaseFileService,
             IUserService userService,
-            IPreReleaseService preReleaseService)
+            IPreReleaseService preReleaseService, 
+            IUserPublicationRoleRepository publicationRoleRepository, 
+            IUserReleaseRoleRepository releaseRoleRepository)
         {
             _persistenceHelper = persistenceHelper;
             _releaseFileService = releaseFileService;
             _userService = userService;
             _preReleaseService = preReleaseService;
+            _publicationRoleRepository = publicationRoleRepository;
+            _releaseRoleRepository = releaseRoleRepository;
         }
 
         [HttpGet("permissions/access")]
         public async Task<ActionResult<GlobalPermissionsViewModel>> GetGlobalPermissions()
         {
+            var isBauUser = await _userService.CheckIsBauUser().IsRight();
+
+            // Note that we are deliberately not giving BAU Users the Approver permission, as we would
+            // not expect a user with that role to be the target of specific Release or Publication
+            // roles.  If they were to be given Approver permissions, we would therefore assume that they
+            // should have Approver access to ALL Methodologies and Releases that are awaiting approval,
+            // which would potentially be overwhelming. 
+            var isApprover = !isBauUser && (await IsReleaseApprover() || await IsPublicationApprover());
+            
             return new GlobalPermissionsViewModel(
                 CanAccessSystem: await _userService.CheckCanAccessSystem().IsRight(),
                 CanAccessAnalystPages: await _userService.CheckCanAccessAnalystPages().IsRight(),
                 CanAccessAllImports: await _userService.CheckCanViewAllImports().IsRight(),
                 CanAccessPrereleasePages: await _userService.CheckCanAccessPrereleasePages().IsRight(),
                 CanManageAllTaxonomy: await _userService.CheckCanManageAllTaxonomy().IsRight(),
-                IsBauUser: await _userService.CheckIsBauUser().IsRight());
+                IsBauUser: isBauUser,
+                IsApprover: isApprover);
         }
 
         [HttpGet("permissions/topic/{topicId:guid}/publication/create")]
@@ -160,6 +177,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Secur
                 .OnSuccess(policyCheck.Invoke)
                 .OnSuccess(_ => new OkObjectResult(true))
                 .OrElse(() => new OkObjectResult(false));
+        }
+
+        private async Task<bool> IsReleaseApprover()
+        {
+            return (await _releaseRoleRepository.GetDistinctRolesByUser(_userService.GetUserId()))
+                .Contains(ReleaseRole.Approver);
+        }
+
+        private async Task<bool> IsPublicationApprover()
+        {
+            return (await _publicationRoleRepository.GetDistinctRolesByUser(_userService.GetUserId()))
+                .Contains(PublicationRole.Approver);
         }
     }
 }

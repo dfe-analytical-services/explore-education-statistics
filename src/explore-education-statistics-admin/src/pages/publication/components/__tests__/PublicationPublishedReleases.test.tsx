@@ -46,6 +46,7 @@ describe('PublicationPublishedReleases', () => {
     type: 'AdHocStatistics',
     year: 2021,
     yearTitle: '2021/22',
+    latestRelease: false,
   };
 
   const testRelease2: ReleaseSummaryWithPermissions = {

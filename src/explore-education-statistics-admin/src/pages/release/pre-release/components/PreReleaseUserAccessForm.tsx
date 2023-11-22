@@ -61,10 +61,6 @@ const PreReleaseUserAccessForm = ({
 
   const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
 
-  const isValidEmail = (input: string) => {
-    return /^[A-Z0-9.'_%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(input);
-  };
-
   const splitAndTrimLines = (input: string) =>
     input
       .split(/\r\n|\r|\n/)
@@ -141,8 +137,9 @@ const PreReleaseUserAccessForm = ({
                 test(value?: string) {
                   if (value) {
                     const emails = splitAndTrimLines(value);
+                    const schema = Yup.string().email();
                     const indexOfFirstInvalid = emails.findIndex(
-                      email => !isValidEmail(email),
+                      email => !schema.isValidSync(email),
                     );
                     if (indexOfFirstInvalid < 0) {
                       return true;

@@ -88,45 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             });
         }
 
-        public static async Task AssertPublicationHandlerFailsRegardlessOfPublicationOwner<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Publication publication)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var user = CreateClaimsPrincipal(Guid.NewGuid());
-
-            // Test the handler fails with the Owner role on the Publication for the User
-            await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
-            new PublicationHandlerTestScenario
-            {
-                User = user,
-                Entity = publication,
-                UserPublicationRoles = new List<UserPublicationRole>
-                {
-                    // Setup a UserPublicationRole for this Publication and User
-                    new UserPublicationRole
-                    {
-                        PublicationId = publication.Id,
-                        UserId = user.GetUserId(),
-                        Role = Owner
-                    }
-                },
-                ExpectedToPass = false,
-                UnexpectedPassMessage = "Expected handler to fail despite having Publication Owner role on the Publication"
-            });
-
-            // Test the handler fails without the Owner role on the Publication for the User
-            await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
-            new PublicationHandlerTestScenario
-            {
-                User = user,
-                Entity = publication,
-                UserPublicationRoles = new List<UserPublicationRole>(),
-                ExpectedToPass = false,
-                UnexpectedPassMessage = "Expected handler to fail with no roles on the Publication"
-            });
-        }
-        
         public class PublicationHandlerTestScenario : HandlerTestScenario
         {
             public List<UserPublicationRole>? UserPublicationRoles { get; set; }

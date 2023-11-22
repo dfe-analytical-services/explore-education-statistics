@@ -121,6 +121,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
+        public string? LocalSkillsImprovementPlanArea_Code { get; set; }
+        public string? LocalSkillsImprovementPlanArea_Name { get; set; }
+
+        [NotMapped]
+        public LocalSkillsImprovementPlanArea? LocalSkillsImprovementPlanArea
+        {
+            get => LocalSkillsImprovementPlanArea_Code == null && LocalSkillsImprovementPlanArea_Name == null
+                ? null
+                : new LocalSkillsImprovementPlanArea(LocalSkillsImprovementPlanArea_Code,
+                    LocalSkillsImprovementPlanArea_Name);
+            init
+            {
+                LocalSkillsImprovementPlanArea_Code = value?.Code;
+                LocalSkillsImprovementPlanArea_Name = value?.Name;
+            }
+        }
+
         public string? MayoralCombinedAuthority_Code { get; set; }
         public string? MayoralCombinedAuthority_Name { get; set; }
 
@@ -309,6 +326,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                    && LocalAuthorityDistrict_Name == other.LocalAuthorityDistrict_Name
                    && LocalEnterprisePartnership_Code == other.LocalEnterprisePartnership_Code
                    && LocalEnterprisePartnership_Name == other.LocalEnterprisePartnership_Name
+                   && LocalSkillsImprovementPlanArea_Code == other.LocalSkillsImprovementPlanArea_Code
+                   && LocalSkillsImprovementPlanArea_Name == other.LocalSkillsImprovementPlanArea_Name
                    && MayoralCombinedAuthority_Code == other.MayoralCombinedAuthority_Code
                    && MayoralCombinedAuthority_Name == other.MayoralCombinedAuthority_Name
                    && MultiAcademyTrust_Code == other.MultiAcademyTrust_Code
@@ -358,6 +377,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             hashCode.Add(LocalAuthorityDistrict_Name);
             hashCode.Add(LocalEnterprisePartnership_Code);
             hashCode.Add(LocalEnterprisePartnership_Name);
+            hashCode.Add(LocalSkillsImprovementPlanArea_Code);
+            hashCode.Add(LocalSkillsImprovementPlanArea_Name);
             hashCode.Add(MayoralCombinedAuthority_Code);
             hashCode.Add(MayoralCombinedAuthority_Name);
             hashCode.Add(MultiAcademyTrust_Code);
@@ -399,6 +420,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                 GeographicLevel.LocalAuthority => LocalAuthority,
                 GeographicLevel.LocalAuthorityDistrict => LocalAuthorityDistrict,
                 GeographicLevel.LocalEnterprisePartnership => LocalEnterprisePartnership,
+                GeographicLevel.LocalSkillsImprovementPlanArea => LocalSkillsImprovementPlanArea,
                 GeographicLevel.Institution => Institution,
                 GeographicLevel.MayoralCombinedAuthority => MayoralCombinedAuthority,
                 GeographicLevel.MultiAcademyTrust => MultiAcademyTrust,
@@ -474,7 +496,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                         // Only allow properties of Location that derive from LocationAttribute to be used in a hierarchy 
                         if (!typeof(LocationAttribute).IsAssignableFrom(propertyInfo.PropertyType))
                         {
-                            throw new ArgumentException($"{nameof(Location)} property {propertyName} is not a {nameof(LocationAttribute)}");
+                            throw new ArgumentException(
+                                $"{nameof(Location)} property {propertyName} is not a {nameof(LocationAttribute)}");
                         }
 
                         var value = propertyInfo.GetValue(location);

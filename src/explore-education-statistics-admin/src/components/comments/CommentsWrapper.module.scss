@@ -1,0 +1,43 @@
+@import '~govuk-frontend/govuk/base';
+@import '@admin/styles/variables';
+
+@include govuk-media-query($from: desktop) {
+  .container {
+    display: flex;
+    margin-left: -$dfe-comments-width;
+    position: relative;
+  }
+
+  .sidebar {
+    bottom: 0;
+    margin-right: $dfe-comments-gutter;
+    padding: 2px;
+    position: absolute;
+    top: 0;
+    width: $dfe-comments-width - $dfe-comments-gutter;
+  }
+
+  .list {
+    max-height: calc(100% - 46px);
+    overflow-y: auto;
+
+    &.inline {
+      max-height: 100%;
+    }
+
+    &.formOpen {
+      margin-top: $dfe-comments-form-height;
+      max-height: calc(100% - #{$dfe-comments-form-height});
+    }
+  }
+
+  .block {
+    margin-left: $dfe-comments-width;
+    max-width: calc(100% - #{$dfe-comments-width});
+    width: 100%;
+  }
+
+  .button {
+    width: 100%;
+  }
+}

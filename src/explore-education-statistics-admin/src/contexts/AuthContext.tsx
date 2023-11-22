@@ -26,6 +26,7 @@ const defaultPermissions: GlobalPermissions = {
   canAccessAnalystPages: false,
   canAccessAllImports: false,
   canManageAllTaxonomy: false,
+  isApprover: false,
   isBauUser: false,
 };
 
@@ -38,7 +39,7 @@ export const AuthContext = createContext<AuthContextState | undefined>(
 );
 
 interface Props {
-  children: ReactNode;
+  children?: ReactNode;
 }
 
 interface State {

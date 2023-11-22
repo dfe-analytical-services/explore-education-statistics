@@ -81,7 +81,7 @@ Verify that validation prevents adding an image without alt text
     user checks page contains    All images must have alternative text
 
     user clicks element    xpath://img
-    user clicks element    xpath://button[span[.="Change image text alternative"]]
+    user clicks button    Change image text alternative
     user enters text into element    label:Text alternative    Alt text for the uploaded content image
     user clicks element    css:button.ck-button-save
 

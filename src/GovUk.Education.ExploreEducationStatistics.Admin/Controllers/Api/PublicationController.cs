@@ -8,9 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ExternalMethodologyViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ExternalMethodologyViewModel;
+using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
+using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
+using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -22,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IUserRoleService _roleService;
 
         public PublicationController(
-            IPublicationService publicationService, 
+            IPublicationService publicationService,
             IUserRoleService roleService)
         {
             _publicationService = publicationService;
@@ -42,8 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<List<PublicationSummaryViewModel>>> ListPublicationSummaries()
         {
             return await _publicationService
-                .ListPublicationSummaries()
-                .HandleFailuresOrOk();
+                         .ListPublicationSummaries()
+                         .HandleFailuresOrOk();
         }
 
         [HttpGet("api/publications/{publicationId:guid}")]
@@ -88,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPut("api/publication/{publicationId:guid}/contact")]
         public async Task<ActionResult<ContactViewModel>> UpdateContact(
-            Guid publicationId, Contact updatedContact)
+            Guid publicationId, ContactSaveRequest updatedContact)
         {
             return await _publicationService.UpdateContact(publicationId, updatedContact)
                 .HandleFailuresOrOk();
@@ -139,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .PartialUpdateLegacyReleases(publicationId, legacyReleases)
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpGet("api/publications/{publicationId:guid}/roles")]
         public async Task<ActionResult<List<UserPublicationRoleViewModel>>> GetRoles(Guid publicationId)
         {

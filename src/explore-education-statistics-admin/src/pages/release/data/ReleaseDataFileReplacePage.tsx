@@ -21,7 +21,6 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
 
@@ -31,7 +30,6 @@ const ReleaseDataFileReplacePage = ({
     params: { publicationId, releaseId, fileId },
   },
 }: RouteComponentProps<ReleaseDataFileReplaceRouteParams>) => {
-  const [isCancelling, toggleCancelling] = useToggle(false);
   const {
     value: dataFile,
     isLoading: dataFileLoading,
@@ -125,14 +123,34 @@ const ReleaseDataFileReplacePage = ({
     });
   };
 
+  const replacementCancelButton = (
+    <ModalConfirm
+      title="Cancel data replacement"
+      triggerButton={
+        <Button variant="secondary">Cancel data replacement</Button>
+      }
+      onConfirm={async () => {
+        if (replacementDataFile?.id) {
+          await releaseDataFileService.deleteDataFiles(
+            releaseId,
+            replacementDataFile.id,
+          );
+        }
+
+        fetchDataFile();
+      }}
+    >
+      <p>
+        Are you sure you want to cancel this data replacement? The pending
+        replacement data file will be deleted.
+      </p>
+    </ModalConfirm>
+  );
+
   const getReplacementPlanMessage = () => {
     if (replacementDataFile?.status === 'COMPLETE') {
       return null;
     }
-
-    const replacementCancelButton = (
-      <Button onClick={toggleCancelling.on}>Cancel data replacement</Button>
-    );
 
     if (replacementDataFileError) {
       return (
@@ -216,11 +234,11 @@ const ReleaseDataFileReplacePage = ({
 
                 {replacementDataFile?.status === 'COMPLETE' && (
                   <DataFileReplacementPlan
+                    cancelButton={replacementCancelButton}
                     publicationId={publicationId}
                     releaseId={releaseId}
                     fileId={dataFile.id}
                     replacementFileId={replacementDataFile.id}
-                    onCancel={toggleCancelling.on}
                     onReplacement={() => {
                       history.push(
                         generatePath<ReleaseDataFileReplaceRouteParams>(
@@ -240,28 +258,6 @@ const ReleaseDataFileReplacePage = ({
           </>
         )}
       </LoadingSpinner>
-      <ModalConfirm
-        title="Cancel data replacement"
-        open={isCancelling}
-        onExit={toggleCancelling.off}
-        onConfirm={async () => {
-          toggleCancelling.off();
-
-          if (replacementDataFile?.id) {
-            await releaseDataFileService.deleteDataFiles(
-              releaseId,
-              replacementDataFile.id,
-            );
-          }
-
-          fetchDataFile();
-        }}
-      >
-        <p>
-          Are you sure you want to cancel this data replacement? The pending
-          replacement data file will be deleted.
-        </p>
-      </ModalConfirm>
     </>
   );
 };

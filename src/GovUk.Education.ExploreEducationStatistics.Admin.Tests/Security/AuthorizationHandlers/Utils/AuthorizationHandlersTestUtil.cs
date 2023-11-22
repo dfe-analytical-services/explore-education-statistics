@@ -34,18 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
         }
 
-        public static async Task AssertHandlerSucceedsWithCorrectClaims<TRequirement>(
-            IAuthorizationHandler handler,
-            params SecurityClaimTypes[] claimsExpectedToSucceed)
-            where TRequirement : IAuthorizationRequirement
-        {
-            var scenarios = GetClaimTestScenarios(null, claimsExpectedToSucceed);
-            await scenarios
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(scenario =>
-                    AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
-        }
-
         public static async Task AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
             TEntity entity,

@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -19,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 
@@ -50,24 +50,19 @@ public class KeyStatisticService : IKeyStatisticService
     {
         return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
             .OnSuccess(_userService.CheckCanUpdateRelease)
-            .OnSuccess(async _ =>
-                await _persistenceHelper.CheckEntityExists<DataBlock>(request.DataBlockId))
-            .OnSuccess(async dataBlock =>
-                await _context.ReleaseContentBlocks.AnyAsync(rcb =>
-                    rcb.ReleaseId == releaseId
-                    && rcb.ContentBlockId == dataBlock.Id)
-                    ? new Either<ActionResult, DataBlock>(dataBlock)
-                    : ValidationUtils.ValidationActionResult(ContentBlockNotAttachedToRelease)
-            )
-            .OnSuccess(async dataBlock =>
-                await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlock)
+            .OnSuccess(_ => _persistenceHelper.CheckEntityExists<DataBlockVersion>(query =>
+                query.Where(dataBlockVersion => dataBlockVersion.Id == request.DataBlockId
+                                                && dataBlockVersion.ReleaseId == releaseId)))
+            .OnSuccessDo(async dataBlockVersion =>
+                await _dataBlockService.IsUnattachedDataBlock(releaseId, dataBlockVersion)
                     ? new Either<ActionResult, Unit>(Unit.Instance)
-                    : ValidationUtils.ValidationActionResult(DataBlockShouldBeUnattached))
-            .OnSuccess(async _ =>
+                    : ValidationActionResult(DataBlockShouldBeUnattached))
+            .OnSuccess(async dataBlockVersion =>
             {
                 var keyStatisticDataBlock = _mapper.Map<KeyStatisticDataBlock>(request);
                 keyStatisticDataBlock.ReleaseId = releaseId;
                 keyStatisticDataBlock.CreatedById = _userService.GetUserId();
+                keyStatisticDataBlock.DataBlockParentId = dataBlockVersion.DataBlockParentId;
 
                 var currentMaxOrder = await _context.KeyStatistics
                     .Where(ks => ks.ReleaseId == releaseId)
@@ -190,7 +185,7 @@ public class KeyStatisticService : IKeyStatisticService
                         newOrder,
                         keyStatistics.Select(ks => ks.Id)))
                 {
-                    return ValidationUtils.ValidationActionResult(
+                    return ValidationActionResult(
                         ProvidedKeyStatIdsDifferFromReleaseKeyStatIds);
                 }
 

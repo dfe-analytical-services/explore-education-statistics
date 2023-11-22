@@ -14,7 +14,7 @@ const PreReleaseContentPage = ({
   const { releaseId } = match.params;
 
   const { value: content, isLoading } = useAsyncHandledRetry(
-    () => releaseContentService.getContent(releaseId),
+    () => releaseContentService.getContent(releaseId, true),
     [releaseId],
   );
 

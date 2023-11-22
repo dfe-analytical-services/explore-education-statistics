@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
@@ -22,8 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid PublicationId { get; set; }
 
         public string PublicationTitle { get; set; } = string.Empty;
-
-        public string PublicationSummary { get; set; } = string.Empty;
 
         public string PublicationSlug { get; set; } = string.Empty;
 
@@ -51,8 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseType Type { get; set; }
-
-        public Contact Contact { get; set; } = null!;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
@@ -121,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public int Year { get; init; }
     }
 
-    public class ReleaseSummaryViewModel
+    public record ReleaseSummaryViewModel
     {
         public Guid Id { get; init; }
 
@@ -153,8 +150,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public bool Amendment { get; init; }
 
+        public bool LatestRelease { get; init; }
+
         public Guid? PreviousVersionId { get; init; }
 
         public ReleasePermissions? Permissions { get; set; }
+
+        public PublicationSummaryViewModel? Publication { get; set; }
     }
 }

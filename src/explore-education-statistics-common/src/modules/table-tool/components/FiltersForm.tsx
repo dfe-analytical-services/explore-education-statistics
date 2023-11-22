@@ -31,14 +31,12 @@ import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 import { ObjectSchema } from 'yup';
 
-export interface FormValues {
+export interface FiltersFormValues {
   indicators: string[];
   filters: Dictionary<string[]>;
 }
 
-export type FilterFormSubmitHandler = (values: FormValues) => void;
-
-const formId = 'filtersForm';
+export type FilterFormSubmitHandler = (values: FiltersFormValues) => void;
 
 const TableQueryErrorCodes = [
   'QueryExceedsMaxAllowableTableSize',
@@ -64,7 +62,7 @@ interface Props extends InjectedWizardProps {
   ) => void;
 }
 
-const FiltersForm = ({
+export default function FiltersForm({
   initialValues,
   selectedPublication,
   subject,
@@ -73,11 +71,11 @@ const FiltersForm = ({
   onSubmit,
   onTableQueryError,
   ...stepProps
-}: Props) => {
+}: Props) {
   const { goToNextStep, isActive } = stepProps;
 
   const [tableQueryError, setTableQueryError] = useState<TableQueryErrorCode>();
-  const [previousValues, setPreviousValues] = useState<FormValues>();
+  const [previousValues, setPreviousValues] = useState<FiltersFormValues>();
   const [openFilterGroups, setOpenFilterGroups] = useState<string[]>([]);
 
   const initialFormValues = useMemo(() => {
@@ -119,7 +117,7 @@ const FiltersForm = ({
     <WizardStepHeading {...stepProps}>Choose your filters</WizardStepHeading>
   );
 
-  const handleSubmitForm = async (values: FormValues) => {
+  const handleSubmit = async (values: FiltersFormValues) => {
     setPreviousValues({ ...values });
 
     try {
@@ -166,7 +164,7 @@ const FiltersForm = ({
     'order',
   );
 
-  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+  const validationSchema = useMemo<ObjectSchema<FiltersFormValues>>(() => {
     return Yup.object({
       indicators: Yup.array()
         .required('Select at least one option from indicators')
@@ -203,7 +201,7 @@ const FiltersForm = ({
         });
         if (isActive) {
           return (
-            <RHFForm id={formId} showSubmitError onSubmit={handleSubmitForm}>
+            <RHFForm id="filtersForm" onSubmit={handleSubmit}>
               {tableQueryError && formState.submitCount > 0 && (
                 <TableQueryError
                   errorCode={tableQueryError}
@@ -288,7 +286,6 @@ const FiltersForm = ({
                               disabled={formState.isSubmitting}
                               groupLabel={filterGroup.legend}
                               hint={filterGroup.hint}
-                              id={`${formId}-${filterName}`}
                               key={filterKey}
                               legend={filterGroup.legend}
                               name={filterName}
@@ -396,6 +393,4 @@ const FiltersForm = ({
       }}
     </FormProvider>
   );
-};
-
-export default FiltersForm;
+}

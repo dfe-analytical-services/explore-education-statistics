@@ -107,7 +107,7 @@ describe('CommentEditForm', () => {
     render(
       <CommentsContextProvider
         comments={[]}
-        onDelete={noop}
+        onDelete={() => Promise.resolve()}
         onCreate={jest.fn()}
         onUpdate={handleUpdateComment}
         onPendingDelete={noop}

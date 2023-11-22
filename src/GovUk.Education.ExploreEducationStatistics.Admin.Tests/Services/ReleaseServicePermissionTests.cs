@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanAssignPrereleaseContactsToSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(list[0], CanAssignPreReleaseUsersToSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService
@@ -230,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         userService
-                            .Setup(s => s.MatchesPolicy(list[0], CanAssignPrereleaseContactsToSpecificRelease))
+                            .Setup(s => s.MatchesPolicy(list[0], CanAssignPreReleaseUsersToSpecificRelease))
                             .ReturnsAsync(true);
 
                         userService

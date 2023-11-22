@@ -5,19 +5,20 @@ import {
 } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import publicationService from '@admin/services/publicationService';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router-dom';
+import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
+import { useQuery } from '@tanstack/react-query';
+import publicationQueries from '@admin/queries/publicationQueries';
 
 const ReleaseTableToolPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { releaseId, publicationId } = match.params;
+  const { release } = useReleaseContext();
 
-  const { value: publication, isLoading } = useAsyncHandledRetry(
-    () => publicationService.getPublication(publicationId),
-    [releaseId],
+  const { data: publication, isLoading } = useQuery(
+    publicationQueries.get(publicationId),
   );
 
   return (
@@ -37,6 +38,7 @@ const ReleaseTableToolPage = ({
           <ReleasePreviewTableTool
             releaseId={releaseId}
             publication={publication}
+            releaseType={release.type}
           />
         )}
       </LoadingSpinner>

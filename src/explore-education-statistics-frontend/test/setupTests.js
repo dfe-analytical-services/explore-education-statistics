@@ -13,3 +13,6 @@ if (typeof window !== 'undefined') {
   // fetch polyfill for making API calls.
   require('cross-fetch');
 }
+
+global.Request = jest.requireActual('node-fetch').Request;
+global.Response = jest.requireActual('node-fetch').Response;

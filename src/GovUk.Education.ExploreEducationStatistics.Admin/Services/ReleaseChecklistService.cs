@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -25,7 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseChecklistService : IReleaseChecklistService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IDataImportService _dataImportService;
         private readonly IUserService _userService;
         private readonly IDataGuidanceService _dataGuidanceService;
@@ -36,7 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public ReleaseChecklistService(
             ContentDbContext contentDbContext,
-            IPersistenceHelper<ContentDbContext> persistenceHelper,
             IDataImportService dataImportService,
             IUserService userService,
             IDataGuidanceService dataGuidanceService,
@@ -46,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IDataBlockService dataBlockService)
         {
             _contentDbContext = contentDbContext;
-            _persistenceHelper = persistenceHelper;
             _dataImportService = dataImportService;
             _userService = userService;
             _dataGuidanceService = dataGuidanceService;
@@ -58,7 +54,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ReleaseChecklistViewModel>> GetChecklist(Guid releaseId)
         {
-            return await _persistenceHelper.CheckEntityExists<Release>(releaseId, HydrateReleaseForChecklist)
+            return await _contentDbContext
+                .Releases
+                .HydrateReleaseForChecklist()
+                .SingleOrNotFoundAsync(r => r.Id == releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(
                     async release => new ReleaseChecklistViewModel(
@@ -66,12 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await GetWarnings(release)
                     )
                 );
-        }
-
-        public static IQueryable<Release> HydrateReleaseForChecklist(IQueryable<Release> query)
-        {
-            return query.Include(r => r.Publication)
-                .Include(r => r.Updates);
         }
 
         public async Task<List<ReleaseChecklistIssue>> GetErrors(Release release)
@@ -145,9 +138,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<bool> ReleaseHasEmptySection(Guid releaseId, ContentSectionType sectionType)
         {
-            return await _contentDbContext.ContentSections
+            return await _contentDbContext
+                .ContentSections
                 .Where(cs =>
-                    cs.Release.ReleaseId == releaseId &&
+                    cs.ReleaseId == releaseId &&
                     cs.Type == sectionType)
                 .AnyAsync(cs => cs.Content.Count == 0);
         }
@@ -156,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.ContentBlocks
                 .Where(cb =>
-                    cb.ContentSection!.Release.ReleaseId == releaseId &&
+                    cb.ContentSection!.ReleaseId == releaseId &&
                     cb.ContentSection.Type == sectionType)
                 .OfType<HtmlBlock>()
                 .AnyAsync(htmlBlock => string.IsNullOrEmpty(htmlBlock.Body));
@@ -166,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentDbContext.ContentBlocks
                 .Where(cb =>
-                    cb.ContentSection!.Release.ReleaseId == releaseId &&
+                    cb.ContentSection!.ReleaseId == releaseId &&
                     cb.ContentSection.Type == sectionType)
                 .OfType<HtmlBlock>()
                 .AnyAsync(htmlBlock => !string.IsNullOrEmpty(htmlBlock.Body));
@@ -176,7 +170,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var warnings = new List<ReleaseChecklistIssue>();
 
-            var methodologies = await _methodologyVersionRepository.GetLatestVersionByPublication(release.PublicationId);
+            var methodologies = await _methodologyVersionRepository
+                .GetLatestVersionByPublication(release.PublicationId);
+
             if (!methodologies.Any())
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoMethodology));
@@ -218,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 }
             }
 
-            if (release.PreReleaseAccessList.IsNullOrEmpty())
+            if (string.IsNullOrEmpty(release.PreReleaseAccessList))
             {
                 warnings.Add(new ReleaseChecklistIssue(ValidationErrorMessages.NoPublicPreReleaseAccessList));
             }
@@ -245,6 +241,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataBlockIds = dataBlocks.Select(dataBlock => dataBlock.Id);
             return await _contentDbContext.FeaturedTables
                 .AnyAsync(ft => dataBlockIds.Contains(ft.DataBlockId));
+        }
+    }
+
+    public static class ReleaseChecklistQueryableExtensions
+    {
+        public static IQueryable<Release> HydrateReleaseForChecklist(this IQueryable<Release> query)
+        {
+            return query.Include(r => r.Publication)
+                .Include(r => r.Updates);
         }
     }
 }

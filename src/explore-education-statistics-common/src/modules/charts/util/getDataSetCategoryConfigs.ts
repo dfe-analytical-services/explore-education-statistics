@@ -1,6 +1,7 @@
 import {
   DataSet,
   DataSetCategory,
+  DataSetConfiguration,
   ExpandedDataSet,
 } from '@common/modules/charts/types/dataSet';
 import {
@@ -16,6 +17,7 @@ import { colours } from '@common/modules/charts/util/chartUtils';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import generateDefaultDataSetLabel from '@common/modules/charts/util/generateDefaultDataSetLabel';
+import { Filter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { Dictionary } from '@common/types';
 import keyBy from 'lodash/keyBy';
@@ -42,20 +44,32 @@ export interface DataSetCategoryConfig {
  */
 interface Options {
   dataSetCategories: DataSetCategory[];
+  dataSetConfigs?: MapDataSetConfig[];
+  /**
+   * Data classification and data groups are now in `dataSetConfigs`
+   * as they are per data set instead of for all data sets (EES-3858).
+   * The deprecated versions are to retain backwards compatibility
+   * with maps created before this change.
+   * @deprecated
+   */
+  deprecatedDataClassification?: DataGroupingType;
+  /**
+   * @deprecated
+   */
+  deprecatedDataGroups?: number;
+  groupByFilterGroups?: boolean;
   legendItems: LegendItem[];
   meta: FullTableMeta;
-  dataSetConfigs?: MapDataSetConfig[];
-  deprecatedDataGroups?: number;
-  deprecatedDataClassification?: DataGroupingType;
 }
 
 export default function getDataSetCategoryConfigs({
   dataSetCategories,
+  dataSetConfigs,
+  deprecatedDataClassification,
+  deprecatedDataGroups,
+  groupByFilterGroups = false,
   legendItems,
   meta,
-  dataSetConfigs,
-  deprecatedDataGroups,
-  deprecatedDataClassification,
 }: Options): DataSetCategoryConfig[] {
   const legendItemsByDataSet = keyBy(legendItems, item =>
     generateDataSetKey(item.dataSet),
@@ -65,7 +79,7 @@ export default function getDataSetCategoryConfigs({
     generateDataSetKey(item.dataSet),
   );
 
-  const deprecatedGrouping =
+  const deprecatedGrouping: DataGroupingConfig | undefined =
     !dataSetConfigs?.length && deprecatedDataClassification
       ? {
           customGroups: [],
@@ -74,61 +88,87 @@ export default function getDataSetCategoryConfigs({
         }
       : undefined;
 
-  const dataSets = dataSetCategories.flatMap(category => {
-    const dataSetCategoryEntries = Object.entries(category.dataSets);
+  const dataSets = dataSetCategories.reduce<DataSetCategoryConfig[]>(
+    (acc, category) => {
+      Object.entries(category.dataSets).forEach(
+        ([dataSetKey, dataSetValue]) => {
+          acc.push(
+            toLegendConfig({
+              dataSetConfigsByDataSet,
+              dataSetKey,
+              dataSetValue,
+              deprecatedGrouping,
+              filter: groupByFilterGroups ? undefined : category.filter,
+              index: acc.length,
+              legendItemsByDataSet,
+              meta,
+            }),
+          );
+        },
+      );
 
-    return dataSetCategoryEntries.map(
-      ([dataSetKey, dataSetCategory], index) => {
-        const rawDataSet = JSON.parse(dataSetKey);
-        const dataSet = expandDataSet(dataSetCategory.dataSet, meta);
-
-        const matchingLegendItem = legendItemsByDataSet[dataSetKey];
-
-        const legendItemConfig = matchingLegendItem
-          ? omit(matchingLegendItem, 'dataSet')
-          : undefined;
-
-        const getDefaultConfig = (): LegendItemConfiguration => {
-          return {
-            label: generateDefaultDataSetLabel(dataSet, category.filter),
-            colour: colours[index % colours.length],
-          };
-        };
-
-        // Try to match a config from:
-        // - a legend item config
-        // - a data set config (for older charts where no legend items)
-        // - a default config
-        const config =
-          legendItemConfig ??
-          dataSetCategory.dataSet.config ??
-          getDefaultConfig();
-
-        return {
-          config,
-          dataSet,
-          rawDataSet,
-          dataKey: dataSetKey,
-          dataGrouping:
-            deprecatedGrouping ??
-            getGrouping(dataSetConfigsByDataSet, dataSetKey),
-        };
-      },
-    );
-  });
+      return acc;
+    },
+    [],
+  );
 
   return uniqBy(dataSets, dataSet => dataSet.dataKey);
 }
 
-function getGrouping(
-  dataSetConfigsByDataSet: Dictionary<MapDataSetConfig>,
-  dataSetKey: string,
-): DataGroupingConfig {
-  const dataSetConfig = dataSetConfigsByDataSet[dataSetKey];
+function toLegendConfig({
+  dataSetValue,
+  dataSetConfigsByDataSet,
+  dataSetKey,
+  deprecatedGrouping,
+  filter,
+  index,
+  legendItemsByDataSet,
+  meta,
+}: {
+  dataSetValue: {
+    dataSet: DataSetConfiguration;
+    value: number;
+  };
+  dataSetConfigsByDataSet: Dictionary<MapDataSetConfig>;
+  dataSetKey: string;
+  deprecatedGrouping?: DataGroupingConfig;
+  filter?: Filter;
+  index: number;
+  legendItemsByDataSet: Dictionary<LegendItem>;
+  meta: FullTableMeta;
+}): DataSetCategoryConfig {
+  const rawDataSet = JSON.parse(dataSetKey);
 
-  if (!dataSetConfig) {
-    return defaultDataGrouping;
-  }
+  const dataSet = expandDataSet(dataSetValue.dataSet, meta);
 
-  return dataSetConfig.dataGrouping;
+  const matchingLegendItem = legendItemsByDataSet[dataSetKey];
+
+  const legendItemConfig = matchingLegendItem
+    ? omit(matchingLegendItem, 'dataSet')
+    : undefined;
+
+  const getDefaultConfig = (): LegendItemConfiguration => {
+    return {
+      label: generateDefaultDataSetLabel(dataSet, filter),
+      colour: colours[index % colours.length],
+    };
+  };
+
+  // Try to match a config from:
+  // - a legend item config
+  // - a data set config (for older charts where no legend items)
+  // - a default config
+  const config =
+    legendItemConfig ?? dataSetValue.dataSet.config ?? getDefaultConfig();
+
+  const dataGrouping =
+    dataSetConfigsByDataSet[dataSetKey]?.dataGrouping ?? defaultDataGrouping;
+
+  return {
+    config,
+    dataSet,
+    rawDataSet,
+    dataKey: dataSetKey,
+    dataGrouping: deprecatedGrouping ?? dataGrouping,
+  };
 }

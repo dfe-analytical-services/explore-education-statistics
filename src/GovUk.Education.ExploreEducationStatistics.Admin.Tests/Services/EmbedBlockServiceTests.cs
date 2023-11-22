@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -37,13 +36,10 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
+            await context.ContentSections.AddRangeAsync(new ContentSection
             {
-                Release = _release,
-                ContentSection = new ContentSection
-                {
-                    Id = contentSectionId,
-                }
+                Id = contentSectionId,
+                Release = _release
             });
             await context.SaveChangesAsync();
         }
@@ -76,6 +72,7 @@ public class EmbedBlockServiceTests
             var embedBlockLink = Assert.Single(embedBlockLinks);
             Assert.Equal(1, embedBlockLink.Order);
             Assert.Equal(contentSectionId, embedBlockLink.ContentSectionId);
+            Assert.Equal(_release.Id, embedBlockLink.ReleaseId);
 
             var embedBlocks = context.EmbedBlocks.ToList();
             var embedBlock = Assert.Single(embedBlocks);
@@ -93,13 +90,10 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
+            await context.ContentSections.AddRangeAsync(new ContentSection
             {
-                Release = _release,
-                ContentSection = new ContentSection
-                {
-                    Id = contentSectionId,
-                }
+                Id = contentSectionId,
+                Release = _release
             });
             await context.SaveChangesAsync();
         }
@@ -128,10 +122,8 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
                     Content = new()
@@ -139,9 +131,9 @@ public class EmbedBlockServiceTests
                         new HtmlBlock { Order = 1 },
                         new HtmlBlock { Order = 2 },
                         new HtmlBlock { Order = 3 },
-                    }
-                }
-            });
+                    },
+                    Release = _release
+                });
             await context.SaveChangesAsync();
         }
 
@@ -176,6 +168,7 @@ public class EmbedBlockServiceTests
             var embedBlockLink = Assert.Single(embedBlockLinks);
             Assert.Equal(4, embedBlockLink.Order);
             Assert.Equal(contentSectionId, embedBlockLink.ContentSectionId);
+            Assert.Equal(_release.Id, embedBlockLink.ReleaseId);
 
             var embedBlocks = context.EmbedBlocks.ToList();
             var embedBlock = Assert.Single(embedBlocks);
@@ -195,14 +188,12 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
-                }
-            });
+                    Release = _release
+                });
             await context.SaveChangesAsync();
         }
 
@@ -229,14 +220,12 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
-                }
-            });
+                    Release = _release
+                });
             await context.SaveChangesAsync();
         }
 
@@ -256,27 +245,21 @@ public class EmbedBlockServiceTests
     }
 
     [Fact]
-    public async Task Create_ContentSectionAttachedToDifferentRelease()
+    public async Task Create_ContentSectionBelongsToDifferentRelease()
     {
-        var contentSectionId = Guid.NewGuid();
+        var otherRelease = new Release();
+        var relatedContentSection = new ContentSection {
+            Release = _release
+        };
+        var unrelatedContentSection = new ContentSection
+        {
+            Release = otherRelease
+        };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(
-                new ReleaseContentSection
-                {
-                    Release = new Release(),
-                    ContentSection = new ContentSection
-                    {
-                        Id = contentSectionId,
-                    }
-                },
-                new ReleaseContentSection
-                {
-                    Release = _release,
-                    ContentSection = new ContentSection(),
-                });
+            await context.ContentSections.AddRangeAsync(unrelatedContentSection, relatedContentSection);
             await context.SaveChangesAsync();
         }
 
@@ -288,7 +271,7 @@ public class EmbedBlockServiceTests
                 {
                     Title = "Test title",
                     Url = "https://department-for-education.shinyapps.io/test-page",
-                    ContentSectionId = contentSectionId,
+                    ContentSectionId = unrelatedContentSection.Id,
                 });
 
             result.AssertBadRequest(ContentSectionNotAttachedToRelease);
@@ -305,10 +288,8 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
                     Content = new()
@@ -318,10 +299,11 @@ public class EmbedBlockServiceTests
                             Id = contentBlockId,
                             Order = 93,
                             EmbedBlockId = embedBlockId,
-                        },
-                    }
-                }
-            });
+                            Release = _release
+                        }
+                    },
+                    Release = _release
+                });
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -360,6 +342,7 @@ public class EmbedBlockServiceTests
             Assert.Equal(93, embedBlockLink.Order);
             Assert.Equal(contentSectionId, embedBlockLink.ContentSectionId);
             Assert.Equal(embedBlockId, embedBlockLink.EmbedBlockId);
+            Assert.Equal(_release.Id, embedBlockLink.ReleaseId);
 
             var embedBlocks = context.EmbedBlocks.ToList();
             var embedBlock = Assert.Single(embedBlocks);
@@ -379,10 +362,8 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
                     Content = new()
@@ -392,10 +373,11 @@ public class EmbedBlockServiceTests
                             Id = contentBlockId,
                             Order = 93,
                             EmbedBlockId = embedBlockId,
+                            Release = _release
                         },
-                    }
-                }
-            });
+                    },
+                    Release = _release
+                });
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -427,6 +409,7 @@ public class EmbedBlockServiceTests
             Assert.Equal(93, embedBlockLink.Order);
             Assert.Equal(contentSectionId, embedBlockLink.ContentSectionId);
             Assert.Equal(embedBlockId, embedBlockLink.EmbedBlockId);
+            Assert.Equal(_release.Id, embedBlockLink.ReleaseId);
 
             var embedBlocks = context.EmbedBlocks.ToList();
             var embedBlock = Assert.Single(embedBlocks);
@@ -446,10 +429,8 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
                     Content = new()
@@ -459,10 +440,10 @@ public class EmbedBlockServiceTests
                             Id = contentBlockId,
                             Order = 93,
                             EmbedBlockId = embedBlockId,
-                        },
-                    }
-                }
-            });
+                        }
+                    },
+                    Release = _release
+                });
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -497,10 +478,8 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
                     Content = new()
@@ -511,9 +490,9 @@ public class EmbedBlockServiceTests
                             Order = 93,
                             EmbedBlockId = embedBlockId,
                         },
-                    }
-                }
-            });
+                    },
+                    Release = _release
+                });
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -539,38 +518,32 @@ public class EmbedBlockServiceTests
     }
 
     [Fact]
-    public async Task Update_ContentSectionAttachedToDifferentRelease()
+    public async Task Update_ContentSectionBelongsToDifferentRelease()
     {
-        var contentSectionId = Guid.NewGuid();
-        var contentBlockId = Guid.NewGuid();
+        var embedBlockLinkId = Guid.NewGuid();
         var embedBlockId = Guid.NewGuid();
+        var otherRelease = new Release();
+        var unrelatedContentSection = new ContentSection
+        {
+            Content = new()
+            {
+                new EmbedBlockLink
+                {
+                    Id = embedBlockLinkId,
+                    Order = 93,
+                    EmbedBlockId = embedBlockId,
+                }
+            },
+            Release = otherRelease
+        };
+        var relatedContentSection = new ContentSection {
+            Release = _release
+        };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(
-                new ReleaseContentSection
-                {
-                    Release = new Release(),
-                    ContentSection = new ContentSection
-                    {
-                        Id = contentSectionId,
-                        Content = new()
-                        {
-                            new EmbedBlockLink
-                            {
-                                Id = contentBlockId,
-                                Order = 93,
-                                EmbedBlockId = embedBlockId,
-                            },
-                        },
-                    },
-                },
-                new ReleaseContentSection
-                {
-                    Release = _release,
-                    ContentSection = new ContentSection(),
-                });
+            await context.ContentSections.AddRangeAsync(unrelatedContentSection, relatedContentSection);
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -584,7 +557,7 @@ public class EmbedBlockServiceTests
         {
             var service = BuildEmbedBlockService(context);
             var result = await service.Update(_release.Id,
-                contentBlockId,
+                embedBlockLinkId,
                 new EmbedBlockUpdateRequest
                 {
                     Title = "Test title update",
@@ -605,10 +578,8 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
                     Content = new()
@@ -619,9 +590,9 @@ public class EmbedBlockServiceTests
                             Order = 93,
                             EmbedBlockId = embedBlockId,
                         },
-                    }
-                }
-            });
+                    },
+                    Release = _release
+                });
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -659,10 +630,8 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
                     Content = new()
@@ -673,9 +642,9 @@ public class EmbedBlockServiceTests
                             Order = 93,
                             EmbedBlockId = embedBlockId,
                         },
-                    }
-                }
-            });
+                    },
+                    Release = _release
+                });
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -704,10 +673,8 @@ public class EmbedBlockServiceTests
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = _release,
-                ContentSection = new ContentSection
+            await context.ContentSections.AddRangeAsync(
+                new ContentSection
                 {
                     Id = contentSectionId,
                     Content = new()
@@ -717,10 +684,10 @@ public class EmbedBlockServiceTests
                             Id = contentBlockId,
                             Order = 93,
                             EmbedBlockId = embedBlockId,
-                        },
-                    }
-                }
-            });
+                        }
+                    },
+                    Release = _release
+                });
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -740,38 +707,32 @@ public class EmbedBlockServiceTests
     }
 
     [Fact]
-    public async Task Delete_ContentBlockAttachedToDifferentRelease()
+    public async Task Delete_ContentBlockBelongsToDifferentRelease()
     {
-        var contentSectionId = Guid.NewGuid();
-        var contentBlockId = Guid.NewGuid();
         var embedBlockId = Guid.NewGuid();
+        var embedBlockLinkId = Guid.NewGuid();
+        var otherRelease = new Release();
+        var unrelatedContentSection = new ContentSection
+        {
+            Content = new()
+            {
+                new EmbedBlockLink
+                {
+                    Id = embedBlockLinkId,
+                    Order = 93,
+                    EmbedBlockId = embedBlockId
+                }
+            },
+            Release = otherRelease
+        };
+        var relatedContentSection = new ContentSection {
+            Release = _release
+        };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(
-                new ReleaseContentSection
-                {
-                    Release = new Release(),
-                    ContentSection = new ContentSection
-                    {
-                        Id = contentSectionId,
-                        Content = new()
-                        {
-                            new EmbedBlockLink
-                            {
-                                Id = contentBlockId,
-                                Order = 93,
-                                EmbedBlockId = embedBlockId,
-                            },
-                        },
-                    },
-                },
-                new ReleaseContentSection
-                {
-                    Release = _release,
-                    ContentSection = new ContentSection(),
-                });
+            await context.ContentSections.AddRangeAsync(unrelatedContentSection, relatedContentSection);
             await context.EmbedBlocks.AddRangeAsync(new EmbedBlock
             {
                 Id = embedBlockId,
@@ -784,7 +745,7 @@ public class EmbedBlockServiceTests
         await using (var context = InMemoryContentDbContext(contextId))
         {
             var service = BuildEmbedBlockService(context);
-            var result = await service.Delete(_release.Id, contentBlockId);
+            var result = await service.Delete(_release.Id, embedBlockLinkId);
 
             result.AssertBadRequest(ContentBlockNotAttachedToRelease);
         }

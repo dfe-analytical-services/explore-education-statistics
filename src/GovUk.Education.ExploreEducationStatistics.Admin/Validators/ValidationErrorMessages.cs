@@ -5,6 +5,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
     {
         // Slug
         SlugNotUnique,
+        SlugUsedByRedirect,
 
         // Partial date
         PartialDateNotValid,
@@ -12,7 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Content
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
-        IncorrectContentBlockTypeForAttach,
         ContentSectionNotAttachedToRelease,
         ContentBlockNotAttachedToRelease,
         EmbedBlockUrlDomainNotPermitted,

@@ -3,40 +3,33 @@ import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
 import RelatedAside from '@common/components/RelatedAside';
-import SummaryList from '@common/components/SummaryList';
-import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
-import TagGroup from '@common/components/TagGroup';
+import VisuallyHidden from '@common/components/VisuallyHidden';
+import ScrollableContainer from '@common/components/ScrollableContainer';
+import WarningMessage from '@common/components/WarningMessage';
+import ReleaseSummarySection from '@common/modules/release/components/ReleaseSummarySection';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
 import ReleaseDataAndFiles from '@common/modules/release/components/ReleaseDataAndFiles';
+import ReleaseHelpAndSupportSection from '@common/modules/release/components/ReleaseHelpAndSupportSection';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
-import { releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
-import {
-  formatPartialDate,
-  isValidPartialDate,
-} from '@common/utils/date/partialDate';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import PageSearchFormWithAnalytics from '@frontend/components/PageSearchFormWithAnalytics';
 import PrintThisPage from '@frontend/components/PrintThisPage';
 import PublicationSectionBlocks from '@frontend/modules/find-statistics/components/PublicationSectionBlocks';
-import PublicationReleaseHelpAndSupportSection from '@frontend/modules/find-statistics/PublicationReleaseHelpAndSupportSection';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import glossaryService from '@frontend/services/glossaryService';
+import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
+import PublicationReleaseHeadlinesSection from '@frontend/modules/find-statistics/components/PublicationReleaseHeadlinesSection';
+import styles from '@frontend/modules/find-statistics/PublicationReleasePage.module.scss';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import VisuallyHidden from '@common/components/VisuallyHidden';
-import ScrollableContainer from '@common/components/ScrollableContainer';
-import WarningMessage from '@common/components/WarningMessage';
-import withAxiosHandler from '@frontend/middleware/ssr/withAxiosHandler';
-import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
-import styles from './PublicationReleasePage.module.scss';
 
 interface Props {
   release: Release;
@@ -52,7 +45,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   // Re-order updates in descending order in-case the cached
   // release from the content API has not been updated to
   // have the updates in the correct order.
-  const updates = orderBy(release.updates, 'on', 'desc');
+  const releaseUpdates = orderBy(release.updates, 'on', 'desc');
 
   const showAllFilesButton = release.downloadFiles.some(
     file =>
@@ -75,7 +68,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       ]}
     >
       <div className={classNames('govuk-grid-row', styles.releaseIntro)}>
-        {release.publication?.isSuperseded ? (
+        {release.publication?.isSuperseded && (
           <WarningMessage testId="superseded-warning">
             This publication has been superseded by{' '}
             <Link
@@ -85,23 +78,62 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               {release.publication.supersededBy?.title}
             </Link>
           </WarningMessage>
-        ) : null}
+        )}
+
         <div className="govuk-grid-column-two-thirds">
-          <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
-            <div>
-              {!release.publication.isSuperseded && !release.latestRelease && (
-                <Link
-                  className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
-                  unvisited
-                  to={`/find-statistics/${release.publication.slug}`}
-                >
-                  View latest data:{' '}
-                  <span className="govuk-!-font-weight-bold">
-                    {release.publication.releases[0].title}
-                  </span>
-                </Link>
-              )}
-              <TagGroup>
+          <ReleaseSummarySection
+            lastUpdated={releaseUpdates[0]?.on}
+            release={release}
+            releaseDate={release.published}
+            renderReleaseNotes={
+              <>
+                {releaseUpdates.length > 0 && (
+                  <Details
+                    id="releaseLastUpdates"
+                    summary={`See all updates (${releaseUpdates.length})`}
+                    hiddenText={`for ${release.title}`}
+                    onToggle={open => {
+                      if (open) {
+                        logEvent({
+                          category: 'Last Updates',
+                          action: 'Release page last updates dropdown opened',
+                          label: window.location.pathname,
+                        });
+                      }
+                    }}
+                  >
+                    <ol className="govuk-list" data-testid="all-updates">
+                      {releaseUpdates.map(update => (
+                        <li key={update.id}>
+                          <FormattedDate
+                            className="govuk-body govuk-!-font-weight-bold"
+                            testId="update-on"
+                          >
+                            {update.on}
+                          </FormattedDate>
+                          <p data-testid="update-reason">{update.reason}</p>
+                        </li>
+                      ))}
+                    </ol>
+                  </Details>
+                )}
+              </>
+            }
+            renderStatusTags={
+              <>
+                {!release.publication.isSuperseded &&
+                  !release.latestRelease && (
+                    <Link
+                      className="govuk-!-display-none-print govuk-!-display-block govuk-!-margin-bottom-3"
+                      unvisited
+                      to={`/find-statistics/${release.publication.slug}`}
+                    >
+                      View latest data:{' '}
+                      <span className="govuk-!-font-weight-bold">
+                        {release.publication.releases[0].title}
+                      </span>
+                    </Link>
+                  )}
                 {!release.publication.isSuperseded && (
                   <>
                     {release.latestRelease ? (
@@ -111,68 +143,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     )}
                   </>
                 )}
-                {release.type && <Tag>{releaseTypes[release.type]}</Tag>}
-              </TagGroup>
-            </div>
-            {release.type === 'NationalStatistics' && (
-              <img
-                src="/assets/images/UKSA-quality-mark.jpg"
-                alt="UK statistics authority quality mark"
-                height="60"
-                width="60"
-              />
-            )}
-          </div>
-          <SummaryList>
-            <SummaryListItem term="Published">
-              <FormattedDate>{release.published}</FormattedDate>
-            </SummaryListItem>
-            {release.latestRelease &&
-              isValidPartialDate(release.nextReleaseDate) && (
-                <SummaryListItem
-                  term="Next update"
-                  testId="next-update-list-item"
-                >
-                  <time>{formatPartialDate(release.nextReleaseDate)}</time>
-                </SummaryListItem>
-              )}
-
-            {updates.length > 0 ? (
-              <SummaryListItem term="Last updated">
-                <FormattedDate>{updates[0].on}</FormattedDate>
-
-                <Details
-                  id="releaseLastUpdates"
-                  summary={`See all updates (${updates.length})`}
-                  hiddenText={`for ${release.title}`}
-                  onToggle={open => {
-                    if (open) {
-                      logEvent({
-                        category: 'Last Updates',
-                        action: 'Release page last updates dropdown opened',
-                        label: window.location.pathname,
-                      });
-                    }
-                  }}
-                >
-                  <ol className="govuk-list" data-testid="all-updates">
-                    {updates.map(update => (
-                      <li key={update.id}>
-                        <FormattedDate
-                          className="govuk-body govuk-!-font-weight-bold"
-                          testId="update-on"
-                        >
-                          {update.on}
-                        </FormattedDate>
-                        <p data-testid="update-reason">{update.reason}</p>
-                      </li>
-                    ))}
-                  </ol>
-                </Details>
-              </SummaryListItem>
-            ) : null}
-
-            <SummaryListItem term="Receive updates">
+              </>
+            }
+            renderSubscribeLink={
               <Link
                 className="govuk-!-display-none-print govuk-!-font-weight-bold"
                 unvisited
@@ -187,8 +160,16 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               >
                 Sign up for email alerts
               </Link>
-            </SummaryListItem>
-          </SummaryList>
+            }
+            onShowReleaseTypeModal={() =>
+              logEvent({
+                category: `${release.publication.title} release page`,
+                action: 'Release type clicked',
+                label: window.location.pathname,
+              })
+            }
+          />
+
           <VisuallyHidden as="h2">
             {/** 
               Visually hidden h2 as currently the release intro editor only starts from h3
@@ -551,12 +532,16 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         </Accordion>
       )}
 
-      <PublicationReleaseHelpAndSupportSection
-        publicationTitle={release.publication.title}
-        methodologies={release.publication.methodologies}
-        externalMethodology={release.publication.externalMethodology}
-        publicationContact={release.publication.contact}
-        releaseType={release.type}
+      <ReleaseHelpAndSupportSection
+        release={release}
+        renderExternalMethodologyLink={externalMethodology => (
+          <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
+        )}
+        renderMethodologyLink={methodology => (
+          <Link to={`/methodology/${methodology.slug}`}>
+            {methodology.title}
+          </Link>
+        )}
       />
 
       <PrintThisPage

@@ -4,10 +4,14 @@
 .container {
   background: govuk-colour('white');
   border: 1px solid govuk-colour('dark-grey');
-  margin-left: -$dfe-comments-gutter/2;
+  margin-bottom: govuk-spacing(2);
   padding: govuk-spacing(2);
-  position: absolute;
-  top: 0;
-  width: $dfe-comments-width;
-  z-index: 9;
+
+  @include govuk-media-query($from: desktop) {
+    margin-bottom: 0;
+    position: absolute;
+    top: 0;
+    z-index: 9;
+    width: $dfe-comments-width - $dfe-comments-gutter;
+  }
 }

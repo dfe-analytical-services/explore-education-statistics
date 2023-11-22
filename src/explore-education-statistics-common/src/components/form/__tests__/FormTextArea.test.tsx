@@ -1,20 +1,21 @@
-import { render } from '@testing-library/react';
+import FormTextArea from '@common/components/form/FormTextArea';
+import { render, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
-import FormTextArea from '../FormTextArea';
+import userEvent from '@testing-library/user-event';
 
 describe('FormTextArea', () => {
   test('renders correctly with required props', () => {
-    const { container, getByLabelText } = render(
+    const { container } = render(
       <FormTextArea id="test-input" label="Test input" name="testInput" />,
     );
 
-    expect(getByLabelText('Test input')).toBeDefined();
+    expect(screen.getByLabelText('Test input')).toBeDefined();
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders correctly with hint', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -23,14 +24,14 @@ describe('FormTextArea', () => {
       />,
     );
 
-    const hint = getByText('Fill me in');
+    const hint = screen.getByText('Fill me in');
 
     expect(hint.id).toBe('test-input-hint');
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders correctly with error', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -40,14 +41,14 @@ describe('FormTextArea', () => {
       />,
     );
 
-    const error = getByText('Field is required');
+    const error = screen.getByText('Field is required');
 
     expect(error.id).toBe('test-input-error');
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('aria-describedby is equal to the hint id', () => {
-    const { getByLabelText, getByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -57,15 +58,18 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(getByText('Fill me in')).toHaveAttribute('id', 'test-input-hint');
-    expect(getByLabelText('Test input')).toHaveAttribute(
+    expect(screen.getByText('Fill me in')).toHaveAttribute(
+      'id',
+      'test-input-hint',
+    );
+    expect(screen.getByLabelText('Test input')).toHaveAttribute(
       'aria-describedby',
       'test-input-hint',
     );
   });
 
   test('aria-describedby is equal to the error id', () => {
-    const { getByLabelText, getByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -75,18 +79,18 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(getByText('Field is required')).toHaveAttribute(
+    expect(screen.getByText('Field is required')).toHaveAttribute(
       'id',
       'test-input-error',
     );
-    expect(getByLabelText('Test input')).toHaveAttribute(
+    expect(screen.getByLabelText('Test input')).toHaveAttribute(
       'aria-describedby',
       'test-input-error',
     );
   });
 
   test('aria-describedby contains both hint and error ids', () => {
-    const { getByLabelText, getByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -96,21 +100,25 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(getByText('Fill me in')).toHaveAttribute('id', 'test-input-hint');
-    expect(getByText('Field is required')).toHaveAttribute(
+    expect(screen.getByText('Fill me in')).toHaveAttribute(
+      'id',
+      'test-input-hint',
+    );
+    expect(screen.getByText('Field is required')).toHaveAttribute(
       'id',
       'test-input-error',
     );
 
-    const ariaDescribedBy =
-      getByLabelText('Test input').getAttribute('aria-describedby');
+    const ariaDescribedBy = screen
+      .getByLabelText('Test input')
+      .getAttribute('aria-describedby');
 
     expect(ariaDescribedBy).toContain('test-input-error');
     expect(ariaDescribedBy).toContain('test-input-hint');
   });
 
   test('shows a character count message when `maxLength` is above 0', () => {
-    const { queryByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -119,11 +127,13 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(queryByText('You have 10 characters remaining')).not.toBeNull();
+    expect(
+      screen.getByText('You have 10 characters remaining'),
+    ).toBeInTheDocument();
   });
 
   test('aria-describedby contains the character count message id when `maxLength` is above 0', () => {
-    const { getByLabelText, getByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -132,18 +142,18 @@ describe('FormTextArea', () => {
       />,
     );
 
-    const ariaDescribedBy =
-      getByLabelText('Test input').getAttribute('aria-describedby');
+    const ariaDescribedBy = screen
+      .getByLabelText('Test input')
+      .getAttribute('aria-describedby');
 
-    expect(getByText('You have 10 characters remaining')).toHaveAttribute(
-      'id',
-      'test-input-info',
-    );
+    expect(
+      screen.getByText('You have 10 characters remaining'),
+    ).toHaveAttribute('id', 'test-input-info');
     expect(ariaDescribedBy).toContain('test-input-info');
   });
 
   test('does not show a character count message when `maxLength` is below 0', () => {
-    const { queryByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -152,11 +162,13 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(queryByText(/You have .+ characters remaining/)).toBeNull();
+    expect(
+      screen.queryByText(/You have .+ characters remaining/),
+    ).not.toBeInTheDocument();
   });
 
   test('does not show a character count message when `maxLength` is 0', () => {
-    const { queryByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -165,11 +177,13 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(queryByText(/You have .+ characters remaining/)).toBeNull();
+    expect(
+      screen.queryByText(/You have .+ characters remaining/),
+    ).not.toBeInTheDocument();
   });
 
   test('shows correct character count message when difference to `maxLength` is 1', () => {
-    const { queryByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -180,11 +194,13 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(queryByText('You have 1 character remaining')).not.toBeNull();
+    expect(
+      screen.getByText('You have 1 character remaining'),
+    ).toBeInTheDocument();
   });
 
   test('shows correct character count message when difference to `maxLength` is 0', () => {
-    const { queryByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -195,11 +211,13 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(queryByText('You have 0 characters remaining')).not.toBeNull();
+    expect(
+      screen.getByText('You have 0 characters remaining'),
+    ).toBeInTheDocument();
   });
 
   test('shows correct character count message when difference to `maxLength` is -1', () => {
-    const { queryByText } = render(
+    render(
       <FormTextArea
         id="test-input"
         label="Test input"
@@ -210,6 +228,35 @@ describe('FormTextArea', () => {
       />,
     );
 
-    expect(queryByText('You have 1 character too many')).not.toBeNull();
+    expect(
+      screen.getByText('You have 1 character too many'),
+    ).toBeInTheDocument();
+  });
+
+  test('trims on blur by default', () => {
+    render(
+      <FormTextArea id="test-input" label="Test input" name="testInput" />,
+    );
+
+    userEvent.type(screen.getByLabelText('Test input'), '  trim me  ');
+    userEvent.tab();
+    expect(screen.getByLabelText('Test input')).toHaveValue('trim me');
+  });
+
+  test('does not trim on blur when `trimValue` is false', () => {
+    render(
+      <FormTextArea
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        trimValue={false}
+      />,
+    );
+
+    userEvent.type(screen.getByLabelText('Test input'), '   do not trim me  ');
+    userEvent.tab();
+    expect(screen.getByLabelText('Test input')).toHaveValue(
+      '   do not trim me  ',
+    );
   });
 });

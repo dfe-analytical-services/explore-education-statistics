@@ -13,6 +13,7 @@ interface Props {
   captionTitle?: string;
   dataBlockId?: string;
   footnotesClassName?: string;
+  footnotesHeadingHiddenText?: string;
   fullTable: FullTable;
   query?: ReleaseTableDataQuery;
   source?: string;
@@ -26,6 +27,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       captionTitle,
       dataBlockId,
       footnotesClassName,
+      footnotesHeadingHiddenText,
       fullTable,
       query,
       source,
@@ -81,10 +83,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
                 ? `dataTableFootnotes-${dataBlockId}`
                 : 'dataTableFootnotes'
             }
+            footnotesHeadingHiddenText={footnotesHeadingHiddenText}
             ref={dataTableRef}
             footnotes={subjectMeta.footnotes}
             source={source}
-            footnotesHeadingHiddenText={`for ${captionTitle}`}
           />
         </>
       );

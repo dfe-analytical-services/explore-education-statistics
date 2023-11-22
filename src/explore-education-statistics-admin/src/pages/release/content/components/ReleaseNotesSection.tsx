@@ -36,8 +36,6 @@ const emptyReleaseNote: ReleaseNote = {
 const ReleaseNotesSection = ({ release }: Props) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
-  const [deletedReleaseNote, setDeletedReleaseNote] =
-    useState<ReleaseNote>(emptyReleaseNote);
   const [selectedReleaseNote, setSelectedReleaseNote] =
     useState<ReleaseNote>(emptyReleaseNote);
   const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>(
@@ -182,65 +180,58 @@ const ReleaseNotesSection = ({ release }: Props) => {
 
   return (
     releaseNotes && (
-      <>
-        <Details
-          summary={`See all updates (${releaseNotes.length})`}
-          id="releaseNotes"
-          open={editingMode === 'edit'}
-        >
-          <ol className="govuk-list">
-            {releaseNotes.map(elem => (
-              <li key={elem.id}>
-                {editingMode === 'edit' &&
-                editFormOpen &&
-                selectedReleaseNote.id === elem.id ? (
-                  renderEditForm()
-                ) : (
-                  <>
-                    <FormattedDate className="govuk-body govuk-!-font-weight-bold">
-                      {elem.on}
-                    </FormattedDate>
-                    <p>{elem.reason}</p>
+      <Details
+        summary={`See all updates (${releaseNotes.length})`}
+        id="releaseNotes"
+        open={editingMode === 'edit'}
+      >
+        <ol className="govuk-list">
+          {releaseNotes.map(elem => (
+            <li key={elem.id}>
+              {editingMode === 'edit' &&
+              editFormOpen &&
+              selectedReleaseNote.id === elem.id ? (
+                renderEditForm()
+              ) : (
+                <>
+                  <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                    {elem.on}
+                  </FormattedDate>
+                  <p>{elem.reason}</p>
 
-                    {editingMode === 'edit' && (
-                      <ButtonGroup>
-                        <Button
-                          variant="secondary"
-                          onClick={() => openEditForm(elem)}
-                        >
-                          Edit note
-                        </Button>
-                        <Button
-                          variant="warning"
-                          onClick={() => setDeletedReleaseNote(elem)}
-                        >
-                          Remove note
-                        </Button>
-                      </ButtonGroup>
-                    )}
-                  </>
-                )}
-              </li>
-            ))}
-          </ol>
-          {editingMode === 'edit' && renderAddForm()}
-        </Details>
+                  {editingMode === 'edit' && (
+                    <ButtonGroup>
+                      <Button
+                        variant="secondary"
+                        onClick={() => openEditForm(elem)}
+                      >
+                        Edit note
+                      </Button>
 
-        <ModalConfirm
-          open={deletedReleaseNote.id.length > 0}
-          title="Confirm deletion of release note"
-          onExit={() => setDeletedReleaseNote(emptyReleaseNote)}
-          onCancel={() => setDeletedReleaseNote(emptyReleaseNote)}
-          onConfirm={async () => {
-            await releaseNoteService
-              .delete(deletedReleaseNote.id, release.id)
-              .then(setReleaseNotes)
-              .finally(() => setDeletedReleaseNote(emptyReleaseNote));
-          }}
-        >
-          <p>This release note will be removed from this release</p>
-        </ModalConfirm>
-      </>
+                      <ModalConfirm
+                        title="Confirm deletion of release note"
+                        triggerButton={
+                          <Button variant="warning">Remove note</Button>
+                        }
+                        onConfirm={async () => {
+                          await releaseNoteService
+                            .delete(elem.id, release.id)
+                            .then(setReleaseNotes);
+                        }}
+                      >
+                        <p>
+                          This release note will be removed from this release
+                        </p>
+                      </ModalConfirm>
+                    </ButtonGroup>
+                  )}
+                </>
+              )}
+            </li>
+          ))}
+        </ol>
+        {editingMode === 'edit' && renderAddForm()}
+      </Details>
     )
   );
 };

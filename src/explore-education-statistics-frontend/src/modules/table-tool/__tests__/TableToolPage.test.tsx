@@ -332,6 +332,7 @@ describe('TableToolPage', () => {
       latestData: true,
       slug: 'latest-release-slug',
       title: 'Latest Release Title',
+      type: 'OfficialStatistics',
     },
     latestRelease: {
       title: 'Latest Release Title',
@@ -347,6 +348,7 @@ describe('TableToolPage', () => {
       latestData: false,
       slug: 'selected-release-slug',
       title: 'Selected Release Title',
+      type: 'OfficialStatistics',
     },
     latestRelease: {
       title: 'Latest Release Title',

@@ -17,18 +17,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class DeleteSpecificMethodologyAuthorizationHandler
         : AuthorizationHandler<DeleteSpecificMethodologyRequirement, MethodologyVersion>
     {
-        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyRepository _methodologyRepository;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public DeleteSpecificMethodologyAuthorizationHandler(
-            IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyRepository methodologyRepository,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
-            _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyRepository = methodologyRepository;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -36,12 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             DeleteSpecificMethodologyRequirement requirement,
             MethodologyVersion methodologyVersion)
         {
-            // If the Methodology is already public, it cannot be deleted.
-            if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
-            {
-                return;
-            }
-
             if (methodologyVersion.Status == Approved)
             {
                 return;
@@ -56,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var owningPublication =
                 await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
             
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         owningPublication.Id,

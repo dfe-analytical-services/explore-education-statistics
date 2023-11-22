@@ -8,23 +8,17 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStor
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
 {
+    // EES-4640 - ideally this should be renamed to "DataBlockVersionTableResultCacheKey" when DataBlock is removed
+    // from the DataBlock model.
     public class DataBlockTableResultCacheKey : IBlobCacheKey
     {
         private Guid ReleaseId { get; }
         private Guid DataBlockId { get; }
 
-        public DataBlockTableResultCacheKey(ReleaseContentBlock releaseContentBlock)
+        public DataBlockTableResultCacheKey(DataBlockVersion dataBlockVersion)
         {
-            if (!releaseContentBlock.ContentBlock.GetType().IsAssignableFrom(typeof(DataBlock)))
-            {
-                throw new ArgumentException(
-                    $"Attempting to build key with incorrect type of content block - " +
-                    $"{releaseContentBlock.ContentBlock.GetType()}");
-            }
-
-            var release = releaseContentBlock.Release;
-            ReleaseId = release.Id;
-            DataBlockId = releaseContentBlock.ContentBlockId;
+            ReleaseId = dataBlockVersion.ReleaseId;
+            DataBlockId = dataBlockVersion.Id;
         }
 
         public IBlobContainer Container => PrivateContent;

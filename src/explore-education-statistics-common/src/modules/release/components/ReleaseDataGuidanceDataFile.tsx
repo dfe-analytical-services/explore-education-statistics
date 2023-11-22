@@ -97,7 +97,9 @@ const ReleaseDataGuidanceDataFile = ({ subject, renderContent }: Props) => {
         <Details summary="Footnotes">
           <ol data-testid="Footnotes">
             {footnotes.map(footnote => (
-              <li key={footnote.id}>{footnote.label}</li>
+              <li key={footnote.id}>
+                <ContentHtml html={footnote.label} />
+              </li>
             ))}
           </ol>
         </Details>

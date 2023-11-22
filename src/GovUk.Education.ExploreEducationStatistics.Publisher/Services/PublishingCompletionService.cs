@@ -23,6 +23,7 @@ public class PublishingCompletionService : IPublishingCompletionService
     private readonly IPublicationRepository _publicationRepository;
     private readonly IPublicationCacheService _publicationCacheService;
     private readonly IReleaseService _releaseService;
+    private readonly IRedirectsCacheService _redirectsCacheService;
 
     public PublishingCompletionService(ContentDbContext contentDbContext,
         IContentService contentService,
@@ -31,7 +32,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         IReleasePublishingStatusService releasePublishingStatusService,
         IPublicationRepository publicationRepository,
         IPublicationCacheService publicationCacheService,
-        IReleaseService releaseService)
+        IReleaseService releaseService,
+        IRedirectsCacheService redirectsCacheService)
     {
         _contentDbContext = contentDbContext;
         _contentService = contentService;
@@ -41,6 +43,7 @@ public class PublishingCompletionService : IPublishingCompletionService
         _publicationCacheService = publicationCacheService;
         _releaseService = releaseService;
         _publicationRepository = publicationRepository;
+        _redirectsCacheService = redirectsCacheService;
     }
 
     public async Task CompletePublishingIfAllPriorStagesComplete(
@@ -80,7 +83,30 @@ public class PublishingCompletionService : IPublishingCompletionService
 
         await releaseIdsToUpdate
             .ToAsyncEnumerable()
-            .ForEachAwaitAsync(releaseId => _releaseService.SetPublishedDate(releaseId, DateTime.UtcNow));
+            .ForEachAwaitAsync(releaseId => _releaseService.CompletePublishing(releaseId, DateTime.UtcNow));
+
+        await releaseIdsToUpdate
+            .ToAsyncEnumerable()
+            .ForEachAwaitAsync(async releaseId =>
+            {
+                var release = await _releaseService.Get(releaseId);
+                var methodologyVersions =
+                    await _methodologyService.GetLatestVersionByRelease(release);
+
+                if (!methodologyVersions.Any())
+                {
+                    return;
+                }
+
+                foreach (var methodologyVersion in methodologyVersions)
+                {
+                    // WARN: This must be called before PublicationRepository#UpdateLatestPublishedRelease
+                    if (await _methodologyService.IsBeingPublishedAlongsideRelease(methodologyVersion, release))
+                    {
+                        await _methodologyService.Publish(methodologyVersion);
+                    }
+                }
+            });
 
         var publicationSlugs = prePublishingStagesComplete
             .Select(status => status.PublicationSlug)
@@ -95,13 +121,6 @@ public class PublishingCompletionService : IPublishingCompletionService
         await directlyRelatedPublicationIds
             .ToAsyncEnumerable()
             .ForEachAwaitAsync(_publicationRepository.UpdateLatestPublishedRelease);
-
-        // Set the published date on any methodologies used by these publications that are now publicly accessible
-        // as a result of releases being published
-        await directlyRelatedPublicationIds
-            .ToAsyncEnumerable()
-            .ForEachAwaitAsync(publicationId =>
-                _methodologyService.SetPublishedDatesIfApplicable(publicationId));
 
         // Update the cached publication and any cached superseded publications.
         // If this is the first live release of the publication, the superseding is now enforced
@@ -124,6 +143,8 @@ public class PublishingCompletionService : IPublishingCompletionService
         // Update the cached trees in case any methodologies/publications
         // are now accessible for the first time after publishing these releases
         await _contentService.UpdateCachedTaxonomyBlobs();
+
+        await _redirectsCacheService.UpdateRedirects();
 
         await prePublishingStagesComplete
             .ToAsyncEnumerable()

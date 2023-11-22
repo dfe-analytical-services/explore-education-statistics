@@ -30,6 +30,21 @@ describe('createErrorHelper', () => {
       expect(hasError('test')).toBe(false);
     });
 
+    test('gets untouched error message when the form is submitted', () => {
+      const { getError, hasError } = createErrorHelper({
+        errors: {
+          test: 'Please select',
+        },
+        touched: {
+          test: false,
+        },
+        submitCount: 1,
+      });
+
+      expect(getError('test')).toBe('Please select');
+      expect(hasError('test')).toBe(true);
+    });
+
     test('gets nested touched error message', () => {
       const { getError } = createErrorHelper<{ test: { something: string } }>({
         errors: {
@@ -135,6 +150,22 @@ describe('createErrorHelper', () => {
       });
 
       expect(getAllErrors()).toEqual({});
+    });
+
+    test('gets untouched errors when the form is submitted', () => {
+      const { getAllErrors } = createErrorHelper({
+        errors: {
+          test: 'Please select',
+        },
+        touched: {
+          test: false,
+        },
+        submitCount: 1,
+      });
+
+      expect(getAllErrors()).toEqual({
+        test: 'Please select',
+      });
     });
 
     test('gets nested touched errors as single-level object with dot-notation keys', () => {

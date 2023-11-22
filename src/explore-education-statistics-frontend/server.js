@@ -48,7 +48,13 @@ const cspScriptSrc = [
 
 const port = process.env.PORT || 3000;
 const dev = process.env.NODE_ENV !== 'production';
-const app = next({ dev });
+const url = new URL(process.env.PUBLIC_URL);
+
+const app = next({
+  dev,
+  hostname: url.hostname,
+  port: process.env.PORT || 3000,
+});
 const handleRequest = app.getRequestHandler();
 
 async function startServer() {

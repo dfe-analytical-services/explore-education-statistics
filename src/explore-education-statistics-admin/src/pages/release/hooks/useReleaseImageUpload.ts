@@ -1,10 +1,8 @@
 import releaseImageService from '@admin/services/releaseImageService';
-import { ImageUploadResult } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
-import { CancellablePromise } from '@common/types/promise';
 import { useCallback, useRef } from 'react';
 
 interface UseImageUploadReturn {
@@ -15,21 +13,22 @@ interface UseImageUploadReturn {
 export default function useReleaseImageUpload(
   releaseId: string,
 ): UseImageUploadReturn {
-  const promise = useRef<CancellablePromise<ImageUploadResult>>();
+  const abortController = useRef<AbortController>();
 
   const handleImageUpload: ImageUploadHandler = useCallback(
-    async (file, updateProgress) => {
-      promise.current = releaseImageService
-        .upload(releaseId, file, updateProgress)
-        .then() as CancellablePromise<ImageUploadResult>;
+    async (file, onProgress) => {
+      abortController.current = new AbortController();
 
-      return promise.current;
+      return releaseImageService.upload(releaseId, file, {
+        signal: abortController.current.signal,
+        onProgress,
+      });
     },
     [releaseId],
   );
 
   const handleImageUploadCancel: ImageUploadCancelHandler = useCallback(() => {
-    promise.current?.cancel();
+    abortController.current?.abort();
   }, []);
 
   return {

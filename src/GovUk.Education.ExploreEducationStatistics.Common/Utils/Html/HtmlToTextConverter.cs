@@ -12,33 +12,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
 {
     internal class HtmlToTextConverter
     {
-        private readonly StringBuilder _builder = new StringBuilder();
+        private readonly StringBuilder _builder = new();
+
+        public string Convert(INodeList nodes)
+        {
+            _builder.Clear();
+
+            ParseNodes(nodes);
+
+            return Output();
+        }
 
         public string Convert(IElement rootElement)
         {
             _builder.Clear();
 
-            ParseChildren(rootElement, ParseElement);
+            ParseChildren(rootElement);
 
+            return Output();
+        }
+
+        private string Output()
+        {
             var rawLines = _builder.ToString().ToLines();
 
-            // Run post-filtering on lines to remove any extraneous
-            // whitespace from the end of lines. This is mostly for
-            // better compat with editors/IDEs, where whitespace may
-            // be automatically removed upon file save.
-            var filteredBuilder = new StringBuilder();
+            // Run post-filtering on lines to:
+            // 1. Remove any extraneous whitespace from the end of lines. This is
+            // mostly for better compatibility with formatters / editors / IDEs, where
+            // trailing whitespace may be automatically removed upon file save.
+            // 2. Ensure we have CRLF (\r\n) line endings for better compatibility with
+            // our Windows users (the majority of users). Otherwise, line endings
+            // would be server OS dependent and this can lead to inconsistent files.
+            var postFilterBuilder = new StringBuilder();
 
-            rawLines.ForEach(line => filteredBuilder.AppendLine(line.TrimEnd()));
+            rawLines.ForEach(line => postFilterBuilder.AppendCrlfLine(line.TrimEnd()));
 
-            return filteredBuilder.ToString().TrimEnd();
+            return postFilterBuilder.ToString().TrimEnd();
         }
 
-        private void ParseChildren(INode node, Action<IElement> parseChildElement)
+        private void ParseChildren(INode node)
         {
-            ParseNodes(node.ChildNodes, (child, _) => parseChildElement(child));
+            ParseNodes(node.ChildNodes);
         }
 
-        private void ParseNodes(IEnumerable<INode> nodes, Action<IElement, int> parseChildElement)
+        private void ParseNodes(IEnumerable<INode> nodes)
+        {
+            ParseNodes(nodes, (child, _) => ParseElement(child));
+        }
+
+        private void ParseNodes(IEnumerable<INode> nodes, Action<IElement, int> elementParser)
         {
             nodes.ForEach(
                 (node, index) =>
@@ -49,11 +71,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                             return;
 
                         case IElement element:
-                            parseChildElement(element, index);
+                            elementParser(element, index);
                             break;
 
                         case IText text:
-                            ParseTextNode(text);
+                            ParseEdgeNode(text);
                             break;
                     }
                 }
@@ -62,30 +84,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
 
         private void ParseElement(IElement element)
         {
-            // If the previous sibling is a non-empty text node, it may
-            // not have an associated line break, so we should add one
-            // to prevent the current element from being appended
-            // on-top of the text node (this looks broken).
-            if (element.PreviousSibling?.NodeType == NodeType.Text &&
-                element.PreviousSibling?.TextContent?.Trim() != string.Empty)
-            {
-                _builder.AppendLine();
-            }
-
             switch (element.LocalName)
             {
-                case "h1":
-                case "h2":
-                case "h3":
-                case "h4":
-                case "h5":
-                case "h6":
-                case "p":
-                    ParseChildren(element, ParseTextElement);
-                    _builder.AppendLine();
-                    _builder.AppendLine();
-                    break;
-
                 case "ul":
                 case "ol":
                     ParseListElement(element);
@@ -95,49 +95,77 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                     ParseDescriptionListElement(element);
                     break;
 
-                case "blockquote":
-                    if (element.Children.Any())
-                    {
-                        ParseChildren(element, ParseElement);
-                    }
-                    else
-                    {
-                        ParseTextElement(element);
-                        _builder.AppendLine();
-                        _builder.AppendLine();
-                    }
-                    break;
-
-                case "cite":
-                case "figcaption":
-                    _builder.Append('—');
-                    ParseTextElement(element);
-                    _builder.AppendLine();
-                    _builder.AppendLine();
-                    break;
-
-                case "br":
-                    _builder.AppendLine();
-                    break;
-
                 case "hr":
                     _builder.AppendLine("---------------");
-                    _builder.AppendLine();
                     break;
 
                 case "table":
                     ParseTableElement(element);
                     break;
 
-                default:
-                    ParseChildren(element, ParseElement);
+                case "a":
+                    ParseLinkElement(element);
                     break;
+
+                case "br":
+                    _builder.AppendLine();
+                    break;
+
+                case "cite":
+                    _builder.Append("— ");
+                    ParseChildren(element);
+                    break;
+
+                default:
+                {
+                    if (element.HasChildNodes)
+                    {
+                        ParseChildren(element);
+                    }
+                    else
+                    {
+                        ParseEdgeNode(element);
+                    }
+
+                    break;
+                }
+            }
+
+            AddSpacing(element);
+        }
+
+        private void AddSpacing(IElement element)
+        {
+            var next = element.NextNonWhitespaceSibling();
+
+            if (element.IsBlockType() || next is IElement nextElement && nextElement.IsBlockType())
+            {
+                // Get last 4 chars to check their line endings. Windows uses CRLF line endings (\r\n),
+                // so there may be up to 4 chars, instead of 2 for LF (\n) when using Linux / Mac.
+                var currentEnding = _builder.Substring(^4..);
+
+                // If already have two line endings, then don't
+                // append more spacing as this would be excessive.
+                if (currentEnding.EndsWith($"{Environment.NewLine}{Environment.NewLine}"))
+                {
+                    return;
+                }
+
+                // Don't have a trailing line ending currently, so it
+                // should be safe to add an additional line ending to
+                // provide better spacing with the next block.
+                if (!currentEnding.EndsWith(Environment.NewLine))
+                {
+                    _builder.AppendLine();
+                }
+
+                _builder.AppendLine();
             }
         }
 
-        private void ParseTextNode(INode node)
+        private void ParseEdgeNode(INode node)
         {
-            // Text node may be split over multiple lines for
+            // Text may be split over multiple lines for
             // formatting purposes in HTML, but this would
             // lead to unnecessary line breaks in rendered text,
             // so we should remove these line breaks.
@@ -148,31 +176,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                 return;
             }
 
-            // As there are potentially inline elements such as span/strong/em,
-            // we should try and add an extra space to avoid the text bunching up.
-            // We currently only add this if the text content starts with an
-            // alphanumeric character, as we can safely assume this isn't a
+            // There are potentially inline elements such as span/strong/em, so we
+            // should try add extra spacing to avoid text bunching up. To do this,
+            // we need to scan the previous sibling elements of the current node to
+            // check that they actually contain something that can be spaced out.
+            var prev = node.PreviousNonWhitespaceSibling();
+
+            if (prev is null)
+            {
+                // If there is no previous non-whitespace sibling, check the siblings of the parent
+                // (if it's an element) instead. For example, when starting from the
+                // `highlight` text node of `some <strong>highlight</strong>`, we want to be able to
+                // locate the `some ` text node that is adjacent to the parent `<strong>` element.
+                if (node.Parent is IElement parentElement && parentElement.IsInlineType())
+                {
+                    prev = parentElement.PreviousNonWhitespaceSibling();
+                }
+            }
+
+            var hasPreviousInlineSibling =
+                prev is IText ||
+                (prev is not IHtmlBreakRowElement and IElement prevElement && prevElement.IsInlineType());
+
+            // We currently only add extra spacing if the text content starts with an
+            // alphanumeric character as we can safely assume this isn't a
             // punctuation character. Not sure if there may be edge cases to this?
-            if (node.PreviousSibling != null
-                && !(node.PreviousSibling is IHtmlBreakRowElement)
-                && content[0].IsAlphanumericAscii())
+            if (hasPreviousInlineSibling && content[0].IsAlphanumericAscii())
             {
                 _builder.Append(' ');
             }
 
             _builder.Append(content);
+
+            var next = node.NextNonWhitespaceSibling();
+
+            if (next is IElement nextElement && nextElement.IsBlockType())
+            {
+                _builder.AppendLine();
+                _builder.AppendLine();
+            }
         }
 
-        private void ParseTextElement(IElement element)
+        private void ParseLinkElement(IElement element)
         {
-            switch (element.LocalName)
+            ParseChildren(element);
+
+            var href = element.Attributes["href"]?.Value;
+
+            if (!href.IsNullOrWhitespace())
             {
-                case "br":
-                    _builder.AppendLine();
-                    break;
-                default:
-                    ParseTextNode(element);
-                    break;
+                _builder.Append($" ({href})");
             }
         }
 
@@ -180,8 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
         {
             var isOrdered = element.LocalName == "ol";
             var listItems = element.ChildNodes
-                .Where(node => node is IElement { LocalName: "li" })
-                .ToList();
+                .Where(node => node is IElement { LocalName: "li" });
 
             ParseNodes(
                 listItems,
@@ -200,19 +252,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                         .ForEach(
                             (line, lineIndex) =>
                             {
-                                if (lineIndex == 0)
-                                {
-                                    _builder.AppendLine(line);
-                                    return;
-                                }
-
-                                _builder.AppendLine(indent + line);
+                                _builder.AppendLine(lineIndex == 0 ? line : indent + line);
                             }
                         );
                 }
             );
-
-            _builder.AppendLine();
         }
 
         private void ParseDescriptionListElement(IElement element)
@@ -220,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
             const string indentation = "  ";
 
             var listItems = element.ChildNodes
-                .Where(node => node is IElement { LocalName: "dt" } || node is IElement { LocalName: "dd" });
+                .Where(node => node is IElement { LocalName: "dt" } or IElement { LocalName: "dd" });
 
             ParseNodes(
                 listItems,
@@ -243,8 +287,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils.Html
                     }
                 }
             );
-
-            _builder.AppendLine();
         }
 
         private void ParseTableElement(IElement element)

@@ -1,25 +1,32 @@
 import TableToolShare from '@frontend/modules/table-tool/components/TableToolShare';
+import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import {
   testTableHeaders,
   testQuery,
 } from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
-import _permalinkSnapshotService, {
+import _permalinkService, {
   PermalinkSnapshot,
-} from '@common/services/permalinkSnapshotService';
+} from '@common/services/permalinkService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 
-jest.mock('@common/services/permalinkSnapshotService');
+jest.mock('@common/services/permalinkService');
 
-const permalinkSnapshotService = _permalinkSnapshotService as jest.Mocked<
-  typeof _permalinkSnapshotService
+const permalinkService = _permalinkService as jest.Mocked<
+  typeof _permalinkService
 >;
+
+const tableQuery: ReleaseTableDataQuery = {
+  releaseId: 'release-1',
+  ...testQuery,
+};
 
 describe('TableToolShare', () => {
   test('renders the generate button', () => {
     render(
-      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
+      <TableToolShare query={tableQuery} tableHeaders={testTableHeaders} />,
     );
 
     expect(screen.getByText('Save table')).toBeInTheDocument();
@@ -29,11 +36,11 @@ describe('TableToolShare', () => {
   });
 
   test('shows the share link when the button is clicked', async () => {
-    permalinkSnapshotService.createPermalink.mockResolvedValue({
+    permalinkService.createPermalink.mockResolvedValue({
       id: 'permalink-id',
     } as PermalinkSnapshot);
     render(
-      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
+      <TableToolShare query={tableQuery} tableHeaders={testTableHeaders} />,
     );
 
     userEvent.click(
@@ -41,6 +48,18 @@ describe('TableToolShare', () => {
         name: 'Generate shareable link',
       }),
     );
+
+    await waitFor(() => {
+      expect(permalinkService.createPermalink).toHaveBeenCalledWith<
+        Parameters<typeof permalinkService.createPermalink>
+      >({
+        releaseId: 'release-1',
+        query: tableQuery,
+        configuration: {
+          tableHeaders: mapUnmappedTableHeaders(testTableHeaders),
+        },
+      });
+    });
 
     await waitFor(() => {
       expect(screen.getByText('Generated share link')).toBeInTheDocument();
@@ -72,12 +91,12 @@ describe('TableToolShare', () => {
   });
 
   test('copies the link to the clipboard when the copy button is clicked', async () => {
-    permalinkSnapshotService.createPermalink.mockResolvedValue({
+    permalinkService.createPermalink.mockResolvedValue({
       id: 'permalink-id',
     } as PermalinkSnapshot);
 
     render(
-      <TableToolShare query={testQuery} tableHeaders={testTableHeaders} />,
+      <TableToolShare query={tableQuery} tableHeaders={testTableHeaders} />,
     );
 
     userEvent.click(

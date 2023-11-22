@@ -12,9 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class ReleasePublishingStatusRepository : IReleasePublishingStatusRepository
     {
-        private readonly ITableStorageService _publisherTableStorageService;
+        private readonly IPublisherTableStorageService _publisherTableStorageService;
 
-        public ReleasePublishingStatusRepository(ITableStorageService publisherTableStorageService)
+        public ReleasePublishingStatusRepository(IPublisherTableStorageService publisherTableStorageService)
         {
             _publisherTableStorageService = publisherTableStorageService;
         }

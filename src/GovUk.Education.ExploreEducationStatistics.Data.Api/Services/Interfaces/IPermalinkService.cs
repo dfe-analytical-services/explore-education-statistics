@@ -15,10 +15,6 @@ public interface IPermalinkService
     Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(PermalinkCreateRequest request,
         CancellationToken cancellationToken = default);
 
-    Task<Either<ActionResult, PermalinkViewModel>> CreatePermalink(Guid releaseId,
-        PermalinkCreateRequest request,
-        CancellationToken cancellationToken = default);
-
     Task<Either<ActionResult, PermalinkViewModel>> GetPermalink(Guid permalinkId,
         CancellationToken cancellationToken = default);
 

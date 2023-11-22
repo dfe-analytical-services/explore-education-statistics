@@ -1,5 +1,4 @@
 #nullable enable
-
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -118,6 +117,18 @@ public record LocalEnterprisePartnership(string? Code, string? Name) : LocationA
         };
 
     public override int CsvPriority => 7;
+}
+
+public record LocalSkillsImprovementPlanArea(string? Code, string? Name) : LocationAttribute(Code, Name)
+{
+    public override KeyValuePair<string, string>[] CsvValues
+        => new KeyValuePair<string, string>[]
+        {
+            new("lsip_code", Code ?? string.Empty),
+            new("lsip_name", Name ?? string.Empty),
+        };
+
+    public override int CsvPriority => 17;
 }
 
 public record MultiAcademyTrust(string? Code, string? Name) : LocationAttribute(Code, Name)

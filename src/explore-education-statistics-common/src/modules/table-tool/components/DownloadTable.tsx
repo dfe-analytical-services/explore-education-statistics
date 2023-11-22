@@ -1,4 +1,6 @@
-import { Form, FormFieldRadioGroup } from '@common/components/form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -8,7 +10,6 @@ import { Footnote } from '@common/services/types/footnotes';
 import downloadFile from '@common/utils/file/downloadFile';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { Formik } from 'formik';
 import React, { createElement, RefObject } from 'react';
 
 export type FileFormat = 'ods' | 'csv';
@@ -57,18 +58,9 @@ const DownloadTable = ({
   };
 
   return (
-    <Formik<FormValues>
+    <FormProvider
       initialValues={{
         fileFormat: undefined as never,
-      }}
-      onSubmit={async ({ fileFormat }) => {
-        await onSubmit?.(fileFormat);
-
-        if (fileFormat === 'csv') {
-          await handleCsvDownload();
-        } else {
-          await handleOdsDownload();
-        }
       }}
       validationSchema={Yup.object<FormValues>({
         fileFormat: Yup.string()
@@ -76,9 +68,20 @@ const DownloadTable = ({
           .required('Choose a file format'),
       })}
     >
-      {form => {
+      {({ formState }) => {
         return (
-          <Form id="downloadTableForm">
+          <RHFForm
+            id="downloadTableForm"
+            onSubmit={async ({ fileFormat }) => {
+              await onSubmit?.(fileFormat);
+
+              if (fileFormat === 'csv') {
+                await handleCsvDownload();
+              } else {
+                await handleOdsDownload();
+              }
+            }}
+          >
             <>
               {createElement(
                 headingTag,
@@ -87,7 +90,7 @@ const DownloadTable = ({
                 },
                 'Download Table',
               )}
-              <FormFieldRadioGroup<FormValues>
+              <RHFFormFieldRadioGroup<FormValues>
                 legend="Select file format:"
                 legendSize="s"
                 legendWeight="regular"
@@ -108,7 +111,7 @@ const DownloadTable = ({
                 ]}
               />
               <ButtonGroup>
-                <Button type="submit" disabled={form.isSubmitting}>
+                <Button type="submit" disabled={formState.isSubmitting}>
                   Download table
                 </Button>
                 <LoadingSpinner
@@ -116,16 +119,16 @@ const DownloadTable = ({
                   className="govuk-!-margin-left-2"
                   inline
                   hideText
-                  loading={form.isSubmitting}
+                  loading={formState.isSubmitting}
                   size="md"
                   text="Preparing download"
                 />
               </ButtonGroup>
             </>
-          </Form>
+          </RHFForm>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

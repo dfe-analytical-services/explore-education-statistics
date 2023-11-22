@@ -188,18 +188,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var footnoteViewModels = FootnotesViewModelBuilder.BuildFootnotes(footnotes);
 
-            var request = new PermalinkCreateRequest
-            {
-                Configuration = new TableBuilderConfiguration
-                {
-                    TableHeaders = new TableHeaders()
-                },
-                Query =
-                {
-                    SubjectId = subject.Id
-                }
-            };
-
             var tableResult = new TableBuilderResultViewModel
             {
                 SubjectMeta = new SubjectResultMetaViewModel
@@ -275,6 +263,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     indicators[0].Name,
                     indicators[1].Name,
                     indicators[2].Name
+                }
+            };
+
+            var request = new PermalinkCreateRequest
+            {
+                ReleaseId = null,
+                Configuration = new TableBuilderConfiguration
+                {
+                    TableHeaders = new TableHeaders()
+                },
+                Query =
+                {
+                    SubjectId = subject.Id
                 }
             };
 
@@ -519,18 +520,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var footnoteViewModels = FootnotesViewModelBuilder.BuildFootnotes(footnotes);
 
-            var request = new PermalinkCreateRequest
-            {
-                Configuration = new TableBuilderConfiguration
-                {
-                    TableHeaders = new TableHeaders()
-                },
-                Query =
-                {
-                    SubjectId = subject.Id
-                }
-            };
-
             var tableResult = new TableBuilderResultViewModel
             {
                 SubjectMeta = new SubjectResultMetaViewModel
@@ -606,6 +595,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     indicators[0].Name,
                     indicators[1].Name,
                     indicators[2].Name
+                }
+            };
+
+            var request = new PermalinkCreateRequest
+            {
+                ReleaseId = release.Id,
+                Configuration = new TableBuilderConfiguration
+                {
+                    TableHeaders = new TableHeaders()
+                },
+                Query =
+                {
+                    SubjectId = subject.Id
                 }
             };
 
@@ -705,7 +707,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     permalinkCsvMetaService: permalinkCsvMetaService.Object,
                     tableBuilderService: tableBuilderService.Object);
 
-                var result = (await service.CreatePermalink(release.Id, request)).AssertRight();
+                var result = (await service.CreatePermalink(request)).AssertRight();
 
                 MockUtils.VerifyAllMocks(
                     publicBlobStorageService,

@@ -43,16 +43,13 @@ public class ContentBlockServiceTests
         {
             Id = Guid.NewGuid(),
             Content = contentBlocks,
+            Release = release
         };
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(new ReleaseContentSection
-            {
-                Release = release,
-                ContentSection = contentSection,
-            });
+            await context.ContentSections.AddRangeAsync(contentSection);
             await context.SaveChangesAsync();
         }
 
@@ -93,33 +90,29 @@ public class ContentBlockServiceTests
     {
         var contentBlockId = Guid.NewGuid();
 
-        var releaseContentSection = new ReleaseContentSection
+        var contentSection = new ContentSection
         {
-            Release = new Release(),
-            ContentSection = new ContentSection
+            Content = new List<ContentBlock>
             {
-                Content = new List<ContentBlock>
+                new HtmlBlock { Order = 1, },
+                new HtmlBlock { Order = 2, },
+                new DataBlock
                 {
-                    new HtmlBlock { Order = 1, },
-                    new HtmlBlock { Order = 2, },
-                    new DataBlock
-                    {
-                        Id = contentBlockId,
-                        Order = 3,
-                    },
-                    new HtmlBlock { Order = 4, },
-                    new HtmlBlock { Order = 5, },
+                    Id = contentBlockId,
+                    Order = 3,
                 },
-            }
+                new HtmlBlock { Order = 4, },
+                new HtmlBlock { Order = 5, },
+            },
+            Release = new Release()
         };
 
-        var contentSection = releaseContentSection.ContentSection;
         var contentBlocks = contentSection.Content;
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(releaseContentSection);
+            await context.ContentSections.AddRangeAsync(contentSection);
             await context.SaveChangesAsync();
         }
 
@@ -159,33 +152,29 @@ public class ContentBlockServiceTests
     {
         var contentBlockId = Guid.NewGuid();
 
-        var releaseContentSection = new ReleaseContentSection
+        var contentSection = new ContentSection
         {
-            Release = new Release(),
-            ContentSection = new ContentSection
+            Content = new List<ContentBlock>
             {
-                Content = new List<ContentBlock>
+                new HtmlBlock { Order = 1, },
+                new HtmlBlock { Order = 2, },
+                new HtmlBlock
                 {
-                    new HtmlBlock { Order = 1, },
-                    new HtmlBlock { Order = 2, },
-                    new HtmlBlock
-                    {
-                        Id = contentBlockId,
-                        Order = 3,
-                    },
-                    new HtmlBlock { Order = 4, },
-                    new HtmlBlock { Order = 5, },
+                    Id = contentBlockId,
+                    Order = 3,
                 },
-            }
+                new HtmlBlock { Order = 4, },
+                new HtmlBlock { Order = 5, },
+            },
+            Release = new Release()
         };
 
-        var contentSection = releaseContentSection.ContentSection;
         var contentBlocks = contentSection.Content;
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(releaseContentSection);
+            await context.ContentSections.AddRangeAsync(contentSection);
             await context.SaveChangesAsync();
         }
 
@@ -220,36 +209,30 @@ public class ContentBlockServiceTests
     {
         var dataBlockId = Guid.NewGuid();
 
-        var releaseContentSection = new ReleaseContentSection
+        var contentSection = new ContentSection
         {
-            Release = new Release(),
-            ContentSection = new ContentSection
+            Content = new List<ContentBlock>
             {
-                Content = new List<ContentBlock>
+                new HtmlBlock(),
+                new DataBlock { Id = dataBlockId, },
+                new EmbedBlockLink
                 {
-                    new HtmlBlock(),
-                    new DataBlock { Id = dataBlockId, },
-                    new EmbedBlockLink
+                    EmbedBlock = new EmbedBlock
                     {
-                        EmbedBlock = new EmbedBlock
-                        {
-                            Title = "title",
-                            Url = "https://"
-                        }
-                    },
-                    new HtmlBlock(),
-                    new HtmlBlock(),
+                        Title = "title",
+                        Url = "https://"
+                    }
                 },
-            }
+                new HtmlBlock(),
+                new HtmlBlock(),
+            },
+            Release = new Release()
         };
-
-        var contentSection = releaseContentSection.ContentSection;
-        var contentBlocks = contentSection.Content;
 
         var contextId = Guid.NewGuid().ToString();
         await using (var context = InMemoryContentDbContext(contextId))
         {
-            await context.ReleaseContentSections.AddRangeAsync(releaseContentSection);
+            await context.ContentSections.AddRangeAsync(contentSection);
             await context.SaveChangesAsync();
         }
 

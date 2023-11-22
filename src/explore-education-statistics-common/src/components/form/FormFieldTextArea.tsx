@@ -1,6 +1,5 @@
-import FormTextArea, {
-  FormTextAreaProps,
-} from '@common/components/form/FormTextArea';
+import FormTextArea from '@common/components/form/FormTextArea';
+import { FormTextAreaProps } from '@common/components/form/FormBaseTextArea';
 import React from 'react';
 import FormField, { FormFieldComponentProps } from './FormField';
 

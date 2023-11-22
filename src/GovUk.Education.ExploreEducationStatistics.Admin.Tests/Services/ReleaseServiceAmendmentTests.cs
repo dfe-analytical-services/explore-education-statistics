@@ -8,11 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -23,6 +25,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
@@ -34,6 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     {
         private readonly Guid _userId = Guid.NewGuid();
 
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public void CreateReleaseAmendment()
         {
@@ -42,7 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publishedDate = DateTime.UtcNow.AddDays(-1);
             var createdDate = DateTime.UtcNow.AddDays(-2);
             var previousVersionReleaseId = Guid.NewGuid();
-            var version = 2;
             var createdById = Guid.NewGuid();
             var createdBy = new User
             {
@@ -55,37 +59,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseName = "2035";
             var timePeriodCoverage = TimeIdentifier.March;
 
-            var dataBlock1 = new DataBlock
-            {
-                Id = Guid.NewGuid(),
-                Name = "Data Block 1",
-                Order = 2,
-                Comments = new List<Comment>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Content = "Comment 1 Text"
-                    },
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Content = "Comment 2 Text"
-                    }
-                }
-            };
+            var dataBlockParents = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestPublishedVersion(() => _fixture
+                    .DefaultDataBlockVersion()
+                    .WithVersion(0)
+                    .Generate())
+                .GenerateList(3);
 
-            var dataBlock2 = new DataBlock
-            {
-                Id = Guid.NewGuid(),
-                Name = "Data Block 2"
-            };
-
-            var dataBlock3 = new DataBlock
-            {
-                Id = Guid.NewGuid(),
-                Name = "Data block to be used by key stat",
-            };
+            var dataBlock1Parent = dataBlockParents[0];
+            var dataBlock2Parent = dataBlockParents[1];
+            var dataBlock3Parent = dataBlockParents[2];
 
             var embedBlockLink = new EmbedBlockLink
             {
@@ -104,9 +88,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Content = "Embed block comment"
                     },
                 },
+                ReleaseId = releaseId
             };
 
-            var release = new Release
+            var originalRelease = new Release
             {
                 Id = releaseId,
                 Type = ReleaseType.OfficialStatistics,
@@ -120,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 NotifiedOn = DateTime.UtcNow,
                 NotifySubscribers = true,
                 UpdatePublishedDate = true,
-                Version = version,
+                Version = 2,
                 PreviousVersionId = previousVersionReleaseId,
                 Created = createdDate,
                 CreatedBy = createdBy,
@@ -176,160 +161,115 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new KeyStatisticText { Title = "key stat text", },
                     new KeyStatisticDataBlock
                     {
-                        DataBlock = dataBlock3,
+                        DataBlock = dataBlock3Parent.LatestPublishedVersion!.ContentBlock,
                     },
                 },
-                Content = new List<ReleaseContentSection>
-                {
-                    new()
+                Content = ListOf(
+                    new ContentSection
                     {
-                        ReleaseId = Guid.NewGuid(),
-                        ContentSection = new ContentSection
+                        Id = Guid.NewGuid(),
+                        Caption = "Template caption index 0",
+                        Heading = "Template heading index 0",
+                        Type = ContentSectionType.Generic,
+                        Order = 1,
+                        Content = new List<ContentBlock>
                         {
-                            Id = Guid.NewGuid(),
-                            Caption = "Template caption index 0",
-                            Heading = "Template heading index 0",
-                            Type = ContentSectionType.Generic,
-                            Order = 1,
-                            Content = new List<ContentBlock>
+                            new HtmlBlock
                             {
-                                new HtmlBlock
+                                Id = Guid.NewGuid(),
+                                Body = @"<div></div>",
+                                Order = 1,
+                                Comments = new List<Comment>
                                 {
-                                    Id = Guid.NewGuid(),
-                                    Body = @"<div></div>",
-                                    Order = 1,
-                                    Comments = new List<Comment>
+                                    new()
                                     {
-                                        new()
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Content = "Comment 1 Text"
-                                        },
-                                        new Comment
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Content = "Comment 2 Text"
-                                        }
+                                        Id = Guid.NewGuid(),
+                                        Content = "Comment 1 Text"
+                                    },
+                                    new Comment
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Content = "Comment 2 Text"
                                     }
-                                },
-                                dataBlock1,
-                                embedBlockLink,
-                            }
+                                }
+                            },
+                            dataBlock1Parent.LatestPublishedVersion!.ContentBlock,
+                            embedBlockLink,
                         }
                     },
-
-                    new()
+                    new ContentSection
                     {
-                        ReleaseId = Guid.NewGuid(),
-                        ContentSection = new ContentSection
+                        Id = Guid.NewGuid(),
+                        Caption = "Template caption index 1",
+                        Heading = "Template heading index 1",
+                        Type = ContentSectionType.Generic,
+                        Order = 2,
+                        Content = new List<ContentBlock>
                         {
-                            Id = Guid.NewGuid(),
-                            Caption = "Template caption index 1",
-                            Heading = "Template heading index 1",
-                            Type = ContentSectionType.Generic,
-                            Order = 2,
-                            Content = new List<ContentBlock>
+                            new MarkDownBlock
                             {
-                                new MarkDownBlock
+                                Id = Guid.NewGuid(),
+                                Body = "Text",
+                                Comments = new List<Comment>
                                 {
-                                    Id = Guid.NewGuid(),
-                                    Body = "Text",
-                                    Comments = new List<Comment>
+                                    new()
                                     {
-                                        new()
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Content = "Inset Comment 1 Text"
-                                        }
+                                        Id = Guid.NewGuid(),
+                                        Content = "Inset Comment 1 Text"
                                     }
                                 }
                             }
                         }
                     },
-
-                    new()
+                    new ContentSection
                     {
-                        ReleaseId = Guid.NewGuid(),
-                        ContentSection = new ContentSection
+                        Id = Guid.NewGuid(),
+                        Caption = "Template caption index 2",
+                        Heading = "Template heading index 2",
+                        Type = ContentSectionType.Headlines,
+                        Order = 1,
+                        Content = new List<ContentBlock>
                         {
-                            Id = Guid.NewGuid(),
-                            Caption = "Template caption index 2",
-                            Heading = "Template heading index 2",
-                            Type = ContentSectionType.Headlines,
-                            Order = 1,
-                            Content = new List<ContentBlock>
+                            new MarkDownBlock
                             {
-                                new MarkDownBlock
+                                Id = Guid.NewGuid(),
+                                Body = "Text",
+                                Comments = new List<Comment>
                                 {
-                                    Id = Guid.NewGuid(),
-                                    Body = "Text",
-                                    Comments = new List<Comment>
+                                    new()
                                     {
-                                        new()
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Content = "Inset Comment 1 Text"
-                                        }
+                                        Id = Guid.NewGuid(),
+                                        Content = "Inset Comment 1 Text"
                                     }
                                 }
                             }
                         }
                     },
-                    new()
+                    new ContentSection
                     {
-                        ReleaseId = Guid.NewGuid(),
-                        ContentSection = new ContentSection
+                        Id = Guid.NewGuid(),
+                        Type = ContentSectionType.RelatedDashboards,
+                        Order = 0,
+                        Content = new List<ContentBlock>
                         {
-                            Id = Guid.NewGuid(),
-                            Type = ContentSectionType.RelatedDashboards,
-                            Order = 0,
-                            Content = new List<ContentBlock>
+                            new HtmlBlock
                             {
-                                new HtmlBlock
+                                Id = Guid.NewGuid(),
+                                Body = "RelatedDashboards text",
+                                Comments = new List<Comment>
                                 {
-                                    Id = Guid.NewGuid(),
-                                    Body = "RelatedDashboards text",
-                                    Comments = new List<Comment>
+                                    new()
                                     {
-                                        new()
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Content = "RelatedDashboards comment"
-                                        }
+                                        Id = Guid.NewGuid(),
+                                        Content = "RelatedDashboards comment"
                                     }
                                 }
                             }
                         }
-                    }
-                },
-
-                ContentBlocks = new List<ReleaseContentBlock>
-                {
-                    new()
-                    {
-                        ReleaseId = releaseId,
-                        ContentBlock = dataBlock1,
-                        ContentBlockId = dataBlock1.Id,
-                    },
-                    new()
-                    {
-                        ReleaseId = releaseId,
-                        ContentBlock = dataBlock2,
-                        ContentBlockId = dataBlock2.Id,
-                    },
-                    new()
-                    {
-                        ReleaseId = releaseId,
-                        ContentBlock = dataBlock3,
-                        ContentBlockId = dataBlock3.Id,
-                    },
-                    new()
-                    {
-                        ReleaseId = releaseId,
-                        ContentBlock = embedBlockLink,
-                        ContentBlockId = embedBlockLink.Id,
-                    },
-                },
+                    }),
+                DataBlockVersions = dataBlockParents
+                    .Select(dataBlockParent => dataBlockParent.LatestPublishedVersion!)
+                    .ToList()
             };
 
             var approverReleaseRole = new UserReleaseRole
@@ -337,7 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 Role = ReleaseRole.Approver,
-                Release = release,
+                Release = originalRelease,
                 ReleaseId = releaseId
             };
 
@@ -346,7 +286,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 Role = ReleaseRole.Contributor,
-                Release = release,
+                Release = originalRelease,
                 ReleaseId = releaseId
             };
 
@@ -355,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 Role = ReleaseRole.Lead,
-                Release = release,
+                Release = originalRelease,
                 ReleaseId = releaseId,
                 Deleted = DateTime.UtcNow,
                 DeletedById = Guid.NewGuid(),
@@ -366,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
                 UserId = Guid.NewGuid(),
                 Role = ReleaseRole.PrereleaseViewer,
-                Release = release,
+                Release = originalRelease,
                 ReleaseId = releaseId,
                 Deleted = DateTime.UtcNow,
                 DeletedById = Guid.NewGuid(),
@@ -399,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new()
                 {
                     Id = Guid.NewGuid(),
-                    Release = release,
+                    Release = originalRelease,
                     ReleaseId = releaseId,
                     File = dataFile1,
                     FileId = dataFile1.Id
@@ -407,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new()
                 {
                     Id = Guid.NewGuid(),
-                    Release = release,
+                    Release = originalRelease,
                     ReleaseId = releaseId,
                     File = dataFile2,
                     FileId = dataFile2.Id
@@ -435,18 +375,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Contact = new Contact(),
                     Releases = new List<Release>
                     {
-                        release
+                        originalRelease
                     }
                 });
-
                 contentDbContext.Add(createdBy);
                 contentDbContext.Add(new User
                 {
                     Id = _userId
                 });
-                contentDbContext.AddRange(userReleaseRoles);
-                contentDbContext.AddRange(releaseFiles);
-
+                contentDbContext.UserReleaseRoles.AddRange(userReleaseRoles);
+                contentDbContext.ReleaseFiles.AddRange(releaseFiles);
+                // contentDbContext.DataBlockParents.AddRange(dataBlock1Parent, dataBlock2Parent, dataBlock3Parent);
+                // contentDbContext.ContentBlocks.AddRange(embedBlockLink);
                 contentDbContext.SaveChanges();
             }
 
@@ -454,8 +394,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 statisticsDbContext.Release.Add(new Data.Model.Release
                 {
-                    Id = release.Id,
-                    PublicationId = release.PublicationId,
+                    Id = originalRelease.Id,
+                    PublicationId = originalRelease.PublicationId,
                 });
 
                 statisticsDbContext.Subject.AddRange(subject1, subject2);
@@ -498,7 +438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 MockUtils.VerifyAllMocks(footnoteService);
 
-                Assert.NotEqual(release.Id, amendmentViewModel.Id);
+                Assert.NotEqual(originalRelease.Id, amendmentViewModel.Id);
                 Assert.NotEqual(Guid.Empty, amendmentViewModel.Id);
                 newReleaseId = amendmentViewModel.Id;
             }
@@ -507,23 +447,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var amendment = contentDbContext
                     .Releases
-                    .Include(r => r.PreviousVersion)
-                    .Include(r => r.CreatedBy)
-                    .Include(r => r.Publication)
-                    .Include(r => r.Content)
-                    .ThenInclude(c => c.ContentSection)
-                    .ThenInclude(c => c.Content)
-                    .ThenInclude(c => c.Comments)
-                    .Include(r => r.Content)
-                    .ThenInclude(c => c.ContentSection)
-                    .ThenInclude(c => c.Content)
-                    .ThenInclude(c => (c as EmbedBlockLink)!.EmbedBlock)
-                    .Include(r => r.Updates)
-                    .Include(r => r.KeyStatistics)
-                    .ThenInclude(ks => (ks as KeyStatisticDataBlock)!.DataBlock)
-                    .Include(r => r.ContentBlocks)
-                    .ThenInclude(r => r.ContentBlock)
+                    .Include(release => release.PreviousVersion)
+                    .Include(release => release.CreatedBy)
+                    .Include(release => release.Publication)
+                    .Include(release => release.Content)
+                    .ThenInclude(section => section.Content)
+                    .ThenInclude(section => section.Comments)
+                    .Include(release => release.Content)
+                    .ThenInclude(section => section.Content)
+                    .ThenInclude(section => (section as EmbedBlockLink)!.EmbedBlock)
+                    .Include(release => release.DataBlockVersions)
+                    .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestDraftVersion)
+                    .Include(release => release.DataBlockVersions)
+                    .ThenInclude(dataBlockVersion => dataBlockVersion.DataBlockParent)
+                    .ThenInclude(dataBlockParent => dataBlockParent.LatestPublishedVersion)
+                    .Include(release => release.DataBlockVersions)
+                    .Include(release => release.Updates)
+                    .Include(release => release.KeyStatistics)
+                    .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
                     .First(r => r.Id == newReleaseId);
+
+                var amendmentContentBlocks = contentDbContext
+                    .ContentBlocks
+                    .Where(block => block.ReleaseId == amendment.Id)
+                    .ToList();
 
                 // check fields that should be set to new values for an amendment, rather than copied from its original
                 // Release
@@ -533,10 +481,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(amendment.UpdatePublishedDate);
                 Assert.Null(amendment.PublishScheduled);
                 Assert.Null(amendment.Published);
-                Assert.Equal(release.Version + 1, amendment.Version);
+                Assert.Equal(originalRelease.Version + 1, amendment.Version);
                 Assert.Equal(ReleaseApprovalStatus.Draft, amendment.ApprovalStatus);
-                Assert.Equal(release.Id, amendment.PreviousVersion?.Id);
-                Assert.Equal(release.Id, amendment.PreviousVersionId);
+                Assert.Equal(originalRelease.Id, amendment.PreviousVersion?.Id);
+                Assert.Equal(originalRelease.Id, amendment.PreviousVersionId);
                 Assert.Equal(_userId, amendment.CreatedBy.Id);
                 Assert.Equal(_userId, amendment.CreatedById);
                 Assert.InRange(DateTime.UtcNow.Subtract(amendment.Created).Milliseconds, 0, 1500);
@@ -547,27 +495,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(timePeriodCoverage, amendment.TimePeriodCoverage);
                 Assert.Equal(publicationId, amendment.PublicationId);
 
-                Assert.Equal(release.RelatedInformation.Count, amendment.RelatedInformation.Count);
+                Assert.Equal(originalRelease.RelatedInformation.Count, amendment.RelatedInformation.Count);
                 amendment.RelatedInformation.ForEach(amended =>
                 {
                     var index = amendment.RelatedInformation.IndexOf(amended);
-                    var previous = release.RelatedInformation[index];
+                    var previous = originalRelease.RelatedInformation[index];
                     AssertAmendedLinkCorrect(amended, previous);
                 });
 
-                Assert.Equal(release.Updates.Count, amendment.Updates.Count);
+                Assert.Equal(originalRelease.Updates.Count, amendment.Updates.Count);
                 amendment.Updates.ForEach(amended =>
                 {
                     var index = amendment.Updates.IndexOf(amended);
-                    var previous = release.Updates[index];
+                    var previous = originalRelease.Updates[index];
                     AssertAmendedUpdateCorrect(amended, previous, amendment);
                 });
 
-                Assert.Equal(release.Content.Count, amendment.Content.Count);
+                Assert.Equal(originalRelease.Content.Count, amendment.Content.Count);
                 amendment.Content.ForEach(amended =>
                 {
                     var index = amendment.Content.IndexOf(amended);
-                    var previous = release.Content[index];
+                    var previous = originalRelease.Content[index];
                     AssertAmendedContentSectionCorrect(amendment, amended, previous);
                 });
 
@@ -576,41 +524,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var amendmentKeyStatText = Assert.IsType<KeyStatisticText>(amendment
                     .KeyStatistics.Find(ks => ks.GetType() == typeof(KeyStatisticText)));
                 Assert.Equal((
-                    release.KeyStatistics[0] as KeyStatisticText)!.Title, amendmentKeyStatText.Title);
-                Assert.NotEqual(release.KeyStatistics[0].Id, amendmentKeyStatText.Id);
+                    originalRelease.KeyStatistics[0] as KeyStatisticText)!.Title, amendmentKeyStatText.Title);
+                Assert.NotEqual(originalRelease.KeyStatistics[0].Id, amendmentKeyStatText.Id);
+                Assert.Equal(8, amendmentContentBlocks.Count);
+
+                // Assert that the original DataBlocks are cloned into the Release Amendment.
+                var amendmentDataBlockVersions = amendment.DataBlockVersions.ToList();
+                Assert.Equal(3, amendmentDataBlockVersions.Count);
+
+                // Assert that each DataBlock has a new version created by the amendment process.
+                // The new DataBlockVersion should now be the LatestDraftVersion of its parent but not
+                // the LatestPublishedVersion (which should not have changed).
+                amendmentDataBlockVersions.ForEach(dataBlockVersion =>
+                {
+                    var dataBlockVersionsForParent = contentDbContext
+                        .DataBlockVersions
+                        .Where(version => version.DataBlockParentId == dataBlockVersion.DataBlockParentId)
+                        .ToList();
+
+                    Assert.Equal(2, dataBlockVersionsForParent.Count);
+                    Assert.Equal(0, dataBlockVersionsForParent[0].Version);
+                    Assert.Equal(1, dataBlockVersionsForParent[1].Version);
+
+                    Assert.Equal(dataBlockVersion, dataBlockVersion.DataBlockParent.LatestDraftVersion);
+                    Assert.NotEqual(dataBlockVersion, dataBlockVersion.DataBlockParent.LatestPublishedVersion);
+                });
+
+                var amendmentContentBlock1 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock1Parent);
+                var amendmentContentBlock2 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock2Parent);
+                var amendmentContentBlock3 = GetMatchingDataBlock(amendmentDataBlockVersions, dataBlock3Parent);
 
                 var amendmentKeyStatDataBlock = Assert.IsType<KeyStatisticDataBlock>(amendment
                     .KeyStatistics.Find(ks => ks.GetType() == typeof(KeyStatisticDataBlock)));
-                Assert.Equal(dataBlock3.Name, amendmentKeyStatDataBlock.DataBlock.Name);
-                Assert.NotEqual(release.KeyStatistics[1].Id, amendmentKeyStatDataBlock.Id);
-                Assert.NotEqual(dataBlock3.Id, amendmentKeyStatDataBlock.DataBlockId);
-                var amendmentDataBlock3 = Assert.IsType<DataBlock>(amendment.ContentBlocks[2].ContentBlock);
-                Assert.Equal(amendmentDataBlock3.Id, amendmentKeyStatDataBlock.DataBlockId);
+                Assert.Equal(dataBlock3Parent.LatestDraftVersion.Name, amendmentKeyStatDataBlock.DataBlock.Name);
+                Assert.NotEqual(originalRelease.KeyStatistics[1].Id, amendmentKeyStatDataBlock.Id);
+                Assert.NotEqual(dataBlock3Parent.LatestDraftVersion.Id, amendmentKeyStatDataBlock.DataBlockId);
+                Assert.Equal(amendmentContentBlock3.Id, amendmentKeyStatDataBlock.DataBlockId);
 
-                Assert.Equal(release.ContentBlocks.Count, amendment.ContentBlocks.Count);
-                var amendmentContentBlock1 = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
-                var amendmentContentBlock2 = Assert.IsType<DataBlock>(amendment.ContentBlocks[1].ContentBlock);
-                var amendmentContentBlock3 = Assert.IsType<DataBlock>(amendment.ContentBlocks[2].ContentBlock);
-                var amendmentContentBlock4 = Assert.IsType<EmbedBlockLink>(amendment.ContentBlocks[3].ContentBlock);
-
-                var amendmentContentBlock1InContent = amendment.Content[0].ContentSection.Content[0];
+                var amendmentContentBlock1InContent = amendment.Content[0].Content[0];
 
                 // Check that the DataBlock that is included in this Release amendment's Content is successfully
                 // identified as the exact same DataBlock that is attached to the Release amendment through the
                 // additional "Release.ContentBlocks" relationship (which is used to determine which Data Blocks
                 // belong to which Release when a Data Block has not yet been - or is removed from - the Release's
                 // Content
-                Assert.NotEqual(dataBlock1.Id, amendmentContentBlock1.Id);
-                Assert.Equal(dataBlock1.Name, amendmentContentBlock1.Name);
+                Assert.NotEqual(dataBlock1Parent.LatestDraftVersion.Id, amendmentContentBlock1.Id);
+                Assert.Equal(dataBlock1Parent.LatestDraftVersion.Name, amendmentContentBlock1.Name);
                 Assert.Equal(amendmentContentBlock1, amendmentContentBlock1InContent);
 
                 // and check that the Data Block that is not yet included in any content is copied across OK still
-                Assert.NotEqual(dataBlock2.Id, amendmentContentBlock2.Id);
-                Assert.Equal(dataBlock2.Name, amendmentContentBlock2.Name);
+                Assert.NotEqual(dataBlock2Parent.LatestDraftVersion.Id, amendmentContentBlock2.Id);
 
                 // and check DataBlock previously associated with key stat is copied correctly
-                Assert.NotEqual(dataBlock3.Id, amendmentContentBlock3.Id);
-                Assert.Equal(dataBlock3.Name, amendmentContentBlock3.Name);
+                Assert.NotEqual(dataBlock3Parent.LatestDraftVersion.Id, amendmentContentBlock3.Id);
+
+                var amendmentEmbedBlocks = amendmentContentBlocks.OfType<EmbedBlockLink>().ToList();
+                var amendmentContentBlock4 = Assert.Single(amendmentEmbedBlocks);
 
                 Assert.NotEqual(embedBlockLink.Id, amendmentContentBlock4.Id);
                 Assert.NotEqual(embedBlockLink.EmbedBlockId, amendmentContentBlock4.EmbedBlockId);
@@ -655,7 +624,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     f.File.Filename == amendmentDataFile2.File.Filename);
                 AssertAmendedReleaseFileCorrect(originalFile2, amendmentDataFile2, amendment);
 
-                Assert.Equal(release.PreReleaseAccessList, amendment.PreReleaseAccessList);
+                Assert.Equal(originalRelease.PreReleaseAccessList, amendment.PreReleaseAccessList);
 
                 Assert.True(amendment.Amendment);
             }
@@ -672,6 +641,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Contains(subject1.Id, releaseSubjectLinks.Select(r => r.SubjectId));
                 Assert.Contains(subject2.Id, releaseSubjectLinks.Select(r => r.SubjectId));
             }
+        }
+
+        private static DataBlock GetMatchingDataBlock(List<DataBlockVersion> amendmentDataBlockVersions, DataBlockParent dataBlockToFind)
+        {
+            return amendmentDataBlockVersions
+                .Where(dataBlockVersion => dataBlockVersion.Name == dataBlockToFind.LatestDraftVersion.Name)
+                .Select(dataBlockParent => dataBlockParent.ContentBlock)
+                .Single();
         }
 
         private static void AssertAmendedLinkCorrect(Link amended, Link previous)
@@ -694,16 +671,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-        private static void AssertAmendedContentSectionCorrect(Release amendment, ReleaseContentSection amended,
-            ReleaseContentSection previous)
+        private static void AssertAmendedContentSectionCorrect(
+            Release amendment,
+            ContentSection amendedSection,
+            ContentSection previousSection)
         {
-            Assert.Equal(amendment, amended.Release);
-            Assert.Equal(amendment.Id, amended.ReleaseId);
-            Assert.True(amended.ContentSectionId != Guid.Empty);
-            Assert.NotEqual(previous.ContentSectionId, amended.ContentSectionId);
-
-            var previousSection = previous.ContentSection;
-            var amendedSection = amended.ContentSection;
+            Assert.Equal(amendment, amendedSection.Release);
+            Assert.Equal(amendment.Id, amendedSection.ReleaseId);
+            Assert.True(amendedSection.Id != Guid.Empty);
+            Assert.NotEqual(previousSection.Id, amendedSection.Id);
 
             Assert.NotEqual(previousSection.Id, amendedSection.Id);
             Assert.Equal(previousSection.Caption, amendedSection.Caption);

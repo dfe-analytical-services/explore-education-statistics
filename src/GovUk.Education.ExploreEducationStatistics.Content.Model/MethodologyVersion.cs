@@ -29,7 +29,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string? AlternativeTitle { get; set; }
 
-        public string Slug => Methodology.Slug;
+        public string Slug => AlternativeSlug ?? Methodology.OwningPublicationSlug;
+
+        public string? AlternativeSlug { get; set; }
 
         public MethodologyApprovalStatus Status { get; set; }
 
@@ -40,8 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public MethodologyVersionContent MethodologyContent { get; set; } = new();
 
         public List<MethodologyNote> Notes { get; set; } = new();
-
-        public string? InternalReleaseNote { get; set; }
 
         public Methodology Methodology { get; set; } = null!;
 
@@ -109,7 +109,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.ScheduledWithRelease = null;
             copy.ScheduledWithReleaseId = null;
             copy.Methodology = null!;
-            copy.InternalReleaseNote = null;
 
             copy.MethodologyContent = MethodologyContent.Clone(createdDate);
 
@@ -145,5 +144,3 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
     }
 }
-
-

@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.20")
+                .HasAnnotation("ProductVersion", "6.0.21")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -324,6 +324,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("LocalEnterprisePartnership_Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("LocalSkillsImprovementPlanArea_Code")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("LocalSkillsImprovementPlanArea_Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("MayoralCombinedAuthority_Code")
                         .HasColumnType("nvarchar(450)");
 
@@ -404,6 +410,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasIndex("LocalAuthority_OldCode");
 
                     b.HasIndex("LocalEnterprisePartnership_Code");
+
+                    b.HasIndex("LocalSkillsImprovementPlanArea_Code");
 
                     b.HasIndex("MayoralCombinedAuthority_Code");
 

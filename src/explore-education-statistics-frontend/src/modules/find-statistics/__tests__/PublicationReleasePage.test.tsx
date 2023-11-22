@@ -293,7 +293,7 @@ describe('PublicationReleasePage', () => {
       />,
     );
 
-    const nextUpdateValue = screen.getByTestId('next-update-list-item-value');
+    const nextUpdateValue = screen.getByTestId('Next update-value');
     expect(nextUpdateValue.textContent).toEqual('February 2022');
   });
 

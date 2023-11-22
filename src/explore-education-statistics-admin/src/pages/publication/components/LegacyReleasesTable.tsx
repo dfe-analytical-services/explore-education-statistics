@@ -25,24 +25,6 @@ import { useHistory } from 'react-router-dom';
 import ButtonText from '@common/components/ButtonText';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 
-interface ConfirmAction {
-  type: 'create' | 'edit' | 'reordering';
-  id?: string;
-}
-
-const getModalTitle = (confirmAction?: ConfirmAction): string => {
-  switch (confirmAction?.type) {
-    case 'create':
-      return 'Create legacy release';
-    case 'edit':
-      return 'Edit legacy release';
-    case 'reordering':
-      return 'Reorder legacy releases';
-    default:
-      return '';
-  }
-};
-
 interface Props {
   canManageLegacyReleases: boolean;
   legacyReleases: LegacyRelease[];
@@ -55,10 +37,6 @@ const LegacyReleasesTable = ({
 }: Props) => {
   const history = useHistory();
   const [isReordering, toggleReordering] = useToggle(false);
-  const [confirmAction, setConfirmAction] = useState<ConfirmAction>();
-  const [deleteLegacyRelease, setDeleteLegacyRelease] =
-    useState<LegacyRelease>();
-
   const [legacyReleases, setLegacyReleases] = useState(initialLegacyReleases);
 
   return (
@@ -143,32 +121,67 @@ const LegacyReleasesTable = ({
                       {canManageLegacyReleases && !isReordering && (
                         <td>
                           <ButtonGroup className="govuk-!-margin-bottom-0">
-                            <ButtonText
-                              onClick={() =>
-                                setConfirmAction({
-                                  type: 'edit',
-                                  id: release.id,
-                                })
+                            <ModalConfirm
+                              confirmText="OK"
+                              title="Edit legacy release"
+                              triggerButton={
+                                <ButtonText>
+                                  Edit
+                                  <VisuallyHidden>
+                                    {` ${release.description}`}
+                                  </VisuallyHidden>
+                                </ButtonText>
                               }
-                            >
-                              Edit
-                              <VisuallyHidden>
-                                {' '}
-                                {release.description}
-                              </VisuallyHidden>
-                            </ButtonText>
-                            <ButtonText
-                              variant="warning"
-                              onClick={() => {
-                                setDeleteLegacyRelease(release);
+                              onConfirm={() => {
+                                history.push(
+                                  generatePath<PublicationEditLegacyReleaseRouteParams>(
+                                    publicationEditLegacyReleaseRoute.path,
+                                    {
+                                      publicationId,
+                                      legacyReleaseId: release.id,
+                                    },
+                                  ),
+                                );
                               }}
                             >
-                              Delete
-                              <VisuallyHidden>
-                                {' '}
-                                {release.description}
-                              </VisuallyHidden>
-                            </ButtonText>
+                              <WarningMessage>
+                                All changes made to legacy releases appear
+                                immediately on the public website.
+                              </WarningMessage>
+                            </ModalConfirm>
+
+                            <ModalConfirm
+                              title="Delete legacy release"
+                              triggerButton={
+                                <ButtonText variant="warning">
+                                  Delete
+                                  <VisuallyHidden>
+                                    {` ${release.description}`}
+                                  </VisuallyHidden>
+                                </ButtonText>
+                              }
+                              onConfirm={async () => {
+                                await legacyReleaseService.deleteLegacyRelease(
+                                  release?.id,
+                                );
+
+                                const nextLegacyReleases =
+                                  legacyReleases.filter(
+                                    legacyRelease =>
+                                      legacyRelease.id !== release.id,
+                                  );
+                                setLegacyReleases(nextLegacyReleases);
+                              }}
+                            >
+                              <p>
+                                Are you sure you want to delete this legacy
+                                release?
+                              </p>
+                              <p>
+                                All changes made to legacy releases appear
+                                immediately on the public website.
+                              </p>
+                            </ModalConfirm>
                           </ButtonGroup>
                         </td>
                       )}
@@ -185,17 +198,41 @@ const LegacyReleasesTable = ({
 
       {canManageLegacyReleases && !isReordering && (
         <ButtonGroup>
-          <Button onClick={() => setConfirmAction({ type: 'create' })}>
-            Create legacy release
-          </Button>
+          <ModalConfirm
+            confirmText="OK"
+            title="Create legacy release"
+            triggerButton={<Button>Create legacy release</Button>}
+            onConfirm={() => {
+              history.push(
+                generatePath<PublicationRouteParams>(
+                  publicationCreateLegacyReleaseRoute.path,
+                  {
+                    publicationId,
+                  },
+                ),
+              );
+            }}
+          >
+            <WarningMessage>
+              All changes made to legacy releases appear immediately on the
+              public website.
+            </WarningMessage>
+          </ModalConfirm>
 
           {legacyReleases.length > 0 && (
-            <Button
-              variant="secondary"
-              onClick={() => setConfirmAction({ type: 'reordering' })}
+            <ModalConfirm
+              confirmText="OK"
+              title="Reorder legacy releases"
+              triggerButton={
+                <Button variant="secondary">Reorder legacy releases</Button>
+              }
+              onConfirm={toggleReordering.on}
             >
-              Reorder legacy releases
-            </Button>
+              <WarningMessage>
+                All changes made to legacy releases appear immediately on the
+                public website.
+              </WarningMessage>
+            </ModalConfirm>
           )}
         </ButtonGroup>
       )}
@@ -228,84 +265,6 @@ const LegacyReleasesTable = ({
           </Button>
         </ButtonGroup>
       )}
-
-      <ModalConfirm
-        open={!!deleteLegacyRelease}
-        onConfirm={async () => {
-          if (deleteLegacyRelease) {
-            await legacyReleaseService.deleteLegacyRelease(
-              deleteLegacyRelease?.id,
-            );
-
-            const nextLegacyReleases = legacyReleases.filter(
-              release => release.id !== deleteLegacyRelease.id,
-            );
-            setLegacyReleases(nextLegacyReleases);
-          }
-
-          setDeleteLegacyRelease(undefined);
-        }}
-        onExit={() => setDeleteLegacyRelease(undefined)}
-        title="Delete legacy release"
-      >
-        <p>Are you sure you want to delete this legacy release?</p>
-        <p>
-          All changes made to legacy releases appear immediately on the public
-          website.
-        </p>
-      </ModalConfirm>
-
-      <ModalConfirm
-        confirmText="OK"
-        open={!!confirmAction}
-        title={getModalTitle(confirmAction)}
-        onConfirm={() => {
-          switch (confirmAction?.type) {
-            case 'create': {
-              history.push(
-                generatePath<PublicationRouteParams>(
-                  publicationCreateLegacyReleaseRoute.path,
-                  {
-                    publicationId,
-                  },
-                ),
-              );
-              break;
-            }
-            case 'edit': {
-              if (confirmAction.id) {
-                history.push(
-                  generatePath<PublicationEditLegacyReleaseRouteParams>(
-                    publicationEditLegacyReleaseRoute.path,
-                    {
-                      publicationId,
-                      legacyReleaseId: confirmAction.id,
-                    },
-                  ),
-                );
-              }
-              break;
-            }
-            case 'reordering':
-              toggleReordering.on();
-              break;
-            default:
-              break;
-          }
-          setConfirmAction(undefined);
-        }}
-        onExit={() => {
-          setConfirmAction(undefined);
-        }}
-        onCancel={() => {
-          setConfirmAction(undefined);
-        }}
-      >
-        <WarningMessage>
-          All changes made to legacy releases appear immediately on the public
-          website.
-        </WarningMessage>
-      </ModalConfirm>
     </>
   );
 };

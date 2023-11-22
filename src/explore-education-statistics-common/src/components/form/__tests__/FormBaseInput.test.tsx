@@ -1,6 +1,7 @@
+import FormBaseInput from '@common/components/form/FormBaseInput';
 import React from 'react';
-import { render } from '@testing-library/react';
-import FormBaseInput from '../FormBaseInput';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 
 describe('FormTextInput', () => {
   test('renders correctly with required props', () => {
@@ -13,7 +14,7 @@ describe('FormTextInput', () => {
   });
 
   test('renders correctly with hint', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormBaseInput
         id="test-input"
         label="Test input"
@@ -22,14 +23,14 @@ describe('FormTextInput', () => {
       />,
     );
 
-    const hint = getByText('Fill me in');
+    const hint = screen.getByText('Fill me in');
 
     expect(hint.id).toBe('test-input-hint');
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('renders correctly with error', () => {
-    const { container, getByText } = render(
+    const { container } = render(
       <FormBaseInput
         id="test-input"
         label="Test input"
@@ -38,14 +39,14 @@ describe('FormTextInput', () => {
       />,
     );
 
-    const error = getByText('Field is required');
+    const error = screen.getByText('Field is required');
 
     expect(error.id).toBe('test-input-error');
     expect(container.innerHTML).toMatchSnapshot();
   });
 
   test('aria-describedby is equal to the hint id', () => {
-    const { getByLabelText, getByText } = render(
+    render(
       <FormBaseInput
         id="test-input"
         label="Test input"
@@ -54,15 +55,18 @@ describe('FormTextInput', () => {
       />,
     );
 
-    expect(getByText('Fill me in')).toHaveAttribute('id', 'test-input-hint');
-    expect(getByLabelText('Test input')).toHaveAttribute(
+    expect(screen.getByText('Fill me in')).toHaveAttribute(
+      'id',
+      'test-input-hint',
+    );
+    expect(screen.getByLabelText('Test input')).toHaveAttribute(
       'aria-describedby',
       'test-input-hint',
     );
   });
 
   test('aria-describedby is equal to the error id', () => {
-    const { getByLabelText, getByText } = render(
+    render(
       <FormBaseInput
         id="test-input"
         label="Test input"
@@ -71,18 +75,18 @@ describe('FormTextInput', () => {
       />,
     );
 
-    expect(getByText('Field is required')).toHaveAttribute(
+    expect(screen.getByText('Field is required')).toHaveAttribute(
       'id',
       'test-input-error',
     );
-    expect(getByLabelText('Test input')).toHaveAttribute(
+    expect(screen.getByLabelText('Test input')).toHaveAttribute(
       'aria-describedby',
       'test-input-error',
     );
   });
 
   test('aria-describedby contains both hint and error ids', () => {
-    const { getByLabelText, getByText } = render(
+    render(
       <FormBaseInput
         id="test-input"
         label="Test input"
@@ -92,14 +96,18 @@ describe('FormTextInput', () => {
       />,
     );
 
-    expect(getByText('Fill me in')).toHaveAttribute('id', 'test-input-hint');
-    expect(getByText('Field is required')).toHaveAttribute(
+    expect(screen.getByText('Fill me in')).toHaveAttribute(
+      'id',
+      'test-input-hint',
+    );
+    expect(screen.getByText('Field is required')).toHaveAttribute(
       'id',
       'test-input-error',
     );
 
-    const ariaDescribedBy =
-      getByLabelText('Test input').getAttribute('aria-describedby');
+    const ariaDescribedBy = screen
+      .getByLabelText('Test input')
+      .getAttribute('aria-describedby');
 
     expect(ariaDescribedBy).toContain('test-input-error');
     expect(ariaDescribedBy).toContain('test-input-hint');
@@ -121,7 +129,7 @@ describe('FormTextInput', () => {
   });
 
   test('renders with an add on', () => {
-    const { container, getByRole } = render(
+    const { container } = render(
       <FormBaseInput
         addOn={<button type="button">Click me!</button>}
         id="test-input"
@@ -132,7 +140,45 @@ describe('FormTextInput', () => {
       />,
     );
 
-    expect(getByRole('button', { name: 'Click me!' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Click me!' }),
+    ).toBeInTheDocument();
     expect(container.innerHTML).toMatchSnapshot();
+  });
+
+  test('trims on blur by default', () => {
+    render(
+      <FormBaseInput id="test-input" label="Test input" name="testInput" />,
+    );
+
+    userEvent.type(screen.getByLabelText('Test input'), '  trim me  ');
+    userEvent.tab();
+    expect(screen.getByLabelText('Test input')).toHaveValue('trim me');
+  });
+
+  test('does not trim on blur when `trimValue` is false', () => {
+    render(
+      <FormBaseInput
+        id="test-input"
+        label="Test input"
+        name="testInput"
+        trimValue={false}
+      />,
+    );
+
+    userEvent.type(screen.getByLabelText('Test input'), '   do not trim me  ');
+    userEvent.tab();
+    expect(screen.getByLabelText('Test input')).toHaveValue(
+      '   do not trim me  ',
+    );
+  });
+
+  test('does not trim when enter is pressed and `trimValue` is false', () => {
+    render(
+      <FormBaseInput id="test-input" label="Test input" name="testInput" />,
+    );
+
+    userEvent.type(screen.getByLabelText('Test input'), '  trim me  {enter}');
+    expect(screen.getByLabelText('Test input')).toHaveValue('trim me');
   });
 });

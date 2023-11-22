@@ -1,7 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import { ReleaseType } from '@common/services/types/releaseType';
-import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/Filters';
+import { FilterChangeHandler } from '@frontend/modules/find-statistics/components/FiltersDesktop';
 import ReleaseTypeFilters from '@frontend/modules/find-statistics/components/ReleaseTypeFilters';
 import React from 'react';
 

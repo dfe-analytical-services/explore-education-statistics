@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
 
@@ -21,8 +22,12 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     {
         // Assert that any users with the "AccessAllReleases" claim can view an arbitrary PreRelease Summary
         // (and no other claim allows this)
-        await AssertReleaseHandlerSucceedsWithCorrectClaims<ViewSpecificPreReleaseSummaryRequirement>(
+        await AssertHandlerSucceedsWithCorrectClaims<Release, ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
+            new Release
+            {
+                Id = Guid.NewGuid()
+            },
             AccessAllReleases);
     }
 
@@ -32,6 +37,10 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
         // Assert that a User who has any unrestricted viewer role on a Release can view the PreRelease Summary
         await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewSpecificPreReleaseSummaryRequirement>(
             CreateHandler,
+            new Release
+            {
+                Id = Guid.NewGuid()
+            },
             ReleaseRole.Viewer, ReleaseRole.Lead, ReleaseRole.Contributor, ReleaseRole.Approver, ReleaseRole.PrereleaseViewer);
     }
 
@@ -55,9 +64,10 @@ public class ViewSpecificPreReleaseSummaryAuthorizationHandlersTests
     private static ViewSpecificPreReleaseSummaryAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
     {
         return new ViewSpecificPreReleaseSummaryAuthorizationHandler(
-            new AuthorizationHandlerResourceRoleService(
+            new AuthorizationHandlerService(
+                contentDbContext,
                 new UserReleaseRoleRepository(contentDbContext),
                 new UserPublicationRoleRepository(contentDbContext),
-                Mock.Of<IPublicationRepository>(Strict)));
+                Mock.Of<IPreReleaseService>(Strict)));
     }
 }

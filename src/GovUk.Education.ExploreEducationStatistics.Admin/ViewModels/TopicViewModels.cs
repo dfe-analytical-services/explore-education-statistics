@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
@@ -27,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Slug
         {
-            get => String.IsNullOrEmpty(_slug) ? NamingUtils.SlugFromTitle(Title) : _slug;
+            get => string.IsNullOrEmpty(_slug) ? NamingUtils.SlugFromTitle(Title) : _slug;
             set => _slug = value;
         }
     }

@@ -1,4 +1,5 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
+import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import { Element, Node } from '@admin/types/ckeditor';
@@ -6,8 +7,6 @@ import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
-import CommentAddForm from '@admin/components/comments/CommentAddForm';
-import CommentsList from '@admin/components/comments/CommentsList';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
@@ -17,7 +16,6 @@ import useToggle from '@common/hooks/useToggle';
 import logger from '@common/services/logger';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import classNames from 'classnames';
 import { Formik, FormikHelpers } from 'formik';
 import React, { useCallback, useRef } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
@@ -61,7 +59,7 @@ const EditableContentForm = ({
   onImageUploadCancel,
   onSubmit,
 }: Props) => {
-  const { comments, clearPendingDeletions } = useCommentsContext();
+  const { clearPendingDeletions } = useCommentsContext();
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
@@ -119,27 +117,15 @@ const EditableContentForm = ({
   );
 
   return (
-    <div className={styles.container} ref={containerRef}>
-      {allowComments && (
-        <div data-testid="comments-sidebar">
-          {showCommentAddForm && (
-            <CommentAddForm
-              baseId={id}
-              containerRef={containerRef}
-              onCancel={toggleCommentAddForm.off}
-              onSave={toggleCommentAddForm.off}
-            />
-          )}
-          {comments.length > 0 && (
-            <CommentsList
-              className={classNames(styles.commentsList, {
-                [styles.padTop]: showCommentAddForm,
-              })}
-            />
-          )}
-        </div>
-      )}
-
+    <CommentsWrapper
+      allowComments={allowComments}
+      commentType="inline"
+      id={id}
+      showCommentAddForm={showCommentAddForm}
+      onAddCancel={toggleCommentAddForm.off}
+      onAddSave={toggleCommentAddForm.off}
+      onAdd={toggleCommentAddForm.on}
+    >
       <div className={styles.form}>
         <Formik<FormValues>
           initialValues={{
@@ -195,7 +181,7 @@ const EditableContentForm = ({
           }}
         </Formik>
       </div>
-    </div>
+    </CommentsWrapper>
   );
 };
 export default EditableContentForm;

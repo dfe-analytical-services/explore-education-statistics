@@ -1,6 +1,6 @@
 #nullable enable
 using System;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using static System.String;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Slug { get; set; } = Empty;
 
-        public Contact Contact { get; set; } = null!;
+        public ContactViewModel Contact { get; set; } = null!;
 
         public IdTitleViewModel Topic { get; set; } = null!;
 

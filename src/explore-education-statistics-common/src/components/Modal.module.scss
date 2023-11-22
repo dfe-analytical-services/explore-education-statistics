@@ -3,15 +3,12 @@
 .underlay {
   align-items: center;
   background: rgba(0, 0, 0, 0.5);
-  bottom: 0;
   cursor: pointer;
   display: flex;
+  inset: 0;
   justify-content: center;
-  left: 0;
   overflow: hidden;
   position: fixed;
-  right: 0;
-  top: 0;
   z-index: 1000;
 }
 
@@ -20,8 +17,10 @@
   background: #fff;
   cursor: initial;
   margin: 0 govuk-spacing(2);
+  max-height: 98vh;
   max-width: map-get($govuk-breakpoints, 'desktop');
   min-width: 30vh;
+  overflow-y: auto;
   padding: govuk-spacing(6);
 
   @include govuk-media-query($from: tablet) {

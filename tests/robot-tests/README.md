@@ -13,7 +13,6 @@
   - [**scripts**](#scripts)
   - [**test-results**](#test-results)
   - [**tests**](#tests)
-  - [**webdriver**](#webdriver-1)
   - [**Snapshots**](#snapshots)
   - [**Guidelines for people writing UI tests**](#guidelines-for-people-writing-ui-tests)
   - [**Parallelism / Pabot**](#parallelism--pabot)
@@ -25,7 +24,6 @@
     - [The tests are flaky when I run them locally.](#the-tests-are-flaky-when-i-run-them-locally)
     - [Test fails after not finding an element after x amount of seconds.](#test-fails-after-not-finding-an-element-after-x-amount-of-seconds)
     - [I get the following error when trying to run a UI test](#i-get-the-following-error-when-trying-to-run-a-ui-test)
-    - [When I run the test, it automatically downloads chromedriver for ARM?](#when-i-run-the-test-it-automatically-downloads-chromedriver-for-arm)
 - [**Who should I talk to?**](#who-should-i-talk-to)
 
 
@@ -130,13 +128,13 @@ After the user has been logged in by the `run_tests.py` script, the local storag
 
 ## **Webdriver**
 
-The `webdriver` directory holds `chromedriver`, used by selenium to interact with the browser. If `chromedriver` isn't present in this directory, it is automatically downloaded when the tests are run. You can explicitly download the `chromedriver` version of your choice with `--chromedriver <version>`. Alternatively, you can manually place the `chromedriver` of your choice into the `webdriver` directory. 
+The `run_tests.py` script uses [webdriver-manager](https://github.com/SergeyPirogov/webdriver_manager) to manage downloading the WebDriver binary.
 
-NOTE: The `run_tests.py` script only downloads `chromedriver` if it doesn't already exist. If you wish the run script to download a different version, you'll first have to delete `chromedriver` from the `webdriver` directory.
+webdriver-manager downloads the appropriate driver binary based on the browser you have installed, and the system OS/architecture, if not already present, into a global cache in the user home directory `~/.wdm`.
 
-`run_tests.py` currently downloads the latest chromedriver by default. You can select a specific version by deleteing your webdriver directory and using the script's `--chromedriver` argument. This will download the chromedrive version you've chosen.
+You can force a specific version by using the script's `--chromedriver <version>` argument.
 
-The latest version of chromedriver should always work for the pipeline. But if you need a specific version for the CI pipeline, you will need to add the `--chromedriver` argument to the `run_tests.py` call inside `scripts/run_tests_pipeline.py`. You can check [this repository](https://github.com/actions/virtual-environments/tree/master/images) for the version of chrome used on the Azure agent you're using. At the time of writing, the robot tests use the [Ubuntu 22.04 image](https://github.com/actions/virtual-environments/blob/master/images/linux)
+The latest version of chromedriver should always work for the pipeline. But if you need a specific version for the CI pipeline, you will need to add the `--chromedriver` argument to the `run_tests.py` call inside `scripts/run_tests_pipeline.py`. You can check [this repository](https://github.com/actions/virtual-environments/tree/master/images) for the version of chrome used on the Azure agent you're using. At the time of writing, the robot tests use the [Ubuntu 22.04 image](https://github.com/actions/virtual-environments/blob/master/images/linux).
 
 
 ## Directory structure
@@ -150,9 +148,6 @@ This directory holds the output of a test run, including the test report and log
 
 ## tests
 This holds the actual robot framework/selenium tests. The tests are themselves organised into different folders. The `libs` doesn't contain tests, but utility keywords used by the tests. Similar to `libs`, `files` contains files used by the tests.
-
-## webdriver
-This holds chromedriver, used by selenium to interact with the browser.
 
 ## Snapshots
 To monitor changes to pages on Production, we use snapshots that are stored in `robot-tests/tests/snapshots`. These snapshots are created using the `create_snapshots.py` script in the `robot-tests/scripts` directory. 
@@ -247,12 +242,6 @@ This error typically occurs when the BAU user password has expired and `setup_au
 
 ### running-snapshot-tests
 Refer to the `create_snapshots.py` script for more information (located in `robot-tests/scripts`).
-
-### When I run the test, it automatically downloads chromedriver for ARM?
-
-There is a known bug with pyderman which is responsible for downloading chromedriver whereby it defaults to downloading the ARM version of chrome if you're using an intel based mac. This means that if you are running the UI tests on an intel based mac the tests fail due to the wrong arch of Chrome being downloaded.
-
-To fix this, you can manually download the correct [chromedriver](https://chromedriver.chromium.org/downloads) and put it in the webdriver directory.
 
 ### Library-bugs
 

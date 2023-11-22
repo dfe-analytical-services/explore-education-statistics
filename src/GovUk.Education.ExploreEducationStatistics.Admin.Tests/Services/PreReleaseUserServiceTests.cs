@@ -699,7 +699,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                Assert.Empty(context.UserReleaseRoles); 
+                Assert.Empty(context.UserReleaseRoles);
                 Assert.Empty(context.UserReleaseInvites);
             }
         }
@@ -1736,99 +1736,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var savedUserInvite = Assert.Single(userAndRolesDbContext.UserInvites);
                 Assert.NotNull(savedUserInvite);
                 Assert.Equal("test@test.com", savedUserInvite!.Email);
-            }
-        }
-
-        [Fact]
-        public async Task SendPreReleaseUserInviteEmails()
-        {
-            var release = new Release
-            {
-                ReleaseName = "2020",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                Publication = new Publication {Title = "Test publication"},
-                PublishScheduled = PublishedScheduledStartOfDay
-            };
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(
-                    release,
-                    new User
-                    {
-                        Email = "test@test.com",
-                    },
-                    new UserReleaseInvite
-                    {
-                        Release = release,
-                        Role = ReleaseRole.PrereleaseViewer,
-                        Email = "test@test.com",
-                        EmailSent = false,
-                    },
-                    new User
-                    {
-                        Email = "test2@test.com"
-                    },
-                    new UserReleaseInvite
-                    {
-                        Release = release,
-                        Role = ReleaseRole.PrereleaseViewer,
-                        Email = "test2@test.com",
-                        EmailSent = true,
-                    }
-                );
-
-                await context.SaveChangesAsync();
-            }
-
-            var emailService = new Mock<IEmailService>(MockBehavior.Strict);
-
-            var expectedTemplateValues = GetExpectedPreReleaseTemplateValues(release, newUser: false);
-
-            emailService.Setup(mock => mock.SendEmail(
-                    "test@test.com",
-                    PreReleaseTemplateId,
-                    expectedTemplateValues
-                ))
-                .Returns(Unit.Instance);
-
-            var preReleaseService = new Mock<IPreReleaseService>(MockBehavior.Strict);
-            SetupGetPrereleaseWindow(preReleaseService, release);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(contextId))
-            {
-                var service = SetupPreReleaseUserService(
-                    context,
-                    usersAndRolesDbContext: userAndRolesDbContext,
-                    preReleaseService: preReleaseService.Object,
-                    emailService: emailService.Object
-                );
-
-                var result = await service.SendPreReleaseUserInviteEmails(release.Id);
-
-                emailService.Verify(
-                    s => s.SendEmail(
-                        "test@test.com",
-                        PreReleaseTemplateId,
-                        expectedTemplateValues
-                    ), Times.Once
-                );
-
-                VerifyAllMocks(emailService, preReleaseService);
-
-                result.AssertRight();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var updatedInvite = context.UserReleaseInvites
-                    .Single(i => i.Email == "test@test.com");
-
-                Assert.Equal(release.Id, updatedInvite.ReleaseId);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, updatedInvite.Role);
-                Assert.True(updatedInvite.EmailSent);
             }
         }
 

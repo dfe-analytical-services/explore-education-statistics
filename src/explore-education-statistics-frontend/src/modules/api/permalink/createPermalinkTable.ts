@@ -7,7 +7,7 @@ import generateTableTitle from '@common/modules/table-tool/utils/generateTableTi
 import logger from '@common/services/logger';
 import { ErrorBody } from '@frontend/modules/api/types/error';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { UnmappedTableHeadersConfig } from '@common/services/permalinkSnapshotService';
+import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataResponse } from '@common/services/tableBuilderService';
 
 interface SuccessBody {

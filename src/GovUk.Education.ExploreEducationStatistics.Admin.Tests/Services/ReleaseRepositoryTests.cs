@@ -33,8 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Test publication 1",
-                        Slug = "test-publication-1",
-                        Contact = new Contact(),
+                        Slug = "test-publication-1"
                     },
                 },
                 Role = ReleaseRole.Lead,
@@ -50,8 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Test publication 2",
-                        Slug = "test-publication-2",
-                        Contact = new Contact(),
+                        Slug = "test-publication-2"
                     },
                 },
                 Role = ReleaseRole.PrereleaseViewer,
@@ -90,8 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Test publication 1",
-                        Slug = "test-publication-1",
-                        Contact = new Contact(),
+                        Slug = "test-publication-1"
                     },
                 },
                 Role = ReleaseRole.Lead,
@@ -107,8 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Publication = new Publication
                     {
                         Title = "Test publication 2",
-                        Slug = "test-publication-2",
-                        Contact = new Contact(),
+                        Slug = "test-publication-2"
                     },
                 },
                 Role = ReleaseRole.PrereleaseViewer,
@@ -135,17 +131,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task ListReleasesForUser_PublicationRole_Owner_Approved()
         {
             var userId = Guid.NewGuid();
-            var userPublicationRole1 = new UserPublicationRole()
+            var userPublicationRole1 = new UserPublicationRole
             {
                 UserId = userId,
                 Publication = new Publication
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Contact = new Contact(),
                     Releases = new List<Release>
                     {
-                        new Release
+                        new()
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -160,10 +155,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test publication 2",
                 Slug = "test-publication-2",
-                Contact = new Contact(),
                 Releases = new List<Release>
                 {
-                    new Release
+                    new()
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Approved,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -201,10 +195,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Contact = new Contact(),
                     Releases = new List<Release>
                     {
-                        new Release
+                        new()
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft,
                             TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -243,10 +236,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     Title = "Test publication 1",
                     Slug = "test-publication-1",
-                    Contact = new Contact(),
                     Releases = new List<Release>
                     {
-                        new Release
+                        new()
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved,
                             TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -261,10 +253,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test publication 2",
                 Slug = "test-publication-2",
-                Contact = new Contact(),
                 Releases = new List<Release>
                 {
-                    new Release
+                    new()
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Approved,
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
@@ -312,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 }
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -336,9 +327,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, statsRelease!.Id);
                 Assert.Equal(release.PublicationId, statsRelease!.PublicationId);
             }
-            
         }
-        
+
         [Fact]
         public async Task ReleaseHierarchyUpdated()
         {
@@ -359,7 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 }
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -394,7 +384,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.PublicationId, statsRelease!.PublicationId);
             }
         }
-        
+
         [Fact]
         public async Task SubjectHierarchyCreated()
         {
@@ -415,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 }
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {

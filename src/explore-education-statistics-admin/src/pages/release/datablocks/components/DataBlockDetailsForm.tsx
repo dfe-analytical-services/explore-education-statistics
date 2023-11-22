@@ -47,8 +47,8 @@ const DataBlockDetailsForm = ({
     ({ highlightName, highlightDescription, isHighlight, ...values }) => {
       onSubmit({
         ...values,
-        highlightName: isHighlight ? highlightName.trim() : '',
-        highlightDescription: isHighlight ? highlightDescription.trim() : '',
+        highlightName: isHighlight ? highlightName : '',
+        highlightDescription: isHighlight ? highlightDescription : '',
       });
     },
     [],
@@ -65,7 +65,7 @@ const DataBlockDetailsForm = ({
         isHighlight: Yup.boolean(),
         highlightName: Yup.string().when('isHighlight', {
           is: true,
-          then: s => s.trim().required('Enter a featured table name'),
+          then: s => s.required('Enter a featured table name'),
         }),
         highlightDescription: Yup.string().when('isHighlight', {
           is: true,

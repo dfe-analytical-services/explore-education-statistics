@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using HeyRed.Mime;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MimeDetective.Extensions;
 using FileType = MimeDetective.FileType;
@@ -37,10 +38,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         };
 
         private readonly ILogger<FileTypeService> _logger;
+        private readonly IConfiguration _configuration;
 
-        public FileTypeService(ILogger<FileTypeService> logger)
+        public FileTypeService(ILogger<FileTypeService> logger, IConfiguration configuration)
         {
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<string> GetMimeType(IFormFile file)
@@ -199,7 +202,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private string GuessMagicInfo(Stream fileStream, MagicOpenFlags flag)
         {
             using var reader = new StreamReader(fileStream);
-            var magic = new Magic(flag);
+
+            var dbPath = _configuration.GetValue<string>("MagicFilePath");
+            var magic = new Magic(flag, dbPath);
+
             var bufferSize = reader.BaseStream.Length >= 1024 ? 1024 : (int) reader.BaseStream.Length;
             return magic.Read(reader.BaseStream, bufferSize);
         }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Reflection;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -47,6 +49,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                 .AddSingleton<IDbContextSupplier, DbContextSupplier>()
                 .BuildServiceProvider();
             HandleRestart(serviceProvider);
+        }
+
+        public override void ConfigureAppConfiguration(IFunctionsConfigurationBuilder builder)
+        {
+            var binDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            var rootDir = Path.GetFullPath(Path.Combine(binDir!, ".."));
+
+            builder.ConfigurationBuilder
+                .AddJsonFile($"{rootDir}/appsettings.Local.json", optional: true, reloadOnChange: true);
         }
 
         private static void HandleRestart(IServiceProvider serviceProvider)

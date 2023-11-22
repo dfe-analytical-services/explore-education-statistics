@@ -114,8 +114,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[{ position: '2014_AY', label: 'Test label 1' }]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -155,8 +154,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: 'state-funded-secondary', label: 'Test label 2' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -202,8 +200,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[{ position: barnetId, label: 'Test label 1' }]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -243,8 +240,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: 'overall-absence-sessions', label: 'Test label 1' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -282,8 +278,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: 4000, label: 'Test label 2' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -314,8 +309,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -337,8 +331,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -365,8 +358,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMinorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -399,8 +391,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -433,8 +424,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMinorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -467,8 +457,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -487,7 +476,7 @@ describe('ChartReferenceLinesConfiguration', () => {
   });
 
   test('shows validation error when adding a reference line between two data points and start and end point are empty', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -495,8 +484,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMinorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -532,7 +520,7 @@ describe('ChartReferenceLinesConfiguration', () => {
   });
 
   test('shows validation error when adding a reference line between two data points and start and end point are the same', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -540,8 +528,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMinorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -574,6 +561,47 @@ describe('ChartReferenceLinesConfiguration', () => {
     });
   });
 
+  test('shows validation error when trying to add a duplicate line', async () => {
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMinorAxisDefinition}
+        lines={[
+          {
+            position: 10,
+            label: 'Test label',
+            labelWidth: undefined,
+            style: 'dashed',
+          },
+        ]}
+        minorAxisDomain={testMinorAxisDomain}
+        onChange={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+
+    expect(
+      referenceLines.queryByText(
+        'A line with these settings has already been added',
+      ),
+    ).not.toBeInTheDocument();
+
+    userEvent.type(referenceLines.getByLabelText('Position'), '10');
+    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+    userEvent.click(referenceLines.getByRole('button', { name: 'Add line' }));
+
+    await waitFor(() => {
+      expect(
+        referenceLines.getByText(
+          'A line with these settings has already been added',
+        ),
+      ).toBeInTheDocument();
+    });
+  });
+
   test('shows error messages when adding reference line with invalid values', async () => {
     render(
       <ChartReferenceLinesConfiguration
@@ -581,8 +609,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -614,8 +641,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -639,8 +665,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         }}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={noop}
+        onChange={noop}
       />,
     );
 
@@ -653,7 +678,7 @@ describe('ChartReferenceLinesConfiguration', () => {
   });
 
   test('adding reference line when grouped by time periods', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -661,8 +686,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -677,24 +701,26 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-    expect(handleAddLine).not.toHaveBeenCalled();
+    expect(handleSubmit).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        position: '2014_AY',
-        style: 'dashed',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          position: '2014_AY',
+          style: 'dashed',
+        },
+      ]);
     });
   });
 
   test('adding reference line when grouped by filters', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -709,8 +735,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -728,19 +753,21 @@ describe('ChartReferenceLinesConfiguration', () => {
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        position: 'state-funded-primary',
-        style: 'dashed',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          position: 'state-funded-primary',
+          style: 'dashed',
+        },
+      ]);
     });
   });
 
   test('adding reference line when grouped by locations', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -755,8 +782,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -775,19 +801,21 @@ describe('ChartReferenceLinesConfiguration', () => {
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        position: barnsleyId,
-        style: 'dashed',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          position: barnsleyId,
+          style: 'dashed',
+        },
+      ]);
     });
   });
 
   test('adding reference line when grouped by indicators', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -802,8 +830,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -821,19 +848,21 @@ describe('ChartReferenceLinesConfiguration', () => {
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        position: 'authorised-absence-sessions',
-        style: 'dashed',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          position: 'authorised-absence-sessions',
+          style: 'dashed',
+        },
+      ]);
     });
   });
 
   test('adding reference line for minor axis', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -841,8 +870,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMinorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -857,19 +885,21 @@ describe('ChartReferenceLinesConfiguration', () => {
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        position: 3000,
-        style: 'dashed',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          position: 3000,
+          style: 'dashed',
+        },
+      ]);
     });
   });
 
   test('adding reference line with non-default style', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -877,8 +907,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -896,24 +925,26 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     userEvent.selectOptions(referenceLines.getByLabelText('Style'), ['none']);
 
-    expect(handleAddLine).not.toHaveBeenCalled();
+    expect(handleSubmit).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        position: '2014_AY',
-        style: 'none',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          position: '2014_AY',
+          style: 'none',
+        },
+      ]);
     });
   });
 
   test('adding a reference line between two data points', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -921,8 +952,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMinorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -947,26 +977,28 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
 
-    expect(handleAddLine).not.toHaveBeenCalled();
+    expect(handleSubmit).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        otherAxisEnd: '2015_AY',
-        otherAxisStart: '2014_AY',
-        position: 3000,
-        style: 'dashed',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          otherAxisEnd: '2015_AY',
+          otherAxisStart: '2014_AY',
+          position: 3000,
+          style: 'dashed',
+        },
+      ]);
     });
   });
 
   test('cannot add reference line when no more options', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -977,8 +1009,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: '2015_AY', label: 'Test label 1' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -994,8 +1025,52 @@ describe('ChartReferenceLinesConfiguration', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('adding reference line with a label width', async () => {
+    const handleSubmit = jest.fn();
+
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMajorAxisDefinition}
+        lines={[]}
+        minorAxisDomain={testMinorAxisDomain}
+        onChange={handleSubmit}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+    expect(referenceLines.getAllByRole('row')).toHaveLength(2);
+
+    userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+      '2014_AY',
+    ]);
+    userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+
+    userEvent.type(referenceLines.getByLabelText('Label width'), '99');
+
+    expect(handleSubmit).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          labelWidth: 99,
+          position: '2014_AY',
+          style: 'dashed',
+        },
+      ]);
+    });
+  });
+
   test('removing reference line when grouped by time periods', async () => {
-    const handleRemoveLine = jest.fn();
+    const handleChange = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -1006,8 +1081,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: '2015_AY', label: 'Test label 2' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={handleRemoveLine}
+        onChange={handleChange}
       />,
     );
 
@@ -1022,18 +1096,15 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleRemoveLine).toHaveBeenCalledTimes(1);
-      expect(handleRemoveLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onRemoveLine']>
-      >({
-        label: 'Test label 1',
-        position: '2014_AY',
-      });
+      expect(handleChange).toHaveBeenCalledTimes(1);
+      expect(handleChange).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([{ position: '2015_AY', label: 'Test label 2' }]);
     });
   });
 
   test('removing reference line when grouped by filters', async () => {
-    const handleRemoveLine = jest.fn();
+    const handleChange = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -1052,8 +1123,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: 'ethnicity-major-chinese', label: 'Test label 3' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={handleRemoveLine}
+        onChange={handleChange}
       />,
     );
 
@@ -1068,18 +1138,18 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleRemoveLine).toHaveBeenCalledTimes(1);
-      expect(handleRemoveLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onRemoveLine']>
-      >({
-        label: 'Test label 2',
-        position: 'state-funded-secondary',
-      });
+      expect(handleChange).toHaveBeenCalledTimes(1);
+      expect(handleChange).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        { position: 'state-funded-primary', label: 'Test label 1' },
+        { position: 'ethnicity-major-chinese', label: 'Test label 3' },
+      ]);
     });
   });
 
   test('removing reference line when grouped by locations', async () => {
-    const handleRemoveLine = jest.fn();
+    const handleChange = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -1097,8 +1167,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: barnsleyId, label: 'Test label 2' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={handleRemoveLine}
+        onChange={handleChange}
       />,
     );
 
@@ -1113,18 +1182,15 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleRemoveLine).toHaveBeenCalledTimes(1);
-      expect(handleRemoveLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onRemoveLine']>
-      >({
-        label: 'Test label 2',
-        position: barnsleyId,
-      });
+      expect(handleChange).toHaveBeenCalledTimes(1);
+      expect(handleChange).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([{ position: barnetId, label: 'Test label 1' }]);
     });
   });
 
   test('removing reference line when grouped by indicators', async () => {
-    const handleRemoveLine = jest.fn();
+    const handleChange = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -1142,8 +1208,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: 'overall-absence-sessions', label: 'Test label 2' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={handleRemoveLine}
+        onChange={handleChange}
       />,
     );
 
@@ -1158,18 +1223,15 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleRemoveLine).toHaveBeenCalledTimes(1);
-      expect(handleRemoveLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onRemoveLine']>
-      >({
-        label: 'Test label 2',
-        position: 'overall-absence-sessions',
-      });
+      expect(handleChange).toHaveBeenCalledTimes(1);
+      expect(handleChange).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([{ position: 'authorised-absence-sessions', label: 'Test label 1' }]);
     });
   });
 
   test('removing reference line for minor axis', async () => {
-    const handleRemoveLine = jest.fn();
+    const handleChange = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -1181,8 +1243,7 @@ describe('ChartReferenceLinesConfiguration', () => {
           { position: 3000, label: 'Test label 2' },
         ]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={noop}
-        onRemoveLine={handleRemoveLine}
+        onChange={handleChange}
       />,
     );
 
@@ -1197,18 +1258,18 @@ describe('ChartReferenceLinesConfiguration', () => {
     );
 
     await waitFor(() => {
-      expect(handleRemoveLine).toHaveBeenCalledTimes(1);
-      expect(handleRemoveLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onRemoveLine']>
-      >({
-        label: 'Test label 2',
-        position: 2000,
-      });
+      expect(handleChange).toHaveBeenCalledTimes(1);
+      expect(handleChange).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        { position: 1000, label: 'Test label 1' },
+        { position: 3000, label: 'Test label 2' },
+      ]);
     });
   });
 
   test('setting the other axis position on a major axis reference line', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -1216,8 +1277,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMajorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
 
@@ -1226,25 +1286,28 @@ describe('ChartReferenceLinesConfiguration', () => {
     userEvent.type(screen.getByLabelText('Y axis position'), '20000');
     userEvent.selectOptions(screen.getByLabelText('Style'), 'dashed');
 
-    expect(handleAddLine).not.toHaveBeenCalled();
+    expect(handleSubmit).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        otherAxisPosition: 20000,
-        position: '2015_AY',
-        style: 'dashed',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          labelWidth: undefined,
+          otherAxisPosition: 20000,
+          position: '2015_AY',
+          style: 'dashed',
+        },
+      ]);
     });
   });
 
   test('setting a custom other axis position on a minor axis reference line', async () => {
-    const handleAddLine = jest.fn();
+    const handleSubmit = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
@@ -1252,8 +1315,7 @@ describe('ChartReferenceLinesConfiguration', () => {
         axisDefinition={testMinorAxisDefinition}
         lines={[]}
         minorAxisDomain={testMinorAxisDomain}
-        onAddLine={handleAddLine}
-        onRemoveLine={noop}
+        onChange={handleSubmit}
       />,
     );
     userEvent.type(screen.getByLabelText('Position'), '40000');
@@ -1264,20 +1326,65 @@ describe('ChartReferenceLinesConfiguration', () => {
 
     userEvent.type(screen.getByLabelText(/Percent/), '75');
 
-    expect(handleAddLine).not.toHaveBeenCalled();
+    expect(handleSubmit).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
     await waitFor(() => {
-      expect(handleAddLine).toHaveBeenCalledTimes(1);
-      expect(handleAddLine).toHaveBeenCalledWith<
-        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
-      >({
-        label: 'Test label',
-        otherAxisPosition: 75,
-        position: 40000,
-        style: 'dashed',
-      });
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label',
+          otherAxisPosition: 75,
+          position: 40000,
+          style: 'dashed',
+        },
+      ]);
+    });
+  });
+
+  test('editing a reference line', async () => {
+    const handleSubmit = jest.fn();
+    render(
+      <ChartReferenceLinesConfiguration
+        dataSetCategories={testTimePeriodDataSetCategories}
+        axisDefinition={testMajorAxisDefinition}
+        lines={[{ position: '2014_AY', label: 'Test label 1' }]}
+        minorAxisDomain={testMinorAxisDomain}
+        onChange={handleSubmit}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+
+    const rows = referenceLines.getAllByRole('row');
+
+    expect(within(rows[1]).getByText('Test label 1')).toBeInTheDocument();
+
+    userEvent.click(within(rows[1]).getByRole('button', { name: 'Edit line' }));
+
+    userEvent.type(within(rows[1]).getByLabelText('Label'), ' edited');
+
+    userEvent.click(within(rows[1]).getByRole('button', { name: 'Save' }));
+
+    expect(handleSubmit).not.toHaveBeenCalled();
+
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onChange']>
+      >([
+        {
+          label: 'Test label 1 edited',
+          labelWidth: undefined,
+          position: '2014_AY',
+          style: 'dashed',
+        },
+      ]);
     });
   });
 });

@@ -61,7 +61,35 @@ exports[`Form renders error summary from form errors when form is submitted 1`] 
 </form>
 `;
 
-exports[`Form renders submit error 1`] = `
+exports[`Form renders submit error with custom field when \`SubmitError\` thrown 1`] = `
+<form id="test-form">
+  <div class="govuk-error-summary"
+       tabindex="-1"
+       data-testid="errorSummary"
+  >
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">
+        There is a problem
+      </h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li>
+            <a href="#test-form-firstName">
+              Custom submit error message
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  The form
+  <button type="submit">
+    Submit
+  </button>
+</form>
+`;
+
+exports[`Form renders submit error with custom message when \`SubmitError\` thrown 1`] = `
 <form id="test-form">
   <div class="govuk-error-summary"
        tabindex="-1"
@@ -75,7 +103,63 @@ exports[`Form renders submit error 1`] = `
         <ul class="govuk-list govuk-error-summary__list">
           <li>
             <a href="#test-form-submit">
-              Something went wrong
+              Custom submit error message
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  The form
+  <button type="submit">
+    Submit
+  </button>
+</form>
+`;
+
+exports[`Form renders submit error with default href when \`SubmitError\` thrown with invalid field 1`] = `
+<form id="test-form">
+  <div class="govuk-error-summary"
+       tabindex="-1"
+       data-testid="errorSummary"
+  >
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">
+        There is a problem
+      </h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li>
+            <a href="#test-form-submit">
+              Custom submit error message
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  The form
+  <button type="submit">
+    Submit
+  </button>
+</form>
+`;
+
+exports[`Form renders submit error with default message when error thrown 1`] = `
+<form id="test-form">
+  <div class="govuk-error-summary"
+       tabindex="-1"
+       data-testid="errorSummary"
+  >
+    <div role="alert">
+      <h2 class="govuk-error-summary__title">
+        There is a problem
+      </h2>
+      <div class="govuk-error-summary__body">
+        <ul class="govuk-list govuk-error-summary__list">
+          <li>
+            <a href="#test-form-submit">
+              Something went wrong whilst submitting the form
             </a>
           </li>
         </ul>

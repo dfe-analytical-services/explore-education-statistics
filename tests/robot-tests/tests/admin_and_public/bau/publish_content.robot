@@ -39,6 +39,7 @@ Add Related dashboards section to release content
     user starts editing text block    id:related-dashboards-content
     user presses keys    Related dashboards test text
     user clicks button    Save & close
+    user waits until page finishes loading
     user waits until element contains    id:related-dashboards-content    Edit block
 
 Add an accordion section to release content
@@ -58,7 +59,9 @@ Add text block with link to absence glossary entry to accordion section
     user clicks button    Insert
     user waits until modal is not visible    Insert glossary link
     user clicks button    Save & close
-    user waits until element contains    ${block}    Absence
+    user waits until page finishes loading
+    user waits until parent contains button    ${block}    Edit block
+    user waits until parent contains button    ${block}    Absence
 
 Check glossary info icon appears on release preview
     user clicks radio    Preview release page

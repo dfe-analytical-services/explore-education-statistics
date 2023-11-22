@@ -107,12 +107,13 @@ User checks search filters publications properly
     user clears element text    id:publicationForm-publicationIdSearch
 
 Choose publication
+    user reloads page
     user clicks radio    Test theme
     user clicks radio    UI tests - data catalogue %{RUN_IDENTIFIER}
     user clicks button    Next step
 
 Check page displays correct data
-    user waits for page to finish loading
+    user waits until page finishes loading
     user waits until h1 is visible    Browse our open data
     user checks page contains    Choose a release
     user clicks radio    ${RELEASE_NAME} 2021/22

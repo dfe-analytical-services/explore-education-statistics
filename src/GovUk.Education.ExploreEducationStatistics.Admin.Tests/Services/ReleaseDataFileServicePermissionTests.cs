@@ -20,6 +20,7 @@ using Microsoft.AspNetCore.Http;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
@@ -213,9 +214,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>(MockBehavior.Strict).Object,
                 fileRepository ?? new FileRepository(contentDbContext),
                 releaseRepository ?? new ReleaseRepository(
-                    contentDbContext, 
-                    statisticsDbContext ?? new Mock<StatisticsDbContext>().Object, 
-                    Common.Services.MapperUtils.MapperForProfile<MappingProfiles>()),
+                    contentDbContext,
+                    statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
+                    AdminMapper()),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseFileService ?? new Mock<IReleaseFileService>(MockBehavior.Strict).Object,
                 releaseDataFileRepository ?? new ReleaseDataFileRepository(contentDbContext),

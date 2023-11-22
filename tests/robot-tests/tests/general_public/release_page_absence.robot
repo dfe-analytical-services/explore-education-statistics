@@ -304,7 +304,7 @@ Check Regional and local authority (LA) breakdown table has footnotes
     [Tags]    Failing
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user scrolls down    500
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     ${data_block_table}=    user gets data block table from parent    LAD map    ${accordion}
     user checks list has x items    testid:footnotes    2    ${data_block_table}
     user checks list item contains    testid:footnotes    1
@@ -386,7 +386,7 @@ Clicking "Create tables" takes user to Table Tool page with absence publication 
     [Tags]    Failing
     user clicks link    View or create your own tables
     user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
-    user waits for page to finish loading
+    user waits until page finishes loading
 
     user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    Pupil absence in schools in England

@@ -12,13 +12,13 @@ interface Props {
   onExit: () => void;
 }
 
-const PreReleaseInvitePlanModel = ({
+export default function PreReleaseInvitePlanModal({
   invitePlan,
   isReleaseApproved,
   onConfirm,
   onCancel,
   onExit,
-}: Props) => {
+}: Props) {
   return (
     <ModalConfirm
       title="Confirm pre-release invitations"
@@ -101,6 +101,4 @@ const PreReleaseInvitePlanModel = ({
       )}
     </ModalConfirm>
   );
-};
-
-export default PreReleaseInvitePlanModel;
+}

@@ -1,14 +1,18 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 
 public interface IReleaseSubjectRepository
 {
-    Task SoftDeleteAllReleaseSubjects(Guid releaseId);
+    Task<IReadOnlyList<ReleaseSubject>> FindAll(
+        Guid releaseId,
+        Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null);
 
-    Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId);
+    Task DeleteReleaseSubject(Guid releaseId, Guid subjectId, bool softDeleteOrphanedSubject = true);
 
-    Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false);
+    Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = true);
 }

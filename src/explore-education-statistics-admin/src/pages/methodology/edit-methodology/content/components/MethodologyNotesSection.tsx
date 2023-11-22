@@ -34,8 +34,6 @@ interface EditFormValues {
 const MethodologyNotesSection = ({ methodology }: Props) => {
   const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
   const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
-  const [deletedMethodologyNoteId, setDeletedMethodologyNoteId] =
-    useState<string>('');
   const [selectedMethodologyNote, setSelectedMethodologyNote] = useState<
     MethodologyNote | undefined
   >();
@@ -75,7 +73,6 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
     await methodologyNoteService.delete(id, methodology.id);
     const updatedNotes = methodologyNotes.filter(note => note.id !== id);
     setMethodologyNotes(updatedNotes);
-    setDeletedMethodologyNoteId('');
   };
 
   const openAddForm = () => {
@@ -224,12 +221,19 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
                           >
                             Edit note
                           </Button>
-                          <Button
-                            variant="warning"
-                            onClick={() => setDeletedMethodologyNoteId(note.id)}
+
+                          <ModalConfirm
+                            title="Confirm deletion of methodology note"
+                            triggerButton={
+                              <Button variant="warning">Remove note</Button>
+                            }
+                            onConfirm={() => deleteMethodologyNote(note.id)}
                           >
-                            Remove note
-                          </Button>
+                            <p>
+                              This methodology note will be removed from this
+                              methodology
+                            </p>
+                          </ModalConfirm>
                         </ButtonGroup>
                       )}
                     </>
@@ -246,16 +250,6 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
           {editingMode === 'edit' && renderAddForm()}
         </>
       )}
-
-      <ModalConfirm
-        open={deletedMethodologyNoteId !== ''}
-        title="Confirm deletion of methodology note"
-        onExit={() => setDeletedMethodologyNoteId('')}
-        onCancel={() => setDeletedMethodologyNoteId('')}
-        onConfirm={() => deleteMethodologyNote(deletedMethodologyNoteId)}
-      >
-        <p>This methodology note will be removed from this methodology</p>
-      </ModalConfirm>
     </SummaryListItem>
   );
 };

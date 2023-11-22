@@ -17,8 +17,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
 import orderBy from 'lodash/orderBy';
 
-const formId = 'publicationDataStepForm';
-
 export type DataSetFormSubmitHandler = (values: { subjectId: string }) => void;
 
 export interface DataSetFormValues {
@@ -108,7 +106,7 @@ export default function DataSetStep({
         {({ formState }) => {
           return (
             <RHFForm
-              id={formId}
+              id="publicationDataStepForm"
               onSubmit={async ({ subjectId: id }) => {
                 await goToNextStep(async () => {
                   await onSubmit({ subjectId: id });
@@ -126,7 +124,7 @@ export default function DataSetStep({
                         : 'govuk-grid-column-one-third govuk-grid-column-one-quarter-from-desktop'
                     }
                   >
-                    <RHFFormFieldRadioGroup
+                    <RHFFormFieldRadioGroup<DataSetFormValues>
                       className="govuk-!-margin-bottom-2"
                       disabled={formState.isSubmitting}
                       legend={renderLegend()}

@@ -190,6 +190,99 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.Throws<ArgumentException>(() => new[] { "test1", "test2", "test3", "test4" }.ToTuple3());
         }
 
+        [Fact]
+        public void ContainsAll_BothEmptyLists_ReturnsTrue()
+        {
+            var source = Enumerable.Empty<string>();
+            var values = Enumerable.Empty<string>();
+
+            bool containsAll = source.ContainsAll(values);
+
+            Assert.True(containsAll);
+        }
+
+        [Fact]
+        public void ContainsAll_SourceListIsEmpty_ReturnsFalse()
+        {
+            var source = Enumerable.Empty<string>();
+            var values = new List<string>() { "" };
+
+            bool containsAll = source.ContainsAll(values);
+
+            Assert.False(containsAll);
+        }
+
+        [Fact]
+        public void ContainsAll_ValuesListIsEmpty_ReturnsTrue()
+        {
+            var source = new List<string>() { "" };
+            var values = Enumerable.Empty<string>();
+
+            bool containsAll = source.ContainsAll(values);
+
+            Assert.True(containsAll);
+        }
+
+        [Fact]
+        public void ContainsAll_BothNullLists_ThrowsArgumentNullException()
+        {
+            IEnumerable<string> source = null;
+            IEnumerable<string> values = null;
+
+            Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
+        }
+
+        [Fact]
+        public void ContainsAll_SourceListIsNull_ThrowsArgumentNullException()
+        {
+            IEnumerable<string> source = null;
+            var values = new List<string>() { "" };
+
+            Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
+        }
+
+        [Fact]
+        public void ContainsAll_ValuesListIsNull_ThrowsArgumentNullException()
+        {
+            var source = new List<string>() { "" };
+            IEnumerable<string> values = null;
+
+            Assert.Throws<ArgumentNullException>(() => source.ContainsAll(values));
+        }
+
+        [Fact]
+        public void ContainsAll_SourceListDoesNotContainSingleValue_ReturnsFalse()
+        {
+            var source = new List<string>() { "a", "b", "c" };
+            var values = new List<string>() { "d" };
+
+            bool containsAll = source.ContainsAll(values);
+
+            Assert.False(containsAll);
+        }
+
+        [Fact]
+        public void ContainsAll_SourceListContainsOneValueButNotAnother_ReturnsFalse()
+        {
+            var source = new List<string>() { "a", "b", "c" };
+            var values = new List<string>() { "a", "d" };
+
+            bool containsAll = source.ContainsAll(values);
+
+            Assert.False(containsAll);
+        }
+
+        [Fact]
+        public void ContainsAll_SourceListContainsAllValues_ReturnsTrue()
+        {
+            var source = new List<string>() { "a", "b", "c" };
+            var values = new List<string>() { "a", "b" };
+
+            bool containsAll = source.ContainsAll(values);
+
+            Assert.True(containsAll);
+        }
+
         private static async Task<Either<Unit, int>> GetSuccessfulEither(int value)
         {
             await Task.Delay(5);

@@ -13,11 +13,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
@@ -30,8 +32,8 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static Moq.MockBehavior;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -41,15 +43,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseServiceTests
     {
-        private readonly Guid _userId = Guid.NewGuid();
+        private static readonly User User = new()
+        {
+            Id = Guid.NewGuid()
+        };
 
         [Fact]
         public async Task CreateReleaseNoTemplate()
         {
             var publication = new Publication
             {
-                Title = "Publication",
-                Contact = new Contact(),
+                Title = "Publication"
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -92,7 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var actual = await context.Releases
+                var actual = await context
+                    .Releases
                     .SingleAsync(r => r.PublicationId == publication.Id);
 
                 Assert.Equal(2018, actual.Year);
@@ -114,6 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task CreateReleaseWithTemplate()
         {
+            var templateReleaseId = Guid.NewGuid();
+
             var dataBlock1 = new DataBlock
             {
                 Id = Guid.NewGuid(),
@@ -131,16 +138,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Id = Guid.NewGuid(),
                         Content = "Comment 2 Text"
                     }
-                }
+                },
+                ReleaseId = templateReleaseId
             };
 
             var dataBlock2 = new DataBlock
             {
                 Id = Guid.NewGuid(),
-                Name = "Data Block 2"
+                Name = "Data Block 2",
+                ReleaseId = templateReleaseId
             };
 
-            var templateReleaseId = new Guid("26f17bad-fc48-4496-9387-d6e5b2cb0e7f");
+            var templateRelease = new Release
+            {
+                Id = templateReleaseId,
+                ReleaseName = "2018",
+                Content = ListOf(new ContentSection
+                {
+                    Id = Guid.NewGuid(),
+                    Caption = "Template caption index 0",
+                    Heading = "Template heading index 0",
+                    Type = ContentSectionType.Generic,
+                    Order = 1,
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Id = Guid.NewGuid(),
+                            Body = @"<div></div>",
+                            Order = 1,
+                            Comments = new List<Comment>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 1 Text"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Content = "Comment 2 Text"
+                                }
+                            }
+                        },
+                        dataBlock1
+                    }
+                }),
+                Version = 0
+            };
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -151,80 +196,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
                         Title = "Publication",
-                        Contact = new Contact(),
-                        Releases = new List<Release>
-                        {
-                            new() // Template release
-                            {
-                                Id = templateReleaseId,
-                                ReleaseName = "2018",
-                                Content = new List<ReleaseContentSection>
-                                {
-                                    new()
-                                    {
-                                        ReleaseId = Guid.NewGuid(),
-                                        ContentSection = new ContentSection
-                                        {
-                                            Id = Guid.NewGuid(),
-                                            Caption = "Template caption index 0",
-                                            Heading = "Template heading index 0",
-                                            Type = ContentSectionType.Generic,
-                                            Order = 1,
-                                            Content = new List<ContentBlock>
-                                            {
-                                                new HtmlBlock
-                                                {
-                                                    Id = Guid.NewGuid(),
-                                                    Body = @"<div></div>",
-                                                    Order = 1,
-                                                    Comments = new List<Comment>
-                                                    {
-                                                        new()
-                                                        {
-                                                            Id = Guid.NewGuid(),
-                                                            Content = "Comment 1 Text"
-                                                        },
-                                                        new()
-                                                        {
-                                                            Id = Guid.NewGuid(),
-                                                            Content = "Comment 2 Text"
-                                                        }
-                                                    }
-                                                },
-                                                dataBlock1
-                                            }
-                                        }
-                                    },
-                                },
-                                Version = 0,
-                                PreviousVersionId = templateReleaseId,
-                                ContentBlocks = new List<ReleaseContentBlock>
-                                {
-                                    new()
-                                    {
-                                        ReleaseId = templateReleaseId,
-                                        ContentBlock = dataBlock1,
-                                        ContentBlockId = dataBlock1.Id,
-                                    },
-                                    new()
-                                    {
-                                        ReleaseId = templateReleaseId,
-                                        ContentBlock = dataBlock2,
-                                        ContentBlockId = dataBlock2.Id,
-                                    }
-                                }
-                            }
-                        }
+                        Releases = ListOf(templateRelease)
                     }
                 );
+                await context.ContentBlocks.AddRangeAsync(dataBlock1, dataBlock2);
                 await context.SaveChangesAsync();
             }
+
+            Guid newReleaseId = Guid.Empty;
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = releaseService.CreateRelease(
+                var result = await releaseService.CreateRelease(
                     new ReleaseCreateRequest
                     {
                         PublicationId = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
@@ -235,12 +220,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
+                var newRelease = result.AssertRight();
+                newReleaseId = newRelease.Id;
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
                 // Do an in depth check of the saved release
-                var newRelease = context.Releases
-                    .Include(r => r.Content)
-                    .ThenInclude(join => join.ContentSection)
+                var newRelease = context
+                    .Releases
+                    .Include(release => release.Content)
                     .ThenInclude(section => section.Content)
-                    .Single(r => r.Id == result.Result.Right.Id);
+                    .Single(r => r.Id == newReleaseId);
 
                 var contentSections = newRelease.GenericContent.ToList();
                 Assert.Single(contentSections);
@@ -249,12 +240,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(contentSections);
                 Assert.Equal(1, contentSections[0].Order);
 
-                // Content should not be copied when create from template
+                // Content should not be copied when created from a template.
                 Assert.Empty(contentSections[0].Content);
                 Assert.Empty(contentSections[0].Content.AsReadOnly());
                 Assert.Equal(ContentSectionType.ReleaseSummary, newRelease.SummarySection.Type);
                 Assert.Equal(ContentSectionType.Headlines, newRelease.HeadlinesSection.Type);
                 Assert.Equal(ContentSectionType.KeyStatisticsSecondary, newRelease.KeyStatisticsSecondarySection.Type);
+
+                // Data Blocks should not be copied when created from a template.
+                Assert.Equal(2, context.DataBlocks.Count());
+                Assert.Empty(context
+                    .DataBlocks
+                    .Where(dataBlock => dataBlock.ReleaseId == newReleaseId));
             }
         }
 
@@ -319,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             releaseDataFileService.Setup(service => service.Delete(release.Id, file.Id, false))
                 .ReturnsAsync(Unit.Instance);
 
-            releaseSubjectRepository.Setup(service => service.SoftDeleteReleaseSubject(release.Id, subject.Id))
+            releaseSubjectRepository.Setup(service => service.DeleteReleaseSubject(release.Id, subject.Id, true))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -481,7 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(service =>
-                    service.SoftDeleteReleaseSubject(release.Id, It.IsIn(subject.Id, replacementSubject.Id)))
+                    service.DeleteReleaseSubject(release.Id, It.IsIn(subject.Id, replacementSubject.Id), true))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -519,8 +516,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 releaseSubjectRepository.Verify(
-                    mock => mock.SoftDeleteReleaseSubject(release.Id,
-                        It.IsIn(subject.Id, replacementSubject.Id)), Times.Exactly(2));
+                    mock => mock.DeleteReleaseSubject(release.Id,
+                        It.IsIn(subject.Id, replacementSubject.Id), true),
+                    Times.Exactly(2));
 
                 result.AssertRight();
             }
@@ -600,10 +598,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 Type = ReleaseType.AdHocStatistics,
-                Publication = new Publication
-                {
-                    Contact = new Contact(),
-                },
+                Publication = new Publication(),
                 ReleaseName = "2030",
                 PublishScheduled = DateTime.UtcNow,
                 NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
@@ -754,22 +749,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Id = new Guid("f7da23e2-304a-4b47-a8f5-dba28a554de9"),
                 Title = "Test publication",
-                Summary = "Test summary",
                 Slug = "test-publication",
-                Contact = new Contact(),
                 LatestPublishedRelease = release,
                 Releases =
                 {
                     release
                 }
             };
-            
+
             var nonPreReleaseUserRole = new UserReleaseRole
             {
                 Role = ReleaseRole.Contributor,
                 Release = release
             };
-            
+
             var nonPreReleaseUserInvite = new UserReleaseInvite
             {
                 Role = ReleaseRole.Contributor,
@@ -801,7 +794,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("2035-1", viewModel.Slug);
                 Assert.Equal(publication.Id, viewModel.PublicationId);
                 Assert.Equal("Test publication", viewModel.PublicationTitle);
-                Assert.Equal("Test summary", viewModel.PublicationSummary);
                 Assert.Equal("test-publication", viewModel.PublicationSlug);
                 Assert.Equal("Latest release note - 1 day ago", viewModel.LatestInternalReleaseNote);
                 Assert.Equal(DateTime.Parse("2020-06-29T01:00:00.00"), viewModel.PublishScheduled);
@@ -832,7 +824,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Contact = new Contact(),
                 Releases =
                 {
                     release
@@ -844,7 +835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = ReleaseRole.PrereleaseViewer,
                 Release = release
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -876,7 +867,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Contact = new Contact(),
                 Releases =
                 {
                     release
@@ -888,7 +878,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = ReleaseRole.PrereleaseViewer,
                 Release = release
             };
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -914,7 +904,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var publication = new Publication
             {
-                Contact = new Contact(),
                 LatestPublishedRelease = new Release
                 {
                     ReleaseName = "2022",
@@ -963,7 +952,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
-                Contact = new Contact(),
                 Releases = new List<Release>
                 {
                     release
@@ -1017,7 +1005,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var latestIdTitleViewModel = result.AssertRight();
 
                 Assert.NotNull(latestIdTitleViewModel);
-                Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel!.Id);
+                Assert.Equal(publication.LatestPublishedReleaseId, latestIdTitleViewModel.Id);
                 Assert.Equal("Calendar year 2022", latestIdTitleViewModel.Title);
             }
         }
@@ -1140,30 +1128,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyScheduledWithRelease = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = WithRelease,
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
                 ScheduledWithReleaseId = release.Id,
                 Methodology = new Methodology
                 {
                     OwningPublicationTitle = "Methodology scheduled with this Release"
                 },
-                InternalReleaseNote = "A note"
             };
 
             // This Methodology has nothing to do with the Release being deleted.
             var methodologyScheduledWithAnotherRelease = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                PublishingStrategy = WithRelease,
+                PublishingStrategy = MethodologyPublishingStrategy.WithRelease,
                 ScheduledWithReleaseId = Guid.NewGuid(),
                 Methodology = new Methodology
                 {
-                    OwningPublicationTitle = "Methodology scheduled with another Release"
-                }
+                    OwningPublicationTitle = "Methodology scheduled with another Release",
+                },
             };
 
             var userReleaseRole = new UserReleaseRole
             {
-                UserId = _userId,
+                UserId = User.Id,
                 Release = release
             };
 
@@ -1214,7 +1201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mock.DeleteAll(release.Id, false)).ReturnsAsync(Unit.Instance);
 
             releaseSubjectRepository.Setup(mock =>
-                mock.SoftDeleteAllReleaseSubjects(release.Id)).Returns(Task.CompletedTask);
+                mock.DeleteAllReleaseSubjects(release.Id, true)).Returns(Task.CompletedTask);
 
             cacheService
                 .Setup(mock => mock.DeleteCacheFolderAsync(
@@ -1324,13 +1311,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Assert that Methodologies that were scheduled to go out with this Release are no longer scheduled
                 // to do so
-                var retrievedMethodology = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithRelease.Id);
-                Assert.True(retrievedMethodology.ScheduledForPublishingImmediately);
-                Assert.Null(retrievedMethodology.ScheduledWithReleaseId);
-                Assert.Null(retrievedMethodology.InternalReleaseNote);
-                Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodology.Status);
+                var retrievedMethodologyVersion = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithRelease.Id);
+                Assert.True(retrievedMethodologyVersion.ScheduledForPublishingImmediately);
+                Assert.Null(retrievedMethodologyVersion.ScheduledWithReleaseId);
+                Assert.Equal(MethodologyApprovalStatus.Draft, retrievedMethodologyVersion.Status);
                 Assert.InRange(DateTime.UtcNow
-                    .Subtract(retrievedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                    .Subtract(retrievedMethodologyVersion.Updated!.Value).Milliseconds, 0, 1500);
 
                 // Assert that Methodologies that were scheduled to go out with other Releases remain unaffected
                 var unrelatedMethodology = context.MethodologyVersions.Single(m => m.Id == methodologyScheduledWithAnotherRelease.Id);
@@ -1641,7 +1627,218 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private ReleaseService BuildReleaseService(
+        public class ListUsersReleasesForApproval
+        {
+            private readonly DataFixture _fixture = new();
+
+            [Fact]
+            public async Task UserHasApproverRoleOnRelease()
+            {
+                var contextId = Guid.NewGuid().ToString();
+
+                var otherUser = new User();
+
+                var publications = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_ => _fixture
+                        .DefaultRelease()
+                        .WithApprovalStatuses(ListOf(
+                            ReleaseApprovalStatus.Draft,
+                            ReleaseApprovalStatus.HigherLevelReview,
+                            ReleaseApprovalStatus.Approved))
+                        .GenerateList())
+                    .GenerateList(4);
+
+                var contributorReleaseRolesForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRole(ReleaseRole.Contributor)
+                    .WithReleases(publications[0].Releases)
+                    .GenerateList();
+
+                var approverReleaseRolesForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRole(ReleaseRole.Approver)
+                    .WithReleases(publications[1].Releases)
+                    .GenerateList();
+
+                var prereleaseReleaseRolesForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRole(ReleaseRole.PrereleaseViewer)
+                    .WithReleases(publications[2].Releases)
+                    .GenerateList();
+
+                var approverReleaseRolesForOtherUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(otherUser)
+                    .WithRole(ReleaseRole.Approver)
+                    .WithReleases(publications.SelectMany(publication => publication.Releases))
+                    .GenerateList();
+
+                var higherReviewReleaseWithApproverRoleForUser = publications[1].Releases[1];
+
+                await using (var context = InMemoryApplicationDbContext(contextId))
+                {
+                    await context.Publications.AddRangeAsync(publications);
+                    await context.UserReleaseRoles.AddRangeAsync(contributorReleaseRolesForUser);
+                    await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForUser);
+                    await context.UserReleaseRoles.AddRangeAsync(prereleaseReleaseRolesForUser);
+                    await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForOtherUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contextId))
+                {
+                    var service = BuildReleaseService(context);
+
+                    var result = await service.ListUsersReleasesForApproval();
+
+                    var viewModels = result.AssertRight();
+
+                    // Assert that the only Release returned for this user is the Release where they have a direct
+                    // Approver role on and it is in Higher Review.
+                    var viewModel = Assert.Single(viewModels);
+                    Assert.Equal(higherReviewReleaseWithApproverRoleForUser.Id, viewModel.Id);
+
+                    // Assert that we have a fully populated ReleaseSummaryViewModel, including details from the owning
+                    // Publication.
+                    Assert.Equal(
+                        higherReviewReleaseWithApproverRoleForUser.Publication.Title,
+                        viewModel.Publication!.Title);
+                }
+            }
+
+            [Fact]
+            public async Task UserHasApproverRoleOnPublications()
+            {
+                var contextId = Guid.NewGuid().ToString();
+
+                var otherUser = new User();
+
+                var publications = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_ => _fixture
+                        .DefaultRelease()
+                        .WithApprovalStatuses(ListOf(
+                            ReleaseApprovalStatus.Draft,
+                            ReleaseApprovalStatus.HigherLevelReview,
+                            ReleaseApprovalStatus.Approved,
+                            ReleaseApprovalStatus.HigherLevelReview))
+                        .GenerateList())
+                    .GenerateList(3);
+
+                var ownerPublicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(User)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublication(publications[0])
+                    .Generate();
+
+                var approverPublicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(User)
+                    .WithRole(PublicationRole.Approver)
+                    .WithPublication(publications[1])
+                    .Generate();
+
+                var ownerPublicationRolesForOtherUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(otherUser)
+                    .WithRole(PublicationRole.Owner)
+                    .WithPublications(publications)
+                    .GenerateList();
+
+                var approverPublicationRolesForOtherUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(otherUser)
+                    .WithRole(PublicationRole.Approver)
+                    .WithPublications(publications)
+                    .GenerateList();
+
+                var release1WithApproverRoleForUser = publications[1].Releases[1];
+                var release2WithApproverRoleForUser = publications[1].Releases[3];
+
+                await using (var context = InMemoryApplicationDbContext(contextId))
+                {
+                    await context.Publications.AddRangeAsync(publications);
+                    await context.UserPublicationRoles.AddRangeAsync(
+                        ownerPublicationRoleForUser,
+                        approverPublicationRoleForUser);
+                    await context.UserPublicationRoles.AddRangeAsync(ownerPublicationRolesForOtherUser);
+                    await context.UserPublicationRoles.AddRangeAsync(approverPublicationRolesForOtherUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contextId))
+                {
+                    var service = BuildReleaseService(context);
+
+                    var result = await service.ListUsersReleasesForApproval();
+
+                    var viewModels = result.AssertRight();
+
+                    // Assert that the only Releases returned for this user are the Releases where they have Approver
+                    // role on the overarching Publication and the Releases are in Higher Review.
+                    Assert.Equal(2, viewModels.Count);
+                    Assert.Equal(release1WithApproverRoleForUser.Id, viewModels[0].Id);
+                    Assert.Equal(release2WithApproverRoleForUser.Id, viewModels[1].Id);
+                }
+            }
+
+            [Fact]
+            public async Task UserIsPublicationAndReleaseApprover_NoDuplication()
+            {
+                var contextId = Guid.NewGuid().ToString();
+
+                var publication = _fixture
+                    .DefaultPublication()
+                    .WithReleases(_ => _fixture
+                        .DefaultRelease()
+                        .WithApprovalStatus(ReleaseApprovalStatus.HigherLevelReview)
+                        .Generate(1))
+                    .Generate();
+
+                var approverReleaseRolesForUser = _fixture
+                    .DefaultUserReleaseRole()
+                    .WithUser(User)
+                    .WithRole(ReleaseRole.Approver)
+                    .WithReleases(publication.Releases)
+                    .GenerateList();
+
+                var approverPublicationRoleForUser = _fixture
+                    .DefaultUserPublicationRole()
+                    .WithUser(User)
+                    .WithRole(PublicationRole.Approver)
+                    .WithPublication(publication)
+                    .Generate();
+
+                await using (var context = InMemoryApplicationDbContext(contextId))
+                {
+                    await context.Publications.AddRangeAsync(publication);
+                    await context.UserReleaseRoles.AddRangeAsync(approverReleaseRolesForUser);
+                    await context.UserPublicationRoles.AddRangeAsync(approverPublicationRoleForUser);
+                    await context.SaveChangesAsync();
+                }
+
+                await using (var context = InMemoryApplicationDbContext(contextId))
+                {
+                    var service = BuildReleaseService(context);
+
+                    var result = await service.ListUsersReleasesForApproval();
+
+                    var viewModels = result.AssertRight();
+
+                    // Assert that the Release only appears once despite the user having approval directly via the
+                    // Release itself AND via the overarching Publication.
+                    Assert.Single(viewModels);
+                    Assert.Equal(publication.Releases[0].Id, viewModels[0].Id);
+                }
+            }
+        }
+
+        private static ReleaseService BuildReleaseService(
             ContentDbContext contentDbContext,
             StatisticsDbContext? statisticsDbContext = null,
             IReleaseRepository? releaseRepository = null,
@@ -1661,7 +1858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             userService
                 .Setup(s => s.GetUserId())
-                .Returns(_userId);
+                .Returns(User.Id);
 
             return new ReleaseService(
                 contentDbContext,

@@ -9,13 +9,16 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
@@ -35,6 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class TopicServiceTests
     {
+        private readonly DataFixture _fixture = new();
+
         [Fact]
         public async Task CreateTopic()
         {
@@ -203,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var savedTopic = await context.Topics.FindAsync(result.Right.Id);
 
                 Assert.NotNull(savedTopic);
-                Assert.Equal("New title", savedTopic!.Title);
+                Assert.Equal("New title", savedTopic.Title);
                 Assert.Equal("new-title", savedTopic.Slug);
                 Assert.Equal(theme.Id, savedTopic.ThemeId);
             }
@@ -333,44 +338,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteTopic()
         {
-            var topicId = Guid.NewGuid();
             var releaseId = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
-
-            var methodology = new Methodology();
 
             var topic = new Topic
             {
-                Id = topicId,
-                Title = "UI test topic"
+                Id = Guid.NewGuid(),
+                Title = "UI test topic to delete"
             };
 
-            var publication = new Publication
-            {
-                Id = publicationId,
-                Topic = topic,
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        PublicationId = publicationId,
-                        Methodology = methodology,
-                        Owner = true
-                    }
-                },
-                Releases = new List<ContentRelease>
-                {
-                    new()
-                    {
-                        Id = releaseId
-                    }
-                }
-            };
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestDraftVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseId(releaseId)
+                    .Generate())
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseId(releaseId)
+                    .Generate())
+                .Generate();
+
+            var release = _fixture
+                .DefaultRelease()
+                .WithId(releaseId)
+                .WithPublication(
+                    _fixture
+                        .DefaultPublication()
+                        .WithTopic(topic)
+                        .Generate())
+                .WithDataBlockVersions(ListOf(
+                    dataBlockParent.LatestDraftVersion!,
+                    dataBlockParent.LatestPublishedVersion!))
+                .Generate();
+
+            var methodology = _fixture
+                .DefaultMethodology()
+                .WithOwningPublication(release.Publication)
+                .Generate();
 
             var statsRelease = new Release
             {
                 Id = releaseId,
-                PublicationId = publicationId
+                PublicationId = release.Publication.Id
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -378,18 +387,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
+                await contentContext.Releases.AddAsync(release);
                 await contentContext.Methodologies.AddAsync(methodology);
-                await contentContext.Publications.AddAsync(publication);
-                await contentContext.Topics.AddAsync(topic);
                 await statisticsContext.Release.AddAsync(statsRelease);
 
                 await contentContext.SaveChangesAsync();
                 await statisticsContext.SaveChangesAsync();
+            }
 
+            await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
+            await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
+            {
                 Assert.Equal(1, contentContext.Publications.Count());
                 Assert.Equal(1, contentContext.Topics.Count());
                 Assert.Equal(1, contentContext.PublicationMethodologies.Count());
                 Assert.Equal(1, contentContext.Releases.Count());
+                Assert.Equal(2, contentContext.DataBlockVersions.Count());
+                Assert.Equal(1, contentContext.DataBlockParents.Count());
                 Assert.Equal(1, statisticsContext.Release.Count());
             }
 
@@ -399,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
             var cacheService = new Mock<IBlobCacheService>(Strict);
-            
+
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -438,7 +452,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                     .Returns(Task.CompletedTask);
 
-                var result = await service.DeleteTopic(topicId);
+                var result = await service.DeleteTopic(topic.Id);
                 VerifyAllMocks(releaseDataFileService,
                     releaseFileService,
                     releaseSubjectRepository,
@@ -451,6 +465,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(0, contentContext.Publications.Count());
                 Assert.Equal(0, contentContext.Topics.Count());
                 Assert.Equal(0, contentContext.Releases.Count());
+                Assert.Equal(0, contentContext.DataBlockVersions.Count());
+                Assert.Equal(0, contentContext.DataBlockParents.Count());
                 Assert.Equal(0, statisticsContext.Release.Count());
             }
         }
@@ -466,7 +482,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion3Id = Guid.NewGuid();
             var releaseVersion4Id = Guid.NewGuid();
 
-            var releaseIdsInExpectedDeleteOrder = 
+            var releaseIdsInExpectedDeleteOrder =
                 AsList(releaseVersion4Id, releaseVersion3Id, releaseVersion2Id, releaseVersion1Id);
 
             var topic = new Topic
@@ -557,7 +573,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var releaseDataFileDeleteSequence = new MockSequence();
 
-                releaseIdsInExpectedDeleteOrder.ForEach(releaseId => 
+                releaseIdsInExpectedDeleteOrder.ForEach(releaseId =>
                     releaseDataFileService
                         .InSequence(releaseDataFileDeleteSequence)
                         .Setup(s => s.DeleteAll(releaseId, true))
@@ -565,15 +581,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var releaseFileDeleteSequence = new MockSequence();
 
-                releaseIdsInExpectedDeleteOrder.ForEach(releaseId => 
+                releaseIdsInExpectedDeleteOrder.ForEach(releaseId =>
                     releaseFileService
                         .InSequence(releaseFileDeleteSequence)
                         .Setup(s => s.DeleteAll(releaseId, true))
                         .ReturnsAsync(Unit.Instance));
 
                 var releaseSubjectDeleteSequence = new MockSequence();
-                
-                releaseIdsInExpectedDeleteOrder.ForEach(releaseId => 
+
+                releaseIdsInExpectedDeleteOrder.ForEach(releaseId =>
                     releaseSubjectRepository
                         .InSequence(releaseSubjectDeleteSequence)
                         .Setup(s => s.DeleteAllReleaseSubjects(releaseId, false))
@@ -581,7 +597,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var releaseCacheInvalidationSequence = new MockSequence();
 
-                releaseIdsInExpectedDeleteOrder.ForEach(releaseId => 
+                releaseIdsInExpectedDeleteOrder.ForEach(releaseId =>
                     cacheService
                         .InSequence(releaseCacheInvalidationSequence)
                         .Setup(s =>
@@ -594,12 +610,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.DeleteTopic(topicId);
                 VerifyAllMocks(
-                    releaseDataFileService, 
-                    releaseFileService, 
-                    releaseSubjectRepository, 
-                    publishingService, 
+                    releaseDataFileService,
+                    releaseFileService,
+                    releaseSubjectRepository,
+                    publishingService,
                     cacheService);
-                
+
                 result.AssertRight();
 
                 Assert.Equal(0, contentContext.Publications.Count());
@@ -739,76 +755,92 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task DeleteTopic_OtherTopicsUnaffected()
         {
-            var topicId = Guid.NewGuid();
             var releaseId = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
-
-            var otherTopicId = Guid.NewGuid();
-            var otherReleaseId = Guid.NewGuid();
-            var otherPublicationId = Guid.NewGuid();
-
-            var methodology = new Methodology();
 
             var topic = new Topic
             {
-                Id = topicId,
-                Title = "UI test topic"
+                Id = Guid.NewGuid(),
+                Title = "UI test topic to delete"
             };
 
-            var publication = new Publication
-            {
-                Id = publicationId,
-                Topic = topic,
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        PublicationId = publicationId,
-                        Methodology = methodology,
-                        Owner = true
-                    }
-                },
-                Releases = AsList(new ContentRelease
-                {
-                    Id = releaseId
-                })
-            };
+            var dataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestDraftVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseId(releaseId)
+                    .Generate())
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseId(releaseId)
+                    .Generate())
+                .Generate();
+
+            var release = _fixture
+                .DefaultRelease()
+                .WithId(releaseId)
+                .WithPublication(
+                    _fixture
+                        .DefaultPublication()
+                        .WithTopic(topic)
+                        .Generate())
+                .WithDataBlockVersions(ListOf(
+                    dataBlockParent.LatestDraftVersion!,
+                    dataBlockParent.LatestPublishedVersion!))
+                .Generate();
+
+            var methodology = _fixture
+                .DefaultMethodology()
+                .WithOwningPublication(release.Publication)
+                .Generate();
 
             var statsRelease = new Release
             {
                 Id = releaseId,
-                PublicationId = publicationId
+                PublicationId = release.Publication.Id
             };
+
+            var otherReleaseId = Guid.NewGuid();
 
             var otherTopic = new Topic
             {
-                Id = otherTopicId,
-                Title = "UI test topic"
+                Id = Guid.NewGuid(),
+                Title = "UI test topic to retain"
             };
 
-            var otherPublication = new Publication
-            {
-                Id = otherPublicationId,
-                Topic = otherTopic,
-                Methodologies = new List<PublicationMethodology>
-                {
-                    new()
-                    {
-                        PublicationId = otherPublicationId,
-                        Methodology = new Methodology(),
-                        Owner = true
-                    }
-                },
-                Releases = AsList(new ContentRelease
-                {
-                    Id = otherReleaseId
-                })
-            };
+            var otherDataBlockParent = _fixture
+                .DefaultDataBlockParent()
+                .WithLatestDraftVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseId(otherReleaseId)
+                    .Generate())
+                .WithLatestPublishedVersion(_fixture
+                    .DefaultDataBlockVersion()
+                    .WithReleaseId(otherReleaseId)
+                    .Generate())
+                .Generate();
+
+            var otherRelease = _fixture
+                .DefaultRelease()
+                .WithId(otherReleaseId)
+                .WithPublication(
+                    _fixture
+                        .DefaultPublication()
+                        .WithTopic(otherTopic)
+                        .Generate())
+                .WithDataBlockVersions(ListOf(
+                    otherDataBlockParent.LatestDraftVersion!,
+                    otherDataBlockParent.LatestPublishedVersion!))
+                .Generate();
+
+            var otherMethodology = _fixture
+                .DefaultMethodology()
+                .WithOwningPublication(otherRelease.Publication)
+                .Generate();
 
             var otherStatsRelease = new Release
             {
                 Id = otherReleaseId,
-                PublicationId = otherPublicationId
+                PublicationId = otherRelease.Publication.Id
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -816,8 +848,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
-                await contentContext.Methodologies.AddAsync(methodology);
-                await contentContext.Publications.AddRangeAsync(publication, otherPublication);
+                await contentContext.Methodologies.AddRangeAsync(methodology, otherMethodology);
+                await contentContext.Releases.AddRangeAsync(release, otherRelease);
                 await contentContext.Topics.AddRangeAsync(topic, otherTopic);
                 await statisticsContext.Release.AddRangeAsync(statsRelease, otherStatsRelease);
 
@@ -829,6 +861,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, contentContext.Methodologies.Count());
                 Assert.Equal(2, contentContext.PublicationMethodologies.Count());
                 Assert.Equal(2, contentContext.Releases.Count());
+                Assert.Equal(4, contentContext.DataBlockVersions.Count());
+                Assert.Equal(2, contentContext.DataBlockParents.Count());
                 Assert.Equal(2, statisticsContext.Release.Count());
             }
 
@@ -838,7 +872,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
             var cacheService = new Mock<IBlobCacheService>(Strict);
-            
+
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -877,7 +911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                     .Returns(Task.CompletedTask);
 
-                var result = await service.DeleteTopic(topicId);
+                var result = await service.DeleteTopic(topic.Id);
                 VerifyAllMocks(releaseDataFileService,
                     releaseFileService,
                     releaseSubjectRepository,
@@ -887,10 +921,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 result.AssertRight();
 
-                Assert.Equal(otherPublicationId, contentContext.Publications.AsQueryable().Select(p => p.Id).Single());
-                Assert.Equal(otherTopicId, contentContext.Topics.AsQueryable().Select(t => t.Id).Single());
-                Assert.Equal(otherReleaseId, contentContext.Releases.AsQueryable().Select(r => r.Id).Single());
-                Assert.Equal(otherReleaseId, statisticsContext.Release.AsQueryable().Select(r => r.Id).Single());
+                Assert.Equal(otherRelease.Publication.Id, contentContext.Publications.Single().Id);
+                Assert.Equal(otherTopic.Id, contentContext.Topics.Single().Id);
+                Assert.Equal(otherRelease.Id, contentContext.Releases.Single().Id);
+                Assert.Equal(otherRelease.Id, statisticsContext.Release.Single().Id);
+                contentContext.DataBlockVersions.ForEach(dataBlockVersion =>
+                    Assert.Equal(otherReleaseId, dataBlockVersion.ReleaseId));
             }
         }
 

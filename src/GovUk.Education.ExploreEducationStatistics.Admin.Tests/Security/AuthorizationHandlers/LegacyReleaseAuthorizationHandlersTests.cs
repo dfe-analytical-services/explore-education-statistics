@@ -43,10 +43,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             private static ManageLegacyReleasesAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
             {
                 return new ManageLegacyReleasesAuthorizationHandler(
-                    new AuthorizationHandlerResourceRoleService(
+                    new AuthorizationHandlerService(
+                        contentDbContext,
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
                         new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        Mock.Of<IPreReleaseService>(Strict)));
             }
         }
 
@@ -81,10 +82,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             private static ViewLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
             {
                 return new ViewLegacyReleaseAuthorizationHandler(
-                    new AuthorizationHandlerResourceRoleService(
+                    new AuthorizationHandlerService(
+                        contentDbContext,
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
                         new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        Mock.Of<IPreReleaseService>(Strict)));
             }
         }
 
@@ -119,10 +121,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             private static UpdateLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
             {
                 return new UpdateLegacyReleaseAuthorizationHandler(
-                    new AuthorizationHandlerResourceRoleService(
+                    new AuthorizationHandlerService(
+                        contentDbContext,
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
                         new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        Mock.Of<IPreReleaseService>(Strict)));
             }
         }
 
@@ -157,10 +160,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             private static DeleteLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
             {
                 return new DeleteLegacyReleaseAuthorizationHandler(
-                    new AuthorizationHandlerResourceRoleService(
+                    new AuthorizationHandlerService(
+                        contentDbContext,
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
                         new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict)));
+                        Mock.Of<IPreReleaseService>(Strict)));
             }
         }
     }

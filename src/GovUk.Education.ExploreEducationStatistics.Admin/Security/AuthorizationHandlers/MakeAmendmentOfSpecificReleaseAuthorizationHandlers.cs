@@ -18,14 +18,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : AuthorizationHandler<MakeAmendmentOfSpecificReleaseRequirement, Release>
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public MakeAmendmentOfSpecificReleaseAuthorizationHandler(
             ContentDbContext contentDbContext,
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
             _contentDbContext = contentDbContext;
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         release.PublicationId,

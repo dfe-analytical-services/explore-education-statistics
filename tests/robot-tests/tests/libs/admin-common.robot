@@ -73,9 +73,9 @@ user selects dashboard theme and topic if possible
     [Arguments]
     ...    ${theme_name}=%{TEST_THEME_NAME}
     ...    ${topic_name}=%{TEST_TOPIC_NAME}
-    user waits until page does not contain loading spinner
-    ${dropsdowns_exist}=    user checks dashboard theme topic dropdowns exist
-    IF    ${dropsdowns_exist}
+    user waits until page finishes loading
+    ${dropdowns_exist}=    user checks dashboard theme topic dropdowns exist
+    IF    ${dropdowns_exist}
         user chooses select option    id:publicationsReleases-themeTopic-themeId    ${theme_name}
         user waits until page contains element    id:publicationsReleases-themeTopic-topicId
         user chooses select option    id:publicationsReleases-themeTopic-topicId    ${topic_name}
@@ -96,13 +96,12 @@ user navigates to release page from dashboard
     ...    ${THEME_NAME}
     ...    ${TOPIC_NAME}
 
-    user waits for page to finish loading
+    user waits until page finishes loading
     ${ROW}=    user gets table row    ${RELEASE_NAME}    testid:${RELEASE_TABLE_TESTID}
     user scrolls to element    ${ROW}
 
-    user clicks element    xpath://a[text()="${LINK_TEXT}"]    ${ROW}    # "user clicks link" doesn't work
+    user clicks link by visible text    ${LINK_TEXT}    ${ROW}
     user waits until h2 is visible    Release summary    %{WAIT_SMALL}
-    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 user navigates to draft release page from dashboard
     [Arguments]
@@ -127,7 +126,7 @@ user navigates to scheduled release page from dashboard
     ...    ${TOPIC_NAME}=%{TEST_TOPIC_NAME}
     user navigates to release page from dashboard
     ...    publication-scheduled-releases
-    ...    Edit
+    ...    View
     ...    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME}
     ...    ${THEME_NAME}
@@ -192,7 +191,7 @@ user navigates to publication page from dashboard
     user clicks link    ${publication}
     user waits until h1 is visible    ${publication}
     user waits until h2 is visible    Manage releases
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
 user creates methodology for publication
     [Arguments]
@@ -416,8 +415,8 @@ user creates public prerelease access list
     user presses keys    BACKSPACE
     user enters text into element    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     user clicks button    Save access list
-    user waits until element contains    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
-    ...    %{WAIT_SMALL}
+    user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]
+    ...    ${content}
 
 user updates public prerelease access list
     [Arguments]    ${content}
@@ -427,7 +426,8 @@ user updates public prerelease access list
     user presses keys    BACKSPACE
     user enters text into element    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
     user clicks button    Save access list
-    user waits until element contains    id:publicPreReleaseAccessForm-preReleaseAccessList    ${content}
+    user waits until element contains    css:[data-testid="publicPreReleaseAccessListPreview"]
+    ...    ${content}
 
 user clicks footnote subject radio
     [Arguments]    ${subject_label}    ${radio_label}
@@ -500,7 +500,7 @@ user approves amended release for immediate publication
 user approves release for immediate publication
     [Arguments]    ${release_type}=original    ${NEXT_RELEASE_MONTH}=01    ${NEXT_RELEASE_YEAR}=2200
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user waits until h2 is visible    Sign off
     user waits until page contains button    Edit release status
     user clicks button    Edit release status
@@ -571,7 +571,7 @@ user puts release into draft
 
 user puts release into higher level review
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user waits until h2 is visible    Sign off    %{WAIT_SMALL}
     user clicks button    Edit release status
     user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
@@ -589,7 +589,7 @@ user approves release for scheduled publication
     ...    ${next_release_year}=2200
     ...    ${update_amendment_published_date}=${False}
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user waits until h2 is visible    Sign off    %{WAIT_SMALL}
     user waits until page contains button    Edit release status    %{WAIT_SMALL}
 
@@ -633,12 +633,8 @@ user waits for scheduled release to be published immediately
     user waits until page contains element    id:release-process-status-Complete    %{WAIT_MEDIUM}
 
 user verifies release summary
-    [Arguments]    ${PUBLICATION_NAME}    ${PUBLICATION_SUMMARY}    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${LEAD_STATISTICIAN}    ${RELEASE_TYPE}
+    [Arguments]    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${RELEASE_TYPE}
     user waits until h2 is visible    Release summary
-    user checks summary list contains    Publication title    ${PUBLICATION_NAME}
-    user checks summary list contains    Publication summary    ${PUBLICATION_SUMMARY}
-    user checks summary list contains    Lead statistician    ${LEAD_STATISTICIAN}
-
     user checks summary list contains    Time period    ${TIME_PERIOD}
     user checks summary list contains    Release period    ${RELEASE_PERIOD}
     user checks summary list contains    Release type    ${RELEASE_TYPE}
@@ -675,6 +671,16 @@ user changes methodology status to Draft
     user clicks button    Update status
     user waits until h2 is visible    Sign off
     user checks page contains tag    In Draft
+
+user changes methodology status to Higher level review
+    user clicks link    Sign off
+    user waits until h2 is visible    Sign off
+
+    user clicks button    Edit status
+    user clicks element    id:methodologyStatusForm-status-HigherLevelReview
+    user clicks button    Update status
+    user waits until h2 is visible    Sign off
+    user checks page contains tag    In Review
 
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
@@ -715,7 +721,7 @@ user removes publication access from analyst
     ${row}=    get child element    ${table}
     ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
     user clicks button    Remove    ${row}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
 user gives release access to analyst
     [Arguments]
@@ -733,13 +739,17 @@ user gives release access to analyst
     ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
 
 user removes release access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${RELEASE_NAME}
+    ...    ${ROLE}
+    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     ${table}=    user gets testid element    releaseAccessTable
     ${row}=    get child element    ${table}
     ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Release"] and text()="${RELEASE_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
     user clicks button    Remove    ${row}
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
 
 user goes to manage user
     [Arguments]    ${EMAIL_ADDRESS}
@@ -770,14 +780,14 @@ user waits until modal is not visible
 
 user gets resolved comments
     [Arguments]    ${parent}=css:body
-    user waits until parent contains element    ${parent}    testid:resolvedComments
-    ${comments}=    get child element    ${parent}    testid:resolvedComments
+    user waits until parent contains element    ${parent}    testid:comments-resolved
+    ${comments}=    get child element    ${parent}    testid:comments-resolved
     [Return]    ${comments}
 
 user gets unresolved comments
     [Arguments]    ${parent}=css:body
-    user waits until parent contains element    ${parent}    testid:unresolvedComments
-    ${comments}=    get child element    ${parent}    testid:unresolvedComments
+    user waits until parent contains element    ${parent}    testid:comments-unresolved
+    ${comments}=    get child element    ${parent}    testid:comments-unresolved
     [Return]    ${comments}
 
 user gets unresolved comment
@@ -813,6 +823,13 @@ get release id from url
     ${release_id}=    Get From List    ${release_id_match}    0
     [Return]    ${release_id}
 
+user clicks the nth key stats tile button
+    [Arguments]
+    ...    ${tile_num}
+    ...    ${button_text}
+    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
+    user clicks button containing text    ${button_text}    xpath://*[@data-testid="keyStat"][${tile_num}]
+
 user adds free text key stat
     [Arguments]    ${title}    ${statistic}    ${trend}    ${guidance_title}    ${guidance_text}
     user clicks button    Add free text key statistic
@@ -831,10 +848,7 @@ user adds free text key stat
 
 user updates free text key stat
     [Arguments]    ${tile_num}    ${title}    ${statistic}    ${trend}    ${guidance_title}    ${guidance_text}
-    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
-
-    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Edit")]
-
+    user clicks the nth key stats tile button    ${tile_num}    Edit
     user waits until page contains button    Save
 
     user enters text into element    xpath://*[@data-testid="keyStat"][${tile_num}]//input[@name="title"]    ${title}
@@ -852,8 +866,7 @@ user updates free text key stat
 
 user removes key stat
     [Arguments]    ${tile_num}
-    user waits until page contains element    xpath://*[@data-testid="keyStat"][${tile_num}]
-    user clicks element    xpath://*[@data-testid="keyStat"][${tile_num}]//button[contains(text(), "Remove")]
+    user clicks the nth key stats tile button    ${tile_num}    Remove
 
 user closes admin feedback banner if needed
     user clicks element if exists    //*[@data-testid="admin-survey-banner"]//button[text()="Close"]

@@ -7,10 +7,16 @@ import {
   SubjectSelectionType,
 } from '@admin/services/footnoteService';
 import footnoteToFlatFootnote from '@admin/services/utils/footnote/footnoteToFlatFootnote';
+import {
+  pluginsConfigLinksOnly,
+  toolbarConfigLinkOnly,
+} from '@admin/config/ckEditorConfig';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form, FormFieldRadioGroup } from '@common/components/form';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
+import useFormSubmit from '@common/hooks/useFormSubmit';
+import sanitizeHtml from '@common/utils/sanitizeHtml';
+import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import deepmerge from 'deepmerge';
@@ -18,13 +24,14 @@ import get from 'lodash/get';
 import mapValues from 'lodash/mapValues';
 import orderBy from 'lodash/orderBy';
 import React, { ReactNode, useMemo } from 'react';
+import SubmitError from '@common/components/form/util/SubmitError';
 
 interface Props {
   cancelButton?: ReactNode;
   footnote?: Footnote;
   footnoteMeta: FootnoteMeta;
   id?: string;
-  onSubmit: (values: BaseFootnote) => void;
+  onSubmit: (values: BaseFootnote) => void | Promise<void>;
 }
 
 const FootnoteForm = ({
@@ -75,6 +82,45 @@ const FootnoteForm = ({
     };
   }, [footnote, footnoteMeta.subjects]);
 
+  const handleSubmit = useFormSubmit(
+    async (values: BaseFootnote) => {
+      const {
+        subjects,
+        indicatorGroups,
+        indicators,
+        filters,
+        filterGroups,
+        filterItems,
+      } = footnoteToFlatFootnote(values);
+      const hasNoneSelected =
+        [
+          ...subjects,
+          ...indicators,
+          ...indicatorGroups,
+          ...filters,
+          ...filterGroups,
+          ...filterItems,
+        ].length === 0;
+
+      if (hasNoneSelected) {
+        throw new SubmitError(
+          'At least one Subject, Indicator or Filter must be selected',
+        );
+      }
+
+      const sanitizedValues = {
+        ...values,
+        content: sanitizeHtml(values.content, { allowedTags: ['a'] }),
+      };
+
+      await onSubmit(sanitizedValues);
+    },
+    [],
+    {
+      fallbackSubmitError: 'Something went wrong assigning the footnote',
+    },
+  );
+
   return (
     <Formik<BaseFootnote>
       initialValues={initialValues}
@@ -82,36 +128,10 @@ const FootnoteForm = ({
         content: Yup.string().required('Footnote content must be added.'),
         subjects: Yup.object(),
       })}
-      onSubmit={async values => {
-        const {
-          subjects,
-          indicatorGroups,
-          indicators,
-          filters,
-          filterGroups,
-          filterItems,
-        } = footnoteToFlatFootnote(values);
-        const hasNoneSelected =
-          [
-            ...subjects,
-            ...indicators,
-            ...indicatorGroups,
-            ...filters,
-            ...filterGroups,
-            ...filterItems,
-          ].length === 0;
-
-        if (hasNoneSelected) {
-          throw new Error(
-            'At least one Subject, Indicator or Filter must be selected',
-          );
-        }
-
-        await onSubmit(values);
-      }}
+      onSubmit={handleSubmit}
     >
       {form => (
-        <Form id={id} showSubmitError>
+        <Form id={id}>
           <p>
             Select which subjects, filters and indicators your footnote applies
             to and these will appear alongside the associated data in your
@@ -124,7 +144,12 @@ const FootnoteForm = ({
             to.
           </p>
 
-          <FormFieldTextArea<BaseFootnote> name="content" label="Footnote" />
+          <FormFieldEditor<BaseFootnote>
+            name="content"
+            label="Footnote"
+            includePlugins={pluginsConfigLinksOnly}
+            toolbarConfig={toolbarConfigLinkOnly}
+          />
 
           {orderBy(
             Object.values(footnoteMeta.subjects),

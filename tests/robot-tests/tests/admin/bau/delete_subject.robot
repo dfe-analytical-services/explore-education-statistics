@@ -22,8 +22,8 @@ Create test publication and release via API
 Verify Release summary
     user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Tax year 2020-21
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Tax year    2020-21
-    ...    UI test contact name    National statistics
+    user verifies release summary    Tax year    2020-21
+    ...    National statistics
 
 Upload subject
     user uploads subject    UI test subject    upload-file-test-with-filter.csv
@@ -137,7 +137,7 @@ Create table
 
 Navigate to Create chart tab
     user waits until page contains link    Chart
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user clicks link    Chart
     user clicks button    Choose an infographic as alternative
     choose file    id:chartConfigurationForm-file    ${FILES_DIR}dfe-logo.jpg

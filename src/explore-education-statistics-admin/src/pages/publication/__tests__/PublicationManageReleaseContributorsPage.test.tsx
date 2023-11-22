@@ -1,8 +1,5 @@
 import PublicationManageReleaseContributorsPage from '@admin/pages/publication/PublicationManageReleaseContributorsPage';
-import {
-  testContact,
-  testPublication,
-} from '@admin/pages/publication/__data__/testPublication';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
   publicationManageReleaseContributorsPageRoute,
@@ -29,7 +26,6 @@ const releasePermissionService = _releasePermissionService as jest.Mocked<
 const testRelease: Release = {
   amendment: false,
   approvalStatus: 'Draft',
-  contact: testContact,
   id: 'release-1',
   latestInternalReleaseNote: 'release1-release-note',
   latestRelease: true,
@@ -38,7 +34,6 @@ const testRelease: Release = {
   previousVersionId: '',
   publicationId: 'publication-1',
   publicationTitle: 'Publication 1',
-  publicationSummary: 'Publication 1 summary',
   publicationSlug: 'publication-slug-1',
   publishScheduled: '',
   slug: 'release-slug-1',

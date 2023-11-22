@@ -253,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release2.Id, userReleaseRoles[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[1].Role);
                 Assert.Equal(CreatedById, userReleaseRoles[1].CreatedById);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[1].Created!.Value).Milliseconds, 0, 1500);
+                userReleaseRoles[1].Created.AssertUtcNow();
 
                 var userReleaseInvites = await contentDbContext.UserReleaseInvites
                     .AsQueryable()

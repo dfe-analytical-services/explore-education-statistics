@@ -1,3 +1,4 @@
+import SubmitError from '@common/components/form/util/SubmitError';
 import WarningMessage from '@common/components/WarningMessage';
 import PublicationForm, {
   PublicationFormSubmitHandler,
@@ -124,7 +125,7 @@ const DataCataloguePage: NextPage<Props> = ({
     const { release } = state.query;
 
     if (!release) {
-      throw new Error('Release has not been selected');
+      throw new SubmitError('Release has not been selected');
     }
 
     await downloadService.downloadFiles(release.id, files);

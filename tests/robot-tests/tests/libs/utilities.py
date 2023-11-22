@@ -3,7 +3,6 @@ import datetime
 import json
 import os
 import re
-import time
 from typing import Union
 from urllib.parse import urlparse
 
@@ -195,14 +194,6 @@ def get_child_elements(parent_locator: object, child_locator: str):
         raise_assertion_error(err)
 
 
-def user_waits_for_page_to_finish_loading():
-    # This is required because despite the DOM being loaded, and even a button being enabled,
-    # React/NextJS hasn't finished processing the page, and so click are intermittently ignored.
-    # I'm wrapping this sleep in a keyword such that if we find a way to check whether the JS
-    # processing has finished in the future, we can change it here.
-    time.sleep(0.2)
-
-
 def user_sets_focus_to_element(selector):
     sl.wait_until_page_contains_element(selector)
     sl.set_focus_to_element(selector)
@@ -257,7 +248,8 @@ def capture_large_screenshot_and_prompt_to_continue():
     prompt_to_continue()
 
 
-def capture_large_screenshot_and_html():
+def capture_screenshots_and_html():
+    visual.capture_screenshot()
     visual.capture_large_screenshot()
     capture_html()
 

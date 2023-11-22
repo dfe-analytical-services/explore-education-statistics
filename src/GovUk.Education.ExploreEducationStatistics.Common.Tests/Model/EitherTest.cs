@@ -1652,5 +1652,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             result.AssertLeft(500);
         }
+
+        [Fact]
+        public void OnSuccessAllReturnVoid()
+        {
+            var either1 = new Either<int, string>("either1");
+            var either2 = new Either<int, string>("either2");
+            var either3 = new Either<int, string>("either3");
+
+            var eitherList = ListOf(either1, either2, either3);
+
+            var results = eitherList.OnSuccessAllReturnVoid();
+
+            Assert.True(results.IsRight);
+            Assert.Equal(Unit.Instance, results.Right);
+        }
+
+        [Fact]
+        public void OnSuccessAllReturnVoid_Left()
+        {
+            var either1 = new Either<int, string>("either1");
+            var either2 = new Either<int, string>(2);
+            var either3 = new Either<int, string>(3);
+
+            var eitherList = ListOf(either1, either2, either3);
+
+            var results = eitherList.OnSuccessAllReturnVoid();
+
+            Assert.True(results.IsLeft);
+            Assert.Equal(2, results.Left);
+        }
     }
 }

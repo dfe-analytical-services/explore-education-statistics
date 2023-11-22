@@ -1,0 +1,26 @@
+﻿Test publication
+2020 Reporting year
+
+This document describes the data included in the ‘Children looked after in England'
+
+Data files
+
+Test data 1
+
+Filename: test-1.csv
+Time period: 2018
+
+Variable names and descriptions for this file are provided below:
+
+Variable name       |  Variable description
+------------------  |  ------------------
+accommodation_type  |  Accommodation type
+
+Footnotes:
+
+1. Footnote with paragraph 1
+   
+   And paragraph 2
+2. Footnote with some link (https://test.com) embedded
+3. Another footnote link (https://test-2.com)
+4. A plain footnote

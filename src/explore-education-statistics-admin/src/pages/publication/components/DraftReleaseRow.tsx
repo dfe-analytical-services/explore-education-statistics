@@ -1,6 +1,8 @@
 import Link from '@admin/components/Link';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
+import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/CancelAmendmentModal';
 import releaseService, {
+  DeleteReleasePlan,
   ReleaseSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import {
@@ -12,18 +14,28 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React from 'react';
+import React, { useState } from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
   publicationId: string;
   release: ReleaseSummaryWithPermissions;
-  onDelete: () => void;
+  onAmendmentDelete?: () => void;
 }
 
-const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
+const DraftReleaseRow = ({
+  publicationId,
+  release,
+  onAmendmentDelete,
+}: Props) => {
   const { value: checklist, isLoading: isLoadingChecklist } =
     useAsyncHandledRetry(() => releaseService.getReleaseChecklist(release.id));
+
+  const [deleteReleasePlan, setDeleteReleasePlan] = useState<
+    DeleteReleasePlan & {
+      releaseId: string;
+    }
+  >();
 
   return (
     <tr>
@@ -71,10 +83,31 @@ const DraftReleaseRow = ({ publicationId, release, onDelete }: Props) => {
         )}
 
         {release.permissions?.canDeleteRelease && release.amendment && (
-          <ButtonText variant="warning" onClick={onDelete}>
-            Cancel amendment
-            <VisuallyHidden> for {release.title}</VisuallyHidden>
-          </ButtonText>
+          <CancelAmendmentModal
+            scheduledMethodologies={deleteReleasePlan?.scheduledMethodologies}
+            triggerButton={
+              <ButtonText
+                variant="warning"
+                onClick={async () => {
+                  setDeleteReleasePlan({
+                    ...(await releaseService.getDeleteReleasePlan(release.id)),
+                    releaseId: release.id,
+                  });
+                }}
+              >
+                Cancel amendment
+                <VisuallyHidden> for {release.title}</VisuallyHidden>
+              </ButtonText>
+            }
+            onConfirm={async () => {
+              if (deleteReleasePlan) {
+                await releaseService.deleteRelease(deleteReleasePlan.releaseId);
+                setDeleteReleasePlan(undefined);
+                onAmendmentDelete?.();
+              }
+            }}
+            onCancel={() => setDeleteReleasePlan(undefined)}
+          />
         )}
       </td>
     </tr>

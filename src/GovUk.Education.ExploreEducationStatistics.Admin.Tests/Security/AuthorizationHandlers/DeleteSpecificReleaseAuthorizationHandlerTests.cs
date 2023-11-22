@@ -9,9 +9,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -24,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task DeleteSpecificReleaseAuthorizationHandler_NotAmendment()
             {
                 // Assert that no users can delete a non-amendment release
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, DeleteSpecificReleaseRequirement>(
                     CreateHandler,
                     new Release
                     {
@@ -37,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task DeleteSpecificReleaseAuthorizationHandler_AmendmentButApproved()
             {
                 // Assert that no users can delete an amendment release that is approved
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, DeleteSpecificReleaseRequirement>(
                     CreateHandler,
                     new Release
                     {
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that users with the "DeleteAllReleaseAmendments" claim can delete an amendment release that is not
                 // yet approved
-                await AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims<Release, DeleteSpecificReleaseRequirement>(
                     CreateHandler,
                     new Release
                     {
@@ -186,10 +187,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static DeleteSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
             return new DeleteSpecificReleaseAuthorizationHandler(
-                new AuthorizationHandlerResourceRoleService(
+                new AuthorizationHandlerService(
+                    contentDbContext,
                     new UserReleaseRoleRepository(contentDbContext),
                     new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPublicationRepository>(MockBehavior.Strict)));
+                    Mock.Of<IPreReleaseService>(Strict)));
         }
     }
 }

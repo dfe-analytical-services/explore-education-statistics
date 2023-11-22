@@ -4,9 +4,11 @@ import get from 'lodash/get';
 const createErrorHelper = <T extends FormikValues>({
   touched,
   errors,
+  submitCount = 0,
 }: {
   touched: FormikTouched<T>;
   errors: FormikErrors<T>;
+  submitCount?: number;
 }) => {
   const getAllErrors = (
     errorGroup: FormikValues,
@@ -17,7 +19,8 @@ const createErrorHelper = <T extends FormikValues>({
 
       const isTouched = get(touched, errorKey, false);
 
-      if (!isTouched || typeof error === 'undefined') {
+      // If the form isn't submitted, only show errors for touched fields.
+      if ((!submitCount && !isTouched) || typeof error === 'undefined') {
         return acc;
       }
 
@@ -38,7 +41,7 @@ const createErrorHelper = <T extends FormikValues>({
   const getError = (name: keyof T | string): string => {
     const isTouched = get(touched, name, false);
 
-    if (!isTouched) {
+    if (!submitCount && !isTouched) {
       return '';
     }
 

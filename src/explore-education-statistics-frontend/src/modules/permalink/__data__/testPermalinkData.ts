@@ -1,4 +1,4 @@
-import { PermalinkSnapshot } from '@common/services/permalinkSnapshotService';
+import { PermalinkSnapshot } from '@common/services/permalinkService';
 
 const testPermalinkSnapshot: PermalinkSnapshot = {
   created: '2020-10-07T12:00:00.00Z',

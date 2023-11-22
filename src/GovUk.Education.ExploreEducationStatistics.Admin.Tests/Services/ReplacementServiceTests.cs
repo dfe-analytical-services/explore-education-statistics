@@ -558,13 +558,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod
-                }
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = contentReleaseVersion2,
-                ContentBlock = dataBlock
+                },
+                Release = contentReleaseVersion2
             };
 
             var footnoteForSubject = CreateFootnote(statsReleaseVersion2,
@@ -629,7 +624,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
                     replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1021,13 +1015,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(location.Id),
                     TimePeriod = timePeriod
-                }
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = contentRelease,
-                ContentBlock = dataBlock
+                },
+                Release = contentRelease
             };
 
             var mocks = Mocks();
@@ -1055,7 +1044,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFile,
                     replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1253,13 +1241,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(location.Id),
                     TimePeriod = timePeriod
-                }
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = contentRelease,
-                ContentBlock = dataBlock
+                },
+                Release = contentRelease
             };
 
             var mocks = Mocks();
@@ -1287,7 +1270,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFile,
                     replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1510,13 +1492,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(location.Id),
                     TimePeriod = timePeriod
-                }
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = contentRelease,
-                ContentBlock = dataBlock
+                },
+                Release = contentRelease
             };
 
             var mocks = Mocks();
@@ -1544,7 +1521,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFile,
                     replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1743,13 +1719,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod
-                }
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = contentRelease,
-                ContentBlock = dataBlock
+                },
+                Release = contentRelease
             };
 
             var mocks = Mocks();
@@ -1776,7 +1747,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalFile, replacementFile);
                 await contentDbContext.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2096,13 +2066,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(location.Id),
                     TimePeriod = timePeriod
-                }
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = contentReleaseVersion2,
-                ContentBlock = dataBlock
+                },
+                Release = contentReleaseVersion2
             };
 
             var footnoteForFilter = CreateFootnote(statsReleaseVersion2,
@@ -2174,7 +2139,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalReleaseFile1, originalReleaseFile2,
                     replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2532,13 +2496,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod
                 },
-                Table = table
-            };
-
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = contentRelease,
-                ContentBlock = dataBlock
+                Table = table,
+                Release = contentRelease
             };
 
             var mocks = Mocks();
@@ -2558,7 +2517,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddRangeAsync(originalFile, replacementFile);
                 await contentDbContext.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
                 await contentDbContext.AddAsync(dataBlock);
-                await contentDbContext.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -2938,12 +2896,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         }
                     }
-                }
+                },
+                Release = contentReleaseVersion2
             };
 
-            var releaseContentBlock = new ReleaseContentBlock
+            var dataBlockVersion = new DataBlockVersion
             {
-                Release = contentReleaseVersion2,
+                Id = dataBlock.Id,
                 ContentBlock = dataBlock
             };
 
@@ -3016,8 +2975,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile1,
                     originalReleaseFile2,
                     replacementReleaseFile);
-                await contentDbContext.DataBlocks.AddRangeAsync(dataBlock);
-                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.DataBlockVersions.AddRangeAsync(dataBlockVersion);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -3040,11 +2998,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                 contentReleaseVersion2.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
 
-            var cacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+            var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
 
             mocks.cacheKeyService
                 .Setup(service => service
-                    .CreateCacheKeyForDataBlock(releaseContentBlock.ReleaseId, releaseContentBlock.ContentBlockId))
+                    .CreateCacheKeyForDataBlock(dataBlock.ReleaseId, dataBlock.Id))
                 .ReturnsAsync(cacheKey);
 
             mocks.cacheService
@@ -3501,12 +3459,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         }
                     }
-                }
+                },
+                Release = contentRelease
             };
 
-            var releaseContentBlock = new ReleaseContentBlock
+            var dataBlockVersion = new DataBlockVersion
             {
-                Release = contentRelease,
+                Id = dataBlock.Id,
                 ContentBlock = dataBlock
             };
 
@@ -3534,7 +3493,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.Files.AddRangeAsync(originalFile, replacementFile);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
-                await contentDbContext.ReleaseContentBlocks.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -3557,11 +3515,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                 contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
 
-            var cacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+            var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
 
             mocks.cacheKeyService
                 .Setup(service => service
-                    .CreateCacheKeyForDataBlock(releaseContentBlock.ReleaseId, releaseContentBlock.ContentBlockId))
+                    .CreateCacheKeyForDataBlock(dataBlock.ReleaseId, dataBlock.Id))
                 .ReturnsAsync(cacheKey);
 
             mocks.cacheService
@@ -3817,12 +3775,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         }
                     }
-                }
+                },
+                Release = contentRelease
             };
 
-            var releaseContentBlock = new ReleaseContentBlock
+            var dataBlockVersion = new DataBlockVersion
             {
-                Release = contentRelease,
+                Id = dataBlock.Id,
                 ContentBlock = dataBlock
             };
 
@@ -3850,7 +3809,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.Files.AddRangeAsync(originalFile, replacementFile);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
-                await contentDbContext.ReleaseContentBlocks.AddAsync(releaseContentBlock);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -3870,11 +3828,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
                 contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
 
-            var cacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+            var cacheKey = new DataBlockTableResultCacheKey(dataBlockVersion);
 
             mocks.cacheKeyService
                 .Setup(service => service
-                    .CreateCacheKeyForDataBlock(releaseContentBlock.ReleaseId, releaseContentBlock.ContentBlockId))
+                    .CreateCacheKeyForDataBlock(dataBlock.ReleaseId, dataBlock.Id))
                 .ReturnsAsync(cacheKey);
 
             mocks.cacheService
@@ -3922,7 +3880,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_FilterSequenceIsReplaced()
         {
-            // Basic test replacing a filter sequence, exercising the service with in-memory data and dependencies.  
+            // Basic test replacing a filter sequence, exercising the service with in-memory data and dependencies.
             // See ReplaceServiceHelperTests.ReplaceFilterSequence for a more comprehensive test of the actual replacement.
 
             var originalSubject = new Subject
@@ -4158,7 +4116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Replace_IndicatorSequenceIsReplaced()
         {
-            // Basic test replacing an indicator sequence, exercising the service with in-memory data and dependencies.  
+            // Basic test replacing an indicator sequence, exercising the service with in-memory data and dependencies.
             // See ReplaceServiceHelperTests.ReplaceIndicatorSequence for a more comprehensive test of the actual replacement.
 
             var originalSubject = new Subject

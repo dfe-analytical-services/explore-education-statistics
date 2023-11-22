@@ -53,6 +53,8 @@ public class LocationCsvUtilsTests
             "planning_area_name",
             "institution_id",
             "institution_name",
+            "lsip_code",
+            "lsip_name",
         };
 
         Assert.Equal(expectedCols, LocationCsvUtils.AllCsvColumns().ToList());

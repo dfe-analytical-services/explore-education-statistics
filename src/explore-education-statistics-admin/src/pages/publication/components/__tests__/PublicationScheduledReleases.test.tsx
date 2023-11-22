@@ -40,6 +40,7 @@ describe('PublicationScheduledReleases', () => {
       value: 'AY',
     },
     type: 'AdHocStatistics',
+    latestRelease: false,
   };
 
   const testRelease2: ReleaseSummaryWithPermissions = {

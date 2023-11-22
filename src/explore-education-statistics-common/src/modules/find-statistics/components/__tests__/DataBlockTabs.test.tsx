@@ -10,7 +10,7 @@ import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDef
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapUnmappedTableHeaders from '@common/modules/table-tool/utils/mapUnmappedTableHeaders';
 import _tableBuilderService from '@common/services/tableBuilderService';
-import { DataBlock } from '@common/services/types/blocks';
+import { Chart, DataBlock } from '@common/services/types/blocks';
 import { screen, waitFor } from '@testing-library/dom';
 import { render } from '@testing-library/react';
 import { AxiosError } from 'axios';
@@ -29,6 +29,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 describe('DataBlockTabs', () => {
   const testDataBlock: DataBlock = {
     id: 'block-1',
+    dataBlockParentId: 'block-1-parent',
     dataSetName: 'Test data set',
     dataSetId: 'test-data-set',
     type: 'DataBlock',
@@ -85,6 +86,7 @@ describe('DataBlockTabs', () => {
 
   const testDataBlockMap: DataBlock = {
     id: 'block-1',
+    dataBlockParentId: 'block-1-parent',
     dataSetId: 'test-data-set',
     dataSetName: 'Test data set',
     type: 'DataBlock',
@@ -158,7 +160,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(screen.getAllByText('Could not load content')).toHaveLength(2);
@@ -191,7 +193,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(
@@ -201,103 +203,103 @@ describe('DataBlockTabs', () => {
     });
   });
 
-  // test('renders line chart', async () => {
-  //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
-  //    testChartTableData,
-  //  );
+  test('renders line chart', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
+    );
 
-  //  const { container } = render(
-  //    <DataBlockTabs
-  //      releaseId="release-1"
-  //      id="test-datablock"
-  //      dataBlock={{
-  //        ...testDataBlock,
-  //        charts: [testChartConfiguration],
-  //      }}
-  //    />,
-  //  );
+    const { container } = render(
+      <DataBlockTabs
+        releaseId="release-1"
+        id="test-datablock"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [testChartConfiguration],
+        }}
+      />,
+    );
 
-  //  forceVisible();
+    forceVisible();
 
-  //  await waitFor(() => {
-  //    expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
-  //      'release-1',
-  //      'block-1',
-  //    );
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+      );
 
-  //    expect(screen.getAllByRole('tab')).toHaveLength(2);
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
 
-  //    expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
-  //  });
-  // });
+      expect(container.querySelectorAll('.recharts-line')).toHaveLength(3);
+    });
+  });
 
-  // test('renders horizontal chart', async () => {
-  //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
-  //    testChartTableData,
-  //  );
+  test('renders horizontal chart', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
+    );
 
-  //  const { container } = render(
-  //    <DataBlockTabs
-  //      releaseId="release-1"
-  //      id="test-block"
-  //      dataBlock={{
-  //        ...testDataBlock,
-  //        charts: [
-  //          {
-  //            ...testChartConfiguration,
-  //            type: 'horizontalbar',
-  //          } as Chart,
-  //        ],
-  //      }}
-  //    />,
-  //  );
+    const { container } = render(
+      <DataBlockTabs
+        releaseId="release-1"
+        id="test-block"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [
+            {
+              ...testChartConfiguration,
+              type: 'horizontalbar',
+            } as Chart,
+          ],
+        }}
+      />,
+    );
 
-  //  forceVisible();
+    forceVisible();
 
-  //  await waitFor(() => {
-  //    expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
-  //      'release-1',
-  //      'block-1',
-  //    );
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+      );
 
-  //    expect(screen.getAllByRole('tab')).toHaveLength(2);
-  //    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
-  //  });
-  // });
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
+      expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+    });
+  });
 
-  // test('renders vertical chart', async () => {
-  //  tableBuilderService.getDataBlockTableData.mockResolvedValue(
-  //    testChartTableData,
-  //  );
+  test('renders vertical chart', async () => {
+    tableBuilderService.getDataBlockTableData.mockResolvedValue(
+      testChartTableData,
+    );
 
-  //  const { container } = render(
-  //    <DataBlockTabs
-  //      releaseId="release-1"
-  //      id="test-block"
-  //      dataBlock={{
-  //        ...testDataBlock,
-  //        charts: [
-  //          {
-  //            ...testChartConfiguration,
-  //            type: 'verticalbar',
-  //          } as Chart,
-  //        ],
-  //      }}
-  //    />,
-  //  );
+    const { container } = render(
+      <DataBlockTabs
+        releaseId="release-1"
+        id="test-block"
+        dataBlock={{
+          ...testDataBlock,
+          charts: [
+            {
+              ...testChartConfiguration,
+              type: 'verticalbar',
+            } as Chart,
+          ],
+        }}
+      />,
+    );
 
-  //  forceVisible();
+    forceVisible();
 
-  //  await waitFor(() => {
-  //    expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
-  //      'release-1',
-  //      'block-1',
-  //    );
+    await waitFor(() => {
+      expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
+        'release-1',
+        'block-1-parent',
+      );
 
-  //    expect(screen.getAllByRole('tab')).toHaveLength(2);
-  //    expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
-  //  });
-  // });
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
+      expect(container.querySelectorAll('.recharts-bar')).toHaveLength(3);
+    });
+  });
 
   test('renders table', async () => {
     tableBuilderService.getDataBlockTableData.mockResolvedValue(
@@ -331,7 +333,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
@@ -358,7 +360,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
@@ -434,6 +436,7 @@ describe('DataBlockTabs', () => {
           dataBlock={{
             ...testDataBlock,
             id: 'block-2-id',
+            dataBlockParentId: 'block-2-parent-id',
             query: {
               subjectId: '1',
               timePeriod: {

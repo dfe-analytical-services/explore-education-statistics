@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleasePublishingStatusService : IReleasePublishingStatusService
     {
         private readonly IMapper _mapper;
-        private readonly ITableStorageService _publisherTableStorageService;
+        private readonly IPublisherTableStorageService _publisherTableStorageService;
         private readonly IUserService _userService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
 
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IMapper mapper,
             IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            ITableStorageService publisherTableStorageService)
+            IPublisherTableStorageService publisherTableStorageService)
         {
             _mapper = mapper;
             _userService = userService;

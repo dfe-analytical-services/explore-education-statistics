@@ -24,7 +24,7 @@ public class ViewMethodologyVersionAuthorizationHandler :
         ViewMethodologyVersionRequirement requirement,
         MethodologyVersion methodologyVersion)
     {
-        if (await _methodologyVersionRepository.IsPubliclyAccessible(methodologyVersion.Id))
+        if (await _methodologyVersionRepository.IsLatestPublishedVersion(methodologyVersion))
         {
             context.Succeed(requirement);
         }

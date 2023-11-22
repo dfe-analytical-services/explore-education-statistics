@@ -170,8 +170,8 @@ Create new release
 Verify created release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary updated    Spring term
-    ...    2025/26    UI Tests Contact Name    National statistics
+    user verifies release summary    Spring term
+    ...    2025/26    National statistics
 
 Edit release summary
     user waits until page contains link    Edit release summary
@@ -185,8 +185,8 @@ Edit release summary
 
 Verify updated release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary updated    Summer term
-    ...    2026/27    UI Tests Contact Name    Official statistics
+    user verifies release summary    Summer term
+    ...    2026/27    Official statistics
 
 
 *** Keywords ***

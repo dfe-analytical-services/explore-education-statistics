@@ -1,9 +1,9 @@
 import ButtonGroup from '@common/components/ButtonGroup';
+import Button from '@common/components/Button';
+import Modal from '@common/components/Modal';
 import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
-import React, { ReactNode } from 'react';
-import Button from './Button';
-import Modal from './Modal';
+import React, { ReactNode, useEffect } from 'react';
 
 interface Props {
   children?: ReactNode;
@@ -11,31 +11,42 @@ interface Props {
   cancelText?: string;
   confirmText?: string;
   open?: boolean;
-  onConfirm(): void;
-  onCancel?(): void;
-  onExit(): void;
   showCancel?: boolean;
   title: string;
+  triggerButton?: ReactNode;
   underlayClass?: string;
+  onCancel?(): void | Promise<void>;
+  onConfirm(): void | Promise<void>;
+  onExit?(): void | Promise<void>;
 }
 
 const ModalConfirm = ({
+  cancelText = 'Cancel',
   children,
   className,
   confirmText = 'Confirm',
-  cancelText = 'Cancel',
-  open,
-  onConfirm,
-  onExit,
-  onCancel = onExit,
+  open: initialOpen = false,
   showCancel = true,
   title,
+  triggerButton,
   underlayClass,
+  onExit,
+  onCancel = onExit,
+  onConfirm,
 }: Props) => {
   const isMounted = useMountedRef();
   const [isDisabled, toggleDisabled] = useToggle(false);
+  const [open, toggleOpen] = useToggle(initialOpen);
 
-  const handleAction = (callback: () => void) => async () => {
+  useEffect(() => {
+    toggleOpen(initialOpen);
+  }, [initialOpen, toggleOpen]);
+
+  const handleAction = (callback?: () => void | Promise<void>) => async () => {
+    if (!callback) {
+      toggleOpen.off();
+      return;
+    }
     if (isDisabled || !isMounted.current) {
       return;
     }
@@ -48,6 +59,7 @@ const ModalConfirm = ({
     // component has been unmounted.
     if (isMounted.current) {
       toggleDisabled.off();
+      toggleOpen.off();
     }
   };
 
@@ -56,10 +68,12 @@ const ModalConfirm = ({
       className={className}
       closeOnOutsideClick={!isDisabled}
       closeOnEsc={!isDisabled}
-      title={title}
       open={open}
-      onExit={onExit}
+      title={title}
+      triggerButton={triggerButton}
       underlayClass={underlayClass}
+      onExit={onExit}
+      onToggleOpen={toggleOpen}
     >
       {children}
 

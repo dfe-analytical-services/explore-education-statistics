@@ -105,7 +105,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 });
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -119,7 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
-                Assert.Equal("Test approval", updatedMethodologyVersion.InternalReleaseNote);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
@@ -136,8 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(Approved, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
@@ -213,7 +212,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(Unit.Instance);
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -235,7 +235,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, imageService, methodologyVersionRepository);
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
-                Assert.Equal("Test approval", updatedMethodologyVersion.InternalReleaseNote);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
@@ -252,8 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Null(updatedMethodology.Published);
                 Assert.Equal(Approved, updatedMethodology.Status);
                 Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodology.Updated.AssertUtcNow();
             }
         }
 
@@ -297,7 +295,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -322,8 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal("Test approval", methodologyStatus.InternalReleaseNote);
                 Assert.Equal(Approved, methodologyStatus.ApprovalStatus);
-                Assert.NotNull(methodologyStatus.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
+                methodologyStatus.Created.AssertUtcNow();
                 Assert.Equal(UserId, methodologyStatus.CreatedById);
             }
         }
@@ -372,7 +370,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             userReleaseRoleService.Setup(mock =>
@@ -403,8 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal("Submitted for higher review", methodologyStatus.InternalReleaseNote);
                 Assert.Equal(HigherLevelReview, methodologyStatus.ApprovalStatus);
-                Assert.NotNull(methodologyStatus.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
+                methodologyStatus.Created.AssertUtcNow();
                 Assert.Equal(UserId, methodologyStatus.CreatedById);
             }
         }
@@ -453,7 +451,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             userReleaseRoleService.Setup(mock =>
@@ -484,8 +483,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal("Moving to draft", methodologyStatus.InternalReleaseNote);
                 Assert.Equal(Draft, methodologyStatus.ApprovalStatus);
-                Assert.NotNull(methodologyStatus.Created);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyStatus.Created!.Value).Milliseconds, 0, 1500);
+                methodologyStatus.Created.AssertUtcNow();
                 Assert.Equal(UserId, methodologyStatus.CreatedById);
             }
         }
@@ -583,7 +581,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -598,27 +597,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
-                Assert.Equal("Test approval", updatedMethodologyVersion.InternalReleaseNote);
                 Assert.False(updatedMethodologyVersion.Published.HasValue);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
-                Assert.Equal(request.LatestInternalReleaseNote, updatedMethodologyVersion.InternalReleaseNote);
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedMethodology = await context
+                var updatedMethodologyVersion = await context
                     .MethodologyVersions
                     .Include(m => m.Methodology)
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
-                Assert.False(updatedMethodology.Published.HasValue);
-                Assert.Equal(Approved, updatedMethodology.Status);
-                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.Equal(request.LatestInternalReleaseNote, updatedMethodology.InternalReleaseNote);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                Assert.False(updatedMethodologyVersion.Published.HasValue);
+                Assert.Equal(Approved, updatedMethodologyVersion.Status);
+                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
 
@@ -659,13 +656,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
             var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
+            var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
 
             contentService.Setup(mock =>
                     mock.GetContentBlocks<HtmlBlock>(methodologyVersion.Id))
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(true);
 
             publishingService.Setup(mock => mock.PublishMethodologyFiles(methodologyVersion.Id))
@@ -676,13 +675,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
                         new List<AllMethodologiesThemeViewModel>()));
 
+            redirectsCacheService.Setup(mock => mock.UpdateRedirects())
+                .ReturnsAsync(new RedirectsViewModel(new List<MethodologyRedirectViewModel>()));
+
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupService(contentDbContext: context,
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     publishingService: publishingService.Object,
-                    methodologyCacheService: methodologyCacheService.Object);
+                    methodologyCacheService: methodologyCacheService.Object,
+                    redirectsCacheService: redirectsCacheService.Object);
 
                 var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
@@ -690,32 +693,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     contentService, 
                     methodologyVersionRepository, 
                     publishingService, 
-                    methodologyCacheService);
+                    methodologyCacheService,
+                    redirectsCacheService);
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
-                Assert.Equal("Test approval", updatedMethodologyVersion.InternalReleaseNote);
-                Assert.True(updatedMethodologyVersion.Published.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodologyVersion.Published!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Published.AssertUtcNow();
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
-                Assert.Equal(request.LatestInternalReleaseNote, updatedMethodologyVersion.InternalReleaseNote);
+                Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedMethodology = await context
+                var updatedMethodologyVersion = await context
                     .MethodologyVersions
                     .Include(m => m.Methodology)
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
-                Assert.True(updatedMethodology.Published.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Published!.Value).Milliseconds, 0, 1500);
-                Assert.Equal(Approved, updatedMethodology.Status);
-                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.Equal(request.LatestInternalReleaseNote, updatedMethodology.InternalReleaseNote);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                updatedMethodologyVersion.Published.AssertUtcNow();
+                Assert.Equal(Approved, updatedMethodologyVersion.Status);
+                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
+                Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
 
@@ -769,7 +769,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -784,19 +785,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedMethodology = await context
+                var updatedMethodologyVersion = await context
                     .MethodologyVersions
+                    .Include(mv => mv.Methodology)
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
-                Assert.Equal(Approved, updatedMethodology.Status);
-                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                // Existing ScheduledWithReleaseId is cleared as requested publishing strategy is not WithRelease
-                Assert.Null(updatedMethodology.ScheduledWithReleaseId);
+                Assert.Equal(Approved, updatedMethodologyVersion.Status);
+                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
+                Assert.Null(updatedMethodologyVersion.ScheduledWithReleaseId);
             }
         }
 
@@ -857,7 +860,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -871,10 +875,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
-                Assert.Equal("Test approval", updatedMethodologyVersion.InternalReleaseNote);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(WithRelease, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
 
                 Assert.NotNull(updatedMethodologyVersion.ScheduledWithRelease);
                 Assert.Equal(scheduledWithRelease.Id, updatedMethodologyVersion.ScheduledWithRelease!.Id);
@@ -883,17 +887,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedMethodology = await context
+                var updatedMethodologyVersion = await context
                     .MethodologyVersions
                     .Include(m => m.Methodology)
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
-                Assert.Null(updatedMethodology.Published);
-                Assert.Equal(Approved, updatedMethodology.Status);
-                Assert.Equal(WithRelease, updatedMethodology.PublishingStrategy);
-                Assert.Equal(scheduledWithRelease.Id, updatedMethodology.ScheduledWithReleaseId);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                Assert.Null(updatedMethodologyVersion.Published);
+                Assert.Equal(Approved, updatedMethodologyVersion.Status);
+                Assert.Equal(WithRelease, updatedMethodologyVersion.PublishingStrategy);
+                Assert.Equal(scheduledWithRelease.Id, updatedMethodologyVersion.ScheduledWithReleaseId);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
 
@@ -1112,11 +1116,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task UpdateApprovalStatus_UnapprovingMethodology()
+        public async Task UpdateApprovalStatus_MovingApprovedMethodologyToDraft()
         {
             var methodologyVersion = new MethodologyVersion
             {
-                InternalReleaseNote = "Test approval",
                 Published = null,
                 PublishingStrategy = Immediately,
                 Status = Approved,
@@ -1154,7 +1157,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
@@ -1171,26 +1175,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
 
-                Assert.Equal("A release note", updatedMethodologyVersion.InternalReleaseNote);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedMethodology = await context
+                var updatedMethodologyVersion = await context
                     .MethodologyVersions
                     .Include(m => m.Methodology)
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
-                Assert.Null(updatedMethodology.Published);
-                Assert.Equal(Draft, updatedMethodology.Status);
-                Assert.Equal(Immediately, updatedMethodology.PublishingStrategy);
-                Assert.Equal("A release note", updatedMethodology.InternalReleaseNote);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                Assert.Null(updatedMethodologyVersion.Published);
+                Assert.Equal(Draft, updatedMethodologyVersion.Status);
+                Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
 
@@ -1200,7 +1203,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var owningPublicationId = Guid.NewGuid();
             var methodologyVersion = new MethodologyVersion
             {
-                InternalReleaseNote = "Test approval",
                 Published = null,
                 Status = Draft,
                 Methodology = new Methodology
@@ -1252,7 +1254,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 .ReturnsAsync(new List<HtmlBlock>());
 
             methodologyVersionRepository.Setup(mock =>
-                    mock.IsPubliclyAccessible(methodologyVersion.Id))
+                    mock.IsToBePublished(It.Is<MethodologyVersion>(mv =>
+                        mv.Id == methodologyVersion.Id)))
                 .ReturnsAsync(false);
 
             userReleaseRoleService.Setup(mock =>
@@ -1293,25 +1296,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
 
-                Assert.Equal("A release note", updatedMethodologyVersion.InternalReleaseNote);
                 Assert.Null(updatedMethodologyVersion.Published);
                 Assert.Equal(Immediately, updatedMethodologyVersion.PublishingStrategy);
                 Assert.Null(updatedMethodologyVersion.ScheduledWithRelease);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var updatedMethodology = await context
+                var updatedMethodologyVersion = await context
                     .MethodologyVersions
                     .Include(m => m.Methodology)
                     .SingleAsync(m => m.Id == methodologyVersion.Id);
 
-                Assert.Null(updatedMethodology.Published);
-                Assert.Equal(HigherLevelReview, updatedMethodology.Status);
-                Assert.Equal("A release note", updatedMethodology.InternalReleaseNote);
-                Assert.True(updatedMethodology.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedMethodology.Updated!.Value).Milliseconds, 0, 1500);
+                Assert.Null(updatedMethodologyVersion.Published);
+                Assert.Equal(HigherLevelReview, updatedMethodologyVersion.Status);
+                updatedMethodologyVersion.Updated.AssertUtcNow();
+                Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
         }
 
@@ -1326,7 +1328,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IUserService? userService = null,
             IUserReleaseRoleService? userReleaseRoleService = null,
             IMethodologyCacheService? methodologyCacheService = null,
-            IEmailTemplateService? emailTemplateService = null)
+            IEmailTemplateService? emailTemplateService = null,
+            IRedirectsCacheService? redirectsCacheService = null)
 
         {
             return new(
@@ -1340,7 +1343,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 userService ?? AlwaysTrueUserService(UserId).Object,
                 userReleaseRoleService ?? Mock.Of<IUserReleaseRoleService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
-                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict));
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
+                redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
         }
     }
 }

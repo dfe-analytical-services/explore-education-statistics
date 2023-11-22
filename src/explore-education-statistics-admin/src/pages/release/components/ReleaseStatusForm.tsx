@@ -138,7 +138,7 @@ const ReleaseStatusForm = ({
       }
     },
     errorMappings,
-    fallbackErrorMapping,
+    { fallbackErrorMapping },
   );
 
   const validationSchema = useMemo(() => {

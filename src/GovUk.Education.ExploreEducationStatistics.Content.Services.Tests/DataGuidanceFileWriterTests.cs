@@ -26,8 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             <p>
                 This document describes the data included in the ‘Children looked after in England 
                 including adoptions: 2019 to 2020’ National Statistics release’s underlying data files. 
-                This data is released under the terms of the Open Government License and is intended to 
-                meet at least three stars for Open Data.
+                This data is released under the terms of the <a href=""https://the-license.gov.uk"">Open Government License</a> 
+                and is intended to meet at least three stars for Open Data.
             </p>
             <h2>Coverage</h2>
             <p>
@@ -242,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Content = @"
                         <p>
                             Local authority level data on care leavers aged 17 to 21, by accommodation type (as 
-                            measured on or around their birthday).
+                            measured on or around their birthday). See <a href=""https://test.com"">reference information</a>.
                         </p>",
                     GeographicLevels = new List<string>
                     {
@@ -763,6 +763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new(Guid.NewGuid(), "Footnote 6"),
                         new(Guid.NewGuid(), "Footnote 7"),
                         new(Guid.NewGuid(), "Footnote 8"),
+                        // New lines are stripped out by text conversion
                         new(
                             Guid.NewGuid(),
                             string.Join("\n", "Footnote 9", "over some", "lines.")
@@ -772,6 +773,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             Guid.NewGuid(),
                             string.Join("\n", "Footnote 11", "over some", "other lines.")
                         ),
+                    }
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+
+            dataGuidanceSubjectService
+                .Setup(s => s.GetSubjects(release.Id, null))
+                .ReturnsAsync(subjects);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            {
+                await contentDbContext.Entry(release).ReloadAsync();
+
+                var writer = BuildDataGuidanceFileWriter(
+                    contentDbContext: contentDbContext,
+                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                );
+
+                await using var stream = new MemoryStream();
+                await writer.WriteToStream(stream, release);
+
+                Snapshot.Match(stream.ReadToEnd());
+            }
+
+            MockUtils.VerifyAllMocks(dataGuidanceSubjectService);
+        }
+
+        [Fact]
+        public async Task WriteToStream_FileWithHtmlFootnotes()
+        {
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.ReportingYear,
+                Publication = new Publication
+                {
+                    Title = "Test publication"
+                },
+                DataGuidance = TestBasicDataGuidance
+            };
+
+            var subjects = new List<DataGuidanceSubjectViewModel>
+            {
+                new()
+                {
+                    Filename = "test-1.csv",
+                    Name = "Test data 1",
+                    Content = "",
+                    GeographicLevels = new List<string>(),
+                    TimePeriods = new TimePeriodLabels("2018", ""),
+                    Variables = new List<LabelValue>
+                    {
+                        new("Accommodation type", "accommodation_type"),
+                    },
+                    Footnotes = new List<FootnoteViewModel>
+                    {
+                        new(Guid.NewGuid(), "<p>Footnote with paragraph 1</p><p>And paragraph 2</p>"),
+                        new(Guid.NewGuid(), @"Footnote with <a href=""https://test.com"">some link</a> embedded"),
+                        new(Guid.NewGuid(), @"<a href=""https://test-2.com"">Another footnote link</a>"),
+                        new(Guid.NewGuid(), "A plain footnote"),
                     }
                 }
             };

@@ -16,12 +16,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ManageLegacyReleasesAuthorizationHandler 
         : AuthorizationHandler<ManageLegacyReleasesRequirement, Publication>
     {
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public ManageLegacyReleasesAuthorizationHandler(
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         publication.Id,
@@ -52,12 +52,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ViewLegacyReleaseAuthorizationHandler 
         : AuthorizationHandler<ViewLegacyReleaseRequirement, LegacyRelease>
     {
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
         
         public ViewLegacyReleaseAuthorizationHandler(
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         legacyRelease.PublicationId,
@@ -88,11 +88,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateLegacyReleaseAuthorizationHandler 
         : AuthorizationHandler<UpdateLegacyReleaseRequirement, LegacyRelease>
     {
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
         
-        public UpdateLegacyReleaseAuthorizationHandler(AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+        public UpdateLegacyReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
         {
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         legacyRelease.PublicationId,
@@ -123,11 +123,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class DeleteLegacyReleaseAuthorizationHandler 
         : AuthorizationHandler<DeleteLegacyReleaseRequirement, LegacyRelease>
     {
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
         
-        public DeleteLegacyReleaseAuthorizationHandler(AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+        public DeleteLegacyReleaseAuthorizationHandler(AuthorizationHandlerService authorizationHandlerService)
         {
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -140,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         legacyRelease.PublicationId,

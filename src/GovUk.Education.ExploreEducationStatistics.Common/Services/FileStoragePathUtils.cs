@@ -16,19 +16,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public static string PublicContentStagingPath() => "staging";
 
-        private static string PublicContentPublicationParentPath(string slug, bool staging = false)
+        private static string PublicContentPublicationParentPath(string publicationSlug, bool staging = false)
         {
-            return $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{slug}";
+            return
+                $"{AppendPathSeparator(staging ? PublicContentStagingPath() : null)}publications/{publicationSlug.TrimToLower()}";
         }
 
         private static string PublicContentReleaseParentPath(string publicationSlug, string releaseSlug)
         {
-            return $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug}";
+            return
+                $"{PublicContentPublicationParentPath(publicationSlug)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}";
         }
 
-        public static string PublicContentPublicationPath(string slug)
+        public static string PublicContentPublicationPath(string publicationSlug)
         {
-            return $"{PublicContentPublicationParentPath(slug)}/{PublicationFileName}";
+            return $"{PublicContentPublicationParentPath(publicationSlug)}/{PublicationFileName}";
         }
 
         public static string PublicContentLatestReleasePath(string publicationSlug, bool staging = false)
@@ -38,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, bool staging = false)
         {
-            return $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{ReleasesDirectory}/{releaseSlug}.json";
+            return
+                $"{PublicContentPublicationParentPath(publicationSlug, staging)}/{ReleasesDirectory}/{releaseSlug.TrimToLower()}.json";
         }
 
         public static string PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)

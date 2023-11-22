@@ -1,38 +1,31 @@
 import Link from '@admin/components/Link';
 import { MethodologyContentPageInternal } from '@admin/pages/methodology/edit-methodology/content/MethodologyContentPage';
-import {
-  MethodologyContextState,
-  MethodologyContentProvider,
-} from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
+import { MethodologyContentProvider } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
 import {
   PreReleaseMethodologyRouteParams,
   preReleaseMethodologiesRoute,
 } from '@admin/routes/preReleaseRoutes';
-import methodologyContentService from '@admin/services/methodologyContentService';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps } from 'react-router';
+import { useQuery } from '@tanstack/react-query';
+import methodologyQueries from '@admin/queries/methodologyQueries';
+import methodologyContentQueries from '@admin/queries/methodologyContentQueries';
 
 const PreReleaseMethodologyPage = ({
   match,
 }: RouteComponentProps<PreReleaseMethodologyRouteParams>) => {
   const { methodologyId, publicationId, releaseId } = match.params;
 
-  const { value, isLoading } =
-    useAsyncHandledRetry<MethodologyContextState>(async () => {
-      const methodology = await methodologyContentService.getMethodologyContent(
-        methodologyId,
-      );
+  const { data: methodologyVersion, isLoading: isMethodologyVersionLoading } =
+    useQuery(methodologyQueries.get(methodologyId));
 
-      return {
-        methodology,
-        canUpdateMethodology: false,
-        isPreRelease: true,
-      };
-    }, [methodologyId]);
+  const { data: methodologyContent, isLoading: isMethodologyContentLoading } =
+    useQuery(methodologyContentQueries.get(methodologyId));
+
+  const isLoading = isMethodologyVersionLoading || isMethodologyContentLoading;
 
   return (
     <div className="govuk-width-container">
@@ -50,8 +43,15 @@ const PreReleaseMethodologyPage = ({
         >
           Back
         </Link>
-        {value ? (
-          <MethodologyContentProvider value={value}>
+        {methodologyContent && methodologyVersion ? (
+          <MethodologyContentProvider
+            value={{
+              methodology: methodologyContent,
+              methodologyVersion,
+              canUpdateMethodology: false,
+              isPreRelease: true,
+            }}
+          >
             <MethodologyContentPageInternal />
           </MethodologyContentProvider>
         ) : (

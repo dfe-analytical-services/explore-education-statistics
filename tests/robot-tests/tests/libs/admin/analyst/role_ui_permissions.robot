@@ -36,7 +36,7 @@ user cannot see edit controls for release content
 
 user cannot see the edit release status controls for release
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user checks page does not contain    Edit release status
 
 user cannot see the enabled approve release controls for release
@@ -54,7 +54,7 @@ user can see the create amendment controls for release
 
 user cannot see the edit status controls for methodology
     user clicks link    Sign off
-    user waits until page does not contain loading spinner
+    user waits until page finishes loading
     user checks page does not contain    Edit status
 
 user cannot see the remove controls for methodology

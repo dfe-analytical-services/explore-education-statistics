@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static Moq.MockBehavior;
 
@@ -25,8 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that users with the "UpdateAllReleases" claim can assign pre release contacts to a release
                 // that's unapproved
-                await AssertReleaseHandlerSucceedsWithCorrectClaims
-                    <AssignPrereleaseContactsToSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims
+                    <Release, AssignPrereleaseContactsToSpecificReleaseRequirement>(
                         CreateHandler,
                         new Release
                         {
@@ -40,8 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that users with the "UpdateAllReleases" claim can assign pre release contacts to a release
                 // that's approved
-                await AssertReleaseHandlerSucceedsWithCorrectClaims
-                    <AssignPrereleaseContactsToSpecificReleaseRequirement>(
+                await AssertHandlerSucceedsWithCorrectClaims
+                    <Release, AssignPrereleaseContactsToSpecificReleaseRequirement>(
                         CreateHandler,
                         new Release
                         {
@@ -120,6 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     CreateHandler,
                     new Release
                     {
+                        Id = Guid.NewGuid(),
                         ApprovalStatus = ReleaseApprovalStatus.Draft
                     },
                     ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
@@ -135,6 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     CreateHandler,
                     new Release
                     {
+                        Id = Guid.NewGuid(),
                         ApprovalStatus = ReleaseApprovalStatus.Approved
                     },
                     ReleaseRole.Approver, ReleaseRole.Contributor, ReleaseRole.Lead);
@@ -144,10 +147,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static IAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
         {
             return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-                new AuthorizationHandlerResourceRoleService(
+                new AuthorizationHandlerService(
+                    contentDbContext,
                     new UserReleaseRoleRepository(contentDbContext),
                     new UserPublicationRoleRepository(contentDbContext),
-                    Mock.Of<IPublicationRepository>(Strict))
+                    Mock.Of<IPreReleaseService>(Strict))
             );
         }
     }

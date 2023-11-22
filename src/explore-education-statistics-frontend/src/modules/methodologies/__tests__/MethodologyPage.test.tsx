@@ -2,7 +2,7 @@ import MethodologyPage from '@frontend/pages/methodology/[methodology]';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { testMethodology } from './__data__/testMethodologyData';
+import { testMethodology } from '@frontend/modules/methodologies/__tests__/__data__/testMethodologyData';
 
 describe('MethodologyPage', () => {
   test('renders methodology page basic details', async () => {
@@ -46,7 +46,7 @@ describe('MethodologyPage', () => {
       'link',
     );
 
-    expect(relatedInformationLinks).toHaveLength(4);
+    expect(relatedInformationLinks).toHaveLength(5);
 
     expect(relatedInformationLinks[0]).toHaveTextContent('Publication 1');
     expect(relatedInformationLinks[1]).toHaveTextContent('Publication 2');
@@ -195,6 +195,50 @@ describe('MethodologyPage', () => {
       expect(within(notes[2]).getByTestId('note-content')).toHaveTextContent(
         'Earliest note',
       );
+    });
+  });
+
+  describe('Help and Support Section', () => {
+    test('renders the Help and Support section', () => {
+      render(<MethodologyPage data={testMethodology} />);
+
+      expect(
+        within(
+          screen.getByRole('navigation', { name: 'Related information' }),
+        ).getByRole('heading', {
+          name: 'Help and support',
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('displays a link to the contact us section within the Related Information section', () => {
+      render(<MethodologyPage data={testMethodology} />);
+
+      expect(
+        within(
+          screen.getByRole('navigation', { name: 'Related information' }),
+        ).getByRole('link', {
+          name: 'Contact us',
+        }),
+      ).toBeInTheDocument();
+    });
+
+    test('navigates to the Contact Us section when the link is clicked', () => {
+      render(<MethodologyPage data={testMethodology} />);
+
+      expect(
+        within(
+          screen.getByRole('navigation', { name: 'Related information' }),
+        ).getByRole('link', {
+          name: 'Contact us',
+        }),
+      ).toHaveAttribute('href', '#contact-us');
+
+      expect(
+        screen
+          .queryAllByRole('heading', { name: 'Contact us' })
+          .find(e => e.id === 'contact-us'),
+      ).not.toBeUndefined();
     });
   });
 });

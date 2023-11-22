@@ -13,13 +13,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public List<PublicationMethodology> Publications { get; set; } = new();
 
-        [Required]
-        public string OwningPublicationTitle { get; set; }
+        [Required] public string OwningPublicationTitle { get; set; } = null!;
 
-        [Required]
-        public string Slug { get; set; }
+        [Required] public string OwningPublicationSlug { get; set; } = null!;
+
+        [Required] public string Slug { get; set; } = null!; // TODO: Remove in EES-4627
 
         public List<MethodologyVersion> Versions { get; set; } = new();
+
+        public Guid? LatestPublishedVersionId { get; set; }
+
+        public MethodologyVersion? LatestPublishedVersion { get; set; }
 
         public PublicationMethodology OwningPublication()
         {

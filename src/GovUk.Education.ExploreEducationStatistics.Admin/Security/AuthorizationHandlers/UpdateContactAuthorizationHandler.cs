@@ -13,12 +13,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
     public class UpdateContactAuthorizationHandler : AuthorizationHandler<UpdateContactRequirement, Publication>
     {
-        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+        private readonly AuthorizationHandlerService _authorizationHandlerService;
 
         public UpdateContactAuthorizationHandler(
-            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            AuthorizationHandlerService authorizationHandlerService)
         {
-            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            _authorizationHandlerService = authorizationHandlerService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            if (await _authorizationHandlerResourceRoleService
+            if (await _authorizationHandlerService
                     .HasRolesOnPublication(
                         context.User.GetUserId(),
                         publication.Id,

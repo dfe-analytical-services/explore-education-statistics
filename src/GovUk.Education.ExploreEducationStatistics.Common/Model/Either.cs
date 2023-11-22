@@ -66,6 +66,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
     public static class EitherExtensions
     {
+        /// <summary>
+        /// If all Eithers in the provided list are successful, return a list of the successful results. Otherwise,
+        /// return the first failure.
+        /// </summary>
         public static Either<TFailure, List<TSuccess>> OnSuccessAll<TFailure, TSuccess>(
             this IEnumerable<Either<TFailure, TSuccess>> items)
         {
@@ -80,6 +84,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
                 result.Add(either.Right);
             }
             return result;
+        }
+
+        /// <summary>
+        /// If all Eithers in the provided list are successful, return Unit.Instance. Otherwise, return the first
+        /// failure.
+        /// </summary>
+        public static Either<TFailure, Unit> OnSuccessAllReturnVoid<TFailure, TSuccess>(
+            this IEnumerable<Either<TFailure, TSuccess>> items)
+        {
+            return items
+                .OnSuccessAll()
+                .OnSuccessVoid();
         }
 
         public static Either<TFailure, Unit> OnSuccessVoid<TFailure, TSuccess>(
