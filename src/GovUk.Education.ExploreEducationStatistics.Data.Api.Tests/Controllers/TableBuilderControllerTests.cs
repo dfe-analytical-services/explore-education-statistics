@@ -491,7 +491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal(DataBlockParentId, viewModel.DataBlockParentId);
             Assert.Equal(ReleaseId, viewModel.ReleaseId);
             Assert.Equal(Release.Slug, viewModel.ReleaseSlug);
-            Assert.Equal(Release.Type, viewModel.ReleaseType);
+            Assert.Equal(Release.Type.ToString(), viewModel.ReleaseType);
             viewModel.Configuration.AssertDeepEqualTo(TableConfiguration);
             viewModel.FullTable.AssertDeepEqualTo(_tableBuilderResults);
             Assert.True(viewModel.LatestData);
@@ -568,7 +568,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             Assert.Equal(DataBlockParentId, viewModel.DataBlockParentId);
             Assert.Equal(ReleaseId, viewModel.ReleaseId);
             Assert.Equal(Release.Slug, viewModel.ReleaseSlug);
-            Assert.Equal(Release.Type, viewModel.ReleaseType);
+            Assert.Equal(Release.Type.ToString(), viewModel.ReleaseType);
             Assert.False(viewModel.LatestData);
             Assert.Equal("Academic year 2021/22", viewModel.LatestReleaseTitle);
         }

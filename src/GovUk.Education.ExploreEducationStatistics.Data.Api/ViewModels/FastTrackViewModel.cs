@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 
         public string ReleaseSlug { get; set; }
         
-        public ReleaseType ReleaseType { get; set; }
+        public string ReleaseType { get; set; }
 
         public bool LatestData { get; set; }
 
