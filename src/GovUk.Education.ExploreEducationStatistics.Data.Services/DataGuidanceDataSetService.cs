@@ -64,22 +64,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .ToAsyncEnumerable()
                         .SelectAwait(async releaseFile =>
                         {
-                            // TODO EES-4661 Remove this and switch to using ReleaseFile for content
                             var subjectId = releaseFile.File.SubjectId!.Value;
-
-                            var releaseSubject = await _statisticsDbContext.ReleaseSubject
-                                .FirstAsync(rs => rs.ReleaseId == releaseId
-                                                  && rs.SubjectId == subjectId,
-                                    cancellationToken);
 
                             var geographicLevels = await ListGeographicLevels(subjectId, cancellationToken);
                             var timePeriods = await _timePeriodService.GetTimePeriodLabels(subjectId);
                             var variables = await ListVariables(subjectId, cancellationToken);
-                            var footnotes = await ListFootnotes(releaseId: releaseSubject.ReleaseId,
+                            var footnotes = await ListFootnotes(releaseId: releaseId,
                                 subjectId: subjectId);
 
                             return BuildDataGuidanceDataSetViewModel(releaseFile,
-                                releaseSubject.DataGuidance,
                                 geographicLevels,
                                 timePeriods,
                                 variables,
@@ -153,7 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static DataGuidanceDataSetViewModel BuildDataGuidanceDataSetViewModel(
             ReleaseFile releaseFile,
-            string? content,
             List<string> geographicLevels,
             TimePeriodLabels timePeriods,
             List<LabelValue> variables,
@@ -162,7 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new DataGuidanceDataSetViewModel
             {
                 FileId = releaseFile.FileId,
-                Content = content ?? "", // TODO EES-4661 Update this to be releaseFile.Summary
+                Content = releaseFile.Summary ?? "",
                 Filename = releaseFile.File.Filename,
                 Order = releaseFile.Order,
                 Name = releaseFile.Name ?? "",

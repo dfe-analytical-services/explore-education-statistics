@@ -75,15 +75,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
-                Subject = subject1,
-                DataGuidance = "Data set 1 guidance"
+                Subject = subject1
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
-                Subject = subject2,
-                DataGuidance = "Data set 2 guidance"
+                Subject = subject2
             };
 
             var subject1Observation1 = new Observation
@@ -714,22 +712,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseVersion1Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion1,
-                Subject = subject1,
-                DataGuidance = "Version 1 data set 1 guidance"
+                Subject = subject1
             };
 
             var releaseVersion2Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion2,
-                Subject = subject1,
-                DataGuidance = "Version 2 data set 1 guidance"
+                Subject = subject1
             };
 
             var releaseVersion2Subject2 = new ReleaseSubject
             {
                 Release = releaseVersion2,
-                Subject = subject2,
-                DataGuidance = "Version 2 data set 2 guidance"
+                Subject = subject2
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
