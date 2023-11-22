@@ -23,7 +23,7 @@ const TableToolInfo = ({
       <h3>Related information</h3>
 
       <ul className="govuk-list">
-        {releaseType && (
+        {!!releaseType && (
           <li>
             Release type: {releaseTypes[releaseType]}{' '}
             <ReleaseTypesModal
