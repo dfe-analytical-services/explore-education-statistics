@@ -58,6 +58,7 @@ Validate release type filters exist
     user checks radio is checked    Show all
     user checks page contains radio    National statistics
     user checks page contains radio    Official statistics
+    user checks page contains radio    Official statistics in development
     user checks page contains radio    Experimental statistics
     user checks page contains radio    Ad hoc statistics
     user checks page contains radio    Management information

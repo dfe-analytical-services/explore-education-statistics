@@ -202,13 +202,13 @@ Change the Release type
     user clicks link    Edit release summary
     user waits until page finishes loading
     user waits until h2 is visible    Edit release summary
-    user checks page contains radio    Experimental statistics
-    user clicks radio    Experimental statistics
+    user checks page contains radio    Official statistics in development
+    user clicks radio    Official statistics in development
     user clicks button    Update release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    Financial year
     ...    3000-01
-    ...    Experimental statistics
+    ...    Official statistics in development
 
 Navigate to data replacement page
     user clicks link    Data and files

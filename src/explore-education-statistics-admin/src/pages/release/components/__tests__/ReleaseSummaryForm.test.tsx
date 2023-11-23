@@ -6,9 +6,7 @@ import noop from 'lodash/noop';
 import React from 'react';
 import { releaseTypes } from '@common/services/types/releaseType';
 import userEvent from '@testing-library/user-event';
-import ReleaseSummaryForm, {
-  ReleaseSummaryFormValues,
-} from '../ReleaseSummaryForm';
+import ReleaseSummaryForm from '../ReleaseSummaryForm';
 
 const metaService = _metaService as jest.Mocked<typeof _metaService>;
 
@@ -27,20 +25,18 @@ describe('ReleaseSummaryForm', () => {
       ],
     },
   ];
-  test('renders correctly with empty initial values', async () => {
+  test('renders correctly with empty initial values and without the template field when `templateRelease` is not provided', async () => {
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
 
     render(
-      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+      <ReleaseSummaryForm
         submitText="Create new release"
-        initialValues={() => {
-          return {
-            timePeriodCoverageCode: '',
-            timePeriodCoverageStartYear: '',
-            releaseType: undefined,
-          };
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          releaseType: undefined,
         }}
         onSubmit={noop}
         onCancel={noop}
@@ -61,26 +57,105 @@ describe('ReleaseSummaryForm', () => {
     );
     expect(inputYear).toBeInTheDocument();
 
-    expect(
-      within(screen.getByRole('group', { name: 'Release type' })).getAllByRole(
-        'radio',
-      ),
-    ).toHaveLength(5);
-    expect(
+    const releaseTypeRadios = within(
+      screen.getByRole('group', { name: 'Release type' }),
+    ).getAllByRole('radio');
+    expect(releaseTypeRadios).toHaveLength(5);
+    expect(releaseTypeRadios[0]).toEqual(
       screen.getByLabelText(releaseTypes.AdHocStatistics),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByLabelText(releaseTypes.ExperimentalStatistics),
-    ).toBeInTheDocument();
-    expect(
+    );
+    expect(releaseTypeRadios[1]).toEqual(
       screen.getByLabelText(releaseTypes.ManagementInformation),
-    ).toBeInTheDocument();
-    expect(
+    );
+    expect(releaseTypeRadios[2]).toEqual(
       screen.getByLabelText(releaseTypes.NationalStatistics),
-    ).toBeInTheDocument();
-    expect(
+    );
+    expect(releaseTypeRadios[3]).toEqual(
       screen.getByLabelText(releaseTypes.OfficialStatistics),
+    );
+    expect(releaseTypeRadios[4]).toEqual(
+      screen.getByLabelText(releaseTypes.OfficialStatisticsInDevelopment),
+    );
+
+    expect(
+      screen.queryByRole('group', { name: 'Select template' }),
+    ).not.toBeInTheDocument();
+
+    const buttonCreate = screen.getByRole('button', {
+      name: 'Create new release',
+    });
+    expect(buttonCreate).toBeInTheDocument();
+    const buttonCancel = screen.getByRole('button', {
+      name: 'Cancel',
+    });
+    expect(buttonCancel).toBeInTheDocument();
+  });
+
+  test('renders correctly with the template field when `templateRelease` is provided', async () => {
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    render(
+      <ReleaseSummaryForm
+        submitText="Create new release"
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          releaseType: undefined,
+        }}
+        templateRelease={{
+          id: 'template-id',
+          title: 'Template title',
+        }}
+        onSubmit={noop}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    const selectYearType = screen.getByLabelText('Type');
+    expect(selectYearType).toBeInTheDocument();
+
+    const inputYear = screen.getByLabelText(
+      testTimeIdentifiers[0].category.label,
+    );
+    expect(inputYear).toBeInTheDocument();
+
+    const releaseTypeRadios = within(
+      screen.getByRole('group', { name: 'Release type' }),
+    ).getAllByRole('radio');
+    expect(releaseTypeRadios).toHaveLength(5);
+    expect(releaseTypeRadios[0]).toEqual(
+      screen.getByLabelText(releaseTypes.AdHocStatistics),
+    );
+    expect(releaseTypeRadios[1]).toEqual(
+      screen.getByLabelText(releaseTypes.ManagementInformation),
+    );
+    expect(releaseTypeRadios[2]).toEqual(
+      screen.getByLabelText(releaseTypes.NationalStatistics),
+    );
+    expect(releaseTypeRadios[3]).toEqual(
+      screen.getByLabelText(releaseTypes.OfficialStatistics),
+    );
+    expect(releaseTypeRadios[4]).toEqual(
+      screen.getByLabelText(releaseTypes.OfficialStatisticsInDevelopment),
+    );
+
+    expect(
+      within(
+        screen.getByRole('group', { name: 'Select template' }),
+      ).getAllByRole('radio'),
+    ).toHaveLength(2);
+    expect(
+      screen.getByLabelText('Copy existing template (Template title)'),
     ).toBeInTheDocument();
+    expect(screen.getByLabelText('Create new template')).toBeInTheDocument();
 
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
@@ -100,14 +175,12 @@ describe('ReleaseSummaryForm', () => {
     const onSubmit = jest.fn();
 
     render(
-      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+      <ReleaseSummaryForm
         submitText="Create new release"
-        initialValues={() => {
-          return {
-            timePeriodCoverageCode: '',
-            timePeriodCoverageStartYear: '',
-            releaseType: undefined,
-          };
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          releaseType: undefined,
         }}
         onSubmit={onSubmit}
         onCancel={noop}
@@ -145,14 +218,12 @@ describe('ReleaseSummaryForm', () => {
     const onSubmit = jest.fn();
 
     render(
-      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+      <ReleaseSummaryForm
         submitText="Create new release"
-        initialValues={() => {
-          return {
-            timePeriodCoverageCode: '',
-            timePeriodCoverageStartYear: '',
-            releaseType: undefined,
-          };
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          releaseType: undefined,
         }}
         onSubmit={onSubmit}
         onCancel={noop}
@@ -199,14 +270,12 @@ describe('ReleaseSummaryForm', () => {
     const onSubmit = jest.fn();
 
     render(
-      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+      <ReleaseSummaryForm
         submitText="Create new release"
-        initialValues={() => {
-          return {
-            timePeriodCoverageCode: '',
-            timePeriodCoverageStartYear: '',
-            releaseType: undefined,
-          };
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          releaseType: undefined,
         }}
         onSubmit={onSubmit}
         onCancel={noop}
@@ -253,14 +322,12 @@ describe('ReleaseSummaryForm', () => {
     const onSubmit = jest.fn();
 
     render(
-      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+      <ReleaseSummaryForm
         submitText="Create new release"
-        initialValues={() => {
-          return {
-            timePeriodCoverageCode: '',
-            timePeriodCoverageStartYear: '',
-            releaseType: undefined,
-          };
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          releaseType: undefined,
         }}
         onSubmit={onSubmit}
         onCancel={noop}
@@ -304,14 +371,12 @@ describe('ReleaseSummaryForm', () => {
     );
 
     render(
-      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+      <ReleaseSummaryForm
         submitText="Create new release"
-        initialValues={() => {
-          return {
-            timePeriodCoverageCode: 'AYQ4',
-            timePeriodCoverageStartYear: '1966',
-            releaseType: 'NationalStatistics',
-          };
+        initialValues={{
+          timePeriodCoverageCode: 'AYQ4',
+          timePeriodCoverageStartYear: '1966',
+          releaseType: 'NationalStatistics',
         }}
         onSubmit={noop}
         onCancel={noop}
@@ -332,15 +397,15 @@ describe('ReleaseSummaryForm', () => {
     );
     expect(inputYear).toHaveValue(1966);
 
-    const radioOptionsReleaseType = within(
+    const releaseTypeRadios = within(
       screen.getByRole('group', { name: 'Release type' }),
     ).getAllByRole('radio');
-    expect(radioOptionsReleaseType).toHaveLength(5);
-    expect(radioOptionsReleaseType[0]).not.toBeChecked();
-    expect(radioOptionsReleaseType[1]).not.toBeChecked();
-    expect(radioOptionsReleaseType[2]).not.toBeChecked();
-    expect(radioOptionsReleaseType[3]).toBeChecked();
-    expect(radioOptionsReleaseType[4]).not.toBeChecked();
+    expect(releaseTypeRadios).toHaveLength(5);
+    expect(releaseTypeRadios[0]).not.toBeChecked();
+    expect(releaseTypeRadios[1]).not.toBeChecked();
+    expect(releaseTypeRadios[2]).toBeChecked();
+    expect(releaseTypeRadios[3]).not.toBeChecked();
+    expect(releaseTypeRadios[4]).not.toBeChecked();
   });
 
   test('submits form with valid values', async () => {
@@ -351,14 +416,12 @@ describe('ReleaseSummaryForm', () => {
     const onSubmit = jest.fn();
 
     render(
-      <ReleaseSummaryForm<ReleaseSummaryFormValues>
+      <ReleaseSummaryForm
         submitText="Create new release"
-        initialValues={() => {
-          return {
-            timePeriodCoverageCode: '',
-            timePeriodCoverageStartYear: '',
-            releaseType: undefined,
-          };
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          releaseType: undefined,
         }}
         onSubmit={onSubmit}
         onCancel={noop}
@@ -394,5 +457,110 @@ describe('ReleaseSummaryForm', () => {
     await waitFor(() => {
       expect(onSubmit).toHaveBeenCalledTimes(1);
     });
+  });
+
+  test('does not show the Experimental statistics release type when empty initial values', async () => {
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    render(
+      <ReleaseSummaryForm
+        submitText="Create new release"
+        initialValues={{
+          timePeriodCoverageCode: '',
+          timePeriodCoverageStartYear: '',
+          releaseType: undefined,
+        }}
+        onSubmit={noop}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      within(screen.getByRole('group', { name: 'Release type' })).getAllByRole(
+        'radio',
+      ),
+    ).toHaveLength(5);
+
+    expect(
+      screen.queryByLabelText(releaseTypes.ExperimentalStatistics),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not show the Experimental statistics release type when another type is in initial values', async () => {
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    render(
+      <ReleaseSummaryForm
+        submitText="Create new release"
+        initialValues={{
+          timePeriodCoverageCode: 'AYQ4',
+          timePeriodCoverageStartYear: '1966',
+          releaseType: 'NationalStatistics',
+        }}
+        onSubmit={noop}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      within(screen.getByRole('group', { name: 'Release type' })).getAllByRole(
+        'radio',
+      ),
+    ).toHaveLength(5);
+
+    expect(
+      screen.queryByLabelText(releaseTypes.ExperimentalStatistics),
+    ).not.toBeInTheDocument();
+  });
+
+  test('shows the Experimental statistics release type when it is already in initial values', async () => {
+    metaService.getTimePeriodCoverageGroups.mockResolvedValue(
+      testTimeIdentifiers,
+    );
+
+    render(
+      <ReleaseSummaryForm
+        submitText="Create new release"
+        initialValues={{
+          timePeriodCoverageCode: 'AYQ4',
+          timePeriodCoverageStartYear: '1966',
+          releaseType: 'ExperimentalStatistics',
+        }}
+        onSubmit={noop}
+        onCancel={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Select time period coverage'),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      within(screen.getByRole('group', { name: 'Release type' })).getAllByRole(
+        'radio',
+      ),
+    ).toHaveLength(6);
+
+    expect(
+      screen.getByLabelText(releaseTypes.ExperimentalStatistics),
+    ).toBeInTheDocument();
   });
 });

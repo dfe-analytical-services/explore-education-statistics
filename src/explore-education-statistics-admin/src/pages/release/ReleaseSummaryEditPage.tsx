@@ -8,22 +8,10 @@ import {
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import releaseService from '@admin/services/releaseService';
-import useFormSubmit from '@common/hooks/useFormSubmit';
-import { mapFieldErrors } from '@common/validation/serverValidations';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps, useLocation } from 'react-router';
-
-const errorMappings = [
-  mapFieldErrors<ReleaseSummaryFormValues>({
-    target: 'timePeriodCoverageStartYear',
-    messages: {
-      SlugNotUnique:
-        'Choose a unique combination of time period and start year',
-    },
-  }),
-];
 
 const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
   const location = useLocation();
@@ -43,7 +31,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
     [releaseId],
   );
 
-  const handleSubmit = useFormSubmit<ReleaseSummaryFormValues>(async values => {
+  const handleSubmit = async (values: ReleaseSummaryFormValues) => {
     if (!release) {
       throw new Error('Could not update missing release');
     }
@@ -65,7 +53,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
         releaseId,
       }),
     );
-  }, errorMappings);
+  };
 
   const handleCancel = () => {
     if (!release) {
@@ -86,13 +74,13 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
         <>
           <h2>Edit release summary</h2>
 
-          <ReleaseSummaryForm<ReleaseSummaryFormValues>
+          <ReleaseSummaryForm
             submitText="Update release summary"
-            initialValues={() => ({
+            initialValues={{
               timePeriodCoverageCode: release.timePeriodCoverage.value,
               timePeriodCoverageStartYear: release.year.toString(),
               releaseType: release.type,
-            })}
+            }}
             onSubmit={handleSubmit}
             onCancel={handleCancel}
           />

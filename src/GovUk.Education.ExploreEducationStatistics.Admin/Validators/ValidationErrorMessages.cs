@@ -78,6 +78,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         ReplacementFileTypesMustBeData,
         ReplacementMustBeValid,
 
+        // Release
+        ReleaseTypeInvalid,
+
         // Release approval
         ReleaseNotApproved,
         PublishedReleaseCannotBeUnapproved,

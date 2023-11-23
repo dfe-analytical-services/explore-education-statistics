@@ -138,7 +138,7 @@ describe('FindStatisticsPage', () => {
       screen.getByRole('group', { name: 'Filter by release type' }),
     );
     const releaseTypeOptions = releaseTypeFilterGroup.getAllByRole('radio');
-    expect(releaseTypeOptions).toHaveLength(6);
+    expect(releaseTypeOptions).toHaveLength(7);
     expect(releaseTypeOptions[0]).toEqual(
       releaseTypeFilterGroup.getByLabelText('Show all'),
     );
@@ -152,17 +152,23 @@ describe('FindStatisticsPage', () => {
     );
     expect(releaseTypeOptions[2]).not.toBeChecked();
     expect(releaseTypeOptions[3]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Experimental statistics'),
+      releaseTypeFilterGroup.getByLabelText(
+        'Official statistics in development',
+      ),
     );
     expect(releaseTypeOptions[3]).not.toBeChecked();
     expect(releaseTypeOptions[4]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Ad hoc statistics'),
+      releaseTypeFilterGroup.getByLabelText('Experimental statistics'),
     );
     expect(releaseTypeOptions[4]).not.toBeChecked();
     expect(releaseTypeOptions[5]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Management information'),
+      releaseTypeFilterGroup.getByLabelText('Ad hoc statistics'),
     );
     expect(releaseTypeOptions[5]).not.toBeChecked();
+    expect(releaseTypeOptions[6]).toEqual(
+      releaseTypeFilterGroup.getByLabelText('Management information'),
+    );
+    expect(releaseTypeOptions[6]).not.toBeChecked();
 
     const publicationsList = within(screen.getByTestId('publicationsList'));
     expect(publicationsList.getAllByRole('listitem')).toHaveLength(3);
@@ -478,7 +484,7 @@ describe('FindStatisticsPage', () => {
     ).toBeInTheDocument();
   });
 
-  test.only('renders the desktop filters', async () => {
+  test('renders the desktop filters', async () => {
     publicationService.listPublications.mockResolvedValue({
       results: testPublications,
       paging: testPaging,
@@ -496,7 +502,7 @@ describe('FindStatisticsPage', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  test.only('renders the mobile filters', async () => {
+  test('renders the mobile filters', async () => {
     mockIsMedia = true;
     publicationService.listPublications.mockResolvedValue({
       results: testPublications,

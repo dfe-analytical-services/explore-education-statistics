@@ -36,6 +36,12 @@ const ReleaseTypesModal = ({
         other person acting on behalf of the Crown or any other organisation
         named on an Official Statistics Order.
       </SummaryListItem>
+      <SummaryListItem term="Official statistics in development">
+        These statistics are undergoing a development. They have been developed
+        under the guidance of the Head of Profession for Statistics and
+        published to involve users and stakeholders at an early stage in
+        assessing their suitability and quality.
+      </SummaryListItem>
       <SummaryListItem term="Experimental statistics">
         Experimental statistics are newly developed or innovative official
         statistics that are undergoing evaluation. They are published to involve
