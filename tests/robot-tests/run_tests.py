@@ -22,10 +22,13 @@ from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
+from tests.libs.fail_fast import failing_suites_filename
 from tests.libs.logger import get_logger
 from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.slack import SlackService
-from tests.libs.fail_fast import failing_suites_filename
+
+pabot_suite_names_filename = ".pabotsuitenames"
+results_foldername = "test-results"
 
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
@@ -202,58 +205,6 @@ if args.expiredinvite_pass:
 # Install chromedriver and add it to PATH
 get_webdriver(args.chromedriver_version or None)
 
-# TODO EES-4412 - this bit will need to be refactored.  It needs to be "rerun.xml" if the user has called this script
-# directly with the "rerun_failed_suites" argument OR if we're in the main "rerun loop" near the bottom of this file
-# and we're performing a rerun.  Therefore this "output_file" parameter probably needs setting in the rerun loop itself.
-
-output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
-
-
-# Set robotArgs
-robotArgs = [
-    "--outputdir",
-    "test-results/",
-    "--output",
-    output_file,
-    "--exclude",
-    "Failing",
-    "--exclude",
-    "UnderConstruction",
-    "--exclude",
-    "BootstrapData",
-    "--exclude",
-    "VisualTesting",
-]
-
-robotArgs += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
-
-if args.fail_fast:
-    robotArgs += ["--exitonfailure"]
-# TODO EES-4412 - this is separate to "rerun_failed_suites" so I think it can either be left alone or come out
-# entirely, as I've never heard of anyone actually using it :)
-
-if args.rerun_failed_tests:
-    robotArgs += ["--rerunfailed", "test-results/output.xml"]
-
-if args.rerun_failed_suites:
-    robotArgs += ["--rerunfailedsuites", "test-results/output.xml"]
-
-# TODO EES-4412 - I *think* that we should still keep this for people using the CLI locally who just want
-#  to perform an arbitrary number of reruns when they need to.
-# But I'd totally expect people to also start using the new "rerun_attempts" option as well day-to-day.
-
-if args.tags:
-    robotArgs += ["--include", args.tags]
-
-if args.print_keywords:
-    robotArgs += ["--listener", "listeners/KeywordListener.py"]
-
-if args.ci:
-    robotArgs += ["--xunit", "xunit"]
-    # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
-    robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
-    robotArgs += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
-
 
 def admin_request(method, endpoint, body=None):
     assert method and endpoint
@@ -313,10 +264,10 @@ def create_test_theme():
     return admin_request("POST", "/api/themes", {"title": "Test theme", "summary": "Test theme summary"})
 
 
-def create_test_topic():
+def create_test_topic(run_id: str):
     assert os.getenv("TEST_THEME_ID") is not None
 
-    topic_name = f'UI test topic {os.getenv("RUN_IDENTIFIER")}'
+    topic_name = f"UI test topic {run_id}"
     resp = admin_request("POST", "/api/topics", {"title": topic_name, "themeId": os.getenv("TEST_THEME_ID")})
 
     os.environ["TEST_TOPIC_NAME"] = topic_name
@@ -350,13 +301,86 @@ def setup_authentication(clear_existing=False):
         )
 
 
+def create_robot_arguments(rerunning_failed: bool) -> []:
+    robot_args = [
+        "--outputdir",
+        "test-results/",
+        "--exclude",
+        "Failing",
+        "--exclude",
+        "UnderConstruction",
+        "--exclude",
+        "BootstrapData",
+        "--exclude",
+        "VisualTesting",
+    ]
+    robot_args += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
+    if args.fail_fast:
+        robot_args += ["--exitonfailure"]
+    if args.tags:
+        robot_args += ["--include", args.tags]
+    if args.print_keywords:
+        robot_args += ["--listener", "listeners/KeywordListener.py"]
+    if args.ci:
+        robot_args += ["--xunit", "xunit"]
+        # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
+        robot_args += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
+        robot_args += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
+    if args.env == "local":
+        robot_args += ["--include", "Local"]
+        robot_args += ["--exclude", "NotAgainstLocal"]
+        # seed Azure storage emulator release files
+        generator = ReleaseFilesGenerator()
+        generator.create_public_release_files()
+        generator.create_private_release_files()
+    if args.env == "dev":
+        robot_args += ["--include", "Dev"]
+        robot_args += ["--exclude", "NotAgainstDev"]
+    if args.env == "test":
+        robot_args += ["--include", "Test", "--exclude", "NotAgainstTest", "--exclude", "AltersData"]
+    # fmt off
+    if args.env == "preprod":
+        robot_args += ["--include", "Preprod", "--exclude", "AltersData", "--exclude", "NotAgainstPreProd"]
+    # fmt on
+    if args.env == "prod":
+        robot_args += ["--include", "Prod", "--exclude", "AltersData", "--exclude", "NotAgainstProd"]
+    if args.visual:
+        robot_args += ["-v", "headless:0"]
+    else:
+        robot_args += ["-v", "headless:1"]
+    if os.getenv("RELEASE_COMPLETE_WAIT"):
+        robot_args += ["-v", f"release_complete_wait:{os.getenv('RELEASE_COMPLETE_WAIT')}"]
+    if os.getenv("FAIL_TEST_SUITES_FAST"):
+        robot_args += ["-v", f"FAIL_TEST_SUITES_FAST:{os.getenv('FAIL_TEST_SUITES_FAST')}"]
+    if args.prompt_to_continue:
+        robot_args += ["-v", "prompt_to_continue_on_failure:1"]
+    if args.debug:
+        robot_args += ["--loglevel", "DEBUG"]
+    robot_args += ["-v", "browser:" + args.browser]
+    # We want to add arguments on the first rerun attempt, but on subsequent attempts, we just want
+    # to change rerunfailedsuites xml file we use
+    if rerunning_failed:
+        robot_args += ["--rerunfailedsuites", f"test-results/output.xml", "--output", "rerun.xml"]
+    else:
+        robot_args += ["--output", "output.xml"]
+
+    robot_args += [args.tests]
+
+    return robot_args
+
+
+def get_failing_suites() -> []:
+    if Path(failing_suites_filename).exists():
+        return open(failing_suites_filename, "r").readlines()
+    return []
+
+
 # Auth not required with general_public tests
 if args.tests and "general_public" not in args.tests:
     setup_authentication()
 
     # Tests that alter data only occur on local and dev environments
     if args.env in ["local", "dev"]:
-        
         get_themes_resp = get_test_themes()
         test_theme_id = None
         test_theme_name = "Test theme"
@@ -372,163 +396,103 @@ if args.tests and "general_public" not in args.tests:
         os.environ["TEST_THEME_NAME"] = test_theme_name
         os.environ["TEST_THEME_ID"] = test_theme_id
 
-if args.env == "local":
-    robotArgs += ["--include", "Local"]
-    robotArgs += ["--exclude", "NotAgainstLocal"]
-    # seed Azure storage emulator release files
-    generator = ReleaseFilesGenerator()
-    generator.create_public_release_files()
-    generator.create_private_release_files()
-
-if args.env == "dev":
-    robotArgs += ["--include", "Dev"]
-    robotArgs += ["--exclude", "NotAgainstDev"]
-
-if args.env == "test":
-    robotArgs += ["--include", "Test", "--exclude", "NotAgainstTest", "--exclude", "AltersData"]
-# fmt off
-if args.env == "preprod":
-    robotArgs += ["--include", "Preprod", "--exclude", "AltersData", "--exclude", "NotAgainstPreProd"]
-# fmt on
-if args.env == "prod":
-    robotArgs += ["--include", "Prod", "--exclude", "AltersData", "--exclude", "NotAgainstProd"]
-
-if args.visual:
-    robotArgs += ["-v", "headless:0"]
-else:
-    robotArgs += ["-v", "headless:1"]
-
-if os.getenv("RELEASE_COMPLETE_WAIT"):
-    robotArgs += ["-v", f"release_complete_wait:{os.getenv('RELEASE_COMPLETE_WAIT')}"]
-
-if os.getenv("FAIL_TEST_SUITES_FAST"):
-    robotArgs += ["-v", f"FAIL_TEST_SUITES_FAST:{os.getenv('FAIL_TEST_SUITES_FAST')}"]
-
-if args.prompt_to_continue:
-    robotArgs += ["-v", "prompt_to_continue_on_failure:1"]
-
-if args.debug:
-    robotArgs += ["--loglevel", "DEBUG"]
-
-robotArgs += ["-v", "browser:" + args.browser]
-robotArgs += [args.tests]
-
-
-# Remove any existing test results if running from scratch
-# TODO EES-4412 - this can stay.  This will help people who are running run_tests.py directly locally with the
-#  "rerun_failed_suites" option enabled.
-if not args.rerun_failed_tests and not args.rerun_failed_suites and Path("test-results").exists():
-    shutil.rmtree("test-results")
-
 if not os.path.exists("test-results/downloads"):
     os.makedirs("test-results/downloads")
 
-# TODO EES-4412 - this is where we need to add a loop, and within that loop we run robot or pabot at least once, and
-# then as many times as the user has specified that we rerun it if failures have been encountered.  That means that
-# if the user has asked for 3 rerun attempts, then we do 1 main run followed by at most 3 more runs for thr rerun
-# attempts.
-#
-# I think that the whole "try" block needs to be put into the loop.  An exception (I guess indicating a test failure)
-# would normally put us into the "finally" block, but in this case now we want to catch the exception, and go for a
-# rerun instead.
-#
-# I think that the part of the finally block that starts with:
-#   if args.rerun_failed_tests or args.rerun_failed_suites:
-#
-# needs to be included each time a rerun occurs, whether it's a failed test run or a passing test run.  This will
-# ensure that each test (re)run will add its set of passing tests to the overall set of passing tests, thus making each
-# rerun hopefully shorter!
-#
-# If we get a full set of passing tests after the first run or after any rerun, we can break out of this loop early.
-#
-# We will need to do:
-#   robotArgs += ["--rerunfailedsuites", "test-results/output.xml"]
-#
-# once as soon as we're starting to do reruns (so after the first run)
+
+def create_run_identifier():
+    # Add randomness to prevent multiple simultaneous run_tests.py generating the same run_identifier value
+    random_str = "".join([random.choice(string.ascii_lowercase + string.digits) for n in range(6)])
+    return datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S-" + random_str)
+
+
+def merge_test_reports():
+    merge_args = [
+        "--outputdir",
+        "test-results/",
+        "-o",
+        "output.xml",
+        "--prerebotmodifier",
+        "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
+        "--merge",
+        "test-results/output.xml",
+        "test-results/rerun.xml",
+    ]
+    robot_rebot_cli(merge_args, exit=False)
+
+
+def clear_files_before_test_run(rerunning_failures: bool):
+    # Remove any existing test results if running from scratch. Leave in place if re-running failures
+    # as we'll need the old results to merge in with the rerun results.
+    if not rerunning_failures and Path(results_foldername).exists():
+        shutil.rmtree(results_foldername)
+
+    # Remove any prior failing suites so the new test run is not marking any running test suites as
+    # failed already.
+    if Path(failing_suites_filename).exists():
+        os.remove(failing_suites_filename)
+
+    # If running with Pabot, remove any existing Pabot suites file as a pre-existing one can otherwise
+    # cause single suites to run multiple times in parallel.
+    if Path(pabot_suite_names_filename).exists():
+        os.remove(pabot_suite_names_filename)
+
+
+def run_tests(rerunning_failures: bool):
+    logger.info(f"Starting tests with RUN_IDENTIFIER: {run_identifier}")
+    if args.interp == "robot":
+        robot_run_cli(create_robot_arguments(rerunning_failures), exit=False)
+    elif args.interp == "pabot":
+        pabot_run_cli(create_robot_arguments(rerunning_failures))
+
 
 try:
     # Run tests
-    # if args.interp == "robot":
-    #     exitCode = robot_run_cli(robotArgs, exit=False)
-    # elif args.interp == "pabot":
-    #     robotArgs = ["--processes", str(args.processes)] + robotArgs
-    #     exitCode = pabot_run_cli(robotArgs)
-
     test_run = 0
-    while args.rerun_attempts is None or test_run <= args.rerun_attempts:
-        test_run += 1
-        rerunning_failed_suites = robotArgs[0] == "--rerunfailedsuites" or test_run > 1
+    while args.rerun_attempts is None or test_run < args.rerun_attempts:
+        rerunning_failed_suites = args.rerun_failed_suites or test_run > 0
 
-        # if rerunning_failed_suites and test_run == 1:
-            
-        
-        if os.path.isfile(failing_suites_filename):
-            os.remove(failing_suites_filename)
-        
-        if os.path.isfile('.pabotsuitenames'):
-            os.remove('.pabotsuitenames')
+        # Perform any cleanup before the test run.
+        clear_files_before_test_run(rerunning_failed_suites)
 
-        # add randomness to prevent multiple simultaneous run_tests.py generating the same runIdentifier value
-        randomStr = "".join([random.choice(string.ascii_lowercase + string.digits) for n in range(6)])
-        runIdentifier = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S-" + randomStr + str(test_run))
+        # Create a unique run identifier so that this test run's data will be unique.
+        run_identifier = create_run_identifier()
+        os.environ["RUN_IDENTIFIER"] = run_identifier
 
-        os.environ["RUN_IDENTIFIER"] = runIdentifier
-        logger.info(f"Starting tests with RUN_IDENTIFIER: {runIdentifier}")
+        # Create a Test Topic under which all of this test run's data will be created.
+        create_test_topic(run_identifier)
 
-        create_test_topic()
+        # Run the tests.
+        run_tests(rerunning_failed_suites)
 
-        if test_run > 1:
-            os.rename("test-results/output.xml", f"test-results/attempt_{str(test_run)}.xml")
-        
-        # We want to add arguments on the first rerun attempt, but on subsequent attempts, we just want
-        # to change rerunfailedsuites xml file we use
+        # If we're rerunning failures, merge the former run's results with this run's
+        # results.
         if rerunning_failed_suites:
-            robotArgs = ["--rerunfailedsuites", f"test-results/attempt_{str(test_run)}.xml"] + robotArgs
+            merge_test_reports()
 
-        if args.interp == "robot":
-            exitCode = robot_run_cli(robotArgs, exit=False)
-        elif args.interp == "pabot":
-            exitCode = pabot_run_cli(robotArgs)
+        # Tear down any data created by this test run unless we've disabled teardown.
+        if not args.disable_teardown:
+            logger.info("Tearing down tests...")
+            delete_test_topic()
 
-        mergeArgs = [
-            "--prerebotmodifier",
-            "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
-            "--merge",
-            f"test-results/attempt_{str(test_run)}.xml",
-            "test-results/output.xml",
-        ]
-        robot_rebot_cli(mergeArgs, exit=False)
+        # If all tests passed, return early.
+        if not get_failing_suites():
+            break
+
+        test_run += 1
 
 finally:
-    if not args.disable_teardown:
-        logger.info("Tearing down tests...")
-        delete_test_topic()
-
-    if args.rerun_failed_tests or args.rerun_failed_suites:
-        logger.info("Combining rerun test results with original test results")
-        merge_options = [
-            "--outputdir",
-            "test-results/",
-            "-o",
-            "output.xml",
-            "--prerebotmodifier",
-            "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
-            "--merge",
-            "test-results/output.xml",
-            "test-results/rerun.xml",
-        ]
-        robot_rebot_cli(merge_options, exit=False)
-
     logger.info(f"Log available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
     logger.info(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
 
-    if os.path.isfile(failing_suites_filename):
+    failing_suites = get_failing_suites()
+
+    if failing_suites:
         logger.info(f"Failing suites:")
-        failing_suites = open(failing_suites_filename, "r").readlines()
-        [logger.info(r"  * file://" + suite) for suite in failing_suites]     
-    
-    logger.info("\nTests finished!")
+        [logger.info(r"  * file://" + suite) for suite in failing_suites]
+    else:
+        logger.info("\nAll tests passed!")
 
     if args.enable_slack_notifications:
         slack_service = SlackService()
-        slack_service.send_test_report(args.env, args.tests)
+        slack_service.send_test_report(args.env, args.tests, failing_suites)
