@@ -2046,8 +2046,24 @@
           "remoteDebuggingEnabled": false,
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
-          "requestTracingEnabled": true
-        }
+          "requestTracingEnabled": true,
+          "customErrorPages": [
+            {
+              "statusCode": 404,
+              "statusText": "Not Found",
+              "url": "https://s101t01saeespublic.blob.core.windows.net/error-pages/defaultErrorPage-with-inline-styles.html"
+            },
+            {
+              "statusCode": 500,
+              "statusText": "Service Unavailable",
+              "url": "https://s101t01saeespublic.blob.core.windows.net/error-pages/defaultErrorPage-with-inline-styles.html"
+            },
+            {
+              "statusCode": 503,
+              "statusText": "Service Unavailable",
+              "url": "https://s101t01saeespublic.blob.core.windows.net/error-pages/defaultErrorPage-with-inline-styles.html"
+            }
+        },
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
