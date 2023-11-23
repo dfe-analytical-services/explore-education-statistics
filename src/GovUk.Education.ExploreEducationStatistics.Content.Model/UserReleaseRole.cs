@@ -11,20 +11,11 @@ public class UserReleaseRole : ResourceRole<ReleaseRole, Release>
         set => Resource = value;
     }
 
-    public Guid ReleaseId 
+    public Guid ReleaseId
     {
         get => ResourceId;
         set => ResourceId = value;
     }
-        
-    public bool SoftDeleted { get; set; }
 
-    public UserReleaseRole CopyForAmendment(Release amendment)
-    {
-        var copy = MemberwiseClone() as UserReleaseRole;
-        copy.Id = Guid.NewGuid();
-        copy.Resource = amendment;
-        copy.ResourceId = amendment.Id;
-        return copy;
-    }
+    public bool SoftDeleted { get; set; }
 }

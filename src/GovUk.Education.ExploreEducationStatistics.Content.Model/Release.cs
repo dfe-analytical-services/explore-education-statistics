@@ -196,10 +196,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         public List<Link> RelatedInformation { get; set; } = new();
-
-        public Release Clone()
-        {
-            return MemberwiseClone() as Release;
-        }
     }
 }

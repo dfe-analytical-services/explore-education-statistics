@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyApprovalStatus;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         WithRelease
     }
 
-    public class MethodologyVersion
+    public class MethodologyVersion : ICreatedTimestamp<DateTime?>
     {
         [Key] [Required] public Guid Id { get; set; }
 
@@ -47,10 +47,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid MethodologyId { get; set; }
 
+        // TODO - can this be non-nullable?
         public DateTime? Created { get; set; }
 
+        // TODO - can this be non-nullable?
         public User? CreatedBy { get; set; }
 
+        // TODO - can this be non-nullable?
         public Guid? CreatedById { get; set; }
 
         public MethodologyVersion? PreviousVersion { get; set; }
@@ -90,57 +93,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         public bool Amendment => PreviousVersionId != null && Published == null;
-
-        public MethodologyVersion CreateMethodologyAmendment(DateTime createdDate, Guid createdByUserId)
-        {
-            var copy = (MethodologyVersion) MemberwiseClone();
-
-            copy.Id = Guid.NewGuid();
-            copy.Status = Draft;
-            copy.Published = null;
-            copy.Updated = null;
-            copy.Version = Version + 1;
-            copy.Created = createdDate;
-            copy.CreatedBy = null;
-            copy.CreatedById = createdByUserId;
-            copy.PreviousVersion = null;
-            copy.PreviousVersionId = Id;
-            copy.PublishingStrategy = Immediately;
-            copy.ScheduledWithRelease = null;
-            copy.ScheduledWithReleaseId = null;
-            copy.Methodology = null!;
-
-            copy.MethodologyContent = MethodologyContent.Clone(createdDate);
-
-            copy.Notes = copy
-                .Notes
-                .Select(n => n.Clone(copy))
-                .ToList();
-
-            return copy;
-        }
     }
 
     public class MethodologyVersionContent
     {
         public Guid MethodologyVersionId { get; set; }
-            
+
         public List<ContentSection> Content { get; set; } = new();
 
         public List<ContentSection> Annexes { get; set; } = new();
-
-        public MethodologyVersionContent Clone(DateTime createdDate)
-        {
-            return new MethodologyVersionContent
-            {
-                Annexes = Annexes
-                    .Select(c => c.Clone(createdDate))
-                    .ToList(),
-
-                Content = Content
-                    .Select(c => c.Clone(createdDate))
-                    .ToList()
-            };
-        }
     }
 }

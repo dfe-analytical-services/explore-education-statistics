@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -31,59 +30,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public Guid ReleaseId { get; set; }
 
         [JsonIgnore] public ContentSectionType Type { get; set; }
-
-        // TODO EES-4637 - we need to decide on how we're being consistent with Created dates in Release Amendments.
-        // TODO EES-4639 - rewrite Release Amendment generation code to be localised to
-        // ReleaseAmendmentExtensions.CreateAmendment() or ReleaseService.CreateBasicReleaseAmendment().
-        public ContentSection Clone(
-            Release amendment,
-            Dictionary<ContentBlock, ContentBlock> originalToAmendmentContentBlocks)
-        {
-            var copy = MemberwiseClone();
-            copy.Id = Guid.NewGuid();
-
-            copy.Release = amendment;
-            copy.ReleaseId = amendment.Id;
-
-            // Using the originalToAmendmentContentBlocks Dictionary, replace the original
-            // ContentBlocks with their cloned equivalents.
-            copy.Content = copy
-                .Content?
-                .Select(originalBlock =>
-                {
-                    var clonedContentBlock = originalToAmendmentContentBlocks[originalBlock];
-                    clonedContentBlock.ContentSection = copy;
-                    clonedContentBlock.ContentSectionId = copy.Id;
-                    return clonedContentBlock;
-                })
-                .ToList();
-
-            return copy;
-        }
-
-        // TODO EES-4639 - rewrite Methodology Amendment generation code to be localised to
-        // MethodologyVersion.CreateMethodologyAmendment() or MethodologyAmendmentService.CreateAndSaveAmendment().
-        public ContentSection Clone(DateTime createdDate)
-        {
-            var copy = MemberwiseClone();
-            copy.Id = Guid.NewGuid();
-
-            copy.Content = copy
-                .Content?
-                .Select(content => content.Clone(createdDate))
-                .ToList();
-
-            copy.Content?.ForEach(c => c.ContentSectionId = copy.Id);
-            return copy;
-        }
-
-        // TODO EES-4639 - adopt straight MemberwiseClone() usage during the generating of Release Amendments,
-        // Methodology Amendments and Releases from templates, then have each call site tailor the resulting
-        // cloned Content tree to their individual requirements, rather than support various Clone() methods in
-        // Release Content entities themselves.
-        public new ContentSection MemberwiseClone()
-        {
-            return base.MemberwiseClone() as ContentSection;
-        }
     }
 }
