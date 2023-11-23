@@ -446,9 +446,10 @@ def run_tests(rerunning_failures: bool):
         pabot_run_cli(create_robot_arguments(rerunning_failures))
 
 
+test_run = 0
+
 try:
     # Run tests
-    test_run = 0
     while args.rerun_attempts is None or test_run < args.rerun_attempts:
         rerunning_failed_suites = args.rerun_failed_suites or test_run > 0
 
@@ -495,4 +496,4 @@ finally:
 
     if args.enable_slack_notifications:
         slack_service = SlackService()
-        slack_service.send_test_report(args.env, args.tests, failing_suites)
+        slack_service.send_test_report(args.env, args.tests, failing_suites, test_run)

@@ -24,7 +24,7 @@ class SlackService:
             if env_var is None:
                 raise AssertionError(f"{env_var} is not set")
 
-    def _build_attachments(self, env: str, suites_ran: str, suites_failed: []):
+    def _build_attachments(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
         with open(f"{PATH}{os.sep}output.xml", "rb") as report:
             contents = report.read()
 
@@ -48,13 +48,14 @@ class SlackService:
                     {"title": "Environment", "value": env},
                     {"title": "Suite", "value": suites_ran.replace("tests/", "")},
                     {"title": "Total test cases", "value": passed_tests + failed_tests},
+                    {"title": "Total runs", "value": run_index + 1},
                     failed_test_suites_field,
                 ],
             }
         ]
 
-    def send_test_report(self, env: str, suites_ran: str, suites_failed: []):
-        attachments = self._build_attachments(env, suites_ran, suites_failed)
+    def send_test_report(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
+        attachments = self._build_attachments(env, suites_ran, suites_failed, run_index)
 
         webhook_url = self.report_webhook_url
         slack_bot_token = self.slack_bot_token
