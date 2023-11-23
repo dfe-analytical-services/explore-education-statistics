@@ -687,7 +687,8 @@ html {
     display: table-cell;
     width: 27px;
     height: 27px;
-    background: (url('images/action-link-arrow.svg')),
+    background:
+      (url('images/action-link-arrow.svg')),
       linear-gradient(transparent, transparent) 50% 50%;
     background-repeat: no-repeat;
     margin-right: 0.5rem;
@@ -705,7 +706,8 @@ html {
   &:before {
     width: 27px;
     height: 27px;
-    background: (url('images/download-link-arrow.svg')),
+    background:
+      (url('images/download-link-arrow.svg')),
       linear-gradient(transparent, transparent) 50% 50%;
 
     @include govuk-media-query($until: tablet) {
