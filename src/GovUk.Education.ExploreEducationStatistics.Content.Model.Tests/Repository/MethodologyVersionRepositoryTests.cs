@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 Id = methodologyVersionId,
                 Methodology = new Methodology
                 {
-                    Slug = "methodology-slug",
+                    OwningPublicationSlug = "publication-slug",
                     LatestPublishedVersionId = methodologyVersionId,
                 },
             };
@@ -341,6 +341,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
 
                 Assert.NotNull(result);
                 Assert.Equal(methodologyVersionId, result.Id);
+                Assert.Equal(methodologyVersion.Methodology.OwningPublicationSlug, result.Slug);
             }
         }
 

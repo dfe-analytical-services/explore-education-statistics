@@ -35,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 PublishingStrategy = Immediately,
                 Methodology = new Methodology
                 {
-                    Slug = publication.Slug, // Remove EES-4627
                     OwningPublicationTitle = publication.Title,
                     OwningPublicationSlug = publication.Slug,
                     Publications = new List<PublicationMethodology>
@@ -87,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             return await _contentDbContext
                 .MethodologyVersions
+                .Include(mv => mv.Methodology) // for MethodologyVersion.Slug
                 .Where(mv =>
                     mv.Methodology.LatestPublishedVersionId == mv.Id
                     // EF cannot translate mv.Slug into a Queryable, so we have to do this...
