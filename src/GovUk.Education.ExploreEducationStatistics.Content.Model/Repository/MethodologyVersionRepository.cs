@@ -209,8 +209,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Collection(mp => mp.Versions)
                 .LoadAsync();
 
-            // TODO EES-4628 SingleOrDefault here is susceptible to bug EES-2672 which is allowing multiple amendments
-            // of the same version to be created. If there is a next version there should only be one.
             return methodologyVersion.Methodology.Versions.SingleOrDefault(mv =>
                 mv.PreviousVersionId == methodologyVersion.Id);
         }
