@@ -26,7 +26,7 @@ Create test publication and release via API
     user creates test release via api    ${publication_id}    CY    2000
 
 Upload subject
-    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}ASD
+    user navigates to draft release page from dashboard    ${PUBLICATION_NAME}
     ...    Calendar year 2000
 
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
