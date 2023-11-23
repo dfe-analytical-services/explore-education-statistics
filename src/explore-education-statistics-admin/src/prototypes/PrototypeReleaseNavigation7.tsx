@@ -7,7 +7,8 @@ import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import styles from './PrototypePublicPage.module.scss';
 
-const getDimensions = e => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getDimensions = (e: any) => {
   const { height } = e.getBoundingClientRect();
   /* eslint-disable-next-line */
   const offsetTop = e.offsetTop;
@@ -32,7 +33,7 @@ const PrototypeReleaseData = () => {
   const [showAllUpdates, setShowAllUpdates] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
-  const [visibleSection, setVisibleSection] = useState();
+  const [visibleSection, setVisibleSection] = useState<string>();
 
   const headerRef = useRef(null);
   const summaryRef = useRef(null);

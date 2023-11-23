@@ -60,7 +60,7 @@ const PrototypePrepareNextSubjectStep1 = ({
             }}
           >
             {() => (
-              <Form id="form" showSubmitError>
+              <Form id="form">
                 <FormFieldset id="downloadFiles" legend={stepHeading}>
                   <>
                     <p>

@@ -54,7 +54,7 @@ const PrototypeEditPublicationSubject = ({
           }}
         >
           {() => (
-            <Form id="form" showSubmitError>
+            <Form id="form">
               <FormFieldSelect<FormValues>
                 id="subjectId"
                 name="subjectId"

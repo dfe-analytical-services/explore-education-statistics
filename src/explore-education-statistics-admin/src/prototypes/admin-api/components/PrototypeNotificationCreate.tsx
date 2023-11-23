@@ -79,7 +79,7 @@ const PrototypeNotificationCreate = ({
           onSubmit={() => {}}
         >
           {form => (
-            <Form id="form" showSubmitError>
+            <Form id="form">
               <FormFieldTextArea
                 label={
                   <span className="govuk-!-font-weight-bold">
