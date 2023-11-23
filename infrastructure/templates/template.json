@@ -2063,7 +2063,8 @@
               "statusText": "Service Unavailable",
               "url": "https://s101t01saeespublic.blob.core.windows.net/error-pages/defaultErrorPage-with-inline-styles.html"
             }
-        },
+          ]
+        }
       },
       "dependsOn": [
         "[concat('Microsoft.Web/serverfarms/', variables('publicPlanName'))]",
