@@ -265,6 +265,24 @@ def create_test_theme():
 
 
 def create_test_topic(run_id: str):
+    setup_authentication()
+
+    if args.env in ["local", "dev"]:
+        get_themes_resp = get_test_themes()
+        test_theme_id = None
+        test_theme_name = "Test theme"
+
+        for theme in get_themes_resp.json():
+            if theme["title"] == test_theme_name:
+                test_theme_id = theme["id"]
+                break
+        if not test_theme_id:
+            create_theme_resp = create_test_theme()
+            test_theme_id = create_theme_resp.json()["id"]
+
+        os.environ["TEST_THEME_NAME"] = test_theme_name
+        os.environ["TEST_THEME_ID"] = test_theme_id
+
     assert os.getenv("TEST_THEME_ID") is not None
 
     topic_name = f"UI test topic {run_id}"
@@ -375,27 +393,6 @@ def get_failing_suites() -> []:
     return []
 
 
-# Auth not required with general_public tests
-if args.tests and "general_public" not in args.tests:
-    setup_authentication()
-
-    # Tests that alter data only occur on local and dev environments
-    if args.env in ["local", "dev"]:
-        get_themes_resp = get_test_themes()
-        test_theme_id = None
-        test_theme_name = "Test theme"
-
-        for theme in get_themes_resp.json():
-            if theme["title"] == test_theme_name:
-                test_theme_id = theme["id"]
-                break
-        if not test_theme_id:
-            create_theme_resp = create_test_theme()
-            test_theme_id = create_theme_resp.json()["id"]
-
-        os.environ["TEST_THEME_NAME"] = test_theme_name
-        os.environ["TEST_THEME_ID"] = test_theme_id
-
 if not os.path.exists("test-results/downloads"):
     os.makedirs("test-results/downloads")
 
@@ -446,12 +443,14 @@ def run_tests(rerunning_failures: bool):
         pabot_run_cli(create_robot_arguments(rerunning_failures))
 
 
-test_run = 0
+test_run_index = -1
 
 try:
     # Run tests
-    while args.rerun_attempts is None or test_run < args.rerun_attempts:
-        rerunning_failed_suites = args.rerun_failed_suites or test_run > 0
+    while args.rerun_attempts is None or test_run_index < args.rerun_attempts:
+        test_run_index += 1
+
+        rerunning_failed_suites = args.rerun_failed_suites or test_run_index > 0
 
         # Perform any cleanup before the test run.
         clear_files_before_test_run(rerunning_failed_suites)
@@ -461,7 +460,10 @@ try:
         os.environ["RUN_IDENTIFIER"] = run_identifier
 
         # Create a Test Topic under which all of this test run's data will be created.
-        create_test_topic(run_identifier)
+        needs_test_topic = args.tests and "general_public" not in args.tests
+
+        if needs_test_topic:
+            create_test_topic(run_identifier)
 
         # Run the tests.
         run_tests(rerunning_failed_suites)
@@ -472,7 +474,7 @@ try:
             merge_test_reports()
 
         # Tear down any data created by this test run unless we've disabled teardown.
-        if not args.disable_teardown:
+        if needs_test_topic and not args.disable_teardown:
             logger.info("Tearing down tests...")
             delete_test_topic()
 
@@ -480,11 +482,11 @@ try:
         if not get_failing_suites():
             break
 
-        test_run += 1
-
 finally:
     logger.info(f"Log available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
     logger.info(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
+
+    logger.info(f"Number of test runs: {test_run_index + 1}")
 
     failing_suites = get_failing_suites()
 
@@ -496,4 +498,4 @@ finally:
 
     if args.enable_slack_notifications:
         slack_service = SlackService()
-        slack_service.send_test_report(args.env, args.tests, failing_suites, test_run)
+        slack_service.send_test_report(args.env, args.tests, failing_suites, test_run_index)
