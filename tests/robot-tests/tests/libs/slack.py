@@ -38,7 +38,7 @@ class SlackService:
         failed_test_suites_field = ({},)
 
         if suites_failed:
-            failed_test_suites_field = {"title": "Failed test suites", "value": suites_failed}
+            failed_test_suites_field = {"title": "Failed test suites", "value": "\n * ".join(suites_failed)}
         return [
             {
                 "pretext": "All results",
