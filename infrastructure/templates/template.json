@@ -2047,7 +2047,7 @@
           "httpLoggingEnabled": true,
           "detailedErrorLoggingEnabled": true,
           "requestTracingEnabled": true,
-          "customErrorPages": [
+          "customErrorPages2": [
             {
               "statusCode": 404,
               "statusText": "Not Found",
