@@ -16,6 +16,7 @@ from pathlib import Path
 
 import admin_api as admin_api
 import args_and_variables as args_and_variables
+import tests.libs.selenium_elements as selenium_elements
 from pabot.pabot import main_program as pabot_run_cli
 from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
@@ -187,6 +188,11 @@ def run():
         # Run tests
         while args.rerun_attempts is None or test_run_index < args.rerun_attempts:
             test_run_index += 1
+
+            # Ensure all SeleniumLibrary elements and keywords are updated to use a branch new
+            # Selenium instance for every test (re)run.
+            if test_run_index > 0:
+                selenium_elements.clear_instances()
 
             rerunning_failed_suites = args.rerun_failed_suites or test_run_index > 0
 
