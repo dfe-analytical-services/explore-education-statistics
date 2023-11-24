@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -26,10 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
     public class MethodologyApprovalService : IMethodologyApprovalService
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
-        private readonly ContentDbContext _context;
+        private readonly ContentDbContext _contentDbContext;
         private readonly IMethodologyContentService _methodologyContentService;
         private readonly IMethodologyFileRepository _methodologyFileRepository;
-        private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
@@ -40,10 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public MethodologyApprovalService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
-            ContentDbContext context,
+            ContentDbContext contentDbContext,
             IMethodologyContentService methodologyContentService,
             IMethodologyFileRepository methodologyFileRepository,
-            IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
             IUserService userService,
@@ -53,10 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IRedirectsCacheService redirectsCacheService)
         {
             _persistenceHelper = persistenceHelper;
-            _context = context;
+            _contentDbContext = contentDbContext;
             _methodologyContentService = methodologyContentService;
             _methodologyFileRepository = methodologyFileRepository;
-            _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
@@ -91,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     .OnSuccessDo(RemoveUnusedImages)
                     .OnSuccess(async methodologyVersion =>
                     {
-                        _context.MethodologyVersions.Update(methodologyVersion);
+                        _contentDbContext.MethodologyVersions.Update(methodologyVersion);
 
                         methodologyVersion.Status = request.Status;
                         methodologyVersion.PublishingStrategy = request.PublishingStrategy;
@@ -103,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         // We cannot rely on Methodology.LatestPublishedVersionId, as it may now be incorrect,
                         // if we are approving and publishing this methodology version.
-                        var isToBePublished = await _methodologyVersionRepository.IsToBePublished(methodologyVersion);
+                        var isToBePublished = await IsToBePublished(methodologyVersion);
 
                         if (isToBePublished)
                         {
@@ -120,9 +116,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             ApprovalStatus = request.Status,
                             CreatedById = _userService.GetUserId(),
                         };
-                        await _context.MethodologyStatus.AddAsync(methodologyStatus);
+                        await _contentDbContext.MethodologyStatus.AddAsync(methodologyStatus);
 
-                        await _context.SaveChangesAsync();
+                        await _contentDbContext.SaveChangesAsync();
 
                         if (isToBePublished)
                         {
@@ -141,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         private async Task NotifyApprovers(MethodologyVersion methodologyVersion)
         {
-            var owningPublicationId = await _context.PublicationMethodologies
+            var owningPublicationId = await _contentDbContext.PublicationMethodologies
                 .Where(pm => pm.MethodologyId == methodologyVersion.MethodologyId
                              && pm.Owner)
                 .Select(pm => pm.PublicationId)
@@ -150,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             var userReleaseRoles = await _userReleaseRoleService
                 .ListUserReleaseRolesByPublication(ReleaseRole.Approver, owningPublicationId);
 
-            var userPublicationRoles = await _context.UserPublicationRoles
+            var userPublicationRoles = await _contentDbContext.UserPublicationRoles
                 .Include(upr => upr.User)
                 .Where(upr => owningPublicationId == upr.PublicationId
                               && upr.Role == PublicationRole.Approver)
@@ -193,11 +189,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         return ValidationActionResult(MethodologyCannotDependOnPublishedRelease);
                     }
 
-                    await _context.Entry(methodologyVersion)
+                    await _contentDbContext.Entry(methodologyVersion)
                         .Reference(m => m.Methodology)
                         .LoadAsync();
 
-                    await _context.Entry(methodologyVersion.Methodology)
+                    await _contentDbContext.Entry(methodologyVersion.Methodology)
                         .Collection(mp => mp.Publications)
                         .LoadAsync();
 
@@ -237,6 +233,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                     return Unit.Instance;
                 });
+        }
+        
+        private async Task<bool> IsToBePublished(MethodologyVersion methodologyVersion)
+        {
+            // A version that's not approved can't be publicly accessible
+            if (!methodologyVersion.Approved)
+            {
+                return false;
+            }
+
+            // A methodology version with a newer published version cannot be live
+            var nextVersion = await GetNextVersion(methodologyVersion);
+            if (nextVersion?.Approved == true)
+            {
+                // If the next version is scheduled for immediate publishing, we don't need to check if the
+                // associated publication is published: the previous version won't be published in either case.
+                if (nextVersion.ScheduledForPublishingImmediately ||
+                    await IsVersionScheduledForPublishingWithPublishedRelease(nextVersion))
+                {
+                    return false;
+                }
+            }
+
+            // A version scheduled for publishing immediately is restricted from public view until it's used by
+            // a publication that's published
+            if (methodologyVersion.ScheduledForPublishingImmediately)
+            {
+                return await PublicationsHaveAtLeastOnePublishedRelease(methodologyVersion);
+            }
+
+            // A version scheduled for publishing with a release is only publicly accessible if that release is published
+            return await IsVersionScheduledForPublishingWithPublishedRelease(methodologyVersion);
+        }
+
+        private async Task<bool> PublicationsHaveAtLeastOnePublishedRelease(MethodologyVersion methodologyVersion)
+        {
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(m => m.Methodology)
+                .LoadAsync();
+
+            await _contentDbContext.Entry(methodologyVersion.Methodology)
+                .Collection(mp => mp.Publications)
+                .LoadAsync();
+
+            return methodologyVersion.Methodology.Publications.Any(publicationMethodology =>
+            {
+                _contentDbContext.Entry(publicationMethodology)
+                    .Reference(pm => pm.Publication)
+                    .Load();
+
+                return publicationMethodology.Publication.Live;
+            });
+        }
+
+        private async Task<bool> IsVersionScheduledForPublishingWithPublishedRelease(
+            MethodologyVersion methodologyVersion)
+        {
+            if (!methodologyVersion.ScheduledForPublishingWithRelease)
+            {
+                return false;
+            }
+
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(m => m.ScheduledWithRelease)
+                .LoadAsync();
+            return methodologyVersion.ScheduledForPublishingWithPublishedRelease;
+        }
+
+        private async Task<MethodologyVersion?> GetNextVersion(MethodologyVersion methodologyVersion)
+        {
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(m => m.Methodology)
+                .LoadAsync();
+
+            await _contentDbContext.Entry(methodologyVersion.Methodology)
+                .Collection(mp => mp.Versions)
+                .LoadAsync();
+
+            return methodologyVersion.Methodology.Versions.SingleOrDefault(mv =>
+                mv.PreviousVersionId == methodologyVersion.Id);
         }
     }
 }

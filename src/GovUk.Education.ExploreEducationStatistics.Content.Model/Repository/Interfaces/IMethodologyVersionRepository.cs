@@ -20,7 +20,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
         Task<List<MethodologyVersion>> GetLatestPublishedVersionByPublication(Guid publicationId);
 
         Task<bool> IsLatestPublishedVersion(MethodologyVersion methodologyVersion);
-
-        Task<bool> IsToBePublished(MethodologyVersion methodologyVersion);
     }
 }
