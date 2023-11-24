@@ -72,61 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
         }
 
         [Fact]
-        public async Task GetLatestVersion()
-        {
-            var methodology = new Methodology();
-
-            var version1 = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = null,
-                Methodology = methodology,
-                PublishingStrategy = Immediately,
-                Status = Approved,
-                Version = 0
-            };
-
-            var version2 = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = version1.Id,
-                Methodology = methodology,
-                PublishingStrategy = Immediately,
-                Status = Approved,
-                Version = 1
-            };
-
-            var version3 = new MethodologyVersion
-            {
-                Id = Guid.NewGuid(),
-                PreviousVersionId = version2.Id,
-                Methodology = methodology,
-                PublishingStrategy = Immediately,
-                Status = Draft,
-                Version = 2
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Methodologies.AddRangeAsync(methodology);
-                await contentDbContext.MethodologyVersions.AddRangeAsync(version1, version2, version3);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext);
-
-                var result = await service.GetLatestVersion(methodology.Id);
-
-                // Check the result contains the latest versions of the methodologies
-                Assert.Equal(version3.Id, result.Id);
-            }
-        }
-
-        [Fact]
         public async Task GetLatestByPublication()
         {
             var publication = new Publication();

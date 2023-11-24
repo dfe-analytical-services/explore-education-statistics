@@ -9,8 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
     {
         Task<MethodologyVersion> CreateMethodologyForPublication(Guid publicationId, Guid createdByUserId);
 
-        Task<MethodologyVersion> GetLatestVersion(Guid methodologyId);
-
         Task<List<MethodologyVersion>> GetLatestVersionByPublication(Guid publicationId);
 
         Task<MethodologyVersion?> GetLatestPublishedVersionBySlug(string slug);

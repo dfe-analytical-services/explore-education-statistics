@@ -55,15 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return methodologyVersion;
         }
 
-        public async Task<MethodologyVersion> GetLatestVersion(Guid methodologyId)
-        {
-            var methodology = await _contentDbContext.Methodologies
-                .Include(m => m.Versions)
-                .SingleAsync(mp => mp.Id == methodologyId);
-
-            return methodology.LatestVersion();
-        }
-
         public async Task<List<MethodologyVersion>> GetLatestVersionByPublication(Guid publicationId)
         {
             var publication = await _contentDbContext.Publications
