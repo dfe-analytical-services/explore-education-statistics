@@ -167,12 +167,6 @@ def execute_tests(arguments: argparse.Namespace, rerunning_failures: bool):
         pabot_run_cli(create_robot_arguments(arguments, rerunning_failures))
 
 
-def setup_user_authentication(tests: str):
-    if not tests or f"{os.sep}admin" in tests:
-        admin_api.setup_bau_authentication()
-        admin_api.setup_analyst_authentication()
-
-
 def run():
     args = args_and_variables.initialise()
 
@@ -184,9 +178,6 @@ def run():
         raise Exception(f"Cannot run tests that change data on environment {args.env}")
 
     install_chromedriver(args.chromedriver_version)
-
-    if data_changing_tests:
-        setup_user_authentication(args.tests)
 
     test_run_index = -1
 

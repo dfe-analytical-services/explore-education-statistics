@@ -38,12 +38,12 @@ class SlackService:
         failed_test_suites_field = ({},)
 
         if suites_failed:
-            failed_test_suites_field = {"title": "Failed test suites", "value": "\n * ".join(suites_failed)}
+            failed_test_suites_field = {"title": "Failed test suites", "value": "\n".join(suites_failed)}
         return [
             {
                 "pretext": "All results",
                 "color": "danger" if suites_failed else "good",
-                "mrkdwn_in": ["pretext", "Failed test suites"],
+                "mrkdwn_in": ["pretext"],
                 "fields": [
                     {"title": "Environment", "value": env},
                     {"title": "Suite", "value": suites_ran.replace("tests/", "")},
