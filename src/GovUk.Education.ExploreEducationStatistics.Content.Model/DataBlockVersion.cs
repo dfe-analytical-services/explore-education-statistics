@@ -132,29 +132,4 @@ public class DataBlockVersion : ICreatedUpdatedTimestamps<DateTime, DateTime?>
         get => ContentBlock.Table;
         set => ContentBlock.Table = value;
     }
-
-    // TODO - EES-4637 - we need to decide on how we're being consistent with Created dates in Release Amendments.
-    public DataBlockVersion Clone(Release amendment)
-    {
-        var now = DateTime.UtcNow;
-        var clonedContentBlock = (ContentBlock.Clone(now) as DataBlock)!;
-        clonedContentBlock.ReleaseId = amendment.Id;
-        clonedContentBlock.Release = amendment;
-
-        var copy = (MemberwiseClone() as DataBlockVersion)!;
-
-        // Keep a one-to-one relationship between DataBlockVersions and ContentBlocks of type "DataBlock".
-        // This will make it easier to migrate DataBlocks out of the ContentBlock table in the future stages.
-        copy.Id = clonedContentBlock.Id;
-        copy.Created = DateTime.UtcNow;
-        copy.Updated = null;
-        copy.Published = null;
-        copy.Release = amendment;
-        copy.ReleaseId = amendment.Id;
-        copy.Version = Version + 1;
-        copy.ContentBlock = clonedContentBlock;
-        copy.ContentBlockId = clonedContentBlock.Id;
-
-        return copy;
-    }
 }
