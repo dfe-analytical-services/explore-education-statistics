@@ -35,17 +35,18 @@ class SlackService:
         failed_tests = int(tests["fail"])
         passed_tests = int(tests["pass"])
 
+        suites_failed = {"Testing testing", "Testing testing 2"}
         failed_test_suites_field = ({},)
         failed_test_suites_field2 = ({},)
 
         if suites_failed:
-            failed_test_suites_field = {"title": "Failed test suites", "value": "\n * ".join(suites_failed)}
+            failed_test_suites_field = {"title": "Failed test suites", "value": "\n* ".join(suites_failed)}
             failed_test_suites_field2 = {"title": "Failed test suites2", "value": ",".join(suites_failed)}
         return [
             {
                 "pretext": "All results",
                 "color": "danger" if suites_failed else "good",
-                "mrkdwn_in": ["pretext", "Failed test suites"],
+                "mrkdwn_in": ["pretext", "fields"],
                 "fields": [
                     {"title": "Environment", "value": env},
                     {"title": "Suite", "value": suites_ran.replace("tests/", "")},
