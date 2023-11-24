@@ -1,6 +1,5 @@
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
 import _releaseService, {
-  Release,
   ReleaseSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import _publicationService from '@admin/services/publicationService';
