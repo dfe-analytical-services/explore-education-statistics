@@ -1,9 +1,10 @@
 import React, { ReactNode } from 'react';
 import { Contact } from '@common/services/publicationService';
-import ReleaseTypesModal from '@common/modules/release/components/ReleaseTypesModal';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
+import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
+import Modal from '@common/components/Modal';
 
 interface Props {
   contactDetails?: Contact;
@@ -25,14 +26,18 @@ const TableToolInfo = ({
       <ul className="govuk-list">
         {releaseType && (
           <li>
-            Release type: {releaseTypes[releaseType]}{' '}
-            <ReleaseTypesModal
+            Release type:{' '}
+            <Modal
+              showClose
+              title={releaseTypes[releaseType]}
               triggerButton={
                 <ButtonText>
-                  <InfoIcon description="What are release types?" />
+                  {releaseTypes[releaseType]} <InfoIcon />
                 </ButtonText>
               }
-            />
+            >
+              <ReleaseTypeSection showHeading={false} type={releaseType} />
+            </Modal>
           </li>
         )}
         {releaseLink && <li>Publication: {releaseLink}</li>}
