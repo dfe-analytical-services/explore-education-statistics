@@ -12,13 +12,10 @@ import visual
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
-from SeleniumLibrary.keywords.waiting import WaitingKeywords
 from SeleniumLibrary.utils import is_noney
 from tests.libs.logger import get_logger
+from tests.libs.selenium_elements import element_finder, sl, waiting
 
-sl = BuiltIn().get_library_instance("SeleniumLibrary")
-element_finder = sl._element_finder
-waiting = WaitingKeywords(sl)
 logger = get_logger(__name__)
 
 # Should only initialise some parts once e.g. registration
@@ -49,8 +46,8 @@ if not utilities_init.initialised:
 
     # Register locator strategies
 
-    element_finder.register("label", _find_by_label, persist=True)
-    element_finder.register("testid", _find_by_testid, persist=True)
+    element_finder().register("label", _find_by_label, persist=True)
+    element_finder().register("testid", _find_by_testid, persist=True)
 
     utilities_init.initialised = True
 
@@ -63,19 +60,26 @@ def enable_basic_auth_headers():
     if public_auth_user and public_auth_password:
         token = base64.b64encode(f"{public_auth_user}:{public_auth_password}".encode())
 
-        sl.driver.execute_cdp_cmd("Network.enable", {})
-        sl.driver.execute_cdp_cmd(
-            "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
-        )
+        try:
+            # Must refetch sl() on rerun or sl().driver is None!
+            # sl() = BuiltIn().get_library_instance("SeleniumLibrary")
+            assert sl().driver is not None, "sl().driver is None"
+            sl().driver.execute_cdp_cmd("Network.enable", {})
+
+            sl().driver.execute_cdp_cmd(
+                "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
+            )
+        except Exception as e:
+            BuiltIn().log_to_console("Exception: ", e)
 
 
 def disable_basic_auth_headers():
     # Must be disabled to visit admin frontend
-    sl.driver.execute_cdp_cmd("Network.disable", {})
+    sl().driver.execute_cdp_cmd("Network.disable", {})
 
 
 def raise_assertion_error(err_msg):
-    sl.failure_occurred()
+    sl().failure_occurred()
     raise AssertionError(err_msg)
 
 
@@ -87,10 +91,10 @@ def user_waits_until_parent_contains_element(
 
         def parent_contains_matching_element() -> bool:
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
-            return element_finder.find(child_locator, required=False, parent=parent_el) is not None
+            return element_finder().find(child_locator, required=False, parent=parent_el) is not None
 
         if is_noney(count):
-            return waiting._wait_until(
+            return waiting()._wait_until(
                 parent_contains_matching_element,
                 "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
                 timeout,
@@ -101,9 +105,9 @@ def user_waits_until_parent_contains_element(
 
         def parent_contains_matching_elements() -> bool:
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
-            return len(sl.find_elements(child_locator, parent=parent_el)) == count
+            return len(sl().find_elements(child_locator, parent=parent_el)) == count
 
-        waiting._wait_until(
+        waiting()._wait_until(
             parent_contains_matching_elements,
             "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (parent_locator, count, child_locator),
             timeout,
@@ -125,10 +129,10 @@ def user_waits_until_parent_does_not_contain_element(
 
         def parent_does_not_contain_matching_element() -> bool:
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
-            return element_finder.find(child_locator, required=False, parent=parent_el) is None
+            return element_finder().find(child_locator, required=False, parent=parent_el) is None
 
         if is_noney(count):
-            return waiting._wait_until(
+            return waiting()._wait_until(
                 parent_does_not_contain_matching_element,
                 "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (parent_locator, child_locator),
                 timeout,
@@ -139,9 +143,9 @@ def user_waits_until_parent_does_not_contain_element(
 
         def parent_does_not_contain_matching_elements() -> bool:
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
-            return len(sl.find_elements(child_locator, parent=parent_el)) != count
+            return len(sl().find_elements(child_locator, parent=parent_el)) != count
 
-        waiting._wait_until(
+        waiting()._wait_until(
             parent_does_not_contain_matching_elements,
             "Parent '%s' should not have contained %s '%s' element(s) within <TIMEOUT>."
             % (parent_locator, count, child_locator),
@@ -188,26 +192,26 @@ def get_child_elements(parent_locator: object, child_locator: str):
     try:
         child_locator = _normalise_child_locator(child_locator)
         parent_el = _get_parent_webelement_from_locator(parent_locator)
-        return element_finder.find_elements(child_locator, parent=parent_el)
+        return element_finder().find_elements(child_locator, parent=parent_el)
     except Exception as err:
         logger.warn(f"Error whilst executing utilities.py get_child_elements() - {err}")
         raise_assertion_error(err)
 
 
 def user_sets_focus_to_element(selector):
-    sl.wait_until_page_contains_element(selector)
-    sl.set_focus_to_element(selector)
+    sl().wait_until_page_contains_element(selector)
+    sl().set_focus_to_element(selector)
 
 
 def set_to_local_storage(key: str, value: str):
-    sl.execute_javascript(f"localStorage.setItem('{key}', '{value}');")
+    sl().execute_javascript(f"localStorage.setItem('{key}', '{value}');")
 
 
 def set_cookie_from_json(cookie_json):
     cookie_dict = json.loads(cookie_json)
     del cookie_dict["domain"]
 
-    sl.driver.add_cookie(cookie_dict)
+    sl().driver.add_cookie(cookie_dict)
 
 
 def format_uk_to_local_datetime(uk_local_datetime: str, strf: str) -> str:
@@ -231,7 +235,7 @@ def format_datetime(datetime: datetime, strf: str) -> str:
 
 
 def user_should_be_at_top_of_page():
-    (x, y) = sl.get_window_position()
+    (x, y) = sl().get_window_position()
     if y != 0:
         raise_assertion_error(f"Windows position Y is {y} not 0! User should be at the top of the page!")
 
@@ -255,12 +259,12 @@ def capture_screenshots_and_html():
 
 
 def capture_html():
-    html = sl.get_source()
+    html = sl().get_source()
     current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
     html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w", encoding="utf-8")
     html_file.write(html)
     html_file.close()
-    logger.warn(f"Captured HTML of {sl.get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
+    logger.warn(f"Captured HTML of {sl().get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
 
 
 def user_gets_row_number_with_heading(heading: str, table_locator: str = "css:table"):
@@ -270,7 +274,7 @@ def user_gets_row_number_with_heading(heading: str, table_locator: str = "css:ta
 
 
 def user_gets_row_with_group_and_indicator(group: str, indicator: str, table_selector: str = "css:table"):
-    table_elem = sl.get_webelement(table_selector)
+    table_elem = sl().get_webelement(table_selector)
     elems = table_elem.find_elements(
         By.XPATH,
         f'.//tbody/tr/th[text()="{group}"]/../self::tr | .//tbody/tr/th[text()="{group}"]/../following-sibling::tr',
@@ -305,12 +309,12 @@ def remove_substring_from_right_of_string(string, substring):
 
 
 def user_clicks_element_if_exists(selector):
-    if element_finder.find(selector, required=False) is not None:
-        sl.click_element(selector)
+    if element_finder().find(selector, required=False) is not None:
+        sl().click_element(selector)
 
 
 def user_is_on_admin_dashboard(admin_url: str) -> bool:
-    current_url = sl.get_location()
+    current_url = sl().get_location()
     url_parts = urlparse(current_url)
     left_part = f"{url_parts.scheme}://{url_parts.netloc}{url_parts.path}"
     if left_part.endswith("/"):
@@ -321,10 +325,10 @@ def user_is_on_admin_dashboard(admin_url: str) -> bool:
 def user_is_on_admin_dashboard_with_theme_and_topic_selected(admin_url: str, theme: str, topic: str) -> bool:
     if not user_is_on_admin_dashboard(admin_url):
         return False
-    selected_theme = sl.get_selected_list_label("id:publicationsReleases-themeTopic-themeId")
+    selected_theme = sl().get_selected_list_label("id:publicationsReleases-themeTopic-themeId")
     if selected_theme != theme:
         return False
-    selected_topic = sl.get_selected_list_label("id:publicationsReleases-themeTopic-topicId")
+    selected_topic = sl().get_selected_list_label("id:publicationsReleases-themeTopic-topicId")
     return selected_topic == topic
 
 
@@ -333,7 +337,7 @@ def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
     if user_is_on_admin_dashboard(admin_url):
         return
 
-    sl.go_to(admin_url)
+    sl().go_to(admin_url)
 
 
 def is_webelement(variable: object) -> bool:
@@ -343,10 +347,10 @@ def is_webelement(variable: object) -> bool:
 def _normalise_child_locator(child_locator: str) -> str:
     if isinstance(child_locator, str):
         # the below substitution is necessary in order to correctly find the parent's descendants.  Without the
-        # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query
+        # preceding dot, the double forward sl()ash breaks out of the parent container and returns the xpath query
         # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below
         # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward
-        # slashes without the "xpath:" prefix are inferred as being xpath expressions.
+        # sl()ashes without the "xpath:" prefix are inferred as being xpath expressions.
         return re.sub(r"^(xpath:)?//", "xpath:.//", child_locator)
 
     raise_assertion_error(f"Child locator was not a str - {child_locator}")
@@ -354,8 +358,8 @@ def _normalise_child_locator(child_locator: str) -> str:
 
 def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = None, error: str = "") -> WebElement:
     if isinstance(parent_locator, str):
-        sl.wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
-        return sl.find_element(parent_locator)
+        sl().wait_until_page_contains_element(parent_locator, timeout=timeout, error=error)
+        return sl().find_element(parent_locator)
     elif isinstance(parent_locator, WebElement):
         return parent_locator
     else:

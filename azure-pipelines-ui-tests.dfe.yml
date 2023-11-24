@@ -32,7 +32,6 @@ jobs:
 
   - task: UsePythonVersion@0
     displayName: Use Python 3.10
-  # retryCountOnTaskFailure: 2
     timeoutInMinutes: 5
     inputs:
       versionSpec: 3.10
@@ -49,19 +48,12 @@ jobs:
     displayName: Public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2
+      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-  #- task: PythonScript@0
-  #  displayName: Public UI tests - rerun failed suites
-  #  condition: not(succeeded())
-  #  inputs:
-  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-  #    arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2 --rerun-failed-suites
-  #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
@@ -92,7 +84,6 @@ jobs:
 
   - task: UsePythonVersion@0
     displayName: Use Python 3.10
-  # retryCountOnTaskFailure: 2
     timeoutInMinutes: 5
     inputs:
       versionSpec: 3.10
@@ -110,20 +101,13 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2
+      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2 --rerun-attempts 3
     #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained ampersands.
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-  #- task: PythonScript@0
-  #  displayName: 'Publish release and amend UI tests - rerun failed suites'
-  #  condition: not(succeeded())
-  #  inputs:
-  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-  #    arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2 --rerun-failed-suites
-  #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
@@ -153,7 +137,6 @@ jobs:
 
   - task: UsePythonVersion@0
     displayName: Use Python 3.10
-  # retryCountOnTaskFailure: 2
     timeoutInMinutes: 5
     inputs:
       versionSpec: 3.10
@@ -171,19 +154,12 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-  #- task: PythonScript@0
-  #  displayName: Admin UI tests - rerun failed suites
-  #  condition: not(succeeded())
-  #  inputs:
-  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2 --rerun-failed-suites
-  #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
@@ -215,7 +191,6 @@ jobs:
 
   - task: UsePythonVersion@0
     displayName: Use Python 3.10
-  # retryCountOnTaskFailure: 2
     timeoutInMinutes: 5
     inputs:
       versionSpec: 3.10
@@ -232,19 +207,12 @@ jobs:
     displayName: Admin public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-  #- task: PythonScript@0
-  #  displayName: Admin public UI tests - rerun failed suites
-  #  condition: not(succeeded())
-  #  inputs:
-  #    scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-  #    arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2 --rerun-failed-suites
-  #    workingDirectory: tests/robot-tests
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
