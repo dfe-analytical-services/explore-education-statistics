@@ -171,7 +171,7 @@ function BaseComment({
         </div>
       ) : (
         <div
-          className="govuk-!-margin-bottom-3 govuk-!-margin-top-2"
+          className="govuk-!-margin-bottom-3 govuk-!-margin-top-2 dfe-word-break--break-word"
           data-testid="comment-content"
         >
           {content}
