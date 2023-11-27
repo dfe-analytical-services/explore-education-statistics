@@ -35,7 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 PublishingStrategy = Immediately,
                 Methodology = new Methodology
                 {
-                    Slug = publication.Slug, // Remove EES-4627
                     OwningPublicationTitle = publication.Title,
                     OwningPublicationSlug = publication.Slug,
                     Publications = new List<PublicationMethodology>
@@ -87,6 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             return await _contentDbContext
                 .MethodologyVersions
+                // We need the Include, in case a caller of this method uses MethodologyVersion.Slug on the result
+                .Include(mv => mv.Methodology)
                 .Where(mv =>
                     mv.Methodology.LatestPublishedVersionId == mv.Id
                     // EF cannot translate mv.Slug into a Queryable, so we have to do this...
@@ -209,8 +210,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Collection(mp => mp.Versions)
                 .LoadAsync();
 
-            // TODO EES-4628 SingleOrDefault here is susceptible to bug EES-2672 which is allowing multiple amendments
-            // of the same version to be created. If there is a next version there should only be one.
             return methodologyVersion.Methodology.Versions.SingleOrDefault(mv =>
                 mv.PreviousVersionId == methodologyVersion.Id);
         }
