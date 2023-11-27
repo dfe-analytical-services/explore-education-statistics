@@ -560,6 +560,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
 
+            services.AddTransient<IDataGuidanceMigrationService, DataGuidanceMigrationService>();
+
             services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
             services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();
 

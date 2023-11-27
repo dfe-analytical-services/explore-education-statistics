@@ -22,6 +22,16 @@ public static class ReleaseGeneratorExtensions
         Guid id)
         => generator.ForInstance(release => release.SetId(id));
 
+    public static Generator<Release> WithIds(
+        this Generator<Release> generator,
+        IEnumerable<Guid> ids)
+    {
+        ids.ForEach((id, index) =>
+            generator.ForIndex(index, s => s.SetId(id)));
+
+        return generator;
+    }
+
     public static Generator<Release> WithPublication(
         this Generator<Release> generator,
         Publication publication)
