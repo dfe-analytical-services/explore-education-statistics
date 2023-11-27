@@ -313,6 +313,10 @@ user adds content to headlines text block
     [Arguments]    ${content}
     user adds content to autosaving text block    id:releaseHeadlines    ${content}
 
+user adds content to related dashboards text block
+    [Arguments]    ${content}
+    user adds content to autosaving text block    id:related-dashboards-content    ${content}
+
 user adds content to accordion section text block
     [Arguments]
     ...    ${section_name}
@@ -426,12 +430,22 @@ user saves autosaving text block
 
     # EES-3501 - moving focus out of the autosave textarea to give the onBlur() with the 100ms timeout in
     # FormEditor.tsx a chance to process prior to processing the form submission when we click "Save & close".
+    #
+    # A problem would occur if a user was able to click the "Save & close" button in the time between us
+    # losing focus from the text block (which triggers the delayed onBlur()) and the user clicking the
+    # "Save & close" button.    If they were able to do that within the 100ms delay between the focus leaving the
+    # text block and the delayed onBlur() occurring, it would leave the page saying "1 content block has
+    # unsaved changes" and with an internal state that indicates we still have dirty text blocks, despite
+    # actually not having any unsaved changes.
+    #
+    # Given this, we wait for 500ms in order to give the onBlur() a chance to execute.
     user presses keys    TAB
-    sleep    0.2
+    sleep    0.5
 
     user clicks button    Save & close    ${parent}
     user waits until page finishes loading
     user waits until parent does not contain button    ${parent}    Save & close    %{WAIT_SMALL}
+    user waits until element contains    ${parent}    Edit block    %{WAIT_SMALL}
 
 user checks accordion section text block contains
     [Arguments]
