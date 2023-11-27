@@ -86,7 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             return await _contentDbContext
                 .MethodologyVersions
-                .Include(mv => mv.Methodology) // for MethodologyVersion.Slug
+                // We need the Include, in case a caller of this method uses MethodologyVersion.Slug on the result
+                .Include(mv => mv.Methodology)
                 .Where(mv =>
                     mv.Methodology.LatestPublishedVersionId == mv.Id
                     // EF cannot translate mv.Slug into a Queryable, so we have to do this...
