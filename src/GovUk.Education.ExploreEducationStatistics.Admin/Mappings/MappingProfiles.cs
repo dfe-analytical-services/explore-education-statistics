@@ -1,20 +1,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using ContactViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContactViewModel;
 using ContentSectionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ContentSectionViewModel;
 using DataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.DataBlockViewModel;
 using EmbedBlockLinkViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.EmbedBlockLinkViewModel;
 using HtmlBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.HtmlBlockViewModel;
 using IContentBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.IContentBlockViewModel;
+using KeyStatisticDataBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticDataBlockViewModel;
+using KeyStatisticTextViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticTextViewModel;
+using KeyStatisticViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.KeyStatisticViewModel;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using MarkDownBlockViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MarkDownBlockViewModel;
 using MethodologyNoteViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyNoteViewModel;
@@ -31,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     /**
      * AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
      */
-    public class MappingProfiles : Profile
+    public class MappingProfiles : CommonMappingProfile
     {
         public MappingProfiles()
         {
@@ -82,8 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(
                     dest => dest.Theme,
                     m => m.MapFrom(p => p.Topic.Theme));
-
-            CreateMap<Contact, ContactViewModel>();
 
             CreateContentBlockMap();
             CreateMap<DataBlockCreateViewModel, DataBlock>();
@@ -217,7 +218,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Comments,
                     m => m.MapFrom(block => block.Comments.OrderBy(comment => comment.Created)));
 
-            CreateMap<DataBlock, DataBlockViewModel>();
+            // EES-4640 - we include an AfterMap configuration here to ensure that any time we create a
+            // DataBlockViewModel from a plain DataBlock, we also include the DataBlockParentId on the
+            // destination DataBlockViewModel that the DataBlock itself does not contain. When DataBlock is
+            // removed from the ContentBlock model, this can go too.
+            CreateMap<DataBlock, DataBlockViewModel>()
+                .AfterMap<DataBlockViewModelPostMappingAction>();
+
+            CreateMap<DataBlockVersion, DataBlockViewModel>();
 
             CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
                 .ForMember(dest => dest.Title,

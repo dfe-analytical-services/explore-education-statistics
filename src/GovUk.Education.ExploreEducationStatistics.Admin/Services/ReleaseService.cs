@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -17,11 +18,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     public class ReleaseService : IReleaseService
     {
         private readonly ContentDbContext _context;
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IMapper _mapper;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
@@ -51,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseFileService _releaseFileService;
         private readonly IDataImportService _dataImportService;
-        private readonly IFootnoteService _footnoteService;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
@@ -72,9 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
             IDataImportService dataImportService,
-            IFootnoteService footnoteService,
             IFootnoteRepository footnoteRepository,
-            StatisticsDbContext statisticsDbContext,
             IDataBlockService dataBlockService,
             IReleaseSubjectRepository releaseSubjectRepository,
             IGuidGenerator guidGenerator,
@@ -91,9 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseDataFileService = releaseDataFileService;
             _releaseFileService = releaseFileService;
             _dataImportService = dataImportService;
-            _footnoteService = footnoteService;
             _footnoteRepository = footnoteRepository;
-            _statisticsDbContext = statisticsDbContext;
             _dataBlockService = dataBlockService;
             _releaseSubjectRepository = releaseSubjectRepository;
             _guidGenerator = guidGenerator;
@@ -121,8 +114,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(releaseCreate.PublicationId)
+            return await ReleaseCreateRequestValidator.Validate(releaseCreate)
+                .OnSuccess(async () => await _persistenceHelper.CheckEntityExists<Publication>(releaseCreate.PublicationId))
                 .OnSuccess(_userService.CheckCanCreateReleaseForPublication)
                 .OnSuccess(async _ => await ValidateReleaseSlugUniqueToPublication(releaseCreate.Slug, releaseCreate.PublicationId))
                 .OnSuccess(async () =>
@@ -243,94 +236,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId, HydrateReleaseForAmendment)
-                .OnSuccess(_userService.CheckCanMakeAmendmentOfRelease)
-                .OnSuccess(originalRelease =>
-                    CreateBasicReleaseAmendment(originalRelease)
-                    .OnSuccess(CreateStatisticsReleaseAmendment)
-                    .OnSuccess(amendment => CopyReleaseRoles(releaseId, amendment))
-                    .OnSuccessDo(amendment => _footnoteService.CopyFootnotes(releaseId, amendment.Id))
-                    .OnSuccess(amendment => CopyFileLinks(originalRelease, amendment))
-                    .OnSuccess(amendment => GetRelease(amendment.Id)));
-        }
-
-        private async Task<Either<ActionResult, Release>> CreateStatisticsReleaseAmendment(Release amendment)
-        {
-            var statsRelease = await _statisticsDbContext
-                .Release
-                .FirstOrDefaultAsync(r => r.Id == amendment.PreviousVersionId);
-
-            // Release does not have to have stats uploaded but if it has then
-            // create a link row to link back to the original subject
-            if (statsRelease != null)
-            {
-                var statsAmendment = statsRelease.CreateReleaseAmendment(amendment.Id);
-
-                var statsAmendmentSubjectLinks = _statisticsDbContext
-                    .ReleaseSubject
-                    .AsQueryable()
-                    .Where(rs => rs.ReleaseId == amendment.PreviousVersionId)
-                    .Select(rs => rs.CopyForRelease(statsAmendment));
-
-                await _statisticsDbContext.Release.AddAsync(statsAmendment);
-                await _statisticsDbContext.ReleaseSubject.AddRangeAsync(statsAmendmentSubjectLinks);
-
-                await _statisticsDbContext.SaveChangesAsync();
-            }
-
-            return amendment;
-        }
-
-        private async Task<Either<ActionResult, Release>> CopyReleaseRoles(Guid originalReleaseId, Release amendment)
-        {
-            // Copy all current roles apart from Prerelease Users to the Release amendment.
-            var newRoles = _context
-                .UserReleaseRoles
-                // For auditing purposes, we also want to migrate release roles that have Deleted set (when a role is
-                // manually removed from a Release as opposed to SoftDeleted, which is only set when a Release is
-                // deleted)
-                .IgnoreQueryFilters()
-                .Where(releaseRole => releaseRole.ReleaseId == originalReleaseId
-                                      && releaseRole.Role != ReleaseRole.PrereleaseViewer)
-                .Select(releaseRole => releaseRole.CopyForAmendment(amendment))
-                .ToList();
-
-            await _context.AddRangeAsync(newRoles);
-            await _context.SaveChangesAsync();
-            return amendment;
-        }
-
-        private async Task<Either<ActionResult, Release>> CreateBasicReleaseAmendment(Release release)
-        {
-            var dataBlocks = await _context
-                .ContentBlocks
-                .Where(block => block.ReleaseId == release.Id)
-                .OfType<DataBlock>()
-                .ToListAsync();
-
-            var (amendment, amendedDataBlocks) = release.CreateAmendment(dataBlocks, DateTime.UtcNow, _userService.GetUserId());
-            await _context.Releases.AddAsync(amendment);
-            await _context.ContentBlocks.AddRangeAsync(amendedDataBlocks);
-            await _context.SaveChangesAsync();
-            return amendment;
-        }
-
-        private async Task<Either<ActionResult, Release>> CopyFileLinks(Release originalRelease, Release newRelease)
-        {
-            var releaseFileCopies = _context
-                .ReleaseFiles
-                .Include(f => f.File)
-                .Where(f => f.ReleaseId == originalRelease.Id)
-                .Select(f => f.CreateReleaseAmendment(newRelease)).ToList();
-
-            await _context.ReleaseFiles.AddRangeAsync(releaseFileCopies);
-            await _context.SaveChangesAsync();
-            return newRelease;
-        }
-
         public Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(Guid releaseId)
         {
             return _persistenceHelper
@@ -342,10 +247,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
             Guid releaseId, ReleaseUpdateRequest request)
         {
-            return await _context
-                .Releases
-                .HydrateReleaseForChecklist()
-                .SingleOrNotFoundAsync(r => r.Id == releaseId)
+            return await ReleaseUpdateRequestValidator.Validate(request)
+                .OnSuccess(async () => await CheckReleaseExists(releaseId))
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccessDo(async release => await ValidateReleaseSlugUniqueToPublication(request.Slug, release.PublicationId, releaseId))
                 .OnSuccess(async release =>
@@ -514,70 +417,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, File>> CheckFileExists(Guid id)
-        {
-            return await _persistenceHelper.CheckEntityExists<File>(id)
-                .OnSuccess(file => file.Type != FileType.Data
-                    ? new Either<ActionResult, File>(
-                        ValidationActionResult(FileTypeMustBeData))
-                    : file);
-        }
-
-        private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(string slug,
-            Guid publicationId, Guid? releaseId = null)
-        {
-            var releases = await _context.Releases
-                .AsQueryable()
-                .Where(r => r.PublicationId == publicationId).ToListAsync();
-
-            if (releases.Any(release => release.Slug == slug && release.Id != releaseId && IsLatestVersionOfRelease(releases, release.Id)))
-            {
-                return ValidationActionResult(SlugNotUnique);
-            }
-
-            return Unit.Instance;
-        }
-
-        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
-        {
-            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
-        }
-
-        private async Task CreateGenericContentFromTemplate(Guid templateReleaseId, Release newRelease)
-        {
-            var templateRelease = await _context
-                .Releases
-                .AsNoTracking()
-                .Include(release => release.Content)
-                .FirstAsync(r => r.Id == templateReleaseId);
-
-            newRelease.Content = templateRelease
-                .Content
-                .Where(section => section.Type == ContentSectionType.Generic)
-                .Select(section => CloneContentSectionFromReleaseTemplate(section, newRelease))
-                .ToList();
-        }
-
-        private ContentSection CloneContentSectionFromReleaseTemplate(
-            ContentSection originalSection,
-            Release newRelease)
-        {
-            // Create a like-for-like copy of the template ContentSection.
-            var copy = originalSection.MemberwiseClone();
-
-            // Assign a new Id for the new ContentSection.
-            copy.Id = Guid.NewGuid();
-
-            // Assign the new ContentSection to the new Release.
-            copy.Release = newRelease;
-            copy.ReleaseId = newRelease.Id;
-
-            // Do not copy over any existing Content from the original template ContentSection.
-            copy.Content = new List<ContentBlock>();
-
-            return copy;
-        }
-
         public async Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
@@ -649,6 +488,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        private async Task<Either<ActionResult, Release>> CheckReleaseExists(Guid releaseId)
+        {
+            return await _context
+                .Releases
+                .HydrateReleaseForChecklist()
+                .SingleOrNotFoundAsync(r => r.Id == releaseId);
+        }
+
+        private async Task<Either<ActionResult, File>> CheckFileExists(Guid id)
+        {
+            return await _persistenceHelper.CheckEntityExists<File>(id)
+                .OnSuccess(file => file.Type != FileType.Data
+                    ? new Either<ActionResult, File>(
+                        ValidationActionResult(FileTypeMustBeData))
+                    : file);
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateReleaseSlugUniqueToPublication(string slug,
+            Guid publicationId, Guid? releaseId = null)
+        {
+            var releases = await _context.Releases
+                .AsQueryable()
+                .Where(r => r.PublicationId == publicationId).ToListAsync();
+
+            if (releases.Any(release => release.Slug == slug && release.Id != releaseId && IsLatestVersionOfRelease(releases, release.Id)))
+            {
+                return ValidationActionResult(SlugNotUnique);
+            }
+
+            return Unit.Instance;
+        }
+
+        private static bool IsLatestVersionOfRelease(IEnumerable<Release> releases, Guid releaseId)
+        {
+            return !releases.Any(r => r.PreviousVersionId == releaseId && r.Id != releaseId);
+        }
+
+        private async Task CreateGenericContentFromTemplate(Guid templateReleaseId, Release newRelease)
+        {
+            var templateRelease = await _context
+                .Releases
+                .AsNoTracking()
+                .Include(release => release.Content)
+                .FirstAsync(r => r.Id == templateReleaseId);
+
+            newRelease.Content = templateRelease
+                .Content
+                .Where(section => section.Type == ContentSectionType.Generic)
+                .Select(section => CloneContentSectionFromReleaseTemplate(section, newRelease))
+                .ToList();
+        }
+
+        private ContentSection CloneContentSectionFromReleaseTemplate(
+            ContentSection originalSection,
+            Release newRelease)
+        {
+            // Create a new ContentSection based upon the original template.
+            return new ContentSection
+            {
+                // Assign a new Id.
+                Id = Guid.NewGuid(),
+
+                // Assign it to the new Release.
+                ReleaseId = newRelease.Id,
+
+                // Copy certain fields from the original.
+                Caption = originalSection.Caption,
+                Heading = originalSection.Heading,
+                Order = originalSection.Order,
+                Type = originalSection.Type
+            };
+        }
+
         private async Task<bool> CanUpdateDataFiles(Guid releaseId)
         {
             var release = await _context.Releases.FirstAsync(r => r.Id == releaseId);
@@ -680,22 +592,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return values
                 .Include(r => r.Publication)
                 .Include(r => r.ReleaseStatuses);
-        }
-
-        private static IQueryable<Release> HydrateReleaseForAmendment(IQueryable<Release> queryable)
-        {
-            return queryable
-                .AsSplitQuery()
-                .Include(release => release.Publication)
-                .Include(release => release.Content)
-                .ThenInclude(section => section.Content)
-                .ThenInclude(block => (block as EmbedBlockLink)!.EmbedBlock)
-                .Include(release => release.Updates)
-                .Include(release => release.Content)
-                .ThenInclude(release => release.Content)
-                .Include(release => release.KeyStatistics)
-                .ThenInclude(keyStat => (keyStat as KeyStatisticDataBlock)!.DataBlock)
-                .Include(release => release.FeaturedTables);
         }
 
         private IList<MethodologyVersion> GetMethodologiesScheduledWithRelease(Guid releaseId)

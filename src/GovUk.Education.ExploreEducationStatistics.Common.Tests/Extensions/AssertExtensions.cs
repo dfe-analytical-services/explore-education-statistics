@@ -22,20 +22,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         public static bool AssertDeepEqualTo<T>(
             this T actual,
             T expected,
-            Expression<Func<T, object>>[]? ignoreProperties = null)
+            Expression<Func<T, object>>[]? notEqualProperties = null)
         {
             var compareLogic = new CompareLogic();
-            ignoreProperties?.ForEach(compareLogic.Config.IgnoreProperty);
+            notEqualProperties?.ForEach(compareLogic.Config.IgnoreProperty);
             var comparison = compareLogic.Compare(actual, expected);
             Assert.True(comparison.AreEqual, comparison.DifferencesString);
+            notEqualProperties?.ForEach(notEqualField =>
+            {
+                var fieldGetter = notEqualField.Compile();
+                var expectedValue = fieldGetter.Invoke(expected);
+                var actualValue = fieldGetter.Invoke(actual);
+
+                try
+                {
+                    Assert.NotEqual(expectedValue, actualValue);
+                }
+                catch (NotEqualException)
+                {
+                    throw new XunitException($"Expected values for expression {notEqualField} to not be equal, " +
+                                             $"but they were both of value \"{expectedValue}\".");
+                }
+
+            });
             return true;
         }
 
         /// <summary>
-        /// A convenience method for combining AssertDeepEqualTo with one or more ignorable fields, to exclude certain
-        /// fields from the deep equality check.
+        /// A convenience method for combining AssertDeepEqualTo with one or more inequality assertions for specific
+        /// fields.  This allows us to check for a general equality rule for the majority of an object's fields, whilst
+        /// also checking the opposite case for a smaller subset of fields.
         /// </summary>
-        public static Expression<Func<T, object>>[] Ignoring<T>(params Expression<Func<T, object>>[] properties)
+        public static Expression<Func<T, object>>[] Except<T>(params Expression<Func<T, object>>[] properties)
         {
             return properties;
         }

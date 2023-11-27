@@ -4,12 +4,8 @@ import {
   methodologySummaryRoute,
 } from '@admin/routes/methodologyRoutes';
 import { methodologyRoute } from '@admin/routes/routes';
-import _methodologyService, {
-  MethodologyVersion,
-} from '@admin/services/methodologyService';
-import _methodologyContentService, {
-  MethodologyContent,
-} from '@admin/services/methodologyContentService';
+import _methodologyService from '@admin/services/methodologyService';
+import _methodologyContentService from '@admin/services/methodologyContentService';
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
 import { screen, waitFor, within } from '@testing-library/react';
@@ -18,6 +14,10 @@ import React from 'react';
 import { Route } from 'react-router-dom';
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import render from '@common-test/render';
+import testMethodology, {
+  testMethodologyAmendment,
+  testMethodologyContent,
+} from '@admin/pages/methodology/edit-methodology/__tests__/__data__/testMethodologyVersionsAmendmentsAndContents';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');
@@ -34,33 +34,6 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyPage', () => {
-  const testMethodology: MethodologyVersion = {
-    id: 'm1',
-    amendment: false,
-    methodologyId: 'm-1',
-    title: 'Test methodology',
-    slug: 'test-methodology',
-    owningPublication: {
-      id: 'p1',
-      title: 'Publication title',
-    },
-    status: 'Draft',
-  };
-  const testMethodologyAmendment = {
-    ...testMethodology,
-    amendment: true,
-  };
-
-  const testMethodologyContent: MethodologyContent = {
-    id: 'mc-1',
-    title: 'The content',
-    slug: 'content-1',
-    status: 'Draft',
-    content: [],
-    annexes: [],
-    notes: [],
-  };
-
   test('renders the page with the summary tab', async () => {
     methodologyService.getMethodology.mockResolvedValue(testMethodology);
     renderPage();

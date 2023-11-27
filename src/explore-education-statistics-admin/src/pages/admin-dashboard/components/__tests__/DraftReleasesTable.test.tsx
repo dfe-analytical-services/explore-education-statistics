@@ -25,6 +25,12 @@ describe('DraftReleasesTable', () => {
         id: 'publication-1',
         title: 'Publication 1',
         slug: 'publication-1-slug',
+        owner: true,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       nextReleaseDate: {
         year: '2200',
@@ -58,6 +64,12 @@ describe('DraftReleasesTable', () => {
         id: 'publication-2',
         title: 'Publication 2',
         slug: 'publication-2-slug',
+        owner: true,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       nextReleaseDate: {
         year: '2200',
@@ -92,6 +104,12 @@ describe('DraftReleasesTable', () => {
         id: 'publication-1',
         title: 'Publication 1',
         slug: 'publication-1-slug',
+        owner: true,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       nextReleaseDate: {
         year: '2200',
@@ -125,6 +143,12 @@ describe('DraftReleasesTable', () => {
         id: 'publication-3',
         title: 'Publication 3',
         slug: 'publication-3-slug',
+        owner: true,
+        contact: {
+          teamName: 'Mock Contact Team Name',
+          teamEmail: 'Mock Contact Team Email',
+          contactName: 'Mock Contact Name',
+        },
       },
       live: false,
       timePeriodCoverage: {

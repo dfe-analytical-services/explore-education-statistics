@@ -3,6 +3,7 @@ import ExperimentalStatisticsSection from '@common/modules/release/components/Ex
 import ManagementInformationSection from '@common/modules/release/components/ManageInformationSection';
 import NationalStatisticsSection from '@common/modules/release/components/NationalStatisticsSection';
 import OfficialStatisticsSection from '@common/modules/release/components/OfficialStatisticsSection';
+import OfficialStatisticsInDevelopmentSection from '@common/modules/release/components/OfficialStatisticsInDevelopmentSection';
 import { ReleaseType } from '@common/services/types/releaseType';
 import React from 'react';
 
@@ -12,6 +13,7 @@ const releaseTypeComponents = {
   ExperimentalStatistics: ExperimentalStatisticsSection,
   AdHocStatistics: AdHocStatisticsSection,
   ManagementInformation: ManagementInformationSection,
+  OfficialStatisticsInDevelopment: OfficialStatisticsInDevelopmentSection,
 };
 
 interface Props {

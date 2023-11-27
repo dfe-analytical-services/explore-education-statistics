@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 
@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
     /**
      * AutoMapper Profile which is configured by AutoMapper.Extensions.Microsoft.DependencyInjection.
      */
-    public class MappingProfiles : Profile
+    public class MappingProfiles : CommonMappingProfile
     {
         public MappingProfiles()
         {
@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
             CreateMap<Publication, PublicationSummaryViewModel>();
-
+            
             CreateMap<KeyStatisticDataBlock, KeyStatisticDataBlockViewModel>();
             CreateMap<KeyStatisticText, KeyStatisticTextViewModel>();
             CreateMap<KeyStatistic, KeyStatisticViewModel>()
@@ -66,7 +66,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
             CreateMap<ContentBlock, IContentBlockViewModel>()
                 .IncludeAllDerived();
 
-            CreateMap<DataBlock, DataBlockViewModel>();
+            // EES-4640 - we include an AfterMap configuration here to ensure that any time we create a
+            // DataBlockViewModel from a plain DataBlock, we also include the DataBlockParentId on the
+            // destination DataBlockViewModel that the DataBlock itself does not contain. When DataBlock is
+            // removed from the ContentBlock model, this can go too.
+            CreateMap<DataBlock, DataBlockViewModel>()
+                .AfterMap<DataBlockViewModelPostMappingAction>();
 
             CreateMap<EmbedBlockLink, EmbedBlockLinkViewModel>()
                 .ForMember(dest => dest.Title,

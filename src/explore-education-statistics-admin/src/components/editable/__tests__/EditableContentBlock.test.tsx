@@ -303,9 +303,9 @@ Test paragraph
       render(
         <CommentsContextProvider
           comments={testComments}
-          onDelete={noop}
+          onDelete={() => Promise.resolve()}
           onCreate={jest.fn()}
-          onUpdate={noop}
+          onUpdate={() => Promise.resolve()}
           onPendingDelete={noop}
           onPendingDeleteUndo={noop}
         >
@@ -333,9 +333,9 @@ Test paragraph
       render(
         <CommentsContextProvider
           comments={testComments}
-          onDelete={noop}
+          onDelete={() => Promise.resolve()}
           onCreate={jest.fn()}
-          onUpdate={noop}
+          onUpdate={() => Promise.resolve()}
           onPendingDelete={noop}
           onPendingDeleteUndo={noop}
         >

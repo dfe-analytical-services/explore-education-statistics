@@ -18,6 +18,10 @@ public class FeaturedTable : ICreatedUpdatedTimestamps<DateTime, DateTime?>
 
     public DataBlock DataBlock { get; set; } = null!;
 
+    public Guid DataBlockParentId { get; set; }
+
+    public DataBlockParent DataBlockParent { get; set; } = null!;
+
     public Guid ReleaseId { get; set; }
 
     public Release Release { get; set; } = null!;
@@ -33,14 +37,4 @@ public class FeaturedTable : ICreatedUpdatedTimestamps<DateTime, DateTime?>
     public Guid? UpdatedById { get; set; }
 
     public User? UpdatedBy { get; set; }
-
-    public FeaturedTable Clone(Release newRelease)
-    {
-        var copy = MemberwiseClone() as FeaturedTable;
-        copy.Id = Guid.NewGuid();
-        copy.Release = newRelease;
-        copy.ReleaseId = newRelease.Id;
-
-        return copy;
-    }
 }

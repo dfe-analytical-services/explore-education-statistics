@@ -29,6 +29,7 @@ const tableBuilderService = _tableBuilderService as jest.Mocked<
 describe('DataBlockTabs', () => {
   const testDataBlock: DataBlock = {
     id: 'block-1',
+    dataBlockParentId: 'block-1-parent',
     dataSetName: 'Test data set',
     dataSetId: 'test-data-set',
     type: 'DataBlock',
@@ -85,6 +86,7 @@ describe('DataBlockTabs', () => {
 
   const testDataBlockMap: DataBlock = {
     id: 'block-1',
+    dataBlockParentId: 'block-1-parent',
     dataSetId: 'test-data-set',
     dataSetName: 'Test data set',
     type: 'DataBlock',
@@ -158,7 +160,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(screen.getAllByText('Could not load content')).toHaveLength(2);
@@ -191,7 +193,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(
@@ -222,7 +224,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -257,7 +259,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -291,7 +293,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(screen.getAllByRole('tab')).toHaveLength(2);
@@ -331,7 +333,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(screen.getByRole('table')).toBeInTheDocument();
@@ -358,7 +360,7 @@ describe('DataBlockTabs', () => {
     await waitFor(() => {
       expect(tableBuilderService.getDataBlockTableData).toBeCalledWith(
         'release-1',
-        'block-1',
+        'block-1-parent',
       );
 
       expect(container.querySelector('.leaflet-container')).toBeInTheDocument();
@@ -434,6 +436,7 @@ describe('DataBlockTabs', () => {
           dataBlock={{
             ...testDataBlock,
             id: 'block-2-id',
+            dataBlockParentId: 'block-2-parent-id',
             query: {
               subjectId: '1',
               timePeriod: {

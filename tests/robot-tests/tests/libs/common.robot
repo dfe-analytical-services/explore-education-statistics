@@ -29,7 +29,7 @@ do this on failure
     ${currently_failing_fast}=    current test suite failing fast
 
     IF    "${currently_failing_fast}" == "${FALSE}"
-        capture large screenshot and html
+        capture screenshots and html
 
         # Additionally, mark the current Test Suite as failing if the "FAIL_TEST_SUITES_FAST" option is enabled, and
         # this will cause subsequent tests within this same Test Suite to fail immediately (by virtue of their "Test
@@ -693,6 +693,11 @@ user checks url contains
     [Arguments]    ${text}
     ${current_url}=    get location
     should contain    ${current_url}    ${text}
+
+user checks url equals
+    [Arguments]    ${expected}
+    ${current_url}=    get location
+    should be equal    ${current_url}    ${expected}
 
 user checks page contains link with text and url
     [Arguments]

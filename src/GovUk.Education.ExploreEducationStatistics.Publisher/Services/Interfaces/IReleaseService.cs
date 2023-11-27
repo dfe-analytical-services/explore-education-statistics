@@ -19,6 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds);
 
-        Task SetPublishedDate(Guid releaseId, DateTime actualPublishedDate);
+        Task CompletePublishing(Guid releaseId, DateTime actualPublishedDate);
     }
 }

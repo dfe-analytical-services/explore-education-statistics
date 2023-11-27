@@ -1,13 +1,11 @@
 #nullable enable
 using System;
-using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.TimePeriodLabelFormatter;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
@@ -77,44 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public bool CanDeleteRelease { get; init; }
 
         public bool CanMakeAmendmentOfRelease { get; init; }
-    }
-
-    public class ReleaseCreateRequest
-    {
-        public Guid PublicationId { get; set; }
-
-        [Required] public ReleaseType Type { get; set; }
-
-        [Required]
-        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        public TimeIdentifier TimePeriodCoverage { get; init; }
-
-        public string Slug => SlugFromTitle(Title);
-
-        private string Title => Format(Year, TimePeriodCoverage);
-
-        [Range(1000, 9999)]
-        public int Year { get; init; }
-
-        public Guid? TemplateReleaseId { get; init; }
-    }
-
-    public class ReleaseUpdateRequest
-    {
-        [Required] public ReleaseType Type { get; init; }
-
-        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        [Required]
-        public TimeIdentifier TimePeriodCoverage { get; init; }
-
-        public string PreReleaseAccessList { get; init; } = String.Empty;
-
-        public string Slug => SlugFromTitle(Title);
-
-        private string Title => Format(Year, TimePeriodCoverage);
-
-        [Range(1000, 9999)]
-        public int Year { get; init; }
     }
 
     public record ReleaseSummaryViewModel

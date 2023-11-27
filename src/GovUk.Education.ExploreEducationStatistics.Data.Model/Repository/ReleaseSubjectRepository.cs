@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -22,6 +23,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             _statisticsDbContext = statisticsDbContext;
             _footnoteRepository = footnoteRepository;
             _subjectDeleter = subjectDeleter ?? new SubjectDeleter();
+        }
+
+        public async Task<IReadOnlyList<ReleaseSubject>> FindAll(
+            Guid releaseId,
+            Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>? queryExtender = null)
+        {
+            IQueryable<ReleaseSubject> query = _statisticsDbContext.ReleaseSubject
+                .Where(rs => rs.ReleaseId == releaseId);
+
+            if (queryExtender is not null)
+            {
+                query = queryExtender.Invoke(query);
+            }
+
+            return await query
+                .ToListAsync();
         }
 
         public async Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = true)

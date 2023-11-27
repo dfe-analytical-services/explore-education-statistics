@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             mocks.cacheService
                 .Setup(s => s.GetItemAsync(cacheKey, typeof(List<SubjectViewModel>)))
-                .ReturnsAsync(null);
+                .ReturnsAsync(null!);
 
             mocks
                 .releaseService
@@ -107,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     Description: "description",
                     SubjectId: Guid.NewGuid(),
                     DataBlockId: Guid.NewGuid(),
+                    DataBlockParentId: Guid.NewGuid(),
                     Order: 0
                 ),
             };

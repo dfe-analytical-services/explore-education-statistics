@@ -4,6 +4,7 @@ import { ConfiguredTable } from '@common/services/types/table';
 import { Dictionary } from '@common/types';
 import { AxiosRequestConfig } from 'axios';
 import { Feature, Geometry } from 'geojson';
+import { ReleaseType } from '@common/services/types/releaseType';
 
 export interface FilterOption {
   label: string;
@@ -94,6 +95,7 @@ export interface FeaturedTable {
   description?: string;
   subjectId: string;
   dataBlockId: string;
+  dataBlockParentId: string;
   order: number;
 }
 
@@ -201,6 +203,7 @@ export interface FastTrackTable extends ConfiguredTable {
 export interface FastTrackTableAndReleaseMeta extends FastTrackTable {
   releaseId: string;
   releaseSlug: string;
+  releaseType: ReleaseType;
   latestData: boolean;
   latestReleaseTitle: string;
 }
@@ -261,16 +264,16 @@ const tableBuilderService = {
   },
   async getDataBlockTableData(
     releaseId: string,
-    dataBlockId: string,
+    dataBlockParentId: string,
   ): Promise<TableDataResponse> {
     return dataApi.get(
-      `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockParentId}`,
     );
   },
   getFastTrackTableAndReleaseMeta(
-    dataBlockId: string,
+    dataBlockParentId: string,
   ): Promise<FastTrackTableAndReleaseMeta> {
-    return dataApi.get(`/tablebuilder/fast-track/${dataBlockId}`);
+    return dataApi.get(`/tablebuilder/fast-track/${dataBlockParentId}`);
   },
 };
 

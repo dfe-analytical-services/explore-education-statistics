@@ -35,6 +35,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public Either<TL, T> OnSuccess<T>(Func<TR, T> func) => Map(func);
 
+        public async Task<Either<TL, T>> OnSuccess<T>(Func<Task<Either<TL, T>>> func)
+        {
+            if (IsLeft)
+            {
+                return _left;
+            }
+
+            return await func();
+        }
+
         public async Task<Either<TL, T>> OnSuccess<T>(Func<TR, Task<Either<TL, T>>> func)
         {
             if (IsLeft)

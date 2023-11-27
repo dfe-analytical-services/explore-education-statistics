@@ -1,11 +1,11 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -14,7 +14,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -27,14 +29,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class ReleaseServiceTests
     {
-        private static readonly DataBlock Release1DataBlock = new()
+        private static readonly Guid ReleaseId = Guid.NewGuid();
+
+        private static readonly Guid DataBlock1Id = Guid.NewGuid();
+        private static readonly Guid DataBlock2Id = Guid.NewGuid();
+
+        private static readonly DataBlockVersion Release1DataBlockVersion1 = new()
         {
-            Id = Guid.NewGuid(),
+            Id = DataBlock1Id,
+            ReleaseId = ReleaseId,
+            ContentBlock = new DataBlock
+            {
+                Id = DataBlock1Id
+            },
+            DataBlockParent = new DataBlockParent
+            {
+                Id = Guid.NewGuid()
+            }
+        };
+
+        private static readonly DataBlockVersion Release1DataBlockVersion2 = new()
+        {
+            Id = DataBlock2Id,
+            ReleaseId = ReleaseId,
+            ContentBlock = new DataBlock
+            {
+                Id = DataBlock2Id,
+                Order = 3
+            },
+            DataBlockParent = new DataBlockParent
+            {
+                Id = Guid.NewGuid()
+            }
         };
 
         private static readonly Release Release1V1 = new()
         {
-            Id = Guid.NewGuid(),
+            Id = ReleaseId,
             ReleaseName = "2018",
             TimePeriodCoverage = AcademicYearQ1,
             DataGuidance = "Release 1 v1 Guidance",
@@ -66,7 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 new KeyStatisticDataBlock
                 {
                     Order = 1,
-                    DataBlock = Release1DataBlock,
+                    DataBlock = Release1DataBlockVersion1.ContentBlock,
+                    DataBlockParentId = Release1DataBlockVersion1.DataBlockParent.Id
                 },
                 new KeyStatisticText { Order = 0 },
             },
@@ -205,6 +237,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Release1Section1HtmlContentBlock1,
                 Release1Section1HtmlContentBlock2,
                 Release1Section1HtmlContentBlock3,
+                Release1DataBlockVersion2.ContentBlock
             },
             Release = Release1V1
         };
@@ -229,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Release = Release1V1
         };
 
-        private static readonly List<ContentSection> ContentSections = 
+        private static readonly List<ContentSection> ContentSections =
             ListOf(
                 Release1SummarySection,
                 Release1RelatedDashboardsSection,
@@ -289,6 +322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(Releases);
+                await contentDbContext.AddRangeAsync(Release1DataBlockVersion1, Release1DataBlockVersion2);
                 await contentDbContext.AddRangeAsync(releaseFiles);
                 await contentDbContext.AddRangeAsync(ContentSections);
                 await contentDbContext.SaveChangesAsync();
@@ -314,7 +348,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(Release1V1.KeyStatistics[0].Id, viewModel.KeyStatistics[1].Id);
                 Assert.Equal(1, viewModel.KeyStatistics[1].Order);
                 var keyStatDataBlockViewModel = Assert.IsType<KeyStatisticDataBlockViewModel>(viewModel.KeyStatistics[1]);
-                Assert.Equal(Release1DataBlock.Id ,keyStatDataBlockViewModel.DataBlockId);
+                Assert.Equal(Release1DataBlockVersion1.Id ,keyStatDataBlockViewModel.DataBlockId);
+                Assert.Equal(Release1DataBlockVersion1.DataBlockParent.Id ,keyStatDataBlockViewModel.DataBlockParentId);
 
                 var summarySection = viewModel.SummarySection;
                 Assert.NotNull(summarySection);
@@ -351,13 +386,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(Release1Section1.Id, content[2].Id);
                 Assert.Equal("Release 1 section 1 order 2", content[2].Heading);
-                Assert.Equal(3, content[2].Content.Count);
+                Assert.Equal(4, content[2].Content.Count);
                 Assert.Equal(Release1Section1HtmlContentBlock2.Id, content[2].Content[0].Id);
                 Assert.Equal("<p>Release 1 section 1 order 0</p>", (content[2].Content[0] as HtmlBlockViewModel)?.Body);
                 Assert.Equal(Release1Section1HtmlContentBlock3.Id, content[2].Content[1].Id);
                 Assert.Equal("<p>Release 1 section 1 order 1</p>", (content[2].Content[1] as HtmlBlockViewModel)?.Body);
                 Assert.Equal(Release1Section1HtmlContentBlock1.Id, content[2].Content[2].Id);
                 Assert.Equal("<p>Release 1 section 1 order 2</p>", (content[2].Content[2] as HtmlBlockViewModel)?.Body);
+                Assert.Equal(Release1DataBlockVersion2.Id, content[2].Content[3].Id);
+                Assert.Equal(Release1DataBlockVersion2.DataBlockParent.Id, (content[2].Content[3] as DataBlockViewModel)?.DataBlockParentId);
 
                 Assert.Single(viewModel.Updates);
                 Assert.Equal(new DateTime(2020, 1, 1), viewModel.Updates[0].On);
@@ -566,8 +603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var viewModel = result.AssertRight();
 
                 // Published date in the view model should match the date now
-                Assert.NotNull(viewModel.Published);
-                Assert.InRange(DateTime.UtcNow.Subtract(viewModel.Published!.Value).Milliseconds, 0, 1500);
+                viewModel.Published.AssertUtcNow();
             }
         }
 
@@ -888,8 +924,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             ContentDbContext contentDbContext,
             IReleaseFileRepository? releaseFileRepository = null,
             IReleaseRepository? releaseRepository = null,
-            IUserService? userService = null,
-            IMapper? mapper = null)
+            IUserService? userService = null)
         {
             return new(
                 contentDbContext,
@@ -897,7 +932,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
                 releaseRepository ?? new ReleaseRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
-                mapper ?? MapperUtils.MapperForProfile<MappingProfiles>()
+                MapperUtils.ContentMapper(contentDbContext)
             );
         }
     }

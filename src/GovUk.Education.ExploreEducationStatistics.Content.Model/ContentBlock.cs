@@ -33,11 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [JsonIgnore] public ContentSection? ContentSection { get; set; }
 
         [JsonIgnore] public Guid? ContentSectionId { get; set; }
-        
+
         public Guid ReleaseId { get; set; }
 
         public Release Release { get; set; }
-        
+
         public int Order { get; set; }
 
         public DateTime? Created { get; set; }
@@ -55,37 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [ConcurrencyCheck]
         public Guid? LockedById { get; set; }
-
-        public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection = null)
-        {
-            var copy = MemberwiseClone() as ContentBlock;
-            copy.Id = Guid.NewGuid();
-
-            copy.ContentSection = newContentSection;
-            copy.ContentSectionId = newContentSection?.Id;
-            copy.Release = context.NewRelease;
-            copy.ReleaseId = context.NewRelease.Id;
-
-            // start a new amendment with no comments
-            copy.Comments = new List<Comment>();
-
-            context.OriginalToAmendmentContentBlockMap.Add(this, copy);
-
-            return copy;
-        }
-
-        public ContentBlock Clone(DateTime createdDate)
-        {
-            var copy = MemberwiseClone() as ContentBlock;
-            copy.Id = Guid.NewGuid();
-            copy.Created = createdDate;
-            copy.ContentSection = null;
-            copy.ContentSectionId = null;
-
-            // start a new amendment with no comments
-            copy.Comments = new List<Comment>();
-            return copy;
-        }
     }
 
     public class MarkDownBlock : ContentBlock

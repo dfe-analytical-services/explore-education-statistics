@@ -13,7 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Content
         IncorrectContentBlockTypeForUpdate,
         ContentBlockAlreadyAttachedToContentSection,
-        IncorrectContentBlockTypeForAttach,
         ContentSectionNotAttachedToRelease,
         ContentBlockNotAttachedToRelease,
         EmbedBlockUrlDomainNotPermitted,
@@ -78,6 +77,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // Data replacement
         ReplacementFileTypesMustBeData,
         ReplacementMustBeValid,
+
+        // Release
+        ReleaseTypeInvalid,
 
         // Release approval
         ReleaseNotApproved,

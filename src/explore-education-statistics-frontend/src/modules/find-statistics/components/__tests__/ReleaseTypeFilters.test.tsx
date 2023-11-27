@@ -12,7 +12,7 @@ describe('ReleaseTypeFilters', () => {
       screen.getByRole('group', { name: 'Filter by release type' }),
     );
     const releaseTypeOptions = releaseTypeFilterGroup.getAllByRole('radio');
-    expect(releaseTypeOptions).toHaveLength(6);
+    expect(releaseTypeOptions).toHaveLength(7);
     expect(releaseTypeOptions[0]).toEqual(
       releaseTypeFilterGroup.getByLabelText('Show all'),
     );
@@ -26,17 +26,23 @@ describe('ReleaseTypeFilters', () => {
     );
     expect(releaseTypeOptions[2]).not.toBeChecked();
     expect(releaseTypeOptions[3]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Experimental statistics'),
+      releaseTypeFilterGroup.getByLabelText(
+        'Official statistics in development',
+      ),
     );
     expect(releaseTypeOptions[3]).not.toBeChecked();
     expect(releaseTypeOptions[4]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Ad hoc statistics'),
+      releaseTypeFilterGroup.getByLabelText('Experimental statistics'),
     );
     expect(releaseTypeOptions[4]).not.toBeChecked();
     expect(releaseTypeOptions[5]).toEqual(
-      releaseTypeFilterGroup.getByLabelText('Management information'),
+      releaseTypeFilterGroup.getByLabelText('Ad hoc statistics'),
     );
     expect(releaseTypeOptions[5]).not.toBeChecked();
+    expect(releaseTypeOptions[6]).toEqual(
+      releaseTypeFilterGroup.getByLabelText('Management information'),
+    );
+    expect(releaseTypeOptions[6]).not.toBeChecked();
 
     expect(
       screen.getByRole('button', { name: 'What are release types?' }),

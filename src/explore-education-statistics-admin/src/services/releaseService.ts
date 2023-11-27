@@ -1,4 +1,8 @@
-import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
+import {
+  IdResponse,
+  IdTitlePair,
+  ValueLabelPair,
+} from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import {
   PublicationSummary,
@@ -263,7 +267,7 @@ const releaseService = {
     return client.get(`/releases/${releaseId}/checklist`);
   },
 
-  createReleaseAmendment(releaseId: string): Promise<Release> {
+  createReleaseAmendment(releaseId: string): Promise<IdResponse> {
     return client.post(`/release/${releaseId}/amendment`);
   },
 };

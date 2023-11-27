@@ -82,38 +82,44 @@ const FootnoteForm = ({
     };
   }, [footnote, footnoteMeta.subjects]);
 
-  const handleSubmit = useFormSubmit(async (values: BaseFootnote) => {
-    const {
-      subjects,
-      indicatorGroups,
-      indicators,
-      filters,
-      filterGroups,
-      filterItems,
-    } = footnoteToFlatFootnote(values);
-    const hasNoneSelected =
-      [
-        ...subjects,
-        ...indicators,
-        ...indicatorGroups,
-        ...filters,
-        ...filterGroups,
-        ...filterItems,
-      ].length === 0;
+  const handleSubmit = useFormSubmit(
+    async (values: BaseFootnote) => {
+      const {
+        subjects,
+        indicatorGroups,
+        indicators,
+        filters,
+        filterGroups,
+        filterItems,
+      } = footnoteToFlatFootnote(values);
+      const hasNoneSelected =
+        [
+          ...subjects,
+          ...indicators,
+          ...indicatorGroups,
+          ...filters,
+          ...filterGroups,
+          ...filterItems,
+        ].length === 0;
 
-    if (hasNoneSelected) {
-      throw new SubmitError(
-        'At least one Subject, Indicator or Filter must be selected',
-      );
-    }
+      if (hasNoneSelected) {
+        throw new SubmitError(
+          'At least one Subject, Indicator or Filter must be selected',
+        );
+      }
 
-    const sanitizedValues = {
-      ...values,
-      content: sanitizeHtml(values.content, { allowedTags: ['a'] }),
-    };
+      const sanitizedValues = {
+        ...values,
+        content: sanitizeHtml(values.content, { allowedTags: ['a'] }),
+      };
 
-    await onSubmit(sanitizedValues);
-  });
+      await onSubmit(sanitizedValues);
+    },
+    [],
+    {
+      fallbackSubmitError: 'Something went wrong assigning the footnote',
+    },
+  );
 
   return (
     <Formik<BaseFootnote>

@@ -36,16 +36,6 @@ public abstract class KeyStatistic : ICreatedUpdatedTimestamps<DateTime, DateTim
     public Guid? UpdatedById { get; set; }
 
     public User? UpdatedBy { get; set; }
-
-    public KeyStatistic Clone(Release newRelease)
-    {
-        var copy = MemberwiseClone() as KeyStatistic;
-        copy.Id = Guid.NewGuid();
-        copy.Release = newRelease;
-        copy.ReleaseId = newRelease.Id;
-
-        return copy;
-    }
 }
 
 public class KeyStatisticDataBlock : KeyStatistic
@@ -53,6 +43,10 @@ public class KeyStatisticDataBlock : KeyStatistic
     public Guid DataBlockId { get; set; }
 
     public DataBlock DataBlock { get; set; } = null!;
+
+    public Guid DataBlockParentId { get; set; }
+
+    public DataBlockParent DataBlockParent { get; set; }
 }
 
 public class KeyStatisticText : KeyStatistic

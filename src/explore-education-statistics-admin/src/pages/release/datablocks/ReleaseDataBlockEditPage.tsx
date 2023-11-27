@@ -141,7 +141,7 @@ const ReleaseDataBlockEditPage = ({
                 <SummaryListItem term="Fast track URL">
                   <UrlContainer
                     data-testid="fastTrackUrl"
-                    url={`${config.PublicAppUrl}/data-tables/fast-track/${dataBlockId}`}
+                    url={`${config.PublicAppUrl}/data-tables/fast-track/${dataBlock.dataBlockParentId}`}
                   />
                 </SummaryListItem>
                 {dataBlock.dataSetName && (

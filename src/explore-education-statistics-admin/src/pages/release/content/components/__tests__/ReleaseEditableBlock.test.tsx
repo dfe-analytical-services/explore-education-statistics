@@ -1,5 +1,6 @@
 import { AuthContextTestProvider } from '@admin/contexts/AuthContext';
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
+import { testComments } from '@admin/components/comments/__data__/testComments';
 import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
@@ -9,6 +10,7 @@ import { GlobalPermissions } from '@admin/services/permissionService';
 import _releaseContentService, {
   EditableRelease,
 } from '@admin/services/releaseContentService';
+import _releaseContentCommentService from '@admin/services/releaseContentCommentService';
 import { EditableBlock } from '@admin/services/types/content';
 import { UserDetails } from '@admin/services/types/user';
 import mockDate from '@common-test/mockDate';
@@ -23,14 +25,20 @@ import {
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React, { ReactNode } from 'react';
+import { MemoryRouter } from 'react-router';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 jest.mock('@admin/services/releaseContentService');
+jest.mock('@admin/services/releaseContentCommentService');
 jest.mock('@admin/services/dataBlockService');
 
 const releaseContentService = _releaseContentService as jest.Mocked<
   typeof _releaseContentService
 >;
+const releaseContentCommentService =
+  _releaseContentCommentService as jest.Mocked<
+    typeof _releaseContentCommentService
+  >;
 
 describe('ReleaseEditableBlock', () => {
   const testHtmlBlock: EditableBlock = {
@@ -43,7 +51,7 @@ describe('ReleaseEditableBlock', () => {
   };
 
   const testEmbedBlock: EditableBlock = {
-    comments: [],
+    comments: testComments,
     id: 'embed-block-id',
     order: 0,
     title: 'Dashboard title',
@@ -51,6 +59,33 @@ describe('ReleaseEditableBlock', () => {
     url: 'https://department-for-education.shinyapps.io/test-dashboard',
   };
 
+  const testDataBlock: EditableBlock = {
+    name: 'Test data block',
+    heading: 'Data block heading',
+    source: '',
+    query: {
+      subjectId: 'subject-id',
+      filters: [],
+      indicators: [],
+      locationIds: [],
+    },
+    charts: [],
+    table: {
+      indicators: [],
+      tableHeaders: {
+        columnGroups: [],
+        columns: [],
+        rowGroups: [],
+        rows: [],
+      },
+    },
+    type: 'DataBlock',
+    dataSetId: 'data-set-id',
+    id: 'data-block-id',
+    order: 0,
+    comments: testComments,
+    dataBlockParentId: 'daata-block-parent-id',
+  };
   const testCurrentUser: UserDetails = {
     id: 'user-1',
     displayName: 'Jane Doe',
@@ -851,6 +886,478 @@ describe('ReleaseEditableBlock', () => {
     );
   });
 
+  test('renders data block', () => {
+    render(
+      <ReleaseEditableBlock
+        publicationId="publication-1"
+        releaseId="release-1"
+        sectionId="section-1"
+        sectionKey="content"
+        block={testDataBlock}
+      />,
+    );
+
+    expect(screen.getByText('Edit data block')).toBeInTheDocument();
+  });
+
+  describe('data block comments', () => {
+    test('renders comments correctly`', () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testDataBlock}
+        />,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Add comment' }),
+      ).toBeInTheDocument();
+
+      const unresolvedComments = within(
+        screen.getByTestId('comments-unresolved'),
+      ).getAllByTestId('comment');
+
+      expect(unresolvedComments).toHaveLength(3);
+      expect(unresolvedComments[0]).toHaveTextContent('Comment 2 content');
+      expect(unresolvedComments[1]).toHaveTextContent('Comment 3 content');
+      expect(unresolvedComments[2]).toHaveTextContent('Comment 4 content');
+
+      const resolvedComments = within(
+        screen.getByTestId('comments-resolved'),
+      ).getAllByTestId('comment');
+
+      expect(resolvedComments).toHaveLength(2);
+      expect(resolvedComments[0]).toHaveTextContent('Comment 1 content');
+      expect(resolvedComments[1]).toHaveTextContent('Comment 5 content');
+    });
+
+    test('calls `deleteContentSectionComment` when a comment delete button is clicked', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testDataBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.deleteContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      const unresolvedComments = within(
+        screen.getByTestId('comments-unresolved'),
+      ).getAllByTestId('comment');
+
+      userEvent.click(
+        within(unresolvedComments[0]).getByRole('button', {
+          name: 'Delete',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.deleteContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.deleteContentSectionComment,
+        ).toHaveBeenCalledWith(testComments[1].id);
+      });
+    });
+
+    test('calls `updateContentSectionComment` when a comment is edited', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testDataBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.updateContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      const unresolvedComments = within(
+        screen.getByTestId('comments-unresolved'),
+      ).getAllByTestId('comment');
+
+      const comment = within(unresolvedComments[0]);
+
+      userEvent.click(comment.getByRole('button', { name: 'Edit' }));
+      userEvent.clear(comment.getByRole('textbox'));
+      await userEvent.type(
+        comment.getByRole('textbox'),
+        'Test updated content',
+      );
+
+      userEvent.click(comment.getByRole('button', { name: 'Update' }));
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledWith({
+          ...testComments[1],
+          content: 'Test updated content',
+        });
+      });
+    });
+
+    test('calls `updateContentSectionComment` when a comment is resolved', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testDataBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.updateContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      const unresolvedComments = within(
+        screen.getByTestId('comments-unresolved'),
+      ).getAllByTestId('comment');
+
+      const comment = within(unresolvedComments[0]);
+
+      userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledWith({
+          ...testComments[1],
+          setResolved: true,
+        });
+      });
+    });
+
+    test('calls `updateContentSectionComment` when a comment is unresolved', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testDataBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.updateContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      const resolvedComments = within(
+        screen.getByTestId('comments-resolved'),
+      ).getAllByTestId('comment');
+
+      const comment = within(resolvedComments[0]);
+
+      userEvent.click(
+        comment.getByRole('button', { name: 'Unresolve', hidden: true }),
+      );
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledWith({
+          ...testComments[0],
+          setResolved: false,
+        });
+      });
+    });
+
+    test('calls `addContentSectionComment` when a comment is added', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testDataBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.addContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Add comment' }));
+
+      await userEvent.type(
+        screen.getByRole('textbox', {
+          name: 'Comment',
+        }),
+        'I am a comment',
+      );
+
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Add comment',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.addContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.addContentSectionComment,
+        ).toHaveBeenCalledWith('release-1', 'section-1', 'data-block-id', {
+          content: 'I am a comment',
+        });
+      });
+    });
+  });
+
+  describe('embed block comments', () => {
+    test('renders comments correctly`', () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testEmbedBlock}
+        />,
+      );
+
+      expect(
+        screen.getByRole('button', { name: 'Add comment' }),
+      ).toBeInTheDocument();
+
+      const unresolvedComments = within(
+        screen.getByTestId('comments-unresolved'),
+      ).getAllByTestId('comment');
+
+      expect(unresolvedComments).toHaveLength(3);
+      expect(unresolvedComments[0]).toHaveTextContent('Comment 2 content');
+      expect(unresolvedComments[1]).toHaveTextContent('Comment 3 content');
+      expect(unresolvedComments[2]).toHaveTextContent('Comment 4 content');
+
+      const resolvedComments = within(
+        screen.getByTestId('comments-resolved'),
+      ).getAllByTestId('comment');
+
+      expect(resolvedComments).toHaveLength(2);
+      expect(resolvedComments[0]).toHaveTextContent('Comment 1 content');
+      expect(resolvedComments[1]).toHaveTextContent('Comment 5 content');
+    });
+
+    test('calls `deleteContentSectionComment` when a comment delete button is clicked', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testEmbedBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.deleteContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      const unresolvedComments = within(
+        screen.getByTestId('comments-unresolved'),
+      ).getAllByTestId('comment');
+
+      userEvent.click(
+        within(unresolvedComments[0]).getByRole('button', {
+          name: 'Delete',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.deleteContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.deleteContentSectionComment,
+        ).toHaveBeenCalledWith(testComments[1].id);
+      });
+    });
+
+    test('calls `updateContentSectionComment` when a comment is edited', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testEmbedBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.updateContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      const unresolvedComments = within(
+        screen.getByTestId('comments-unresolved'),
+      ).getAllByTestId('comment');
+
+      const comment = within(unresolvedComments[0]);
+
+      userEvent.click(comment.getByRole('button', { name: 'Edit' }));
+      userEvent.clear(comment.getByRole('textbox'));
+      await userEvent.type(
+        comment.getByRole('textbox'),
+        'Test updated content',
+      );
+
+      userEvent.click(comment.getByRole('button', { name: 'Update' }));
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledWith({
+          ...testComments[1],
+          content: 'Test updated content',
+        });
+      });
+    });
+
+    test('calls `updateContentSectionComment` when a comment is resolved', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testEmbedBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.updateContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      const unresolvedComments = within(
+        screen.getByTestId('comments-unresolved'),
+      ).getAllByTestId('comment');
+
+      const comment = within(unresolvedComments[0]);
+
+      userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledWith({
+          ...testComments[1],
+          setResolved: true,
+        });
+      });
+    });
+
+    test('calls `updateContentSectionComment` when a comment is unresolved', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testEmbedBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.updateContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      const resolvedComments = within(
+        screen.getByTestId('comments-resolved'),
+      ).getAllByTestId('comment');
+
+      const comment = within(resolvedComments[0]);
+
+      userEvent.click(
+        comment.getByRole('button', { name: 'Unresolve', hidden: true }),
+      );
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.updateContentSectionComment,
+        ).toHaveBeenCalledWith({
+          ...testComments[0],
+          setResolved: false,
+        });
+      });
+    });
+
+    test('calls `addContentSectionComment` when a comment is added', async () => {
+      render(
+        <ReleaseEditableBlock
+          publicationId="publication-1"
+          releaseId="release-1"
+          sectionId="section-1"
+          sectionKey="content"
+          block={testEmbedBlock}
+        />,
+      );
+
+      expect(
+        releaseContentCommentService.addContentSectionComment,
+      ).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Add comment' }));
+
+      await userEvent.type(
+        screen.getByRole('textbox', {
+          name: 'Comment',
+        }),
+        'I am a comment',
+      );
+
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Add comment',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(
+          releaseContentCommentService.addContentSectionComment,
+        ).toHaveBeenCalledTimes(1);
+        expect(
+          releaseContentCommentService.addContentSectionComment,
+        ).toHaveBeenCalledWith('release-1', 'section-1', 'embed-block-id', {
+          content: 'I am a comment',
+        });
+      });
+    });
+  });
+
   function render(
     child: ReactNode,
     release: EditableRelease = testEditableRelease,
@@ -872,7 +1379,7 @@ describe('ReleaseEditableBlock', () => {
               unattachedDataBlocks: [],
             }}
           >
-            {child}
+            <MemoryRouter>{child}</MemoryRouter>
           </ReleaseContentProvider>
         </ReleaseContentHubContextProvider>
       </AuthContextTestProvider>,

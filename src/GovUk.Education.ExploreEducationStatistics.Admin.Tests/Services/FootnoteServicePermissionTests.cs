@@ -49,98 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public async Task CopyFootnotes_ViewSourceRelease()
-        {
-            var (
-                contentPersistenceHelper,
-                dataBlockService,
-                footnoteService,
-                statisticsPersistenceHelper
-                ) = Mocks();
-
-            var sourceRelease = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var destinationRelease = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
-            SetupCall(contentPersistenceHelper, sourceRelease.Id, sourceRelease);
-            SetupCall(contentPersistenceHelper, destinationRelease.Id, destinationRelease);
-
-            await PermissionTestUtils.PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheck(sourceRelease, ContentSecurityPolicies.CanViewSpecificRelease, false)
-                .AssertForbidden(
-                    async userService =>
-                    {
-                        userService
-                            .Setup(s => s.MatchesPolicy(destinationRelease, SecurityPolicies.CanUpdateSpecificRelease))
-                            .ReturnsAsync(true);
-
-                        var service = new FootnoteService(
-                            InMemoryStatisticsDbContext(),
-                            contentPersistenceHelper.Object,
-                            userService.Object,
-                            dataBlockService.Object,
-                            footnoteService.Object,
-                            statisticsPersistenceHelper.Object
-                        );
-
-                        return await service.CopyFootnotes(
-                            sourceReleaseId: sourceRelease.Id,
-                            destinationReleaseId: destinationRelease.Id);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task CopyFootnotes_UpdateDestinationRelease()
-        {
-            var (
-                contentPersistenceHelper,
-                dataBlockService,
-                footnoteService,
-                statisticsPersistenceHelper
-                ) = Mocks();
-
-            var sourceRelease = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var destinationRelease = new Release
-            {
-                Id = Guid.NewGuid()
-            };
-
-            SetupCall(contentPersistenceHelper, sourceRelease.Id, sourceRelease);
-            SetupCall(contentPersistenceHelper, destinationRelease.Id, destinationRelease);
-
-            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheck(destinationRelease, SecurityPolicies.CanUpdateSpecificRelease, false)
-                .AssertForbidden(
-                    async userService =>
-                    {
-                        var service = new FootnoteService(
-                            InMemoryStatisticsDbContext(),
-                            contentPersistenceHelper.Object,
-                            userService.Object,
-                            dataBlockService.Object,
-                            footnoteService.Object,
-                            statisticsPersistenceHelper.Object
-                        );
-
-                        return await service.CopyFootnotes(
-                            sourceReleaseId: sourceRelease.Id,
-                            destinationReleaseId: destinationRelease.Id);
-                    }
-                );
-        }
-
-        [Fact]
         public async Task CreateFootnote()
         {
             await AssertSecurityPolicyChecked(
@@ -242,7 +150,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper,
                 dataBlockService,
                 footnoteService,
-                statisticsPersistenceHelper
+                statisticsPersistenceHelper,
+                releaseSubjectRepository
                 ) = Mocks();
 
             return PermissionTestUtils.PolicyCheckBuilder<TPolicy>()
@@ -256,6 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService.Object,
                             dataBlockService.Object,
                             footnoteService.Object,
+                            releaseSubjectRepository.Object,
                             statisticsPersistenceHelper.Object
                         );
 
@@ -268,13 +178,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IDataBlockService>,
             Mock<IFootnoteRepository>,
-            Mock<IPersistenceHelper<StatisticsDbContext>>) Mocks()
+            Mock<IPersistenceHelper<StatisticsDbContext>>,
+            Mock<IReleaseSubjectRepository>) Mocks()
         {
             return (
                 MockPersistenceHelper<ContentDbContext, Release>(Release.Id, Release),
                 new Mock<IDataBlockService>(),
                 new Mock<IFootnoteRepository>(),
-                MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote));
+                MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),
+                new Mock<IReleaseSubjectRepository>());
         }
     }
 }

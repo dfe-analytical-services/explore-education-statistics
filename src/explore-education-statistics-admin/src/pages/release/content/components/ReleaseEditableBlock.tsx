@@ -1,6 +1,7 @@
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import EditableEmbedBlock from '@admin/components/editable/EditableEmbedBlock';
+import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { useReleaseContentHubContext } from '@admin/contexts/ReleaseContentHubContext';
@@ -24,6 +25,7 @@ import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/relea
 import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback, useEffect } from 'react';
 import { generatePath } from 'react-router';
+import useToggle from '@common/hooks/useToggle';
 
 interface Props {
   allowComments?: boolean;
@@ -77,6 +79,8 @@ const ReleaseEditableBlock = ({
   const transformImageAttributes = useReleaseImageAttributeTransformer({
     releaseId,
   });
+
+  const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
 
   const updateBlock = useCallback(
     (nextBlock: EditableBlock) => {
@@ -310,54 +314,65 @@ const ReleaseEditableBlock = ({
 
   const blockId = `block-${block.id}`;
 
-  switch (block.type) {
-    case 'DataBlock':
-      return (
-        <div className="dfe-content-overflow">
-          <EditableBlockWrapper
-            dataBlockEditLink={generatePath<ReleaseDataBlockRouteParams>(
-              releaseDataBlockEditRoute.path,
-              {
-                publicationId,
-                releaseId,
-                dataBlockId: block.id,
-              },
-            )}
-            onDelete={editable ? handleDelete : undefined}
+  function renderBlock() {
+    switch (block.type) {
+      case 'DataBlock':
+        return (
+          <CommentsWrapper
+            commentType="block"
+            id={block.id}
+            showCommentAddForm={showCommentAddForm}
+            testId={`data-block-comments-${block.name}`}
+            onAddCancel={toggleCommentAddForm.off}
+            onAddSave={toggleCommentAddForm.off}
+            onAdd={toggleCommentAddForm.on}
           >
-            <Gate condition={!!visible}>
-              <DataBlockTabs
-                releaseId={releaseId}
-                id={blockId}
-                dataBlock={block}
-                getInfographic={getChartFile}
-              />
-            </Gate>
-          </EditableBlockWrapper>
-        </div>
-      );
-    case 'EmbedBlockLink': {
-      return (
-        <EditableEmbedBlock
-          editable={editable}
-          block={block}
-          visible={visible}
-          onDelete={handleDeleteEmbedBlock}
-          onSubmit={handleSaveEmbedBlock}
-        />
-      );
-    }
-    case 'HtmlBlock':
-    case 'MarkDownBlock': {
-      return (
-        <CommentsContextProvider
-          comments={block.comments}
-          onDelete={handleDeleteComment}
-          onPendingDelete={handlePendingDeleteComment}
-          onPendingDeleteUndo={handlePendingDeleteComment}
-          onCreate={handleSaveComment}
-          onUpdate={handleSaveUpdatedComment}
-        >
+            <EditableBlockWrapper
+              dataBlockEditLink={generatePath<ReleaseDataBlockRouteParams>(
+                releaseDataBlockEditRoute.path,
+                {
+                  publicationId,
+                  releaseId,
+                  dataBlockId: block.id,
+                },
+              )}
+              onDelete={editable ? handleDelete : undefined}
+            >
+              <Gate condition={!!visible}>
+                <DataBlockTabs
+                  releaseId={releaseId}
+                  id={blockId}
+                  dataBlock={block}
+                  getInfographic={getChartFile}
+                />
+              </Gate>
+            </EditableBlockWrapper>
+          </CommentsWrapper>
+        );
+      case 'EmbedBlockLink': {
+        return (
+          <CommentsWrapper
+            commentType="block"
+            id={block.id}
+            showCommentAddForm={showCommentAddForm}
+            testId="embed-block-comments"
+            onAddCancel={toggleCommentAddForm.off}
+            onAddSave={toggleCommentAddForm.off}
+            onAdd={toggleCommentAddForm.on}
+          >
+            <EditableEmbedBlock
+              editable={editable}
+              block={block}
+              visible={visible}
+              onDelete={handleDeleteEmbedBlock}
+              onSubmit={handleSaveEmbedBlock}
+            />
+          </CommentsWrapper>
+        );
+      }
+      case 'HtmlBlock':
+      case 'MarkDownBlock': {
+        return (
           <EditableContentBlock
             actionThrottle={lockThrottle}
             allowComments={allowComments}
@@ -384,12 +399,25 @@ const ReleaseEditableBlock = ({
               allowImages ? handleImageUploadCancel : undefined
             }
           />
-        </CommentsContextProvider>
-      );
+        );
+      }
+      default:
+        return <div>Unable to edit content</div>;
     }
-    default:
-      return <div>Unable to edit content</div>;
   }
+
+  return (
+    <CommentsContextProvider
+      comments={block.comments}
+      onDelete={handleDeleteComment}
+      onPendingDelete={handlePendingDeleteComment}
+      onPendingDeleteUndo={handlePendingDeleteComment}
+      onCreate={handleSaveComment}
+      onUpdate={handleSaveUpdatedComment}
+    >
+      {renderBlock()}
+    </CommentsContextProvider>
+  );
 };
 
 export default ReleaseEditableBlock;

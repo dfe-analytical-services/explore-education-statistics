@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -19,12 +18,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
@@ -91,24 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = BuildReleaseService(userService.Object);
                         return service.GetLatestPublishedRelease(Publication.Id);
-                    }
-                );
-        }
-
-        [Fact]
-        public async Task CreateReleaseAmendment()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_release, CanMakeAmendmentOfSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        using var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendmentAsync");
-                        contentDbContext.Attach(_release);
-                        var service = BuildReleaseService(
-                            userService.Object,
-                            contentDbContext);
-                        return service.CreateReleaseAmendment(_release.Id);
                     }
                 );
         }
@@ -331,9 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<IReleaseDataFileService>(),
                 Mock.Of<IReleaseFileService>(),
                 Mock.Of<IDataImportService>(),
-                Mock.Of<IFootnoteService>(),
                 Mock.Of<IFootnoteRepository>(),
-                Mock.Of<StatisticsDbContext>(),
                 Mock.Of<IDataBlockService>(),
                 Mock.Of<IReleaseSubjectRepository>(),
                 new SequentialGuidGenerator(),

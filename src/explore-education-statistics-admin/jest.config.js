@@ -32,6 +32,7 @@ const config = {
       '<rootDir>/../explore-education-statistics-common/test/$1',
     '^axios$': '<rootDir>/node_modules/axios/dist/axios.js',
     '^marked$': '<rootDir>/node_modules/marked/lib/marked.umd.js',
+    '^explore-education-statistics-ckeditor$': '<rootDir>/test/EditorStub.js',
   },
   moduleFileExtensions: [
     'web.js',

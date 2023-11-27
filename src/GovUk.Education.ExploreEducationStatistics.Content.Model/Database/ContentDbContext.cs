@@ -63,6 +63,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<KeyStatisticDataBlock> KeyStatisticsDataBlock { get; set; }
         public virtual DbSet<KeyStatisticText> KeyStatisticsText { get; set; }
         public virtual DbSet<DataBlock> DataBlocks { get; set; }
+        public virtual DbSet<DataBlockParent> DataBlockParents { get; set; }
+        public virtual DbSet<DataBlockVersion> DataBlockVersions { get; set; }
         public virtual DbSet<DataImport> DataImports { get; set; }
         public virtual DbSet<DataImportError> DataImportErrors { get; set; }
         public virtual DbSet<HtmlBlock> HtmlBlocks { get; set; }
@@ -90,6 +92,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         {
             modelBuilder.AddFreeTextTableSupport();
 
+            ConfigureComment(modelBuilder);
+            ConfigureDataImport(modelBuilder);
+            ConfigureDataImportError(modelBuilder);
+            ConfigureMethodology(modelBuilder);
+            ConfigureMethodologyContent(modelBuilder);
+            ConfigureMethodologyVersion(modelBuilder);
+            ConfigureMethodologyStatus(modelBuilder);
+            ConfigureMethodologyFile(modelBuilder);
+            ConfigureMethodologyNote(modelBuilder);
+            ConfigureMethodologyRedirects(modelBuilder);
+            ConfigurePublication(modelBuilder);
+            ConfigurePublicationMethodology(modelBuilder);
+            ConfigureReleaseStatus(modelBuilder);
+            ConfigureReleaseFile(modelBuilder);
+            ConfigureFile(modelBuilder);
+            ConfigureContentBlock(modelBuilder);
+            ConfigureContentSection(modelBuilder);
+            ConfigureRelease(modelBuilder);
+            ConfigureDataBlock(modelBuilder);
+            ConfigureHtmlBlock(modelBuilder);
+            ConfigureEmbedBlockLink(modelBuilder);
+            ConfigureMarkdownBlock(modelBuilder);
+            ConfigureFeaturedTable(modelBuilder);
+            ConfigurePermalink(modelBuilder);
+            ConfigureUser(modelBuilder);
+            ConfigureUserPublicationRole(modelBuilder);
+            ConfigureUserReleaseRole(modelBuilder);
+            ConfigureUserReleaseInvite(modelBuilder);
+            ConfigureUserPublicationInvite(modelBuilder);
+            ConfigureGlossaryEntry(modelBuilder);
+            ConfigureKeyStatisticsDataBlock(modelBuilder);
+            ConfigureKeyStatisticsText(modelBuilder);
+            ConfigureDataBlockParent(modelBuilder);
+            ConfigureDataBlockVersion(modelBuilder);
+        }
+
+        private static void ConfigureComment(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Comment>()
                 .Property(comment => comment.Created)
                 .HasConversion(
@@ -101,7 +141,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+        }
 
+        private static void ConfigureDataImport(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<DataImport>()
                 .HasOne(import => import.File)
                 .WithOne()
@@ -131,19 +174,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<HashSet<GeographicLevel>>(v));
+        }
 
+        private static void ConfigureDataImportError(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<DataImportError>()
                 .Property(importError => importError.Created)
                 .HasConversion(
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        }
 
+        private static void ConfigureMethodology(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Methodology>()
                 .HasOne(m => m.LatestPublishedVersion)
                 .WithOne()
                 .HasForeignKey<Methodology>(m => m.LatestPublishedVersionId)
                 .IsRequired(false);
+        }
 
+        private static void ConfigureMethodologyContent(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<MethodologyVersionContent>().ToTable("MethodologyVersions");
             modelBuilder.Entity<MethodologyVersionContent>().Property<Guid>("MethodologyVersionId");
             modelBuilder.Entity<MethodologyVersionContent>().HasKey("MethodologyVersionId");
@@ -159,7 +211,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+        }
 
+        private static void ConfigureMethodologyVersion(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<MethodologyVersion>()
                 .HasOne(m => m.MethodologyContent)
                 .WithOne()
@@ -183,7 +238,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(m => m.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+        }
 
+        private static void ConfigureMethodologyStatus(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<MethodologyStatus>()
                 .Property(rs => rs.Created)
                 .HasConversion(
@@ -200,7 +258,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyStatus>()
                 .Property(rs => rs.ApprovalStatus)
                 .HasConversion(new EnumToStringConverter<MethodologyApprovalStatus>());
+        }
 
+        private static void ConfigureMethodologyFile(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<MethodologyFile>()
                 .HasOne(mf => mf.MethodologyVersion)
                 .WithMany()
@@ -210,7 +271,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(mf => mf.File)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+        }
 
+        private static void ConfigureMethodologyNote(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<MethodologyNote>()
                 .Property(n => n.Created)
                 .HasConversion(
@@ -239,7 +303,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction)
                 .IsRequired(false);
+        }
 
+
+        private static void ConfigureMethodologyRedirects(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<MethodologyRedirect>()
+                .HasKey(mr => new { mr.MethodologyVersionId, mr.Slug });
+        }
+
+        private static void ConfigurePublication(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Publication>()
                 .OwnsOne(p => p.ExternalMethodology)
                 .ToTable("ExternalMethodology");
@@ -252,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Publication>()
                 .HasOne(p => p.Contact)
-                .WithMany()  // Ideally this would be WithOne, but we would need to fix existing data to do this
+                .WithMany() // Ideally this would be WithOne, but we would need to fix existing data to do this
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Publication>()
@@ -260,7 +334,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithOne()
                 .HasForeignKey<Publication>(p => p.LatestPublishedReleaseId)
                 .IsRequired(false);
+        }
 
+        private static void ConfigurePublicationMethodology(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});
 
@@ -275,7 +352,99 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .WithMany(m => m.Publications)
                 .HasForeignKey(pm => pm.MethodologyId)
                 .OnDelete(DeleteBehavior.Cascade);
+        }
 
+        private static void ConfigureReleaseStatus(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ReleaseStatus>()
+                .Property(rs => rs.Created)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue
+                        ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                        : null);
+
+            modelBuilder.Entity<ReleaseStatus>()
+                .HasOne(rs => rs.CreatedBy)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseStatus>()
+                .Property(rs => rs.ApprovalStatus)
+                .HasConversion(new EnumToStringConverter<ReleaseApprovalStatus>());
+        }
+
+        private static void ConfigureReleaseFile(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ReleaseFile>()
+                .HasOne(rf => rf.Release)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseFile>()
+                .HasOne(rf => rf.File)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+        }
+
+        private static void ConfigureFile(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<File>(entity =>
+            {
+                entity.Property(e => e.ContentType)
+                    .HasMaxLength(255);
+                entity.Property(e => e.Type)
+                    .HasConversion(new EnumToStringConverter<FileType>())
+                    .HasMaxLength(25);
+                entity.HasIndex(e => e.Type);
+                entity.HasOne(b => b.Replacing)
+                    .WithOne()
+                    .HasForeignKey<File>(b => b.ReplacingId)
+                    .IsRequired(false);
+                entity.HasOne(b => b.ReplacedBy)
+                    .WithOne()
+                    .HasForeignKey<File>(b => b.ReplacedById)
+                    .IsRequired(false);
+                entity.Property(e => e.Created)
+                    .HasConversion(
+                        v => v,
+                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            });
+        }
+
+        private static void ConfigureContentBlock(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ContentBlock>(entity =>
+            {
+                entity.ToTable("ContentBlock")
+                    .HasDiscriminator<string>("Type");
+                entity.Property("Type")
+                    .HasMaxLength(25);
+                entity.HasIndex("Type");
+                entity.Property(e => e.Created)
+                    .HasConversion(
+                        v => v,
+                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+                entity.Property(e => e.Locked)
+                    .HasConversion(
+                        v => v,
+                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+            });
+        }
+
+        private static void ConfigureContentSection(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ContentSection>(entity =>
+            {
+                entity.Property(e => e.Type)
+                    .HasConversion(new EnumToStringConverter<ContentSectionType>())
+                    .HasMaxLength(25);
+                entity.HasIndex(e => e.Type);
+            });
+        }
+
+        private static void ConfigureRelease(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Release>()
                 .Property(r => r.TimePeriodCoverage)
                 .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
@@ -318,85 +487,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Release>()
                 .HasIndex(release => release.Type);
 
-            modelBuilder.Entity<ReleaseStatus>()
-                .Property(rs => rs.Created)
-                .HasConversion(
-                    v => v,
-                    v => v.HasValue
-                        ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
-                        : null);
-
-            modelBuilder.Entity<ReleaseStatus>()
-                .HasOne(rs => rs.CreatedBy)
-                .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<ReleaseStatus>()
-                .Property(rs => rs.ApprovalStatus)
-                .HasConversion(new EnumToStringConverter<ReleaseApprovalStatus>());
-
-            modelBuilder.Entity<ReleaseFile>()
-                .HasOne(rf => rf.Release)
-                .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<ReleaseFile>()
-                .HasOne(rf => rf.File)
-                .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<File>(entity =>
-            {
-                entity.Property(e => e.ContentType)
-                    .HasMaxLength(255);
-                entity.Property(e => e.Type)
-                    .HasConversion(new EnumToStringConverter<FileType>())
-                    .HasMaxLength(25);
-                entity.HasIndex(e => e.Type);
-                entity.HasOne(b => b.Replacing)
-                    .WithOne()
-                    .HasForeignKey<File>(b => b.ReplacingId)
-                    .IsRequired(false);
-                entity.HasOne(b => b.ReplacedBy)
-                    .WithOne()
-                    .HasForeignKey<File>(b => b.ReplacedById)
-                    .IsRequired(false);
-                entity.Property(e => e.Created)
-                    .HasConversion(
-                        v => v,
-                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-            });
-
-            modelBuilder.Entity<Release>()
-                .HasOne(r => r.PreviousVersion)
-                .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
-
-            modelBuilder.Entity<ContentBlock>(entity =>
-            {
-                entity.ToTable("ContentBlock")
-                    .HasDiscriminator<string>("Type");
-                entity.Property("Type")
-                    .HasMaxLength(25);
-                entity.HasIndex("Type");
-                entity.Property(e => e.Created)
-                    .HasConversion(
-                        v => v,
-                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-                entity.Property(e => e.Locked)
-                    .HasConversion(
-                        v => v,
-                        v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
-            });
-
-            modelBuilder.Entity<ContentSection>(entity =>
-            {
-                entity.Property(e => e.Type)
-                    .HasConversion(new EnumToStringConverter<ContentSectionType>())
-                    .HasMaxLength(25);
-                entity.HasIndex(e => e.Type);
-            });
-
             modelBuilder.Entity<Release>()
                 .Property(release => release.NextReleaseDate)
                 .HasConversion(
@@ -413,6 +503,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(release => release.ApprovalStatus)
                 .HasConversion(new EnumToStringConverter<ReleaseApprovalStatus>());
 
+            modelBuilder.Entity<Release>()
+                .HasOne(r => r.PreviousVersion)
+                .WithMany()
+                .OnDelete(DeleteBehavior.NoAction);
+        }
+
+        private static void ConfigureDataBlock(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Heading)
                 .HasColumnName("DataBlock_Heading");
@@ -437,11 +535,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v));
+        }
 
+        private static void ConfigureHtmlBlock(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<HtmlBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("Body");
+        }
 
+        private static void ConfigureEmbedBlockLink(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<EmbedBlockLink>()
                 .Property(block => block.EmbedBlockId)
                 .HasColumnName("EmbedBlockId");
@@ -450,15 +554,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(eb => eb.EmbedBlock)
                 .WithOne()
                 .OnDelete(DeleteBehavior.Cascade);
+        }
 
+        private static void ConfigureMarkdownBlock(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<MarkDownBlock>()
                 .Property(block => block.Body)
                 .HasColumnName("Body");
+        }
 
+        private static void ConfigureFeaturedTable(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<FeaturedTable>()
                 .HasOne(ft => ft.DataBlock)
                 .WithOne();
+        }
 
+        private static void ConfigurePermalink(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<Permalink>()
                 .Property(permalink => permalink.Created)
                 .HasConversion(
@@ -470,12 +583,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Permalink>()
                 .HasIndex(data => data.SubjectId);
+        }
 
-            modelBuilder.Entity<MethodologyRedirect>()
-                .HasKey(mr => new { mr.MethodologyVersionId, mr.Slug });
-
+        private static void ConfigureUser(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<User>();
+        }
 
+        private static void ConfigureUserPublicationRole(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<UserPublicationRole>()
                 .Property(r => r.Created)
                 .HasConversion(
@@ -493,7 +609,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<UserPublicationRole>()
                 .HasQueryFilter(p => p.Deleted == null);
+        }
 
+        private static void ConfigureUserReleaseRole(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<UserReleaseRole>()
                 .Property(userReleaseRole => userReleaseRole.Created)
                 .HasConversion(
@@ -508,7 +627,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasQueryFilter(r =>
                     !r.SoftDeleted
                     && r.Deleted == null);
+        }
 
+        private static void ConfigureUserReleaseInvite(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<UserReleaseInvite>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
@@ -527,7 +649,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+        }
 
+        private static void ConfigureUserPublicationInvite(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<UserPublicationInvite>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<PublicationRole>());
@@ -537,7 +662,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+        }
 
+        private static void ConfigureGlossaryEntry(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<GlossaryEntry>()
                 .Property(rs => rs.Created)
                 .HasConversion(
@@ -548,7 +676,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+        }
 
+        private static void ConfigureKeyStatisticsDataBlock(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<KeyStatisticDataBlock>()
                 .ToTable("KeyStatisticsDataBlock");
 
@@ -559,7 +690,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 // associated data block is removed. That cascade delete _only_ removes the KeyStatisticsDataBlock
                 // entry, leaving a KeyStatistics table entry, which should never happen.
                 .OnDelete(DeleteBehavior.NoAction);
+        }
 
+        private static void ConfigureDataBlockParent(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DataBlockParent>()
+                .ToTable("DataBlocks");
+
+            modelBuilder.Entity<DataBlockParent>()
+                .HasOne(dataBlock => dataBlock.LatestDraftVersion)
+                .WithOne()
+                .HasForeignKey<DataBlockParent>(version => version.LatestDraftVersionId);
+
+            modelBuilder.Entity<DataBlockParent>()
+                .HasOne(dataBlock => dataBlock.LatestPublishedVersion)
+                .WithOne()
+                .HasForeignKey<DataBlockParent>(version => version.LatestPublishedVersionId)
+                .IsRequired(false);
+        }
+
+        private static void ConfigureDataBlockVersion(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<DataBlockVersion>()
+                .ToTable("DataBlockVersions");
+
+            modelBuilder.Entity<DataBlockVersion>()
+                .Property(f => f.DataBlockParentId)
+                .HasColumnName("DataBlockId");
+
+            modelBuilder.Entity<DataBlockVersion>()
+                .Property(invite => invite.Published)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            modelBuilder.Entity<DataBlockVersion>()
+                .Property(invite => invite.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<DataBlockVersion>()
+                .Property(invite => invite.Updated)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            // Automatically include the backing ContentBlock of type "DataBlock" whenever we retrieve
+            // DataBlockVersions, as DataBlockVersions encapsulate their backing ContentBlocks and will replace them
+            // entirely in EES-4640.
+            modelBuilder.Entity<DataBlockVersion>()
+                .Navigation(dataBlockVersion => dataBlockVersion.ContentBlock)
+                .AutoInclude();
+        }
+
+        private static void ConfigureKeyStatisticsText(ModelBuilder modelBuilder)
+        {
             modelBuilder.Entity<KeyStatisticText>()
                 .ToTable("KeyStatisticsText");
         }

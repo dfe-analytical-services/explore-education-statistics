@@ -2,6 +2,7 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
@@ -10,20 +11,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
     {
         private string PublicationSlug { get; }
         private string ReleaseSlug { get; }
-        private Guid DataBlockId { get; }
+        private Guid DataBlockParentId { get; }
 
-        public DataBlockTableResultCacheKey(CacheableDataBlock cacheable)
-        {
-            PublicationSlug = cacheable.PublicationSlug;
-            ReleaseSlug = cacheable.ReleaseSlug;
-            DataBlockId = cacheable.DataBlockId;
-        }
-
-        public DataBlockTableResultCacheKey(string publicationSlug, string releaseSlug, Guid dataBlockId)
+        // ReSharper disable once UnusedMember.Global
+        public DataBlockTableResultCacheKey(DataBlockVersion dataBlockVersion) : this(
+            publicationSlug: dataBlockVersion.Release.Publication.Slug,
+            releaseSlug: dataBlockVersion.Release.Slug,
+            dataBlockParentId: dataBlockVersion.DataBlockParentId)
+        {}
+        
+        public DataBlockTableResultCacheKey(string publicationSlug, string releaseSlug, Guid dataBlockParentId)
         {
             PublicationSlug = publicationSlug;
             ReleaseSlug = releaseSlug;
-            DataBlockId = dataBlockId;
+            DataBlockParentId = dataBlockParentId;
         }
 
         public IBlobContainer Container => BlobContainers.PublicContent;
@@ -31,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
         public string Key => PublicContentDataBlockPath(
             PublicationSlug,
             ReleaseSlug,
-            DataBlockId
+            DataBlockParentId
         );
     }
 }

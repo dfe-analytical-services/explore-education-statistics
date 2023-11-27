@@ -1,7 +1,7 @@
 import styles from '@admin/components/comments/Comment.module.scss';
 import CommentEditForm from '@admin/components/comments/CommentEditForm';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
-import { Comment as CommentType } from '@admin/services/types/content';
+import { Comment as CommentData } from '@admin/services/types/content';
 import FormattedDate from '@common/components/FormattedDate';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import classNames from 'classnames';
@@ -9,15 +9,24 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
-import React, { useEffect, useRef } from 'react';
+import React, { ReactNode, useEffect, useRef } from 'react';
+
+export type CommentType = 'inline' | 'block';
 
 interface Props {
-  comment: CommentType;
+  comment: CommentData;
+  type: CommentType;
 }
 
-const Comment = ({ comment }: Props) => {
-  const { content, created, createdBy, id, resolved, resolvedBy, updated } =
-    comment;
+export default function Comment({ comment, type }: Props) {
+  return type === 'inline' ? (
+    <InlineComment comment={comment} />
+  ) : (
+    <BlockComment comment={comment} />
+  );
+}
+
+function InlineComment({ comment }: { comment: CommentData }) {
   const {
     selectedComment,
     removeComment,
@@ -25,23 +34,21 @@ const Comment = ({ comment }: Props) => {
     unresolveComment,
     setSelectedComment,
   } = useCommentsContext();
-  const [isEditingComment, toggleIsEditingComment] = useToggle(false);
   const [isFocused, toggleIsFocused] = useToggle(false);
   const ref = useRef<HTMLDivElement>(null);
-  const { user } = useAuthContext();
 
   useEffect(() => {
-    if (selectedComment.id === id) {
+    if (selectedComment.id === comment.id) {
       ref.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
         inline: 'start',
       });
     }
-  }, [id, selectedComment]);
+  }, [comment.id, selectedComment]);
 
   const handleCommentSelection = () => {
-    if (!resolved) {
+    if (!comment.resolved) {
       setSelectedComment({ id: comment.id });
     }
   };
@@ -51,57 +58,15 @@ const Comment = ({ comment }: Props) => {
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
         className={classNames(styles.comment, {
-          [styles.active]: selectedComment.id === id,
+          [styles.active]: selectedComment.id === comment.id,
           [styles.focused]: isFocused,
         })}
         ref={ref}
         onClick={handleCommentSelection}
       >
-        <p className="govuk-!-margin-bottom-0 govuk-body-s">
-          <strong data-testid="comment-author">
-            {`${createdBy.firstName} ${createdBy.lastName} `}
-          </strong>
-          <span className="govuk-visually-hidden"> commented on </span>
-          <br />
-          <FormattedDate format="d MMM yyyy, HH:mm">{created}</FormattedDate>
-          {updated && (
-            <>
-              <br />
-              (Updated{' '}
-              <FormattedDate format="d MMM yyyy, HH:mm">
-                {updated}
-              </FormattedDate>
-              )
-            </>
-          )}
-        </p>
-        {isEditingComment ? (
-          <div className={styles.form}>
-            <CommentEditForm
-              comment={comment}
-              id={id}
-              onCancel={toggleIsEditingComment.off}
-              onSubmit={toggleIsEditingComment.off}
-            />
-          </div>
-        ) : (
-          <div
-            className="govuk-!-margin-bottom-3 govuk-!-margin-top-2"
-            data-testid="comment-content"
-          >
-            {content}
-          </div>
-        )}
-
-        {resolved && (
-          <p className="govuk-!-margin-bottom-0 govuk-body-s">
-            Resolved by {resolvedBy?.firstName} {resolvedBy?.lastName} on{' '}
-            <FormattedDate format="d MMM yyyy, HH:mm">{resolved}</FormattedDate>
-          </p>
-        )}
-
-        {!isEditingComment && (
-          <>
+        <BaseComment
+          comment={comment}
+          highlightButton={
             <button
               aria-hidden
               className="govuk-visually-hidden"
@@ -116,45 +81,129 @@ const Comment = ({ comment }: Props) => {
             >
               Highlight comment in content
             </button>
-            {resolved ? (
-              <ButtonText
-                onClick={async () => {
-                  await unresolveComment.current(comment.id, true);
-                }}
-              >
-                Unresolve
-              </ButtonText>
-            ) : (
-              <ButtonGroup className="govuk-!-margin-bottom-0">
-                <Button
-                  onClick={async () => {
-                    await resolveComment.current(comment.id, true);
-                  }}
-                >
-                  Resolve
-                </Button>
-                {user?.id === createdBy.id && (
-                  <>
-                    <ButtonText onClick={toggleIsEditingComment.on}>
-                      Edit
-                    </ButtonText>
-
-                    <ButtonText
-                      onClick={async () => {
-                        removeComment.current(comment.id);
-                      }}
-                    >
-                      Delete
-                    </ButtonText>
-                  </>
-                )}
-              </ButtonGroup>
-            )}
-          </>
-        )}
+          }
+          onRemove={() => {
+            removeComment.current(comment.id);
+          }}
+          onResolve={async () => {
+            await resolveComment.current(comment.id, true);
+          }}
+          onUnresolve={async () => {
+            await unresolveComment.current(comment.id, true);
+          }}
+        />
       </div>
     </li>
   );
-};
+}
 
-export default Comment;
+function BlockComment({ comment }: { comment: CommentData }) {
+  const { deleteComment, resolveComment, unresolveComment } =
+    useCommentsContext();
+
+  return (
+    <li className={styles.container} data-testid="comment">
+      <div className={styles.comment}>
+        <BaseComment
+          comment={comment}
+          onRemove={async () => {
+            await deleteComment(comment.id);
+          }}
+          onResolve={async () => {
+            await resolveComment.current(comment.id, true);
+          }}
+          onUnresolve={async () => {
+            await unresolveComment.current(comment.id, true);
+          }}
+        />
+      </div>
+    </li>
+  );
+}
+
+interface BaseCommentProps {
+  comment: CommentData;
+  highlightButton?: ReactNode;
+  onRemove: () => void;
+  onResolve: () => void;
+  onUnresolve: () => void;
+}
+
+function BaseComment({
+  comment,
+  highlightButton,
+  onRemove,
+  onResolve,
+  onUnresolve,
+}: BaseCommentProps) {
+  const { content, created, createdBy, id, resolved, resolvedBy, updated } =
+    comment;
+
+  const { user } = useAuthContext();
+
+  const [isEditingComment, toggleIsEditingComment] = useToggle(false);
+
+  return (
+    <>
+      <p className="govuk-!-margin-bottom-0 govuk-body-s">
+        <strong data-testid="comment-author">
+          {`${createdBy.firstName} ${createdBy.lastName} `}
+        </strong>
+        <span className="govuk-visually-hidden"> commented on </span>
+        <br />
+        <FormattedDate format="d MMM yyyy, HH:mm">{created}</FormattedDate>
+        {updated && (
+          <>
+            <br />
+            (Updated{' '}
+            <FormattedDate format="d MMM yyyy, HH:mm">{updated}</FormattedDate>)
+          </>
+        )}
+      </p>
+      {isEditingComment ? (
+        <div className={styles.form}>
+          <CommentEditForm
+            comment={comment}
+            id={id}
+            onCancel={toggleIsEditingComment.off}
+            onSubmit={toggleIsEditingComment.off}
+          />
+        </div>
+      ) : (
+        <div
+          className="govuk-!-margin-bottom-3 govuk-!-margin-top-2"
+          data-testid="comment-content"
+        >
+          {content}
+        </div>
+      )}
+      {resolved && (
+        <p className="govuk-!-margin-bottom-0 govuk-body-s">
+          Resolved by {resolvedBy?.firstName} {resolvedBy?.lastName} on{' '}
+          <FormattedDate format="d MMM yyyy, HH:mm">{resolved}</FormattedDate>
+        </p>
+      )}
+      {!isEditingComment && (
+        <>
+          {highlightButton}
+          {resolved ? (
+            <ButtonText onClick={onUnresolve}>Unresolve</ButtonText>
+          ) : (
+            <ButtonGroup className="govuk-!-margin-bottom-0">
+              <Button onClick={onResolve}>Resolve</Button>
+              {user?.id === createdBy.id && (
+                <>
+                  <ButtonText onClick={toggleIsEditingComment.on}>
+                    Edit
+                  </ButtonText>
+
+                  <ButtonText onClick={onRemove}>Delete</ButtonText>
+                </>
+              )}
+            </ButtonGroup>
+          )}
+        </>
+      )}
+    </>
+  );
+}

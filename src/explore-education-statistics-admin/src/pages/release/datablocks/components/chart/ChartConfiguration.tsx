@@ -112,7 +112,7 @@ const ChartConfiguration = ({
             // eslint-disable-next-line react/no-this-in-sfc
             const title: string = this.resolve(Yup.ref('title')) ?? '';
 
-            return value.trim() !== title.trim();
+            return value !== title;
           },
         }),
       height: Yup.number()

@@ -70,6 +70,22 @@ const category2Group1Filter2 = new CategoryFilter({
   category: 'Category 2',
 });
 
+const category3Group1Filter1 = new CategoryFilter({
+  value: 'category3_group1_filter1',
+  label: 'Category 3 Group 1 Filter 1',
+  group: 'Group 1',
+  isTotal: false,
+  category: 'Category 3',
+});
+
+const category3Group1Filter2 = new CategoryFilter({
+  value: 'category3_group1_filter2',
+  label: 'Category 3 Group 1 Filter 2',
+  group: 'Group 1',
+  isTotal: false,
+  category: 'Category 3',
+});
+
 export const testTableWithOnlyMergedCellsInColumnHeadersConfig: TableHeadersConfig =
   {
     columns: [category1Group1Filter1, category1Group2Filter2],
@@ -731,6 +747,140 @@ export const testTableWithMergedCellsAndMissingData: FullTable = {
         [indicator1.id]: '320',
       },
       timePeriod: timePeriod1.id,
+    },
+  ],
+};
+
+export const testTableWithMergedCellsAndMissingDataColHeadersConfig2: TableHeadersConfig =
+  {
+    columns: [indicator1],
+    columnGroups: [
+      [timePeriod1],
+      [category3Group1Filter1, category3Group1Filter2],
+      [category1Group1Filter1, category1Group2Filter1, category1Group2Filter2],
+    ],
+    rows: [category2Group1Filter1, category2Group1Filter2],
+    rowGroups: [],
+  };
+
+export const testTableWithMergedCellsAndMissingDataRowHeadersConfig2: TableHeadersConfig =
+  {
+    columns: [category2Group1Filter1, category2Group1Filter2],
+    columnGroups: [],
+    rows: [indicator1],
+    rowGroups: [
+      [timePeriod1],
+      [category3Group1Filter1, category3Group1Filter2],
+      [category1Group1Filter1, category1Group2Filter1, category1Group2Filter2],
+    ],
+  };
+
+export const testTableWithMergedCellsAndMissingData2: FullTable = {
+  subjectMeta: {
+    ...testInitialTableSubjectMeta,
+    filters: {
+      Category2: {
+        name: 'category_2',
+        options: [category2Group1Filter1, category2Group1Filter2],
+        order: 2,
+      },
+      Category1: {
+        name: 'category_1',
+        options: [
+          category1Group1Filter1,
+          category1Group2Filter1,
+          category1Group2Filter2,
+        ],
+        order: 5,
+      },
+      Category3: {
+        name: 'category_3',
+        options: [category3Group1Filter1, category3Group1Filter2],
+        order: 6,
+      },
+    },
+    indicators: [indicator1],
+    locations: [location1],
+    timePeriodRange: [timePeriod1],
+  },
+  results: [
+    {
+      filters: [
+        category3Group1Filter1.id,
+        category2Group1Filter1.id,
+        category1Group1Filter1.id,
+      ],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '5',
+      },
+      timePeriod: '2012_AY',
+    },
+    {
+      filters: [
+        category3Group1Filter1.id,
+        category2Group1Filter2.id,
+        category1Group1Filter1.id,
+      ],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '11',
+      },
+      timePeriod: '2012_AY',
+    },
+    {
+      filters: [
+        category3Group1Filter1.id,
+        category1Group2Filter2.id,
+        category2Group1Filter1.id,
+      ],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '37',
+      },
+      timePeriod: '2012_AY',
+    },
+    {
+      filters: [
+        category3Group1Filter1.id,
+        category1Group2Filter2.id,
+        category2Group1Filter2.id,
+      ],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '18',
+      },
+      timePeriod: '2012_AY',
+    },
+    {
+      filters: [
+        category2Group1Filter1.id,
+        category3Group1Filter2.id,
+        category1Group2Filter1.id,
+      ],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '39',
+      },
+      timePeriod: '2012_AY',
+    },
+    {
+      filters: [
+        category2Group1Filter2.id,
+        category3Group1Filter2.id,
+        category1Group2Filter1.id,
+      ],
+      geographicLevel: 'country',
+      locationId: location1.value,
+      measures: {
+        [indicator1.id]: '32',
+      },
+      timePeriod: '2012_AY',
     },
   ],
 };

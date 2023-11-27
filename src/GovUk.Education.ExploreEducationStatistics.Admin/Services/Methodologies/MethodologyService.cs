@@ -18,11 +18,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
+using MethodologyVersionSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.MethodologyVersionSummaryViewModel;
+using MethodologyVersionViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology.MethodologyVersionViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -260,6 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .Query()
                 .Include(m => m.Publications)
                 .ThenInclude(p => p.Publication)
+                .ThenInclude(p => p.Contact)
                 .LoadAsync();
 
             var publicationLinks = loadedMethodologyVersion.Methodology.Publications;
@@ -407,7 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     query => query.Include(m => m.Versions))
                 .OnSuccess(async methodology =>
                 {
-                    var methodologyVersionIds= methodology
+                    var methodologyVersionIds = methodology
                         .Versions
                         .Select(methodologyVersion => new IdAndPreviousVersionIdPair<string>(
                             methodologyVersion.Id.ToString(),
@@ -549,10 +553,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
         }
 
-        private static IdTitleViewModel BuildPublicationViewModel(PublicationMethodology publicationMethodology)
+        private static PublicationSummaryViewModel BuildPublicationViewModel(PublicationMethodology publicationMethodology)
         {
             var publication = publicationMethodology.Publication;
-            return new IdTitleViewModel(publication.Id, publication.Title);
+            return new PublicationSummaryViewModel(publication.Id, publication.Title, publication.Slug, publicationMethodology.Owner, publication.Contact);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateMethodologySlug(

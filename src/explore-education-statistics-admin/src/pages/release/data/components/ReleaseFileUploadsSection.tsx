@@ -56,9 +56,9 @@ export default function ReleaseFileUploadsSection({
   const handleSubmit = useCallback(
     async (values: AncillaryFileFormValues) => {
       const newFile = await releaseAncillaryFileService.createFile(releaseId, {
-        title: values.title.trim(),
+        title: values.title,
         file: values.file as File,
-        summary: values.summary.trim(),
+        summary: values.summary,
       });
 
       queryClient.setQueryData(listFilesQuery.queryKey, [...files, newFile]);

@@ -52,7 +52,7 @@ const KeyStatDataBlockSelectForm = ({
         >
           <KeyStatDataBlock
             releaseId={releaseId}
-            dataBlockId={selectedDataBlock.id}
+            dataBlockParentId={selectedDataBlock.dataBlockParentId}
           />
         </Details>
       </section>

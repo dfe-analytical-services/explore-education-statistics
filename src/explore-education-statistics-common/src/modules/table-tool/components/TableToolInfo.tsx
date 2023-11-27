@@ -1,27 +1,60 @@
 import React, { ReactNode } from 'react';
 import { Contact } from '@common/services/publicationService';
+import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
+import ButtonText from '@common/components/ButtonText';
+import InfoIcon from '@common/components/InfoIcon';
+import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
+import Modal from '@common/components/Modal';
 
 interface Props {
   contactDetails?: Contact;
   methodologyLinks?: ReactNode[];
   releaseLink?: ReactNode;
+  releaseType?: ReleaseType;
 }
 
 const TableToolInfo = ({
   contactDetails,
   methodologyLinks,
   releaseLink,
+  releaseType,
 }: Props) => {
   return (
     <>
       <h3>Related information</h3>
+
       <ul className="govuk-list">
+        {releaseType && (
+          <li>
+            Release type:{' '}
+            <Modal
+              showClose
+              title={releaseTypes[releaseType]}
+              triggerButton={
+                <ButtonText>
+                  {releaseTypes[releaseType]} <InfoIcon />
+                </ButtonText>
+              }
+            >
+              <ReleaseTypeSection showHeading={false} type={releaseType} />
+            </Modal>
+          </li>
+        )}
         {releaseLink && <li>Publication: {releaseLink}</li>}
         {methodologyLinks?.map((methodologyLink, index) => (
           // eslint-disable-next-line react/no-array-index-key
           <li key={index}>Methodology: {methodologyLink}</li>
         ))}
       </ul>
+
+      <p>
+        Our statistical practice is regulated by the{' '}
+        <a href="https://osr.statisticsauthority.gov.uk/what-we-do/">
+          Office for Statistics Regulation
+        </a>{' '}
+        (OSR)
+      </p>
+
       {contactDetails && (
         <>
           <h3>Contact us</h3>
