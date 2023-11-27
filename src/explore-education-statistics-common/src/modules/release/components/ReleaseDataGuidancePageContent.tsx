@@ -3,21 +3,21 @@ import AccordionSection from '@common/components/AccordionSection';
 import FormattedDate from '@common/components/FormattedDate';
 import ContentHtml from '@common/components/ContentHtml';
 import ReleaseDataGuidanceDataFile from '@common/modules/release/components/ReleaseDataGuidanceDataFile';
-import { SubjectDataGuidance } from '@common/services/releaseDataGuidanceService';
+import { DataSetDataGuidance } from '@common/services/releaseDataGuidanceService';
 import React, { ReactNode } from 'react';
 
 interface Props {
   published?: string;
   dataGuidance: string;
   renderDataCatalogueLink?: ReactNode;
-  subjects: SubjectDataGuidance[];
+  dataSets: DataSetDataGuidance[];
 }
 
 const ReleaseDataGuidancePageContent = ({
   published,
   dataGuidance,
   renderDataCatalogueLink,
-  subjects,
+  dataSets,
 }: Props) => {
   return (
     <>
@@ -33,7 +33,7 @@ const ReleaseDataGuidancePageContent = ({
         <ContentHtml html={dataGuidance} testId="dataGuidance-content" />
       )}
 
-      {subjects.length > 0 && (
+      {dataSets.length > 0 && (
         <>
           <h3 className="govuk-!-margin-top-6">Data files</h3>
 
@@ -46,11 +46,11 @@ const ReleaseDataGuidancePageContent = ({
           )}
 
           <Accordion id="dataFiles">
-            {subjects.map(subject => (
-              <AccordionSection heading={subject.name} key={subject.id}>
+            {dataSets.map(dataSet => (
+              <AccordionSection heading={dataSet.name} key={dataSet.fileId}>
                 <ReleaseDataGuidanceDataFile
-                  key={subject.id}
-                  subject={subject}
+                  key={dataSet.fileId}
+                  dataSet={dataSet}
                 />
               </AccordionSection>
             ))}

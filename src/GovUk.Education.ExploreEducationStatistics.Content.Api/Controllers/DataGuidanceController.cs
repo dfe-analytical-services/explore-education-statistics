@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿#nullable enable
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -17,18 +18,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("publications/{publicationSlug}/releases/latest/data-guidance")]
-        public async Task<ActionResult<DataGuidanceViewModel>> GetLatest(string publicationSlug)
+        public async Task<ActionResult<DataGuidanceViewModel>> GetLatestReleaseDataGuidance(string publicationSlug)
         {
-            return await _dataGuidanceService.Get(publicationSlug)
+            return await _dataGuidanceService.GetDataGuidance(publicationSlug)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}/data-guidance")]
-        public async Task<ActionResult<DataGuidanceViewModel>> Get(
+        public async Task<ActionResult<DataGuidanceViewModel>> GetReleaseDataGuidance(
             string publicationSlug,
             string releaseSlug)
         {
-            return await _dataGuidanceService.Get(
+            return await _dataGuidanceService.GetDataGuidance(
                     publicationSlug,
                     releaseSlug
                 )

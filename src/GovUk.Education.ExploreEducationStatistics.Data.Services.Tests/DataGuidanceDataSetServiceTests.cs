@@ -5,17 +5,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
@@ -23,10 +19,10 @@ using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    public class DataGuidanceSubjectServiceTests
+    public class DataGuidanceDataSetServiceTests
     {
         [Fact]
-        public async Task Get()
+        public async Task ListDataSets()
         {
             var release = new Release();
 
@@ -242,12 +238,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddRangeAsync(subject1, subject2);
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.AddRangeAsync(subject1Filter, subject2Filter);
-                await statisticsDbContext.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
-                await statisticsDbContext.AddRangeAsync(
+                await statisticsDbContext.Release.AddRangeAsync(release);
+                await statisticsDbContext.Subject.AddRangeAsync(subject1, subject2);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.Filter.AddRangeAsync(subject1Filter, subject2Filter);
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(subject1IndicatorGroup, subject2IndicatorGroup);
+                await statisticsDbContext.Observation.AddRangeAsync(
                     subject1Observation1,
                     subject1Observation2,
                     subject1Observation3,
@@ -255,8 +251,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     subject2Observation2,
                     subject2Observation3
                 );
-                await statisticsDbContext.AddRangeAsync(subject1Footnote1, subject1Footnote2, subject1Footnote3);
-                await statisticsDbContext.AddRangeAsync(subject2Footnote1, subject2Footnote2);
+                await statisticsDbContext.SubjectFootnote.AddRangeAsync(subject1Footnote1);
+                await statisticsDbContext.FilterFootnote.AddRangeAsync(subject1Footnote2);
+                await statisticsDbContext.FilterGroupFootnote.AddRangeAsync(subject1Footnote3);
+                await statisticsDbContext.FilterItemFootnote.AddRangeAsync(subject2Footnote1);
+                await statisticsDbContext.IndicatorFootnote.AddRangeAsync(subject2Footnote2);
                 await statisticsDbContext.AddRangeAsync(
                     releaseFootnote1,
                     releaseFootnote2,
@@ -267,9 +266,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
+            var contentRelease = new Content.Model.Release
+            {
+                Id = release.Id
+            };
+
             var releaseFile1 = new ReleaseFile
             {
-                ReleaseId = release.Id,
+                Release = contentRelease,
                 Name = "Subject 1",
                 File = new File
                 {
@@ -281,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseFile2 = new ReleaseFile
             {
-                ReleaseId = release.Id,
+                Release = contentRelease,
                 Name = "Subject 2",
                 File = new File
                 {
@@ -294,6 +298,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
+                await contentDbContext.Releases.AddRangeAsync(contentRelease);
                 await contentDbContext.AddRangeAsync(releaseFile1, releaseFile2);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -305,13 +310,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = (await service.GetSubjects(release.Id)).AssertRight();
+                var result = (await service.ListDataSets(release.Id)).AssertRight();
 
-                // Assert there are two Subjects with the correct content
+                // Assert there are two data sets with the correct content
 
                 Assert.Equal(2, result.Count);
 
-                Assert.Equal(subject1.Id, result[0].Id);
+                Assert.Equal(releaseFile1.FileId, result[0].FileId);
                 Assert.Equal("Subject 1 Guidance", result[0].Content);
                 Assert.Equal("file1.csv", result[0].Filename);
                 Assert.Equal("Subject 1", result[0].Name);
@@ -339,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("Subject 1 Footnote 3", result[0].Footnotes[2].Label);
                 Assert.Equal(subject1Footnote3.FootnoteId, result[0].Footnotes[2].Id);
 
-                Assert.Equal(subject2.Id, result[1].Id);
+                Assert.Equal(releaseFile2.FileId, result[1].FileId);
                 Assert.Equal("Subject 2 Guidance", result[1].Content);
                 Assert.Equal("file2.csv", result[1].Filename);
                 Assert.Equal("Subject 2", result[1].Name);
@@ -367,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task Get_OrderedByName()
+        public async Task ListDataSets_OrderedByName()
         {
             var release = new Release();
 
@@ -393,8 +398,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var statisticsDbContextId = Guid.NewGuid().ToString();
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject3);
+                await statisticsDbContext.Release.AddRangeAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1,
+                    releaseSubject2,
+                    releaseSubject3);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -412,7 +419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Filename = "file1.csv",
                     Type = FileType.Data,
                 },
-                Name = "Subject 1",
+                Name = "Data set 1",
             };
             var releaseFile2 = new ReleaseFile
             {
@@ -423,7 +430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Filename = "file2.csv",
                     Type = FileType.Data,
                 },
-                Name = "Subject 2",
+                Name = "Data set 2",
             };
             var releaseFile3 = new ReleaseFile
             {
@@ -434,13 +441,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Filename = "file3.csv",
                     Type = FileType.Data,
                 },
-                Name = "Subject 3",
+                Name = "Data set 3",
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
+                await contentDbContext.Releases.AddRangeAsync(contentRelease);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     // Saved in random order
                     releaseFile3,
                     releaseFile1,
@@ -455,20 +463,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = await service.GetSubjects(release.Id);
+                var result = await service.ListDataSets(release.Id);
 
-                Assert.True(result.IsRight);
+                var viewModels = result.AssertRight();
 
-                Assert.Equal(3, result.Right.Count);
+                Assert.Equal(3, viewModels.Count);
 
-                Assert.Equal("Subject 1", result.Right[0].Name);
-                Assert.Equal("Subject 2", result.Right[1].Name);
-                Assert.Equal("Subject 3", result.Right[2].Name);
+                Assert.Equal("Data set 1", viewModels[0].Name);
+                Assert.Equal("Data set 2", viewModels[1].Name);
+                Assert.Equal("Data set 3", viewModels[2].Name);
             }
         }
 
         [Fact]
-        public async Task Get_SpecificSubjects()
+        public async Task ListDataSets_FilterDataSetsByFileId()
         {
             var release = new Release();
 
@@ -476,29 +484,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = release,
                 Subject = new Subject(),
-                DataGuidance = "Subject 1 Guidance"
+                DataGuidance = "Data set 1 guidance"
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
                 Subject = new Subject(),
-                DataGuidance = "Subject 2 Guidance"
+                DataGuidance = "Data set 2 guidance"
             };
 
             var releaseSubject3 = new ReleaseSubject
             {
                 Release = release,
                 Subject = new Subject(),
-                DataGuidance = "Subject 3 Guidance"
+                DataGuidance = "Data set 3 guidance"
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject3);
+                await statisticsDbContext.Release.AddRangeAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1,
+                    releaseSubject2,
+                    releaseSubject3);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -510,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile1 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 1",
+                Name = "Data set 1",
                 File = new File
                 {
                     SubjectId = releaseSubject1.SubjectId,
@@ -522,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile2 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 2",
+                Name = "Data set 2",
                 File = new File
                 {
                     SubjectId = releaseSubject2.SubjectId,
@@ -534,7 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile3 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 3",
+                Name = "Data set 3",
                 File = new File
                 {
                     SubjectId = releaseSubject3.SubjectId,
@@ -546,7 +556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     releaseFile1, releaseFile2, releaseFile3);
                 await contentDbContext.SaveChangesAsync();
             }
@@ -558,78 +568,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
-                var result = await service.GetSubjects(release.Id, new List<Guid>
+                var result = await service.ListDataSets(release.Id, new List<Guid>
                 {
-                    releaseSubject1.SubjectId, releaseSubject3.SubjectId
+                    releaseFile1.FileId, releaseFile3.FileId
                 });
 
                 // Assert only the specified Subjects are returned
-                Assert.True(result.IsRight);
+                var viewModels = result.AssertRight();
 
-                Assert.Equal(2, result.Right.Count);
+                Assert.Equal(2, viewModels.Count);
 
-                Assert.Equal(releaseSubject1.SubjectId, result.Right[0].Id);
-                Assert.Equal("Subject 1 Guidance", result.Right[0].Content);
-                Assert.Equal("file1.csv", result.Right[0].Filename);
-                Assert.Equal("Subject 1", result.Right[0].Name);
-                Assert.Empty(result.Right[0].TimePeriods.From);
-                Assert.Empty(result.Right[0].TimePeriods.To);
-                Assert.Empty(result.Right[0].GeographicLevels);
-                Assert.Empty(result.Right[0].Variables);
+                Assert.Equal(releaseFile1.FileId, viewModels[0].FileId);
+                Assert.Equal("Data set 1 guidance", viewModels[0].Content);
+                Assert.Equal("file1.csv", viewModels[0].Filename);
+                Assert.Equal("Data set 1", viewModels[0].Name);
+                Assert.Empty(viewModels[0].TimePeriods.From);
+                Assert.Empty(viewModels[0].TimePeriods.To);
+                Assert.Empty(viewModels[0].GeographicLevels);
+                Assert.Empty(viewModels[0].Variables);
 
-                Assert.Equal(releaseSubject3.SubjectId, result.Right[1].Id);
-                Assert.Equal("Subject 3 Guidance", result.Right[1].Content);
-                Assert.Equal("file3.csv", result.Right[1].Filename);
-                Assert.Equal("Subject 3", result.Right[1].Name);
-                Assert.Empty(result.Right[1].TimePeriods.From);
-                Assert.Empty(result.Right[1].TimePeriods.To);
-                Assert.Empty(result.Right[1].GeographicLevels);
-                Assert.Empty(result.Right[1].Variables);
+                Assert.Equal(releaseFile3.FileId, viewModels[1].FileId);
+                Assert.Equal("Data set 3 guidance", viewModels[1].Content);
+                Assert.Equal("file3.csv", viewModels[1].Filename);
+                Assert.Equal("Data set 3", viewModels[1].Name);
+                Assert.Empty(viewModels[1].TimePeriods.From);
+                Assert.Empty(viewModels[1].TimePeriods.To);
+                Assert.Empty(viewModels[1].GeographicLevels);
+                Assert.Empty(viewModels[1].Variables);
             }
         }
 
         [Fact]
-        public async Task Get_NoRelease()
+        public async Task ListDataSets_NoRelease()
         {
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+            var service = SetupService();
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupService(statisticsDbContext: statisticsDbContext);
+            var result = await service.ListDataSets(Guid.NewGuid());
 
-                var result = await service.GetSubjects(Guid.NewGuid());
-
-                Assert.True(result.IsRight);
-                Assert.Empty(result.Right);
-            }
+            result.AssertNotFound();
         }
 
         [Fact]
-        public async Task Get_NoSubjects()
+        public async Task ListDataSets_NoDataSets()
         {
-            var release = new Release();
+            var release = new Content.Model.Release();
 
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.SaveChangesAsync();
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupService(statisticsDbContext: statisticsDbContext);
+                var service = SetupService(contentDbContext: contentDbContext);
 
-                var result = await service.GetSubjects(release.Id);
+                var result = await service.ListDataSets(release.Id);
 
-                Assert.True(result.IsRight);
-                Assert.Empty(result.Right);
+                var viewModels = result.AssertRight();
+                Assert.Empty(viewModels);
             }
         }
 
         [Fact]
-        public async Task Get_AmendedRelease()
+        public async Task ListDataSets_AmendedRelease()
         {
             var releaseVersion1 = new Release
             {
@@ -644,36 +648,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var subject1 = new Subject();
             var subject2 = new Subject();
 
-            // Version 1 has one Subject, Version 2 adds another Subject
+            // Version 1 has one data set, Version 2 adds another data set
 
             var releaseVersion1Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion1,
                 Subject = subject1,
-                DataGuidance = "Version 1 Subject 1 Guidance"
+                DataGuidance = "Version 1 data set 1 guidance"
             };
 
             var releaseVersion2Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion2,
                 Subject = subject1,
-                DataGuidance = "Version 2 Subject 1 Guidance"
+                DataGuidance = "Version 2 data set 1 guidance"
             };
 
             var releaseVersion2Subject2 = new ReleaseSubject
             {
                 Release = releaseVersion2,
                 Subject = subject2,
-                DataGuidance = "Version 2 Subject 2 Guidance"
+                DataGuidance = "Version 2 data set 2 guidance"
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddRangeAsync(releaseVersion1, releaseVersion2);
-                await statisticsDbContext.AddRangeAsync(subject1, subject2);
-                await statisticsDbContext.AddRangeAsync(releaseVersion1Subject1, releaseVersion2Subject1,
+                await statisticsDbContext.Release.AddRangeAsync(releaseVersion1, releaseVersion2);
+                await statisticsDbContext.Subject.AddRangeAsync(subject1, subject2);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseVersion1Subject1, releaseVersion2Subject1,
                     releaseVersion2Subject2);
                 await statisticsDbContext.SaveChangesAsync();
             }
@@ -708,27 +712,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = contentReleaseVersion1,
                 File = file1,
-                Name = "Subject 1",
+                Name = "Version 1 data set 1"
             };
 
             var releaseVersion2File1 = new ReleaseFile
             {
                 Release = contentReleaseVersion2,
                 File = file1,
-                Name = "Subject 1",
+                Name = "Version 2 data set 1"
             };
 
             var releaseVersion2File2 = new ReleaseFile
             {
                 Release = contentReleaseVersion2,
                 File = file2,
-                Name = "Subject 2",
+                Name = "Version 2 data set 2"
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
+                await contentDbContext.Releases.AddRangeAsync(
+                    contentReleaseVersion1,
+                    contentReleaseVersion2);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     releaseVersion1File1,
                     releaseVersion2File1,
                     releaseVersion2File2);
@@ -742,62 +749,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext: statisticsDbContext,
                     contentDbContext: contentDbContext);
 
-                var version1Result = await service.GetSubjects(releaseVersion1.Id);
+                var version1Result = await service.ListDataSets(releaseVersion1.Id);
+                var version1ViewModels = version1Result.AssertRight();
 
-                // Assert version 1 has one Subject with the correct content
-                Assert.True(version1Result.IsRight);
+                // Assert version 1 has one data set with the correct content
+                Assert.Single(version1ViewModels);
 
-                Assert.Single(version1Result.Right);
+                Assert.Equal(releaseVersion1File1.FileId, version1ViewModels[0].FileId);
+                Assert.Equal("Version 1 data set 1 guidance", version1ViewModels[0].Content);
+                Assert.Equal("file1.csv", version1ViewModels[0].Filename);
+                Assert.Equal("Version 1 data set 1", version1ViewModels[0].Name);
+                Assert.Empty(version1ViewModels[0].TimePeriods.From);
+                Assert.Empty(version1ViewModels[0].TimePeriods.To);
+                Assert.Empty(version1ViewModels[0].GeographicLevels);
+                Assert.Empty(version1ViewModels[0].Variables);
 
-                Assert.Equal(subject1.Id, version1Result.Right[0].Id);
-                Assert.Equal("Version 1 Subject 1 Guidance", version1Result.Right[0].Content);
-                Assert.Equal("file1.csv", version1Result.Right[0].Filename);
-                Assert.Equal("Subject 1", version1Result.Right[0].Name);
-                Assert.Empty(version1Result.Right[0].TimePeriods.From);
-                Assert.Empty(version1Result.Right[0].TimePeriods.To);
-                Assert.Empty(version1Result.Right[0].GeographicLevels);
-                Assert.Empty(version1Result.Right[0].Variables);
+                var version2Result = await service.ListDataSets(releaseVersion2.Id);
+                var version2ViewModels = version2Result.AssertRight();
 
-                var version2Result = await service.GetSubjects(releaseVersion2.Id);
+                // Assert version 2 has two data sets with the correct content
+                Assert.Equal(2, version2ViewModels.Count);
 
-                // Assert version 2 has two Subjects with the correct content
-                Assert.True(version2Result.IsRight);
+                Assert.Equal(releaseVersion2File1.FileId, version2ViewModels[0].FileId);
+                Assert.Equal("Version 2 data set 1 guidance", version2ViewModels[0].Content);
+                Assert.Equal("file1.csv", version2ViewModels[0].Filename);
+                Assert.Equal("Version 2 data set 1", version2ViewModels[0].Name);
+                Assert.Empty(version2ViewModels[0].TimePeriods.From);
+                Assert.Empty(version2ViewModels[0].TimePeriods.To);
+                Assert.Empty(version2ViewModels[0].GeographicLevels);
+                Assert.Empty(version2ViewModels[0].Variables);
 
-                Assert.Equal(2, version2Result.Right.Count);
-
-                Assert.Equal(subject1.Id, version2Result.Right[0].Id);
-                Assert.Equal("Version 2 Subject 1 Guidance", version2Result.Right[0].Content);
-                Assert.Equal("file1.csv", version2Result.Right[0].Filename);
-                Assert.Equal("Subject 1", version2Result.Right[0].Name);
-                Assert.Empty(version2Result.Right[0].TimePeriods.From);
-                Assert.Empty(version2Result.Right[0].TimePeriods.To);
-                Assert.Empty(version2Result.Right[0].GeographicLevels);
-
-                Assert.Equal(subject2.Id, version2Result.Right[1].Id);
-                Assert.Equal("Version 2 Subject 2 Guidance", version2Result.Right[1].Content);
-                Assert.Equal("file2.csv", version2Result.Right[1].Filename);
-                Assert.Equal("Subject 2", version2Result.Right[1].Name);
-                Assert.Empty(version2Result.Right[1].TimePeriods.From);
-                Assert.Empty(version2Result.Right[1].TimePeriods.To);
-                Assert.Empty(version2Result.Right[1].GeographicLevels);
-                Assert.Empty(version2Result.Right[1].Variables);
+                Assert.Equal(releaseVersion2File2.FileId, version2ViewModels[1].FileId);
+                Assert.Equal("Version 2 data set 2 guidance", version2ViewModels[1].Content);
+                Assert.Equal("file2.csv", version2ViewModels[1].Filename);
+                Assert.Equal("Version 2 data set 2", version2ViewModels[1].Name);
+                Assert.Empty(version2ViewModels[1].TimePeriods.From);
+                Assert.Empty(version2ViewModels[1].TimePeriods.To);
+                Assert.Empty(version2ViewModels[1].GeographicLevels);
+                Assert.Empty(version2ViewModels[1].Variables);
             }
         }
 
         [Fact]
         public async Task Validate_NoRelease()
         {
-            var statisticsDbContextId = Guid.NewGuid().ToString();
+            await using var statisticsDbContext = InMemoryStatisticsDbContext();
+            var service = SetupService(statisticsDbContext: statisticsDbContext);
 
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupService(statisticsDbContext: statisticsDbContext);
+            var result = await service.Validate(Guid.NewGuid());
 
-                var result = await service.Validate(Guid.NewGuid());
-
-                Assert.True(result.IsRight);
-                Assert.True(result.Right);
-            }
+            result.AssertRight();
         }
 
         [Fact]
@@ -809,7 +810,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
+                await statisticsDbContext.Release.AddRangeAsync(release);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -819,8 +820,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Validate(release.Id);
 
-                Assert.True(result.IsRight);
-                Assert.True(result.Right);
+                result.AssertRight();
             }
         }
 
@@ -831,14 +831,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject1 = new ReleaseSubject
             {
-                DataGuidance = "Subject 1 Guidance",
+                DataGuidance = "Data set 1 guidance",
                 Release = release,
                 Subject = new Subject()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
-                DataGuidance = "Subject 2 Guidance",
+                DataGuidance = "Data set 2 guidance",
                 Release = release,
                 Subject = new Subject()
             };
@@ -847,8 +847,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.Release.AddRangeAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -858,8 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Validate(release.Id);
 
-                Assert.True(result.IsRight);
-                Assert.True(result.Right);
+                result.AssertRight();
             }
         }
 
@@ -870,12 +869,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject1 = new ReleaseSubject
             {
-                DataGuidance = "Subject 1 Guidance",
+                DataGuidance = "Data set 1 guidance",
                 Release = release,
                 Subject = new Subject()
             };
 
-            // Guidance is not populated for Subject 2
+            // Guidance is not populated for data set 2
             var releaseSubject2 = new ReleaseSubject
             {
                 DataGuidance = null,
@@ -887,8 +886,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddRangeAsync(releaseSubject1, releaseSubject2);
+                await statisticsDbContext.Release.AddRangeAsync(release);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -898,13 +897,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = await service.Validate(release.Id);
 
-                Assert.True(result.IsRight);
-                Assert.False(result.Right);
+                result.AssertBadRequest(ValidationErrorMessages.PublicDataGuidanceRequired);
             }
         }
 
         [Fact]
-        public async Task GetGeographicLevels()
+        public async Task ListGeographicLevels()
         {
             var release = new Release();
 
@@ -954,10 +952,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject);
-                await statisticsDbContext.AddRangeAsync(
+                await statisticsDbContext.Release.AddRangeAsync(release);
+                await statisticsDbContext.Subject.AddRangeAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
+                await statisticsDbContext.Observation.AddRangeAsync(
                     subjectObservation1,
                     subjectObservation2,
                     subjectObservation3);
@@ -968,7 +966,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = SetupService(statisticsDbContext: statisticsDbContext);
 
-                var result = await service.GetGeographicLevels(subject.Id);
+                var result = await service.ListGeographicLevels(subject.Id);
 
                 Assert.Equal(3, result.Count);
                 Assert.Equal("National", result[0]);
@@ -978,7 +976,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetGeographicLevels_NoObservations()
+        public async Task ListGeographicLevels_NoObservations()
         {
             var release = new Release();
 
@@ -995,9 +993,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.AddAsync(release);
-                await statisticsDbContext.AddAsync(subject);
-                await statisticsDbContext.AddAsync(releaseSubject);
+                await statisticsDbContext.Release.AddRangeAsync(release);
+                await statisticsDbContext.Subject.AddRangeAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1005,27 +1003,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var service = SetupService(statisticsDbContext: statisticsDbContext);
 
-                var result = await service.GetGeographicLevels(subject.Id);
+                var result = await service.ListGeographicLevels(subject.Id);
 
                 Assert.Empty(result);
             }
         }
 
-        private static DataGuidanceSubjectService SetupService(
-            StatisticsDbContext statisticsDbContext,
-            IIndicatorRepository? indicatorRepository = null,
-            IPersistenceHelper<StatisticsDbContext>? persistenceHelper = null,
+        private static DataGuidanceDataSetService SetupService(
+            StatisticsDbContext? statisticsDbContext = null,
             ContentDbContext? contentDbContext = null,
+            IIndicatorRepository? indicatorRepository = null,
             IFootnoteRepository? footnoteRepository = null,
             ITimePeriodService? timePeriodService = null)
         {
-            return new (
-                indicatorRepository ?? new IndicatorRepository(statisticsDbContext),
+            statisticsDbContext ??= InMemoryStatisticsDbContext();
+            contentDbContext ??= InMemoryContentDbContext();
+
+            return new(
                 statisticsDbContext,
-                persistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
-                contentDbContext != null
-                    ? new ReleaseDataFileRepository(contentDbContext)
-                    : Mock.Of<IReleaseDataFileRepository>(),
+                contentDbContext,
+                indicatorRepository ?? new IndicatorRepository(statisticsDbContext),
                 footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
                 timePeriodService ?? new TimePeriodService(statisticsDbContext)
             );

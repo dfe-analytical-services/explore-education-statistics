@@ -1,10 +1,10 @@
 import client from '@admin/services/utils/service';
-import { SubjectDataGuidance } from '@common/services/releaseDataGuidanceService';
+import { DataSetDataGuidance } from '@common/services/releaseDataGuidanceService';
 
 export interface ReleaseDataGuidance {
   id: string;
   content: string;
-  subjects: SubjectDataGuidance[];
+  dataSets: DataSetDataGuidance[];
 }
 
 const releaseDataGuidanceService = {
@@ -15,8 +15,8 @@ const releaseDataGuidanceService = {
     releaseId: string,
     data: {
       content: string;
-      subjects: {
-        id: string;
+      dataSets: {
+        fileId: string;
         content: string;
       }[];
     },
