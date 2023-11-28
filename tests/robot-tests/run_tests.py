@@ -173,7 +173,18 @@ def run():
 
     # If running all tests, or admin, admin_and_public or admin_and_public_2 suites, these
     # change data on environments and require test themes, test topics and user authentication.
-    data_changing_tests = args.tests == f"tests/" or f"/admin" in args.tests
+    #
+    # We check for both explicit forward slashes AND OS-specific separators here, as in Windows
+    # we can expect to get either scenario depending upon how we're running these tests e.g.
+    # Git Bash versus Command Prompt versus IDEs.  {os.sep} in Windows always evaluates to
+    # `\\` whereas any of these run options above may choose to either supply forward slashes or
+    # back slashes.
+    data_changing_tests = (
+        args.tests == "tests/"
+        or "/admin" in args.tests
+        or args.tests == f"tests{os.sep}"
+        or f"{os.sep}admin" in args.tests
+    )
 
     if data_changing_tests and args.env not in ["local", "dev"]:
         raise Exception(f"Cannot run tests that change data on environment {args.env}")
