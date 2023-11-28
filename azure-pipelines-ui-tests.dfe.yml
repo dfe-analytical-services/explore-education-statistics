@@ -54,16 +54,16 @@ jobs:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-
   - task: PublishTestResults@2
     displayName: Publish Test Results
     condition: succeededOrFailed()
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: false
+      failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Test Pipeline Artifact
+    condition: succeededOrFailed()
     inputs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-public
@@ -108,15 +108,15 @@ jobs:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-
   - task: PublishTestResults@2
     displayName: Publish Test Results
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: false
+      failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Pipeline Artifact
+    condition: succeededOrFailed()
     inputs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin-and-public-2
@@ -160,13 +160,12 @@ jobs:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-
   - task: PublishTestResults@2
     displayName: Publish Test Results
     condition: succeededOrFailed()
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: false
+      failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Test Pipeline Artifact
@@ -213,14 +212,15 @@ jobs:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-
   - task: PublishTestResults@2
     displayName: Publish Test Results
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
+      failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Test Pipeline Artifact
+    condition: succeededOrFailed()
     inputs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin-public
