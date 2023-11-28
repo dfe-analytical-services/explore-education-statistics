@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './InfoIcon.module.scss';
 
 interface Props {
-  description: string;
+  description?: string;
 }
 
 const InfoIcon = ({ description }: Props) => {
@@ -11,7 +11,9 @@ const InfoIcon = ({ description }: Props) => {
       <span className={styles.infoIcon} aria-hidden>
         ?
       </span>
-      <span className="govuk-visually-hidden">{description}</span>
+      {description && (
+        <span className="govuk-visually-hidden">{description}</span>
+      )}
     </>
   );
 };

@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
     /// </summary>
     public class CacheServiceTestFixture : IDisposable
     {
-        protected const string CacheServiceTests = "Cache service tests";
+        public const string CacheServiceTests = "Cache service tests";
 
         protected static readonly Mock<IBlobCacheService> BlobCacheService = new(MockBehavior.Strict);
         protected static readonly Mock<IBlobCacheService> PublicBlobCacheService = new(MockBehavior.Strict);

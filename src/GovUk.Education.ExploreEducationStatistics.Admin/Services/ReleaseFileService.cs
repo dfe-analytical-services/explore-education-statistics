@@ -224,6 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             using var archive = new ZipArchive(outputStream, ZipArchiveMode.Create);
 
+            var releaseFilesWithZipEntries = new List<ReleaseFile>();
             foreach (var releaseFile in releaseFiles)
             {
                 // Stop immediately if we receive a cancellation request
@@ -237,6 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseFile.Path()
                 );
 
+                // Ignore files which do not exist in blob storage
                 if (!blobExists)
                 {
                     continue;
@@ -254,15 +256,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     stream: entryStream,
                     cancellationToken: cancellationToken
                 );
+                
+                releaseFilesWithZipEntries.Add(releaseFile);
             }
 
             // Add data guidance file if there are any data files in this zip.
-            var subjectIds = releaseFiles
-                .Where(rf => rf.File.SubjectId.HasValue)
-                .Select(rf => rf.File.SubjectId.GetValueOrDefault())
-                .ToList();
-
-            if (subjectIds.Any())
+            if (releaseFilesWithZipEntries.Any(rf => rf.File.Type == FileType.Data))
             {
                 var entry = archive
                     .CreateEntry(FileType.DataGuidance.GetEnumLabel() + "/data-guidance.txt")
@@ -270,7 +269,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                 await using var entryStream = entry.Open();
 
-                await _dataGuidanceFileWriter.WriteToStream(entryStream, release, subjectIds);
+                var dataFileIds = releaseFilesWithZipEntries
+                    .Where(rf => rf.File.Type == FileType.Data)
+                    .Select(rf => rf.FileId)
+                    .ToList();
+
+                await _dataGuidanceFileWriter.WriteToStream(entryStream, release, dataFileIds);
             }
         }
 

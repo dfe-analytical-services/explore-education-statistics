@@ -4,8 +4,8 @@ import {
   ReleaseSummary,
 } from '@common/services/publicationService';
 
-export interface SubjectDataGuidance {
-  id: string;
+export interface DataSetDataGuidance {
+  fileId: string;
   filename: string;
   name: string;
   content: string;
@@ -27,7 +27,7 @@ export interface SubjectDataGuidance {
 export interface ReleaseDataGuidanceSummary extends ReleaseSummary {
   publication: PublicationSummary;
   dataGuidance: string;
-  subjects: SubjectDataGuidance[];
+  dataSets: DataSetDataGuidance[];
 }
 
 const releaseDataGuidanceService = {

@@ -8,15 +8,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
     {
         public string DataGuidance { get;  }
 
-        public List<DataGuidanceSubjectViewModel> Subjects { get; }
+        public List<DataGuidanceDataSetViewModel> DataSets { get; }
 
         public DataGuidanceViewModel(
             ReleaseCacheViewModel release,
             PublicationCacheViewModel publication,
-            List<DataGuidanceSubjectViewModel> subjects) : base(release, publication)
+            List<DataGuidanceDataSetViewModel> dataSets) : base(release, publication)
         {
             DataGuidance = release.DataGuidance;
-            Subjects = subjects;
+            DataSets = dataSets;
         }
     }
 }

@@ -40,6 +40,7 @@ src/explore-education-statistics-frontend/*.xml
 !/tests/robot-tests/.env.example
 /tests/robot-tests/IDENTITY_*
 /tests/robot-tests/.pabotsuitenames
+/tests/robot-tests/.failing_suites
 /tests/robot-tests/geckodriver.log
 /tests/robot-tests/debug.log
 **/*/jwt

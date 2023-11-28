@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
-        private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
+        private readonly IDataGuidanceDataSetService _dataGuidanceDataSetService;
         private readonly ITimePeriodService _timePeriodService;
 
         public ReleaseService(
@@ -35,14 +35,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
             IUserService userService,
-            IDataGuidanceSubjectService dataGuidanceSubjectService,
+            IDataGuidanceDataSetService dataGuidanceDataSetService,
             ITimePeriodService timePeriodService)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsDbContext = statisticsDbContext;
             _userService = userService;
-            _dataGuidanceSubjectService = dataGuidanceSubjectService;
+            _dataGuidanceDataSetService = dataGuidanceDataSetService;
             _timePeriodService = timePeriodService;
         }
 
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                 order: releaseFile.Order,
                                 content: rs.DataGuidance ?? string.Empty,
                                 timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
-                                geographicLevels: await _dataGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
+                                geographicLevels: await _dataGuidanceDataSetService.ListGeographicLevels(rs.SubjectId),
                                 filters: await GetFilters(rs.SubjectId, rs.FilterSequence),
                                 indicators: await GetIndicators(rs.SubjectId, rs.IndicatorSequence),
                                 file: releaseFile.ToFileInfo()

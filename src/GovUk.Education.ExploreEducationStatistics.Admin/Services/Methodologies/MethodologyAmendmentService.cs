@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -47,12 +48,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         }
 
         private async Task<Either<ActionResult, MethodologyVersion>> CreateAndSaveAmendment(
-            MethodologyVersion methodologyVersion)
+            MethodologyVersion originalMethodologyVersion)
         {
-            var amendment = methodologyVersion.CreateMethodologyAmendment(DateTime.UtcNow, _userService.GetUserId());
+            var amendment = CreateMethodologyAmendment(originalMethodologyVersion, _userService.GetUserId());
             var savedAmendment = (await _context.MethodologyVersions.AddAsync(amendment)).Entity;
             await _context.SaveChangesAsync();
             return savedAmendment;
+        }
+
+        public MethodologyVersion CreateMethodologyAmendment(
+            MethodologyVersion originalMethodologyVersion,
+            Guid createdByUserId)
+        {
+            var methodologyVersionAmendmentId = Guid.NewGuid();
+
+            var amendment = new MethodologyVersion
+            {
+                // Assign a new Id.
+                Id = methodologyVersionAmendmentId,
+
+                // Assign this new MethodologyVersion to the same parent as the original.
+                MethodologyId = originalMethodologyVersion.MethodologyId,
+
+                // Copy certain fields from the original.
+                AlternativeTitle = originalMethodologyVersion.AlternativeTitle,
+                AlternativeSlug = originalMethodologyVersion.AlternativeSlug,
+
+                // Assign new values to fields specifically for this amendment.
+                Status = MethodologyApprovalStatus.Draft,
+                Version = originalMethodologyVersion.Version + 1,
+                PreviousVersionId = originalMethodologyVersion.Id,
+                PublishingStrategy = MethodologyPublishingStrategy.Immediately,
+
+                MethodologyContent = CopyMethodologyContent(originalMethodologyVersion, createdByUserId),
+                Notes = CopyNotes(originalMethodologyVersion, methodologyVersionAmendmentId, createdByUserId),
+                CreatedById = createdByUserId
+            };
+
+            return amendment;
+        }
+
+        private List<MethodologyNote> CopyNotes(
+            MethodologyVersion originalMethodologyVersion,
+            Guid methodologyVersionAmendmentId,
+            Guid createdByUserId)
+        {
+            return originalMethodologyVersion
+                .Notes
+                .Select(originalNote => new MethodologyNote
+                {
+                    // Assign a new Id.
+                    Id = Guid.NewGuid(),
+
+                    // Copy certain fields from the original.
+                    Content = originalNote.Content,
+                    DisplayDate = originalNote.DisplayDate,
+
+                    // Link it to the new MethodologyVersion amendment.
+                    MethodologyVersionId = methodologyVersionAmendmentId,
+
+                    CreatedById = createdByUserId,
+                })
+                .ToList();
+        }
+
+        private MethodologyVersionContent CopyMethodologyContent(
+            MethodologyVersion originalMethodologyVersion,
+            Guid methodologyVersionAmendmentId)
+        {
+            return new MethodologyVersionContent
+            {
+                MethodologyVersionId = methodologyVersionAmendmentId,
+                Annexes = CopyContentSections(originalMethodologyVersion.MethodologyContent.Annexes),
+                Content = CopyContentSections(originalMethodologyVersion.MethodologyContent.Content),
+            };
+        }
+
+        private List<ContentSection> CopyContentSections(List<ContentSection> originalContentSections)
+        {
+            return originalContentSections
+                .Select(originalContentSection => new ContentSection
+                {
+                    // Assign a new Id.
+                    Id = Guid.NewGuid(),
+
+                    // Copy certain fields from the original.
+                    Caption = originalContentSection.Caption,
+                    Heading = originalContentSection.Heading,
+                    Order = originalContentSection.Order,
+                    Type = originalContentSection.Type,
+
+                    // Copy the ContentBlocks.
+                    Content = CopyContentBlocks(originalContentSection.Content),
+                })
+                .ToList();
+        }
+
+        private List<ContentBlock> CopyContentBlocks(List<ContentBlock> originalContentBlocks)
+        {
+            return originalContentBlocks
+                .Select<ContentBlock, ContentBlock>(originalContentBlock =>
+                {
+                    if (originalContentBlock is HtmlBlock originalHtmlBlock)
+                    {
+                        return new HtmlBlock
+                        {
+                            // Assign a new Id.
+                            Id = Guid.NewGuid(),
+
+                            // Copy certain fields from the original.
+                            Body = originalHtmlBlock.Body,
+                            Order = originalHtmlBlock.Order,
+
+                            // Manually set the created date, as Methodology content is currently saved in JSON and
+                            // therefore not able to make use of the ICreated interface's automatic setting of
+                            // created dates.
+                            Created = DateTime.UtcNow
+                        };
+                    }
+
+                    throw new ArgumentException(
+                        $"Unknown {nameof(ContentBlockType)} value {originalContentBlock.GetType()} during amendment");
+                })
+                .ToList();
         }
 
         private async Task<Either<ActionResult, Unit>> LinkOriginalMethodologyFilesToAmendment(

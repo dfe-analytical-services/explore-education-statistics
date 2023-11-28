@@ -18,8 +18,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteRelease(Guid releaseId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId);
-
         Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id);
 
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(Guid releaseId);

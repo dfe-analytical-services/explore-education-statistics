@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
     public class ReleasesController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
+        private readonly IReleaseAmendmentService _releaseAmendmentService;
         private readonly IReleaseApprovalService _releaseApprovalService;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
@@ -30,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         public ReleasesController(
             IReleaseService releaseService,
+            IReleaseAmendmentService releaseAmendmentService,
             IReleaseApprovalService releaseApprovalService,
             IReleaseDataFileService releaseDataFileService,
             IReleasePublishingStatusService releasePublishingStatusService,
@@ -37,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IDataImportService dataImportService)
         {
             _releaseService = releaseService;
+            _releaseAmendmentService = releaseAmendmentService;
             _releaseApprovalService = releaseApprovalService;
             _releaseDataFileService = releaseDataFileService;
             _releasePublishingStatusService = releasePublishingStatusService;
@@ -64,9 +67,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpPost("release/{releaseId:guid}/amendment")]
-        public async Task<ActionResult<ReleaseViewModel>> CreateReleaseAmendment(Guid releaseId)
+        public async Task<ActionResult<IdViewModel>> CreateReleaseAmendment(Guid releaseId)
         {
-            return await _releaseService
+            return await _releaseAmendmentService
                 .CreateReleaseAmendment(releaseId)
                 .HandleFailuresOrOk();
         }

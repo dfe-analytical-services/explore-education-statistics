@@ -1,5 +1,7 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -21,17 +23,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId:guid}/data-guidance")]
-        public async Task<ActionResult<DataGuidanceViewModel>> Get(Guid releaseId)
+        public async Task<ActionResult<DataGuidanceViewModel>> GetReleaseDataGuidance(Guid releaseId)
         {
-            return await _dataGuidanceService.Get(releaseId)
+            return await _dataGuidanceService.GetDataGuidance(releaseId)
                 .HandleFailuresOrOk();
         }
 
         [HttpPatch("release/{releaseId:guid}/data-guidance")]
-        public async Task<ActionResult<DataGuidanceViewModel>> Update(Guid releaseId,
-            DataGuidanceUpdateViewModel request)
+        public async Task<ActionResult<DataGuidanceViewModel>> UpdateReleaseDataGuidance(Guid releaseId,
+            DataGuidanceUpdateRequest request)
         {
-            return await _dataGuidanceService.Update(releaseId, request)
+            return await _dataGuidanceService.UpdateDataGuidance(releaseId, request)
                 .HandleFailuresOrOk();
         }
     }
