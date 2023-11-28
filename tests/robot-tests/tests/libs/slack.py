@@ -47,8 +47,11 @@ class SlackService:
                 "fields": [
                     {"title": "Environment", "value": env},
                     {"title": "Suite", "value": suites_ran.replace("tests/", "")},
-                    {"title": "Total test cases", "value": passed_tests + failed_tests},
                     {"title": "Total runs", "value": run_index + 1},
+                    {"title": "Total test cases", "value": passed_tests + failed_tests},
+                    {"title": "Passed test cases", "value": passed_tests},
+                    {"title": "Failed test cases", "value": failed_tests},
+                    {"title": "Failed test suites", "value": len(suites_failed)},
                     failed_test_suites_field,
                 ],
             }
