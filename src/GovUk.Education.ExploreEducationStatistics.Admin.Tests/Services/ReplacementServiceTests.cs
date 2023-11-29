@@ -139,10 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Type = FileType.Data,
                 SubjectId = Guid.NewGuid(),
-                Replacing = originalFile
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -169,126 +166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetReplacementPlan_OriginalFileIsNotAssociatedWithReplacementFile()
-        {
-            var release = _fixture.DefaultRelease().Generate();
-
-            var originalFile = new File
-            {
-                Type = FileType.Data,
-                SubjectId = Guid.NewGuid()
-            };
-
-            var replacementFile = new File
-            {
-                Type = FileType.Data,
-                SubjectId = Guid.NewGuid(),
-                Replacing = originalFile
-            };
-
-            // Don't set up an association to the replacement file
-            originalFile.Replacing = null;
-
-            var originalReleaseFile = new ReleaseFile
-            {
-                Release = release,
-                File = originalFile
-            };
-
-            var replacementReleaseFile = new ReleaseFile
-            {
-                Release = release,
-                File = replacementFile
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var replacementService = BuildReplacementService(contentDbContext,
-                    statisticsDbContext);
-
-                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    replacementService.GetReplacementPlan(
-                        releaseId: release.Id,
-                        originalFileId: originalReleaseFile.FileId,
-                        replacementFileId: replacementReleaseFile.FileId));
-
-                Assert.Equal("Original file has no association with the replacement file", exception.Message);
-            }
-        }
-
-        [Fact]
-        public async Task GetReplacementPlan_ReplacementFileIsNotAssociatedWithOriginalFile()
-        {
-            var release = _fixture.DefaultRelease().Generate();
-
-            var originalFile = new File
-            {
-                Filename = "original.csv",
-                Type = FileType.Data,
-                SubjectId = Guid.NewGuid()
-            };
-
-            // Set up the replacement file but without an association to the original file
-            var replacementFile = new File
-            {
-                Filename = "replacement.csv",
-                Type = FileType.Data,
-                SubjectId = Guid.NewGuid(),
-                Replacing = null
-            };
-
-            originalFile.ReplacedBy = replacementFile;
-
-            var originalReleaseFile = new ReleaseFile
-            {
-                Release = release,
-                File = originalFile
-            };
-
-            var replacementReleaseFile = new ReleaseFile
-            {
-                Release = release,
-                File = replacementFile
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(release);
-                await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var replacementService = BuildReplacementService(contentDbContext,
-                    statisticsDbContext);
-
-                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
-                    replacementService.GetReplacementPlan(
-                        releaseId: release.Id,
-                        originalFileId: originalReleaseFile.FileId,
-                        replacementFileId: replacementReleaseFile.FileId));
-
-                Assert.Equal("Replacement file has no association with the original file", exception.Message);
-            }
-        }
-
-        [Fact]
         public async Task GetReplacementPlan_ReplacementFileAttachedToDifferentRelease()
         {
             var (release1, release2) = _fixture.DefaultRelease().GenerateList(2).ToTuple2();
@@ -302,11 +179,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = Guid.NewGuid(),
-                Replacing = originalFile
+                SubjectId = Guid.NewGuid()
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -370,11 +244,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId,
-                Replacing = originalFile
+                SubjectId = replacementReleaseSubject.SubjectId
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -466,11 +337,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId,
-                Replacing = originalFile
+                SubjectId = replacementReleaseSubject.SubjectId
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -909,11 +777,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId,
-                Replacing = originalFile
+                SubjectId = replacementReleaseSubject.SubjectId
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -1140,11 +1005,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId,
-                Replacing = originalFile
+                SubjectId = replacementReleaseSubject.SubjectId
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -1363,11 +1225,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId,
-                Replacing = originalFile
+                SubjectId = replacementReleaseSubject.SubjectId
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -1612,11 +1471,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId,
-                Replacing = originalFile
+                SubjectId = replacementReleaseSubject.SubjectId
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -1862,11 +1718,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var replacementFile = new File
             {
                 Type = FileType.Data,
-                SubjectId = replacementReleaseSubject.SubjectId,
-                Replacing = originalFile
+                SubjectId = replacementReleaseSubject.SubjectId
             };
-
-            originalFile.ReplacedBy = replacementFile;
 
             var originalReleaseFile = new ReleaseFile
             {
@@ -2554,6 +2407,188 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     timePeriodService);
 
                 result.AssertBadRequest(ReplacementMustBeValid);
+            }
+        }
+
+        [Fact]
+        public async Task Replace_OriginalFileIsNotAssociatedWithReplacementFile()
+        {
+            var release = _fixture.DefaultRelease().Generate();
+
+            var statsRelease = _fixture.DefaultStatsRelease()
+                .WithId(release.Id)
+                .Generate();
+
+            var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
+                .WithRelease(statsRelease)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .Generate(2)
+                .ToTuple2();
+
+            var originalFile = new File
+            {
+                Type = FileType.Data,
+                SubjectId = originalReleaseSubject.SubjectId
+            };
+
+            var replacementFile = new File
+            {
+                Type = FileType.Data,
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = originalFile
+            };
+
+            // Don't set up a link to the replacement file
+            originalFile.ReplacedBy = null;
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = replacementFile
+            };
+
+            var locationRepository = new Mock<ILocationRepository>(Strict);
+            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<Location>());
+
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.Release.AddRangeAsync(statsRelease);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(originalReleaseSubject,
+                    replacementReleaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext,
+                    statisticsDbContext,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object);
+
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                    replacementService.Replace(
+                        releaseId: release.Id,
+                        originalFileId: originalReleaseFile.FileId,
+                        replacementFileId: replacementReleaseFile.FileId));
+
+                VerifyAllMocks(locationRepository,
+                    timePeriodService);
+
+                Assert.Equal("Original file has no link with the replacement file", exception.Message);
+            }
+        }
+
+        [Fact]
+        public async Task Replace_ReplacementFileIsNotAssociatedWithOriginalFile()
+        {
+            var release = _fixture.DefaultRelease().Generate();
+
+            var statsRelease = _fixture.DefaultStatsRelease()
+                .WithId(release.Id)
+                .Generate();
+
+            var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
+                .WithRelease(statsRelease)
+                .WithSubjects(_fixture.DefaultSubject().Generate(2))
+                .Generate(2)
+                .ToTuple2();
+
+            var originalFile = new File
+            {
+                Filename = "original.csv",
+                Type = FileType.Data,
+                SubjectId = originalReleaseSubject.SubjectId
+            };
+
+            // Set up the replacement file but without a link to the original file
+            var replacementFile = new File
+            {
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+                SubjectId = replacementReleaseSubject.SubjectId,
+                Replacing = null
+            };
+
+            originalFile.ReplacedBy = replacementFile;
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = replacementFile
+            };
+
+            var locationRepository = new Mock<ILocationRepository>(Strict);
+            locationRepository.Setup(service => service.GetDistinctForSubject(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<Location>());
+
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+            timePeriodService.Setup(service => service.GetTimePeriods(replacementReleaseSubject.SubjectId))
+                .ReturnsAsync(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.Release.AddRangeAsync(statsRelease);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(originalReleaseSubject,
+                    replacementReleaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext,
+                    statisticsDbContext,
+                    locationRepository: locationRepository.Object,
+                    timePeriodService: timePeriodService.Object);
+
+                var exception = await Assert.ThrowsAsync<InvalidOperationException>(() =>
+                    replacementService.Replace(
+                        releaseId: release.Id,
+                        originalFileId: originalReleaseFile.FileId,
+                        replacementFileId: replacementReleaseFile.FileId));
+
+                VerifyAllMocks(locationRepository,
+                    timePeriodService);
+
+                Assert.Equal("Replacement file has no link with the original file", exception.Message);
             }
         }
 
