@@ -117,6 +117,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var (plan, (originalReleaseFile, replacementReleaseFile)) = planAndReleaseFiles;
 
+                    // It should be possible to replace a file with any other file provided there is a valid plan,
+                    // but we want to ensure that the replacement file has been created through the designated process.
+                    // The replacement upload process links the replacement file to the original, allowing us to
+                    // identify files with ongoing data replacements and filter out replacement files from the regular
+                    // data files view.
+                    if (originalReleaseFile.File.ReplacedById != replacementFileId)
+                    {
+                        throw new InvalidOperationException(
+                            "Original file has no link with the replacement file");
+                    }
+                    if (replacementReleaseFile.File.ReplacingId != originalFileId)
+                    {
+                        throw new InvalidOperationException(
+                            "Replacement file has no link with the original file");
+                    }
+
                     var originalSubjectId = plan.OriginalSubjectId;
                     var replacementSubjectId = plan.ReplacementSubjectId;
 
@@ -161,24 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .FirstOrNotFoundAsync(rf => rf.ReleaseId == releaseId
                                                 && rf.FileId == replacementFileId
                                                 && rf.File.Type == FileType.Data))
-                .OnSuccess(releaseFiles =>
-                {
-                    var (originalReleaseFile, replacementReleaseFile) = releaseFiles;
-
-                    if (originalReleaseFile.File.ReplacedById != replacementFileId)
-                    {
-                        throw new InvalidOperationException(
-                            "Original file has no association with the replacement file");
-                    }
-
-                    if (replacementReleaseFile.File.ReplacingId != originalFileId)
-                    {
-                        throw new InvalidOperationException(
-                            "Replacement file has no association with the original file");
-                    }
-
-                    return releaseFiles.ToValueTuple();
-                });
+                .OnSuccess(releaseFiles => releaseFiles.ToValueTuple());
         }
 
         private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
