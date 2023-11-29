@@ -40,5 +40,13 @@ services:
     ports:
       - "5030:8080"
 
+  public-api-db:
+    image: postgres:16.1-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: public_data
+      POSTGRES_PASSWORD: password
+
 volumes:
   data-storage-data:
