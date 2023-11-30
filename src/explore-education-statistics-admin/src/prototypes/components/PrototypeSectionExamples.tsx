@@ -638,7 +638,7 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
                 Published 16 October 2023, last updated 31 October 2023,{' '}
                 <a
                   href="#"
-                  onClick={() => change()}
+                  onClick={() => change && change()}
                   className="govuk-link--no-visited-stat"
                 >
                   View all updates
