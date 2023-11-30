@@ -14,9 +14,10 @@ import styles from '../PrototypePublicPage.module.scss';
 
 interface Props {
   sectionExample?: string;
+  change?: () => void;
 }
 
-const ExampleSection = ({ sectionExample }: Props) => {
+const ExampleSection = ({ sectionExample, change }: Props) => {
   const [showHelp1, setShowHelp1] = useToggle(false);
   const [showHelp2, setShowHelp2] = useToggle(false);
   const [showHelp3, setShowHelp3] = useToggle(false);
@@ -634,7 +635,14 @@ const ExampleSection = ({ sectionExample }: Props) => {
           <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-top-0">
             <div>
               <p className="govuk-body-s govuk-!-margin-bottom-0">
-                Published 16 October 2023, last updated 31 October 2023
+                Published 16 October 2023, last updated 31 October 2023,{' '}
+                <a
+                  href="#"
+                  onClick={() => change()}
+                  className="govuk-link--no-visited-stat"
+                >
+                  View all updates
+                </a>
               </p>
               <a
                 href="#"
@@ -1934,7 +1942,7 @@ const ExampleSection = ({ sectionExample }: Props) => {
       )}
       {sectionExample === 'explore2' && (
         <>
-          <h2 className="govuk-heading-l govuk-!-margin-top-9" id="exploreData">
+          <h2 className="govuk-heading-l" id="exploreData">
             Explore data and files used in this release
           </h2>
           <div
@@ -2001,7 +2009,7 @@ const ExampleSection = ({ sectionExample }: Props) => {
                 in our data catalogue
               </p>
             </div>
-
+            {/* 
             <div className={classNames(styles.prototypeCardChevron)}>
               <h2
                 className={classNames(
@@ -2021,6 +2029,7 @@ const ExampleSection = ({ sectionExample }: Props) => {
                 online guidance
               </p>
             </div>
+            */}
           </div>
         </>
       )}

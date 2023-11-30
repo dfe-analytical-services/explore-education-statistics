@@ -26,6 +26,7 @@ const PrototypeReleaseData = () => {
   const [navSelected, setNavSelected] = useState('none');
   const [showMainRelease, setShowMainRelease] = useState(true);
   const [showMethodologies, setShowMethodologies] = useState(false);
+  const [showData, setShowData] = useState(false);
   const [showGuidance, setShowGuidance] = useState(false);
   const [showPreRelease, setShowPreRelease] = useState(false);
   const [showOtherReleases, setShowOtherReleases] = useState(false);
@@ -33,6 +34,17 @@ const PrototypeReleaseData = () => {
   const [showHelp, setShowHelp] = useState(false);
 
   const [visibleSection, setVisibleSection] = useState();
+
+  function viewUpdates() {
+    setShowMainRelease(false);
+    setShowMethodologies(false);
+    setShowData(false);
+    setShowGuidance(false);
+    setShowPreRelease(false);
+    setShowOtherReleases(false);
+    setShowAllUpdates(true);
+    setShowHelp(false);
+  }
 
   const headerRef = useRef(null);
   const summaryRef = useRef(null);
@@ -108,7 +120,11 @@ const PrototypeReleaseData = () => {
         wide={false}
       >
         <div ref={headerRef}>
-          <PrototypeSectionExamples sectionExample="header9" />
+          <PrototypeSectionExamples
+            sectionExample="header9"
+            /* eslint-disable-next-line */
+            change={viewUpdates}
+          />
           <div className="govuk-!-margin-top-3">
             <nav className="govuk-!-margin-bottom-0" aria-label="Useful links">
               <h2 className="govuk-body govuk-visually-hidden">Useful links</h2>
@@ -136,6 +152,29 @@ const PrototypeReleaseData = () => {
                     </div>
                   </li>
                 )}
+                <li>
+                  <div className={styles.prototypeActionLink}>
+                    <span className={styles.prototypeActionLinkWrapper}>
+                      <a
+                        href="#"
+                        className="govuk-link--no-visited-state"
+                        onClick={e => {
+                          e.preventDefault();
+                          setShowMainRelease(false);
+                          setShowMethodologies(false);
+                          setShowGuidance(false);
+                          setShowData(true);
+                          setShowPreRelease(false);
+                          setShowOtherReleases(false);
+                          setShowAllUpdates(false);
+                          setShowHelp(false);
+                        }}
+                      >
+                        Explore data and create tables
+                      </a>
+                    </span>
+                  </div>
+                </li>
 
                 <li>
                   <div className={styles.prototypeActionLink}>
@@ -147,6 +186,7 @@ const PrototypeReleaseData = () => {
                           e.preventDefault();
                           setShowMainRelease(false);
                           setShowMethodologies(false);
+                          setShowData(false);
                           setShowGuidance(true);
                           setShowPreRelease(false);
                           setShowOtherReleases(false);
@@ -159,6 +199,30 @@ const PrototypeReleaseData = () => {
                     </span>
                   </div>
                 </li>
+                <li>
+                  <div className={styles.prototypeActionLink}>
+                    <span className={styles.prototypeActionLinkWrapperDownload}>
+                      <a
+                        href="#releaseDetails"
+                        className="govuk-link--no-visited-state"
+                        onClick={e => {
+                          e.preventDefault();
+                          setShowMainRelease(false);
+                          setShowMethodologies(true);
+                          setShowData(false);
+                          setShowGuidance(false);
+                          setShowPreRelease(false);
+                          setShowOtherReleases(false);
+                          setShowAllUpdates(false);
+                          setShowHelp(false);
+                        }}
+                      >
+                        Methodologies
+                      </a>
+                    </span>
+                  </div>
+                </li>
+                {/* 
                 <li>
                   <div className={styles.prototypeActionLink}>
                     <span className={styles.prototypeActionLinkWrapper}>
@@ -181,6 +245,8 @@ const PrototypeReleaseData = () => {
                     </span>
                   </div>
                 </li>
+                */}
+
                 <li>
                   <div className={styles.prototypeActionLink}>
                     <span className={styles.prototypeActionLinkWrapper}>
@@ -191,6 +257,7 @@ const PrototypeReleaseData = () => {
                           e.preventDefault();
                           setShowMainRelease(false);
                           setShowMethodologies(false);
+                          setShowData(false);
                           setShowGuidance(false);
                           setShowPreRelease(false);
                           setShowOtherReleases(true);
@@ -199,28 +266,6 @@ const PrototypeReleaseData = () => {
                         }}
                       >
                         Releases in this series
-                      </a>
-                    </span>
-                  </div>
-                </li>
-                <li>
-                  <div className={styles.prototypeActionLink}>
-                    <span className={styles.prototypeActionLinkWrapperDownload}>
-                      <a
-                        href="#releaseDetails"
-                        className="govuk-link--no-visited-state"
-                        onClick={e => {
-                          e.preventDefault();
-                          setShowMainRelease(false);
-                          setShowMethodologies(true);
-                          setShowGuidance(false);
-                          setShowPreRelease(false);
-                          setShowOtherReleases(false);
-                          setShowAllUpdates(false);
-                          setShowHelp(false);
-                        }}
-                      >
-                        Methodologies
                       </a>
                     </span>
                   </div>
@@ -236,6 +281,7 @@ const PrototypeReleaseData = () => {
                           e.preventDefault();
                           setShowMainRelease(false);
                           setShowMethodologies(false);
+                          setShowData(false);
                           setShowGuidance(false);
                           setShowPreRelease(true);
                           setShowOtherReleases(false);
@@ -260,6 +306,7 @@ const PrototypeReleaseData = () => {
                           setShowMainRelease(false);
                           setShowMethodologies(false);
                           setShowGuidance(false);
+                          setShowData(false);
                           setShowPreRelease(false);
                           setShowOtherReleases(false);
                           setShowAllUpdates(false);
@@ -749,6 +796,9 @@ const PrototypeReleaseData = () => {
 
               {showMethodologies && (
                 <PrototypeSectionExamples sectionExample="methodologies" />
+              )}
+              {showData && (
+                <PrototypeSectionExamples sectionExample="explore2" />
               )}
               {showGuidance && (
                 <PrototypeSectionExamples sectionExample="guidance" />
