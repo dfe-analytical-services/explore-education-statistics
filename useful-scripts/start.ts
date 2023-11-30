@@ -74,6 +74,7 @@ const allowedServiceNames = [
   'frontend',
   'frontendProd',
   'processor',
+  'publicApiDb',
   'publicData',
   'publisher',
   'notifier',
@@ -165,6 +166,11 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
   dataStorage: {
     service: 'data-storage',
     colour: chalk.green,
+    type: 'docker',
+  },
+  publicApiDb: {
+    service: 'public-api-db',
+    colour: chalk.blue,
     type: 'docker',
   },
 };
