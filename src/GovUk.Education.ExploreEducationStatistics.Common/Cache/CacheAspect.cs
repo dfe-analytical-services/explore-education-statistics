@@ -7,7 +7,7 @@ using Aspects.Universal.Aspects;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
-    [Aspect(Scope.Global)]
+    [Aspect(Scope.PerInstance)]
     public class CacheAspect : BaseUniversalWrapperAspect
     {
         private const BindingFlags ConstructorBindingFlags =

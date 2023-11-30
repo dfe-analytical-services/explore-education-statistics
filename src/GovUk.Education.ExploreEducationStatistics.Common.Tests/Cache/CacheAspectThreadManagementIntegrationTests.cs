@@ -20,11 +20,7 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache;
 
-[Collection(CacheTestFixture.CollectionName)]
-public class CacheAspectThreadManagementIntegrationTests : 
-    IClassFixture<TestApplicationFactory<TestStartup>>,
-    IClassFixture<CacheTestFixture>,
-    IDisposable
+public class CacheAspectThreadManagementIntegrationTests : IntegrationTest<TestStartup>
 {
     // An artificial delay that we will add to dummy async sections of our test setup, including getting
     // cached items setting cached items and time spent in Controller methods. 
@@ -39,16 +35,8 @@ public class CacheAspectThreadManagementIntegrationTests :
     // milliseconds.
     private const int TaskDelayErrorToleranceMillis = 15;
 
-    private readonly WebApplicationFactory<TestStartup> _testApp;
-
-    public CacheAspectThreadManagementIntegrationTests(TestApplicationFactory<TestStartup> testApp)
+    public CacheAspectThreadManagementIntegrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
     {
-        _testApp = testApp;
-    }
-
-    public void Dispose()
-    {
-        BlobCacheAttribute.ClearServices();
     }
 
     /// <summary>

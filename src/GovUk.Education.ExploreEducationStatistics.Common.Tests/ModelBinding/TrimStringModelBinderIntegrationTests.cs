@@ -10,14 +10,10 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.ModelBinding;
 
-public class TrimStringModelBinderIntegrationTests
-    : IClassFixture<TestApplicationFactory<TestStartup>>
+public class TrimStringModelBinderIntegrationTests : IntegrationTest<TestStartup>
 {
-    private readonly WebApplicationFactory<TestStartup> _testApp;
-
-    public TrimStringModelBinderIntegrationTests(TestApplicationFactory<TestStartup> testApp)
+    public TrimStringModelBinderIntegrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
     {
-        _testApp = testApp;
     }
 
     [Fact]

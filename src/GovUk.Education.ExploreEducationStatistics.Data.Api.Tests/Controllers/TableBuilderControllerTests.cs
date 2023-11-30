@@ -9,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -35,9 +37,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    [Collection(CacheServiceTests)]
-    public class TableBuilderControllerTests : CacheServiceTestFixture,
-        IClassFixture<TestApplicationFactory<TestStartup>>
+    public class TableBuilderControllerTests : IntegrationTest<TestStartup>
     {
         private static readonly DataFixture Fixture = new();
 
@@ -131,11 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             },
         };
 
-        private readonly WebApplicationFactory<TestStartup> _testApp;
-
-        public TableBuilderControllerTests(TestApplicationFactory<TestStartup> testApp)
+        public TableBuilderControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
         {
-            _testApp = testApp;
         }
 
         [Fact]

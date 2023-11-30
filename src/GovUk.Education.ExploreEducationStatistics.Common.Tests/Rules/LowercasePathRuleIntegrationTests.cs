@@ -10,14 +10,10 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Rules;
 
-public class LowercasePathRuleIntegrationTests
-    : IClassFixture<TestApplicationFactory<TestStartup>>
+public class LowercasePathRuleIntegrationTests : IntegrationTest<TestStartup>
 {
-    private readonly WebApplicationFactory<TestStartup> _testApp;
-
-    public LowercasePathRuleIntegrationTests(TestApplicationFactory<TestStartup> testApp)
+    public LowercasePathRuleIntegrationTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
     {
-        _testApp = testApp;
     }
 
     [Fact]

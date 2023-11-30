@@ -17,7 +17,6 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    [Collection(CacheServiceTests)]
     public class ReleaseControllerTests : CacheServiceTestFixture
     {
         private const string PublicationSlug = "publication-a";
