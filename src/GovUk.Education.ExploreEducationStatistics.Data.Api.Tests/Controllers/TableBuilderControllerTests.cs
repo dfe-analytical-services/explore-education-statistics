@@ -575,7 +575,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             IReleaseRepository? releaseRepository = null,
             ITableBuilderService? tableBuilderService = null)
         {
-            return _testApp
+            return TestApp
                 .ResetDbContexts()
                 .ConfigureServices(
                     services =>

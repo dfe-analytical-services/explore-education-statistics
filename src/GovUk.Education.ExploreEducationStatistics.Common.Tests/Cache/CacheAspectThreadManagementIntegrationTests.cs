@@ -400,7 +400,7 @@ public class CacheAspectThreadManagementIntegrationTests : IntegrationTest<TestS
         IBlobCacheService blobCacheService,
         List<Event> events)
     {
-        var app = _testApp
+        var app = TestApp
             .ConfigureServices(services => services
                 .AddSingleton(_ => blobCacheService)
                 .AddSingleton(_ => events)

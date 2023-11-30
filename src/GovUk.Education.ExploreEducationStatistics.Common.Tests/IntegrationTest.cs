@@ -10,10 +10,10 @@ public abstract class IntegrationTest<TStartup> :
     IClassFixture<TestApplicationFactory<TStartup>>,
     IClassFixture<CacheTestFixture> where TStartup : class
 {
-    protected readonly WebApplicationFactory<TStartup> _testApp;
+    protected readonly WebApplicationFactory<TStartup> TestApp;
 
     protected IntegrationTest(TestApplicationFactory<TStartup> testApp)
     {
-        _testApp = testApp;
+        TestApp = testApp;
     }
 }

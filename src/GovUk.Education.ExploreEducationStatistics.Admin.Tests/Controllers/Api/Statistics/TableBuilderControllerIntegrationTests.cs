@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private WebApplicationFactory<TestStartup> SetupApp(
             ITableBuilderService? tableBuilderService = null)
         {
-            return _testApp.ConfigureServices(services =>
+            return TestApp.ConfigureServices(services =>
                 services.ReplaceService(tableBuilderService ?? Mock.Of<ITableBuilderService>(Strict)));
         }
     }

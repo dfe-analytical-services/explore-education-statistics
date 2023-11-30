@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
         private WebApplicationFactory<TestStartup> SetupApp(IReleaseFileService? releaseFileService = null)
         {
-            return _testApp
+            return TestApp
                 .ResetDbContexts()
                 .ConfigureServices(
                     services =>

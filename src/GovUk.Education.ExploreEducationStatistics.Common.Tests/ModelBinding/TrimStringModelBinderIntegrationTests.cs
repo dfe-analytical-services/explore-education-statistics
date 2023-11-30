@@ -76,7 +76,7 @@ public class TrimStringModelBinderIntegrationTests : IntegrationTest<TestStartup
 
     private WebApplicationFactory<TestStartup> SetupApp()
     {
-        return _testApp.WithWebHostBuilder(builder => builder
+        return TestApp.WithWebHostBuilder(builder => builder
             .WithAdditionalControllers(typeof(TestController)));
     }
 

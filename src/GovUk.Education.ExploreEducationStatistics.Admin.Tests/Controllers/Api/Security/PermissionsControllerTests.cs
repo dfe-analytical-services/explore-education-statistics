@@ -21,7 +21,7 @@ public class PermissionsControllerTests : IntegrationTest<TestStartup>
     [Fact]
     public async Task GetGlobalPermissions_AuthenticatedUser()
     {
-        var client = _testApp
+        var client = TestApp
             .SetUser(AuthenticatedUser())
             .CreateClient();
 
@@ -40,7 +40,7 @@ public class PermissionsControllerTests : IntegrationTest<TestStartup>
     [Fact]
     public async Task GetGlobalPermissions_BauUser()
     {
-        var client = _testApp
+        var client = TestApp
             .SetUser(BauUser())
             .CreateClient();
 
@@ -63,7 +63,7 @@ public class PermissionsControllerTests : IntegrationTest<TestStartup>
     {
         var user = AnalystUser();
 
-        var client = _testApp
+        var client = TestApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -101,7 +101,7 @@ public class PermissionsControllerTests : IntegrationTest<TestStartup>
     {
         var user = AnalystUser();
 
-        var client = _testApp
+        var client = TestApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -131,7 +131,7 @@ public class PermissionsControllerTests : IntegrationTest<TestStartup>
     {
         var user = AnalystUser();
 
-        var client = _testApp
+        var client = TestApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -159,7 +159,7 @@ public class PermissionsControllerTests : IntegrationTest<TestStartup>
     [Fact]
     public async Task GetGlobalPermissions_PreReleaseUser()
     {
-        var client = _testApp
+        var client = TestApp
             .SetUser(PreReleaseUser())
             .CreateClient();
 
@@ -178,7 +178,7 @@ public class PermissionsControllerTests : IntegrationTest<TestStartup>
     [Fact]
     public async Task GetGlobalPermissions_UnauthenticatedUser()
     {
-        var response = await _testApp.CreateClient().GetAsync("/api/permissions/access");
+        var response = await TestApp.CreateClient().GetAsync("/api/permissions/access");
         response.AssertUnauthorized();
     }
 }

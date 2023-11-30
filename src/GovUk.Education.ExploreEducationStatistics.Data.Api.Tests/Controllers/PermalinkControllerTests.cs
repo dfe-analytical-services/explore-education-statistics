@@ -186,7 +186,7 @@ public class PermalinkControllerTests : IntegrationTest<TestStartup>
 
     private WebApplicationFactory<TestStartup> SetupApp(IPermalinkService? permalinkService = null)
     {
-        return _testApp.ConfigureServices(
+        return TestApp.ConfigureServices(
             services =>
             {
                 services.AddTransient(_ => permalinkService ?? Mock.Of<IPermalinkService>(MockBehavior.Strict));
