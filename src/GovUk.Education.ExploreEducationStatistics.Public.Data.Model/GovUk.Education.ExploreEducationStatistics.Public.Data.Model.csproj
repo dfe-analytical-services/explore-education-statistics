@@ -8,9 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="JsonKnownTypes" Version="0.5.5" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.25" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.25" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="6.0.22" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
     </ItemGroup>
 
 </Project>
