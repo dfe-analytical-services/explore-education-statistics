@@ -17,8 +17,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [Required] public string OwningPublicationSlug { get; set; } = null!;
 
-        [Required] public string Slug { get; set; } = null!; // TODO: Remove in EES-4627
-
         public List<MethodologyVersion> Versions { get; set; } = new();
 
         public Guid? LatestPublishedVersionId { get; set; }

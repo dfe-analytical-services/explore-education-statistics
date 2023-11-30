@@ -16,12 +16,12 @@ describe('ReleaseDataGuidanceSection', () => {
   const testDataGuidance: ReleaseDataGuidance = {
     id: 'release-1',
     content: '<p>Test main content</p>',
-    subjects: [
+    dataSets: [
       {
-        id: 'subject-1',
-        name: 'Subject 1',
-        filename: 'subject-1.csv',
-        content: '<p>Test subject 1 content</p>',
+        fileId: 'file-1',
+        name: 'Data set 1',
+        filename: 'data-1.csv',
+        content: '<p>Test data set 1 content</p>',
         geographicLevels: ['Local authority', 'National'],
         timePeriods: {
           from: '2018',
@@ -43,10 +43,10 @@ describe('ReleaseDataGuidanceSection', () => {
         ],
       },
       {
-        id: 'subject-2',
-        name: 'Subject 2',
-        filename: 'subject-2.csv',
-        content: '<p>Test subject 2 content</p>',
+        fileId: 'file-2',
+        name: 'Data set 2',
+        filename: 'data-2.csv',
+        content: '<p>Test data set 2 content</p>',
         geographicLevels: ['Regional', 'Ward'],
         timePeriods: {
           from: '2020',
@@ -115,10 +115,10 @@ describe('ReleaseDataGuidanceSection', () => {
       );
     });
 
-    test('renders correct message when there are no subjects', async () => {
+    test('renders correct message when there are no data sets', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
         ...testDataGuidance,
-        subjects: [],
+        dataSets: [],
       });
 
       render(
@@ -140,7 +140,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(screen.queryAllByRole('accordionSection')).toHaveLength(0);
     });
 
-    test('renders existing guidance with subjects', async () => {
+    test('renders existing guidance with data sets', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
         testDataGuidance,
       );
@@ -159,109 +159,105 @@ describe('ReleaseDataGuidanceSection', () => {
         '<p>Test main content</p>',
       );
 
-      const subjects = screen.getAllByTestId('accordionSection');
+      const dataSets = screen.getAllByTestId('accordionSection');
 
-      // Subject 1
+      // Data set 1
 
-      const subject1 = within(subjects[0]);
+      const dataSet1 = within(dataSets[0]);
 
-      expect(subject1.getByTestId('Filename')).toHaveTextContent(
-        'subject-1.csv',
-      );
-      expect(subject1.getByTestId('Geographic levels')).toHaveTextContent(
+      expect(dataSet1.getByTestId('Filename')).toHaveTextContent('data-1.csv');
+      expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
-      expect(subject1.getByTestId('Time period')).toHaveTextContent(
+      expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
 
-      expect(subject1.getByLabelText('File guidance content')).toHaveValue(
-        '<p>Test subject 1 content</p>',
+      expect(dataSet1.getByLabelText('File guidance content')).toHaveValue(
+        '<p>Test data set 1 content</p>',
       );
 
       userEvent.click(
-        subject1.getByRole('button', {
+        dataSet1.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
       );
 
-      const subject1VariableRows = subject1.getAllByRole('row');
+      const dataSet1VariableRows = dataSet1.getAllByRole('row');
 
-      const subject1VariableRow1Cells = within(
-        subject1VariableRows[1],
+      const dataSet1VariableRow1Cells = within(
+        dataSet1VariableRows[1],
       ).getAllByRole('cell');
 
-      expect(subject1VariableRow1Cells[0]).toHaveTextContent('filter_1');
-      expect(subject1VariableRow1Cells[1]).toHaveTextContent('Filter 1');
+      expect(dataSet1VariableRow1Cells[0]).toHaveTextContent('filter_1');
+      expect(dataSet1VariableRow1Cells[1]).toHaveTextContent('Filter 1');
 
-      const subject1VariableRow2Cells = within(
-        subject1VariableRows[2],
+      const dataSet1VariableRow2Cells = within(
+        dataSet1VariableRows[2],
       ).getAllByRole('cell');
 
-      expect(subject1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
-      expect(subject1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
+      expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
+      expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      userEvent.click(subject1.getByRole('button', { name: 'Footnotes' }));
+      userEvent.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
 
-      const subject1Footnotes = within(
-        subject1.getByTestId('Footnotes'),
+      const dataSet1Footnotes = within(
+        dataSet1.getByTestId('Footnotes'),
       ).getAllByRole('listitem');
 
-      expect(subject1Footnotes).toHaveLength(2);
-      expect(subject1Footnotes[0]).toHaveTextContent('Footnote 1');
-      expect(subject1Footnotes[1]).toHaveTextContent('Footnote 2');
+      expect(dataSet1Footnotes).toHaveLength(2);
+      expect(dataSet1Footnotes[0]).toHaveTextContent('Footnote 1');
+      expect(dataSet1Footnotes[1]).toHaveTextContent('Footnote 2');
 
-      // Subject 2
+      // Data set 2
 
-      const subject2 = within(subjects[1]);
+      const dataSet2 = within(dataSets[1]);
 
-      expect(subject2.getByTestId('Filename')).toHaveTextContent(
-        'subject-2.csv',
-      );
-      expect(subject2.getByTestId('Geographic levels')).toHaveTextContent(
+      expect(dataSet2.getByTestId('Filename')).toHaveTextContent('data-2.csv');
+      expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
-      expect(subject2.getByTestId('Time period')).toHaveTextContent(
+      expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );
 
-      expect(subject2.getByLabelText('File guidance content')).toHaveValue(
-        '<p>Test subject 2 content</p>',
+      expect(dataSet2.getByLabelText('File guidance content')).toHaveValue(
+        '<p>Test data set 2 content</p>',
       );
 
       userEvent.click(
-        subject2.getByRole('button', {
+        dataSet2.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
       );
 
-      const subject2VariableRows = subject2.getAllByRole('row');
+      const dataSet2VariableRows = dataSet2.getAllByRole('row');
 
-      const subject2VariableRow1Cells = within(
-        subject2VariableRows[1],
+      const dataSet2VariableRow1Cells = within(
+        dataSet2VariableRows[1],
       ).getAllByRole('cell');
 
-      expect(subject2VariableRow1Cells[0]).toHaveTextContent('filter_2');
-      expect(subject2VariableRow1Cells[1]).toHaveTextContent('Filter 2');
+      expect(dataSet2VariableRow1Cells[0]).toHaveTextContent('filter_2');
+      expect(dataSet2VariableRow1Cells[1]).toHaveTextContent('Filter 2');
 
-      const subject2VariableRow2Cells = within(
-        subject2VariableRows[2],
+      const dataSet2VariableRow2Cells = within(
+        dataSet2VariableRows[2],
       ).getAllByRole('cell');
 
-      expect(subject2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
-      expect(subject2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
+      expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
+      expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      userEvent.click(subject2.getByRole('button', { name: 'Footnotes' }));
+      userEvent.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
 
-      const subject2Footnotes = within(
-        subject2.getByTestId('Footnotes'),
+      const dataSet2Footnotes = within(
+        dataSet2.getByTestId('Footnotes'),
       ).getAllByRole('listitem');
 
-      expect(subject2Footnotes).toHaveLength(1);
-      expect(subject2Footnotes[0]).toHaveTextContent('Footnote 3');
+      expect(dataSet2Footnotes).toHaveLength(1);
+      expect(dataSet2Footnotes[0]).toHaveTextContent('Footnote 3');
     });
 
-    test('renders correctly with subjects in preview mode', async () => {
+    test('renders correctly with data sets in preview mode', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
         testDataGuidance,
       );
@@ -292,126 +288,122 @@ describe('ReleaseDataGuidanceSection', () => {
       `,
       );
 
-      const subjects = screen.getAllByTestId('accordionSection');
+      const dataSets = screen.getAllByTestId('accordionSection');
 
-      // Subject 1
+      // Data set 1
 
-      const subject1 = within(subjects[0]);
+      const dataSet1 = within(dataSets[0]);
 
-      expect(subject1.getByTestId('Filename')).toHaveTextContent(
-        'subject-1.csv',
-      );
-      expect(subject1.getByTestId('Geographic levels')).toHaveTextContent(
+      expect(dataSet1.getByTestId('Filename')).toHaveTextContent('data-1.csv');
+      expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
-      expect(subject1.getByTestId('Time period')).toHaveTextContent(
+      expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
 
       expect(
-        subject1.queryByLabelText('File guidance content'),
+        dataSet1.queryByLabelText('File guidance content'),
       ).not.toBeInTheDocument();
 
       expect(
-        subject1.getByTestId('fileGuidanceContent').innerHTML,
+        dataSet1.getByTestId('fileGuidanceContent').innerHTML,
       ).toMatchInlineSnapshot(
         `
         <p>
-          Test subject 1 content
+          Test data set 1 content
         </p>
       `,
       );
 
       userEvent.click(
-        subject1.getByRole('button', {
+        dataSet1.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
       );
 
-      const subject1VariableRows = subject1.getAllByRole('row');
+      const dataSet1VariableRows = dataSet1.getAllByRole('row');
 
-      const subject1VariableRow1Cells = within(
-        subject1VariableRows[1],
+      const dataSet1VariableRow1Cells = within(
+        dataSet1VariableRows[1],
       ).getAllByRole('cell');
 
-      expect(subject1VariableRow1Cells[0]).toHaveTextContent('filter_1');
-      expect(subject1VariableRow1Cells[1]).toHaveTextContent('Filter 1');
+      expect(dataSet1VariableRow1Cells[0]).toHaveTextContent('filter_1');
+      expect(dataSet1VariableRow1Cells[1]).toHaveTextContent('Filter 1');
 
-      const subject1VariableRow2Cells = within(
-        subject1VariableRows[2],
+      const dataSet1VariableRow2Cells = within(
+        dataSet1VariableRows[2],
       ).getAllByRole('cell');
 
-      expect(subject1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
-      expect(subject1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
+      expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
+      expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      userEvent.click(subject1.getByRole('button', { name: 'Footnotes' }));
+      userEvent.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
 
-      const subject1Footnotes = within(
-        subject1.getByTestId('Footnotes'),
+      const dataSet1Footnotes = within(
+        dataSet1.getByTestId('Footnotes'),
       ).getAllByRole('listitem');
 
-      expect(subject1Footnotes).toHaveLength(2);
-      expect(subject1Footnotes[0]).toHaveTextContent('Footnote 1');
-      expect(subject1Footnotes[1]).toHaveTextContent('Footnote 2');
+      expect(dataSet1Footnotes).toHaveLength(2);
+      expect(dataSet1Footnotes[0]).toHaveTextContent('Footnote 1');
+      expect(dataSet1Footnotes[1]).toHaveTextContent('Footnote 2');
 
-      // Subject 2
+      // Data set 2
 
-      const subject2 = within(subjects[1]);
+      const dataSet2 = within(dataSets[1]);
 
-      expect(subject2.getByTestId('Filename')).toHaveTextContent(
-        'subject-2.csv',
-      );
-      expect(subject2.getByTestId('Geographic levels')).toHaveTextContent(
+      expect(dataSet2.getByTestId('Filename')).toHaveTextContent('data-2.csv');
+      expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
-      expect(subject2.getByTestId('Time period')).toHaveTextContent(
+      expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );
 
       expect(
-        subject2.queryByLabelText('File guidance content'),
+        dataSet2.queryByLabelText('File guidance content'),
       ).not.toBeInTheDocument();
 
       expect(
-        subject2.getByTestId('fileGuidanceContent').innerHTML,
+        dataSet2.getByTestId('fileGuidanceContent').innerHTML,
       ).toMatchInlineSnapshot(
         `
         <p>
-          Test subject 2 content
+          Test data set 2 content
         </p>
       `,
       );
 
       userEvent.click(
-        subject2.getByRole('button', {
+        dataSet2.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
       );
 
-      const subject2VariableRows = subject2.getAllByRole('row');
+      const dataSet2VariableRows = dataSet2.getAllByRole('row');
 
-      const subject2VariableRow1Cells = within(
-        subject2VariableRows[1],
+      const dataSet2VariableRow1Cells = within(
+        dataSet2VariableRows[1],
       ).getAllByRole('cell');
 
-      expect(subject2VariableRow1Cells[0]).toHaveTextContent('filter_2');
-      expect(subject2VariableRow1Cells[1]).toHaveTextContent('Filter 2');
+      expect(dataSet2VariableRow1Cells[0]).toHaveTextContent('filter_2');
+      expect(dataSet2VariableRow1Cells[1]).toHaveTextContent('Filter 2');
 
-      const subject2VariableRow2Cells = within(
-        subject2VariableRows[2],
+      const dataSet2VariableRow2Cells = within(
+        dataSet2VariableRows[2],
       ).getAllByRole('cell');
 
-      expect(subject2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
-      expect(subject2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
+      expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
+      expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      userEvent.click(subject2.getByRole('button', { name: 'Footnotes' }));
+      userEvent.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
 
-      const subject2Footnotes = within(
-        subject2.getByTestId('Footnotes'),
+      const dataSet2Footnotes = within(
+        dataSet2.getByTestId('Footnotes'),
       ).getAllByRole('listitem');
 
-      expect(subject2Footnotes).toHaveLength(1);
-      expect(subject2Footnotes[0]).toHaveTextContent('Footnote 3');
+      expect(dataSet2Footnotes).toHaveLength(1);
+      expect(dataSet2Footnotes[0]).toHaveTextContent('Footnote 3');
     });
 
     test('shows validation message when main guidance content is empty', async () => {
@@ -465,16 +457,16 @@ describe('ReleaseDataGuidanceSection', () => {
         expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
 
-      const subjects = screen.getAllByTestId('accordionSection');
-      const subject1 = within(subjects[0]);
+      const dataSets = screen.getAllByTestId('accordionSection');
+      const dataSet1 = within(dataSets[0]);
 
-      const fileGuidanceContent = subject1.getByLabelText(
+      const fileGuidanceContent = dataSet1.getByLabelText(
         'File guidance content',
       );
 
       expect(
         screen.queryByRole('link', {
-          name: 'Enter file guidance content for Subject 1',
+          name: 'Enter file guidance content for Data set 1',
         }),
       ).not.toBeInTheDocument();
 
@@ -484,13 +476,13 @@ describe('ReleaseDataGuidanceSection', () => {
       await waitFor(() => {
         expect(
           screen.getByRole('link', {
-            name: 'Enter file guidance content for Subject 1',
+            name: 'Enter file guidance content for Data set 1',
           }),
-        ).toHaveAttribute('href', '#dataGuidanceForm-subjects0Content');
+        ).toHaveAttribute('href', '#dataGuidanceForm-dataSets0Content');
 
         expect(fileGuidanceContent).toHaveAttribute(
           'id',
-          'dataGuidanceForm-subjects-0-content',
+          'dataGuidanceForm-dataSets-0-content',
         );
       });
     });
@@ -531,7 +523,7 @@ describe('ReleaseDataGuidanceSection', () => {
       });
     });
 
-    test('cannot submit with invalid subject content', async () => {
+    test('cannot submit with invalid data set content', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
         testDataGuidance,
       );
@@ -544,10 +536,10 @@ describe('ReleaseDataGuidanceSection', () => {
         expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
 
-      const subjects = screen.getAllByTestId('accordionSection');
+      const dataSets = screen.getAllByTestId('accordionSection');
 
       userEvent.clear(
-        within(subjects[0]).getByLabelText('File guidance content'),
+        within(dataSets[0]).getByLabelText('File guidance content'),
       );
 
       expect(
@@ -559,9 +551,9 @@ describe('ReleaseDataGuidanceSection', () => {
       await waitFor(() => {
         expect(
           screen.getByRole('link', {
-            name: 'Enter file guidance content for Subject 1',
+            name: 'Enter file guidance content for Data set 1',
           }),
-        ).toHaveAttribute('href', '#dataGuidanceForm-subjects0Content');
+        ).toHaveAttribute('href', '#dataGuidanceForm-dataSets0Content');
 
         expect(
           releaseDataGuidanceService.updateDataGuidance,
@@ -590,21 +582,21 @@ describe('ReleaseDataGuidanceSection', () => {
         '<p>Updated main guidance content</p>',
       );
 
-      const subjects = screen.getAllByTestId('accordionSection');
+      const dataSets = screen.getAllByTestId('accordionSection');
 
-      const subject1 = within(subjects[0]);
-      const subject2 = within(subjects[1]);
+      const dataSet1 = within(dataSets[0]);
+      const dataSet2 = within(dataSets[1]);
 
-      userEvent.clear(subject1.getByLabelText('File guidance content'));
+      userEvent.clear(dataSet1.getByLabelText('File guidance content'));
       await userEvent.type(
-        subject1.getByLabelText('File guidance content'),
-        '<p>Updated subject 1 guidance content</p>',
+        dataSet1.getByLabelText('File guidance content'),
+        '<p>Updated data set 1 guidance content</p>',
       );
 
-      userEvent.clear(subject2.getByLabelText('File guidance content'));
+      userEvent.clear(dataSet2.getByLabelText('File guidance content'));
       await userEvent.type(
-        subject2.getByLabelText('File guidance content'),
-        '<p>Updated subject 2 guidance content</p>',
+        dataSet2.getByLabelText('File guidance content'),
+        '<p>Updated data set 2 guidance content</p>',
       );
 
       // Not the right return value, but we'll just
@@ -627,14 +619,14 @@ describe('ReleaseDataGuidanceSection', () => {
           releaseDataGuidanceService.updateDataGuidance,
         ).toHaveBeenCalledWith('release-1', {
           content: '<p>Updated main guidance content</p>',
-          subjects: [
+          dataSets: [
             {
-              id: 'subject-1',
-              content: '<p>Updated subject 1 guidance content</p>',
+              fileId: 'file-1',
+              content: '<p>Updated data set 1 guidance content</p>',
             },
             {
-              id: 'subject-2',
-              content: '<p>Updated subject 2 guidance content</p>',
+              fileId: 'file-2',
+              content: '<p>Updated data set 2 guidance content</p>',
             },
           ],
         });
@@ -705,10 +697,10 @@ describe('ReleaseDataGuidanceSection', () => {
       });
     });
 
-    test('renders message when there are no subjects', async () => {
+    test('renders message when there are no data sets', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue({
         ...testDataGuidance,
-        subjects: [],
+        dataSets: [],
       });
 
       render(
@@ -733,7 +725,7 @@ describe('ReleaseDataGuidanceSection', () => {
       expect(screen.queryAllByRole('accordionSection')).toHaveLength(0);
     });
 
-    test('renders existing guidance with subjects', async () => {
+    test('renders existing guidance with data sets', async () => {
       releaseDataGuidanceService.getDataGuidance.mockResolvedValue(
         testDataGuidance,
       );
@@ -756,112 +748,108 @@ describe('ReleaseDataGuidanceSection', () => {
               </p>
           `);
 
-      const subjects = screen.getAllByTestId('accordionSection');
+      const dataSets = screen.getAllByTestId('accordionSection');
 
-      // Subject 1
+      // Data set 1
 
-      const subject1 = within(subjects[0]);
+      const dataSet1 = within(dataSets[0]);
 
-      expect(subject1.getByTestId('Filename')).toHaveTextContent(
-        'subject-1.csv',
-      );
-      expect(subject1.getByTestId('Geographic levels')).toHaveTextContent(
+      expect(dataSet1.getByTestId('Filename')).toHaveTextContent('data-1.csv');
+      expect(dataSet1.getByTestId('Geographic levels')).toHaveTextContent(
         'Local authority; National',
       );
-      expect(subject1.getByTestId('Time period')).toHaveTextContent(
+      expect(dataSet1.getByTestId('Time period')).toHaveTextContent(
         '2018 to 2019',
       );
 
-      expect(subject1.getByTestId('fileGuidanceContent').innerHTML)
+      expect(dataSet1.getByTestId('fileGuidanceContent').innerHTML)
         .toMatchInlineSnapshot(`
               <p>
-                Test subject 1 content
+                Test data set 1 content
               </p>
           `);
 
       userEvent.click(
-        subject1.getByRole('button', {
+        dataSet1.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
       );
 
-      const subject1VariableRows = subject1.getAllByRole('row');
+      const dataSet1VariableRows = dataSet1.getAllByRole('row');
 
-      const subject1VariableRow1Cells = within(
-        subject1VariableRows[1],
+      const dataSet1VariableRow1Cells = within(
+        dataSet1VariableRows[1],
       ).getAllByRole('cell');
 
-      expect(subject1VariableRow1Cells[0]).toHaveTextContent('filter_1');
-      expect(subject1VariableRow1Cells[1]).toHaveTextContent('Filter 1');
+      expect(dataSet1VariableRow1Cells[0]).toHaveTextContent('filter_1');
+      expect(dataSet1VariableRow1Cells[1]).toHaveTextContent('Filter 1');
 
-      const subject1VariableRow2Cells = within(
-        subject1VariableRows[2],
+      const dataSet1VariableRow2Cells = within(
+        dataSet1VariableRows[2],
       ).getAllByRole('cell');
 
-      expect(subject1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
-      expect(subject1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
+      expect(dataSet1VariableRow2Cells[0]).toHaveTextContent('indicator_1');
+      expect(dataSet1VariableRow2Cells[1]).toHaveTextContent('Indicator 1');
 
-      userEvent.click(subject1.getByRole('button', { name: 'Footnotes' }));
+      userEvent.click(dataSet1.getByRole('button', { name: 'Footnotes' }));
 
-      const subject1Footnotes = within(
-        subject1.getByTestId('Footnotes'),
+      const dataSet1Footnotes = within(
+        dataSet1.getByTestId('Footnotes'),
       ).getAllByRole('listitem');
 
-      expect(subject1Footnotes).toHaveLength(2);
-      expect(subject1Footnotes[0]).toHaveTextContent('Footnote 1');
-      expect(subject1Footnotes[1]).toHaveTextContent('Footnote 2');
+      expect(dataSet1Footnotes).toHaveLength(2);
+      expect(dataSet1Footnotes[0]).toHaveTextContent('Footnote 1');
+      expect(dataSet1Footnotes[1]).toHaveTextContent('Footnote 2');
 
-      // Subject 2
+      // Data set 2
 
-      const subject2 = within(subjects[1]);
+      const dataSet2 = within(dataSets[1]);
 
-      expect(subject2.getByTestId('Filename')).toHaveTextContent(
-        'subject-2.csv',
-      );
-      expect(subject2.getByTestId('Geographic levels')).toHaveTextContent(
+      expect(dataSet2.getByTestId('Filename')).toHaveTextContent('data-2.csv');
+      expect(dataSet2.getByTestId('Geographic levels')).toHaveTextContent(
         'Regional; Ward',
       );
-      expect(subject2.getByTestId('Time period')).toHaveTextContent(
+      expect(dataSet2.getByTestId('Time period')).toHaveTextContent(
         '2020 to 2021',
       );
 
-      expect(subject2.getByTestId('fileGuidanceContent').innerHTML)
+      expect(dataSet2.getByTestId('fileGuidanceContent').innerHTML)
         .toMatchInlineSnapshot(`
               <p>
-                Test subject 2 content
+                Test data set 2 content
               </p>
           `);
 
       userEvent.click(
-        subject2.getByRole('button', {
+        dataSet2.getByRole('button', {
           name: 'Variable names and descriptions',
         }),
       );
 
-      const subject2VariableRows = subject2.getAllByRole('row');
+      const dataSet2VariableRows = dataSet2.getAllByRole('row');
 
-      const subject2VariableRow1Cells = within(
-        subject2VariableRows[1],
+      const dataSet2VariableRow1Cells = within(
+        dataSet2VariableRows[1],
       ).getAllByRole('cell');
 
-      expect(subject2VariableRow1Cells[0]).toHaveTextContent('filter_2');
-      expect(subject2VariableRow1Cells[1]).toHaveTextContent('Filter 2');
+      expect(dataSet2VariableRow1Cells[0]).toHaveTextContent('filter_2');
+      expect(dataSet2VariableRow1Cells[1]).toHaveTextContent('Filter 2');
 
-      const subject2VariableRow2Cells = within(
-        subject2VariableRows[2],
+      const dataSet2VariableRow2Cells = within(
+        dataSet2VariableRows[2],
       ).getAllByRole('cell');
 
-      expect(subject2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
-      expect(subject2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
+      expect(dataSet2VariableRow2Cells[0]).toHaveTextContent('indicator_2');
+      expect(dataSet2VariableRow2Cells[1]).toHaveTextContent('Indicator 2');
 
-      userEvent.click(subject2.getByRole('button', { name: 'Footnotes' }));
+      userEvent.click(dataSet2.getByRole('button', { name: 'Footnotes' }));
 
-      const subject2Footnotes = within(
-        subject2.getByTestId('Footnotes'),
+      const dataSet2Footnotes = within(
+        dataSet2.getByTestId('Footnotes'),
       ).getAllByRole('listitem');
 
-      expect(subject2Footnotes).toHaveLength(1);
-      expect(subject2Footnotes[0]).toHaveTextContent('Footnote 3');
+      expect(dataSet2Footnotes).toHaveLength(1);
+      expect(dataSet2Footnotes[0]).toHaveTextContent('Footnote 3');
     });
   });
 });

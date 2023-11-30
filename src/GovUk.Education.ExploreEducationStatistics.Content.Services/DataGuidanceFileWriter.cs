@@ -21,28 +21,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private const string VariableSeparator = "  |  ";
 
         private readonly ContentDbContext _contentDbContext;
-        private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
+        private readonly IDataGuidanceDataSetService _dataGuidanceDataSetService;
 
         public DataGuidanceFileWriter(
             ContentDbContext contentDbContext,
-            IDataGuidanceSubjectService dataGuidanceSubjectService)
+            IDataGuidanceDataSetService dataGuidanceDataSetService)
         {
             _contentDbContext = contentDbContext;
-            _dataGuidanceSubjectService = dataGuidanceSubjectService;
+            _dataGuidanceDataSetService = dataGuidanceDataSetService;
         }
 
-        public async Task<Stream> WriteToStream(Stream stream, Release release, IEnumerable<Guid>? subjectIds = null)
+        public async Task<Stream> WriteToStream(Stream stream, Release release, IList<Guid>? dataFileIds = null)
         {
             // Make sure publication has been hydrated
             await _contentDbContext.Entry(release)
                 .Reference(r => r.Publication)
                 .LoadAsync();
 
-            var subjects = await ListSubjects(release, subjectIds);
+            var dataSets = await ListDataSets(release, dataFileIds);
 
             await using var file = new StreamWriter(stream, leaveOpen: stream.CanRead);
 
-            await DoWrite(file, release, subjects);
+            await DoWrite(file, release, dataSets);
 
             await file.FlushAsync();
 
@@ -54,24 +54,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return stream;
         }
 
-        private async Task<List<DataGuidanceSubjectViewModel>> ListSubjects(
+        private async Task<List<DataGuidanceDataSetViewModel>> ListDataSets(
             Release release,
-            IEnumerable<Guid>? subjectIds = null)
+            IList<Guid>? dataFileIds = null)
         {
-            var subjects = await _dataGuidanceSubjectService.GetSubjects(release.Id, subjectIds);
+            var dataSets = await _dataGuidanceDataSetService.ListDataSets(release.Id, dataFileIds);
 
-            if (subjects.IsLeft)
+            if (dataSets.IsLeft)
             {
-                throw new ArgumentException($"Could not find subjects for release: {release.Id}");
+                throw new ArgumentException($"Could not find data sets for release: {release.Id}");
             }
 
-            return subjects.Right;
+            return dataSets.Right;
         }
 
         private static async Task DoWrite(
             TextWriter file,
             Release release,
-            IList<DataGuidanceSubjectViewModel> subjects)
+            IList<DataGuidanceDataSetViewModel> dataSets)
         {
             // Add header information including publication/release title
             await file.WriteLineAsync(release.Publication.Title);
@@ -93,12 +93,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 await file.WriteLineAsync();
             }
 
-            await WriteDataFiles(file, subjects);
+            await WriteDataFiles(file, dataSets);
         }
 
-        private static async Task WriteDataFiles(TextWriter file, IList<DataGuidanceSubjectViewModel> subjects)
+        private static async Task WriteDataFiles(TextWriter file, IList<DataGuidanceDataSetViewModel> dataSets)
         {
-            if (subjects.Count == 0)
+            if (dataSets.Count == 0)
             {
                 return;
             }
@@ -108,36 +108,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             await file.WriteLineAsync("Data files");
             await file.WriteLineAsync();
 
-            await subjects
+            await dataSets
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(
-                    async (subject, index) =>
+                    async (dataSet, index) =>
                     {
-                        await file.WriteLineAsync(subject.Name);
+                        await file.WriteLineAsync(dataSet.Name);
                         await file.WriteLineAsync();
 
-                        await file.WriteLineAsync("Filename: " + subject.Filename);
+                        await file.WriteLineAsync("Filename: " + dataSet.Filename);
 
-                        if (subject.GeographicLevels.Any())
+                        if (dataSet.GeographicLevels.Any())
                         {
                             await file.WriteLineAsync("Geographic levels: " +
-                                                      string.Join("; ", subject.GeographicLevels));
+                                                      string.Join("; ", dataSet.GeographicLevels));
                         }
 
-                        var timePeriodsLabel = subject.TimePeriods.ToLabel();
+                        var timePeriodsLabel = dataSet.TimePeriods.ToLabel();
 
                         if (!timePeriodsLabel.IsNullOrWhitespace())
                         {
                             await file.WriteLineAsync($"Time period: {timePeriodsLabel}");
                         }
 
-                        if (!subject.Content.IsNullOrWhitespace())
+                        if (!dataSet.Content.IsNullOrWhitespace())
                         {
-                            var content = await HtmlToTextUtils.HtmlToText(subject.Content);
+                            var content = await HtmlToTextUtils.HtmlToText(dataSet.Content);
                             await file.WriteLineAsync($"Content summary: {content}");
                         }
 
-                        var variables = subject.Variables
+                        var variables = dataSet.Variables
                             .Where(
                                 variable =>
                                     !variable.Label.IsNullOrWhitespace()
@@ -194,10 +194,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                                 );
                         }
 
-                        await WriteFootnotes(file, subject);
+                        await WriteFootnotes(file, dataSet);
 
                         // Add some extra lines between data files
-                        if (index < subjects.Count - 1)
+                        if (index < dataSets.Count - 1)
                         {
                             await file.WriteLineAsync();
                             await file.WriteLineAsync();
@@ -206,9 +206,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 );
         }
 
-        private static async Task WriteFootnotes(TextWriter file, DataGuidanceSubjectViewModel subject)
+        private static async Task WriteFootnotes(TextWriter file, DataGuidanceDataSetViewModel dataSet)
         {
-            var footnotes = subject.Footnotes
+            var footnotes = dataSet.Footnotes
                 .Where(footnote => !footnote.Label.IsNullOrWhitespace())
                 .ToList();
 

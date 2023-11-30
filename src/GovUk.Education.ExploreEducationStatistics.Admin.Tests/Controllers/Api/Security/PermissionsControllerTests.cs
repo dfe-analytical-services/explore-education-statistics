@@ -12,10 +12,11 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Uti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
+[Collection(CacheServiceTestFixture.CacheServiceTests)]
 public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<TestStartup>>
 {
     private readonly WebApplicationFactory<TestStartup> _testApp;
-    
+
     public PermissionsControllerTests(TestApplicationFactory<TestStartup> testApp)
     {
         _testApp = testApp;
@@ -27,9 +28,9 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
         var client = _testApp
             .SetUser(AuthenticatedUser())
             .CreateClient();
-        
+
         var response = await client.GetAsync("/api/permissions/access");
-        
+
         response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: false,
@@ -39,16 +40,16 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
             IsBauUser: false,
             IsApprover: false));
     }
-    
+
     [Fact]
     public async Task GetGlobalPermissions_BauUser()
     {
         var client = _testApp
             .SetUser(BauUser())
             .CreateClient();
-        
+
         var response = await client.GetAsync("/api/permissions/access");
-        
+
         response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: true,
@@ -60,7 +61,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
             // individual Approver roles on Releases or Publications.
             IsApprover: false));
     }
-    
+
     [Fact]
     public async Task GetGlobalPermissions_AnalystUser_NotReleaseOrPublicationApprover()
     {
@@ -76,7 +77,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
                     UserId = user.GetUserId(),
                     Role = ReleaseRole.Contributor
                 });
-                
+
                 // Add test data that gives the user access to a Publication without being an Approver.
                 context.UserPublicationRoles.Add(new UserPublicationRole
                 {
@@ -85,9 +86,9 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
                 });
             })
             .CreateClient();
-        
+
         var response = await client.GetAsync("/api/permissions/access");
-        
+
         response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: true,
@@ -98,7 +99,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
             // Expect this to be false if the user isn't an approver of any kind
             IsApprover: false));
     }
-    
+
     [Fact]
     public async Task GetGlobalPermissions_AnalystUser_ReleaseApprover()
     {
@@ -115,9 +116,9 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
                 });
             })
             .CreateClient();
-        
+
         var response = await client.GetAsync("/api/permissions/access");
-        
+
         response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: true,
@@ -145,9 +146,9 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
                 });
             })
             .CreateClient();
-        
+
         var response = await client.GetAsync("/api/permissions/access");
-        
+
         response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: true,
@@ -165,9 +166,9 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
         var client = _testApp
             .SetUser(PreReleaseUser())
             .CreateClient();
-        
+
         var response = await client.GetAsync("/api/permissions/access");
-        
+
         response.AssertOk(new GlobalPermissionsViewModel(
             CanAccessSystem: true,
             CanAccessAnalystPages: false,
@@ -177,7 +178,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
             IsBauUser: false,
             IsApprover: false));
     }
-    
+
     [Fact]
     public async Task GetGlobalPermissions_UnauthenticatedUser()
     {

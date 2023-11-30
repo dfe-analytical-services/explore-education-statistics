@@ -536,7 +536,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<ILocationRepository, LocationRepository>();
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
-            services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
+            services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
             services.AddTransient<IContentSectionRepository, ContentSectionRepository>();
@@ -559,6 +559,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient<IReleaseFileBlobService, PrivateReleaseFileBlobService>();
+
+            services.AddTransient<IDataGuidanceMigrationService, DataGuidanceMigrationService>();
 
             services.AddSingleton<IPrivateBlobStorageService, PrivateBlobStorageService>();
             services.AddSingleton<IPublicBlobStorageService, PublicBlobStorageService>();

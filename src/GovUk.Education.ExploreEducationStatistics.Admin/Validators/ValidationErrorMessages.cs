@@ -75,7 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         MetaFileIsIncorrectlyNamed,
 
         // Data replacement
-        ReplacementFileTypesMustBeData,
         ReplacementMustBeValid,
 
         // Release
@@ -101,6 +100,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         RelatedDashboardsSectionContainsEmptyHtmlBlock,
         ReleaseMustContainKeyStatOrNonEmptyHeadlineBlock,
         SummarySectionContainsEmptyHtmlBlock,
+
+        // Data guidance
+        DataGuidanceDataSetNotAttachedToRelease,
 
         // Release checklist warnings
         NoMethodology,

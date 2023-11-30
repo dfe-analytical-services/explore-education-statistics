@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();
-            services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
+            services.AddTransient<IDataGuidanceDataSetService, DataGuidanceDataSetService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
             services.AddTransient<IPermalinkCsvMetaService, PermalinkCsvMetaService>();

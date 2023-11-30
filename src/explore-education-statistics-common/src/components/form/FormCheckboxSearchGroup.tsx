@@ -20,13 +20,17 @@ export interface FormCheckboxSearchGroupProps extends FormCheckboxGroupProps {
 
 const FormCheckboxSearchGroup = ({
   searchLabel,
+  searchOnly = false,
   ...props
 }: FormCheckboxSearchGroupProps) => {
   const { isMounted } = useMounted();
 
   const [searchTerm, setSearchTerm] = useState('');
 
-  if (!isMounted) {
+  // searchOnly is used when we expect a very large number
+  // of options which would cause very slow rendering
+  // if they were all rendered.
+  if (!isMounted && !searchOnly) {
     return <FormCheckboxGroup {...props} />;
   }
 
@@ -42,7 +46,6 @@ const FormCheckboxSearchGroup = ({
     name,
     options = [],
     searchHelpText,
-    searchOnly = false,
     value = [],
     onFieldsetFocus,
     onFieldsetBlur,
@@ -65,7 +68,6 @@ const FormCheckboxSearchGroup = ({
   let filteredOptions = searchOnly
     ? options.filter(option => value.includes(option.value))
     : options;
-
   if (searchTerm) {
     // Search for URN in the hint field if search term is a number.
     if (searchOnly && !Number.isNaN(Number(searchTerm))) {

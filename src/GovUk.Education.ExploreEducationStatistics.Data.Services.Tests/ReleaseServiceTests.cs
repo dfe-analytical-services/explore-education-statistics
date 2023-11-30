@@ -19,6 +19,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static Moq.MockBehavior;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 1"
+                DataGuidance = "Data set 1 guidance"
 
             };
 
@@ -42,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 2"
+                DataGuidance = "Data set 2 guidance"
             };
 
             var subject1Filter1 = new Filter
@@ -115,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile1 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 1",
+                Name = "Data set 1",
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -123,19 +124,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
                 },
+                Summary = "Data set 1 guidance"
             };
 
             var releaseFile2 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 2",
+                Name = "Data set 2",
                 File = new File
                 {
                     Filename = "data2.csv",
                     ContentLength = 20480,
                     Type = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
-                }
+                },
+                Summary = "Data set 2 guidance"
             };
 
             var import1 = new DataImport
@@ -161,8 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
-                var timePeriodService = new Mock<ITimePeriodService>();
+                var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+                var timePeriodService = new Mock<ITimePeriodService>(Strict);
 
                 timePeriodService
                     .Setup(s => s.GetTimePeriodLabels(releaseSubject1.SubjectId))
@@ -172,24 +175,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(s => s.GetTimePeriodLabels(releaseSubject2.SubjectId))
                     .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
 
-                dataGuidanceSubjectService
-                    .Setup(s => s.GetGeographicLevels(releaseSubject1.SubjectId))
+                dataGuidanceDataSetService
+                    .Setup(s => s.ListGeographicLevels(releaseSubject1.SubjectId, default))
                     .ReturnsAsync(ListOf("Local Authority", "Local Authority District"));
 
-                dataGuidanceSubjectService
-                    .Setup(s => s.GetGeographicLevels(releaseSubject2.SubjectId))
+                dataGuidanceDataSetService
+                    .Setup(s => s.ListGeographicLevels(releaseSubject2.SubjectId, default))
                     .ReturnsAsync(ListOf("National"));
 
                 var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
                     timePeriodService: timePeriodService.Object
                 );
 
                 var result = await service.ListSubjects(contentRelease.Id);
 
-                MockUtils.VerifyAllMocks(dataGuidanceSubjectService, timePeriodService);
+                MockUtils.VerifyAllMocks(dataGuidanceDataSetService, timePeriodService);
 
                 var subjects = result.AssertRight();
 
@@ -341,12 +344,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+
+            dataGuidanceDataSetService
+                .Setup(s => s.ListGeographicLevels(It.IsAny<Guid>(), default))
+                .ReturnsAsync(new List<string>());
+
+            timePeriodService
+                .Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>()))
+                .ReturnsAsync(new TimePeriodLabels());
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext
+                    statisticsDbContext: statisticsDbContext,
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
+                    timePeriodService: timePeriodService.Object
                 );
 
                 var result = await service.ListSubjects(contentRelease.Id);
@@ -441,12 +457,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+
+            dataGuidanceDataSetService
+                .Setup(s => s.ListGeographicLevels(It.IsAny<Guid>(), default))
+                .ReturnsAsync(new List<string>());
+
+            timePeriodService
+                .Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>()))
+                .ReturnsAsync(new TimePeriodLabels());
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext
+                    statisticsDbContext: statisticsDbContext,
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
+                    timePeriodService: timePeriodService.Object
                 );
 
                 var result = await service.ListSubjects(contentRelease.Id);
@@ -578,7 +607,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 1",
                 FilterSequence = new List<FilterSequenceEntry>
                 {
                     new (subject1Filter2Id, new List<FilterGroupSequenceEntry>()),
@@ -660,12 +688,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+
+            dataGuidanceDataSetService
+                .Setup(s => s.ListGeographicLevels(It.IsAny<Guid>(), default))
+                .ReturnsAsync(new List<string>());
+
+            timePeriodService
+                .Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>()))
+                .ReturnsAsync(new TimePeriodLabels());
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext
+                    statisticsDbContext: statisticsDbContext,
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
+                    timePeriodService: timePeriodService.Object
                 );
 
                 var result = await service.ListSubjects(contentRelease.Id);
@@ -704,7 +745,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 1",
                 IndicatorSequence = new List<IndicatorGroupSequenceEntry>
                 {
                     new(Guid.NewGuid(), new List<Guid> { subject1Indicator2.Id, subject1Indicator1.Id, }),
@@ -778,12 +818,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
+            var dataGuidanceDataSetService = new Mock<IDataGuidanceDataSetService>(Strict);
+            var timePeriodService = new Mock<ITimePeriodService>(Strict);
+
+            dataGuidanceDataSetService
+                .Setup(s => s.ListGeographicLevels(It.IsAny<Guid>(), default))
+                .ReturnsAsync(new List<string>());
+
+            timePeriodService
+                .Setup(s => s.GetTimePeriodLabels(It.IsAny<Guid>()))
+                .ReturnsAsync(new TimePeriodLabels());
+
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext
+                    statisticsDbContext: statisticsDbContext,
+                    dataGuidanceDataSetService: dataGuidanceDataSetService.Object,
+                    timePeriodService: timePeriodService.Object
                 );
 
                 var result = await service.ListSubjects(contentRelease.Id);
@@ -1192,7 +1245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
-            IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
+            IDataGuidanceDataSetService? dataGuidanceDataSetService = null,
             ITimePeriodService? timePeriodService = null)
         {
             return new ReleaseService(
@@ -1200,8 +1253,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
-                timePeriodService ?? Mock.Of<ITimePeriodService>()
+                dataGuidanceDataSetService ?? Mock.Of<IDataGuidanceDataSetService>(Strict),
+                timePeriodService ?? Mock.Of<ITimePeriodService>(Strict)
             );
         }
     }
