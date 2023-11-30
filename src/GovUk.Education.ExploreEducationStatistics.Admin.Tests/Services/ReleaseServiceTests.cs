@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -47,6 +46,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             Id = Guid.NewGuid()
         };
+
+        [Fact]
+        public async Task CreateRelease_ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
+        {
+            var releaseCreateRequest = new ReleaseCreateRequest
+            {
+                Type = ReleaseType.ExperimentalStatistics,
+            };
+
+            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+
+            var result = await releaseService.CreateRelease(releaseCreateRequest);
+
+            result.AssertBadRequest(ReleaseTypeInvalid);
+        }
+
+        [Fact]
+        public async Task UpdateRelease_ReleaseTypeExperimentalStatistics_ReturnsValidationActionResult()
+        {
+            var releaseUpdateRequest = new ReleaseUpdateRequest
+            {
+                Type = ReleaseType.ExperimentalStatistics,
+            };
+
+            var releaseService = BuildReleaseService(Mock.Of<ContentDbContext>());
+
+            var result = await releaseService.UpdateRelease(It.IsAny<Guid>(), releaseUpdateRequest);
+
+            result.AssertBadRequest(ReleaseTypeInvalid);
+        }
 
         [Fact]
         public async Task CreateReleaseNoTemplate()
@@ -203,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            Guid newReleaseId = Guid.Empty;
+            var newReleaseId = Guid.Empty;
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
@@ -1872,9 +1901,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 dataImportService ?? Mock.Of<IDataImportService>(Strict),
-                footnoteService ?? Mock.Of<IFootnoteService>(Strict),
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(Strict),
-                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
                 dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
                 new SequentialGuidGenerator(),

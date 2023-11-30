@@ -5,55 +5,86 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { FormFieldset } from '@common/components/form';
-import Form from '@common/components/form/Form';
-import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
-import FormFieldRadioGroup from '@common/components/form/FormFieldRadioGroup';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
 import { SelectOption } from '@common/components/form/FormSelect';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
+import { IdTitlePair } from '@admin/services/types/common';
 import Yup from '@common/validation/yup';
-import { Formik, FormikHelpers } from 'formik';
-import React, { ReactNode } from 'react';
+import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
+import { mapFieldErrors } from '@common/validation/serverValidations';
 
 export interface ReleaseSummaryFormValues {
+  releaseType?: ReleaseType;
+  templateReleaseId?: string;
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
-  releaseType?: ReleaseType;
 }
 
 const formId = 'releaseSummaryForm';
 
-interface Props<FormValues extends ReleaseSummaryFormValues> {
-  additionalFields?: ReactNode;
+const errorMappings = [
+  mapFieldErrors<ReleaseSummaryFormValues>({
+    target: 'timePeriodCoverageStartYear',
+    messages: {
+      SlugNotUnique:
+        'Choose a unique combination of time period and start year',
+    },
+  }),
+];
+
+interface Props {
   submitText: string;
-  initialValues: (
-    timePeriodCoverageGroups: TimePeriodCoverageGroup[],
-  ) => FormValues;
-  validationSchema?: (
-    baseSchema: ObjectSchema<ReleaseSummaryFormValues>,
-  ) => ObjectSchema<FormValues | ReleaseSummaryFormValues>;
-  onSubmit: (values: FormValues, actions: FormikHelpers<FormValues>) => void;
+  templateRelease?: IdTitlePair;
+  initialValues: ReleaseSummaryFormValues;
+  onSubmit: (values: ReleaseSummaryFormValues) => Promise<void> | void;
   onCancel: () => void;
 }
 
-const ReleaseSummaryForm = <
-  FormValues extends ReleaseSummaryFormValues = ReleaseSummaryFormValues,
->({
-  additionalFields,
-  submitText,
+export default function ReleaseSummaryForm({
   initialValues,
-  validationSchema,
+  submitText,
+  templateRelease,
   onSubmit,
   onCancel,
-}: Props<FormValues>) => {
+}: Props) {
   const { value: timePeriodCoverageGroups, isLoading } = useAsyncRetry<
     TimePeriodCoverageGroup[]
   >(() => metaService.getTimePeriodCoverageGroups());
+
+  // Can't create new releases with type Experimental statistics.
+  const permittedReleaseTypes = useMemo(
+    () =>
+      (Object.keys(releaseTypes) as ReleaseType[]).filter(type =>
+        type === 'ExperimentalStatistics'
+          ? initialValues.releaseType === 'ExperimentalStatistics'
+          : true,
+      ),
+    [initialValues.releaseType],
+  );
+
+  const validationSchema = useMemo<
+    ObjectSchema<ReleaseSummaryFormValues>
+  >(() => {
+    return Yup.object({
+      timePeriodCoverageCode: Yup.string().required('Choose a time period'),
+      timePeriodCoverageStartYear: Yup.string()
+        .required('Enter a year')
+        .length(4, 'Year must be exactly 4 characters'),
+      releaseType: Yup.string()
+        .required('Choose a release type')
+        .oneOf(permittedReleaseTypes),
+      templateReleaseId: Yup.string(),
+    });
+  }, [permittedReleaseTypes]);
 
   if (isLoading) {
     return <LoadingSpinner />;
@@ -84,43 +115,33 @@ const ReleaseSummaryForm = <
       ) || timePeriodCoverageGroups[0]
     );
   };
-  const baseSchema: ObjectSchema<ReleaseSummaryFormValues> = Yup.object({
-    timePeriodCoverageCode: Yup.string().required('Choose a time period'),
-    timePeriodCoverageStartYear: Yup.string()
-      .required('Enter a year')
-      .length(4, 'Year must be exactly 4 characters'),
-    releaseType: Yup.string()
-      .required('Choose a release type')
-      .oneOf(Object.keys(releaseTypes) as ReleaseType[]),
-  });
+
   return (
-    <Formik<FormValues>
+    <FormProvider
       enableReinitialize
-      initialValues={initialValues(timePeriodCoverageGroups)}
-      validationSchema={
-        validationSchema ? validationSchema(baseSchema) : baseSchema
-      }
-      onSubmit={onSubmit}
+      errorMappings={errorMappings}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
     >
-      {form => {
+      {({ getValues }) => {
         const timePeriodLabel =
-          findTimePeriodCoverageGroup(form.values.timePeriodCoverageCode)
+          findTimePeriodCoverageGroup(getValues('timePeriodCoverageCode'))
             ?.category.label ?? '';
 
         return (
-          <Form id={formId}>
+          <RHFForm id={formId} onSubmit={onSubmit}>
             <FormFieldset
               hint="For 6 digit years, enter only the first four digits in this box e.g. for 2017/18, only enter 2017."
               id="timePeriodCoverage"
               legend="Select time period coverage"
               legendSize="m"
             >
-              <FormFieldSelect<ReleaseSummaryFormValues>
+              <RHFFormFieldSelect<ReleaseSummaryFormValues>
                 label="Type"
                 name="timePeriodCoverageCode"
                 optGroups={timePeriodOptions}
               />
-              <FormFieldNumberInput<ReleaseSummaryFormValues>
+              <RHFFormFieldNumberInput<ReleaseSummaryFormValues>
                 name="timePeriodCoverageStartYear"
                 label={`
                       ${
@@ -138,29 +159,38 @@ const ReleaseSummaryForm = <
                 width={4}
               />
             </FormFieldset>
-
-            <FormFieldRadioGroup<ReleaseSummaryFormValues>
+            <RHFFormFieldRadioGroup<ReleaseSummaryFormValues>
               legend="Release type"
               name="releaseType"
-              options={(Object.keys(releaseTypes) as ReleaseType[]).map(
-                type => ({
-                  label: releaseTypes[type],
-                  value: type,
-                }),
-              )}
+              options={permittedReleaseTypes.map(type => ({
+                label: releaseTypes[type],
+                value: type,
+              }))}
             />
 
-            {additionalFields}
-
+            {templateRelease && (
+              <RHFFormFieldRadioGroup<ReleaseSummaryFormValues>
+                legend="Select template"
+                name="templateReleaseId"
+                options={[
+                  {
+                    label: 'Create new template',
+                    value: 'new',
+                  },
+                  {
+                    label: `Copy existing template (${templateRelease.title})`,
+                    value: `${templateRelease.id}`,
+                  },
+                ]}
+              />
+            )}
             <ButtonGroup>
               <Button type="submit">{submitText}</Button>
               <ButtonText onClick={onCancel}>Cancel</ButtonText>
             </ButtonGroup>
-          </Form>
+          </RHFForm>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
-};
-
-export default ReleaseSummaryForm;
+}

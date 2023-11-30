@@ -114,8 +114,7 @@ Add text block with content to Test section two
 
 Add content to text block in Related dashboards section
     user opens accordion section    View related dashboard(s)    id:data-accordion
-    user adds content to autosaving text block    id:related-dashboards-content
-    ...    Related dashboards test text
+    user adds content to related dashboards text block    Related dashboards test text
 
 Validate checklist errors and warnings after adding content to text blocks
     user edits release status

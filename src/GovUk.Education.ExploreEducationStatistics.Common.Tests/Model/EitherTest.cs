@@ -151,6 +151,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
 
         [Fact]
+        public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsLeft_SecondEitherIsRight_ReturnsLeft()
+        {
+            var result =
+                await new Either<int, string>(1)
+                    .OnSuccess(() =>
+                        Task.FromResult(new Either<int, string>("either 2")));
+
+            result.AssertLeft(1);
+        }
+
+        [Fact]
+        public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsLeft_SecondEitherIsLeft_ReturnsFirstLeft()
+        {
+            var result =
+                await new Either<int, string>(1)
+                    .OnSuccess(() =>
+                        Task.FromResult(new Either<int, string>(2)));
+
+            result.AssertLeft(1);
+        }
+
+        [Fact]
+        public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsRight_SecondEitherIsLeft_ReturnsLeft()
+        {
+            var result =
+                await new Either<int, string>("either1")
+                    .OnSuccess(() =>
+                        Task.FromResult(new Either<int, string>(2)));
+
+            result.AssertLeft(2);
+        }
+
+        [Fact]
+        public async Task OnSuccess_WithEitherTaskNoInputParameters_FirstEitherIsRight_SecondEitherIsRight_ReturnsSecondRight()
+        {
+            var result =
+                await new Either<int, string>("either1")
+                    .OnSuccess(() =>
+                        Task.FromResult(new Either<int, string>("either2")));
+
+            result.AssertRight("either2");
+        }
+
+        [Fact]
         public async Task OnSuccess_WithEitherTask()
         {
             var result =

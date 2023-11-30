@@ -22,16 +22,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public string? Summary { get; set; }
 
         public int Order { get; set; }
-
-        public ReleaseFile CreateReleaseAmendment(Release amendment)
-        {
-            var copy = MemberwiseClone() as ReleaseFile;
-
-            copy.Id = Guid.NewGuid();
-            copy.Release = amendment;
-            copy.ReleaseId = amendment.Id;
-
-            return copy;
-        }
     }
 }

@@ -105,13 +105,12 @@ export default function PublicationPublishedReleases({
               publicationId={publicationId}
               releases={allReleases}
               onAmend={async id => {
-                const amendment = await releaseService.createReleaseAmendment(
-                  id,
-                );
+                const { id: amendmentId } =
+                  await releaseService.createReleaseAmendment(id);
                 history.push(
                   generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
                     publicationId,
-                    releaseId: amendment.id,
+                    releaseId: amendmentId,
                   }),
                 );
               }}

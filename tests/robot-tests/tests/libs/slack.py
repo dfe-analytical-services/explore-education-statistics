@@ -24,49 +24,38 @@ class SlackService:
             if env_var is None:
                 raise AssertionError(f"{env_var} is not set")
 
-    def _build_attachments(self, env: str, suite: str):
+    def _build_attachments(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
         with open(f"{PATH}{os.sep}output.xml", "rb") as report:
             contents = report.read()
 
         soup = BeautifulSoup(contents, features="xml")
 
-        test = soup.find("total").find("stat")
+        tests = soup.find("total").find("stat")
 
-        failed_tests = int(test["fail"])
-        passed_tests = int(test["pass"])
+        failed_tests = int(tests["fail"])
+        passed_tests = int(tests["pass"])
 
-        failed_tests_field = ({},)
+        failed_test_suites_field = ({},)
 
-        if failed_tests > 0:
-            failed_tests_field = {"title": "Failed tests", "value": failed_tests}
+        if suites_failed:
+            failed_test_suites_field = {"title": "Failed test suites", "value": "\n".join(suites_failed)}
         return [
             {
                 "pretext": "All results",
-                "color": "danger" if failed_tests else "good",
+                "color": "danger" if suites_failed else "good",
                 "mrkdwn_in": ["pretext"],
                 "fields": [
                     {"title": "Environment", "value": env},
-                    {"title": "Suite", "value": suite.replace("tests/", "")},
+                    {"title": "Suite", "value": suites_ran.replace("tests/", "")},
                     {"title": "Total test cases", "value": passed_tests + failed_tests},
-                    failed_tests_field,
+                    {"title": "Total runs", "value": run_index + 1},
+                    failed_test_suites_field,
                 ],
             }
         ]
 
-    def _tests_failed(self):
-        with open(f"{PATH}{os.sep}output.xml", "rb") as report:
-            contents = report.read()
-
-            soup = BeautifulSoup(contents, features="xml")
-            test = soup.find("total").find("stat")
-
-            failed_tests = int(test["fail"])
-
-            if failed_tests > 0:
-                return True
-
-    def send_test_report(self, env: str, suite: str):
-        attachments = self._build_attachments(env, suite)
+    def send_test_report(self, env: str, suites_ran: str, suites_failed: [], run_index: int):
+        attachments = self._build_attachments(env, suites_ran, suites_failed, run_index)
 
         webhook_url = self.report_webhook_url
         slack_bot_token = self.slack_bot_token
@@ -78,12 +67,12 @@ class SlackService:
 
         logger.info("Sent UI test statistics to #build")
 
-        if self._tests_failed():
+        if suites_failed:
             client = WebClient(token=slack_bot_token)
 
             date = datetime.datetime.utcnow().strftime("%Y%m%d-%H%M%S")
 
-            report_name = f"UI-test-report-{suite.replace('tests/', '')}-{env}-{date}.zip"
+            report_name = f"UI-test-report-{suites_ran.replace('tests/', '')}-{env}-{date}.zip"
 
             shutil.make_archive(report_name.replace(".zip", ""), "zip", PATH)
             try:

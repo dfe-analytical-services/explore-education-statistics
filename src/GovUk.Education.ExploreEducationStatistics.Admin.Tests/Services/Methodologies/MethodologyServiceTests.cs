@@ -363,7 +363,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     {
                         Id = Guid.NewGuid(),
                         OwningPublicationSlug = MockPublication.Slug,
-                        Slug = "test-publication",
                         OwningPublicationTitle = MockPublication.Title,
                         Publications = new List<PublicationMethodology>
                         {

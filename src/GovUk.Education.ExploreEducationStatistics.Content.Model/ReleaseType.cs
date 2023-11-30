@@ -13,5 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         ManagementInformation,
 
         OfficialStatistics,
+
+        OfficialStatisticsInDevelopment
     }
 }

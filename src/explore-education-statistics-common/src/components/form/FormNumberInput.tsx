@@ -1,4 +1,4 @@
-import BaseFormInput, {
+import FormBaseInput, {
   FormBaseInputProps,
 } from '@common/components/form/FormBaseInput';
 import React from 'react';
@@ -12,7 +12,7 @@ export interface FormNumberInputProps extends FormBaseInputProps {
 
 const FormNumberInput = ({ value, ...props }: FormNumberInputProps) => {
   return (
-    <BaseFormInput
+    <FormBaseInput
       {...props}
       type="number"
       value={!value && value !== 0 ? '' : value}

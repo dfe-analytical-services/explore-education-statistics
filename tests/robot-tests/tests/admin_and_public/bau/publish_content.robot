@@ -6,6 +6,7 @@ Resource            ../../libs/public-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -36,11 +37,7 @@ Add Related dashboards section to release content
     user waits until page contains accordion section    View related dashboard(s)
 
     user opens accordion section    View related dashboard(s)    id:data-accordion
-    user starts editing text block    id:related-dashboards-content
-    user presses keys    Related dashboards test text
-    user clicks button    Save & close
-    user waits until page finishes loading
-    user waits until element contains    id:related-dashboards-content    Edit block
+    user adds content to related dashboards text block    Related dashboards test text
 
 Add an accordion section to release content
     user clicks button    Add new section
@@ -58,6 +55,10 @@ Add text block with link to absence glossary entry to accordion section
     user clicks element    id:glossarySearch-option-0
     user clicks button    Insert
     user waits until modal is not visible    Insert glossary link
+    # Note that the way that interacting with the Glossary Search popup affects the user's focus means
+    # that the usual behaviour of the autosaving CK Editor text blocks does not lend itself to using
+    # the "user saves autosaving text block" keyword here - therefore we're OK just to use a standard
+    # button click to save here.
     user clicks button    Save & close
     user waits until page finishes loading
     user waits until parent contains button    ${block}    Edit block

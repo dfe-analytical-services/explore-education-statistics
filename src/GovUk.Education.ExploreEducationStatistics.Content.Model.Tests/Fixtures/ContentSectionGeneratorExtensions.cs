@@ -18,6 +18,11 @@ public static class ContentSectionGeneratorExtensions
         IEnumerable<ContentBlock> blocks)
         => generator.ForInstance(d => d.SetContentBlocks(blocks));
 
+    public static Generator<ContentSection> WithType(
+        this Generator<ContentSection> generator,
+        ContentSectionType type)
+        => generator.ForInstance(d => d.SetType(type));
+
     public static InstanceSetters<ContentSection> SetDefaults(this InstanceSetters<ContentSection> setters)
         => setters
             .SetDefault(p => p.Id)
@@ -30,4 +35,9 @@ public static class ContentSectionGeneratorExtensions
         this InstanceSetters<ContentSection> setters,
         IEnumerable<ContentBlock> blocks)
         => setters.Set(d => d.Content, blocks.ToList());
+
+    public static InstanceSetters<ContentSection> SetType(
+        this InstanceSetters<ContentSection> setters,
+        ContentSectionType type)
+        => setters.Set(d => d.Type, type);
 }

@@ -91,7 +91,7 @@ const PrototypePrepareNextSubjectStep2 = ({ name, ...stepProps }: Props) => {
               }}
             >
               {form => (
-                <Form id="form" showSubmitError>
+                <Form id="form">
                   <FormFieldset id="downloadFiles" legend={stepHeading}>
                     <>
                       <p>

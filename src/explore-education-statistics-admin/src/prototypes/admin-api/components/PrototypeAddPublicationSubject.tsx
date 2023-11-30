@@ -79,7 +79,7 @@ const PrototypeAddPublicationSubject = ({
           }}
         >
           {() => (
-            <Form id="form" showSubmitError>
+            <Form id="form">
               {/* 
                 <FormFieldTextInput
                   id="title"

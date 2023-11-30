@@ -17,12 +17,10 @@ describe('TableToolInfo', () => {
 
     render(<TableToolInfo releaseType={testReleaseType} />);
 
-    expect(
-      screen.getByText('Release type: Official statistics'),
-    ).toBeInTheDocument();
+    expect(screen.getByText('Release type:')).toBeInTheDocument();
 
     expect(
-      screen.getByRole('button', { name: 'What are release types?' }),
+      screen.getByRole('button', { name: 'Official statistics' }),
     ).toBeInTheDocument();
 
     expect(
@@ -34,7 +32,7 @@ describe('TableToolInfo', () => {
     render(<TableToolInfo releaseType={undefined} />);
 
     expect(
-      screen.queryByRole('button', { name: 'What are release types?' }),
+      screen.queryByRole('button', { name: 'Official statistics' }),
     ).not.toBeInTheDocument();
 
     expect(

@@ -26,8 +26,8 @@ import React from 'react';
 
 export interface DataGuidanceFormValues {
   content: string;
-  subjects: {
-    id: string;
+  dataSets: {
+    fileId: string;
     content: string;
   }[];
 }
@@ -110,30 +110,30 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
       <LoadingSpinner loading={isLoading}>
         {dataGuidance && (
           <>
-            {dataGuidance.subjects.length > 0 ? (
+            {dataGuidance.dataSets.length > 0 ? (
               <Formik<DataGuidanceFormValues>
                 enableReinitialize
                 initialValues={{
                   content: dataGuidance.content || initialReleaseDataGuidance,
-                  subjects: dataGuidance.subjects.map(subject => ({
-                    id: subject.id,
-                    content: subject.content,
+                  dataSets: dataGuidance.dataSets.map(dataSet => ({
+                    fileId: dataSet.fileId,
+                    content: dataSet.content,
                   })),
                 }}
                 validationSchema={Yup.object<DataGuidanceFormValues>({
                   content: Yup.string().required('Enter main guidance content'),
-                  subjects: Yup.array().of(
+                  dataSets: Yup.array().of(
                     Yup.object({
                       id: Yup.string(),
                       content: Yup.string().required(params => {
                         const [, index] = toPath(params.path);
-                        const subject = dataGuidance?.subjects[Number(index)];
+                        const dataSet = dataGuidance?.dataSets[Number(index)];
 
-                        if (!subject) {
+                        if (!dataSet) {
                           return null;
                         }
 
-                        return `Enter file guidance content for ${subject.name}`;
+                        return `Enter file guidance content for ${dataSet.name}`;
                       }),
                     }),
                   ),
@@ -166,7 +166,7 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                         </>
                       )}
 
-                      {dataGuidance.subjects.length > 0 && (
+                      {dataGuidance.dataSets.length > 0 && (
                         <>
                           <h3 className="govuk-!-margin-top-6">Data files</h3>
 
@@ -174,27 +174,27 @@ const ReleaseDataGuidanceSection = ({ releaseId, canUpdateRelease }: Props) => {
                             id="dataGuidance-dataFiles"
                             openAll={hasSubmitValidationError || isEditing}
                           >
-                            {dataGuidance.subjects.map((subject, index) => (
+                            {dataGuidance.dataSets.map((dataSet, index) => (
                               <AccordionSection
-                                heading={subject.name}
-                                key={subject.id}
+                                heading={dataSet.name}
+                                key={dataSet.fileId}
                               >
                                 <ReleaseDataGuidanceDataFile
-                                  key={subject.id}
-                                  subject={subject}
+                                  key={dataSet.fileId}
+                                  dataSet={dataSet}
                                   renderContent={() =>
                                     isEditing ? (
                                       <FormFieldEditor<DataGuidanceFormValues>
                                         includePlugins={pluginsConfigSimple}
                                         toolbarConfig={toolbarConfigSimple}
-                                        name={`subjects[${index}].content`}
+                                        name={`dataSets[${index}].content`}
                                         label="File guidance content"
                                         testId="fileGuidanceContent"
                                       />
                                     ) : (
                                       <ContentHtml
                                         html={
-                                          form.values.subjects[index].content
+                                          form.values.dataSets[index].content
                                         }
                                         testId="fileGuidanceContent"
                                       />

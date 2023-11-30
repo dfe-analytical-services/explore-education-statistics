@@ -8,6 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 {
     public interface IDataGuidanceService
     {
-        public Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationSlug, string? releaseSlug = null);
+        public Task<Either<ActionResult, DataGuidanceViewModel>> GetDataGuidance(string publicationSlug,
+            string? releaseSlug = null);
     }
 }

@@ -70,7 +70,7 @@ const PrototypeMapFacetModal = ({
           onSubmit(selectedItem);
         }}
       >
-        <Form id="form" showSubmitError>
+        <Form id="form">
           <div className={styles.inner}>
             <h3>Current data set {name}</h3>
             <SummaryList className="govuk-!-margin-bottom-5">

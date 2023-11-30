@@ -24,16 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public DateTime? Created { get; set; }
 
         public DateTime? Updated { get; set; }
-
-        public ReleaseSubject CopyForRelease(Release release)
-        {
-            var releaseSubject = MemberwiseClone() as ReleaseSubject;
-
-            releaseSubject.Release = release;
-            releaseSubject.ReleaseId = release.Id;
-
-            return releaseSubject;
-        }
     }
 
     public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);

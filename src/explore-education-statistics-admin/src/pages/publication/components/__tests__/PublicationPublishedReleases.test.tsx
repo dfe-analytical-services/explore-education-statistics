@@ -1,6 +1,5 @@
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
 import _releaseService, {
-  Release,
   ReleaseSummaryWithPermissions,
 } from '@admin/services/releaseService';
 import _publicationService from '@admin/services/publicationService';
@@ -333,7 +332,7 @@ describe('PublicationPublishedReleases', () => {
 
     releaseService.createReleaseAmendment.mockResolvedValue({
       id: 'release-amendment-id',
-    } as Release);
+    });
 
     baseRender(
       <Router history={history}>

@@ -39,7 +39,7 @@ const ReleaseDataGuidancePage = ({ release }: Props) => {
             data catalogue
           </Link>
         }
-        subjects={release.subjects}
+        dataSets={release.dataSets}
       />
     </Page>
   );

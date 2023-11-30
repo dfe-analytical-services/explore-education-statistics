@@ -4,7 +4,8 @@ import PrototypeSectionExamples from '@admin/prototypes/components/PrototypeSect
 import React, { useState, useEffect, useRef } from 'react';
 import styles from './PrototypePublicPage.module.scss';
 
-const getDimensions = e => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const getDimensions = (e: any) => {
   const { height } = e.getBoundingClientRect();
   /* eslint-disable-next-line */
   const offsetTop = e.offsetTop;
@@ -21,7 +22,7 @@ const PrototypeReleaseData = () => {
   const [showContents, setShowContents] = useState(true);
   const [navSelected, setNavSelected] = useState('none');
 
-  const [visibleSection, setVisibleSection] = useState();
+  const [visibleSection, setVisibleSection] = useState<string>();
 
   const headerRef = useRef(null);
   const summaryRef = useRef(null);

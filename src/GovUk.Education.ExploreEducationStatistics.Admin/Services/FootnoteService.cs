@@ -99,42 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId,
-            Guid destinationReleaseId)
-        {
-            return await _contentPersistenceHelper.CheckEntityExists<Release>(destinationReleaseId)
-                .OnSuccessDo(_userService.CheckCanUpdateRelease)
-                .OnSuccess(() => GetFootnotes(sourceReleaseId))
-                .OnSuccess(async footnotes =>
-                {
-                    return await footnotes
-                        .ToAsyncEnumerable()
-                        .SelectAwait(async footnote =>
-                        {
-                            var filterIds = footnote.Filters
-                                .Select(filterFootnote => filterFootnote.FilterId).ToHashSet();
-                            var filterGroupIds = footnote.FilterGroups
-                                .Select(filterGroupFootnote => filterGroupFootnote.FilterGroupId).ToHashSet();
-                            var filterItemIds = footnote.FilterItems
-                                .Select(filterItemFootnote => filterItemFootnote.FilterItemId).ToHashSet();
-                            var indicatorIds = footnote.Indicators
-                                .Select(indicatorFootnote => indicatorFootnote.IndicatorId).ToHashSet();
-                            var subjectIds = footnote.Subjects
-                                .Select(subjectFootnote => subjectFootnote.SubjectId).ToHashSet();
-
-                            return await _footnoteRepository.CreateFootnote(destinationReleaseId,
-                                footnote.Content,
-                                filterIds: filterIds,
-                                filterGroupIds: filterGroupIds,
-                                filterItemIds: filterItemIds,
-                                indicatorIds: indicatorIds,
-                                subjectIds: subjectIds,
-                                footnote.Order);
-                        })
-                        .ToListAsync();
-                });
-        }
-
         public async Task<Either<ActionResult, Unit>> DeleteFootnote(Guid releaseId, Guid footnoteId)
         {
             return await _contentPersistenceHelper
