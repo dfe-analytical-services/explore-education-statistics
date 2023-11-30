@@ -37,15 +37,10 @@ public static class ReleaseSubjectGeneratorExtensions
         return generator;
     }
 
-    public static Generator<ReleaseSubject> WithDataGuidance(this Generator<ReleaseSubject> generator,
-        string dataGuidance)
-        => generator.ForInstance(rs => rs.SetDataGuidance(dataGuidance));
-
     public static InstanceSetters<ReleaseSubject> SetDefaults(this InstanceSetters<ReleaseSubject> setters)
         => setters
             .SetDefault(rs => rs.ReleaseId)
-            .SetDefault(rs => rs.SubjectId)
-            .SetDefault(rs => rs.DataGuidance);
+            .SetDefault(rs => rs.SubjectId);
 
     public static InstanceSetters<ReleaseSubject> SetRelease(this InstanceSetters<ReleaseSubject> setters,
         Release release)
@@ -56,8 +51,4 @@ public static class ReleaseSubjectGeneratorExtensions
         => setters
             .Set(rs => rs.Subject, subject)
             .Set(rs => rs.SubjectId, subject.Id);
-
-    public static InstanceSetters<ReleaseSubject> SetDataGuidance(this InstanceSetters<ReleaseSubject> setters,
-        string dataGuidance)
-        => setters.Set(rs => rs.DataGuidance, dataGuidance);
 }

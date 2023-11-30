@@ -18,6 +18,6 @@ public interface IDataGuidanceService
         DataGuidanceUpdateRequest request,
         CancellationToken cancellationToken = default);
 
-    public Task<Either<ActionResult, Unit>> Validate(Guid releaseId,
+    public Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(Guid releaseId,
         CancellationToken cancellationToken = default);
 }
