@@ -651,7 +651,7 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
                 }}
                 className="govuk-body-s govuk-link--no-underline govuk-link--no-visited-state"
               >
-                National statistics?{' '}
+                National statistics{' '}
                 <InfoIcon description="What are national statistics?" />
               </a>{' '}
               <p
