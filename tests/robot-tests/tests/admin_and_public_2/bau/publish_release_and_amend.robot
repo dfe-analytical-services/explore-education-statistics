@@ -226,13 +226,13 @@ Verify data block is updated correctly
     #checking if data block cache has been invalidated by verifying the updates on the block
     user scrolls to accordion section    Dates data block    id:releaseMainContent
     user opens accordion section    Dates data block    id:releaseMainContent
-    ${section}=    user gets accordion section content element    Dates data block    id:releaseMainContent
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
 
-    user checks chart title contains    ${section}    Updated dates table title
-    user clicks link by visible text    Table    ${section}
-    user waits until parent contains element    ${section}
+    user checks chart title contains    ${datablock}    Updated dates table title
+    user clicks link by visible text    Table    ${datablock}
+    user waits until parent contains element    ${datablock}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
-    user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]
+    user waits until parent contains element    ${datablock}    xpath:.//*[.="Source: Updated dates source"]
     user closes accordion section    Dates data block    id:releaseMainContent
 
 Add public prerelease access list
@@ -427,7 +427,6 @@ Verify Dates data block table has footnotes
     ...    ${data_block_table}
 
 Verify Dates data block Fast Track page
-
     ${release_url}=    user gets url
 
     user clicks link by visible text    Explore data    testid:Data block - Dates data block name-table-tab
@@ -912,7 +911,6 @@ Verify amendment Dates data block table has footnotes
     ...    ${data_block_table}
 
 Verify amendment Dates data block Fast Track page
-
     ${release_url}=    user gets url
 
     user clicks link by visible text    Explore data    testid:Data block - Dates data block name-table-tab
@@ -1037,4 +1035,4 @@ Validate next update date
 
 Verify that the Dates data block is no longer available
     go to    ${FAST_TRACK_URL}
-    user waits until page contains title   Page not found
+    user waits until page contains title    Page not found
