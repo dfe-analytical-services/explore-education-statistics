@@ -80,9 +80,6 @@
     "capacityStatisticsDb": {
       "value": 6
     },
-    "enableAlerts": {
-      "value": true
-    },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
     },
