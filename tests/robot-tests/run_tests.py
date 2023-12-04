@@ -61,6 +61,8 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
         "BootstrapData",
         "--exclude",
         "VisualTesting",
+        "--xunit",
+        "xunit",
     ]
     robot_args += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
     if arguments.fail_fast:
@@ -70,7 +72,6 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
     if arguments.print_keywords:
         robot_args += ["--listener", "listeners/KeywordListener.py"]
     if arguments.ci:
-        robot_args += ["--xunit", "xunit"]
         # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
         robot_args += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
         robot_args += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
@@ -135,6 +136,8 @@ def merge_test_reports():
         f"{results_foldername}/",
         "-o",
         "output.xml",
+        "--xunit",
+        "xunit.xml",
         "--prerebotmodifier",
         "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
         "--merge",
