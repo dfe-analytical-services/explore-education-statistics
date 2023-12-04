@@ -4,6 +4,7 @@ public enum DataSetMetaType
 {
     Filters,
     Locations,
+    GeographicLevels,
     TimePeriods,
     Indicators
 }

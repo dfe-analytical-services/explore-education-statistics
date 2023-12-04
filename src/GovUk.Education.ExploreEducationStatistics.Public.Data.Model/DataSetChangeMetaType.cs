@@ -1,10 +1,10 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-public enum MetadataType
+public enum DataSetChangeMetaType
 {
     Filter,
-    FilterItem,
-    Indicator,
+    FilterOption,
     Location,
-    TimePeriod
+    TimePeriod,
+    Indicator
 }
