@@ -4120,6 +4120,7 @@
       },
       "properties": {
         "description": "[variables('metricAlerts')[copyIndex()].description]",
+        "enabled": "true",
         "severity": 3,
         "scopes": ["[variables('metricAlerts')[copyIndex()].resourceId]"],
         "evaluationFrequency": "PT1M",
