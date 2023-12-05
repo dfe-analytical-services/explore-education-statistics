@@ -679,10 +679,6 @@
       "type": "int",
       "defaultValue": 268435456000
     },
-    "enableAlerts": {
-      "type": "bool",
-      "defaultValue": false
-    },
     "slackWebhook": {
       "type": "string",
       "metadata": {
@@ -3523,9 +3519,6 @@
           "actionGroupAlerts": {
             "value": "[variables('actionGroupAlerts')]"
           },
-          "enableAlerts": {
-            "value": "[parameters('enableAlerts')]"
-          }
         }
       },
       "dependsOn": [
@@ -4101,7 +4094,6 @@
       "location": "global",
       "properties": {
         "groupShortName": "alertAG",
-        "enabled": "[parameters('enableAlerts')]",
         "logicAppReceivers": [
           {
             "name": "[variables('logicAppSlackAlerts')]",
@@ -4128,7 +4120,6 @@
       "properties": {
         "description": "[variables('metricAlerts')[copyIndex()].description]",
         "severity": 3,
-        "enabled": "[parameters('enableAlerts')]",
         "scopes": ["[variables('metricAlerts')[copyIndex()].resourceId]"],
         "evaluationFrequency": "PT1M",
         "windowSize": "PT5M",

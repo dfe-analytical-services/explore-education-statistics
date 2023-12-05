@@ -47,9 +47,6 @@
     "actionGroupAlerts": {
       "type": "string"
     },
-    "enableAlerts": {
-      "type": "bool"
-    }
   },
   "variables":{
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
@@ -100,7 +97,6 @@
       "properties": {
         "description": "Data Factory - Activity Failures",
         "severity": 3,
-        "enabled": "[parameters('enableAlerts')]",
         "scopes": [
           "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
         ],
