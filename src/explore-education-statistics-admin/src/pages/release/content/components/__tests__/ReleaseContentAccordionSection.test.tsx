@@ -2,18 +2,17 @@ import { AuthContextTestProvider } from '@admin/contexts/AuthContext';
 import EditableAccordion from '@admin/components/editable/EditableAccordion';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import ReleaseContentAccordionSection from '@admin/pages/release/content/components/ReleaseContentAccordionSection';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { GlobalPermissions } from '@admin/services/permissionService';
-import {
-  EditableBlock,
-  EditableContentBlock,
-} from '@admin/services/types/content';
 import { UserDetails } from '@admin/services/types/user';
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
+import {
+  generateContentSection,
+  generateEditableContentBlock,
+} from '@admin-test/generators/contentGenerators';
 import MockDate from '@common-test/mockDate';
 import { getDescribedBy } from '@common-test/queries';
-import { ContentSection } from '@common/services/publicationService';
 import { render, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -21,49 +20,20 @@ import React from 'react';
 jest.mock('@admin/services/hubs/utils/createConnection');
 
 describe('ReleaseContentAccordionSection', () => {
-  const testOtherUser: UserDetails = {
-    id: 'user-2',
-    displayName: 'Rob Rowe',
-    email: 'rob@test.com',
-  };
-
-  const testBlock: EditableContentBlock = {
-    id: 'block-1',
-    order: 1,
-    body: '<p>Test block content</p>',
-    type: 'HtmlBlock',
-    comments: [],
-  };
-
-  const testLockedBlock: EditableContentBlock = {
-    id: 'block-2',
-    order: 2,
-    body: '<p>Test block content</p>',
-    type: 'HtmlBlock',
-    comments: [],
-    locked: '2022-03-12T12:00:00Z',
-    lockedUntil: '2022-03-12T12:10:00Z',
-    lockedBy: testOtherUser,
-  };
-
-  const testSection: ContentSection<EditableBlock> = {
-    id: 'section-1',
-    order: 1,
-    heading: 'Test section 1',
-    content: [testBlock],
-  };
+  const testReleaseContent = generateReleaseContent({});
 
   test('renders correctly in editable mode', () => {
     render(
       <EditingContextProvider editingMode="edit">
         <ReleaseContentProvider
           value={{
-            release: testEditableRelease,
+            ...testReleaseContent,
             canUpdateRelease: true,
-            unattachedDataBlocks: [],
           }}
         >
-          <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
+          <ReleaseContentHubContextProvider
+            releaseId={testReleaseContent.release.id}
+          >
             <EditableAccordion
               onAddSection={noop}
               id="test-accordion"
@@ -71,10 +41,7 @@ describe('ReleaseContentAccordionSection', () => {
             >
               <ReleaseContentAccordionSection
                 id="test-section-1"
-                section={{
-                  ...testSection,
-                  content: [testBlock],
-                }}
+                section={testReleaseContent.release.content[0]}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -117,13 +84,12 @@ describe('ReleaseContentAccordionSection', () => {
         <EditingContextProvider editingMode="edit">
           <ReleaseContentProvider
             value={{
-              release: testEditableRelease,
+              ...testReleaseContent,
               canUpdateRelease: true,
-              unattachedDataBlocks: [],
             }}
           >
             <ReleaseContentHubContextProvider
-              releaseId={testEditableRelease.id}
+              releaseId={testReleaseContent.release.id}
             >
               <EditableAccordion
                 onAddSection={noop}
@@ -132,10 +98,7 @@ describe('ReleaseContentAccordionSection', () => {
               >
                 <ReleaseContentAccordionSection
                   id="test-section-1"
-                  section={{
-                    ...testSection,
-                    content: [testBlock],
-                  }}
+                  section={testReleaseContent.release.content[0]}
                 />
               </EditableAccordion>
             </ReleaseContentHubContextProvider>
@@ -170,12 +133,13 @@ describe('ReleaseContentAccordionSection', () => {
       <EditingContextProvider editingMode="preview">
         <ReleaseContentProvider
           value={{
-            release: testEditableRelease,
+            ...testReleaseContent,
             canUpdateRelease: true,
-            unattachedDataBlocks: [],
           }}
         >
-          <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
+          <ReleaseContentHubContextProvider
+            releaseId={testReleaseContent.release.id}
+          >
             <EditableAccordion
               onAddSection={noop}
               id="test-accordion"
@@ -183,10 +147,7 @@ describe('ReleaseContentAccordionSection', () => {
             >
               <ReleaseContentAccordionSection
                 id="test-section-1"
-                section={{
-                  ...testSection,
-                  content: [testBlock],
-                }}
+                section={testReleaseContent.release.content[0]}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -217,15 +178,19 @@ describe('ReleaseContentAccordionSection', () => {
 
   test('renders heading with unsaved changes if there are any unsaved blocks', () => {
     render(
-      <EditingContextProvider editingMode="edit" unsavedBlocks={['block-1']}>
+      <EditingContextProvider
+        editingMode="edit"
+        unsavedBlocks={['content-block-1']}
+      >
         <ReleaseContentProvider
           value={{
-            release: testEditableRelease,
+            ...testReleaseContent,
             canUpdateRelease: true,
-            unattachedDataBlocks: [],
           }}
         >
-          <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
+          <ReleaseContentHubContextProvider
+            releaseId={testReleaseContent.release.id}
+          >
             <EditableAccordion
               onAddSection={noop}
               id="test-accordion"
@@ -233,10 +198,7 @@ describe('ReleaseContentAccordionSection', () => {
             >
               <ReleaseContentAccordionSection
                 id="test-section-1"
-                section={{
-                  ...testSection,
-                  content: [testBlock],
-                }}
+                section={testReleaseContent.release.content[0]}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -246,7 +208,7 @@ describe('ReleaseContentAccordionSection', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /Test section 1 \(unsaved changes\)/,
+        name: /Content section 1 \(unsaved changes\)/,
       }),
     ).toBeInTheDocument();
   });
@@ -256,17 +218,18 @@ describe('ReleaseContentAccordionSection', () => {
       <EditingContextProvider
         editingMode="edit"
         unsavedCommentDeletions={{
-          'block-1': ['comment-1'],
+          'content-block-1': ['comment-1'],
         }}
       >
         <ReleaseContentProvider
           value={{
-            release: testEditableRelease,
+            ...testReleaseContent,
             canUpdateRelease: true,
-            unattachedDataBlocks: [],
           }}
         >
-          <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
+          <ReleaseContentHubContextProvider
+            releaseId={testReleaseContent.release.id}
+          >
             <EditableAccordion
               onAddSection={noop}
               id="test-accordion"
@@ -274,10 +237,7 @@ describe('ReleaseContentAccordionSection', () => {
             >
               <ReleaseContentAccordionSection
                 id="test-section-1"
-                section={{
-                  ...testSection,
-                  content: [testBlock],
-                }}
+                section={testReleaseContent.release.content[0]}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>
@@ -287,7 +247,7 @@ describe('ReleaseContentAccordionSection', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /Test section 1 \(unsaved changes\)/,
+        name: /Content section 1 \(unsaved changes\)/,
       }),
     ).toBeInTheDocument();
   });
@@ -295,16 +255,36 @@ describe('ReleaseContentAccordionSection', () => {
   test('renders locked state if any child blocks are locked', () => {
     MockDate.set('2022-03-12T12:05:00Z');
 
+    const testOtherUser: UserDetails = {
+      id: 'user-2',
+      displayName: 'Rob Rowe',
+      email: 'rob@test.com',
+    };
+
+    const testSectionWithLockedBlock = generateContentSection({
+      heading: 'Test section',
+      content: [
+        generateEditableContentBlock({ id: 'test-block' }),
+        generateEditableContentBlock({
+          id: 'test-block-locked',
+          locked: '2022-03-12T12:00:00Z',
+          lockedUntil: '2022-03-12T12:10:00Z',
+          lockedBy: testOtherUser,
+        }),
+      ],
+    });
+
     render(
       <EditingContextProvider editingMode="edit">
         <ReleaseContentProvider
           value={{
-            release: testEditableRelease,
+            ...testReleaseContent,
             canUpdateRelease: true,
-            unattachedDataBlocks: [],
           }}
         >
-          <ReleaseContentHubContextProvider releaseId={testEditableRelease.id}>
+          <ReleaseContentHubContextProvider
+            releaseId={testReleaseContent.release.id}
+          >
             <EditableAccordion
               onAddSection={noop}
               id="test-accordion"
@@ -312,10 +292,7 @@ describe('ReleaseContentAccordionSection', () => {
             >
               <ReleaseContentAccordionSection
                 id="test-section-1"
-                section={{
-                  ...testSection,
-                  content: [testBlock, testLockedBlock],
-                }}
+                section={testSectionWithLockedBlock}
               />
             </EditableAccordion>
           </ReleaseContentHubContextProvider>

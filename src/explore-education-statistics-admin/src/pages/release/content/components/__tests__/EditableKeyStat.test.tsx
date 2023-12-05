@@ -1,8 +1,8 @@
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import EditableKeyStat from '@admin/pages/release/content/components/EditableKeyStat';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import _dataBlockService from '@admin/services/dataBlockService';
 import _keyStatisticService from '@admin/services/keyStatisticService';
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
 import {
   KeyStatisticDataBlock,
   KeyStatisticText,
@@ -301,12 +301,12 @@ describe('EditableKeyStat', () => {
 });
 
 function render(child: ReactNode): RenderResult {
+  const testReleaseContent = generateReleaseContent({});
   return baseRender(
     <ReleaseContentProvider
       value={{
-        release: testEditableRelease,
+        ...testReleaseContent,
         canUpdateRelease: true,
-        unattachedDataBlocks: [],
       }}
     >
       {child}

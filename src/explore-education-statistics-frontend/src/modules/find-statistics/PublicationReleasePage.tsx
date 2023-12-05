@@ -233,20 +233,22 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
                 )}
-                <li>
-                  <a
-                    href="#content"
-                    onClick={() => {
-                      logEvent({
-                        category: `${release.publication.title} release page`,
-                        action: `Release contents clicked`,
-                        label: window.location.pathname,
-                      });
-                    }}
-                  >
-                    Release contents
-                  </a>
-                </li>
+                {!!release.content.length && (
+                  <li>
+                    <a
+                      href="#content"
+                      onClick={() => {
+                        logEvent({
+                          category: `${release.publication.title} release page`,
+                          action: `Release contents clicked`,
+                          label: window.location.pathname,
+                        });
+                      }}
+                    >
+                      Release contents
+                    </a>
+                  </li>
+                )}
                 <li>
                   <a
                     href="#explore-data-and-files"
