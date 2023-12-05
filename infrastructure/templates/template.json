@@ -3518,7 +3518,7 @@
           },
           "actionGroupAlerts": {
             "value": "[variables('actionGroupAlerts')]"
-          },
+          }
         }
       },
       "dependsOn": [
