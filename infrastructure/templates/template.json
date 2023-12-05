@@ -685,6 +685,12 @@
         "description": "Slack webhook URI for alerts"
       }
     },
+    "slackAlertsChannel": {
+      "type": "string",
+      "metadata": {
+        "description": "Slack channel to post Azure alerts to"
+      }
+    },
     "dataFactoryConcurrency": {
       "type": "int",
       "defaultValue": 1
@@ -4072,7 +4078,7 @@
                   "body": {
                     "username": "Alertbot",
                     "icon_emoji": ":face_with_monocle",
-                    "channel": "#alerts",
+                    "channel": "[parameters('slackAlertsChannel')]",
                     "text": "Alert @{triggerBody()?['data']?['essentials']?['monitorCondition']}!\n@{triggerBody()?['data']?['essentials']?['alertRule']}\n@{triggerBody()?['data']?['essentials']?['description']}"
                   },
                   "method": "POST",
