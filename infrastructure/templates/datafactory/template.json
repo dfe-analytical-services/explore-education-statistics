@@ -46,7 +46,7 @@
     },
     "actionGroupAlerts": {
       "type": "string"
-    },
+    }
   },
   "variables":{
     "templateBaseUrl": "[concat('https://raw.githubusercontent.com/dfe-analytical-services/explore-education-statistics/', parameters('branch'), '/infrastructure/templates/')]"
