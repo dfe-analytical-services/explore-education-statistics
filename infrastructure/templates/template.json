@@ -4094,6 +4094,7 @@
       "location": "global",
       "properties": {
         "groupShortName": "alertAG",
+        "enabled": "true",
         "logicAppReceivers": [
           {
             "name": "[variables('logicAppSlackAlerts')]",
