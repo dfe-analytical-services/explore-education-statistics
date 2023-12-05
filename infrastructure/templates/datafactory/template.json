@@ -96,6 +96,7 @@
       ],
       "properties": {
         "description": "Data Factory - Activity Failures",
+        "enabled": "true",
         "severity": 3,
         "scopes": [
           "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
