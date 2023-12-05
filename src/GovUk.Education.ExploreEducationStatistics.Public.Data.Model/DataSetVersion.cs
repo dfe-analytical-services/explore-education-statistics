@@ -2,7 +2,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset>
+public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
 {
     public Guid Id { get; init; }
 
@@ -20,13 +20,23 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public string Notes { get; set; } = string.Empty;
 
-    public List<DataSetChange> Changes { get; set; } = new();
+    public DataSetVersionMetaSummary MetaSummary { get; set; } = null!;
 
-    public DateTimeOffset Published { get; set; }
+    public List<DataSetChangeFilter> FilterChanges { get; set; } = new();
+
+    public List<DataSetChangeFilterOption> FilterOptionChanges { get; set; } = new();
+
+    public List<DataSetChangeIndicator> IndicatorChanges { get; set; } = new();
+
+    public List<DataSetChangeLocation> LocationChanges { get; set; } = new();
+
+    public List<DataSetChangeTimePeriod> TimePeriodChanges { get; set; } = new();
+
+    public DateTimeOffset? Published { get; set; }
 
     public DataSetVersionStatus Status { get; set; }
 
     public DateTimeOffset Created { get; set; }
 
-    public DateTimeOffset Updated { get; set; }
+    public DateTimeOffset? Updated { get; set; }
 }
