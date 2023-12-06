@@ -36,6 +36,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public DateTimeOffset? Published { get; set; }
 
+    public DateTimeOffset? Unpublished { get; set; }
+
     public DataSetVersionStatus Status { get; set; }
 
     public DateTimeOffset Created { get; set; }
