@@ -15,9 +15,10 @@ import AddSecondaryStats from './AddSecondaryStats';
 
 interface Props {
   release: EditableRelease;
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
-const ReleaseHeadlines = ({ release }: Props) => {
+const ReleaseHeadlines = ({ release, transformFeaturedTableLinks }: Props) => {
   const { editingMode } = useEditingContext();
   const actions = useReleaseContentActions();
 
@@ -46,7 +47,11 @@ const ReleaseHeadlines = ({ release }: Props) => {
           blocks={release.headlinesSection.content}
           sectionId={release.headlinesSection.id}
           renderBlock={block => (
-            <ReleaseBlock block={block} releaseId={release.id} />
+            <ReleaseBlock
+              block={block}
+              releaseId={release.id}
+              transformFeaturedTableLinks={transformFeaturedTableLinks}
+            />
           )}
           renderEditableBlock={block => (
             <ReleaseEditableBlock

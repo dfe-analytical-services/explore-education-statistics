@@ -8,6 +8,7 @@ import EditableContentForm, {
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';
 import glossaryService from '@admin/services/glossaryService';
 import { UserDetails } from '@admin/services/types/user';
+import { ToolbarGroup, ToolbarOption } from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -38,6 +39,9 @@ interface EditableContentBlockProps {
   locked?: string;
   lockedBy?: UserDetails;
   hideLabel?: boolean;
+  toolbarConfig?:
+    | ReadonlyArray<ToolbarOption | ToolbarGroup>
+    | Array<ToolbarOption | ToolbarGroup>;
   transformImageAttributes?: (
     attributes: Dictionary<string>,
   ) => Dictionary<string>;
@@ -67,6 +71,7 @@ const EditableContentBlock = ({
   locked,
   lockedBy,
   hideLabel = false,
+  toolbarConfig,
   transformImageAttributes,
   useMarkdown,
   value,
@@ -146,6 +151,7 @@ const EditableContentBlock = ({
         hideLabel={hideLabel}
         id={id}
         idleTimeout={idleTimeout}
+        toolbarConfig={toolbarConfig}
         onAction={onActive}
         onAutoSave={onAutoSave}
         onBlur={onBlur}

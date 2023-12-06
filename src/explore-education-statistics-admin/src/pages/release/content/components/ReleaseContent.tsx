@@ -39,7 +39,11 @@ interface MethodologyLink {
   url: string;
 }
 
-const ReleaseContent = () => {
+const ReleaseContent = ({
+  transformFeaturedTableLinks,
+}: {
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
+}) => {
   const config = useConfig();
   const location = useLocation();
   const { editingMode, unsavedBlocks, unsavedCommentDeletions } =
@@ -133,8 +137,10 @@ const ReleaseContent = () => {
           <ReleaseSummarySection
             isEditing={editingMode === 'edit'}
             lastUpdated={release.updates[0]?.on}
-            release={release}
+            latestRelease={release.latestRelease}
+            nextReleaseDate={release.nextReleaseDate}
             releaseDate={release.published ?? release.publishScheduled}
+            releaseType={release.type}
             renderReleaseNotes={<ReleaseNotesSection release={release} />}
             renderStatusTags={
               <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
@@ -158,7 +164,11 @@ const ReleaseContent = () => {
                   blocks={release.summarySection.content}
                   sectionId={release.summarySection.id}
                   renderBlock={block => (
-                    <ReleaseBlock block={block} releaseId={release.id} />
+                    <ReleaseBlock
+                      block={block}
+                      releaseId={release.id}
+                      transformFeaturedTableLinks={transformFeaturedTableLinks}
+                    />
                   )}
                   renderEditableBlock={block => (
                     <ReleaseEditableBlock
@@ -345,13 +355,17 @@ const ReleaseContent = () => {
 
       <hr />
 
-      <ReleaseHeadlines release={release} />
+      <ReleaseHeadlines
+        release={release}
+        transformFeaturedTableLinks={transformFeaturedTableLinks}
+      />
 
       {(release.downloadFiles ||
         release.hasPreReleaseAccessList ||
         !!release.relatedDashboardsSection?.content.length) && (
         <ReleaseDataAndFiles
-          release={release}
+          downloadFiles={release.downloadFiles}
+          hasDataGuidance={release.hasDataGuidance}
           renderAllFilesLink={
             <ButtonText
               disableDoubleClick
@@ -431,10 +445,15 @@ const ReleaseContent = () => {
           </div>
         )}
 
-      <ReleaseContentAccordion release={release} sectionName="Contents" />
+      <ReleaseContentAccordion
+        release={release}
+        sectionName="Contents"
+        transformFeaturedTableLinks={transformFeaturedTableLinks}
+      />
 
       <ReleaseHelpAndSupportSection
-        release={release}
+        publication={release.publication}
+        releaseType={release.type}
         renderExternalMethodologyLink={externalMethodology => (
           <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
         )}

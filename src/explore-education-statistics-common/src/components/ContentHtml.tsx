@@ -19,6 +19,7 @@ export interface ContentHtmlProps {
   sanitizeOptions?: SanitizeHtmlOptions;
   testId?: string;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
 export default function ContentHtml({
@@ -28,6 +29,7 @@ export default function ContentHtml({
   sanitizeOptions,
   testId,
   trackGlossaryLinks,
+  transformFeaturedTableLinks,
 }: ContentHtmlProps) {
   const { isMounted } = useMounted();
 
@@ -55,6 +57,17 @@ export default function ContentHtml({
             {domToReact(node.children)}
           </GlossaryEntryButton>
         ) : undefined;
+      }
+
+      if (
+        transformFeaturedTableLinks &&
+        node.name === 'a' &&
+        typeof node.attribs['data-featured-table'] !== 'undefined'
+      ) {
+        const text = domToReact(node.children);
+        return isMounted && typeof text === 'string'
+          ? transformFeaturedTableLinks(node.attribs.href, text)
+          : undefined;
       }
 
       if (node.name === 'figure' && node.attribs.class === 'table') {

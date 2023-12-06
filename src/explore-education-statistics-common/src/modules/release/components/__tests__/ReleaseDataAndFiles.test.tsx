@@ -67,7 +67,8 @@ describe('ReleaseDataAndFiles', () => {
   test('renders the download all data link if files are available', () => {
     render(
       <ReleaseDataAndFiles
-        release={testRelease}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -90,10 +91,8 @@ describe('ReleaseDataAndFiles', () => {
   test('does not render the download all data link if no files are available', () => {
     render(
       <ReleaseDataAndFiles
-        release={{
-          ...testRelease,
-          downloadFiles: [],
-        }}
+        downloadFiles={[]}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -116,7 +115,8 @@ describe('ReleaseDataAndFiles', () => {
   test('renders the data catalogue section', () => {
     render(
       <ReleaseDataAndFiles
-        release={testRelease}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -139,7 +139,8 @@ describe('ReleaseDataAndFiles', () => {
   test('renders the download files list if showDataFileList is true', () => {
     render(
       <ReleaseDataAndFiles
-        release={testRelease}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -173,7 +174,8 @@ describe('ReleaseDataAndFiles', () => {
   test('renders the data guidance section if guidance is available', () => {
     render(
       <ReleaseDataAndFiles
-        release={testRelease}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -196,10 +198,8 @@ describe('ReleaseDataAndFiles', () => {
   test('does not render the data guidance section if guidance is not available', () => {
     render(
       <ReleaseDataAndFiles
-        release={{
-          ...testRelease,
-          hasDataGuidance: false,
-        }}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={false}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -222,7 +222,8 @@ describe('ReleaseDataAndFiles', () => {
   test('renders the create tables section', () => {
     render(
       <ReleaseDataAndFiles
-        release={testRelease}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -245,7 +246,8 @@ describe('ReleaseDataAndFiles', () => {
   test('renders the ancillary files section if ancillary files are available', () => {
     render(
       <ReleaseDataAndFiles
-        release={testRelease}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -293,7 +295,8 @@ describe('ReleaseDataAndFiles', () => {
   test('does not render the ancillary files section if no ancillary files are available', () => {
     render(
       <ReleaseDataAndFiles
-        release={{ ...testRelease, downloadFiles: [] }}
+        downloadFiles={[]}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -320,7 +323,8 @@ describe('ReleaseDataAndFiles', () => {
   test('renders related dashboards', () => {
     render(
       <ReleaseDataAndFiles
-        release={testRelease}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
@@ -338,7 +342,8 @@ describe('ReleaseDataAndFiles', () => {
   test('does not render related dashboards', () => {
     render(
       <ReleaseDataAndFiles
-        release={testRelease}
+        downloadFiles={testRelease.downloadFiles}
+        hasDataGuidance={testRelease.hasDataGuidance}
         renderAllFilesLink={mockAllFilesButton}
         renderCreateTablesLink={mockCreateTablesButton}
         renderDataCatalogueLink={mockDataCatalogueLink}
