@@ -17,6 +17,6 @@ public class HelloWorldControllerTests : IntegrationTestFixture
 
         var content = await response.Content.ReadAsStringAsync();
 
-        Assert.Equal("Hello world", content);
+        Assert.Equal("Hello World", content);
     }
 }

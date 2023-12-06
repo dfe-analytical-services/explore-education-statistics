@@ -3,7 +3,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers;
 
@@ -12,9 +11,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 public class HelloWorldController(PublicDataDbContext publicDataDbContext) : ControllerBase
 {
     [HttpGet]
-    public async Task<ActionResult<List<DataSet>>> Get()
+    public async Task<ActionResult<string>> Get()
     {
-        return await publicDataDbContext.DataSets.ToListAsync();
+        return await Task.FromResult("Hello World");
     }
 
     [HttpPost]
