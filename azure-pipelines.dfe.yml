@@ -11,7 +11,7 @@ variables:
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
   NODE_VERSION: 18.18.2
-  DOTNET_VERSION: 6.0.x
+  DOTNET_VERSION: 8.0.x
 
 trigger:
   branches:
