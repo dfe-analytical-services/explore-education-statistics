@@ -20,8 +20,12 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
     [HttpPost]
     public async Task<DataSet> Create()
     {
+        var dataSetId = Guid.NewGuid();
+        var dataSetVersionId = Guid.NewGuid();
+
         var dataSet = new DataSet
         {
+            Id = dataSetId,
             Status = DataSetStatus.Published,
             Title = "My first dataset",
             PublicationId = Guid.NewGuid(),
@@ -29,6 +33,8 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
             {
                 new()
                 {
+                    DataSetId = dataSetId,
+                    Status = DataSetVersionStatus.Staged,
                     CsvFileId = Guid.NewGuid(),
                     Notes = "fdshbab",
                     VersionMajor = 1,
@@ -44,10 +50,29 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
                         Indicators = new List<string>()
                         {
                             "thing"
+                        },
+                        GeographicLevels = new List<GeographicLevel>
+                        {
+                            GeographicLevel.Country,
+                            GeographicLevel.LocalAuthority,
+                        },
+                        TimePeriodRange = new TimePeriodRange
+                        {
+                            Start = new TimePeriodMeta
+                            {
+                                Code = TimeIdentifier.AcademicYear,
+                                Year = 2018
+                            },
+                            End = new TimePeriodMeta
+                            {
+                                Code = TimeIdentifier.AcademicYear,
+                                Year = 2023
+                            }
                         }
                     },
                     Meta = new DataSetMeta
                     {
+                        DataSetVersionId = dataSetVersionId,
                         Filters = new List<FilterMeta>
                         {
                             new()
@@ -118,6 +143,7 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
                     {
                         new()
                         {
+                            DataSetVersionId = dataSetVersionId,
                             Changes = new List<Change<FilterChangeState>>
                             {
                                 new()
@@ -159,6 +185,7 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
                     {
                         new()
                         {
+                            DataSetVersionId = dataSetVersionId,
                             Changes = new List<Change<IndicatorChangeState>>
                             {
                                 new()

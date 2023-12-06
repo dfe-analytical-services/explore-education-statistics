@@ -1,6 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
+using Namotion.Reflection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 
@@ -37,9 +38,14 @@ public class PublicDataDbContext : DbContext
                 ms.ToJson();
                 ms.OwnsOne(msb => msb.TimePeriodRange, msb =>
                 {
-                    msb.ToJson();
-                    msb.OwnsOne(timePeriodRange => timePeriodRange.Start);
-                    msb.OwnsOne(timePeriodRange => timePeriodRange.End);
+                    msb.OwnsOne(tpr => tpr.Start, tpr =>
+                    {
+                        tpr.Property(tpm => tpm.Code).HasConversion<string>();
+                    });
+                    msb.OwnsOne(tpr => tpr.End, tpr =>
+                    {
+                        tpr.Property(tpm => tpm.Code).HasConversion<string>();
+                    });
                 });
             });
 
