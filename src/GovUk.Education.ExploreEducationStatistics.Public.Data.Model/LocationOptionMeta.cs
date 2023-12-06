@@ -5,9 +5,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 public class LocationOptionMeta
 {
     [JsonPropertyName("Id")]
-    public string Identifier { get; set; } = string.Empty;
+    public required string Identifier { get; set; }
 
-    public string Label { get; set; } = string.Empty;
+    public required string Label { get; set; }
 
     public string Code { get; set; } = string.Empty;
 }

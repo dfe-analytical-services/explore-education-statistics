@@ -1,7 +1,6 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using System.Reflection.Metadata;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 
@@ -10,62 +9,11 @@ public class PublicDataDbContext : DbContext
 
     public PublicDataDbContext(DbContextOptions<PublicDataDbContext> options) : base(options)
     {
-        Configure(updateTimestamps: true);
     }
 
     public PublicDataDbContext(DbContextOptions<PublicDataDbContext> options, bool updateTimestamps = true) : base(options)
     {
         Configure(updateTimestamps: updateTimestamps);
-    }
-
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<DataSet>()
-            .Property(d => d.Status)
-            .HasConversion<string>();
-
-        modelBuilder.Entity<DataSetVersion>()
-            .OwnsOne(c => c.MetaSummary, m =>
-            {
-                m.ToJson();
-                m.OwnsOne(m => m.TimePeriodRange, m =>
-                {
-                    m.ToJson();
-                    m.OwnsOne(m => m.Start);
-                    m.OwnsOne(m => m.End);
-                });
-            })
-            .Property(v => v.Status)
-            .HasConversion<string>();
-
-        modelBuilder.Entity<DataSetMeta>()
-            .OwnsMany(m => m.Filters, m =>
-            {
-                m.ToJson()
-                .OwnsMany(fm => fm.Options);
-            })
-            .OwnsMany(m => m.Indicators, m => m.ToJson())
-            .OwnsMany(m => m.TimePeriods, m => m.ToJson())
-            .OwnsMany(m => m.Locations, m =>
-            {
-                m.ToJson()
-                .OwnsMany(l => l.Options);
-            });
-
-        modelBuilder.Entity<DataSetChangeFilter>()
-            .OwnsMany(d => d.Changes, o => o.ToJson());
-
-        modelBuilder.Entity<DataSetChangeFilterOption>()
-            .OwnsMany(d => d.Changes, o => o.ToJson());
-
-        modelBuilder.Entity<DataSetChangeIndicator>()
-            .OwnsMany(d => d.Changes, o => o.ToJson());
-
-        modelBuilder.Entity<DataSetChangeLocation>()
-            .OwnsMany(d => d.Changes, o => o.ToJson());
-
-        modelBuilder.Entity<DataSetChangeTimePeriod>()
-            .OwnsMany(d => d.Changes, o => o.ToJson());
     }
 
     private void Configure(bool updateTimestamps = true)
@@ -77,12 +25,100 @@ public class PublicDataDbContext : DbContext
         }
     }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<DataSet>()
+            .Property(ds => ds.Status)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<DataSetVersion>()
+            .OwnsOne(v => v.MetaSummary, ms =>
+            {
+                ms.ToJson();
+                ms.OwnsOne(msb => msb.TimePeriodRange, msb =>
+                {
+                    msb.ToJson();
+                    msb.OwnsOne(timePeriodRange => timePeriodRange.Start);
+                    msb.OwnsOne(timePeriodRange => timePeriodRange.End);
+                });
+            });
+
+        modelBuilder.Entity<DataSetVersion>()
+            .Property(dsv => dsv.Status)
+            .HasConversion<string>();
+
+        modelBuilder.Entity<DataSetMeta>()
+            .OwnsMany(m => m.Filters, m =>
+            {
+                m.ToJson();
+                m.OwnsMany(fm => fm.Options);
+            })
+            .OwnsMany(m => m.Indicators,
+                m => m.ToJson())
+            .OwnsMany(m => m.TimePeriods,
+                m => m.ToJson())
+            .OwnsMany(m => m.Locations, m =>
+            {
+                m.ToJson();
+                m.OwnsMany(lm => lm.Options);
+            });
+
+        modelBuilder.Entity<DataSetMeta>()
+            .Property(m => m.GeographicLevels)
+            .HasColumnType("text[]");
+
+        modelBuilder.Entity<ChangeSetFilters>()
+            .OwnsMany(cs => cs.Changes, cs =>
+            {
+                cs.ToJson();
+                cs.Property(c => c.Type).HasConversion<string>();
+                cs.OwnsOne(c => c.CurrentState);
+                cs.OwnsOne(c => c.PreviousState);
+            });
+
+        modelBuilder.Entity<ChangeSetFilterOptions>()
+            .OwnsMany(cs => cs.Changes, cs =>
+            {
+                cs.ToJson();
+                cs.Property(c => c.Type).HasConversion<string>();
+                cs.OwnsOne(c => c.CurrentState);
+                cs.OwnsOne(c => c.PreviousState);
+            });
+
+        modelBuilder.Entity<ChangeSetIndicators>()
+            .OwnsMany(cs => cs.Changes, cs =>
+            {
+                cs.ToJson();
+                cs.Property(c => c.Type).HasConversion<string>();
+                cs.OwnsOne(c => c.CurrentState);
+                cs.OwnsOne(c => c.PreviousState);
+            });
+
+        modelBuilder.Entity<ChangeSetLocations>()
+            .OwnsMany(cs => cs.Changes, cs =>
+            {
+                cs.ToJson();
+                cs.Property(c => c.Type).HasConversion<string>();
+                cs.OwnsOne(c => c.CurrentState);
+                cs.OwnsOne(c => c.PreviousState);
+            });
+
+        modelBuilder.Entity<ChangeSetTimePeriods>()
+            .OwnsMany(cs => cs.Changes, cs =>
+            {
+                cs.ToJson();
+                cs.Property(c => c.Type).HasConversion<string>();
+                cs.OwnsOne(c => c.CurrentState);
+                cs.OwnsOne(c => c.PreviousState);
+            });
+    }
+
     public DbSet<DataSet> DataSets { get; init; } = null!;
     public DbSet<DataSetVersion> DataSetVersions { get; init; } = null!;
     public DbSet<DataSetMeta> DataSetMeta { get; init; } = null!;
-    public DbSet<DataSetChangeFilter> DataSetChangeFilters { get; init; } = null!;
-    public DbSet<DataSetChangeFilterOption> DataSetChangeFilterOptions { get; init; } = null!;
-    public DbSet<DataSetChangeIndicator> DataSetChangeIndicators { get; init; } = null!;
-    public DbSet<DataSetChangeLocation> DataSetChangeLocations { get; init; } = null!;
-    public DbSet<DataSetChangeTimePeriod> DataSetChangeTimePeriods { get; init; } = null!;
+    public DbSet<ChangeSetFilters> DataSetChangeSetFilters { get; init; } = null!;
+    public DbSet<ChangeSetFilterOptions> DataSetChangeSetFilterOptions { get; init; } = null!;
+    public DbSet<ChangeSetIndicators> DataSetChangeSetIndicators { get; init; } = null!;
+    public DbSet<ChangeSetLocations> DataSetChangeSetLocations { get; init; } = null!;
+    public DbSet<ChangeSetTimePeriods> DataSetChangeSetTimePeriods { get; init; } = null!;
 }

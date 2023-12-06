@@ -6,11 +6,11 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 {
     public Guid Id { get; init; }
 
-    public string Title { get; set; } = string.Empty;
+    public required string Title { get; set; }
 
-    public Guid PublicationId { get; set; }
+    public required Guid PublicationId { get; set; }
 
-    public DataSetStatus Status { get; set; }
+    public required DataSetStatus Status { get; set; }
 
     public Guid? SupersedingDataSetId { get; set; }
 

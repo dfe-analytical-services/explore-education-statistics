@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
@@ -7,15 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 
 [ApiController]
 [Route("/HelloWorld")]
-public class HelloWorldController : ControllerBase
+public class HelloWorldController(PublicDataDbContext publicDataDbContext) : ControllerBase
 {
-    private readonly PublicDataDbContext publicDataDbContext;
-
-    public HelloWorldController(PublicDataDbContext publicDataDbContext)
-    {
-        this.publicDataDbContext=publicDataDbContext;
-    }
-
     [HttpGet]
     public async Task<ActionResult<List<DataSet>>> Get()
     {
@@ -29,9 +24,10 @@ public class HelloWorldController : ControllerBase
         {
             Status = DataSetStatus.Public,
             Title = "My first dataset",
+            PublicationId = Guid.NewGuid(),
             Versions = new List<DataSetVersion>
             {
-                new DataSetVersion
+                new()
                 {
                     CsvFileId = Guid.NewGuid(),
                     Notes = "fdshbab",
@@ -50,15 +46,83 @@ public class HelloWorldController : ControllerBase
                             "thing"
                         }
                     },
-                    FilterChanges = new List<DataSetChangeFilter>
+                    Meta = new DataSetMeta
                     {
-                        new DataSetChangeFilter
+                        Filters = new List<FilterMeta>
                         {
-                            Changes = new List<DataSetChange<FilterChangeState>>
+                            new()
                             {
-                                new DataSetChange<FilterChangeState>
+                                Identifier = "school_type",
+                                Label = "School type",
+                                Options = new List<FilterOptionMeta>
                                 {
-                                    Type = DataSetChangeType.Add,
+                                    new()
+                                    {
+                                        Identifier = "123",
+                                        Label = "Primary"
+                                    },
+                                    new()
+                                    {
+                                        Identifier = "345",
+                                        Label = "Secondary"
+                                    }
+                                },
+                            }
+                        },
+                        Indicators = new List<IndicatorMeta>()
+                        {
+                            new()
+                            {
+                                Identifier = "number_pupils",
+                                Label = "Number of pupils",
+                            }
+                        },
+                        TimePeriods = new List<TimePeriodMeta>
+                        {
+                            new()
+                            {
+                                Year = 2020,
+                                Code = TimeIdentifier.AcademicYear
+                            }
+                        },
+                        Locations = new List<LocationMeta>
+                        {
+                            new()
+                            {
+                                Level = GeographicLevel.LocalAuthority,
+                                Options = new List<LocationOptionMeta>
+                                {
+                                    new()
+                                    {
+                                        Identifier = "1",
+                                        Label = "Barnsley",
+                                        Code = "E00001"
+                                    },
+                                    new()
+                                    {
+                                        Identifier = "2",
+                                        Label = "Sheffield",
+                                        Code = "E00002"
+                                    }
+                                }
+                            }
+                        },
+                        GeographicLevels = new List<GeographicLevel>
+                        {
+                            GeographicLevel.Country,
+                            GeographicLevel.Region,
+                            GeographicLevel.LocalAuthority
+                        }
+                    },
+                    FilterChanges = new List<ChangeSetFilters>
+                    {
+                        new()
+                        {
+                            Changes = new List<Change<FilterChangeState>>
+                            {
+                                new()
+                                {
+                                    Type = ChangeType.Add,
                                     CurrentState = new FilterChangeState
                                     {
                                         Label = "dd",
@@ -72,9 +136,9 @@ public class HelloWorldController : ControllerBase
                                         Id = "d"
                                     }
                                 },
-                                new DataSetChange<FilterChangeState>
+                                new()
                                 {
-                                    Type = DataSetChangeType.Add,
+                                    Type = ChangeType.Add,
                                     CurrentState = new FilterChangeState
                                     {
                                         Label = "aa",
@@ -91,15 +155,15 @@ public class HelloWorldController : ControllerBase
                             }
                         }
                     },
-                    IndicatorChanges = new List<DataSetChangeIndicator>
+                    IndicatorChanges = new List<ChangeSetIndicators>
                     {
-                        new DataSetChangeIndicator
+                        new()
                         {
-                            Changes = new List<DataSetChange<IndicatorChangeState>>
+                            Changes = new List<Change<IndicatorChangeState>>
                             {
-                                new DataSetChange<IndicatorChangeState>
+                                new()
                                 {
-                                    Type = DataSetChangeType.Update,
+                                    Type = ChangeType.Update,
                                     CurrentState = new IndicatorChangeState
                                     {
                                         Label = "aa",
@@ -113,7 +177,7 @@ public class HelloWorldController : ControllerBase
                                         Id = "d",
                                         DecimalPlaces = 2,
                                         Unit = "%"
-                                    }   
+                                    }
                                 }
                             }
                         }
@@ -126,6 +190,6 @@ public class HelloWorldController : ControllerBase
 
         await publicDataDbContext.SaveChangesAsync();
 
-        return null;
+        return null!;
     }
 }

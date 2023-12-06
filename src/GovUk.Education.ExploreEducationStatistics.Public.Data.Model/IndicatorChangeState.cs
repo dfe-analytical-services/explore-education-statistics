@@ -1,11 +1,8 @@
-using System.Text.Json.Serialization;
-
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-public class IndicatorMeta
+public class IndicatorChangeState
 {
-    [JsonPropertyName("Id")]
-    public required string Identifier { get; set; }
+    public required string Id { get; set; }
 
     public required string Label { get; set; }
 

@@ -1,6 +1,6 @@
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
-public enum DataSetChangeType
+public enum ChangeType
 {
     Add,
     Update,

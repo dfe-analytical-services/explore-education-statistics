@@ -2,7 +2,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 public class TimePeriodRange
 {
-    public TimePeriodMeta Start { get; set; } = null!;
+    public required TimePeriodMeta Start { get; set; }
 
-    public TimePeriodMeta End { get; set; } = null!;
+    public required TimePeriodMeta End { get; set; }
 }

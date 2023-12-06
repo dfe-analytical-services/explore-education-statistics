@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
@@ -5,9 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 public class FilterMeta
 {
     [JsonPropertyName("Id")]
-    public string Identifier { get; set; } = string.Empty;
+    public required string Identifier { get; set; }
 
-    public string Label { get; set; } = string.Empty;
+    public required string Label { get; set; }
 
     public string Hint { get; set; } = string.Empty;
 

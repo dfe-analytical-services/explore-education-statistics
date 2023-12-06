@@ -11,15 +11,15 @@ public class DataSetMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOff
 
     public DataSetVersion DataSetVersion { get; set; } = null!;
 
-    public List<FilterMeta> Filters { get; set; } = new();
+    public required List<FilterMeta> Filters { get; set; } = new();
 
-    public List<IndicatorMeta> Indicators { get; set; } = new();
+    public required List<IndicatorMeta> Indicators { get; set; } = new();
 
-    public List<TimePeriodMeta> TimePeriods { get; set; } = new();
+    public required List<TimePeriodMeta> TimePeriods { get; set; } = new();
 
-    public List<LocationMeta> Locations { get; set; } = new();
+    public required List<LocationMeta> Locations { get; set; } = new();
 
-    //public List<object> GeographicLevels { get; set; } = new();
+    public required List<GeographicLevel> GeographicLevels { get; set; } = new();
 
     public DateTimeOffset Created { get; set; }
 

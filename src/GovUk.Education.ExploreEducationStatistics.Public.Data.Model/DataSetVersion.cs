@@ -10,27 +10,29 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public DataSet DataSet { get; set; } = null!;
 
-    public Guid CsvFileId { get; set; }
+    public required Guid CsvFileId { get; set; }
 
-    public string ParquetFilename { get; set; } = string.Empty;
+    public required string ParquetFilename { get; set; } = string.Empty;
 
-    public int VersionMajor { get; set; }
+    public required int VersionMajor { get; set; }
 
-    public int VersionMinor { get; set; }
+    public required int VersionMinor { get; set; }
 
-    public string Notes { get; set; } = string.Empty;
+    public required string Notes { get; set; } = string.Empty;
 
     public DataSetVersionMetaSummary MetaSummary { get; set; } = null!;
 
-    public List<DataSetChangeFilter> FilterChanges { get; set; } = new();
+    public DataSetMeta Meta { get; set; } = null!;
 
-    public List<DataSetChangeFilterOption> FilterOptionChanges { get; set; } = new();
+    public List<ChangeSetFilters> FilterChanges { get; set; } = new();
 
-    public List<DataSetChangeIndicator> IndicatorChanges { get; set; } = new();
+    public List<ChangeSetFilterOptions> FilterOptionChanges { get; set; } = new();
 
-    public List<DataSetChangeLocation> LocationChanges { get; set; } = new();
+    public List<ChangeSetIndicators> IndicatorChanges { get; set; } = new();
 
-    public List<DataSetChangeTimePeriod> TimePeriodChanges { get; set; } = new();
+    public List<ChangeSetLocations> LocationChanges { get; set; } = new();
+
+    public List<ChangeSetTimePeriods> TimePeriodChanges { get; set; } = new();
 
     public DateTimeOffset? Published { get; set; }
 

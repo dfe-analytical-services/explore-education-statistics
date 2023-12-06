@@ -62,19 +62,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 });
 
             migrationBuilder.CreateTable(
-                name: "DataSetChangeFilterOptions",
+                name: "DataSetChangeSetFilterOptions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Changes = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSetChangeFilterOptions", x => x.Id);
+                    table.PrimaryKey("PK_DataSetChangeSetFilterOptions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DataSetChangeFilterOptions_DataSetVersions_DataSetVersionId",
+                        name: "FK_DataSetChangeSetFilterOptions_DataSetVersions_DataSetVersio~",
                         column: x => x.DataSetVersionId,
                         principalTable: "DataSetVersions",
                         principalColumn: "Id",
@@ -82,19 +83,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 });
 
             migrationBuilder.CreateTable(
-                name: "DataSetChangeFilters",
+                name: "DataSetChangeSetFilters",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Changes = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSetChangeFilters", x => x.Id);
+                    table.PrimaryKey("PK_DataSetChangeSetFilters", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DataSetChangeFilters_DataSetVersions_DataSetVersionId",
+                        name: "FK_DataSetChangeSetFilters_DataSetVersions_DataSetVersionId",
                         column: x => x.DataSetVersionId,
                         principalTable: "DataSetVersions",
                         principalColumn: "Id",
@@ -102,19 +104,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 });
 
             migrationBuilder.CreateTable(
-                name: "DataSetChangeIndicators",
+                name: "DataSetChangeSetIndicators",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Changes = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSetChangeIndicators", x => x.Id);
+                    table.PrimaryKey("PK_DataSetChangeSetIndicators", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DataSetChangeIndicators_DataSetVersions_DataSetVersionId",
+                        name: "FK_DataSetChangeSetIndicators_DataSetVersions_DataSetVersionId",
                         column: x => x.DataSetVersionId,
                         principalTable: "DataSetVersions",
                         principalColumn: "Id",
@@ -122,19 +125,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 });
 
             migrationBuilder.CreateTable(
-                name: "DataSetChangeLocations",
+                name: "DataSetChangeSetLocations",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Changes = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSetChangeLocations", x => x.Id);
+                    table.PrimaryKey("PK_DataSetChangeSetLocations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DataSetChangeLocations_DataSetVersions_DataSetVersionId",
+                        name: "FK_DataSetChangeSetLocations_DataSetVersions_DataSetVersionId",
                         column: x => x.DataSetVersionId,
                         principalTable: "DataSetVersions",
                         principalColumn: "Id",
@@ -142,19 +146,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 });
 
             migrationBuilder.CreateTable(
-                name: "DataSetChangeTimePeriods",
+                name: "DataSetChangeSetTimePeriods",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Changes = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DataSetChangeTimePeriods", x => x.Id);
+                    table.PrimaryKey("PK_DataSetChangeSetTimePeriods", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DataSetChangeTimePeriods_DataSetVersions_DataSetVersionId",
+                        name: "FK_DataSetChangeSetTimePeriods_DataSetVersions_DataSetVersionId",
                         column: x => x.DataSetVersionId,
                         principalTable: "DataSetVersions",
                         principalColumn: "Id",
@@ -167,6 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetVersionId = table.Column<Guid>(type: "uuid", nullable: false),
+                    GeographicLevels = table.Column<string[]>(type: "text[]", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Filters = table.Column<string>(type: "jsonb", nullable: true),
@@ -186,34 +192,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSetChangeFilterOptions_DataSetVersionId",
-                table: "DataSetChangeFilterOptions",
+                name: "IX_DataSetChangeSetFilterOptions_DataSetVersionId",
+                table: "DataSetChangeSetFilterOptions",
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSetChangeFilters_DataSetVersionId",
-                table: "DataSetChangeFilters",
+                name: "IX_DataSetChangeSetFilters_DataSetVersionId",
+                table: "DataSetChangeSetFilters",
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSetChangeIndicators_DataSetVersionId",
-                table: "DataSetChangeIndicators",
+                name: "IX_DataSetChangeSetIndicators_DataSetVersionId",
+                table: "DataSetChangeSetIndicators",
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSetChangeLocations_DataSetVersionId",
-                table: "DataSetChangeLocations",
+                name: "IX_DataSetChangeSetLocations_DataSetVersionId",
+                table: "DataSetChangeSetLocations",
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DataSetChangeTimePeriods_DataSetVersionId",
-                table: "DataSetChangeTimePeriods",
+                name: "IX_DataSetChangeSetTimePeriods_DataSetVersionId",
+                table: "DataSetChangeSetTimePeriods",
                 column: "DataSetVersionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataSetMeta_DataSetVersionId",
                 table: "DataSetMeta",
-                column: "DataSetVersionId");
+                column: "DataSetVersionId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_DataSets_SupersedingDataSetId",
@@ -230,19 +237,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "DataSetChangeFilterOptions");
+                name: "DataSetChangeSetFilterOptions");
 
             migrationBuilder.DropTable(
-                name: "DataSetChangeFilters");
+                name: "DataSetChangeSetFilters");
 
             migrationBuilder.DropTable(
-                name: "DataSetChangeIndicators");
+                name: "DataSetChangeSetIndicators");
 
             migrationBuilder.DropTable(
-                name: "DataSetChangeLocations");
+                name: "DataSetChangeSetLocations");
 
             migrationBuilder.DropTable(
-                name: "DataSetChangeTimePeriods");
+                name: "DataSetChangeSetTimePeriods");
 
             migrationBuilder.DropTable(
                 name: "DataSetMeta");
