@@ -13,6 +13,18 @@
       "metadata": {
         "description": "The name of the key vault"
       }
+    },
+    "slackWebhook": {
+      "type": "string",
+      "metadata": {
+        "description": "Slack webhook URI for alerts"
+      }
+    },
+    "slackAlertsChannel": {
+      "type": "string",
+      "metadata": {
+        "description": "Slack channel to post Azure alerts to"
+      }
     }
   },
   "variables": {
@@ -92,6 +104,111 @@
               "referenceName": "ls_sql_statistics",
               "type": "LinkedServiceReference"
             }
+          },
+          {
+            "name": "Report success",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "sp_rebuild_indexes",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.12:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('slackWebhook')]",
+              "method": "POST",
+              "body": {
+                "channel": "[parameters('slackAlertsChannel')]",
+                "icon_emoji": ":smile",
+                "text": "Data Factory Success!",
+                "username": "Alertbot",
+                "attachments": [{
+                  "color": "good",
+                  "fields": [{
+                    "title": "Data Factory",
+                    "value": "@{pipeline().DataFactory}",
+                    "short": true
+                  },
+                  {
+                    "title": "Pipeline",
+                    "value": "@{pipeline().Pipeline}",
+                    "short": true
+                  },
+                  {
+                    "title": "Duration",
+                    "value": "@{activity('sp_rebuild_indexes').Duration}",
+                    "short": true
+                  }]
+                }]
+              }
+            }
+          },
+          {
+            "name": "Report failure",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "sp_rebuild_indexes",
+                "dependencyConditions": [
+                  "Failed"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.12:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('slackWebhook')]",
+              "method": "POST",
+              "body": {
+                "channel": "[parameters('slackAlertsChannel')]",
+                "icon_emoji": ":face_vomiting",
+                "text": "Data Factory Failure!",
+                "username": "Alertbot",
+                "attachments": [
+                  {
+                    "color": "warning",
+                    "fields": [
+                      {
+                        "title": "Data Factory",
+                        "value": "@{pipeline().DataFactory}",
+                        "short": true
+                      },
+                      {
+                        "title": "Pipeline",
+                        "value": "@{pipeline().Pipeline}",
+                        "short": true
+                      },
+                      {
+                        "title": "Error",
+                        "value": "@{activity('sp_rebuild_indexes').Error.message}",
+                        "short": true
+                      },
+                      {
+                        "title": "Duration",
+                        "value": "@{activity('sp_rebuild_indexes').Duration}",
+                        "short": true
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
           }
         ],
         "parameters": {
@@ -154,6 +271,111 @@
             "linkedServiceName": {
               "referenceName": "ls_sql_statistics",
               "type": "LinkedServiceReference"
+            }
+          },
+          {
+            "name": "Report success",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "sp_remove_soft_deleted_subjects",
+                "dependencyConditions": [
+                  "Succeeded"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.12:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('slackWebhook')]",
+              "method": "POST",
+              "body": {
+                "channel": "[parameters('slackAlertsChannel')]",
+                "icon_emoji": ":smile",
+                "text": "Data Factory Success!",
+                "username": "Alertbot",
+                "attachments": [{
+                  "color": "good",
+                  "fields": [{
+                    "title": "Data Factory",
+                    "value": "@{pipeline().DataFactory}",
+                    "short": true
+                  },
+                    {
+                      "title": "Pipeline",
+                      "value": "@{pipeline().Pipeline}",
+                      "short": true
+                    },
+                    {
+                      "title": "Duration",
+                      "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}",
+                      "short": true
+                    }]
+                }]
+              }
+            }
+          },
+          {
+            "name": "Report failure",
+            "type": "WebActivity",
+            "dependsOn": [
+              {
+                "activity": "sp_remove_soft_deleted_subjects",
+                "dependencyConditions": [
+                  "Failed"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.12:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "url": "[parameters('slackWebhook')]",
+              "method": "POST",
+              "body": {
+                "channel": "[parameters('slackAlertsChannel')]",
+                "icon_emoji": ":face_vomiting",
+                "text": "Data Factory Failure!",
+                "username": "Alertbot",
+                "attachments": [
+                  {
+                    "color": "warning",
+                    "fields": [
+                      {
+                        "title": "Data Factory",
+                        "value": "@{pipeline().DataFactory}",
+                        "short": true
+                      },
+                      {
+                        "title": "Pipeline",
+                        "value": "@{pipeline().Pipeline}",
+                        "short": true
+                      },
+                      {
+                        "title": "Error",
+                        "value": "@{activity('sp_remove_soft_deleted_subjects').Error.message}",
+                        "short": true
+                      },
+                      {
+                        "title": "Duration",
+                        "value": "@{activity('sp_remove_soft_deleted_subjects').Duration}",
+                        "short": true
+                      }
+                    ]
+                  }
+                ]
+              }
             }
           }
         ],
