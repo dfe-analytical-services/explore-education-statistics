@@ -1,8 +1,8 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model
+namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
-    public enum Unit
+    public enum IndicatorUnit
     {
         [EnumLabelValue("", "")]
         Number,
