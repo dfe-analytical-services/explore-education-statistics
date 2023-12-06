@@ -1,17 +1,10 @@
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
-using Namotion.Reflection;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 
 public class PublicDataDbContext : DbContext
 {
-
-    public PublicDataDbContext(DbContextOptions<PublicDataDbContext> options) : base(options)
-    {
-    }
-
     public PublicDataDbContext(DbContextOptions<PublicDataDbContext> options, bool updateTimestamps = true) : base(options)
     {
         Configure(updateTimestamps: updateTimestamps);

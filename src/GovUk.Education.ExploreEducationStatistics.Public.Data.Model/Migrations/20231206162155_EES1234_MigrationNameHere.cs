@@ -41,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     DataSetId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
                     CsvFileId = table.Column<Guid>(type: "uuid", nullable: false),
                     ParquetFilename = table.Column<string>(type: "text", nullable: false),
                     VersionMajor = table.Column<int>(type: "integer", nullable: false),
@@ -48,7 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     Notes = table.Column<string>(type: "text", nullable: false),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Unpublished = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    Status = table.Column<string>(type: "text", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     MetaSummary = table.Column<string>(type: "jsonb", nullable: false)

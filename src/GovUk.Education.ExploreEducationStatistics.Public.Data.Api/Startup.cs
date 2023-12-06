@@ -5,6 +5,8 @@ using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
@@ -12,6 +14,7 @@ using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Npgsql;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
@@ -63,10 +66,14 @@ public class Startup
         // Databases
 
         services.AddDbContext<PublicDataDbContext>(options =>
+        {
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(Configuration.GetConnectionString("PublicDataDbContext"));
+            dataSourceBuilder.MapEnum<GeographicLevel>();
+
             options
-                .UseNpgsql(Configuration.GetConnectionString("PublicDataDbContext"))
-                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
-        );
+                .UseNpgsql(dataSourceBuilder.Build())
+                .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment());
+        });
 
         // Caching and compression
 
