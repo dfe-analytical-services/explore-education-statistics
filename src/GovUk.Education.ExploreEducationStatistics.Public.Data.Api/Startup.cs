@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 using AngleSharp.Io;
 using FluentValidation;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
@@ -46,6 +47,11 @@ public class Startup
             options.RespectBrowserAcceptHeader = true;
             options.ReturnHttpNotAcceptable = true;
             options.EnableEndpointRouting = false;
+        });
+
+        services.ConfigureHttpJsonOptions(options =>
+        {
+            options.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
         });
 
         services.AddControllers(options =>
