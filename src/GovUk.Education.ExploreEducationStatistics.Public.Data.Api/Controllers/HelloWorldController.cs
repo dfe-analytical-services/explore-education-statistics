@@ -22,7 +22,7 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
     {
         var dataSet = new DataSet
         {
-            Status = DataSetStatus.Public,
+            Status = DataSetStatus.Published,
             Title = "My first dataset",
             PublicationId = Guid.NewGuid(),
             Versions = new List<DataSetVersion>

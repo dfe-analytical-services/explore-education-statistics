@@ -116,9 +116,9 @@ public class PublicDataDbContext : DbContext
     public DbSet<DataSet> DataSets { get; init; } = null!;
     public DbSet<DataSetVersion> DataSetVersions { get; init; } = null!;
     public DbSet<DataSetMeta> DataSetMeta { get; init; } = null!;
-    public DbSet<ChangeSetFilters> DataSetChangeSetFilters { get; init; } = null!;
-    public DbSet<ChangeSetFilterOptions> DataSetChangeSetFilterOptions { get; init; } = null!;
-    public DbSet<ChangeSetIndicators> DataSetChangeSetIndicators { get; init; } = null!;
-    public DbSet<ChangeSetLocations> DataSetChangeSetLocations { get; init; } = null!;
-    public DbSet<ChangeSetTimePeriods> DataSetChangeSetTimePeriods { get; init; } = null!;
+    public DbSet<ChangeSetFilters> ChangeSetFilters { get; init; } = null!;
+    public DbSet<ChangeSetFilterOptions> ChangeSetFilterOptions { get; init; } = null!;
+    public DbSet<ChangeSetIndicators> ChangeSetIndicators { get; init; } = null!;
+    public DbSet<ChangeSetLocations> ChangeSetLocations { get; init; } = null!;
+    public DbSet<ChangeSetTimePeriods> ChangeSetTimePeriods { get; init; } = null!;
 }
