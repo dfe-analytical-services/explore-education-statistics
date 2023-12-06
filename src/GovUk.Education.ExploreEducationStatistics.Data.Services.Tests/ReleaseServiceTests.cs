@@ -34,16 +34,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = new Subject(),
-                DataGuidance = "Guidance 1"
-
+                Subject = new Subject()
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = statisticsRelease,
-                Subject = new Subject(),
-                DataGuidance = "Guidance 2"
+                Subject = new Subject()
             };
 
             var subject1Filter1 = new Filter
@@ -116,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseFile1 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 1",
+                Name = "Data set 1",
                 File = new File
                 {
                     Filename = "data1.csv",
@@ -124,19 +121,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
                 },
+                Summary = "Data set 1 guidance"
             };
 
             var releaseFile2 = new ReleaseFile
             {
                 Release = contentRelease,
-                Name = "Subject 2",
+                Name = "Data set 2",
                 File = new File
                 {
                     Filename = "data2.csv",
                     ContentLength = 20480,
                     Type = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
-                }
+                },
+                Summary = "Data set 2 guidance"
             };
 
             var import1 = new DataImport
@@ -198,12 +197,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(2, subjects.Count);
                 Assert.Equal(releaseSubject1.Subject.Id, subjects[0].Id);
                 Assert.Equal(releaseFile1.Name, subjects[0].Name);
+                Assert.Equal(releaseFile1.Summary, subjects[0].Content);
                 Assert.Equal(releaseFile1.File.Id, subjects[0].File.Id);
                 Assert.Equal(releaseFile1.File.Filename, subjects[0].File.FileName);
                 Assert.Equal("10 Kb", subjects[0].File.Size);
                 Assert.Equal("csv", subjects[0].File.Extension);
-
-                Assert.Equal(releaseSubject1.DataGuidance, subjects[0].Content);
 
                 Assert.Equal("2020/21", subjects[0].TimePeriods.From);
                 Assert.Equal("2021/22", subjects[0].TimePeriods.To);
@@ -225,10 +223,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(releaseSubject2.Subject.Id, subjects[1].Id);
                 Assert.Equal(releaseFile2.Name, subjects[1].Name);
+                Assert.Equal(releaseFile2.Summary, subjects[1].Content);
                 Assert.Equal(releaseFile2.File.Id, subjects[1].File.Id);
                 Assert.Equal(releaseFile2.File.Filename, subjects[1].File.FileName);
                 Assert.Equal("20 Kb", subjects[1].File.Size);
-                Assert.Equal(releaseSubject2.DataGuidance, subjects[1].Content);
                 Assert.Equal("csv", subjects[1].File.Extension);
 
                 Assert.Equal("2030", subjects[1].TimePeriods.From);
@@ -605,7 +603,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 1",
                 FilterSequence = new List<FilterSequenceEntry>
                 {
                     new (subject1Filter2Id, new List<FilterGroupSequenceEntry>()),
@@ -744,7 +741,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                DataGuidance = "Guidance 1",
                 IndicatorSequence = new List<IndicatorGroupSequenceEntry>
                 {
                     new(Guid.NewGuid(), new List<Guid> { subject1Indicator2.Id, subject1Indicator1.Id, }),

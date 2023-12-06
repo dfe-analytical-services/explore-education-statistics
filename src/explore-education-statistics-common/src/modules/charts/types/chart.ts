@@ -120,6 +120,7 @@ export interface ChartProps {
   includeNonNumericData?: boolean;
   showDataLabels?: boolean;
   map?: MapConfig;
+  subtitle?: string;
 }
 
 export interface StackedBarProps extends ChartProps {
@@ -147,6 +148,7 @@ export interface ChartDefinitionOptions {
   height: number;
   width?: number;
   barThickness?: number;
+  subtitle?: string;
   title?: string;
   titleType: TitleType;
   alt: string;

@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             IPrivateBlobStorageService privateBlobStorageService,
             IPublicBlobStorageService publicBlobStorageService,
             IGlossaryCacheService glossaryCacheService,
-            IMethodologyCacheService methodologyCacheService, 
+            IMethodologyCacheService methodologyCacheService,
             IPublicationCacheService publicationCacheService)
         {
             _privateBlobStorageService = privateBlobStorageService;
@@ -77,15 +77,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 await request.CacheEntries
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
-                        
+
                         async entry =>
                         {
                             var allowedPath =
                                 EnumUtil.GetFromString<UpdatePublicCacheTreePathsViewModel.CacheEntry>(entry);
-                            
+
                             switch (allowedPath)
                             {
-                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
+                                case UpdatePublicCacheTreePathsViewModel.CacheEntry.MethodologyTree:
                                     await _methodologyCacheService.UpdateSummariesTree();
                                     break;
                                 case UpdatePublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         public async Task<ActionResult> ClearPublicCachePublicationJson()
         {
             var publicationJsonFilenameRegex = FileStoragePathUtils.PublicationFileName.Replace(".", "\\.");
-            
+
             await _publicBlobStorageService.DeleteBlobs(
                 BlobContainers.PublicContent,
                 options: new DeleteBlobsOptions
@@ -179,12 +179,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         public async Task<ActionResult> ClearPublicCacheReleaseJson()
         {
             var latestReleaseJsonFilenameRegex = FileStoragePathUtils.LatestReleaseFileName.Replace(".", "\\.");
-            
+
             await _publicBlobStorageService.DeleteBlobs(
                 BlobContainers.PublicContent,
                 options: new DeleteBlobsOptions
                 {
-                    IncludeRegex = new Regex($"^publications/[^/]+/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}-[^/]+\\.json)$")
+                    // Match against patterns:
+                    //
+                    // publications/***/latest-release.json
+                    // publications/***/releases/1234.json
+                    // publications/***/releases/1234-35.json
+                    // publications/***/releases/1234-q1.json
+                    // publications/***/releases/1234-35-q1.json
+                    IncludeRegex = new Regex($"^publications/[^/]+/({latestReleaseJsonFilenameRegex}|releases/[0-9]{{4}}(-[^/]+)?\\.json)$")
                 });
 
             return NoContent();
@@ -197,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 MethodologyTree,
                 PublicationTree
             }
-            
+
             private static readonly HashSet<string> AllowedCacheEntries = new()
             {
                 CacheEntry.MethodologyTree.ToString(),

@@ -439,6 +439,7 @@ Configure basic line chart
     user clicks button    Line
     user clicks radio    Set an alternative title
     user enters text into element    label:Enter chart title    Test chart title
+    user enters text into element    label:Subtitle    Test chart subtitle
     user enters text into element    label:Alt text    Test chart alt
     user enters text into element    label:Height (pixels)    400
     user enters text into element    label:Width (pixels)    900
@@ -490,6 +491,7 @@ Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview
 
     user checks chart title contains    id:chartBuilderPreview    Test chart title
+    user checks chart subtitle contains    id:chartBuilderPreview    Test chart subtitle
     user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
 
     user checks chart height    id:chartBuilderPreview    400
@@ -565,6 +567,7 @@ Validate line chart embeds correctly
     user waits until element contains line chart    ${datablock}
 
     user checks chart title contains    ${datablock}    Test chart title
+    user checks chart subtitle contains    ${datablock}    Test chart subtitle
     user checks chart legend item contains    ${datablock}    1    Admission Numbers (Nailsea Youngwood)
 
     user checks chart height    ${datablock}    400

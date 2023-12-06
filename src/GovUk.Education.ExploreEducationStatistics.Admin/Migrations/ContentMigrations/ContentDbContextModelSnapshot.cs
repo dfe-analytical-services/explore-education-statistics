@@ -22,6 +22,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.Contact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ContactName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContactTelNo")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeamEmail")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TeamName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Contacts");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Comment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -62,32 +88,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasIndex("ResolvedById");
 
                     b.ToTable("Comment");
-                });
-
-            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Contact", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("ContactName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContactTelNo")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TeamEmail")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TeamName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Contacts");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock", b =>
@@ -176,21 +176,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("LatestPublishedVersionId")
+                    b.Property<Guid?>("LatestDraftVersionId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("LatestDraftVersionId")
+                    b.Property<Guid?>("LatestPublishedVersionId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LatestPublishedVersionId")
-                        .IsUnique()
-                        .HasFilter("[LatestPublishedVersionId] IS NOT NULL");
-
                     b.HasIndex("LatestDraftVersionId")
                         .IsUnique()
                         .HasFilter("[LatestDraftVersionId] IS NOT NULL");
+
+                    b.HasIndex("LatestPublishedVersionId")
+                        .IsUnique()
+                        .HasFilter("[LatestPublishedVersionId] IS NOT NULL");
 
                     b.ToTable("DataBlocks", (string)null);
                 });
@@ -585,10 +585,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("OwningPublicationTitle")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Slug")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -1450,17 +1446,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", "LatestPublishedVersion")
-                        .WithOne()
-                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "LatestPublishedVersionId");
-
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", "LatestDraftVersion")
                         .WithOne()
                         .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "LatestDraftVersionId");
 
-                    b.Navigation("LatestPublishedVersion");
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", "LatestPublishedVersion")
+                        .WithOne()
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockParent", "LatestPublishedVersionId");
 
                     b.Navigation("LatestDraftVersion");
+
+                    b.Navigation("LatestPublishedVersion");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataBlockVersion", b =>
@@ -1762,7 +1758,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Contact", "Contact")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Common.Model.Contact", "Contact")
                         .WithMany()
                         .HasForeignKey("ContactId")
                         .OnDelete(DeleteBehavior.Restrict)

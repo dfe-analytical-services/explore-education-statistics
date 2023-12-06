@@ -1,4 +1,5 @@
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
+import { methodologyToolbarConfigFull } from '@admin/config/ckEditorConfig';
 import { EditableContentBlock as EditableContentBlockType } from '@admin/services/types/content';
 import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
@@ -60,6 +61,7 @@ const MethodologyEditableBlock = ({
           hideLabel
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
+          toolbarConfig={methodologyToolbarConfigFull}
           transformImageAttributes={transformImageAttributes}
           onCancel={toggleEditing.off}
           onEditing={toggleEditing.on}

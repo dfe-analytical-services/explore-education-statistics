@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                 id: rs.SubjectId,
                                 name: releaseFile.Name ?? string.Empty,
                                 order: releaseFile.Order,
-                                content: rs.DataGuidance ?? string.Empty,
+                                content: releaseFile.Summary ?? string.Empty,
                                 timePeriods: await _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
                                 geographicLevels: await _dataGuidanceDataSetService.ListGeographicLevels(rs.SubjectId),
                                 filters: await GetFilters(rs.SubjectId, rs.FilterSequence),

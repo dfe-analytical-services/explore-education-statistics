@@ -62,10 +62,11 @@ export type ChartBuilderActions =
     };
 
 const defaultOptions: ChartOptions = {
+  alt: '',
   height: 300,
+  subtitle: '',
   title: '',
   titleType: 'default',
-  alt: '',
 };
 
 const defaultLegend: LegendConfiguration = {

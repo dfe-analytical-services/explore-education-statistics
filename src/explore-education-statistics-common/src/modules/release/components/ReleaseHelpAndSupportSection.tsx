@@ -1,14 +1,16 @@
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
-import { Release } from '@common/services/publicationService';
+import { Publication } from '@common/services/publicationService';
 import {
   ExternalMethodology,
   MethodologySummary,
 } from '@common/services/types/methodology';
+import { ReleaseType } from '@common/services/types/releaseType';
 import React, { ReactNode } from 'react';
 
 interface Props {
-  release: Release;
+  publication: Publication;
+  releaseType: ReleaseType;
   renderExternalMethodologyLink: (
     externalMethodology: ExternalMethodology,
   ) => ReactNode;
@@ -16,12 +18,12 @@ interface Props {
 }
 
 export default function ReleaseHelpAndSupportSection({
-  release,
+  publication,
+  releaseType,
   renderMethodologyLink,
   renderExternalMethodologyLink,
 }: Props) {
-  const { externalMethodology, methodologies, contact, title } =
-    release.publication;
+  const { externalMethodology, methodologies, contact, title } = publication;
 
   return (
     <>
@@ -52,7 +54,7 @@ export default function ReleaseHelpAndSupportSection({
         </>
       )}
 
-      <ReleaseTypeSection type={release.type} />
+      <ReleaseTypeSection type={releaseType} />
 
       <ContactUsSection publicationContact={contact} publicationTitle={title} />
     </>

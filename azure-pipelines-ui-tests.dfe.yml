@@ -48,22 +48,22 @@ jobs:
     displayName: Public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 2 --rerun-attempts 5
+      arguments: --admin-pass "test" --analyst-pass "test" --expiredinvite-pass "test" --env "dev" --file "tests/general_public/" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
-
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
     condition: succeededOrFailed()
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: false
+      failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Test Pipeline Artifact
+    condition: succeededOrFailed()
     inputs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-public
@@ -101,22 +101,22 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 2 --rerun-attempts 5
+      arguments: --admin-pass '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public_2" --processes 4 --rerun-attempts 3
     #  The magic incantation '"$(variable)"'was added by Mark to resolve an issue with Analyst password that contained ampersands.
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-
   - task: PublishTestResults@2
     displayName: Publish Test Results
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: false
+      failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Pipeline Artifact
+    condition: succeededOrFailed()
     inputs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin-and-public-2
@@ -154,19 +154,18 @@ jobs:
     condition: succeededOrFailed()
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 2 --rerun-attempts 5
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
-
 
   - task: PublishTestResults@2
     displayName: Publish Test Results
     condition: succeededOrFailed()
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
-      failTaskOnFailedTests: false
+      failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Test Pipeline Artifact
@@ -207,20 +206,21 @@ jobs:
     displayName: Admin public UI tests
     inputs:
       scriptPath: tests/robot-tests/scripts/run_tests_pipeline.py
-      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 2 --rerun-attempts 5
+      arguments: --admin-pass  '"$(ees-test-ADMIN-PASSWORD)"' --analyst-pass  '"$(ees-test-ANALYST-PASSWORD)"' --expiredinvite-pass '"$(ees-test-expiredinvite-password)"' --env "dev" --file "tests/admin_and_public" --processes 4 --rerun-attempts 3
       workingDirectory: tests/robot-tests
     env:
       SLACK_BOT_TOKEN: $(ees-test-SLACK-BOT-TOKEN)
       SLACK_TEST_REPORT_WEBHOOK_URL: $(ees-test-SLACK-TEST-REPORT-WEBHOOK-URL)
 
-
   - task: PublishTestResults@2
     displayName: Publish Test Results
     inputs:
       testResultsFiles: tests/robot-tests/test-results/xunit.xml
+      failTaskOnFailedTests: true
 
   - task: PublishPipelineArtifact@1
     displayName: Publish Test Pipeline Artifact
+    condition: succeededOrFailed()
     inputs:
       path: tests/robot-tests/test-results/
       artifactName: test-results-admin-public

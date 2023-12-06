@@ -46,7 +46,7 @@ function ChartRenderer({
   id,
   ...props
 }: ChartRendererProps & ChartRendererInternalProps) {
-  const { data, meta, title, type } = props;
+  const { data, meta, subtitle, title, type } = props;
 
   const chart = useMemo(() => {
     switch (props.type) {
@@ -86,7 +86,17 @@ function ChartRenderer({
 
     return (
       <figure className="govuk-!-margin-0" id={id} data-testid={id}>
-        {title && <figcaption className="govuk-heading-s">{title}</figcaption>}
+        {title && (
+          <figcaption>
+            <p
+              className="govuk-heading-s govuk-!-margin-bottom-1"
+              data-testid="chart-title"
+            >
+              {title}
+            </p>
+            {subtitle && <p data-testid="chart-subtitle">{subtitle}</p>}
+          </figcaption>
+        )}
 
         {chart}
 

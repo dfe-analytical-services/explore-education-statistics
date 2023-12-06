@@ -539,9 +539,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DataGuidance")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("FilterSequence")
                         .HasColumnType("nvarchar(max)");
 
