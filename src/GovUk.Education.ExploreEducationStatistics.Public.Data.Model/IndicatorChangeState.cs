@@ -9,5 +9,5 @@ public class IndicatorChangeState
     // TODO: Change to Unit type
     public string Unit { get; set; } = string.Empty;
 
-    public byte DecimalPlaces { get; set; }
+    public byte? DecimalPlaces { get; set; } = null;
 }

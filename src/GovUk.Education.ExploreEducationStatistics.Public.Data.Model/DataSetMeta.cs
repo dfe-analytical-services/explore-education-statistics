@@ -7,19 +7,19 @@ public class DataSetMeta : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOff
 {
     public Guid Id { get; set; }
 
-    public Guid DataSetVersionId { get; set; }
+    public required Guid DataSetVersionId { get; set; }
 
     public DataSetVersion DataSetVersion { get; set; } = null!;
 
-    public required List<FilterMeta> Filters { get; set; } = new();
+    public required List<FilterMeta> Filters { get; set; }
 
-    public required List<IndicatorMeta> Indicators { get; set; } = new();
+    public required List<IndicatorMeta> Indicators { get; set; }
 
-    public required List<TimePeriodMeta> TimePeriods { get; set; } = new();
+    public required List<TimePeriodMeta> TimePeriods { get; set; }
 
-    public required List<LocationMeta> Locations { get; set; } = new();
+    public required List<LocationMeta> Locations { get; set; }
 
-    public required List<GeographicLevel> GeographicLevels { get; set; } = new();
+    public required List<GeographicLevel> GeographicLevels { get; set; }
 
     public DateTimeOffset Created { get; set; }
 

@@ -6,19 +6,21 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 {
     public Guid Id { get; init; }
 
-    public Guid DataSetId { get; set; }
+    public required Guid DataSetId { get; set; }
 
     public DataSet DataSet { get; set; } = null!;
 
+    public required DataSetVersionStatus Status { get; set; }
+
     public required Guid CsvFileId { get; set; }
 
-    public required string ParquetFilename { get; set; } = string.Empty;
+    public required string ParquetFilename { get; set; }
 
     public required int VersionMajor { get; set; }
 
     public required int VersionMinor { get; set; }
 
-    public required string Notes { get; set; } = string.Empty;
+    public required string Notes { get; set; }
 
     public DataSetVersionMetaSummary MetaSummary { get; set; } = null!;
 
@@ -37,8 +39,6 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     public DateTimeOffset? Published { get; set; }
 
     public DateTimeOffset? Unpublished { get; set; }
-
-    public DataSetVersionStatus Status { get; set; }
 
     public DateTimeOffset Created { get; set; }
 

@@ -4,11 +4,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 public class DataSetVersionMetaSummary
 {
-    public TimePeriodRange TimePeriodRange { get; set; } = null!;
+    public required TimePeriodRange TimePeriodRange { get; set; }
 
-    public List<string> Filters { get; set; } = new();
+    public required List<string> Filters { get; set; }
 
-    public List<string> Indicators { get; set; } = new();
+    public required List<string> Indicators { get; set; }
 
-    public List<GeographicLevel> GeographicLevels { get; set; } = new();
+    public required List<GeographicLevel> GeographicLevels { get; set; }
 }

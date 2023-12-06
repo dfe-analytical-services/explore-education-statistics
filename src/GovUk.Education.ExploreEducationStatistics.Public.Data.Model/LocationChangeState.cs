@@ -8,7 +8,7 @@ public class LocationChangeState
 
     public required string Label { get; set; }
 
-    public string Code { get; set; } = string.Empty;
+    public required string Code { get; set; }
 
-    public GeographicLevel Level { get; set; }
+    public required GeographicLevel Level { get; set; }
 }

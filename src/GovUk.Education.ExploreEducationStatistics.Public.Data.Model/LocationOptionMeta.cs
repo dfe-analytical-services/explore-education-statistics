@@ -9,5 +9,5 @@ public class LocationOptionMeta
 
     public required string Label { get; set; }
 
-    public string Code { get; set; } = string.Empty;
+    public required string Code { get; set; }
 }

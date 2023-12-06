@@ -8,9 +8,9 @@ public abstract class ChangeSet<TChangeState> : ICreatedUpdatedTimestamps<DateTi
 
     public DataSetVersion DataSetVersion { get; set; } = null!;
 
-    public Guid DataSetVersionId { get; set; }
+    public required Guid DataSetVersionId { get; set; }
 
-    public List<Change<TChangeState>> Changes { get; set; } = new();
+    public required List<Change<TChangeState>> Changes { get; set; }
 
     public DateTimeOffset Created { get; set; }
 

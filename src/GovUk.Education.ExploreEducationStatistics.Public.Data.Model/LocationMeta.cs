@@ -6,5 +6,5 @@ public class LocationMeta
 {
     public required GeographicLevel Level { get; set; }
 
-    public List<LocationOptionMeta> Options { get; set; } = new();
+    public required List<LocationOptionMeta> Options { get; set; }
 }

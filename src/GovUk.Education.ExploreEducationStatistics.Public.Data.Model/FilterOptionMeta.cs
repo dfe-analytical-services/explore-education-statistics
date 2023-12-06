@@ -10,6 +10,4 @@ public class FilterOptionMeta
     public required string Label { get; set; }
 
     public bool? IsAggregate { get; set; } = null!;
-
-    public FilterMeta FilterMeta { get; set; } = null!;
 }
