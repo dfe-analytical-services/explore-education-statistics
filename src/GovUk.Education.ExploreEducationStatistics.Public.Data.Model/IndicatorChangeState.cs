@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
 public class IndicatorChangeState
@@ -6,8 +8,7 @@ public class IndicatorChangeState
 
     public required string Label { get; set; }
 
-    // TODO: Change to Unit type
-    public string Unit { get; set; } = string.Empty;
+    public IndicatorUnit? Unit { get; set; }
 
-    public byte? DecimalPlaces { get; set; } = null;
+    public byte? DecimalPlaces { get; set; }
 }
