@@ -171,6 +171,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LatestVersionId")
+                        .IsUnique();
+
                     b.HasIndex("SupersedingDataSetId");
 
                     b.ToTable("DataSets");
@@ -771,9 +774,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", b =>
                 {
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", "LatestVersion")
+                        .WithOne("DataSet")
+                        .HasForeignKey("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "LatestVersionId");
+
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "SupersedingDataSet")
                         .WithMany()
                         .HasForeignKey("SupersedingDataSetId");
+
+                    b.Navigation("LatestVersion");
 
                     b.Navigation("SupersedingDataSet");
                 });
@@ -982,7 +991,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", b =>
                 {
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", "DataSet")
+                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSet", null)
                         .WithMany("Versions")
                         .HasForeignKey("DataSetId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1077,8 +1086,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                 .IsRequired();
                         });
 
-                    b.Navigation("DataSet");
-
                     b.Navigation("MetaSummary")
                         .IsRequired();
                 });
@@ -1090,6 +1097,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Public.Data.Model.DataSetVersion", b =>
                 {
+                    b.Navigation("DataSet")
+                        .IsRequired();
+
                     b.Navigation("FilterChanges");
 
                     b.Navigation("FilterOptionChanges");

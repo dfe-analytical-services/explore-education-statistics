@@ -18,6 +18,8 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 
     public Guid? LatestVersionId { get; set; }
 
+    public DataSetVersion? LatestVersion { get; set; }
+
     public List<DataSetVersion> Versions { get; set; } = new();
 
     public DateTimeOffset? Published { get; set; }

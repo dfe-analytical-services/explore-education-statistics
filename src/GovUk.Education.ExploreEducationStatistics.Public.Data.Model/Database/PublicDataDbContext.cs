@@ -24,6 +24,11 @@ public class PublicDataDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<DataSet>()
+            .HasOne(ds => ds.LatestVersion)
+            .WithOne(dsv => dsv.DataSet)
+            .HasForeignKey<DataSet>(ds => ds.LatestVersionId);
+
+        modelBuilder.Entity<DataSet>()
             .Property(ds => ds.Status)
             .HasConversion<string>();
 
@@ -44,9 +49,7 @@ public class PublicDataDbContext : DbContext
                             .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
                     });
                 });
-            });
-
-        modelBuilder.Entity<DataSetVersion>()
+            })
             .Property(dsv => dsv.Status)
             .HasConversion<string>();
 
@@ -72,9 +75,7 @@ public class PublicDataDbContext : DbContext
             {
                 m.ToJson();
                 m.OwnsMany(lm => lm.Options);
-            });
-
-        modelBuilder.Entity<DataSetMeta>()
+            })
             .Property(m => m.GeographicLevels)
             .HasColumnType("text[]");
 
