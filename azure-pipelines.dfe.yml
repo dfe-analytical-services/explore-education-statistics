@@ -150,12 +150,6 @@ jobs:
           script: 'corepack enable'
 
       - task: UseDotNet@2
-        displayName: 'Install .NET 8.0 SDK'
-        inputs:
-          version: 8.0.x
-          performMultiLevelLookup: true
-
-      - task: UseDotNet@2
         displayName: 'Install .NET 6.0 SDK'
         inputs:
           version: 6.0.x
