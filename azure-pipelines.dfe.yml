@@ -11,7 +11,6 @@ variables:
   IsBranchDeployable: ${{ containsValue(parameters.DeployBranches, variables['Build.SourceBranchName']) }}
   CI: true
   NODE_VERSION: 18.18.2
-  DOTNET_VERSION: 8.0.x
 
 trigger:
   branches:
@@ -32,9 +31,15 @@ jobs:
       clean: all
     steps:
       - task: UseDotNet@2
-        displayName: 'Install .NET Core SDK'
+        displayName: 'Install .NET 8.0 SDK'
         inputs:
-          version: $(DOTNET_VERSION)
+          version: 8.0.x
+          performMultiLevelLookup: true
+
+      - task: UseDotNet@2
+        displayName: 'Install .NET 6.0 SDK'
+        inputs:
+          version: 6.0.x
           performMultiLevelLookup: true
 
       - task: 'DotNetCoreCLI@2'
@@ -147,7 +152,7 @@ jobs:
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'
         inputs:
-          version: $(DOTNET_VERSION)
+          version: 6.0.x
           performMultiLevelLookup: true
 
       - task: 'DotNetCoreCLI@2'
