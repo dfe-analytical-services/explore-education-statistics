@@ -1,3 +1,5 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,11 +35,13 @@ public class PublicDataDbContext : DbContext
                 {
                     msb.OwnsOne(tpr => tpr.Start, tpr =>
                     {
-                        tpr.Property(tpm => tpm.Code).HasConversion<string>();
+                        tpr.Property(tpm => tpm.Code)
+                            .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
                     });
                     msb.OwnsOne(tpr => tpr.End, tpr =>
                     {
-                        tpr.Property(tpm => tpm.Code).HasConversion<string>();
+                        tpr.Property(tpm => tpm.Code)
+                            .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
                     });
                 });
             });
@@ -52,10 +56,18 @@ public class PublicDataDbContext : DbContext
                 m.ToJson();
                 m.OwnsMany(fm => fm.Options);
             })
-            .OwnsMany(m => m.Indicators,
-                m => m.ToJson())
-            .OwnsMany(m => m.TimePeriods,
-                m => m.ToJson())
+            .OwnsMany(m => m.Indicators, m =>
+            {
+                m.ToJson();
+                m.Property(im => im.Unit)
+                    .HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
+            })
+            .OwnsMany(m => m.TimePeriods, m =>
+            {
+                m.ToJson();
+                m.Property(tpm => tpm.Code)
+                    .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+            })
             .OwnsMany(m => m.Locations, m =>
             {
                 m.ToJson();
@@ -89,8 +101,16 @@ public class PublicDataDbContext : DbContext
             {
                 cs.ToJson();
                 cs.Property(c => c.Type).HasConversion<string>();
-                cs.OwnsOne(c => c.CurrentState);
-                cs.OwnsOne(c => c.PreviousState);
+                cs.OwnsOne(c => c.CurrentState, s =>
+                {
+                    s.Property(sb => sb.Unit)
+                        .HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
+                });
+                cs.OwnsOne(c => c.PreviousState, s =>
+                {
+                    s.Property(sb => sb.Unit)
+                        .HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
+                });
             });
 
         modelBuilder.Entity<ChangeSetLocations>()
@@ -98,7 +118,10 @@ public class PublicDataDbContext : DbContext
             {
                 cs.ToJson();
                 cs.Property(c => c.Type).HasConversion<string>();
-                cs.OwnsOne(c => c.CurrentState);
+                cs.OwnsOne(c => c.CurrentState, s =>
+                {
+                    s.Property(sb => sb.Level).HasConversion<string>();
+                });
                 cs.OwnsOne(c => c.PreviousState);
             });
 
@@ -107,8 +130,16 @@ public class PublicDataDbContext : DbContext
             {
                 cs.ToJson();
                 cs.Property(c => c.Type).HasConversion<string>();
-                cs.OwnsOne(c => c.CurrentState);
-                cs.OwnsOne(c => c.PreviousState);
+                cs.OwnsOne(c => c.CurrentState, s =>
+                {
+                    s.Property(sb => sb.Code)
+                        .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                });
+                cs.OwnsOne(c => c.PreviousState, s =>
+                {
+                    s.Property(sb => sb.Code)
+                        .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                });
             });
     }
 

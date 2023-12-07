@@ -99,6 +99,7 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
                             {
                                 Identifier = "number_pupils",
                                 Label = "Number of pupils",
+                                Unit = IndicatorUnit.Pound
                             }
                         },
                         TimePeriods = new List<TimePeriodMeta>
@@ -195,14 +196,59 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
                                         Label = "aa",
                                         Id = "a",
                                         DecimalPlaces = 3,
-                                        Unit = "%"
+                                        Unit = IndicatorUnit.Percent
                                     },
                                     PreviousState = new IndicatorChangeState
                                     {
                                         Label = "aaa",
                                         Id = "d",
                                         DecimalPlaces = 2,
-                                        Unit = "%"
+                                        Unit = IndicatorUnit.Pound
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    LocationChanges = new List<ChangeSetLocations>()
+                    {
+                        new()
+                        {
+                            DataSetVersionId = dataSetVersionId,
+                            Changes = new List<Change<LocationChangeState>>
+                            {
+                                new()
+                                {
+                                    Type = ChangeType.Add,
+                                    CurrentState = new LocationChangeState
+                                    {
+                                        Id = "123",
+                                        Label = "Barnsley",
+                                        Level = GeographicLevel.LocalAuthority,
+                                        Code = "E123"
+                                    },
+                                }
+                            }
+                        }
+                    },
+                    TimePeriodChanges = new List<ChangeSetTimePeriods>
+                    {
+                        new()
+                        {
+                            DataSetVersionId = dataSetVersionId,
+                            Changes = new List<Change<TimePeriodChangeState>>
+                            {
+                                new()
+                                {
+                                    Type = ChangeType.Update,
+                                    CurrentState = new TimePeriodChangeState
+                                    {
+                                        Code = TimeIdentifier.FinancialYear,
+                                        Year = 2020,
+                                    },
+                                    PreviousState = new TimePeriodChangeState
+                                    {
+                                        Code = TimeIdentifier.FinancialYear,
+                                        Year = 2023,
                                     }
                                 }
                             }
