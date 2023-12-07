@@ -118,7 +118,10 @@ public class PublicDataDbContext : DbContext
             {
                 cs.ToJson();
                 cs.Property(c => c.Type).HasConversion<string>();
-                cs.OwnsOne(c => c.CurrentState);
+                cs.OwnsOne(c => c.CurrentState, s =>
+                {
+                    s.Property(sb => sb.Level).HasConversion<string>();
+                });
                 cs.OwnsOne(c => c.PreviousState);
             });
 

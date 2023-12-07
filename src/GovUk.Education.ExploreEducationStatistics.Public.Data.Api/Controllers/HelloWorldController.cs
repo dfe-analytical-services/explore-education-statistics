@@ -209,6 +209,27 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
                             }
                         }
                     },
+                    LocationChanges = new List<ChangeSetLocations>()
+                    {
+                        new()
+                        {
+                            DataSetVersionId = dataSetVersionId,
+                            Changes = new List<Change<LocationChangeState>>
+                            {
+                                new()
+                                {
+                                    Type = ChangeType.Add,
+                                    CurrentState = new LocationChangeState
+                                    {
+                                        Id = "123",
+                                        Label = "Barnsley",
+                                        Level = GeographicLevel.LocalAuthority,
+                                        Code = "E123"
+                                    },
+                                }
+                            }
+                        }
+                    },
                     TimePeriodChanges = new List<ChangeSetTimePeriods>
                     {
                         new()
