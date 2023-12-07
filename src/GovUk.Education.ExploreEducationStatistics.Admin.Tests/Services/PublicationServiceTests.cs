@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -977,7 +978,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                result.AssertBadRequest(SlugNotUnique);
+                result.AssertBadRequest(PublicationSlugNotUnique);
             }
         }
 
@@ -1023,10 +1024,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var methodologyService = new Mock<IMethodologyService>(Strict);
-
-                var publicationService = BuildPublicationService(context,
-                    methodologyService: methodologyService.Object);
-
                 methodologyService
                     .Setup(s => s.PublicationTitleOrSlugChanged(
                         publication.Id,
@@ -1034,6 +1031,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         "New title",
                         "new-title"))
                     .Returns(Task.CompletedTask);
+
+                var publicationService = BuildPublicationService(context,
+                    methodologyService: methodologyService.Object);
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -1142,6 +1142,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
 
+                methodologyService
+                    .Setup(s => s.PublicationTitleOrSlugChanged(
+                        publication.Id,
+                        publication.Slug,
+                        "New title",
+                        "new-title"))
+                    .Returns(Task.CompletedTask);
+
                 methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                     .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
                         new List<AllMethodologiesThemeViewModel>()));
@@ -1168,16 +1176,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     methodologyCacheService: methodologyCacheService.Object,
                     redirectsCacheService: redirectsCacheService.Object);
 
-                // Expect the title to change but not the slug, as the Publication is already published.
-                methodologyService
-                    .Setup(s => s.PublicationTitleOrSlugChanged(
-                        publication.Id,
-                        publication.Slug,
-                        "New title",
-                        "new-title"))
-                    .Returns(Task.CompletedTask);
-
-                // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
                     new PublicationSaveRequest
@@ -1289,6 +1287,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
 
+                methodologyService.Setup(mock =>
+                        mock.ValidateMethodologySlug("new-title", null, null))
+                    .ReturnsAsync(Unit.Instance);
+
+                methodologyService
+                    .Setup(s => s.PublicationTitleOrSlugChanged(
+                        publication.Id,
+                        publication.Slug,
+                        "New title",
+                        "new-title"))
+                    .Returns(Task.CompletedTask);
+
                 methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
                     .ReturnsAsync(new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
                         new List<AllMethodologiesThemeViewModel>()));
@@ -1311,14 +1321,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationCacheService: publicationCacheService.Object,
                     methodologyCacheService: methodologyCacheService.Object,
                     redirectsCacheService: redirectsCacheService.Object);
-
-                methodologyService
-                    .Setup(s => s.PublicationTitleOrSlugChanged(
-                        publication.Id,
-                        publication.Slug,
-                        "New title",
-                        "new-title"))
-                    .Returns(Task.CompletedTask);
 
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
@@ -1572,15 +1574,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             };
             var publication = new Publication
             {
-                Title = "Old title",
-                Slug = "old-title",
+                Title = "Current title",
+                Slug = "current-title",
                 Topic = topic,
                 LatestPublishedReleaseId = Guid.NewGuid(),
             };
             var olderRedirect = new PublicationRedirect
             {
                 Publication = publication,
-                Slug = "older-title",
+                Slug = "old-title",
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -1595,8 +1597,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var methodologyService = new Mock<IMethodologyService>(Strict);
                 methodologyService.Setup(mock =>
+                        mock.ValidateMethodologySlug("new-title", null, null))
+                    .ReturnsAsync(Unit.Instance);
+                methodologyService.Setup(mock =>
                         mock.PublicationTitleOrSlugChanged(
-                            publication.Id, "old-title", "New title", "new-title"))
+                            publication.Id, "current-title", "New title", "new-title"))
                     .Returns(Task.CompletedTask);
 
                 var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
@@ -1611,7 +1616,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publicationCacheService.Setup(mock =>
                         mock.UpdatePublication("new-title"))
                     .ReturnsAsync(new PublicationCacheViewModel());
-                publicationCacheService.Setup(mock => mock.RemovePublication("old-title"))
+                publicationCacheService.Setup(mock => mock.RemovePublication("current-title"))
                     .ReturnsAsync(Unit.Instance);
 
                 var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
@@ -1650,10 +1655,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, publicationRedirects.Count);
 
                 Assert.Equal(publication.Id, publicationRedirects[0].PublicationId);
-                Assert.Equal("older-title", publicationRedirects[0].Slug);
+                Assert.Equal("old-title", publicationRedirects[0].Slug);
 
                 Assert.Equal(publication.Id, publicationRedirects[1].PublicationId);
-                Assert.Equal("old-title", publicationRedirects[1].Slug);
+                Assert.Equal("current-title", publicationRedirects[1].Slug);
             }
         }
 
@@ -1689,6 +1694,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var methodologyService = new Mock<IMethodologyService>(Strict);
+                methodologyService.Setup(mock =>
+                        mock.ValidateMethodologySlug("older-title", null, null))
+                    .ReturnsAsync(Unit.Instance);
                 methodologyService.Setup(mock =>
                         mock.PublicationTitleOrSlugChanged(
                             publication.Id, "title", "Older title", "older-title"))
@@ -1742,15 +1750,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("older-title", dbPublication.Slug);
 
                 var publicationRedirects = context.PublicationRedirects.ToList();
-                Assert.Equal(2, publicationRedirects.Count);
+                var redirect = Assert.Single(publicationRedirects);
 
-                // we don't remove redundant redirects for the currently live slug - they are filtered out
-                // in RedirectsService#List
-                Assert.Equal(publication.Id, publicationRedirects[0].PublicationId);
-                Assert.Equal("older-title", publicationRedirects[0].Slug);
+                // As the current slug is now "older-title", the "older-title" redirect is redundant
+                // and so is removed
 
-                Assert.Equal(publication.Id, publicationRedirects[1].PublicationId);
-                Assert.Equal("title", publicationRedirects[1].Slug);
+                Assert.Equal(publication.Id, redirect.PublicationId);
+                Assert.Equal("title", redirect.Slug);
             }
         }
 
@@ -1797,7 +1803,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                result.AssertBadRequest(SlugNotUnique);
+                result.AssertBadRequest(PublicationSlugNotUnique);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1854,7 +1860,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                result.AssertBadRequest(SlugUsedByRedirect);
+                result.AssertBadRequest(PublicationSlugUsedByRedirect);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1867,96 +1873,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var publicationRedirects = context.PublicationRedirects.ToList();
                 var redirect = Assert.Single(publicationRedirects);
-                Assert.Equal(publicationRedirect.PublicationId, redirect.PublicationId);
-                Assert.Equal(publicationRedirect.Slug, redirect.Slug);
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_PublicationAlreadyHasRedirect()
-        {
-            // NOTE: This setup happens if a live publication has changed its slug
-            // back to one it previously used while live. So the publication has the same slug
-            // as an existing redirect
-            var topic = new Topic
-            {
-                Title = "Topic title",
-                Theme = new Theme(),
-            };
-            var publication = new Publication
-            {
-                Title = "Duplicated title",
-                Slug = "duplicated-title",
-                Topic = topic,
-                LatestPublishedReleaseId = Guid.NewGuid(),
-            };
-            var publicationRedirect = new PublicationRedirect
-            {
-                Slug = "duplicated-title",
-                Publication = publication,
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.PublicationRedirects.AddAsync(publicationRedirect);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var methodologyService = new Mock<IMethodologyService>(Strict);
-                methodologyService.Setup(mock => mock.PublicationTitleOrSlugChanged(
-                        publication.Id, "duplicated-title",
-                        "New title", "new-title"))
-                    .Returns(Task.CompletedTask);
-
-                var methodologyCacheService = new Mock<IMethodologyCacheService>(Strict);
-                methodologyCacheService.Setup(mock => mock.UpdateSummariesTree())
-                    .ReturnsAsync(
-                        new Either<ActionResult, List<AllMethodologiesThemeViewModel>>(
-                            new List<AllMethodologiesThemeViewModel>()));
-
-                var publicationCacheService = new Mock<IPublicationCacheService>(Strict);
-                publicationCacheService.Setup(mock => mock.UpdatePublicationTree())
-                    .ReturnsAsync(new List<PublicationTreeThemeViewModel>());
-                publicationCacheService.Setup(mock =>
-                        mock.UpdatePublication("new-title"))
-                    .ReturnsAsync(new PublicationCacheViewModel());
-                publicationCacheService.Setup(mock => mock.RemovePublication("duplicated-title"))
-                    .ReturnsAsync(Unit.Instance);
-
-                var redirectsCacheService = new Mock<IRedirectsCacheService>(Strict);
-                redirectsCacheService.Setup(mock => mock.UpdateRedirects())
-                    .ReturnsAsync(new RedirectsViewModel(
-                        new List<RedirectViewModel>(), new List<RedirectViewModel>()));
-
-                var publicationService = BuildPublicationService(context,
-                    methodologyService: methodologyService.Object,
-                    methodologyCacheService: methodologyCacheService.Object,
-                    publicationCacheService: publicationCacheService.Object,
-                    redirectsCacheService: redirectsCacheService.Object);
-
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveRequest
-                    {
-                        Title = "New title",
-                        TopicId = topic.Id,
-                    }
-                );
-
-                var viewModel = result.AssertRight();
-
-                Assert.Equal(publication.Id, viewModel.Id);
-                Assert.Equal("new-title", viewModel.Slug);
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var redirects = await context.PublicationRedirects.ToListAsync();
-                var redirect = Assert.Single(redirects); // no duplicate redirect
-
                 Assert.Equal(publicationRedirect.PublicationId, redirect.PublicationId);
                 Assert.Equal(publicationRedirect.Slug, redirect.Slug);
             }
@@ -1990,6 +1906,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Publication = publication,
                 Methodology = methodology,
+                Owner = true,
             };
 
             var otherMethodology = new Methodology
@@ -2008,19 +1925,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicationService = BuildPublicationService(context);
+                var methodologyService = new Mock<IMethodologyService>(Strict);
+
+                methodologyService.Setup(mock =>
+                        mock.ValidateMethodologySlug("already-used-by-methodology", null, null))
+                    .ReturnsAsync(ValidationUtils.ValidationActionResult(MethodologySlugNotUnique));
+
+                var publicationService = BuildPublicationService(context,
+                    methodologyService: methodologyService.Object);
 
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
                     new PublicationSaveRequest
                     {
                         Title = "Already used by methodology",
-                        Slug = "already-used-by-methodology",
                         TopicId = topic.Id,
                     }
                 );
 
-                result.AssertBadRequest(SlugUsedByMethodology);
+                result.AssertBadRequest(MethodologySlugNotUnique);
             }
 
             await using (var context = InMemoryApplicationDbContext(contextId))

@@ -50,5 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
             string originalSlug,
             string updatedTitle,
             string updatedSlug);
+
+        Task<Either<ActionResult, Unit>> ValidateMethodologySlug(
+            string newSlug, string? oldSlug = null, Guid? methodologyId = null);
     }
 }

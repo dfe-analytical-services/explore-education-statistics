@@ -19,8 +19,10 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'title',
     messages: {
-      SlugNotUnique: 'Used by other methodology. Choose a unique title',
-      SlugUsedByRedirect: 'Used by methodology redirect. Choose a unique title',
+      MethodologySlugNotUnique:
+        'Used by other methodology. Choose a unique title',
+      MethodologySlugUsedByRedirect:
+        'Used by methodology redirect. Choose a unique title',
     },
   }),
 ];

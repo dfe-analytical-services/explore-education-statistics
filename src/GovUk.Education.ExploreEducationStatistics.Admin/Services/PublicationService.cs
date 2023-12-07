@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -209,15 +210,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         if (publication.Live
                             && _context.PublicationRedirects.All(pr =>
                                 !(pr.PublicationId == publicationId && pr.Slug == originalSlug))) // don't create duplicate redirect
+                        {
+                            var publicationRedirect = new PublicationRedirect
                             {
-                                var publicationRedirect = new PublicationRedirect
-                                {
-                                    Slug = originalSlug,
-                                    Publication = publication,
-                                    PublicationId = publication.Id,
-                                };
-                                _context.PublicationRedirects.Add(publicationRedirect);
-                            }
+                                Slug = originalSlug,
+                                Publication = publication,
+                                PublicationId = publication.Id,
+                            };
+                            _context.PublicationRedirects.Add(publicationRedirect);
+                        }
+
+                        // If there is an existing redirects for the new slug, they're redundant. Remove them
+                        var redundantRedirects = await _context.PublicationRedirects
+                            .Where(pr => pr.Slug == updatedPublication.Slug)
+                            .ToListAsync();
+                        if (redundantRedirects.Count > 0)
+                        {
+                            _context.PublicationRedirects.RemoveRange(redundantRedirects);
+                        }
                     }
 
                     publication.Title = updatedPublication.Title;
@@ -472,30 +482,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, Unit>> ValidatePublicationSlug(
-            string slug, Guid? publicationId = null)
+            string newSlug, Guid? publicationId = null)
         {
             if (await _context.Publications.AsQueryable()
                     .AnyAsync(publication =>
                         publication.Id != publicationId
-                        && publication.Slug == slug))
+                        && publication.Slug == newSlug))
             {
-                return ValidationActionResult(SlugNotUnique);
+                return ValidationActionResult(PublicationSlugNotUnique);
             }
 
             var hasRedirect = await _context.PublicationRedirects
                 .AnyAsync(pr =>
                     pr.PublicationId != publicationId // If publication previously used this slug, can change it back
-                    && pr.Slug == slug);
+                    && pr.Slug == newSlug);
 
             if (hasRedirect)
             {
-                return ValidationActionResult(SlugUsedByRedirect);
+                return ValidationActionResult(PublicationSlugUsedByRedirect);
             }
 
-            if (publicationId.HasValue)
+            if (publicationId.HasValue &&
+                _context.PublicationMethodologies.Any(pm =>
+                    pm.Publication.Id == publicationId
+                    && pm.Owner)
+                // Strictly, we should also check whether the owned methodology inherits the publication slug - we don't
+                // need to validate the new slug against methodologies if it isn't changing the methodology slug - but
+                // this check is expensive and an unlikely edge case, so doesn't seem worth it.
+                )
             {
-                // if a methodology is inheriting the new publication slug, it must also be validated
-                //_methodologyService.ValidateMethodologySlug(slug); // @MarkFix
+                var methodologySlugValidation = await _methodologyService
+                    .ValidateMethodologySlug(newSlug);
+                if (methodologySlugValidation.IsLeft)
+                {
+                    return methodologySlugValidation.Left;
+                }
             }
 
             return Unit.Instance;

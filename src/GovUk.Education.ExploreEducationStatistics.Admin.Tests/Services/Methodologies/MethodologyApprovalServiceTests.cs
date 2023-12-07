@@ -115,7 +115,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -223,7 +224,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyImageService: imageService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 imageService.Verify(mock =>
                     mock.Delete(methodologyVersion.Id, new List<Guid>
@@ -305,7 +307,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -523,7 +526,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var service = SetupService(contentDbContext: context);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 Assert.Equal(methodologyVersion.Id, updatedMethodologyVersion.Id);
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
@@ -687,12 +691,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyCacheService: methodologyCacheService.Object,
                     redirectsCacheService: redirectsCacheService.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 VerifyAllMocks(
-                    contentService, 
-                    methodologyVersionRepository, 
-                    publishingService, 
+                    contentService,
+                    methodologyVersionRepository,
+                    publishingService,
                     methodologyCacheService,
                     redirectsCacheService);
 
@@ -779,7 +784,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -870,7 +876,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     methodologyContentService: contentService.Object,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -1169,7 +1176,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 // Un-approving is allowed for users that can approve the methodology providing it's not publicly accessible
                 // Test that un-approving alters the status
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -1198,7 +1206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
-        public async Task UpdateApprovalStatus_SubmitDraftForHigherReview()
+        public async Task UpdateApprovalStatus_SubmitForHigherReview()
         {
             var owningPublicationId = Guid.NewGuid();
             var methodologyVersion = new MethodologyVersion
@@ -1290,7 +1298,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     userReleaseRoleService: userReleaseRoleService.Object,
                     emailTemplateService: emailTemplateService.Object);
 
-                var updatedMethodologyVersion = (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
+                var updatedMethodologyVersion =
+                    (await service.UpdateApprovalStatus(methodologyVersion.Id, request)).AssertRight();
 
                 VerifyAllMocks(contentService, methodologyVersionRepository);
 
@@ -1302,7 +1311,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal(request.Status, updatedMethodologyVersion.Status);
                 Assert.Null(updatedMethodologyVersion.Methodology.LatestPublishedVersionId);
             }
-
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var updatedMethodologyVersion = await context
