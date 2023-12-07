@@ -16,6 +16,8 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 
     public DataSet? SupersedingDataSet { get; set; }
 
+    public Guid? LatestVersionId { get; set; }
+
     public List<DataSetVersion> Versions { get; set; } = new();
 
     public DateTimeOffset? Published { get; set; }

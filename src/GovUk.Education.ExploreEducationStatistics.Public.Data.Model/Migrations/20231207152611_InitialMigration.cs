@@ -20,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     PublicationId = table.Column<Guid>(type: "uuid", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     SupersedingDataSetId = table.Column<Guid>(type: "uuid", nullable: true),
+                    LatestVersionId = table.Column<Guid>(type: "uuid", nullable: true),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Unpublished = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
@@ -181,7 +182,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     GeographicLevels = table.Column<string[]>(type: "text[]", nullable: false),
                     TimePeriods = table.Column<string>(type: "jsonb", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    Updated = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
