@@ -44,5 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         Task<Either<ActionResult, List<MethodologyStatusViewModel>>> GetMethodologyStatuses(Guid methodologyVersionId);
 
         Task<Either<ActionResult, List<MethodologyVersionViewModel>>> ListUsersMethodologyVersionsForApproval();
+
+        Task PublicationTitleOrSlugChanged(
+            Guid publicationId,
+            string originalSlug,
+            string updatedTitle,
+            string updatedSlug);
     }
 }
