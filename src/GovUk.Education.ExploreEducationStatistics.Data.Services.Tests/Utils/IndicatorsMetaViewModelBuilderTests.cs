@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Xunit;
@@ -33,7 +34,7 @@ public class IndicatorsMetaViewModelBuilderTests
                         DecimalPlaces = 1,
                         Label = "Indicator a",
                         Name = "indicator_a",
-                        Unit = Unit.Percent
+                        Unit = IndicatorUnit.Percent
                     },
                     new()
                     {
@@ -41,7 +42,7 @@ public class IndicatorsMetaViewModelBuilderTests
                         DecimalPlaces = 2,
                         Label = "Indicator b",
                         Name = "indicator_b",
-                        Unit = Unit.Pound
+                        Unit = IndicatorUnit.Pound
                     }
                 }
             },
@@ -57,7 +58,7 @@ public class IndicatorsMetaViewModelBuilderTests
                         DecimalPlaces = 1,
                         Label = "Indicator c",
                         Name = "indicator_c",
-                        Unit = Unit.Percent
+                        Unit = IndicatorUnit.Percent
                     },
                     new()
                     {
@@ -65,7 +66,7 @@ public class IndicatorsMetaViewModelBuilderTests
                         DecimalPlaces = 2,
                         Label = "Indicator d",
                         Name = "indicator_d",
-                        Unit = Unit.Pound
+                        Unit = IndicatorUnit.Pound
                     }
                 }
             }
@@ -420,7 +421,7 @@ public class IndicatorsMetaViewModelBuilderTests
                 DecimalPlaces = 1,
                 Label = "Indicator a",
                 Name = "indicator_a",
-                Unit = Unit.Percent
+                Unit = IndicatorUnit.Percent
             },
             new()
             {
@@ -428,7 +429,7 @@ public class IndicatorsMetaViewModelBuilderTests
                 DecimalPlaces = 2,
                 Label = "Indicator b",
                 Name = "indicator_b",
-                Unit = Unit.Pound
+                Unit = IndicatorUnit.Pound
             }
         };
 
