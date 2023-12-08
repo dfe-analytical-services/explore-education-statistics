@@ -1,5 +1,5 @@
 import TableToolFinalStep from '@frontend/modules/table-tool/components/TableToolFinalStep';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import _publicationService from '@common/services/publicationService';
 import {
   testTable,
@@ -176,7 +176,7 @@ describe('TableToolFinalStep', () => {
     ).toHaveAttribute('href', '/find-statistics/test-publication');
   });
 
-  test('renders the Table Tool final step correctly when this is the latest data', async () => {
+  test('renders correctly when this is the latest data', async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
       testPublicationRelease,
     );
@@ -199,7 +199,7 @@ describe('TableToolFinalStep', () => {
     ).not.toBeInTheDocument();
   });
 
-  test(`renders the Table Tool final step correctly if this is not the latest data`, async () => {
+  test(`renders correctly if this is not the latest data`, async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
       testPublicationRelease,
     );
@@ -234,6 +234,80 @@ describe('TableToolFinalStep', () => {
       'href',
       '/find-statistics/test-publication/selected-release-slug',
     );
+  });
+
+  test('renders a warning when the publication is superseded', async () => {
+    publicationService.getLatestPublicationRelease.mockResolvedValue({
+      ...testPublicationRelease,
+      publication: {
+        ...testPublicationRelease.publication,
+        isSuperseded: true,
+        supersededBy: {
+          id: 'superseding-id',
+          slug: 'superseding-slug',
+          title: 'Superseding publication',
+        },
+      },
+    });
+    render(
+      <TableToolFinalStep
+        query={testQuery}
+        table={testTable}
+        tableHeaders={testTableHeaders}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
+        onReorderTableHeaders={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('This publication has been superseded by'),
+      ).toBeInTheDocument();
+    });
+
+    const supersededWarningLink = within(
+      screen.getByTestId('superseded-warning'),
+    ).getByRole('link', {
+      name: 'Superseding publication',
+    });
+
+    expect(supersededWarningLink).toHaveAttribute(
+      'href',
+      '/find-statistics/superseding-slug',
+    );
+
+    expect(
+      screen.queryByText('This is the latest data'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('This data is not from the latest release'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('View latest data link'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('does not render a warning when the publication is not superseded', async () => {
+    publicationService.getLatestPublicationRelease.mockResolvedValue(
+      testPublicationRelease,
+    );
+    render(
+      <TableToolFinalStep
+        query={testQuery}
+        table={testTable}
+        tableHeaders={testTableHeaders}
+        selectedPublication={testSelectedPublicationWithLatestRelease}
+        onReorderTableHeaders={noop}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('This is the latest data')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByText('This publication has been superseded by'),
+    ).not.toBeInTheDocument();
   });
 
   test('renders the methodology link correctly', async () => {

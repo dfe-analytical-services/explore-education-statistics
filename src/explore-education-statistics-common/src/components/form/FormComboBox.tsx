@@ -1,3 +1,6 @@
+import ErrorMessage from '@common/components/ErrorMessage';
+import inputStyles from '@common/components/form/FormTextSearchInput.module.scss';
+import styles from '@common/components/form/FormComboBox.module.scss';
 import useClickAway from '@common/hooks/useClickAway';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
@@ -11,8 +14,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import inputStyles from '@common/components/form/FormTextSearchInput.module.scss';
-import styles from './FormComboBox.module.scss';
 
 interface ComboBoxRenderProps {
   value: string;
@@ -22,6 +23,7 @@ interface ComboBoxRenderProps {
 interface Props {
   afterInput?: ReactNode | ((props: ComboBoxRenderProps) => ReactNode);
   classes?: Partial<Record<'inputLabel', string>>;
+  error?: ReactNode | string;
   hideSearchIcon?: boolean;
   id: string;
   inputLabel: ReactNode;
@@ -31,13 +33,15 @@ interface Props {
   listBoxLabel?: ReactNode | ((props: ComboBoxRenderProps) => ReactNode);
   listBoxLabelId?: string;
   options?: ReactNode[] | ((props: ComboBoxRenderProps) => ReactNode[]);
+  overflowContainer?: boolean;
   onInputChange: ChangeEventHandler<HTMLInputElement>;
   onSelect(selectedOption: number): void;
 }
 
-const FormComboBox = ({
+export default function FormComboBox({
   afterInput,
   classes = {},
+  error,
   hideSearchIcon = false,
   id,
   inputLabel,
@@ -47,9 +51,10 @@ const FormComboBox = ({
   options,
   listBoxLabel,
   listBoxLabelId,
+  overflowContainer = true,
   onInputChange,
   onSelect,
-}: Props) => {
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const listBoxRef = useRef<HTMLUListElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -154,10 +159,16 @@ const FormComboBox = ({
 
   return (
     <div
-      className={styles.container}
+      className={classNames(styles.container, {
+        'govuk-form-group--error': !!error,
+      })}
       role="none"
       onClick={handleContainerInteraction}
-      onKeyDown={handleContainerInteraction}
+      onKeyDown={event => {
+        if (event.key !== 'Tab') {
+          handleContainerInteraction();
+        }
+      }}
       ref={containerRef}
     >
       <label
@@ -167,13 +178,17 @@ const FormComboBox = ({
         {inputLabel}
       </label>
 
+      {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
+
       <input
         type="text"
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...inputProps}
         role="combobox"
+        autoComplete="off"
         className={classNames('govuk-input', {
           [inputStyles.searchInput]: !hideSearchIcon,
+          'govuk-input--error': !!error,
         })}
         id={`${id}-input`}
         value={value}
@@ -184,6 +199,11 @@ const FormComboBox = ({
         aria-expanded={renderedOptions ? renderedOptions.length > 0 : false}
         aria-activedescendant={
           selectedOption > -1 ? `${id}-option-${selectedOption}` : undefined
+        }
+        aria-describedby={
+          classNames({
+            [`${id}-error`]: !!error,
+          }) || undefined
         }
         onChange={event => {
           event.persist();
@@ -218,7 +238,12 @@ const FormComboBox = ({
         : afterInput}
 
       {showOptions && renderedOptions && (
-        <div className={styles.optionsContainer} role="alert">
+        <div
+          className={classNames(styles.optionsContainer, {
+            [styles.overflowContainer]: overflowContainer,
+          })}
+          role="alert"
+        >
           {typeof listBoxLabel === 'function'
             ? listBoxLabel({ selectedOption, value })
             : listBoxLabel}
@@ -324,6 +349,4 @@ const FormComboBox = ({
       )}
     </div>
   );
-};
-
-export default FormComboBox;
+}

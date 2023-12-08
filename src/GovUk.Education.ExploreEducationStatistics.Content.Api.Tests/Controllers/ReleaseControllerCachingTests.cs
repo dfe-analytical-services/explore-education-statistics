@@ -19,7 +19,6 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-[Collection(CacheServiceTests)]
 public class ReleaseControllerCachingTests : CacheServiceTestFixture
 {
     private const string PublicationSlug = "publication-a";
@@ -50,7 +49,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
 
         publicationCacheService.Setup(mock => mock.GetPublication(PublicationSlug))
             .ReturnsAsync(publicationCacheViewModel);
-        
+
         releaseCacheService.Setup(mock => mock.GetRelease(PublicationSlug, null))
             .ReturnsAsync(releaseCacheViewModel);
 

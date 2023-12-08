@@ -82,6 +82,7 @@ describe('chartBuilderReducer', () => {
       axes: {},
       options: {
         height: 300,
+        subtitle: '',
         title: '',
         titleType: 'default',
         alt: '',
@@ -107,6 +108,7 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 300,
+        subtitle: '',
         title: '',
         titleType: 'default',
         alt: '',
@@ -132,6 +134,7 @@ describe('chartBuilderReducer', () => {
         ...initialState,
         options: {
           height: 400,
+          subtitle: 'Some subtitle',
           title: 'Some title',
           titleType: 'alternative',
           alt: 'Some alt',
@@ -164,6 +167,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         // Height is set to the definition default
         height: 300,
+        subtitle: 'Some subtitle',
         title: 'Some title',
         titleType: 'alternative',
         alt: 'Some alt',
@@ -351,6 +355,7 @@ describe('chartBuilderReducer', () => {
       definition: testChartDefinition,
       options: {
         height: 300,
+        subtitle: '',
         title: '',
         titleType: 'default',
         alt: '',
@@ -363,6 +368,7 @@ describe('chartBuilderReducer', () => {
         payload: {
           height: 500,
           width: 400,
+          subtitle: 'Test subtitle',
           title: 'Test title',
           titleType: 'alternative',
           alt: 'Test alt',
@@ -374,6 +380,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 500,
         width: 400,
+        subtitle: 'Test subtitle',
         title: 'Test title',
         titleType: 'alternative',
         alt: 'Test alt',
@@ -385,6 +392,7 @@ describe('chartBuilderReducer', () => {
         ...initialState,
         options: {
           height: 300,
+          subtitle: '',
           title: '',
           titleType: 'default',
           alt: '',
@@ -397,6 +405,7 @@ describe('chartBuilderReducer', () => {
         payload: {
           height: 500,
           width: 400,
+          subtitle: '',
           title: '',
           titleType: 'default',
           alt: '',
@@ -411,6 +420,7 @@ describe('chartBuilderReducer', () => {
       expect(nextState.options).toEqual<ChartOptions>({
         height: 500,
         width: 400,
+        subtitle: '',
         title: '',
         titleType: 'default',
         alt: '',
@@ -424,6 +434,7 @@ describe('chartBuilderReducer', () => {
         options: {
           height: 300,
           width: 400,
+          subtitle: '',
           title: '',
           titleType: 'default',
           alt: '',
@@ -435,6 +446,7 @@ describe('chartBuilderReducer', () => {
         payload: {
           height: 300,
           width: undefined,
+          subtitle: '',
           title: '',
           titleType: 'default',
           alt: '',
@@ -448,6 +460,7 @@ describe('chartBuilderReducer', () => {
 
       expect(nextState.options).toEqual<ChartOptions>({
         height: 300,
+        subtitle: '',
         title: '',
         titleType: 'default',
         alt: '',

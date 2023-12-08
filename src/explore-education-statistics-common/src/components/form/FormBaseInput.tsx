@@ -25,6 +25,7 @@ export interface FormBaseInputProps
   inputMode?: HTMLAttributes<HTMLInputElement>['inputMode'];
   inputRef?: Ref<HTMLInputElement>;
   list?: string;
+  maxLength?: number;
   name: string;
   trimValue?: boolean;
   width?: 20 | 10 | 5 | 4 | 3 | 2;
@@ -52,6 +53,7 @@ function FormBaseInput({
   inputRef,
   label,
   labelSize,
+  maxLength,
   trimValue = true,
   width,
   type = 'text',
@@ -92,6 +94,7 @@ function FormBaseInput({
         classNames({
           [`${id}-error`]: !!error,
           [`${id}-hint`]: !!hint,
+          [`${id}-info`]: !!maxLength,
         }) || undefined
       }
       className={classNames('govuk-input', className, {

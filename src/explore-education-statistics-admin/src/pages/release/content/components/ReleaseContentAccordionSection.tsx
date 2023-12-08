@@ -24,10 +24,12 @@ import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 export interface ReleaseContentAccordionSectionProps {
   id: string;
   section: ContentSection<EditableBlock>;
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
 const ReleaseContentAccordionSection = ({
   section,
+  transformFeaturedTableLinks,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
   const { id: sectionId, caption, content: sectionContent = [] } = section;
@@ -191,6 +193,7 @@ const ReleaseContentAccordionSection = ({
               <ReleaseBlock
                 block={block}
                 releaseId={release.id}
+                transformFeaturedTableLinks={transformFeaturedTableLinks}
                 visible={open}
               />
             )}

@@ -2604,8 +2604,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var (originalReleaseSubject, replacementReleaseSubject) = _fixture.DefaultReleaseSubject()
                 .WithRelease(statsRelease)
                 .WithSubjects(_fixture.DefaultSubject().Generate(2))
-                .ForIndex(0, i => i.SetDataGuidance("Original data set guidance"))
-                .ForIndex(1, i => i.SetDataGuidance(null!))
                 .Generate(2)
                 .ToTuple2();
 
@@ -3189,9 +3187,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Null(replacedReleaseSubject.FilterSequence);
                 Assert.Null(replacedReleaseSubject.IndicatorSequence);
-
-                // TODO EES-4661 Remove this
-                Assert.Equal("Original data set guidance", replacedReleaseSubject.DataGuidance);
             }
         }
 

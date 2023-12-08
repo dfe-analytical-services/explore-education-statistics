@@ -61,6 +61,8 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
         "BootstrapData",
         "--exclude",
         "VisualTesting",
+        "--xunit",
+        "xunit",
     ]
     robot_args += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
     if arguments.fail_fast:
@@ -70,7 +72,6 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
     if arguments.print_keywords:
         robot_args += ["--listener", "listeners/KeywordListener.py"]
     if arguments.ci:
-        robot_args += ["--xunit", "xunit"]
         # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
         robot_args += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
         robot_args += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
@@ -135,6 +136,8 @@ def merge_test_reports():
         f"{results_foldername}/",
         "-o",
         "output.xml",
+        "--xunit",
+        "xunit.xml",
         "--prerebotmodifier",
         "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
         "--merge",
@@ -198,49 +201,50 @@ def run():
     try:
         # Run tests
         while args.rerun_attempts is None or test_run_index < args.rerun_attempts:
-            test_run_index += 1
+            try:
+                test_run_index += 1
 
-            # Ensure all SeleniumLibrary elements and keywords are updated to use a branch new
-            # Selenium instance for every test (re)run.
-            if test_run_index > 0:
-                selenium_elements.clear_instances()
+                # Ensure all SeleniumLibrary elements and keywords are updated to use a branch new
+                # Selenium instance for every test (re)run.
+                if test_run_index > 0:
+                    selenium_elements.clear_instances()
 
-            rerunning_failed_suites = args.rerun_failed_suites or test_run_index > 0
+                rerunning_failed_suites = args.rerun_failed_suites or test_run_index > 0
 
-            # Perform any cleanup before the test run.
-            clear_files_before_test_run(rerunning_failed_suites)
+                # Perform any cleanup before the test run.
+                clear_files_before_test_run(rerunning_failed_suites)
 
-            if not Path(f"{results_foldername}/downloads").exists():
-                os.makedirs(f"{results_foldername}/downloads")
+                if not Path(f"{results_foldername}/downloads").exists():
+                    os.makedirs(f"{results_foldername}/downloads")
 
-            # Create a unique run identifier so that this test run's data will be unique.
-            run_identifier = create_run_identifier()
-            os.environ["RUN_IDENTIFIER"] = run_identifier
+                # Create a unique run identifier so that this test run's data will be unique.
+                run_identifier = create_run_identifier()
+                os.environ["RUN_IDENTIFIER"] = run_identifier
 
-            # Create a Test Topic under which all of this test run's data will be created.
-            if data_changing_tests:
-                admin_api.create_test_topic(run_identifier)
+                # Create a Test Topic under which all of this test run's data will be created.
+                if data_changing_tests:
+                    admin_api.create_test_topic(run_identifier)
 
-            # Run the tests.
-            logger.info(f"Performing test run {test_run_index + 1} with unique identifier {run_identifier}")
-            execute_tests(args, rerunning_failed_suites)
+                # Run the tests.
+                logger.info(f"Performing test run {test_run_index + 1} with unique identifier {run_identifier}")
+                execute_tests(args, rerunning_failed_suites)
 
-            # If we're rerunning failures, merge the former run's results with this run's
-            # results.
-            if rerunning_failed_suites:
-                logger.info(f"Merging results from test run {test_run_index + 1} with previous run's report")
-                merge_test_reports()
+                # If we're rerunning failures, merge the former run's results with this run's
+                # results.
+                if rerunning_failed_suites:
+                    logger.info(f"Merging results from test run {test_run_index + 1} with previous run's report")
+                    merge_test_reports()
 
-            # Tear down any data created by this test run unless we've disabled teardown.
-            if data_changing_tests and not args.disable_teardown:
-                logger.info("Tearing down test data...")
-                admin_api.delete_test_topic()
+            finally:
+                # Tear down any data created by this test run unless we've disabled teardown.
+                if data_changing_tests and not args.disable_teardown:
+                    logger.info("Tearing down test data...")
+                    admin_api.delete_test_topic()
 
             # If all tests passed, return early.
             if not get_failing_suites():
                 break
 
-    finally:
         logger.info(f"Log available at: file://{os.getcwd()}{os.sep}{results_foldername}{os.sep}log.html")
         logger.info(f"Report available at: file://{os.getcwd()}{os.sep}{results_foldername}{os.sep}report.html")
 
@@ -257,6 +261,12 @@ def run():
         if args.enable_slack_notifications:
             slack_service = SlackService()
             slack_service.send_test_report(args.env, args.tests, failing_suites, test_run_index)
+
+    except Exception as ex:
+        if args.enable_slack_notifications:
+            slack_service = SlackService()
+            slack_service.send_exception_details(args.env, args.tests, test_run_index, ex)
+        raise ex
 
 
 current_dir = Path(__file__).absolute().parent

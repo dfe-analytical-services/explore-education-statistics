@@ -17,7 +17,4 @@ public interface IDataGuidanceDataSetService
 
     Task<List<string>> ListGeographicLevels(Guid subjectId,
         CancellationToken cancellationToken = default);
-
-    Task<Either<ActionResult, Unit>> Validate(Guid releaseId,
-        CancellationToken cancellationToken = default);
 }

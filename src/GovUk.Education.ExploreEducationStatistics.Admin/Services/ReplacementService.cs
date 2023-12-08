@@ -1098,9 +1098,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             _statisticsDbContext.Update(replacementReleaseSubject);
 
-            // TODO EES-4661 Remove this now that we replace data guidance on the ReleaseFile instead
-            replacementReleaseSubject.DataGuidance = originalReleaseSubject.DataGuidance;
-
             replacementReleaseSubject.FilterSequence =
                 await ReplaceFilterSequence(originalReleaseSubject, replacementReleaseSubject);
             replacementReleaseSubject.IndicatorSequence =

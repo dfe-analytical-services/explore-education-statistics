@@ -4,41 +4,42 @@ import Accordion from '@common/components/Accordion';
 import ChevronCard from '@common/components/ChevronCard';
 import ChevronGrid from '@common/components/ChevronGrid';
 import styles from '@common/modules/release/components/ReleaseDataAndFiles.module.scss';
-import { Release } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
 import orderBy from 'lodash/orderBy';
 import React, { ReactNode } from 'react';
 
 interface Props {
-  release: Release;
+  downloadFiles: FileInfo[];
+  hasDataGuidance: boolean;
   renderCreateTablesLink?: ReactNode;
   renderDataCatalogueLink?: ReactNode;
   renderAllFilesLink?: ReactNode;
   renderDataGuidanceLink: ReactNode;
   renderDownloadLink: (file: FileInfo) => ReactNode;
   renderRelatedDashboards?: ReactNode;
-  onSectionOpen?: (accordionSection: { id: string; title: string }) => void;
   showDownloadFilesList?: boolean;
+  onSectionOpen?: (accordionSection: { id: string; title: string }) => void;
 }
 
 const ReleaseDataAndFiles = ({
-  release,
+  downloadFiles,
+  hasDataGuidance,
   renderCreateTablesLink,
   renderDataCatalogueLink,
   renderAllFilesLink,
   renderDataGuidanceLink,
   renderDownloadLink,
   renderRelatedDashboards,
-  onSectionOpen,
   showDownloadFilesList = false,
+  onSectionOpen,
 }: Props) => {
   const dataFiles = orderBy(
-    release.downloadFiles.filter(file => file.type === 'Data'),
+    downloadFiles.filter(file => file.type === 'Data'),
     ['name'],
   );
 
   const ancillaryFiles = orderBy(
-    release.downloadFiles.filter(
+    downloadFiles.filter(
       file => file.type === 'Ancillary' && file.name !== 'All files',
     ),
     ['name'],
@@ -58,7 +59,7 @@ const ReleaseDataAndFiles = ({
           description="View tables that we have built for you, or create your own tables from open data using our table tool"
           link={renderCreateTablesLink}
         />
-        {release.downloadFiles && (
+        {downloadFiles && (
           <>
             <ChevronCard
               description="Browse and download open data files from this release in our data catalogue"
@@ -80,7 +81,7 @@ const ReleaseDataAndFiles = ({
               link={renderDataCatalogueLink}
             />
 
-            {release.hasDataGuidance && (
+            {hasDataGuidance && (
               <ChevronCard
                 description="Learn more about the data files used in this release using our online guidance"
                 link={renderDataGuidanceLink}

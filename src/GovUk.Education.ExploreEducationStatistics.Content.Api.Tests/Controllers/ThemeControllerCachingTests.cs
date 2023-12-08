@@ -21,18 +21,17 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers;
 
-[Collection(CacheServiceTests)]
 public class ThemeControllerCachingTests : CacheServiceTestFixture
 {
     private readonly IList<ThemeViewModel> _themes = ListOf(
         new ThemeViewModel(Guid.NewGuid(), "slug1", "title1", "summary1"),
         new ThemeViewModel(Guid.NewGuid(), "slug2", "title2", "summary2"));
-    
+
     [Fact]
     public async Task ListThemes_NoCachedEntryExists()
     {
         var themeService = new Mock<IThemeService>(Strict);
-        
+
         MemoryCacheService
             .Setup(s => s.GetItem(
                 new ListThemesCacheKey(),
@@ -41,27 +40,27 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
             10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
-        
+
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
                 new ListThemesCacheKey(),
                 _themes,
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
                 null));
-        
+
         themeService
             .Setup(s => s.ListThemes())
             .ReturnsAsync(_themes);
-        
+
         var controller = BuildController(themeService.Object);
 
         var result = await controller.ListThemes();
-        
+
         VerifyAllMocks(MemoryCacheService, themeService);
 
         Assert.Equal(_themes, result);
     }
-    
+
     [Fact]
     public async Task ListThemes_CachedEntryExists()
     {
@@ -70,16 +69,16 @@ public class ThemeControllerCachingTests : CacheServiceTestFixture
                 new ListThemesCacheKey(),
                 typeof(IList<ThemeViewModel>)))
             .Returns(_themes);
-        
+
         var controller = BuildController();
 
         var result = await controller.ListThemes();
-        
+
         VerifyAllMocks(MemoryCacheService);
 
         Assert.Equal(_themes, result);
     }
-    
+
     [Fact]
     public void ThemeViewModelList_SerializeAndDeserialize()
     {

@@ -5,6 +5,7 @@ export interface FeaturedTable {
   name: string;
   description: string;
   dataBlockId: string;
+  dataBlockParentId: string;
   order: number;
 }
 

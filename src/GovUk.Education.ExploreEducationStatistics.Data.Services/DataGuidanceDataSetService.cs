@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -64,22 +63,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .ToAsyncEnumerable()
                         .SelectAwait(async releaseFile =>
                         {
-                            // TODO EES-4661 Remove this and switch to using ReleaseFile for content
                             var subjectId = releaseFile.File.SubjectId!.Value;
-
-                            var releaseSubject = await _statisticsDbContext.ReleaseSubject
-                                .FirstAsync(rs => rs.ReleaseId == releaseId
-                                                  && rs.SubjectId == subjectId,
-                                    cancellationToken);
 
                             var geographicLevels = await ListGeographicLevels(subjectId, cancellationToken);
                             var timePeriods = await _timePeriodService.GetTimePeriodLabels(subjectId);
                             var variables = await ListVariables(subjectId, cancellationToken);
-                            var footnotes = await ListFootnotes(releaseId: releaseSubject.ReleaseId,
+                            var footnotes = await ListFootnotes(releaseId: releaseId,
                                 subjectId: subjectId);
 
                             return BuildDataGuidanceDataSetViewModel(releaseFile,
-                                releaseSubject.DataGuidance,
                                 geographicLevels,
                                 timePeriods,
                                 variables,
@@ -89,29 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .ThenBy(viewModel => viewModel.Name) // For data sets existing before ordering was added
                         .ToListAsync(cancellationToken);
                 });
-        }
-
-        public async Task<Either<ActionResult, Unit>> Validate(Guid releaseId,
-            CancellationToken cancellationToken = default)
-        {
-            // TODO EES-4661 Switch to using ReleaseFile once we know the migration of all existing data set guidance
-            // has been a success. Inline this method with the validation that's already in DataGuidanceService 
-            var releaseSubjects = _statisticsDbContext
-                .ReleaseSubject
-                .Where(rs => rs.ReleaseId == releaseId);
-
-            var releaseHasAnyDataSets = await releaseSubjects.AnyAsync(cancellationToken);
-
-            if (releaseHasAnyDataSets)
-            {
-                if (await releaseSubjects.AnyAsync(rs =>
-                        string.IsNullOrWhiteSpace(rs.DataGuidance), cancellationToken))
-                {
-                    return ValidationUtils.ValidationResult(ValidationErrorMessages.PublicDataGuidanceRequired);
-                }
-            }
-
-            return Unit.Instance;
         }
 
         public async Task<List<string>> ListGeographicLevels(Guid subjectId,
@@ -153,7 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static DataGuidanceDataSetViewModel BuildDataGuidanceDataSetViewModel(
             ReleaseFile releaseFile,
-            string? content,
             List<string> geographicLevels,
             TimePeriodLabels timePeriods,
             List<LabelValue> variables,
@@ -162,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new DataGuidanceDataSetViewModel
             {
                 FileId = releaseFile.FileId,
-                Content = content ?? "", // TODO EES-4661 Update this to be releaseFile.Summary
+                Content = releaseFile.Summary ?? "",
                 Filename = releaseFile.File.Filename,
                 Order = releaseFile.Order,
                 Name = releaseFile.Name ?? "",

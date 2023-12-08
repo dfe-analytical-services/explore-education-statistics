@@ -47,21 +47,17 @@ Add text block with link to absence glossary entry to accordion section
     user adds text block to editable accordion section    Test section    id:releaseMainContent
     ${block}=    user starts editing accordion section text block    Test section    1    id:releaseMainContent
     ${toolbar}=    get editor toolbar    ${block}
-    ${button}=    user gets button element    Add glossary entry    ${toolbar}
+    ${insert}=    user gets button element    Insert    ${toolbar}
+    user clicks element    ${insert}
+    ${button}=    user gets button element    Insert glossary link    ${toolbar}
     user clicks element    ${button}
-    user waits until modal is visible    Insert glossary link
+    ${modal}=    user waits until modal is visible    Insert glossary link
     user enters text into element    id:glossarySearch-input    abs
     user waits until page contains element    id:glossarySearch-options
     user clicks element    id:glossarySearch-option-0
-    user clicks button    Insert
+    user clicks button    Insert    ${modal}
     user waits until modal is not visible    Insert glossary link
-    # Note that the way that interacting with the Glossary Search popup affects the user's focus means
-    # that the usual behaviour of the autosaving CK Editor text blocks does not lend itself to using
-    # the "user saves autosaving text block" keyword here - therefore we're OK just to use a standard
-    # button click to save here.
-    user clicks button    Save & close
-    user waits until page finishes loading
-    user waits until parent contains button    ${block}    Edit block
+    user saves autosaving text block    ${block}
     user waits until parent contains button    ${block}    Absence
 
 Check glossary info icon appears on release preview

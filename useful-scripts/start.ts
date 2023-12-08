@@ -24,7 +24,12 @@ const __dirname = getDirname(import.meta.url);
 const __filename = getFilename(import.meta.url);
 const projectRoot = path.resolve(__dirname, '..');
 
-const allowedDockerServices = ['db', 'data-storage', 'idp'] as const;
+const allowedDockerServices = [
+  'db',
+  'data-storage',
+  'idp',
+  'public-api-db',
+] as const;
 
 type DockerService = (typeof allowedDockerServices)[number];
 
@@ -69,6 +74,8 @@ const allowedServiceNames = [
   'frontend',
   'frontendProd',
   'processor',
+  'publicApiDb',
+  'publicData',
   'publisher',
   'notifier',
   'idp',
@@ -119,6 +126,12 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
     checkReady: line => line.startsWith('Server started on '),
     type: 'command',
   },
+  publicData: {
+    root: 'src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api',
+    colour: chalk.magentaBright,
+    type: 'dotnet',
+    dockerServices: ['public-api-db'],
+  },
   processor: {
     root: 'src/GovUk.Education.ExploreEducationStatistics.Data.Processor',
     colour: chalk.rgb(255, 158, 165),
@@ -153,6 +166,11 @@ const serviceSchemas: Record<ServiceName, ServiceSchema> = {
   dataStorage: {
     service: 'data-storage',
     colour: chalk.green,
+    type: 'docker',
+  },
+  publicApiDb: {
+    service: 'public-api-db',
+    colour: chalk.blue,
     type: 'docker',
   },
 };
