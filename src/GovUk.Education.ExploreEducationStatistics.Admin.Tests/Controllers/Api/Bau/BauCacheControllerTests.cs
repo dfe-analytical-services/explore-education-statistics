@@ -252,18 +252,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "publications/publication-1/latest-release.json");
+            Assert.Matches(regex, "publications/publication-1/releases/1234.json");
+            Assert.Matches(regex, "publications/publication-1/releases/1234-q1.json");
             Assert.Matches(regex, "publications/publication-1/releases/1234-56.json");
-            Assert.Matches(regex, "publications/publication-1/releases/1234-56-fy.json");
+            Assert.Matches(regex, "publications/publication-1/releases/1234-56-q1.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/latest-release_json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234_json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234/data-block-id.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234-56_json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234-56/data-block-id.json");
             Assert.DoesNotMatch(regex, "publications/latest-release.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/1234.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/1234-56.json");
+            Assert.DoesNotMatch(regex, "publications/publication-1/1234-56-q1.json");
+            Assert.DoesNotMatch(regex, "publications/1234.json");
             Assert.DoesNotMatch(regex, "publications/1234-56.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/latest-release.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/12-56.json");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/latest-release.json.bak");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234.json.bak");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234-56.json.bak");
+            Assert.DoesNotMatch(regex, "publications/publication-1/releases/1234-56-q1.json.bak");
         }
 
         [Fact]

@@ -3,15 +3,18 @@ import glossaryQueries from '@admin/queries/glossaryQueries';
 import { GlossaryItem } from '@admin/types/ckeditor';
 import Button from '@common/components/Button';
 import FormComboBox from '@common/components/form/FormComboBox';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
+import createRHFErrorHelper from '@common/components/form/rhf/validation/createRHFErrorHelper';
+import FormProvider from '@common/components/form/rhf/FormProvider';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form, FormFieldTextInput } from '@common/components/form';
 import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { GlossaryEntry } from '@common/services/types/glossary';
 import Yup from '@common/validation/yup';
-import React, { useMemo, useState } from 'react';
-import { Formik } from 'formik';
-import { useQuery } from '@tanstack/react-query';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import React, { useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { ObjectSchema } from 'yup';
 
 interface FormValues {
   slug: string;
@@ -49,49 +52,68 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
     setSearchResults(nextSearchResults);
   }, 400);
 
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      slug: Yup.string().required('Select a glossary entry'),
+      text: Yup.string().required('Enter link text'),
+    });
+  }, []);
+
+  const handleFormSubmit = (values: FormValues) =>
+    onSubmit({
+      text: values.text,
+      url: `${config.PublicAppUrl}/glossary#${values.slug}`,
+    });
+
+  if (isLoading) {
+    return <LoadingSpinner hideText text="Loading glossary" />;
+  }
+
   return (
-    <LoadingSpinner loading={isLoading} hideText text="Loading glossary">
-      <Formik<FormValues>
-        initialValues={{
-          slug: '',
-          text: '',
-        }}
-        validationSchema={Yup.object({
-          slug: Yup.string().required('Select a glossary entry'),
-          text: Yup.string().when('slug', {
-            is: (val: string) => val,
-            then: s => s.required('Enter link text'),
-          }),
-        })}
-        onSubmit={values =>
-          onSubmit({
-            text: values.text,
-            url: `${config.PublicAppUrl}/glossary#${values.slug}`,
-          })
-        }
-      >
-        {form => (
-          <Form id="glossaryForm">
+    <FormProvider validationSchema={validationSchema}>
+      {({ formState, getValues, handleSubmit, setValue, trigger }) => {
+        const { getError } = createRHFErrorHelper({
+          errors: formState.errors,
+          touchedFields: formState.touchedFields,
+          isSubmitted: true,
+        });
+
+        const slug = getValues('slug');
+
+        return (
+          <RHFForm
+            id="featuredTablesForm"
+            showErrorSummary={false}
+            onSubmit={handleFormSubmit}
+          >
             <FormComboBox
+              error={getError('slug')}
               hideSearchIcon={!!selectedEntry}
               id="glossarySearch"
               inputLabel="Glossary entry"
-              options={searchResults.map(result => result.title)}
               inputValue={selectedEntry?.title}
+              options={searchResults.map(result => result.title)}
+              overflowContainer={false}
               onInputChange={event => {
                 search(event.target.value);
               }}
               onSelect={selectedIndex => {
-                form.setFieldValue('text', searchResults[selectedIndex].title);
-                form.setFieldValue('slug', searchResults[selectedIndex].slug);
+                setValue('text' as const, searchResults[selectedIndex].title, {
+                  shouldTouch: true,
+                });
+                setValue('slug' as const, searchResults[selectedIndex].slug, {
+                  shouldTouch: true,
+                });
+                trigger('slug');
                 setSelectedEntry(searchResults[selectedIndex]);
               }}
             />
-            {form.values.slug && (
-              <>
-                <p className="govuk-!-margin-top-1">Slug: {form.values.slug}</p>
 
-                <FormFieldTextInput
+            {slug && (
+              <>
+                <p className="govuk-!-margin-top-1">Slug: {slug}</p>
+
+                <RHFFormFieldTextInput<FormValues>
                   formGroupClass="govuk-!-margin-top-5 govuk-!-margin-bottom-2"
                   id="text"
                   label="Link text"
@@ -108,7 +130,7 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
                   // despite being in a modal, so otherwise it submits
                   // the parent EditableContentForm.
                   event.preventDefault();
-                  form.submitForm();
+                  handleSubmit(handleFormSubmit)();
                 }}
               >
                 Insert
@@ -117,9 +139,9 @@ export default function GlossaryItemInsertForm({ onCancel, onSubmit }: Props) {
                 Cancel
               </Button>
             </ButtonGroup>
-          </Form>
-        )}
-      </Formik>
-    </LoadingSpinner>
+          </RHFForm>
+        );
+      }}
+    </FormProvider>
   );
 }

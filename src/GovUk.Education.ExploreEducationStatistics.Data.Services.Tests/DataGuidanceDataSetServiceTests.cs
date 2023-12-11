@@ -75,15 +75,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseSubject1 = new ReleaseSubject
             {
                 Release = release,
-                Subject = subject1,
-                DataGuidance = "Data set 1 guidance"
+                Subject = subject1
             };
 
             var releaseSubject2 = new ReleaseSubject
             {
                 Release = release,
-                Subject = subject2,
-                DataGuidance = "Data set 2 guidance"
+                Subject = subject2
             };
 
             var subject1Observation1 = new Observation
@@ -714,22 +712,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseVersion1Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion1,
-                Subject = subject1,
-                DataGuidance = "Version 1 data set 1 guidance"
+                Subject = subject1
             };
 
             var releaseVersion2Subject1 = new ReleaseSubject
             {
                 Release = releaseVersion2,
-                Subject = subject1,
-                DataGuidance = "Version 2 data set 1 guidance"
+                Subject = subject1
             };
 
             var releaseVersion2Subject2 = new ReleaseSubject
             {
                 Release = releaseVersion2,
-                Subject = subject2,
-                DataGuidance = "Version 2 data set 2 guidance"
+                Subject = subject2
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -851,117 +846,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Empty(version2ViewModels[1].TimePeriods.To);
                 Assert.Empty(version2ViewModels[1].GeographicLevels);
                 Assert.Empty(version2ViewModels[1].Variables);
-            }
-        }
-
-        [Fact]
-        public async Task Validate_NoRelease()
-        {
-            await using var statisticsDbContext = InMemoryStatisticsDbContext();
-            var service = SetupService(statisticsDbContext: statisticsDbContext);
-
-            var result = await service.Validate(Guid.NewGuid());
-
-            result.AssertRight();
-        }
-
-        [Fact]
-        public async Task Validate_NoSubjects()
-        {
-            var release = new Release();
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Release.AddRangeAsync(release);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupService(statisticsDbContext: statisticsDbContext);
-
-                var result = await service.Validate(release.Id);
-
-                result.AssertRight();
-            }
-        }
-
-        [Fact]
-        public async Task Validate_DataGuidancePopulated()
-        {
-            var release = new Release();
-
-            var releaseSubject1 = new ReleaseSubject
-            {
-                DataGuidance = "Data set 1 guidance",
-                Release = release,
-                Subject = new Subject()
-            };
-
-            var releaseSubject2 = new ReleaseSubject
-            {
-                DataGuidance = "Data set 2 guidance",
-                Release = release,
-                Subject = new Subject()
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Release.AddRangeAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupService(statisticsDbContext: statisticsDbContext);
-
-                var result = await service.Validate(release.Id);
-
-                result.AssertRight();
-            }
-        }
-
-        [Fact]
-        public async Task Validate_DataGuidanceNotPopulated()
-        {
-            var release = new Release();
-
-            var releaseSubject1 = new ReleaseSubject
-            {
-                DataGuidance = "Data set 1 guidance",
-                Release = release,
-                Subject = new Subject()
-            };
-
-            // Guidance is not populated for data set 2
-            var releaseSubject2 = new ReleaseSubject
-            {
-                DataGuidance = null,
-                Release = release,
-                Subject = new Subject()
-            };
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Release.AddRangeAsync(release);
-                await statisticsDbContext.ReleaseSubject.AddRangeAsync(releaseSubject1, releaseSubject2);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = SetupService(statisticsDbContext: statisticsDbContext);
-
-                var result = await service.Validate(release.Id);
-
-                result.AssertBadRequest(ValidationErrorMessages.PublicDataGuidanceRequired);
             }
         }
 

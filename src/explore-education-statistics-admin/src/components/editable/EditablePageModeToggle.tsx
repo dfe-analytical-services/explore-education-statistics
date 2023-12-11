@@ -6,26 +6,32 @@ import classNames from 'classnames';
 import styles from './EditablePageModeToggle.module.scss';
 
 interface Props {
+  canUpdateRelease?: boolean;
   previewLabel?: string;
   showTablePreviewOption?: boolean;
 }
 const EditablePageModeToggle = ({
+  canUpdateRelease = true,
   previewLabel = 'Preview content',
   showTablePreviewOption = false,
 }: Props) => {
   const { editingMode, setEditingMode } = useEditingContext();
   const [isOpen, toggleOpen] = useToggle(true);
 
-  const options = [
-    {
+  const previewOption = {
+    label: previewLabel,
+    value: 'preview',
+  };
+
+  const options = [previewOption];
+
+  if (canUpdateRelease) {
+    options.push({
       label: 'Edit content',
       value: 'edit',
-    },
-    {
-      label: previewLabel,
-      value: 'preview',
-    },
-  ];
+    });
+  }
+
   if (showTablePreviewOption) {
     options.push({
       label: 'Preview table tool',

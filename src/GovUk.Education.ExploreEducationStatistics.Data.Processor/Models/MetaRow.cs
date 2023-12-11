@@ -1,5 +1,5 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
 {
@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Models
         public string? FilterGroupingColumn { get; set; }
         public string? FilterHint { get; set; }
         public string? IndicatorGrouping { get; set; }
-        public Unit IndicatorUnit { get; set; }
+        public IndicatorUnit IndicatorUnit { get; set; }
         public int? DecimalPlaces { get; set; }
     }
 }

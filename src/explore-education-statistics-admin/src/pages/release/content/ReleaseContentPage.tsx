@@ -17,19 +17,31 @@ import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
+import featuredTableService from '@admin/services/featuredTableService';
+import ButtonText from '@common/components/ButtonText';
 import classNames from 'classnames';
-import React from 'react';
+import React, { useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 
 const ReleaseContentPageLoaded = () => {
-  const { canUpdateRelease, release } = useReleaseContentState();
+  const { canUpdateRelease, release, featuredTables } =
+    useReleaseContentState();
+  const [previewFeaturedTableId, setPreviewFeaturedTableId] =
+    useState<string>();
+  const canPreviewRelease =
+    canUpdateRelease || (!canUpdateRelease && !release.published);
 
   return (
     <EditingContextProvider
       editingMode={canUpdateRelease ? 'edit' : 'preview'}
       unresolvedComments={getUnresolvedComments(release)}
     >
-      {({ editingMode, totalUnresolvedComments, totalUnsavedBlocks }) => {
+      {({
+        editingMode,
+        setEditingMode,
+        totalUnresolvedComments,
+        totalUnsavedBlocks,
+      }) => {
         return (
           <>
             {editingMode === 'edit' && (
@@ -43,7 +55,7 @@ const ReleaseContentPageLoaded = () => {
             )}
 
             {canUpdateRelease && (
-              <div className="govuk-form-group">
+              <>
                 {totalUnsavedBlocks > 0 && (
                   <WarningMessage>
                     {`${totalUnsavedBlocks} content ${
@@ -58,14 +70,16 @@ const ReleaseContentPageLoaded = () => {
                       : `There are ${totalUnresolvedComments} unresolved comments`}
                   </WarningMessage>
                 )}
-
-                <EditablePageModeToggle
-                  previewLabel="Preview release page"
-                  showTablePreviewOption
-                />
-              </div>
+              </>
             )}
 
+            {canPreviewRelease && (
+              <EditablePageModeToggle
+                canUpdateRelease={canUpdateRelease}
+                previewLabel="Preview release page"
+                showTablePreviewOption
+              />
+            )}
             <div
               className={classNames({
                 [styles.container]: editingMode === 'edit',
@@ -88,7 +102,39 @@ const ReleaseContentPageLoaded = () => {
                     </h2>
 
                     <ReleaseContentHubContextProvider releaseId={release.id}>
-                      <ReleaseContent />
+                      <ReleaseContent
+                        transformFeaturedTableLinks={
+                          canPreviewRelease
+                            ? (url: string, text: string) => {
+                                return (
+                                  <ButtonText
+                                    onClick={() => {
+                                      // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
+                                      // so split twice to get the dataBlockParentId.
+                                      const dataBlockParentId = url
+                                        .split('fast-track/')[1]
+                                        .split('?')[0];
+                                      const featuredTable =
+                                        featuredTables?.find(
+                                          table =>
+                                            table.dataBlockParentId ===
+                                            dataBlockParentId,
+                                        );
+                                      if (featuredTable) {
+                                        setEditingMode('table-preview');
+                                        setPreviewFeaturedTableId(
+                                          featuredTable.dataBlockId,
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    {text}
+                                  </ButtonText>
+                                );
+                              }
+                            : undefined
+                        }
+                      />
                     </ReleaseContentHubContextProvider>
                   </>
                 )}
@@ -97,6 +143,7 @@ const ReleaseContentPageLoaded = () => {
                     releaseId={release.id}
                     releaseType={release.type}
                     publication={release.publication}
+                    featuredTableId={previewFeaturedTableId}
                   />
                 )}
               </div>
@@ -122,10 +169,15 @@ const ReleaseContentPage = ({
         releaseId,
       );
 
+      const featuredTables = await featuredTableService.listFeaturedTables(
+        releaseId,
+      );
+
       return {
         release,
         unattachedDataBlocks,
         canUpdateRelease,
+        featuredTables,
       };
     }, [releaseId]);
 

@@ -281,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureUnit(ModelBuilder modelBuilder)
         {
-            var unitConverter = new EnumToEnumValueConverter<Unit>();
+            var unitConverter = new EnumToEnumValueConverter<IndicatorUnit>();
 
             modelBuilder.Entity<Indicator>()
                 .Property(indicator => indicator.Unit)

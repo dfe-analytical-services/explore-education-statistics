@@ -1,26 +1,59 @@
 import PageTitle from '@admin/components/PageTitle';
+import Link from '@admin/components/Link';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import releaseContentService from '@admin/services/releaseContentService';
+import {
+  preReleaseTableToolRoute,
+  PreReleaseTableToolRouteParams,
+} from '@admin/routes/preReleaseRoutes';
+import featuredTableQueries from '@admin/queries/featuredTableQueries';
+import releaseContentQueries from '@admin/queries/releaseContentQueries';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import { generatePath } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
 const PreReleaseContentPage = ({
   match,
 }: RouteComponentProps<ReleaseRouteParams>) => {
-  const { releaseId } = match.params;
+  const { publicationId, releaseId } = match.params;
 
-  const { value: content, isLoading } = useAsyncHandledRetry(
-    () => releaseContentService.getContent(releaseId, true),
-    [releaseId],
+  const { data: content, isLoading: isLoadingContent } = useQuery(
+    releaseContentQueries.get(releaseId),
   );
+
+  const { data: featuredTables = [], isLoading: isLoadingFeaturedTables } =
+    useQuery(featuredTableQueries.list(releaseId));
+
+  const handleFeaturedTableLinks = (url: string, text: string) => {
+    // the url format is `/data-tables/fast-track/<data-block-parent-id>?featuredTables`
+    // so split twice to get the dataBlockParentId.
+    const dataBlockParentId = url.split('fast-track/')[1].split('?')[0];
+    const featuredTable = featuredTables.find(
+      table => table.dataBlockParentId === dataBlockParentId,
+    );
+
+    return (
+      <Link
+        to={generatePath<PreReleaseTableToolRouteParams>(
+          preReleaseTableToolRoute.path,
+          {
+            publicationId,
+            releaseId,
+            dataBlockId: featuredTable?.dataBlockId,
+          },
+        )}
+      >
+        {text}
+      </Link>
+    );
+  };
 
   return (
     <div className="govuk-width-container">
-      <LoadingSpinner loading={isLoading}>
+      <LoadingSpinner loading={isLoadingContent || isLoadingFeaturedTables}>
         {content && (
           <ReleaseContentProvider
             value={{
@@ -33,7 +66,9 @@ const PreReleaseContentPage = ({
               title={content.release.publication.title}
             />
 
-            <ReleaseContent />
+            <ReleaseContent
+              transformFeaturedTableLinks={handleFeaturedTableLinks}
+            />
           </ReleaseContentProvider>
         )}
       </LoadingSpinner>

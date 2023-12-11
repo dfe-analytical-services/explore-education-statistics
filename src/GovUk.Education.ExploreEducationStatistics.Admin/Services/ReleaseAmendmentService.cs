@@ -508,7 +508,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
             var statsAmendmentSubjectLinks = _statisticsDbContext
                 .ReleaseSubject
-                .AsQueryable()
                 .Where(rs => rs.ReleaseId == amendment.PreviousVersionId)
                 .Select(originalReleaseSubject => new ReleaseSubject
                 {
@@ -517,7 +516,6 @@ public class ReleaseAmendmentService : IReleaseAmendmentService
 
                     // Copy certain fields from the original.
                     SubjectId = originalReleaseSubject.SubjectId,
-                    DataGuidance = originalReleaseSubject.DataGuidance,
                     FilterSequence = originalReleaseSubject.FilterSequence,
                     IndicatorSequence = originalReleaseSubject.IndicatorSequence
                 });

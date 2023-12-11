@@ -24,7 +24,6 @@ using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    [Collection(CacheServiceTests)]
     public class TableBuilderMetaControllerTests : CacheServiceTestFixture
     {
         private static readonly Guid ReleaseId = Guid.NewGuid();

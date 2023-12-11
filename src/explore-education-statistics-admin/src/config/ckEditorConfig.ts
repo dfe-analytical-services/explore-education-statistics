@@ -3,10 +3,11 @@ import {
   HeadingOption,
   PluginName,
   ResizeOption,
+  ToolbarGroup,
   ToolbarOption,
 } from '@admin/types/ckeditor';
 
-export const toolbarConfigFull: ReadonlyArray<ToolbarOption> = [
+export const toolbarConfigFull: ReadonlyArray<ToolbarOption | ToolbarGroup> = [
   'heading',
   '|',
   'bold',
@@ -24,10 +25,33 @@ export const toolbarConfigFull: ReadonlyArray<ToolbarOption> = [
   '|',
   'redo',
   'undo',
+];
+
+export const releaseToolbarConfigFull: ReadonlyArray<
+  ToolbarOption | ToolbarGroup
+> = [
+  ...toolbarConfigFull,
   '|',
   'comment',
-  'glossary',
+  {
+    label: 'Insert',
+    icon: 'plus',
+    items: ['featuredTables', 'glossary'],
+  },
 ];
+
+export const methodologyToolbarConfigFull: ReadonlyArray<
+  ToolbarOption | ToolbarGroup
+> = [
+  ...toolbarConfigFull,
+  '|',
+  {
+    label: 'Insert',
+    icon: 'plus',
+    items: ['glossary'],
+  },
+];
+
 export const toolbarConfigSimple: ReadonlyArray<ToolbarOption> = [
   'bold',
   'italic',

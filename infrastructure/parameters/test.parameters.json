@@ -23,6 +23,9 @@
     "skuPublisher": {
       "value": "B1 Basic"
     },
+    "slackAlertsChannel": {
+      "value": "#alerts-test"
+    },
     "publishReleasesCronSchedule": {
       "value": "0 0 * * * *"
     },

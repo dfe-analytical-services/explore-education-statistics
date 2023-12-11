@@ -19,7 +19,6 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.Cache;
 
-[Collection(CacheServiceTests)]
 public class MethodologyCacheServiceTests : CacheServiceTestFixture
 {
     private readonly List<AllMethodologiesThemeViewModel> _methodologyTree = ListOf(

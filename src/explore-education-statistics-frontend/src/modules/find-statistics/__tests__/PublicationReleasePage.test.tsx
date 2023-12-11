@@ -121,6 +121,25 @@ describe('PublicationReleasePage', () => {
     expect(quickLinks[2]).toHaveAttribute('href', '#help-and-support');
   });
 
+  test('does not render release contents link when there is no content', async () => {
+    render(
+      <PublicationReleasePage
+        release={{
+          ...testRelease,
+          content: [],
+        }}
+      />,
+    );
+
+    const quickLinksNav = screen.getByRole('navigation', {
+      name: 'Quick links',
+    });
+
+    expect(
+      within(quickLinksNav).queryByRole('link', { name: 'Release contents' }),
+    ).not.toBeInTheDocument();
+  });
+
   test(`renders quick link to view related dashboard(s) when section exists`, async () => {
     render(
       <PublicationReleasePage

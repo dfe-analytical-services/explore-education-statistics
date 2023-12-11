@@ -46,9 +46,6 @@
     },
     "actionGroupAlerts": {
       "type": "string"
-    },
-    "enableAlerts": {
-      "type": "bool"
     }
   },
   "variables":{
@@ -99,8 +96,8 @@
       ],
       "properties": {
         "description": "Data Factory - Activity Failures",
+        "enabled": "true",
         "severity": 3,
-        "enabled": "[parameters('enableAlerts')]",
         "scopes": [
           "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
         ],

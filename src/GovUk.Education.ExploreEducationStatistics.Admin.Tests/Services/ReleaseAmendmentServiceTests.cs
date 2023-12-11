@@ -325,7 +325,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 SubjectId = subject.Id,
                 Created = DateTime.UtcNow.AddDays(-2),
                 Updated = DateTime.UtcNow.AddDays(-1),
-                DataGuidance = "guidance 1",
                 FilterSequence = new List<FilterSequenceEntry>
                 {
                     new(

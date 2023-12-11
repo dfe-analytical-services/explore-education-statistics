@@ -64,6 +64,9 @@ describe('GlossaryItemInsertForm ', () => {
     expect(options).toHaveLength(2);
     expect(options[0]).toHaveTextContent('Antelope');
     expect(options[1]).toHaveTextContent('Ant');
+
+    expect(screen.queryByText('Dog')).not.toBeInTheDocument();
+    expect(screen.queryByText('Partridge')).not.toBeInTheDocument();
   });
 
   test('selecting a search result shows the edit form', async () => {
@@ -157,12 +160,7 @@ describe('GlossaryItemInsertForm ', () => {
     userEvent.click(screen.getByRole('button', { name: 'Insert' }));
 
     await waitFor(() => {
-      expect(screen.getByText('There is a problem')).toBeInTheDocument();
-      expect(
-        screen.getByRole('link', {
-          name: 'Select a glossary entry',
-        }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Select a glossary entry')).toBeInTheDocument();
     });
 
     expect(handleSubmit).not.toHaveBeenCalled();
@@ -190,12 +188,7 @@ describe('GlossaryItemInsertForm ', () => {
     userEvent.click(screen.getByRole('button', { name: 'Insert' }));
 
     await waitFor(() => {
-      expect(screen.getByText('There is a problem')).toBeInTheDocument();
-      expect(
-        screen.getByRole('link', {
-          name: 'Enter link text',
-        }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Enter link text')).toBeInTheDocument();
     });
 
     expect(handleSubmit).not.toHaveBeenCalled();

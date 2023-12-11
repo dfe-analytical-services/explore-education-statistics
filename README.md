@@ -6,25 +6,32 @@
 
 The project is primarily composed of two areas:
 
-### Public frontend (for general public users)
+### Public frontend (for public users)
 
 - **UI** - `src/explore-education-statistics-frontend`
-  - NextJS React app
+  - Next.js React app
   - Depends on:
     - Content API
     - Data API
     - Notifier
 
 - **Content API** - `src/GovUk.Education.ExploreEducationStatistics.Content.Api`
+  - Private API providing content for UI app 
   - Depends on:
     - Publisher - to generate its cache
 
 - **Data API** - `src/GovUk.Education.ExploreEducationStatistics.Data.Api`
+  - Private API providing statistics for UI app
   - Depends on:
     - SQLServer `statistics` database (known as `public-statistics` in non-local environments)
 
 - **Notifier**
     - Azure function for adding users to GOV.UK Notify
+
+- **Public Data API** - `src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api`
+  - Public API providing statistics for public users
+  - Depends on:
+    - Postgres `public_data` database
 
 ### Admin (for admins and analysts)
 
@@ -59,9 +66,12 @@ You will need the following groups of dependencies to run the project successful
 To run applications in this service you will require the following:
 
    - [NodeJS v18+](https://nodejs.org/)
-   - [.NET Core v6.0](https://dotnet.microsoft.com/download/dotnet-core/6.0)
+   - [.NET SDK v6.0](https://dotnet.microsoft.com/en-us/download/dotnet/6.0)
+   - [.NET SDK v8.0](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
    - [Azure Functions Core Tools v4+](https://github.com/Azure/azure-functions-core-tools)
-   
+
+**Note** - Both .NET 6 and 8 are currently required as not all projects are using the latest SDK version.
+
 To run the databases:
    - [Docker and Docker Compose](https://docs.docker.com/) - see [Setting up the database](#setting-up-the-database-and-storage-emulator)
 
@@ -376,6 +386,12 @@ Examples:
   pnpm start publisher processor
   ```
 
+- To start the public data API:
+
+  ```bash
+  pnpm start publicData
+  ```
+
 The frontend applications can be accessed via:
 
 - `http://localhost:3000` for the public frontend
@@ -591,6 +607,15 @@ To generate a migration for the UsersAndRolesDbContext:
 ```sh
 cd src/GovUk.Education.ExploreEducationStatistics.Admin
 dotnet ef migrations add EES1234_MigrationNameGoesHere --context UsersAndRolesDbContext --output-dir Migrations/UsersAndRolesMigrations -v
+```
+
+#### Public Data API DB migrations
+
+To generate a migration for the public data API db:
+
+```sh
+cd src/GovUk.Education.ExploreEducationStatistics.Public.Data.Api
+dotnet ef migrations add EES1234_MigrationNameHere --context PublicDataDbContext --project ../GovUk.Education.ExploreEducationStatistics.Public.Data.Model -v
 ```
 
 ### Resetting Azurite

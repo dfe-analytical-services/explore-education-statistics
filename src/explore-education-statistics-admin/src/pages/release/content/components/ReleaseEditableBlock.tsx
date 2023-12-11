@@ -2,6 +2,7 @@ import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrappe
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import EditableEmbedBlock from '@admin/components/editable/EditableEmbedBlock';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
+import { releaseToolbarConfigFull } from '@admin/config/ckEditorConfig';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import { useReleaseContentHubContext } from '@admin/contexts/ReleaseContentHubContext';
@@ -384,6 +385,7 @@ const ReleaseEditableBlock = ({
             label="Content block"
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}
+            toolbarConfig={releaseToolbarConfigFull}
             transformImageAttributes={transformImageAttributes}
             useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}

@@ -120,6 +120,10 @@ const ChartConfiguration = ({
         .positive('Chart height must be positive'),
       width: Yup.number().positive('Chart width must be positive'),
       includeNonNumericData: Yup.boolean(),
+      subtitle: Yup.string().max(
+        160,
+        'Subtitle must be 160 characters or less',
+      ),
     });
 
     if (definition.capabilities.stackable) {
@@ -279,30 +283,40 @@ const ChartConfiguration = ({
                 accept="image/*"
               />
             )}
+            <div className="govuk-!-width-three-quarters">
+              <FormFieldRadioGroup<FormValues>
+                hint="Communicate the headline message of the chart. For example 'Increase in number of people living alone'."
+                legend="Chart title"
+                legendSize="s"
+                name="titleType"
+                order={[]}
+                options={[
+                  {
+                    label: 'Use table title',
+                    value: 'default',
+                  },
+                  {
+                    label: 'Set an alternative title',
+                    value: 'alternative',
+                    conditional: (
+                      <FormFieldTextInput<FormValues>
+                        label="Enter chart title"
+                        name="title"
+                        hint="Use a concise descriptive title that summarises the main message in the chart."
+                      />
+                    ),
+                  },
+                ]}
+              />
 
-            <FormFieldRadioGroup<FormValues>
-              legend="Chart title"
-              legendSize="s"
-              name="titleType"
-              order={[]}
-              options={[
-                {
-                  label: 'Use table title',
-                  value: 'default',
-                },
-                {
-                  label: 'Set an alternative title',
-                  value: 'alternative',
-                  conditional: (
-                    <FormFieldTextInput<FormValues>
-                      label="Enter chart title"
-                      name="title"
-                      hint="Use a concise descriptive title that summarises the main message in the chart."
-                    />
-                  ),
-                },
-              ]}
-            />
+              <FormFieldTextInput<FormValues>
+                label="Subtitle"
+                name="subtitle"
+                hint="The statistical subtitle should say what the data is, the geography the data relates to and the time period shown. 
+                For example, 'Figure 1: Number of people living in one person households, England, 1991 to 2021'."
+                maxLength={160}
+              />
+            </div>
 
             <FormFieldTextArea<FormValues>
               className="govuk-!-width-three-quarters"

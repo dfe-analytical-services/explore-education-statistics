@@ -127,6 +127,7 @@ describe('ChartConfiguration', () => {
     height: 600,
     includeNonNumericData: true,
     showDataLabels: true,
+    subtitle: 'This is the subtitle',
     titleType: 'default',
     width: 400,
   };
@@ -161,6 +162,7 @@ describe('ChartConfiguration', () => {
     expect(
       screen.getByRole('group', { name: 'Chart title' }),
     ).toBeInTheDocument();
+    expect(screen.getByLabelText('Subtitle')).toBeInTheDocument();
     expect(screen.getByLabelText('Alt text')).toBeInTheDocument();
     expect(screen.getByLabelText('Height (pixels)')).toBeInTheDocument();
     expect(screen.getByLabelText('Width (pixels)')).toBeInTheDocument();
@@ -185,6 +187,7 @@ describe('ChartConfiguration', () => {
     expect(
       screen.getByRole('group', { name: 'Chart title' }),
     ).toBeInTheDocument();
+    expect(screen.getByLabelText('Subtitle')).toBeInTheDocument();
     expect(screen.getByLabelText('Alt text')).toBeInTheDocument();
     expect(screen.getByLabelText('Stacked bars')).toBeInTheDocument();
     expect(screen.getByLabelText('Height (pixels)')).toBeInTheDocument();
@@ -211,6 +214,7 @@ describe('ChartConfiguration', () => {
     expect(
       screen.getByRole('group', { name: 'Chart title' }),
     ).toBeInTheDocument();
+    expect(screen.getByLabelText('Subtitle')).toBeInTheDocument();
     expect(screen.getByLabelText('Alt text')).toBeInTheDocument();
     expect(screen.getByLabelText('Stacked bars')).toBeInTheDocument();
     expect(screen.getByLabelText('Height (pixels)')).toBeInTheDocument();
@@ -237,6 +241,7 @@ describe('ChartConfiguration', () => {
     expect(
       screen.getByRole('group', { name: 'Chart title' }),
     ).toBeInTheDocument();
+    expect(screen.getByLabelText('Subtitle')).toBeInTheDocument();
     expect(screen.getByLabelText('Alt text')).toBeInTheDocument();
     expect(screen.getByLabelText('Height (pixels)')).toBeInTheDocument();
     expect(screen.getByLabelText('Width (pixels)')).toBeInTheDocument();
@@ -281,6 +286,7 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
+    userEvent.type(screen.getByLabelText('Subtitle'), 'This is the subtitle');
     userEvent.type(screen.getByLabelText('Alt text'), 'This is the alt text');
     userEvent.type(screen.getByLabelText('Width (pixels)'), '500');
 
@@ -294,6 +300,7 @@ describe('ChartConfiguration', () => {
         boundaryLevel: undefined,
         dataLabelPosition: 'above',
         height: 300,
+        subtitle: 'This is the subtitle',
         title: '',
         titleType: 'default',
         width: 500,
@@ -340,6 +347,9 @@ describe('ChartConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
+    expect(screen.getByLabelText('Subtitle')).toHaveValue(
+      'This is the subtitle',
+    );
     expect(screen.getByLabelText('Alt text')).toHaveValue(
       'This is the alt text',
     );

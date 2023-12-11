@@ -11,10 +11,16 @@ import Gate from '@common/components/Gate';
 interface Props {
   block: Block;
   releaseId: string;
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
   visible?: boolean;
 }
 
-const ReleaseBlock = ({ block, releaseId, visible }: Props) => {
+const ReleaseBlock = ({
+  block,
+  releaseId,
+  transformFeaturedTableLinks,
+  visible,
+}: Props) => {
   const getChartFile = useGetChartFile(releaseId);
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
@@ -46,6 +52,7 @@ const ReleaseBlock = ({ block, releaseId, visible }: Props) => {
     <ContentBlockRenderer
       key={block.id}
       block={block}
+      transformFeaturedTableLinks={transformFeaturedTableLinks}
       transformImageAttributes={transformImageAttributes}
       getGlossaryEntry={glossaryService.getEntry}
     />

@@ -3,6 +3,7 @@ import {
   ContentSectionKeys,
   ReleaseDispatchAction,
 } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
+import { FeaturedTable } from '@admin/services/featuredTableService';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
@@ -18,6 +19,7 @@ export type ReleaseContentContextDispatch = (
 export interface ReleaseContentContextState {
   release: EditableRelease;
   canUpdateRelease: boolean;
+  featuredTables?: FeaturedTable[];
   unattachedDataBlocks: DataBlock[];
 }
 

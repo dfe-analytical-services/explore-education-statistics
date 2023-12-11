@@ -26,6 +26,9 @@
     "skuPublisher": {
       "value": "S1 Standard"
     },
+    "slackAlertsChannel": {
+      "value": "#alerts"
+    },
     "publicAppBasicAuth": {
       "value": "false"
     },
@@ -79,9 +82,6 @@
     },
     "capacityStatisticsDb": {
       "value": 6
-    },
-    "enableAlerts": {
-      "value": true
     },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000

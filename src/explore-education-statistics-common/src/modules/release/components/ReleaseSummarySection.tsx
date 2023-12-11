@@ -1,5 +1,6 @@
 import FormattedDate from '@common/components/FormattedDate';
 import {
+  PartialDate,
   formatPartialDate,
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
@@ -8,7 +9,6 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
 import ReleaseTypeSection from '@common/modules/release/components/ReleaseTypeSection';
-import { Release } from '@common/services/publicationService';
 import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import Modal from '@common/components/Modal';
 import { parseISO } from 'date-fns';
@@ -29,8 +29,10 @@ const releaseTypesToIcons: Partial<Record<ReleaseType, ReleaseTypeIcon>> = {
 interface Props {
   isEditing?: boolean;
   lastUpdated?: Date;
-  release: Release;
-  releaseDate: string;
+  latestRelease: boolean;
+  nextReleaseDate?: PartialDate;
+  releaseDate?: string;
+  releaseType: ReleaseType;
   renderReleaseNotes: ReactNode;
   renderStatusTags: ReactNode;
   renderSubscribeLink: ReactNode;
@@ -40,8 +42,10 @@ interface Props {
 export default function ReleaseSummarySection({
   isEditing,
   lastUpdated,
-  release,
+  latestRelease,
+  nextReleaseDate,
   releaseDate,
+  releaseType,
   renderReleaseNotes,
   renderStatusTags,
   renderSubscribeLink,
@@ -51,10 +55,10 @@ export default function ReleaseSummarySection({
     <>
       <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
         <div>{renderStatusTags}</div>
-        {releaseTypesToIcons[release.type] && (
+        {releaseTypesToIcons[releaseType] && (
           <img
-            src={releaseTypesToIcons[release.type]?.url}
-            alt={releaseTypesToIcons[release.type]?.altText}
+            src={releaseTypesToIcons[releaseType]?.url}
+            alt={releaseTypesToIcons[releaseType]?.altText}
             height="60"
             width="60"
           />
@@ -69,12 +73,11 @@ export default function ReleaseSummarySection({
             <p>TBA</p>
           )}
         </SummaryListItem>
-        {release.latestRelease &&
-          isValidPartialDate(release.nextReleaseDate) && (
-            <SummaryListItem term="Next update">
-              <time>{formatPartialDate(release.nextReleaseDate)}</time>
-            </SummaryListItem>
-          )}
+        {latestRelease && isValidPartialDate(nextReleaseDate) && (
+          <SummaryListItem term="Next update">
+            <time>{formatPartialDate(nextReleaseDate)}</time>
+          </SummaryListItem>
+        )}
 
         {(isEditing || lastUpdated) && (
           <SummaryListItem term="Last updated">
@@ -86,21 +89,21 @@ export default function ReleaseSummarySection({
         <SummaryListItem term="Release type">
           <Modal
             showClose
-            title={releaseTypes[release.type]}
+            title={releaseTypes[releaseType]}
             triggerButton={
               <ButtonText
                 onClick={() => {
                   onShowReleaseTypeModal?.();
                 }}
               >
-                {releaseTypes[release.type]}{' '}
+                {releaseTypes[releaseType]}{' '}
                 <InfoIcon
-                  description={`Information on ${releaseTypes[release.type]}`}
+                  description={`Information on ${releaseTypes[releaseType]}`}
                 />
               </ButtonText>
             }
           >
-            <ReleaseTypeSection showHeading={false} type={release.type} />
+            <ReleaseTypeSection showHeading={false} type={releaseType} />
           </Modal>
         </SummaryListItem>
 

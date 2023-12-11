@@ -1,0 +1,32 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
+
+public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?>
+{
+    public Guid Id { get; init; }
+
+    public required string Title { get; set; }
+
+    public required Guid PublicationId { get; set; }
+
+    public required DataSetStatus Status { get; set; }
+
+    public Guid? SupersedingDataSetId { get; set; }
+
+    public DataSet? SupersedingDataSet { get; set; }
+
+    public Guid? LatestVersionId { get; set; }
+
+    public DataSetVersion? LatestVersion { get; set; }
+
+    public List<DataSetVersion> Versions { get; set; } = new();
+
+    public DateTimeOffset? Published { get; set; }
+
+    public DateTimeOffset? Unpublished { get; set; }
+
+    public DateTimeOffset Created { get; set; }
+
+    public DateTimeOffset? Updated { get; set; }
+}

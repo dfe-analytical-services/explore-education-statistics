@@ -45,7 +45,7 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
   ],
   allowedAttributes: {
     figure: ['class', 'style'],
-    a: ['href', 'data-glossary', 'rel', 'target'],
+    a: ['href', 'data-featured-table', 'data-glossary', 'rel', 'target'],
     img: ['alt', 'src', 'srcset', 'sizes', 'width'],
     th: ['colspan', 'rowspan'],
     td: ['colspan', 'rowspan'],

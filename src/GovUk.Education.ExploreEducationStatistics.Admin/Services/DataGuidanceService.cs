@@ -14,7 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -28,19 +27,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IDataGuidanceDataSetService _dataGuidanceDataSetService;
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
 
         public DataGuidanceService(ContentDbContext contentDbContext,
             IDataGuidanceDataSetService dataGuidanceDataSetService,
-            StatisticsDbContext statisticsDbContext,
             IUserService userService,
             IReleaseDataFileRepository releaseDataFileRepository)
         {
             _contentDbContext = contentDbContext;
             _dataGuidanceDataSetService = dataGuidanceDataSetService;
-            _statisticsDbContext = statisticsDbContext;
             _userService = userService;
             _releaseDataFileRepository = releaseDataFileRepository;
         }
@@ -69,23 +65,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(releaseAndDataSets => BuildViewModel(releaseAndDataSets.Item1, releaseAndDataSets.Item2));
         }
 
-        public async Task<Either<ActionResult, Unit>> Validate(Guid releaseId,
+        public async Task<Either<ActionResult, Unit>> ValidateForReleaseChecklist(Guid releaseId,
             CancellationToken cancellationToken = default)
         {
             return await _contentDbContext.Releases
                 .FirstOrNotFoundAsync(release => release.Id == releaseId, cancellationToken)
-                .OnSuccess(async release =>
+                .OnSuccess<ActionResult, Release, Unit>(async release =>
                 {
-                    if (await _releaseDataFileRepository.HasAnyDataFiles(release.Id))
+                    var releaseFilesQueryable = _contentDbContext.ReleaseFiles
+                        .Where(rf => rf.ReleaseId == releaseId 
+                                     && rf.File.Type == FileType.Data);
+
+                    if (await releaseFilesQueryable.AnyAsync(cancellationToken))
                     {
                         if (string.IsNullOrWhiteSpace(release.DataGuidance))
                         {
                             return ValidationResult(PublicDataGuidanceRequired);
                         }
 
-                        // TODO EES-4661 Inline this validation into this service as soon as we
-                        // only need to check release files rather than subjects.
-                        return await _dataGuidanceDataSetService.Validate(releaseId, cancellationToken);
+                        if (await releaseFilesQueryable.AnyAsync(rf =>
+                                string.IsNullOrWhiteSpace(rf.Summary), cancellationToken))
+                        {
+                            return ValidationResult(PublicDataGuidanceRequired);
+                        }
                     }
 
                     return Unit.Instance;
@@ -118,37 +120,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                       && dataFileIds.Contains(releaseFile.FileId))
                 .ToListAsync(cancellationToken);
 
-            var subjectIds = releaseFiles
-                .Select(releaseFile => releaseFile.File.SubjectId!.Value)
-                .ToList();
-
-            var releaseSubjectsBySubjectId = await _statisticsDbContext.ReleaseSubject
-                .Where(releaseSubject => releaseSubject.ReleaseId == release.Id
-                                         && subjectIds.Contains(releaseSubject.SubjectId)
-                )
-                .ToDictionaryAsync(releaseSubject => releaseSubject.SubjectId,
-                    cancellationToken: cancellationToken);
-
             releaseFiles.ForEach(releaseFile =>
             {
                 var content = updateRequestsByFileId[releaseFile.FileId].Content;
 
                 _contentDbContext.Update(releaseFile);
                 releaseFile.Summary = content;
-
-                // Until we switch over data guidance and data catalogue to use ReleaseFiles as the
-                // source for content, ensure data guidance content is still updated for each corresponding
-                // ReleaseSubject.
-                // TODO EES-4661 Once the change to migrate data guidance from ReleaseSubject to ReleaseFile has been
-                // a success, drop ReleaseSubject.DataGuidance.
-
-                var releaseSubject = releaseSubjectsBySubjectId[releaseFile.File.SubjectId!.Value];
-                _statisticsDbContext.Update(releaseSubject);
-                releaseSubject.DataGuidance = content;
             });
 
             await _contentDbContext.SaveChangesAsync(cancellationToken);
-            await _statisticsDbContext.SaveChangesAsync(cancellationToken);
 
             return Unit.Instance;
         }

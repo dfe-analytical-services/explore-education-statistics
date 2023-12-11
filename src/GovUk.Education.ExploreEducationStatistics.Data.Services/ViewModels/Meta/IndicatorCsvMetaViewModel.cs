@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 
@@ -12,8 +13,8 @@ public record IndicatorCsvMetaViewModel
 
     public string Label { get; init; } = string.Empty;
 
-    [JsonConverter(typeof(EnumToEnumValueJsonConverter<Unit>))]
-    public Unit Unit { get; init; }
+    [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
+    public IndicatorUnit Unit { get; init; }
 
     public string Name { get; init; } = string.Empty;
 

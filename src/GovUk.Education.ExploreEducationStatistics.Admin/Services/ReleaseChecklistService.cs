@@ -83,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 errors.Add(new ReleaseChecklistIssue(ValidationErrorMessages.DataFileReplacementsMustBeCompleted));
             }
 
-            var isDataGuidanceValid = await _dataGuidanceService.Validate(release.Id);
+            var isDataGuidanceValid = await _dataGuidanceService.ValidateForReleaseChecklist(release.Id);
 
             if (isDataGuidanceValid.IsLeft)
             {

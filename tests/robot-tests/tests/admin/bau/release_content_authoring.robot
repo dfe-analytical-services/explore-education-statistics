@@ -287,7 +287,9 @@ Add data block
 Add review comment for data block as bau1
     user switches to bau1 browser
     user reloads page
+    user closes Set Page View box
     user opens accordion section    ${SECTION_2_TITLE}    id:releaseMainContent
+    user scrolls down    400
     ${block}=    set variable    xpath://*[@data-testid="data-block-comments-${DATABLOCK_NAME}"]
     user adds comment to data block    ${block}    Test data block comment
 

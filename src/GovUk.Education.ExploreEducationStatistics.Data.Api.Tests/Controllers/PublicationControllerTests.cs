@@ -22,7 +22,6 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    [Collection(CacheServiceTests)]
     public class PublicationControllerTests : CacheServiceTestFixture
     {
         [Fact]

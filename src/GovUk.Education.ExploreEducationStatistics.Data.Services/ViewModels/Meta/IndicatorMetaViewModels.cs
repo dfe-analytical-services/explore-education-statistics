@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 
@@ -30,8 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
     {
         public string Label { get; init; } = string.Empty;
 
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<Unit>))]
-        public Unit Unit { get; init; }
+        [JsonConverter(typeof(EnumToEnumValueJsonConverter<IndicatorUnit>))]
+        public IndicatorUnit Unit { get; init; }
 
         public Guid Value { get; init; }
 

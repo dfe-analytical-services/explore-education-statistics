@@ -2,7 +2,12 @@ import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import CommentsWrapper from '@admin/components/comments/CommentsWrapper';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
-import { Element, Node } from '@admin/types/ckeditor';
+import {
+  Element,
+  Node,
+  ToolbarGroup,
+  ToolbarOption,
+} from '@admin/types/ckeditor';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -32,6 +37,9 @@ export interface Props {
   id: string;
   idleTimeout?: number;
   label: string;
+  toolbarConfig?:
+    | ReadonlyArray<ToolbarOption | ToolbarGroup>
+    | Array<ToolbarOption | ToolbarGroup>;
   onAction?: () => void;
   onAutoSave?: (content: string) => void;
   onBlur?: (isDirty: boolean) => void;
@@ -50,6 +58,7 @@ const EditableContentForm = ({
   id,
   idleTimeout = 600_000,
   label,
+  toolbarConfig,
   onAction,
   onAutoSave,
   onBlur,
@@ -149,6 +158,7 @@ const EditableContentForm = ({
                   hideLabel={hideLabel}
                   label={label}
                   name="content"
+                  toolbarConfig={toolbarConfig}
                   validateElements={validateElements}
                   onAutoSave={handleAutoSave}
                   onBlur={onBlur}

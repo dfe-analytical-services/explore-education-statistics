@@ -39,7 +39,11 @@ interface MethodologyLink {
   url: string;
 }
 
-const ReleaseContent = () => {
+const ReleaseContent = ({
+  transformFeaturedTableLinks,
+}: {
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
+}) => {
   const config = useConfig();
   const location = useLocation();
   const { editingMode, unsavedBlocks, unsavedCommentDeletions } =
@@ -133,8 +137,10 @@ const ReleaseContent = () => {
           <ReleaseSummarySection
             isEditing={editingMode === 'edit'}
             lastUpdated={release.updates[0]?.on}
-            release={release}
+            latestRelease={release.latestRelease}
+            nextReleaseDate={release.nextReleaseDate}
             releaseDate={release.published ?? release.publishScheduled}
+            releaseType={release.type}
             renderReleaseNotes={<ReleaseNotesSection release={release} />}
             renderStatusTags={
               <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
@@ -151,14 +157,18 @@ const ReleaseContent = () => {
             }
           />
 
-          <div id="releaseSummary">
+          <div id="releaseSummary" data-testid="release-summary">
             {release.summarySection && (
               <>
                 <EditableSectionBlocks
                   blocks={release.summarySection.content}
                   sectionId={release.summarySection.id}
                   renderBlock={block => (
-                    <ReleaseBlock block={block} releaseId={release.id} />
+                    <ReleaseBlock
+                      block={block}
+                      releaseId={release.id}
+                      transformFeaturedTableLinks={transformFeaturedTableLinks}
+                    />
                   )}
                   renderEditableBlock={block => (
                     <ReleaseEditableBlock
@@ -221,9 +231,11 @@ const ReleaseContent = () => {
                     <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
                 )}
-                <li>
-                  <a href="#releaseMainContent">Release contents</a>
-                </li>
+                {(editingMode === 'edit' || !!release.content.length) && (
+                  <li>
+                    <a href="#releaseMainContent">Release contents</a>
+                  </li>
+                )}
                 <li>
                   <a href="#explore-data-and-files">Explore data</a>
                 </li>
@@ -234,7 +246,7 @@ const ReleaseContent = () => {
             </nav>
 
             <h2 className="govuk-heading-s">Related information</h2>
-            <ul className="govuk-list">
+            <ul className="govuk-list" data-testid="related-information">
               <li>
                 <Link
                   to={{
@@ -325,7 +337,7 @@ const ReleaseContent = () => {
                 >
                   Methodologies
                 </h3>
-                <ul className="govuk-list">
+                <ul className="govuk-list" data-testid="methodologies-list">
                   {allMethodologies.map(methodology => (
                     <li key={methodology.key}>
                       {editingMode === 'edit' ? (
@@ -345,13 +357,17 @@ const ReleaseContent = () => {
 
       <hr />
 
-      <ReleaseHeadlines release={release} />
+      <ReleaseHeadlines
+        release={release}
+        transformFeaturedTableLinks={transformFeaturedTableLinks}
+      />
 
       {(release.downloadFiles ||
         release.hasPreReleaseAccessList ||
         !!release.relatedDashboardsSection?.content.length) && (
         <ReleaseDataAndFiles
-          release={release}
+          downloadFiles={release.downloadFiles}
+          hasDataGuidance={release.hasDataGuidance}
           renderAllFilesLink={
             <ButtonText
               disableDoubleClick
@@ -431,10 +447,15 @@ const ReleaseContent = () => {
           </div>
         )}
 
-      <ReleaseContentAccordion release={release} sectionName="Contents" />
+      <ReleaseContentAccordion
+        release={release}
+        sectionName="Contents"
+        transformFeaturedTableLinks={transformFeaturedTableLinks}
+      />
 
       <ReleaseHelpAndSupportSection
-        release={release}
+        publication={release.publication}
+        releaseType={release.type}
         renderExternalMethodologyLink={externalMethodology => (
           <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
         )}

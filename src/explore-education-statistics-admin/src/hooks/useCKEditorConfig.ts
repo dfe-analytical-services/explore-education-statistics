@@ -12,6 +12,7 @@ import {
   EditorConfig,
   PluginName,
   ToolbarOption,
+  ToolbarGroup,
 } from '@admin/types/ckeditor';
 import Editor from 'explore-education-statistics-ckeditor';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
@@ -31,6 +32,7 @@ const useCKEditorConfig = ({
   onAutoSave,
   onCancelComment,
   onClickAddComment,
+  onClickAddFeaturedTableLink,
   onClickAddGlossaryItem,
   onImageUpload,
   onImageUploadCancel,
@@ -44,10 +46,13 @@ const useCKEditorConfig = ({
     body: string;
   }[];
   includePlugins?: ReadonlySet<PluginName> | Set<PluginName>;
-  toolbarConfig?: ReadonlyArray<ToolbarOption> | Array<ToolbarOption>;
+  toolbarConfig?:
+    | ReadonlyArray<ToolbarOption | ToolbarGroup>
+    | Array<ToolbarOption | ToolbarGroup>;
   onAutoSave?: (content: string) => void;
   onCancelComment?: () => void;
   onClickAddComment?: () => void;
+  onClickAddFeaturedTableLink?: () => void;
   onClickAddGlossaryItem?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
@@ -121,6 +126,13 @@ const useCKEditorConfig = ({
               url?.startsWith(process.env.PUBLIC_URL) &&
               url?.match(/\/glossary#[a-zA-Z-0-9-]+$/),
             attributes: { 'data-glossary': '' },
+          },
+          addDataFeaturedTableAttributeToFeaturedTableLinks: {
+            mode: 'automatic',
+            callback: (url: string) =>
+              url?.startsWith(process.env.PUBLIC_URL) &&
+              url?.match(/\/data-tables\/fast-track\/[a-zA-Z-0-9-]/),
+            attributes: { 'data-featured-table': '' },
           },
           openInNewTab: {
             mode: 'manual',
@@ -201,6 +213,11 @@ const useCKEditorConfig = ({
           }
         : undefined,
       alignment: alignmentOptions,
+      featuredTables: {
+        addFeaturedTableLink() {
+          onClickAddFeaturedTableLink?.();
+        },
+      },
       glossary: {
         addGlossaryItem() {
           onClickAddGlossaryItem?.();
@@ -216,6 +233,7 @@ const useCKEditorConfig = ({
     onAutoSave,
     onCancelComment,
     onClickAddComment,
+    onClickAddFeaturedTableLink,
     onClickAddGlossaryItem,
     onImageUpload,
     onImageUploadCancel,

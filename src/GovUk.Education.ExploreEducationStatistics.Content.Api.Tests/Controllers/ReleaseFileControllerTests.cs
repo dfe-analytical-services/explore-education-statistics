@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -24,20 +25,17 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    public class ReleaseFileControllerTests : IClassFixture<TestApplicationFactory<TestStartup>>
+    public class ReleaseFileControllerTests : IntegrationTest<TestStartup>
     {
-        private readonly WebApplicationFactory<TestStartup> _testApp;
+        public ReleaseFileControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
+        {
+        }
 
         private readonly Release _release = new()
         {
             Id = Guid.NewGuid(),
             Publication = new Publication()
         };
-
-        public ReleaseFileControllerTests(TestApplicationFactory<TestStartup> testApp)
-        {
-            _testApp = testApp;
-        }
 
         [Fact]
         public async Task Stream()
@@ -136,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
         private WebApplicationFactory<TestStartup> SetupApp(IReleaseFileService? releaseFileService = null)
         {
-            return _testApp
+            return TestApp
                 .ResetDbContexts()
                 .ConfigureServices(
                     services =>

@@ -14,9 +14,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         // Updating Indicators
         IndicatorGroupsDifferFromSubject,
         IndicatorsDifferFromSubject,
-
-        // Data Guidance
-        // TODO EES-4661 Remove this when we remove checklist validation from DataGuidanceDataSetService.Validate
-        PublicDataGuidanceRequired
     }
 }

@@ -2,30 +2,26 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Security;
 
-[Collection(CacheServiceTestFixture.CacheServiceTests)]
-public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<TestStartup>>
+public class PermissionsControllerTests : IntegrationTest<TestStartup>
 {
-    private readonly WebApplicationFactory<TestStartup> _testApp;
-
-    public PermissionsControllerTests(TestApplicationFactory<TestStartup> testApp)
-    {
-        _testApp = testApp;
-    }
+    public PermissionsControllerTests(TestApplicationFactory<TestStartup> testApp) 
+        : base(testApp)
+    {}
 
     [Fact]
     public async Task GetGlobalPermissions_AuthenticatedUser()
     {
-        var client = _testApp
+        var client = TestApp
             .SetUser(AuthenticatedUser())
             .CreateClient();
 
@@ -44,7 +40,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     [Fact]
     public async Task GetGlobalPermissions_BauUser()
     {
-        var client = _testApp
+        var client = TestApp
             .SetUser(BauUser())
             .CreateClient();
 
@@ -67,7 +63,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     {
         var user = AnalystUser();
 
-        var client = _testApp
+        var client = TestApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -105,7 +101,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     {
         var user = AnalystUser();
 
-        var client = _testApp
+        var client = TestApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -135,7 +131,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     {
         var user = AnalystUser();
 
-        var client = _testApp
+        var client = TestApp
             .SetUser(user)
             .AddContentDbTestData(context =>
             {
@@ -163,7 +159,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     [Fact]
     public async Task GetGlobalPermissions_PreReleaseUser()
     {
-        var client = _testApp
+        var client = TestApp
             .SetUser(PreReleaseUser())
             .CreateClient();
 
@@ -182,7 +178,7 @@ public class PermissionsControllerTests : IClassFixture<TestApplicationFactory<T
     [Fact]
     public async Task GetGlobalPermissions_UnauthenticatedUser()
     {
-        var response = await _testApp.CreateClient().GetAsync("/api/permissions/access");
+        var response = await TestApp.CreateClient().GetAsync("/api/permissions/access");
         response.AssertUnauthorized();
     }
 }

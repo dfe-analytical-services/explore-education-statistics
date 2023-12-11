@@ -29,6 +29,15 @@ export interface CommentsPluginConfig {
   undoRedoComment: (type: CommentUndoRedoActions, markerId: string) => void;
 }
 
+export interface FeaturedTableLink {
+  url: string;
+  text: string;
+}
+
+export interface FeaturedTablesPluginConfig {
+  addFeaturedTableLink: (link: FeaturedTableLink) => void;
+}
+
 export interface GlossaryItem {
   url: string;
   text: string;
@@ -53,7 +62,7 @@ export interface AlignmentConfig {
 }
 
 export interface EditorConfig {
-  toolbar: string[];
+  toolbar: (ToolbarOption | ToolbarGroup)[];
   extraPlugins?: Plugin[];
   image?: {
     toolbar: string[];
@@ -71,6 +80,7 @@ export interface EditorConfig {
   comments?: CommentsPluginConfig;
   autosave?: AutoSavePluginConfig;
   alignment?: AlignmentConfig;
+  featuredTables?: FeaturedTablesPluginConfig;
   glossary?: GlossaryPluginConfig;
 }
 
@@ -91,6 +101,10 @@ export interface CommentsPlugin extends Plugin {
   removeCommentMarker(id: string): void;
   resolveCommentMarker(id: string, resolved: boolean): void;
   selectCommentMarker(id: string): void;
+}
+
+export interface FeaturedTablesPlugin extends Plugin {
+  addFeaturedTableLink(link: FeaturedTableLink): void;
 }
 
 export interface GlossaryPlugin extends Plugin {
@@ -266,6 +280,7 @@ export type ToolbarOption =
   | 'bold'
   | 'bulletedList'
   | 'comment'
+  | 'featuredTables'
   | 'glossary'
   | 'heading'
   | 'imageUpload'
@@ -276,3 +291,9 @@ export type ToolbarOption =
   | 'redo'
   | 'toggleTableCaption'
   | 'undo';
+
+export interface ToolbarGroup {
+  label: string;
+  icon: string;
+  items: ToolbarOption[];
+}

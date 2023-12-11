@@ -26,6 +26,9 @@
     "skuPublisher": {
       "value": "S1 Standard"
     },
+    "slackAlertsChannel": {
+      "value": "#alerts-preprod"
+    },
     "useSubnets": {
       "value": true
     },

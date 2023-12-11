@@ -8,14 +8,16 @@ import ReleaseContentAccordionSection from './ReleaseContentAccordionSection';
 
 interface ReleaseContentAccordionProps {
   id?: string;
-  sectionName: string;
   release: EditableRelease;
+  sectionName: string;
+  transformFeaturedTableLinks?: (url: string, text: string) => void;
 }
 
 const ReleaseContentAccordion = ({
   release,
   id = 'releaseMainContent',
   sectionName,
+  transformFeaturedTableLinks,
 }: ReleaseContentAccordionProps) => {
   const { addContentSection, updateContentSectionsOrder } =
     useReleaseContentActions();
@@ -54,6 +56,7 @@ const ReleaseContentAccordion = ({
           key={section.id}
           id={`${id}-${section.id}`}
           section={section}
+          transformFeaturedTableLinks={transformFeaturedTableLinks}
         />
       ))}
     </EditableAccordion>

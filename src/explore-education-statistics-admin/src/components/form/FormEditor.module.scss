@@ -16,6 +16,16 @@ $active-colour: lighten(govuk-colour('orange'), 10);
   :global(.ck-content img) {
     width: 100%;
   }
+
+  // show grouped toolbar options in a vertical list
+  :global(.ck-dropdown__panel .ck.ck-toolbar > .ck-toolbar__items) {
+    flex-direction: column;
+  }
+
+  :global(.ck-dropdown__panel .ck-toolbar__items .ck-button) {
+    text-align: left;
+    width: 100%;
+  }
 }
 
 .focused {

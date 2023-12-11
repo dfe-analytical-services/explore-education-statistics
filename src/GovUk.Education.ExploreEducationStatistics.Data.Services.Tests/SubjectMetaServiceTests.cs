@@ -24,7 +24,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
@@ -701,7 +700,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             new Indicator
                             {
                                 Id = Guid.NewGuid(),
-                                Unit = Unit.Number,
+                                Unit = IndicatorUnit.Number,
                                 Label = "Indicator 2"
                             })
                     },
@@ -713,7 +712,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             new Indicator
                             {
                                 Id = Guid.NewGuid(),
-                                Unit = Unit.Percent,
+                                Unit = IndicatorUnit.Percent,
                                 Label = "Indicator 1"
                             })
                     });
@@ -814,7 +813,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                                 new IndicatorMetaViewModel
                                 {
                                     Label = "Indicator 1",
-                                    Unit = Unit.Percent,
+                                    Unit = IndicatorUnit.Percent,
                                     Value = indicatorGroups[1].Indicators[0].Id
                                 }),
                             Order = 0
@@ -829,7 +828,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                                 new IndicatorMetaViewModel
                                 {
                                     Label = "Indicator 2",
-                                    Unit = Unit.Number,
+                                    Unit = IndicatorUnit.Number,
                                     Value = indicatorGroups[0].Indicators[0].Id
                                 }),
                             Order = 1

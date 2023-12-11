@@ -83,8 +83,10 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         <div className="govuk-grid-column-two-thirds">
           <ReleaseSummarySection
             lastUpdated={releaseUpdates[0]?.on}
-            release={release}
+            latestRelease={release.latestRelease}
+            nextReleaseDate={release.nextReleaseDate}
             releaseDate={release.published}
+            releaseType={release.type}
             renderReleaseNotes={
               <>
                 {releaseUpdates.length > 0 && (
@@ -231,20 +233,22 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
                 )}
-                <li>
-                  <a
-                    href="#content"
-                    onClick={() => {
-                      logEvent({
-                        category: `${release.publication.title} release page`,
-                        action: `Release contents clicked`,
-                        label: window.location.pathname,
-                      });
-                    }}
-                  >
-                    Release contents
-                  </a>
-                </li>
+                {!!release.content.length && (
+                  <li>
+                    <a
+                      href="#content"
+                      onClick={() => {
+                        logEvent({
+                          category: `${release.publication.title} release page`,
+                          action: `Release contents clicked`,
+                          label: window.location.pathname,
+                        });
+                      }}
+                    >
+                      Release contents
+                    </a>
+                  </li>
+                )}
                 <li>
                   <a
                     href="#explore-data-and-files"
@@ -417,7 +421,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       {(release.downloadFiles ||
         !!release.relatedDashboardsSection?.content.length) && (
         <ReleaseDataAndFiles
-          release={release}
+          downloadFiles={release.downloadFiles}
+          hasDataGuidance={release.hasDataGuidance}
           renderAllFilesLink={
             <Link
               to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
@@ -533,7 +538,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       )}
 
       <ReleaseHelpAndSupportSection
-        release={release}
+        publication={release.publication}
+        releaseType={release.type}
         renderExternalMethodologyLink={externalMethodology => (
           <Link to={externalMethodology.url}>{externalMethodology.title}</Link>
         )}

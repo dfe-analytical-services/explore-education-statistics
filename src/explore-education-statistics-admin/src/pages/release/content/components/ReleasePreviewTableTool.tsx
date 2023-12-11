@@ -17,16 +17,18 @@ import React, { useState } from 'react';
 import { ReleaseType } from '@common/services/types/releaseType';
 
 interface Props {
+  featuredTableId?: string;
   releaseId: string;
   releaseType: ReleaseType;
   publication: Publication | ContentPublication;
 }
 const ReleasePreviewTableTool = ({
+  featuredTableId,
   releaseId,
   releaseType,
   publication,
 }: Props) => {
-  const [dataBlockId, setDataBlockId] = useState<string>();
+  const [dataBlockId, setDataBlockId] = useState(featuredTableId ?? '');
 
   const { value: initialState, isLoading } = useAsyncHandledRetry<
     InitialTableToolState | undefined
@@ -92,7 +94,7 @@ const ReleasePreviewTableTool = ({
             themeMeta={[]}
             hidePublicationStep
             initialState={initialState}
-            onSubjectStepBack={() => setDataBlockId(undefined)}
+            onSubjectStepBack={() => setDataBlockId('')}
             renderFeaturedTableLink={featuredTable => (
               <ButtonText
                 onClick={() => {

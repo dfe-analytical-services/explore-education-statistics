@@ -1,13 +1,16 @@
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import styles from '@admin/components/form/FormEditor.module.scss';
+import FeaturedTableLinkInsertForm from '@admin/components/editable/FeaturedTableLinkInsertForm';
 import GlossaryItemInsertForm from '@admin/components/editable/GlossaryItemInsertForm';
 import {
   CommentsPlugin,
   DowncastWriter,
   Editor as EditorType,
   Element,
+  FeaturedTablesPlugin,
   GlossaryPlugin,
   PluginName,
+  ToolbarGroup,
   ToolbarOption,
 } from '@admin/types/ckeditor';
 import { defaultAllowedHeadings } from '@admin/config/ckEditorConfig';
@@ -48,7 +51,9 @@ export interface FormEditorProps {
   includePlugins?: ReadonlySet<PluginName> | Set<PluginName>;
   label: string;
   testId?: string;
-  toolbarConfig?: ReadonlyArray<ToolbarOption> | Array<ToolbarOption>;
+  toolbarConfig?:
+    | ReadonlyArray<ToolbarOption | ToolbarGroup>
+    | Array<ToolbarOption | ToolbarGroup>;
   value: string;
   onAutoSave?: (values: string) => void;
   onBlur?: () => void;
@@ -86,10 +91,12 @@ const FormEditor = ({
 }: FormEditorProps) => {
   const editorInstance = useRef<EditorType>();
   const commentsPlugin = useRef<CommentsPlugin>();
+  const featuredTablesPlugin = useRef<FeaturedTablesPlugin>();
   const glossaryPlugin = useRef<GlossaryPlugin>();
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
   const { currentInteraction, selectedComment, setMarkersOrder } =
     useCommentsContext();
+  const [showFeaturedTablesModal, toggleFeaturedTablesModal] = useToggle(false);
   const [showGlossaryModal, toggleGlossaryModal] = useToggle(false);
   const config = useCKEditorConfig({
     allowComments,
@@ -100,6 +107,7 @@ const FormEditor = ({
     onAutoSave,
     onCancelComment,
     onClickAddComment,
+    onClickAddFeaturedTableLink: toggleFeaturedTablesModal.on,
     onClickAddGlossaryItem: toggleGlossaryModal.on,
     onImageUpload,
     onImageUploadCancel,
@@ -218,6 +226,11 @@ const FormEditor = ({
         commentsPlugin.current = editor.plugins.get<CommentsPlugin>('Comments');
       }
 
+      if (editor.plugins.has<FeaturedTablesPlugin>('FeaturedTables')) {
+        featuredTablesPlugin.current =
+          editor.plugins.get<FeaturedTablesPlugin>('FeaturedTables');
+      }
+
       if (editor.plugins.has<GlossaryPlugin>('Glossary')) {
         glossaryPlugin.current = editor.plugins.get<GlossaryPlugin>('Glossary');
       }
@@ -332,6 +345,21 @@ const FormEditor = ({
               />
               <Modal
                 className="govuk-!-width-one-third"
+                title="Insert featured table link"
+                open={showFeaturedTablesModal}
+                onExit={toggleFeaturedTablesModal.off}
+              >
+                <FeaturedTableLinkInsertForm
+                  onCancel={toggleFeaturedTablesModal.off}
+                  onSubmit={item => {
+                    featuredTablesPlugin.current?.addFeaturedTableLink(item);
+                    toggleFeaturedTablesModal.off();
+                    editorRef.current?.focus();
+                  }}
+                />
+              </Modal>
+              <Modal
+                className="govuk-!-width-one-third"
                 title="Insert glossary link"
                 open={showGlossaryModal}
                 onExit={toggleGlossaryModal.off}
@@ -341,6 +369,7 @@ const FormEditor = ({
                   onSubmit={item => {
                     glossaryPlugin.current?.addGlossaryItem(item);
                     toggleGlossaryModal.off();
+                    editorRef.current?.focus();
                   }}
                 />
               </Modal>

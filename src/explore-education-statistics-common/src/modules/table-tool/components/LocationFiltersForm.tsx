@@ -234,6 +234,7 @@ const LocationFiltersForm = ({
                               ? 'Search by school name or unique reference number (URN), and select at least one option before continuing to the next step.'
                               : 'Search above and select at least one option before continuing to the next step.'
                           }
+                          small
                         />
                       );
                     })}

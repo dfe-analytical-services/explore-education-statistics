@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -22,13 +23,10 @@ using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers;
 
-public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<TestStartup>>
+public class PermalinkControllerTests : IntegrationTest<TestStartup>
 {
-    private readonly WebApplicationFactory<TestStartup> _testApp;
-
-    public PermalinkControllerTests(TestApplicationFactory<TestStartup> testApp)
+    public PermalinkControllerTests(TestApplicationFactory<TestStartup> testApp) : base(testApp)
     {
-        _testApp = testApp;
     }
 
     [Fact]
@@ -188,7 +186,7 @@ public class PermalinkControllerTests : IClassFixture<TestApplicationFactory<Tes
 
     private WebApplicationFactory<TestStartup> SetupApp(IPermalinkService? permalinkService = null)
     {
-        return _testApp.ConfigureServices(
+        return TestApp.ConfigureServices(
             services =>
             {
                 services.AddTransient(_ => permalinkService ?? Mock.Of<IPermalinkService>(MockBehavior.Strict));

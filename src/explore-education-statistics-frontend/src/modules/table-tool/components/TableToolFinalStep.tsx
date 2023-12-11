@@ -1,4 +1,5 @@
 import Tag from '@common/components/Tag';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
@@ -71,29 +72,41 @@ const TableToolFinalStep = ({
       {table && tableHeaders && (
         <>
           <div className="govuk-!-margin-bottom-3 dfe-flex dfe-align-items-start dfe-justify-content--space-between">
-            {selectedPublication.selectedRelease.latestData && (
-              <Tag strong>This is the latest data</Tag>
-            )}
-
-            {!selectedPublication.selectedRelease.latestData && (
-              <>
-                <div className="govuk-!-margin-bottom-3">
-                  <Tag strong colour="orange">
-                    This data is not from the latest release
-                  </Tag>
-                </div>
-
+            {publication?.isSuperseded ? (
+              <WarningMessage testId="superseded-warning">
+                This publication has been superseded by{' '}
                 <Link
-                  className="govuk-!-display-none-print"
-                  unvisited
-                  to={`/find-statistics/${selectedPublication.slug}`}
-                  testId="View latest data link"
+                  testId="superseded-by-link"
+                  to={`/find-statistics/${publication.supersededBy?.slug}`}
                 >
-                  View latest data:{' '}
-                  <span className="govuk-!-font-weight-bold">
-                    {selectedPublication.latestRelease.title}
-                  </span>
+                  {publication.supersededBy?.title}
                 </Link>
+              </WarningMessage>
+            ) : (
+              <>
+                {selectedPublication.selectedRelease.latestData ? (
+                  <Tag strong>This is the latest data</Tag>
+                ) : (
+                  <>
+                    <div className="govuk-!-margin-bottom-3">
+                      <Tag strong colour="orange">
+                        This data is not from the latest release
+                      </Tag>
+                    </div>
+
+                    <Link
+                      className="govuk-!-display-none-print"
+                      unvisited
+                      to={`/find-statistics/${selectedPublication.slug}`}
+                      testId="View latest data link"
+                    >
+                      View latest data:{' '}
+                      <span className="govuk-!-font-weight-bold">
+                        {selectedPublication.latestRelease.title}
+                      </span>
+                    </Link>
+                  </>
+                )}
               </>
             )}
           </div>

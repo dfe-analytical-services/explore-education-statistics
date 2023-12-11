@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                                     Id = Guid.NewGuid(),
                                     Label = "Indicator label",
                                     Name = "Indicator name",
-                                    Unit = Data.Model.Unit.Percent,
+                                    Unit = IndicatorUnit.Percent,
                                     DecimalPlaces = 2
                                 }
                             }
