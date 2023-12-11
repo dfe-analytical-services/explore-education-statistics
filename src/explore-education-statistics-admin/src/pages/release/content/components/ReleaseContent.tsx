@@ -157,7 +157,7 @@ const ReleaseContent = ({
             }
           />
 
-          <div id="releaseSummary">
+          <div id="releaseSummary" data-testid="release-summary">
             {release.summarySection && (
               <>
                 <EditableSectionBlocks
@@ -231,9 +231,11 @@ const ReleaseContent = ({
                     <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
                 )}
-                <li>
-                  <a href="#releaseMainContent">Release contents</a>
-                </li>
+                {(editingMode === 'edit' || !!release.content.length) && (
+                  <li>
+                    <a href="#releaseMainContent">Release contents</a>
+                  </li>
+                )}
                 <li>
                   <a href="#explore-data-and-files">Explore data</a>
                 </li>
@@ -244,7 +246,7 @@ const ReleaseContent = ({
             </nav>
 
             <h2 className="govuk-heading-s">Related information</h2>
-            <ul className="govuk-list">
+            <ul className="govuk-list" data-testid="related-information">
               <li>
                 <Link
                   to={{
@@ -335,7 +337,7 @@ const ReleaseContent = ({
                 >
                   Methodologies
                 </h3>
-                <ul className="govuk-list">
+                <ul className="govuk-list" data-testid="methodologies-list">
                   {allMethodologies.map(methodology => (
                     <li key={methodology.key}>
                       {editingMode === 'edit' ? (
