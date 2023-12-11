@@ -1,0 +1,9 @@
+@import '~govuk-frontend/govuk/base';
+@import '@admin/styles/variables';
+
+.container {
+  @include govuk-media-query($from: desktop) {
+    margin-left: $dfe-comments-width;
+    margin-right: 0;
+  }
+}

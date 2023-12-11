@@ -54,6 +54,7 @@ import PrototypeReleaseNav4 from './PrototypeReleaseNavigation4';
 import PrototypeReleaseNav5 from './PrototypeReleaseNavigation5';
 import PrototypeReleaseNav6 from './PrototypeReleaseNavigation6';
 import PrototypeReleaseNav7 from './PrototypeReleaseNavigation7';
+import PrototypeReleaseContentPageView from './page-view/PrototypeReleaseContentPageView';
 
 interface PrototypeRoute extends RouteProps {
   name: string;
@@ -380,6 +381,11 @@ const prototypeRoutes: PrototypeRoute[] = [
     name: 'Release navigation 7',
     path: '/prototypes/release-nav7',
     component: PrototypeReleaseNav7,
+  },
+  {
+    name: 'Release content - set page view',
+    path: '/prototypes/release-content-page-view',
+    component: PrototypeReleaseContentPageView,
   },
 ];
 
