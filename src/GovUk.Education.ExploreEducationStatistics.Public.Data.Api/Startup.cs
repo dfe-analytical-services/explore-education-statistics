@@ -8,6 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
@@ -99,7 +101,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddValidatorsFromAssemblyContaining<Startup>();
         services.AddFluentValidationAutoValidation();
 
-        services.AddHttpClient("ContentApi", httpClient =>
+        services.AddHttpClient(ContentApiOptions.Section, httpClient =>
         {
             var contentApiOptions = configuration
                 .GetRequiredSection(ContentApiOptions.Section)
@@ -109,7 +111,15 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
         });
 
-        // TODO: Add more services
+        services.AddScoped<IContentApiClient, ContentApiClient>(sp =>
+        {
+            var httpClientFactory = sp.GetService<IHttpClientFactory>();
+            var httpClient = httpClientFactory!.CreateClient(ContentApiOptions.Section);
+
+            return new ContentApiClient(httpClient);
+        });
+
+        services.AddScoped<IPublicationService, PublicationService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
