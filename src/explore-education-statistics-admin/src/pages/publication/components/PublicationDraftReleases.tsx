@@ -30,13 +30,13 @@ const PublicationDraftReleases = ({
       <thead>
         <tr>
           <th className="govuk-!-width-one-third">Release period</th>
-          <th>
+          <th className="dfe-white-space--nowrap">
             Status <DraftStatusGuidanceModal />
           </th>
-          <th>
+          <th className="dfe-white-space--nowrap">
             Errors <IssuesGuidanceModal />
           </th>
-          <th>
+          <th className="dfe-white-space--nowrap">
             Warnings <IssuesGuidanceModal />
           </th>
           <th>Actions</th>

@@ -86,12 +86,14 @@ const DraftReleasesTable = ({
                     >
                       Publication / Release period
                     </th>
-                    <th>
+                    <th className="dfe-white-space--nowrap">
                       Status <DraftStatusGuidanceModal />
                     </th>
                     {/* Don't render the issues for BAU users to prevent performance problems. */}
                     {!isBauUser && (
-                      <th className={styles.issuesColumn}>
+                      <th
+                        className={`${styles.issuesColumn} dfe-white-space--nowrap`}
+                      >
                         Issues <IssuesGuidanceModal />
                       </th>
                     )}
