@@ -1,8 +1,6 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 
@@ -15,7 +13,8 @@ public record PublicationSearchResultViewModel
     public string Theme { get; init; }
     public DateTime Published { get; init; }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [System.Text.Json.Serialization.JsonConverter(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+    [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
     public ReleaseType Type { get; init; }
 
     public int? Rank { get; set; }
