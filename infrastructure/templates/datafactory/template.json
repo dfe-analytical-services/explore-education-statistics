@@ -46,6 +46,18 @@
     },
     "actionGroupAlerts": {
       "type": "string"
+    },
+    "slackWebhook": {
+      "type": "string",
+      "metadata": {
+        "description": "Slack webhook URI for alerts"
+      }
+    },
+    "slackAlertsChannel": {
+      "type": "string",
+      "metadata": {
+        "description": "Slack channel to post Azure alerts to"
+      }
     }
   },
   "variables":{
@@ -79,6 +91,12 @@
           },
           "keyVaultName": {
             "value": "[parameters('keyVaultName')]"
+          },
+          "slackWebhook": {
+            "value": "[parameters('slackWebhook')]"
+          },
+          "slackAlertsChannel": {
+            "value": "[parameters('slackAlertsChannel')]"
           }
         }
       },
