@@ -46,7 +46,7 @@ export default function PublicationPublishedReleasesTable({
       <thead>
         <tr>
           <th className="govuk-!-width-one-third">Release period</th>
-          <th className={styles.statusColumn}>
+          <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
             Status <PublishedStatusGuidanceModal />
           </th>
           <th>Published date</th>

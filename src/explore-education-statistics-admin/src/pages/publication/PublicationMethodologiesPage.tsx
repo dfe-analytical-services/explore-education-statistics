@@ -110,10 +110,10 @@ const PublicationMethodologiesPage = () => {
           <thead>
             <tr>
               <th>Methodology</th>
-              <th>
+              <th className="dfe-white-space--nowrap">
                 Type <MethodologyTypeGuidanceModal />
               </th>
-              <th>
+              <th className="dfe-white-space--nowrap">
                 Status <MethodologyStatusGuidanceModal />
               </th>
               <th>Published date</th>
