@@ -24,7 +24,7 @@ const WizardStepHeading = ({
       })}
     >
       <span
-        className={classNames('govuk-tag', {
+        className={classNames('govuk-tag', 'dfe-white-space--nowrap', {
           'govuk-tag--turquoise govuk-!-margin-right-2': isActive,
           'govuk-tag govuk-tag--grey': !isActive,
         })}
