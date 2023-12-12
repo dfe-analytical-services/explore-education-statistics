@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
 
-public record PublicationsListRequest(
+public record PublicationsListGetRequest(
     ReleaseType? ReleaseType,
     Guid? ThemeId,
     [MinLength(3)] string? Search,

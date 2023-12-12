@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [MemoryCache(typeof(GetPublicationListCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
         [HttpGet("publications")]
         public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
-            [FromQuery] PublicationsListRequest request)
+            [FromQuery] PublicationsListGetRequest request)
         {
             return await _publicationService
                 .ListPublications(
@@ -62,6 +62,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     request.Order,
                     page: request.Page,
                     pageSize: request.PageSize)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("publications")]
+        public async Task<ActionResult<PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
+            [FromBody] PublicationsListPostRequest request)
+        {
+            return await _publicationService
+                .ListPublications(
+                    request.ReleaseType,
+                    request.ThemeId,
+                    request.Search,
+                    request.Sort,
+                    request.Order,
+                    page: request.Page,
+                    pageSize: request.PageSize,
+                    publicationIds: request.PublicationIds)
                 .HandleFailuresOrOk();
         }
 

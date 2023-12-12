@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 public class PublicationControllerCachingTests : CacheServiceTestFixture
 {
-    private readonly PublicationsListRequest _query = new(
+    private readonly PublicationsListGetRequest _query = new(
         ReleaseType.ExperimentalStatistics,
         ThemeId: Guid.Empty,
         Search: "",

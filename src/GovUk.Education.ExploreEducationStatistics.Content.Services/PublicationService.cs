@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,7 +87,8 @@ public class PublicationService : IPublicationService
         PublicationsSortBy? sort = null,
         SortOrder? order = null,
         int page = 1,
-        int pageSize = 10)
+        int pageSize = 10,
+        IEnumerable<Guid>? publicationIds = null)
     {
         sort ??= search == null ? Title : Relevance;
         order ??= order ?? (sort == Title ? Asc : Desc);
@@ -96,6 +97,12 @@ public class PublicationService : IPublicationService
         var baseQueryable = _contentDbContext.Publications
             .Where(p => p.LatestPublishedReleaseId.HasValue &&
                         (p.SupersededById == null || !p.SupersededBy!.LatestPublishedReleaseId.HasValue));
+
+        // Retrieve only requested publication IDs if specified
+        if (publicationIds is not null)
+        {
+            baseQueryable = baseQueryable.Where(p => publicationIds!.Contains(p.Id));
+        }
 
         // Apply release type and theme filters
         if (releaseType.HasValue)
