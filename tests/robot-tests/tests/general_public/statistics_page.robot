@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
+Resource            ../seed_data/seed_data_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -35,7 +36,7 @@ Validate Related information section and links exist
 Validate bootstrapped themes filters exist
     [Tags]    Local    Dev    NotAgainstProd
     user checks radio is checked    All themes
-    user checks page contains radio    Pupils and schools
+    user checks page contains radio    ${SEED_DATA_THEME_1}
     user checks page contains radio    UI tests - Publication and Release UI Permissions Theme
 
 Validate themes filters exist
@@ -47,7 +48,7 @@ Validate themes filters exist
     user checks page contains radio    Finance and funding
     user checks page contains radio    Further education
     user checks page contains radio    Higher education
-    user checks page contains radio    Pupils and schools
+    user checks page contains radio    ${SEED_DATA_THEME_1}
     user checks page contains radio    School and college outcomes and performance
     user checks page contains radio    Teachers and school workforce
     user checks page contains radio    UK education and training statistics
@@ -75,13 +76,13 @@ Validate publications list exists
 
 Filter by theme
     [Tags]    Local    Dev
-    user clicks radio    Pupils and schools
-    user checks page contains button    Pupils and schools
+    user clicks radio    ${SEED_DATA_THEME_1}
+    user checks page contains button    ${SEED_DATA_THEME_1}
 
 Remove theme filter
     [Tags]    Local    Dev
-    user clicks button    Pupils and schools
-    user checks page does not contain button    Pupils and schools
+    user clicks button    ${SEED_DATA_THEME_1}
+    user checks page does not contain button    ${SEED_DATA_THEME_1}
     user checks radio is checked    All themes
 
 Filter by release type
@@ -98,16 +99,16 @@ Remove release type filter
 Searching
     [Tags]    Local    Dev
     user clicks element    id:searchForm-search
-    user presses keys    Pupil absence in schools in England
+    user presses keys    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     user clicks button    Search
-    user checks page contains button    Pupil absence in schools in England
+    user checks page contains button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     user checks radio is checked    Relevance
-    user checks list item contains    testid:publicationsList    1    Pupil absence in schools in England
+    user checks list item contains    testid:publicationsList    1    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
 
 Removing search
     [Tags]    Local    Dev
-    user clicks button    Pupil absence in schools in England
-    user checks page does not contain button    Pupil absence in schools in England
+    user clicks button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user checks page does not contain button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     user checks radio is checked    Newest
 
 Clear all filters
@@ -115,17 +116,17 @@ Clear all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user clicks radio    Pupils and schools
+    user clicks radio    ${SEED_DATA_THEME_1}
     user clicks radio    Official statistics
 
     user checks page contains button    pupil
-    user checks page contains button    Pupils and schools
+    user checks page contains button    ${SEED_DATA_THEME_1}
     user checks page contains button    Official statistics
 
     user clicks button    Clear all filters
 
     user checks page does not contain button    pupil
-    user checks page does not contain button    Pupils and schools
+    user checks page does not contain button    ${SEED_DATA_THEME_1}
     user checks page does not contain button    Official statistics
     user checks page does not contain button    Clear all filters
 

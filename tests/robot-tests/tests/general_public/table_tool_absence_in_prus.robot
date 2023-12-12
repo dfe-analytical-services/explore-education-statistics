@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
+Resource            ../seed_data/seed_data_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -12,12 +13,12 @@ Force Tags          GeneralPublic    Local    Dev    Preprod
 Go to Table Tool page
     user navigates to data tables page on public frontend
 
-Select "Pupil absence" publication
-    user clicks radio    Pupils and schools
-    user clicks radio    Pupil absence in schools in England
+Select "Seed Data Theme 1 Publication 1" publication
+    user clicks radio    ${SEED_DATA_THEME_1}
+    user clicks radio    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
-    user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
+    user checks previous table tool step contains    1    Publication    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
 
 Validate "Absence in prus" subject details
     user clicks radio    Absence in prus

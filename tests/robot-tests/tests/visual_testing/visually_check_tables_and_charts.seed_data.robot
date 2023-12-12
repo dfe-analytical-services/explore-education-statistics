@@ -1,6 +1,7 @@
 *** Settings ***
-Resource            tables_and_charts.robot
 Library             tables_and_charts.py
+Resource            tables_and_charts.robot
+Resource            ../seed_data/seed_data_constants.robot
 
 Force Tags          GeneralPublic    Local    Dev
 
@@ -14,8 +15,8 @@ Check release /find-statistics/permanent-and-fixed-period-exclusions-in-england/
     ${release}=    get release by url    /find-statistics/permanent-and-fixed-period-exclusions-in-england/2016-17
     Check release    ${release}
 
-Check release /find-statistics/pupil-absence-in-schools-in-england/2016-17
-    ${release}=    get release by url    /find-statistics/pupil-absence-in-schools-in-england/2016-17
+Check release ${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}/2016-17
+    ${release}=    get release by url    ${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}/2016-17
     Check release    ${release}
 
 

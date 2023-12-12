@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
+Resource            ../seed_data/seed_data_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -9,16 +10,16 @@ Force Tags          GeneralPublic    Local    Dev
 
 
 *** Test Cases ***
-Navigate to Pupil absence in schools in England methodology page
+Navigate to Seed Data Theme 1 methodologies
     user navigates to public methodologies page
-    user opens accordion section    Pupils and schools
+    user opens accordion section    ${SEED_DATA_THEME_1}
 
-Go to Pupil absence methodology page
+Go to Seed Data Theme 1 Publication 1 Methodology 1
     user checks page contains link with text and url
-    ...    Pupil absence statistics: methodology
-    ...    /methodology/pupil-absence-in-schools-in-england
-    user clicks link    Pupil absence statistics: methodology
-    user waits until h1 is visible    Pupil absence statistics: methodology
+    ...    ${SEED_DATA_THEME_1_METHODOLOGY_1_TITLE}
+    ...    ${SEED_DATA_THEME_1_METHODOLOGY_1_RELATIVE_URL}
+    user clicks link    ${SEED_DATA_THEME_1_METHODOLOGY_1_TITLE}
+    user waits until h1 is visible    ${SEED_DATA_THEME_1_METHODOLOGY_1_TITLE}
     user waits until page contains title caption    Methodology
 
 Validate Published date
@@ -51,8 +52,8 @@ Validate Related information section and links exist
 
     user checks element contains child element    ${relatedInformation}    xpath://h3[text()="Publications"]
     user checks page contains link with text and url
-    ...    Pupil absence in schools in England
-    ...    /find-statistics/pupil-absence-in-schools-in-england
+    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}
     ...    ${relatedInformation}
 
     user checks element contains child element    ${relatedInformation}    xpath://h3[text()="Related pages"]

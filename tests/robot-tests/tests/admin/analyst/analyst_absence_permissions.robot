@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
+Resource            ../../seed_data/seed_data_constants.robot
 
 Suite Setup         user signs in as analyst1
 Suite Teardown      user closes the browser
@@ -10,16 +11,17 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
-    user waits until h3 is visible    Pupils and schools / Pupil absence
+    user waits until h3 is visible    ${SEED_DATA_THEME_1} / ${SEED_DATA_THEME_1_TOPIC_2}
     ${ABSENCE_PUBLICATIONS}=    get webelement
-    ...    xpath://*[@data-testid="topic-publications-Pupils and schools-Pupil absence"]
-    user waits until parent contains element    ${ABSENCE_PUBLICATIONS}    link:Pupil absence in schools in England
+    ...    xpath://*[@data-testid="topic-publications-${SEED_DATA_THEME_1}-${SEED_DATA_THEME_1_TOPIC_2}"]
+    user waits until parent contains element    ${ABSENCE_PUBLICATIONS}
+    ...    link:${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
 
-    user waits until h3 is visible    Pupils and schools / Exclusions
+    user waits until h3 is visible    ${SEED_DATA_THEME_1} / ${SEED_DATA_THEME_1_TOPIC_1}
     ${EXCLUSION_PUBLICATIONS}=    get webelement
-    ...    xpath://*[@data-testid="topic-publications-Pupils and schools-Exclusions"]
+    ...    xpath://*[@data-testid="topic-publications-${SEED_DATA_THEME_1}-${SEED_DATA_THEME_1_TOPIC_1}"]
     user waits until parent contains element    ${EXCLUSION_PUBLICATIONS}
-    ...    link:Permanent and fixed-period exclusions in England
+    ...    link:${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
 
 Validate Analyst1 can see correct draft, approvals and scheduled releases tabs
     user checks element should contain    id:draft-releases-tab    Draft releases
@@ -29,9 +31,9 @@ Validate Analyst1 can see correct draft, approvals and scheduled releases tabs
 Validate Analyst1 cannot create a publication
     user checks page does not contain element    link:Create new publication
 
-Navigate to Pupil absence Publication page
-    user clicks link    Pupil absence in schools in England
-    user waits until h1 is visible    Pupil absence in schools in England
+Navigate to Seed Data Theme 1 Publication 1 page
+    user clicks link    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
 
 Navigate to legacy releases
     user clicks link    Legacy releases
@@ -86,14 +88,14 @@ Navigate to releases
     user clicks link    Releases
     user waits until h2 is visible    Manage releases
 
-Validate Analyst1 cannot create a release for Pupil absence publication
+Validate Analyst1 cannot create a release for Seed Data Theme 1 Publication 1 publication
     user checks page does not contain    link:Create new release
 
 Navigate to Absence release
     ${ROW}=    user gets table row    Academic year 2016/17    testid:publication-published-releases
     user clicks link containing text    View    ${ROW}
 
-    user waits until h1 is visible    Pupil absence in schools in England
+    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     user waits until h2 is visible    Release summary
 
 Validate Analyst1 can see Absence release summary
@@ -103,7 +105,7 @@ Validate Analyst1 can see Absence release summary
 Validate Analyst1 can see 'Content' page
     user clicks link    Content
     user waits until page finishes loading
-    user waits until h2 is visible    Pupil absence in schools in England    %{WAIT_SMALL}
+    user waits until h2 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}    %{WAIT_SMALL}
 
 Validate Analyst1 can see 'Content' page key stats
     user waits until page contains element    id:releaseHeadlines    %{WAIT_LONG}

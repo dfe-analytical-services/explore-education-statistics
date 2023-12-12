@@ -1,5 +1,7 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
+Resource            ../seed_data/seed_data_constants.robot
+
 Force Tags          GeneralPublic    Prod
 
 Suite Setup         user opens the browser
@@ -17,16 +19,16 @@ Navigate to /methodology page
 
 Validate page contents
     [Tags]    Local    NotAgainstProd
-    user waits until page contains accordion section    Pupils and schools
-    user opens accordion section    Pupils and schools
+    user waits until page contains accordion section    ${SEED_DATA_THEME_1}
+    user opens accordion section    ${SEED_DATA_THEME_1}
 
     user checks page contains link with text and url
-    ...    Pupil exclusion statistics: methodology
-    ...    /methodology/permanent-and-fixed-period-exclusions-in-england
+    ...    ${SEED_DATA_THEME_1_METHODOLOGY_2_TITLE}
+    ...    ${SEED_DATA_THEME_1_METHODOLOGY_2_RELATIVE_URL}
 
     user checks page contains link with text and url
-    ...    Pupil absence statistics: methodology
-    ...    /methodology/pupil-absence-in-schools-in-england
+    ...    ${SEED_DATA_THEME_1_METHODOLOGY_1_TITLE}
+    ...    ${SEED_DATA_THEME_1_METHODOLOGY_1_RELATIVE_URL}
 
 Validate accordion sections exist
     user checks url contains    methodology

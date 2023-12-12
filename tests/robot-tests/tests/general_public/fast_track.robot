@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
+Resource            ../seed_data/seed_data_constants.robot
 
 Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
@@ -11,10 +12,10 @@ Test Setup          fail test fast if required
 *** Test Cases ***
 Navigate to publication release page
     environment variable should be set    PUBLIC_URL
-    user navigates to public frontend    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
+    user navigates to public frontend    %{PUBLIC_URL}${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}
 
 Click fast track link for 'Pupil absence rates' data block
-    user waits until h1 is visible    Pupil absence in schools in England
+    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     user opens accordion section    Pupil absence rates    id:content
     user scrolls to accordion section    Pupil absence rates    id:content
     user scrolls to element    testid:Data block - Generic data block - National
@@ -24,7 +25,7 @@ Click fast track link for 'Pupil absence rates' data block
 Validate Publication selected step option
     user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
     user waits until page contains element    css:table
-    user checks previous table tool step contains    1    Publication    Pupil absence in schools in England
+    user checks previous table tool step contains    1    Publication    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
 
 Validate Subject selected step option
     [Tags]    NotAgainstDev    NotAgainstTest
