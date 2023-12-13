@@ -1,22 +1,75 @@
+using Asp.Versioning;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers;
 
+[ApiVersion(1.0)]
+[ApiVersion(2.0)]
 [ApiController]
-[Route("/HelloWorld")]
+[Route("api/v{version:apiVersion}/HelloWorld")]
 public class HelloWorldController(PublicDataDbContext publicDataDbContext) : ControllerBase
 {
+    /// <summary>
+    /// List v1
+    /// </summary>
+    /// <remarks>
+    /// Test the API can list with `GET` in v1.
+    /// </remarks>
     [HttpGet]
-    public async Task<ActionResult<string>> Get()
+    [SwaggerResponse(200, "The list of things", typeof(string))]
+    public async Task<ActionResult<string>> List()
     {
         return await Task.FromResult("Hello World");
     }
 
-    [HttpPost]
+    /// <summary>
+    /// List v2
+    /// </summary>
+    /// <remarks>
+    /// Tests the API can list with `GET` in v2.
+    /// </remarks>
+    [MapToApiVersion(2.0)]
+    [HttpGet]
+    [SwaggerResponse(200, "The list of things", typeof(string))]
+    public async Task<ActionResult<string>> ListV2()
+    {
+        return await Task.FromResult("Hello World v2");
+    }
+
+    /// <summary>
+    /// Get by ID
+    /// </summary>
+    /// <remarks>
+    /// Tests the API can get by ID with `GET` v1 and v2.
+    /// </remarks>
+    [HttpGet("{id}", Name = "GetById")]
+    [SwaggerResponse(200, "The specific thing", typeof(string))]
+    [SwaggerResponse(404, "Thing could not be found")]
+    public async Task<ActionResult<string>> Get(
+        [SwaggerParameter("The ID of the thing")] string id)
+    {
+        if (id.IsNullOrEmpty())
+        {
+            return NotFound();
+        }
+
+        return await Task.FromResult("Hello World v1 and v2");
+    }
+
+    /// <summary>
+    /// Create
+    /// </summary>
+    /// <remarks>
+    /// Tests the API can create with `POST` in v1 and v2.
+    /// </remarks>
+    [HttpPost(Name = "CreateCustomId")]
+    [SwaggerResponse(201, "Thing was created")]
     public async Task<DataSet> Create()
     {
         var dataSetId = Guid.NewGuid();
