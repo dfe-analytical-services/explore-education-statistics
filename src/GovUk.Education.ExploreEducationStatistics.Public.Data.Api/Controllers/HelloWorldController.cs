@@ -27,6 +27,7 @@ public class HelloWorldController(PublicDataDbContext publicDataDbContext) : Con
             Id = dataSetId,
             Status = DataSetStatus.Published,
             Title = "My first dataset",
+            Summary = "My first summary",
             PublicationId = Guid.NewGuid(),
             Versions = new List<DataSetVersion>
             {
