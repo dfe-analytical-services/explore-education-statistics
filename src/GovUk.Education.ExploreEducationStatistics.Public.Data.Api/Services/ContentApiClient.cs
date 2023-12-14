@@ -17,11 +17,7 @@ internal class ContentApiClient : IContentApiClient
     public async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
     {
         var request = new PublicationsListPostRequest(
-            ReleaseType: null,
-            ThemeId: null,
             Search: search,
-            Sort: null,
-            Order: null,
             Page: page,
             PageSize: pageSize,
             PublicationIds: publicationIds);

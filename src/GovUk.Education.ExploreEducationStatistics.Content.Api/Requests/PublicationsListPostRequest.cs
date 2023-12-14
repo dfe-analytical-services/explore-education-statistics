@@ -9,11 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
 
 public record PublicationsListPostRequest(
-    ReleaseType? ReleaseType,
-    Guid? ThemeId,
-    [MinLength(3)] string? Search,
-    IPublicationService.PublicationsSortBy? Sort,
-    SortOrder? Order,
+    ReleaseType? ReleaseType = null,
+    Guid? ThemeId = null,
+    [MinLength(3)] string? Search = null,
+    IPublicationService.PublicationsSortBy? Sort = null,
+    SortOrder? Order = null,
     [Range(1, int.MaxValue)] int Page = 1,
     [Range(1, int.MaxValue)] int PageSize = 10,
     IEnumerable<Guid>? PublicationIds = null);
