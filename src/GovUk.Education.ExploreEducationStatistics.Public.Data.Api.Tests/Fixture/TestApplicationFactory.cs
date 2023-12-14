@@ -1,11 +1,11 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Moq;
 using Testcontainers.PostgreSql;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
@@ -15,8 +15,6 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16.1-alpine")
         .Build();
-
-    public readonly Mock<IContentApiClient> ContentApiClientMock = new();
 
     public async Task Initialize()
     {
@@ -58,13 +56,6 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
         }
     }
 
-    public async Task Reset()
-    {
-        await ClearAllTestData();
-
-        ContentApiClientMock.Reset();
-    }
-
     public async Task ClearAllTestData()
     {
         await ClearTestData<PublicDataDbContext>();
@@ -83,7 +74,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
                 services.AddDbContext<PublicDataDbContext>(
                     options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
 
-                services.ReplaceService(ContentApiClientMock.Object);
+                services.ReplaceService<IContentApiClient>(new ContentApiClientMock());
             });
     }
 }
