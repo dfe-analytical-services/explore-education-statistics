@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.WebUtilities;
 using Moq;
+using System.Net;
 using System.Net.Http.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
