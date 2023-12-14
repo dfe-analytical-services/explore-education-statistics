@@ -22,7 +22,7 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public required string Notes { get; set; }
 
-    public DataSetVersionMetaSummary MetaSummary { get; set; } = null!;
+    public required DataSetVersionMetaSummary MetaSummary { get; set; }
 
     public DataSetMeta Meta { get; set; } = null!;
 
