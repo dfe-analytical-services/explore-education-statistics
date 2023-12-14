@@ -22,7 +22,7 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 
     public DataSetVersion? LatestVersion { get; set; }
 
-    public List<DataSetVersion> Versions { get; set; } = new();
+    public List<DataSetVersion> Versions { get; set; } = [];
 
     public DateTimeOffset? Published { get; set; }
 

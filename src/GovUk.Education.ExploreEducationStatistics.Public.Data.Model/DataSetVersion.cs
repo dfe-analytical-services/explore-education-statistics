@@ -26,15 +26,15 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public DataSetMeta Meta { get; set; } = null!;
 
-    public List<ChangeSetFilters> FilterChanges { get; set; } = new();
+    public List<ChangeSetFilters> FilterChanges { get; set; } = [];
 
-    public List<ChangeSetFilterOptions> FilterOptionChanges { get; set; } = new();
+    public List<ChangeSetFilterOptions> FilterOptionChanges { get; set; } = [];
 
-    public List<ChangeSetIndicators> IndicatorChanges { get; set; } = new();
+    public List<ChangeSetIndicators> IndicatorChanges { get; set; } = [];
 
-    public List<ChangeSetLocations> LocationChanges { get; set; } = new();
+    public List<ChangeSetLocations> LocationChanges { get; set; } = [];
 
-    public List<ChangeSetTimePeriods> TimePeriodChanges { get; set; } = new();
+    public List<ChangeSetTimePeriods> TimePeriodChanges { get; set; } = [];
 
     public DateTimeOffset? Published { get; set; }
 
