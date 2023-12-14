@@ -23,8 +23,7 @@ internal class PublicationService(PublicDataDbContext publicDataDbContext, ICont
         var paging = new PagingViewModel(
             paginatedPublications.Paging.Page, 
             paginatedPublications.Paging.PageSize, 
-            paginatedPublications.Paging.TotalResults, 
-            paginatedPublications.Paging.TotalPages);
+            paginatedPublications.Paging.TotalResults);
 
         return new PaginatedListViewModel<PublicationListViewModel>(results, paging);
     }
