@@ -15,6 +15,7 @@ public static class DataSetGeneratorExtensions
         => setters
             .SetDefault(f => f.Id)
             .SetDefault(f => f.Title)
+            .SetDefault(f => f.Summary)
             .SetDefault(f => f.PublicationId)
             .Set(f => f.Status, DataSetStatus.Staged)
             .Set(f => f.Created, f => f.Date.PastOffset())
