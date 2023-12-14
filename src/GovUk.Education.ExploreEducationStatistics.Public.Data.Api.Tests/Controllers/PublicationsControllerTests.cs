@@ -18,17 +18,22 @@ public class PublicationsControllerTests : IntegrationTestFixture
 
     [Theory]
     [InlineData(1, 2, 2, 1)]
-    public async Task ListPublications_MultiplePublishedDataSets_Returns200WithAllPublications(int page, int pageSize, int numberOfPublishedDataSets, int numberOfUnpublishedDataSets)
+    [InlineData(2, 2, 2, 1)]
+    [InlineData(1, 2, 2, 10)]
+    [InlineData(1, 2, 9, 1)]
+    [InlineData(2, 2, 9, 1)]
+    [InlineData(1, 2, 9, 10)]
+    [InlineData(1, 3, 2, 1)]
+    public async Task ListPublications_MultiplePublishedDataSets_Returns200WithAllPublicationsForPublishedDataSets(
+        int page,
+        int pageSize,
+        int numberOfPublishedDataSets,
+        int numberOfUnpublishedDataSets)
     {
         var publishedDataSets = GeneratePublishedDataSets(numberOfPublishedDataSets);
         var unpublishedDataSets = GenerateUnublishedDataSets(numberOfUnpublishedDataSets);
 
         var allDataSets = publishedDataSets.Concat(unpublishedDataSets);
-
-        var allPublishedDataSetPublicationIds = allDataSets
-            .Where(ds => ds.Status == DataSetStatus.Published)
-            .Select(ds => ds.PublicationId)
-            .ToList();
 
         await AddTestDataSets(allDataSets.ToArray());
 
@@ -42,11 +47,27 @@ public class PublicationsControllerTests : IntegrationTestFixture
         content!.Paging.Page.Should().Be(page);
         content.Paging.PageSize.Should().Be(pageSize);
         content.Paging.TotalResults.Should().Be(numberOfPublishedDataSets);
-        content.Results.Should().HaveCount(Math.Min(numberOfPublishedDataSets, pageSize));
 
-        foreach (var publicationId in allPublishedDataSetPublicationIds)
+        var publishedDataSetPublicationIdsToBeReturned = allDataSets
+            .Where(ds => ds.Status == DataSetStatus.Published)
+            .Select(ds => ds.PublicationId)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize);
+
+        content.Results.Should().HaveCount(publishedDataSetPublicationIdsToBeReturned.Count());
+
+        var publicationIdsThatShouldNotHaveBeenReturned = allDataSets
+            .Select(ds => ds.PublicationId)
+            .Except(publishedDataSetPublicationIdsToBeReturned);
+
+        foreach (var publicationId in publishedDataSetPublicationIdsToBeReturned)
         {
             content.Results.Should().Contain(r => r.Id == publicationId);
+        }
+
+        foreach (var publicationId in publicationIdsThatShouldNotHaveBeenReturned)
+        {
+            content.Results.Should().NotContain(r => r.Id == publicationId);
         }
     }
 
