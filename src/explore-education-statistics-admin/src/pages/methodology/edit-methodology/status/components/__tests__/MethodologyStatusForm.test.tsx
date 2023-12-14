@@ -1,5 +1,5 @@
 import MethodologyStatusForm, {
-  FormValues,
+  MethodologyStatusFormValues,
 } from '@admin/pages/methodology/edit-methodology/status/components/MethodologyStatusForm';
 import { IdTitlePair } from '@admin/services/types/common';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -305,7 +305,7 @@ describe('MethodologyStatusForm', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
-    const expectedValues: FormValues = {
+    const expectedValues: MethodologyStatusFormValues = {
       latestInternalReleaseNote: 'Test release note',
       status: 'Approved',
       publishingStrategy: 'WithRelease',

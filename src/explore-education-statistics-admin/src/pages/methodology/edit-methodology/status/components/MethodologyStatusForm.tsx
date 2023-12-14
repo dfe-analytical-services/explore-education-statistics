@@ -2,6 +2,7 @@ import {
   MethodologyVersion,
   MethodologyPublishingStrategy,
   MethodologyApprovalStatus,
+  UpdateMethodology,
 } from '@admin/services/methodologyService';
 import { MethodologyStatusPermissions } from '@admin/services/permissionService';
 import { IdTitlePair } from '@admin/services/types/common';
@@ -18,12 +19,7 @@ import Yup from '@common/validation/yup';
 import React, { useMemo } from 'react';
 import { ObjectSchema } from 'yup';
 
-export interface FormValues {
-  status: MethodologyApprovalStatus;
-  latestInternalReleaseNote?: string;
-  publishingStrategy?: MethodologyPublishingStrategy;
-  withReleaseId?: string;
-}
+export type MethodologyStatusFormValues = Omit<UpdateMethodology, 'title'>;
 
 interface Props {
   isPublished?: string;
@@ -31,7 +27,7 @@ interface Props {
   statusPermissions?: MethodologyStatusPermissions;
   unpublishedReleases: IdTitlePair[];
   onCancel: () => void;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: MethodologyStatusFormValues) => void;
 }
 
 const MethodologyStatusForm = ({
@@ -42,7 +38,9 @@ const MethodologyStatusForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+  const validationSchema = useMemo<
+    ObjectSchema<MethodologyStatusFormValues>
+  >(() => {
     return Yup.object({
       status: Yup.string()
         .oneOf<MethodologyApprovalStatus>([
@@ -85,7 +83,7 @@ const MethodologyStatusForm = ({
           <RHFForm id="methodologyStatusForm" onSubmit={onSubmit}>
             <h2>Edit methodology status</h2>
 
-            <RHFFormFieldRadioGroup<FormValues>
+            <RHFFormFieldRadioGroup<MethodologyStatusFormValues>
               legend="Status"
               hint={
                 isPublished &&
@@ -111,7 +109,7 @@ const MethodologyStatusForm = ({
               ]}
               order={[]}
             />
-            <RHFFormFieldTextArea<FormValues>
+            <RHFFormFieldTextArea<MethodologyStatusFormValues>
               name="latestInternalReleaseNote"
               className="govuk-!-width-one-half"
               label="Internal note"
@@ -119,7 +117,7 @@ const MethodologyStatusForm = ({
               rows={2}
             />
             {status === 'Approved' && (
-              <RHFFormFieldRadioGroup<FormValues>
+              <RHFFormFieldRadioGroup<MethodologyStatusFormValues>
                 name="publishingStrategy"
                 legend="When to publish"
                 legendSize="m"
@@ -130,7 +128,7 @@ const MethodologyStatusForm = ({
                     label: 'With a specific release',
                     value: 'WithRelease',
                     conditional: (
-                      <RHFFormFieldSelect<FormValues>
+                      <RHFFormFieldSelect<MethodologyStatusFormValues>
                         label="Select release"
                         name="withReleaseId"
                         order={FormSelect.unordered}
