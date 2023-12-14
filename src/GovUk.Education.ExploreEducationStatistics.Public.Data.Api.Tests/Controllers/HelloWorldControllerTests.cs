@@ -13,7 +13,7 @@ public class HelloWorldControllerTests : IntegrationTestFixture
     {
         var client = TestApp.CreateClient();
 
-        var response = await client.GetAsync("/HelloWorld");
+        var response = await client.GetAsync("/api/v1/HelloWorld");
 
         var content = await response.Content.ReadAsStringAsync();
 

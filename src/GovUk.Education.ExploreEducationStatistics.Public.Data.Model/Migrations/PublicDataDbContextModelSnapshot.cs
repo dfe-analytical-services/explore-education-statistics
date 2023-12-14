@@ -156,6 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid?>("SupersedingDataSetId")
                         .HasColumnType("uuid");
 
