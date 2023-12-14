@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.OpenApi.Models;
 using Npgsql;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
@@ -101,7 +102,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddValidatorsFromAssemblyContaining<Startup>();
         services.AddFluentValidationAutoValidation();
 
-        services.AddHttpClient(ContentApiOptions.Section, httpClient =>
+        services.AddHttpClient<ContentApiClient>(httpClient =>
         {
             var contentApiOptions = configuration
                 .GetRequiredSection(ContentApiOptions.Section)
@@ -111,13 +112,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
         });
 
-        services.AddScoped<IContentApiClient, ContentApiClient>(sp =>
-        {
-            var httpClientFactory = sp.GetService<IHttpClientFactory>();
-            var httpClient = httpClientFactory!.CreateClient(ContentApiOptions.Section);
-
-            return new ContentApiClient(httpClient);
-        });
+        services.AddScoped<IContentApiClient, ContentApiClient>();
 
         services.AddScoped<IPublicationService, PublicationService>();
     }
