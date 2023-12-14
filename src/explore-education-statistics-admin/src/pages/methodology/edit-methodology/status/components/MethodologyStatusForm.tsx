@@ -3,22 +3,24 @@ import {
   MethodologyPublishingStrategy,
   MethodologyApprovalStatus,
 } from '@admin/services/methodologyService';
+import { MethodologyStatusPermissions } from '@admin/services/permissionService';
 import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { Form, FormFieldRadioGroup, FormSelect } from '@common/components/form';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
-import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import { FormSelect } from '@common/components/form';
+import RHFFormFieldRadioGroup from '@common/components/form/rhf/RHFFormFieldRadioGroup';
+import RHFFormFieldTextArea from '@common/components/form/rhf/RHFFormFieldTextArea';
+import RHFFormFieldSelect from '@common/components/form/rhf/RHFFormFieldSelect';
 import Yup from '@common/validation/yup';
-import useFormSubmit from '@common/hooks/useFormSubmit';
-import { Formik } from 'formik';
-import React from 'react';
-import { MethodologyStatusPermissions } from '@admin/services/permissionService';
+import React, { useMemo } from 'react';
+import { ObjectSchema } from 'yup';
 
 export interface FormValues {
   status: MethodologyApprovalStatus;
-  latestInternalReleaseNote: string;
+  latestInternalReleaseNote?: string;
   publishingStrategy?: MethodologyPublishingStrategy;
   withReleaseId?: string;
 }
@@ -40,37 +42,50 @@ const MethodologyStatusForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      status: Yup.string()
+        .oneOf<MethodologyApprovalStatus>([
+          'Draft',
+          'HigherLevelReview',
+          'Approved',
+        ])
+        .required('Choose a status'),
+      latestInternalReleaseNote: Yup.string().when('status', {
+        is: 'Approved',
+        then: s => s.required('Enter an internal note'),
+      }),
+      publishingStrategy: Yup.string()
+        .oneOf<MethodologyPublishingStrategy>(['WithRelease', 'Immediately'])
+        .when('status', {
+          is: 'Approved',
+          then: s => s.required('Choose when to publish'),
+        }),
+      withReleaseId: Yup.string().when('publishingStrategy', {
+        is: 'WithRelease',
+        then: s => s.required('Choose a release'),
+      }),
+    });
+  }, []);
+
   return (
-    <Formik<FormValues>
+    <FormProvider
+      enableReinitialize
       initialValues={{
         status: methodology.status,
         latestInternalReleaseNote: methodology.internalReleaseNote ?? '',
         publishingStrategy: methodology.publishingStrategy ?? 'Immediately',
         withReleaseId: methodology.scheduledWithRelease?.id,
       }}
-      onSubmit={useFormSubmit<FormValues>(onSubmit)}
-      validationSchema={Yup.object<FormValues>({
-        status: Yup.mixed().required('Choose a status'),
-        latestInternalReleaseNote: Yup.string().when('status', {
-          is: 'Approved',
-          then: s => s.required('Enter an internal note'),
-        }),
-        publishingStrategy: Yup.string().when('status', {
-          is: 'Approved',
-          then: s => s.required('Choose when to publish'),
-        }),
-        withReleaseId: Yup.string().when('publishingStrategy', {
-          is: 'WithRelease',
-          then: s => s.required('Choose a release'),
-        }),
-      })}
+      validationSchema={validationSchema}
     >
-      {form => {
+      {({ watch }) => {
+        const status = watch('status');
         return (
-          <Form id="methodologyStatusForm">
+          <RHFForm id="methodologyStatusForm" onSubmit={onSubmit}>
             <h2>Edit methodology status</h2>
 
-            <FormFieldRadioGroup<FormValues, MethodologyApprovalStatus>
+            <RHFFormFieldRadioGroup<FormValues>
               legend="Status"
               hint={
                 isPublished &&
@@ -96,15 +111,15 @@ const MethodologyStatusForm = ({
               ]}
               order={[]}
             />
-            <FormFieldTextArea<FormValues>
+            <RHFFormFieldTextArea<FormValues>
               name="latestInternalReleaseNote"
               className="govuk-!-width-one-half"
               label="Internal note"
               hint="Please include any relevant information"
               rows={2}
             />
-            {form.values.status === 'Approved' && (
-              <FormFieldRadioGroup<FormValues>
+            {status === 'Approved' && (
+              <RHFFormFieldRadioGroup<FormValues>
                 name="publishingStrategy"
                 legend="When to publish"
                 legendSize="m"
@@ -115,7 +130,7 @@ const MethodologyStatusForm = ({
                     label: 'With a specific release',
                     value: 'WithRelease',
                     conditional: (
-                      <FormFieldSelect<FormValues>
+                      <RHFFormFieldSelect<FormValues>
                         label="Select release"
                         name="withReleaseId"
                         order={FormSelect.unordered}
@@ -139,19 +154,12 @@ const MethodologyStatusForm = ({
 
             <ButtonGroup>
               <Button type="submit">Update status</Button>
-              <ButtonText
-                onClick={() => {
-                  form.resetForm();
-                  onCancel();
-                }}
-              >
-                Cancel
-              </ButtonText>
+              <ButtonText onClick={onCancel}>Cancel</ButtonText>
             </ButtonGroup>
-          </Form>
+          </RHFForm>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

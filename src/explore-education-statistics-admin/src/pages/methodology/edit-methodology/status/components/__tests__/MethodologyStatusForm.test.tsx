@@ -313,10 +313,7 @@ describe('MethodologyStatusForm', () => {
     };
 
     await waitFor(() => {
-      expect(handleSubmit).toHaveBeenCalledWith(
-        expectedValues,
-        expect.anything(),
-      );
+      expect(handleSubmit).toHaveBeenCalledWith(expectedValues);
     });
   });
 });
