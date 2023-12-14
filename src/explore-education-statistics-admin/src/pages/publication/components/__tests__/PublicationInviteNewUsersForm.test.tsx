@@ -104,7 +104,7 @@ describe('PublicationInviteNewUsersForm', () => {
       expect(userService.inviteContributor).toHaveBeenCalledTimes(0);
       expect(
         screen.getByText('Enter an email address', {
-          selector: '#email-error',
+          selector: '#inviteContributorForm-email-error',
         }),
       );
     });
@@ -151,7 +151,7 @@ describe('PublicationInviteNewUsersForm', () => {
       expect(userService.inviteContributor).toHaveBeenCalledTimes(0);
       expect(
         screen.getByText('Select at least one release', {
-          selector: '#releaseIds-error',
+          selector: '#inviteContributorForm-releaseIds-error',
         }),
       );
     });
