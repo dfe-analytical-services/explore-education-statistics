@@ -1,12 +1,10 @@
 using FluentAssertions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.WebUtilities;
-using Moq;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -18,80 +16,68 @@ public class PublicationsControllerTests : IntegrationTestFixture
     {
     }
 
-    [Fact]
-    public async Task ListPublications_MultiplePublishedDataSets_Returns200WithAllPublications()
+    [Theory]
+    [InlineData(1, 2, 2, 1)]
+    public async Task ListPublications_MultiplePublishedDataSets_Returns200WithAllPublications(int page, int pageSize, int numberOfPublishedDataSets, int numberOfUnpublishedDataSets)
     {
-        var dataSet1 = DataFixture
-            .DefaultDataSet()
-            .WithStatus(DataSetStatus.Published)
-            .Generate();
+        var publishedDataSets = GeneratePublishedDataSets(numberOfPublishedDataSets);
+        var unpublishedDataSets = GenerateUnublishedDataSets(numberOfUnpublishedDataSets);
 
-        var dataSet2 = DataFixture
-            .DefaultDataSet()
-            .WithStatus(DataSetStatus.Published)
-            .Generate();
+        var allDataSets = publishedDataSets.Concat(unpublishedDataSets);
 
-        var dataSet3 = DataFixture
-            .DefaultDataSet()
-            .WithStatus(DataSetStatus.Unpublished)
-            .Generate();
+        var allPublishedDataSetPublicationIds = allDataSets
+            .Where(ds => ds.Status == DataSetStatus.Published)
+            .Select(ds => ds.PublicationId)
+            .ToList();
 
-        await AddTestDataSets(dataSet1, dataSet2, dataSet3);
+        await AddTestDataSets(allDataSets.ToArray());
 
-        int page = 1;
-        int pageSize = 2;
-        string? search = null;
-
-        var contentApiResults = new List<PublicationSearchResultViewModel>
-        {
-            new()
-            {
-                Id = dataSet1.PublicationId
-            },
-            new()
-            {
-                Id = dataSet2.PublicationId
-            }
-        };
-
-        var contentApiPaging = new Common.ViewModels.PagingViewModel(page, pageSize, 3);
-
-        var contentApiResponse = new Common.ViewModels.PaginatedListViewModel<PublicationSearchResultViewModel>(contentApiResults, contentApiPaging);
-
-        var publishedDataSetPublicationIds = new List<Guid> { dataSet1.PublicationId, dataSet2.PublicationId };
-
-        ContentApiClientMock
-            .Setup(c => c.ListPublications(page, pageSize, search, publishedDataSetPublicationIds))
-            .ReturnsAsync(contentApiResponse);
-
-        var query = new Dictionary<string, string?>
-        {
-            { "page", page.ToString() },
-            { "pageSize", pageSize.ToString() },
-            { "search", search },
-        };
-
-        var uri = QueryHelpers.AddQueryString(_baseUrl, query);
-
-        var response = await TestAppClient.GetAsync(uri);
+        var response = await ListPublications(page, pageSize);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         var content = await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationListViewModel>>();
 
-        ContentApiClientMock
-            .Verify(c => c.ListPublications(page, pageSize, search, publishedDataSetPublicationIds), Times.Once);
-
         content.Should().NotBeNull();
         content!.Paging.Page.Should().Be(page);
         content.Paging.PageSize.Should().Be(pageSize);
-        content.Paging.TotalPages.Should().Be(2);
-        content.Paging.TotalResults.Should().Be(3);
-        content.Results.Should().HaveCount(contentApiResults.Count);
-        content.Results.Should()
-            .Contain(r => r.Id == dataSet1.PublicationId)
-            .And
-            .Contain(r => r.Id == dataSet2.PublicationId);
+        content.Paging.TotalResults.Should().Be(numberOfPublishedDataSets);
+        content.Results.Should().HaveCount(Math.Min(numberOfPublishedDataSets, pageSize));
+
+        foreach (var publicationId in allPublishedDataSetPublicationIds)
+        {
+            content.Results.Should().Contain(r => r.Id == publicationId);
+        }
+    }
+
+    private IReadOnlyList<DataSet> GeneratePublishedDataSets(int numberToGenerate)
+    {
+        return Enumerable.Range(0, numberToGenerate)
+            .Select(_ => GeneratePublishedDataSet())
+            .ToList();
+    }
+
+    private DataSet GeneratePublishedDataSet()
+    {
+        return DataFixture
+            .DefaultDataSet()
+            .WithStatus(DataSetStatus.Published)
+            .Generate();
+    }
+
+    private IReadOnlyList<DataSet> GenerateUnublishedDataSets(int numberToGenerate)
+    {
+        return Enumerable.Range(0, numberToGenerate)
+            .Select(_ => GenerateUnublishedDataSet())
+            .ToList();
+    }
+
+    private DataSet GenerateUnublishedDataSet()
+    {
+        return DataFixture
+            .DefaultDataSet()
+            .WithStatus(DataSetStatus.Unpublished)
+            .Generate();
     }
 
     private async Task AddTestDataSets(params DataSet[] dataSets)
@@ -107,6 +93,20 @@ public class PublicationsControllerTests : IntegrationTestFixture
         async Task supplier(PublicDataDbContext dbContext) => await dbContext.AddAsync(dataSet);
 
         await TestApp.AddTestData<PublicDataDbContext>(supplier);
+    }
+
+    private async Task<HttpResponseMessage> ListPublications(int page, int pageSize)
+    {
+        var query = new Dictionary<string, string?>
+        {
+            { "page", page.ToString() },
+            { "pageSize", pageSize.ToString() },
+            { "search", null },
+        };
+
+        var uri = QueryHelpers.AddQueryString(_baseUrl, query);
+
+        return await TestAppClient.GetAsync(uri);
     }
 
     private const string _baseUrl = "api/v1/publications";
