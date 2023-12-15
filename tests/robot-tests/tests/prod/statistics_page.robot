@@ -1,12 +1,11 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          GeneralPublic    Local    Dev    PreProd
+Force Tags          GeneralPublic    Prod
 
 
 *** Test Cases ***
@@ -34,8 +33,17 @@ Validate Related information section and links exist
 
 Validate themes filters exist
     user checks radio is checked    All themes
-    user checks page contains radio    ${SEED_DATA_THEME_1}
-    user checks page contains radio    UI tests - Publication and Release UI Permissions Theme
+    user checks page contains radio    Children's social care
+    user checks page contains radio    COVID-19
+    user checks page contains radio    Destination of pupils and students
+    user checks page contains radio    Early years
+    user checks page contains radio    Finance and funding
+    user checks page contains radio    Further education
+    user checks page contains radio    Higher education
+    user checks page contains radio    Pupils and schools
+    user checks page contains radio    School and college outcomes and performance
+    user checks page contains radio    Teachers and school workforce
+    user checks page contains radio    UK education and training statistics
 
 Validate release type filters exist
     user clicks button    Release type
@@ -56,12 +64,12 @@ Validate publications list exists
     user checks page contains element    testid:publicationsList
 
 Filter by theme
-    user clicks radio    ${SEED_DATA_THEME_1}
-    user checks page contains button    ${SEED_DATA_THEME_1}
+    user clicks radio    Pupils and schools
+    user checks page contains button    Pupils and schools
 
 Remove theme filter
-    user clicks button    ${SEED_DATA_THEME_1}
-    user checks page does not contain button    ${SEED_DATA_THEME_1}
+    user clicks button    Pupils and schools
+    user checks page does not contain button    Pupils and schools
     user checks radio is checked    All themes
 
 Filter by release type
@@ -75,32 +83,32 @@ Remove release type filter
 
 Searching
     user clicks element    id:searchForm-search
-    user presses keys    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user presses keys    Pupil absence in schools in England
     user clicks button    Search
-    user checks page contains button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user checks page contains button    Pupil absence in schools in England
     user checks radio is checked    Relevance
-    user checks list item contains    testid:publicationsList    1    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user checks list item contains    testid:publicationsList    1    Pupil absence in schools in England
 
 Removing search
-    user clicks button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
-    user checks page does not contain button    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
+    user clicks button    Pupil absence in schools in England
+    user checks page does not contain button    Pupil absence in schools in England
     user checks radio is checked    Newest
 
 Clear all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user clicks radio    ${SEED_DATA_THEME_1}
+    user clicks radio    Pupils and schools
     user clicks radio    Official statistics
 
     user checks page contains button    pupil
-    user checks page contains button    ${SEED_DATA_THEME_1}
+    user checks page contains button    Pupils and schools
     user checks page contains button    Official statistics
 
     user clicks button    Clear all filters
 
     user checks page does not contain button    pupil
-    user checks page does not contain button    ${SEED_DATA_THEME_1}
+    user checks page does not contain button    Pupils and schools
     user checks page does not contain button    Official statistics
     user checks page does not contain button    Clear all filters
 

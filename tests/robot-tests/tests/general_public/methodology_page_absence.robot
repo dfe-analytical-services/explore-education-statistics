@@ -6,7 +6,7 @@ Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-Force Tags          GeneralPublic    Local    Dev
+Force Tags          GeneralPublic    Local    Dev    PreProd
 
 
 *** Test Cases ***
@@ -46,25 +46,25 @@ Validate accordion sections order
     user checks accordion is in position    Annex F - Absence rates over time    6    id:annexes
 
 Validate Related information section and links exist
-    ${relatedInformation}=    get webelement    css:[aria-labelledby="related-information"]
+    ${related_information}=    get webelement    css:[aria-labelledby="related-information"]
 
-    user checks element contains child element    ${relatedInformation}    xpath://h2[text()="Related information"]
+    user checks element contains child element    ${related_information}    xpath://h2[text()="Related information"]
 
-    user checks element contains child element    ${relatedInformation}    xpath://h3[text()="Publications"]
+    user checks element contains child element    ${related_information}    xpath://h3[text()="Publications"]
     user checks page contains link with text and url
     ...    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     ...    ${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}
-    ...    ${relatedInformation}
+    ...    ${related_information}
 
-    user checks element contains child element    ${relatedInformation}    xpath://h3[text()="Related pages"]
+    user checks element contains child element    ${related_information}    xpath://h3[text()="Related pages"]
     user checks page contains link with text and url
     ...    Find statistics and data
     ...    /find-statistics
-    ...    ${relatedInformation}
+    ...    ${related_information}
     user checks page contains link with text and url
     ...    Education statistics: glossary
     ...    /glossary
-    ...    ${relatedInformation}
+    ...    ${related_information}
 
 Validate page has Print this page link
     user waits until page contains button    Print this page
