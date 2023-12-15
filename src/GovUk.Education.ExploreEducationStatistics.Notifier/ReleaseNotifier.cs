@@ -34,7 +34,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         [FunctionName("ReleaseNotifier")]
         // ReSharper disable once UnusedMember.Global
         public void ReleaseNotifierFunc(
-            [QueueTrigger(ReleaseNotificationQueue)] ReleaseNotificationMessage notificationMessage,
+            [QueueTrigger(ReleaseNotificationQueue)]
+            ReleaseNotificationMessage msg,
             ILogger logger,
             ExecutionContext context)
         {
@@ -43,50 +44,128 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
             var config = LoadAppSettings(context);
 
-            var emailTemplateId = notificationMessage.Amendment
+            var newReleaseTemplateId = msg.Amendment
                 ? config.GetValue<string>(ReleaseAmendmentEmailTemplateIdName)
                 : config.GetValue<string>(ReleaseEmailTemplateIdName);
+
+            var newReleaseSupersededSubscribersTemplateId = msg.Amendment
+                ? config.GetValue<string>(ReleaseAmendmentSupersededSubscribersEmailTemplateIdName)
+                : config.GetValue<string>(ReleaseEmailSupersededSubscribersTemplateIdName);
 
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
             var client = GetNotifyClient(config);
             var table = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
-            var query = new TableQuery<SubscriptionEntity>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
-                    notificationMessage.PublicationId.ToString()));
 
-            TableContinuationToken? token = null;
-            do
+            var sentToEmailAddresses = new HashSet<string>();
+
+            // Send emails to subscribers of publication
             {
-                var resultSegment =
-                    table.ExecuteQuerySegmentedAsync(query, token).Result;
-                token = resultSegment.ContinuationToken;
+                var query = new TableQuery<SubscriptionEntity>()
+                    .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
+                        msg.PublicationId.ToString()));
 
-                logger.LogInformation("Emailing {SubscriberCount} subscribers",
-                    resultSegment.Results.Count);
-                foreach (var entity in resultSegment.Results)
+                TableContinuationToken? token = null;
+                do
                 {
-                    var unsubscribeToken =
-                        _tokenService.GenerateToken(tokenSecretKey, entity.RowKey, DateTime.UtcNow.AddYears(1));
-                    var values = new Dictionary<string, dynamic>
-                    {
-                        // Use values from the queue just in case the name or slug of the publication changes
-                        { "publication_name", notificationMessage.PublicationName },
-                        { "release_name", notificationMessage.ReleaseName },
-                        {
-                            "release_link",
-                            $"{webApplicationBaseUrl}find-statistics/{notificationMessage.PublicationSlug}/{notificationMessage.ReleaseSlug}"
-                        },
-                        { // NOTE: update_note not used by original release email template
-                            "update_note", notificationMessage.UpdateNote
-                        },
-                        { "unsubscribe_link", $"{baseUrl}{entity.PartitionKey}/unsubscribe/{unsubscribeToken}" },
-                    };
+                    var resultSegment =
+                        table.ExecuteQuerySegmentedAsync(query, token).Result;
+                    token = resultSegment.ContinuationToken;
 
-                    _emailService.SendEmail(client, entity.RowKey, emailTemplateId, values);
-                }
-            } while (token != null);
+                    logger.LogInformation("Emailing {SubscriberCount} subscribers",
+                        resultSegment.Results.Count);
+                    foreach (var entity in resultSegment.Results)
+                    {
+                        var email = entity.RowKey;
+
+                        sentToEmailAddresses.Add(email);
+
+                        var unsubscribeToken =
+                            _tokenService.GenerateToken(tokenSecretKey, email, DateTime.UtcNow.AddYears(1));
+                        var values = new Dictionary<string, dynamic>
+                        {
+                            // Use values from the queue just in case the name or slug of the publication changes
+                            { "publication_name", msg.PublicationName },
+                            { "release_name", msg.ReleaseName },
+                            {
+                                "release_link",
+                                $"{webApplicationBaseUrl}find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
+                            },
+                            {
+                                // NOTE: update_note not used by original release email template
+                                "update_note", msg.UpdateNote
+                            },
+                            { "unsubscribe_link", $"{baseUrl}{msg.PublicationId}/unsubscribe/{unsubscribeToken}" },
+                        };
+
+                        _emailService.SendEmail(client, email, newReleaseTemplateId, values);
+                    }
+                } while (token != null);
+            }
+
+            // Send emails to subscribers of superseded publications - should only be 1 superseded publication, but
+            // service allows multiple
+            for (var i = 0; i < msg.SupersededPublicationIds.Count; i++)
+            {
+                var supersededPublicationId = msg.SupersededPublicationIds[i];
+                var supersededPublicationTitle = msg.SupersededPublicationTitles[i];
+
+                var query = new TableQuery<SubscriptionEntity>()
+                    .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
+                        supersededPublicationId.ToString()));
+
+                logger.LogInformation("Emailing subscribers from a superseded publication");
+                var numSupersedeSubscriberEmailsSent = 0;
+
+                TableContinuationToken? token = null;
+                do
+                {
+                    var resultSegment =
+                        table.ExecuteQuerySegmentedAsync(query, token).Result;
+                    token = resultSegment.ContinuationToken;
+
+                    numSupersedeSubscriberEmailsSent += resultSegment.Results.Count;
+                    foreach (var entity in resultSegment.Results)
+                    {
+                        var email = entity.RowKey;
+
+                        if (sentToEmailAddresses.Contains(email))
+                        {
+                            numSupersedeSubscriberEmailsSent--;
+                            continue;
+                        }
+                        sentToEmailAddresses.Add(email);
+
+                        var unsubscribeToken =
+                            _tokenService.GenerateToken(tokenSecretKey, email, DateTime.UtcNow.AddYears(1));
+                        var values = new Dictionary<string, dynamic>
+                        {
+                            // Use values from the queue just in case the name or slug of the publication changes
+                            { "publication_name", msg.PublicationName },
+                            { "release_name", msg.ReleaseName },
+                            {
+                                "release_link",
+                                $"{webApplicationBaseUrl}find-statistics/{msg.PublicationSlug}/{msg.ReleaseSlug}"
+                            },
+                            {
+                                // NOTE: update_note not used by original release email template
+                                "update_note", msg.UpdateNote
+                            },
+                            { "unsubscribe_link", $"{baseUrl}{supersededPublicationId}/unsubscribe/{unsubscribeToken}" },
+                            { "superseded_publication_title", supersededPublicationTitle },
+                        };
+
+                        _emailService.SendEmail(client, email, newReleaseSupersededSubscribersTemplateId, values);
+                    }
+                } while (token != null);
+
+                logger.LogInformation("Emailed {NumEmailsSent} subscribers from a superseded publication",
+                    numSupersedeSubscriberEmailsSent);
+            }
+
+            logger.LogInformation("Sent {NumEmailsSent} emails in total to subscribers",
+                sentToEmailAddresses.Count);
         }
     }
 }
