@@ -58,7 +58,7 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
         "--exclude",
         "UnderConstruction",
         "--exclude",
-        "BootstrapData",
+        "SeedDataGeneration",
         "--exclude",
         "VisualTesting",
         "--xunit",
@@ -174,8 +174,8 @@ def execute_tests(arguments: argparse.Namespace, rerunning_failures: bool):
 def run():
     args = args_and_variables.initialise()
 
-    # If running all tests, or admin, admin_and_public or admin_and_public_2 suites, these
-    # change data on environments and require test themes, test topics and user authentication.
+    # If running all tests, or admin, admin_and_public, admin_and_public_2 or seed_data suites,
+    # these change data on environments and require test themes, test topics and user authentication.
     #
     # We check for both explicit forward slashes AND OS-specific separators here, as in Windows
     # we can expect to get either scenario depending upon how we're running these tests e.g.
@@ -184,9 +184,11 @@ def run():
     # back slashes.
     data_changing_tests = (
         args.tests == "tests/"
-        or "/admin" in args.tests
         or args.tests == f"tests{os.sep}"
         or f"{os.sep}admin" in args.tests
+        or "/admin" in args.tests
+        or f"{os.sep}seed_data" in args.tests
+        or "/seed_data" in args.tests
     )
 
     if data_changing_tests and args.env not in ["local", "dev"]:
