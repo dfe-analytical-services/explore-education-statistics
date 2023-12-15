@@ -1,7 +1,7 @@
 *** Settings ***
 Resource            ../../../libs/admin-common.robot
 Resource            ../../../libs/common.robot
-Resource            ../../../libs/bootstrap_data/bootstrap_data_constants.robot
+Resource            ../../../seed_data/seed_data_constants.robot
 Resource            ../../../libs/admin/analyst/role_ui_permissions.robot
 
 Suite Setup         user signs in as analyst1
@@ -13,8 +13,10 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Import permissions test variables
-    Import bootstrap data roles and permissions variables
-    Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_PUBLICATION_APPROVER}
+    Set suite variable    ${PUBLICATION_NAME}    ${SEED_DATA_THEME_2_PUBLICATION_FOR_PUBLICATION_APPROVER}
+    Set suite variable    ${THEME_NAME}    ${SEED_DATA_THEME_2_TITLE}
+    Set suite variable    ${TOPIC_NAME}    ${SEED_DATA_THEME_2_TOPIC_1_TITLE}
+    Set suite variable    ${PUBLISHED_RELEASE_TYPE}    ${SEED_DATA_THEME_2_PUBLISHED_RELEASE_TYPE}
 
 Validates publication approver publication page is correct
     user navigates to publication page from dashboard    ${PUBLICATION_NAME}
