@@ -7,6 +7,8 @@
     "VerificationEmailTemplateId": "change-me",
     "ReleaseEmailTemplateId": "change-me",
     "ReleaseAmendmentEmailTemplateId": "change-me",
+    "ReleaseEmailSupersededSubscribersTemplateId": "change-me",
+    "ReleaseAmendmentEmailSupersededSubscribersTemplateId": "change-me",
     "SubscriptionConfirmationEmailTemplateId": "change-me",
     "TokenSecretKey": "change-me",
     "BaseUrl": "http://localhost:7073/api/publication/",

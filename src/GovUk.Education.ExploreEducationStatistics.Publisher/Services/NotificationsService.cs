@@ -67,6 +67,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 latestUpdateNoteReason = latestUpdateNote.Reason;
             }
 
+            var supersededPublications = _context.Publications
+                .Where(p => p.SupersededById == release.PublicationId)
+                .Select(p => new { p.Id, p.Title })
+                .ToList();
 
             return new ReleaseNotificationMessage
             {
@@ -77,6 +81,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 ReleaseSlug = release.Slug,
                 Amendment = release.Version > 0,
                 UpdateNote = latestUpdateNoteReason,
+                SupersededPublicationIds = supersededPublications.Select(p => p.Id).ToList(),
+                SupersededPublicationTitles = supersededPublications.Select(p => p.Title).ToList(),
             };
         }
     }

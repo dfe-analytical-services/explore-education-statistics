@@ -325,6 +325,20 @@
         "description": "Gov UK Notify service template Id for amended release notification"
       }
     },
+    "releaseEmailSupersededSubscribersTemplateId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for new release for superseded subscribers notification"
+      }
+    },
+    "releaseAmendmentEmailSupersededSubscribersTemplateId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for amended release for superseded subscribers notification"
+      }
+    },
     "subscriptionConfirmationEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
@@ -2896,6 +2910,8 @@
         "VerificationEmailTemplateId": "[parameters('verificationEmailTemplateId')]",
         "ReleaseEmailTemplateId": "[parameters('releaseEmailTemplateId')]",
         "ReleaseAmendmentEmailTemplateId": "[parameters('releaseAmendmentEmailTemplateId')]",
+        "ReleaseEmailSupersededSubscribersTemplateId": "[parameters('releaseEmailSupersededSubscribersTemplateId')]",
+        "ReleaseAmendmentEmailSupersededSubscribersTemplateId": "[parameters('releaseAmendmentEmailSupersededSubscribersTemplateId')]",
         "SubscriptionConfirmationEmailTemplateId": "[parameters('subscriptionConfirmationEmailTemplateId')]",
         "TableStorageConnString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
       }

@@ -19,5 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Utils
             "ReleaseEmailTemplateId";
         public const string ReleaseAmendmentEmailTemplateIdName =
             "ReleaseAmendmentEmailTemplateId";
+        public const string ReleaseEmailSupersededSubscribersTemplateIdName =
+            "ReleaseEmailSupersededSubscribersTemplateId";
+        public const string ReleaseAmendmentSupersededSubscribersEmailTemplateIdName =
+            "ReleaseAmendmentEmailSupersededSubscribersTemplateId";
     }
 }
