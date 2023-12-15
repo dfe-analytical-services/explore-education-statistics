@@ -23,27 +23,18 @@ export class GlossaryPage {
     // Locators
     this.page_search_box = page.locator('input#pageSearchForm-input');
     this.page_search_results = page.locator('div#pageSearchForm-resultsLabel');
-    this.page_search_selection = page.locator(
-      'li[id="pageSearchForm-option-0"]',
-    );
+    this.page_search_selection = page.locator('li[id="pageSearchForm-option-0"]');
     this.accordion_section_A = page.locator('//span[text()="A"]');
     this.accordion_section_B = page.locator('//span[text()="B"]');
     this.accordion_section_C = page.locator('//span[text()="C"]');
     this.accordion_section_D = page.locator('//span[text()="D"]');
     this.accordion_section_E = page.locator('//span[text()="E"]');
     this.accordion_section_Z = page.locator('//span[text()="Z"]');
-    this.voluntary_repayment_section = page.locator(
-      '//h3[text()="Voluntary repayment"]',
-    );
-    this.voluntary_repayment_section_text = page.locator(
-      '//div[@id="voluntary-repayment"]//p[1]',
-    );
-    this.education_statistics_methodology = page.locator(
-      '//a[text()="Education statistics: methodology"]',
-    );
+    this.voluntary_repayment_section = page.locator('//h3[text()="Voluntary repayment"]');
+    this.voluntary_repayment_section_text = page.locator('//div[@id="voluntary-repayment"]//p[1]');
+    this.education_statistics_methodology = page.locator('//a[text()="Education statistics: methodology"]');
   }
 
   // standard text
-  readonly voluntary_repayment_section_paragraph_text =
-    'A borrower can at any time choose to repay some or all of their loan balance early, in addition to any repayments they are liable to make based on their income';
+  readonly voluntary_repayment_section_paragraph_text = 'A borrower can at any time choose to repay some or all of their loan balance early, in addition to any repayments they are liable to make based on their income';
 }

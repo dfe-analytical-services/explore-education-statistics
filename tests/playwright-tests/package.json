@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "**How to install Playwright and set up VS Code?**",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "precommit": "lint-staged"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -11,10 +13,16 @@
     "@playwright/test": "^1.40.1",
     "@types/node": "^20.10.4",
     "husky": "^8.0.3",
-    "lint-staged": "^15.2.0"
+    "lint-staged": "^15.2.0",
+    "prettier": "^2.5.1" 
   },
   
   "dependencies": {
     "dotenv": "^16.3.1"
-  }
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "git add"  
+    ]
+}
 }

@@ -3,7 +3,7 @@
 import { Locator, Page } from '@playwright/test';
 import { environment } from '../../utils/env';
 
-// Glossary page
+// Home page
 export class HomePage {
   readonly page: Page;
   readonly glossary: Locator;
