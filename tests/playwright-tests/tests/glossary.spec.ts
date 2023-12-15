@@ -25,6 +25,7 @@ test.describe('Verify the end to end functionality of glossary page', () => {
     await expect(glossarypage.page_search_results).toBeTruthy();
 
     await glossarypage.page_search_selection.click();
+    
     await expect(glossarypage.voluntary_repayment_section).toBeVisible();
     await expect(glossarypage.voluntary_repayment_section_text).toContainText(glossarypage.voluntary_repayment_section_paragraph_text);
   });
