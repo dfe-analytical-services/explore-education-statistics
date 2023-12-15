@@ -26,24 +26,12 @@ export class GlossaryPage {
     this.page_search_selection = page.locator(
       'li[id="pageSearchForm-option-0"]',
     );
-    this.accordion_section_A = page.locator(
-      '(//*[@data-testid="accordionSection-heading"])[1]',
-    );
-    this.accordion_section_B = page.locator(
-      '(//*[@data-testid="accordionSection-heading"])[2]',
-    );
-    this.accordion_section_C = page.locator(
-      '(//*[@data-testid="accordionSection-heading"])[3]',
-    );
-    this.accordion_section_D = page.locator(
-      '(//*[@data-testid="accordionSection-heading"])[4]',
-    );
-    this.accordion_section_E = page.locator(
-      '(//*[@data-testid="accordionSection-heading"])[5]',
-    );
-    this.accordion_section_Z = page.locator(
-      '(//*[@data-testid="accordionSection-heading"])[26]',
-    );
+    this.accordion_section_A = page.locator('//span[text()="A"]');
+    this.accordion_section_B = page.locator('//span[text()="B"]');
+    this.accordion_section_C = page.locator('//span[text()="C"]');
+    this.accordion_section_D = page.locator('//span[text()="D"]');
+    this.accordion_section_E = page.locator('//span[text()="E"]');
+    this.accordion_section_Z = page.locator('//span[text()="Z"]');
     this.voluntary_repayment_section = page.locator(
       '//h3[text()="Voluntary repayment"]',
     );

@@ -15,7 +15,7 @@ export class HomePage {
   }
 
   async navigateToGlossaryPage() {
-    await this.page.goto(environment.BASE_URL);
+    await this.page.goto(environment.BASE_URL!);
     await this.glossary.click();
     await this.page.waitForURL('**/glossary');
   }
