@@ -1,6 +1,5 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -16,7 +15,7 @@ Go to Table Tool page
 Go to permalink
     user navigates to public frontend    %{PUBLIC_URL}/data-tables/permalink/30999037-fcd4-409f-9ff4-d3680da7402d
     user waits until h1 is visible
-    ...    'Total days missed due to fixed period exclusions' from '${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}'
+    ...    'Total days missed due to fixed period exclusions' from 'Permanent and fixed-period exclusions in England'
 
 Validate breadcrumbs
     user checks breadcrumb count should be    4
@@ -24,7 +23,7 @@ Validate breadcrumbs
     user checks nth breadcrumb contains    2    Data tables
     user checks nth breadcrumb contains    3    Permanent link
     user checks nth breadcrumb contains    4
-    ...    'Total days missed due to fixed period exclusions' from '${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}'
+    ...    'Total days missed due to fixed period exclusions' from 'Permanent and fixed-period exclusions in England'
 
 Validate miscellaneous
     user checks summary list contains    Created    7 April 2020
