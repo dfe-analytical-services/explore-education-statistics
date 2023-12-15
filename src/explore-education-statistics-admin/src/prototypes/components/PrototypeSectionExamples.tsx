@@ -15,9 +15,10 @@ import styles from '../PrototypePublicPage.module.scss';
 interface Props {
   sectionExample?: string;
   change?: () => void;
+  change2?: () => void;
 }
 
-const ExampleSection = ({ sectionExample, change }: Props) => {
+const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
   const [showHelp1, setShowHelp1] = useToggle(false);
   const [showHelp2, setShowHelp2] = useToggle(false);
   const [showHelp3, setShowHelp3] = useToggle(false);
@@ -618,7 +619,7 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
         <>
           <span
             className="govuk-caption-xl dfe-flex dfe-align-items--center"
-            data-testid="page-title-caption"
+            id="topOfRelease"
           >
             <span className="govuk-tag govuk-!-margin-right-2">
               Latest data
@@ -634,17 +635,18 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
 
           <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-top-0">
             <div>
-              <p className="govuk-body-s govuk-!-margin-bottom-0">
+              <p className="govuk-body-s govuk-!-margin-bottom-6">
                 Published 16 October 2023, last updated 31 October 2023,{' '}
                 <a
-                  href="#"
+                  href="#viewUpdates"
                   onClick={() => change && change()}
                   className="govuk-link--no-visited-stat"
                 >
                   View all updates
                 </a>
               </p>
-              <a
+              {/* 
+               <a
                 href="#"
                 onClick={() => {
                   toggleReleaseTypeModal(true);
@@ -653,7 +655,7 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
               >
                 National statistics{' '}
                 <InfoIcon description="What are national statistics?" />
-              </a>{' '}
+              </a>{' '} */}
               <p
                 className={classNames(
                   styles.prototypeConstrainWidth,
@@ -665,6 +667,7 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
                 subject, provider, geography etc.
               </p>
             </div>
+
             <div
               className="dfe-flex dfe-align-items--center"
               style={{ flexDirection: 'column' }}
@@ -2009,6 +2012,27 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
                 in our data catalogue
               </p>
             </div>
+            <div className={classNames(styles.prototypeCardChevron)}>
+              <h2
+                className={classNames(
+                  'govuk-heading-s',
+                  'govuk-!-margin-bottom-2',
+                )}
+              >
+                <a
+                  href="#"
+                  onClick={() => change2 && change2()}
+                  className={classNames('govuk-link--no-visited-state')}
+                >
+                  Data guidance
+                </a>
+              </h2>
+              <p className="govuk-body govuk-!-margin-bottom-0">
+                Learn more about the data files used in this release using our
+                online guidance
+              </p>
+            </div>
+
             {/* 
             <div className={classNames(styles.prototypeCardChevron)}>
               <h2
@@ -2093,7 +2117,7 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
             and traineeship learning. Therefore, extra care should be taken in
             comparing and interpreting data presented in this release.
           </p>
-          <p className="govuk-!-padding-bottom-9">
+          <p>
             The furlough scheme may also have impacted on how aspects of ILR
             data were recorded, such as how the ‘learning status’ of a learner
             was captured, e.g. whether a learner was recorded as a continuing
@@ -2463,45 +2487,7 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
               Further education and skills statistics: methodology
             </a>
           </p>
-          <h3>National statistics</h3>
-          <p>
-            The{' '}
-            <a href="https://www.statisticsauthority.gov.uk/">
-              United Kingdom Statistics Authority
-            </a>{' '}
-            designated these statistics as National Statistics in accordance
-            with the{' '}
-            <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
-              Statistics and Registration Service Act 2007
-            </a>{' '}
-            and signifying compliance with the Code of Practice for Statistics.
-          </p>
-          <p>
-            Designation signifying their compliance with the authority's{' '}
-            <a href="https://www.statisticsauthority.gov.uk/code-of-practice/the-code/">
-              Code of Practice for Statistics
-            </a>{' '}
-            which broadly means these statistics are:
-          </p>
-          <ul className="govuk-list govuk-list--bullet">
-            <li>managed impartially and objectively in the public interest</li>
-            <li>meet identified user needs</li>
-            <li>produced according to sound methods</li>
-            <li>well explained and readily accessible</li>
-          </ul>
-          <p>
-            Once designated as National Statistics it's a statutory requirement
-            for statistics to follow and comply with the Code of Practice for
-            Statistics to be observed.
-          </p>
-          <p>
-            Find out more about the standards we follow to produce these
-            statistics through our{' '}
-            <a href="https://www.gov.uk/government/publications/standards-for-official-statistics-published-by-the-department-for-education">
-              Standards for official statistics published by DfE
-            </a>{' '}
-            guidance.
-          </p>
+
           <h3 id="contact-us">Contact us</h3>
           <p>
             If you have a specific enquiry about Apprenticeships and
@@ -2527,21 +2513,12 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
             Opening times: <br />
             Monday to Friday from 9.30am to 5pm (excluding bank holidays)
           </p>
-          <div className="govuk-!-display-none-print PrintThisPage_printContainer__nj7rf PrintThisPage_mobileHidden__zEGPT">
-            <button
-              aria-disabled="false"
-              type="button"
-              className="govuk-button govuk-button--secondary"
-            >
-              Print this page
-            </button>
-          </div>
         </>
       )}
 
       {sectionExample === 'otherReleases' && (
         <>
-          <h2>Releases in this series</h2>
+          <h2 id="releasesInSeries">Releases in this series</h2>
           <table className="govuk-!-margin-bottom-9">
             <caption className="govuk-visually-hidden">
               <h3>Releases in this series</h3>
@@ -2622,8 +2599,9 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
       )}
 
       {sectionExample === 'allUpdates' && (
-        <>
-          <h2>View all updates</h2>
+        <div style={{ marginBottom: '300px' }}>
+          <h2 id="viewUpdates">View all updates to this release</h2>
+          <p>Academic year 2022/23</p>
           <ol className="govuk-list" data-testid="all-updates">
             <li>
               <time
@@ -2753,42 +2731,8 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
                 Achievement rate data also added covering 2021/22{' '}
               </p>
             </li>
-            <li>
-              <time
-                data-testid="update-on"
-                className="govuk-body govuk-!-font-weight-bold"
-              >
-                16 February 2023
-              </time>
-              <p data-testid="update-reason">
-                Updated with monthly starts for the first four months of 2022/23
-              </p>
-            </li>
-            <li>
-              <time
-                data-testid="update-on"
-                className="govuk-body govuk-!-font-weight-bold"
-              >
-                26 January 2023
-              </time>
-              <p data-testid="update-reason">
-                Updated to clarify wording around interactive data visualisation
-                tool
-              </p>
-            </li>
-            <li>
-              <time
-                data-testid="update-on"
-                className="govuk-body govuk-!-font-weight-bold"
-              >
-                26 January 2023
-              </time>
-              <p data-testid="update-reason">
-                Updated to add links to the interactive data visualisation tool
-              </p>
-            </li>
           </ol>
-        </>
+        </div>
       )}
       {sectionExample === 'methodologies' && (
         <>
@@ -2809,9 +2753,67 @@ const ExampleSection = ({ sectionExample, change }: Props) => {
           </ul>
         </>
       )}
+      {sectionExample === 'nationalStats' && (
+        <>
+          <h2>What are National Statistics?</h2>
+          <p>
+            These accredited official statistics have been independently
+            reviewed by the{' '}
+            <a href="https://osr.statisticsauthority.gov.uk/what-we-do/">
+              Office for Statistics Regulation
+            </a>{' '}
+            (OSR). They comply with the standards of trustworthiness, quality
+            and value in the{' '}
+            <a href="https://code.statisticsauthority.gov.uk/the-code/">
+              Code of Practice for Statistics
+            </a>
+            . Accredited official statistics are called National Statistics in
+            the{' '}
+            <a href="https://www.legislation.gov.uk/ukpga/2007/18/contents">
+              Statistics and Registration Service Act 2007
+            </a>
+            .
+          </p>
+          <p>
+            Accreditation signifies their compliance with the authority's{' '}
+            <a href="https://code.statisticsauthority.gov.uk/the-code/">
+              Code of Practice for Statistics
+            </a>{' '}
+            which broadly means these statistics are:
+          </p>
+          <ul className="govuk-list govuk-list--bullet">
+            <li>managed impartially and objectively in the public interest</li>
+            <li>meet identified user needs</li>
+            <li>produced according to sound methods</li>
+            <li>well explained and readily accessible</li>
+          </ul>
+          <p>
+            Our statistical practice is regulated by the Office for Statistics
+            Regulation (OSR).
+          </p>
+          <p>
+            OSR sets the standards of trustworthiness, quality and value in the{' '}
+            <a href="https://code.statisticsauthority.gov.uk/the-code/">
+              Code of Practice for Statistics
+            </a>{' '}
+            that all producers of official statistics should adhere to.
+          </p>
+          <p>
+            You are welcome to contact us directly with any comments about how
+            we meet these standards. Alternatively, you can contact OSR by
+            emailing{' '}
+            <a href="mailto:regulation@statistics.gov.uk">
+              regulation@statistics.gov.uk
+            </a>{' '}
+            or via the{' '}
+            <a href="https://osr.statisticsauthority.gov.uk/">OSR website</a>.
+          </p>
+        </>
+      )}
       {sectionExample === 'preRelease' && (
         <>
-          <h2>Pre-release access list</h2>
+          <hr className={styles.prototypeSectionBreak} />
+          <h2 className="govuk-!-margin-top-9">Pre-release access list</h2>
           <p>Published 16 October 2023</p>
           <p>
             In the 12 October update to this release (Apprenticeships and

@@ -626,6 +626,13 @@
   line-height: 1;
 }
 
+.prototypeInPageNavOn {
+  border-left: 0.3rem solid $govuk-brand-colour;
+  display: block;
+  font-weight: bold;
+  padding-left: 0.5rem;
+}
+
 .prototypeIntroMastHead {
   background: govuk-colour('blue');
   padding: 1rem;
@@ -692,6 +699,7 @@ html {
       linear-gradient(transparent, transparent) 50% 50%;
     background-repeat: no-repeat;
     margin-right: 0.5rem;
+    transform: rotate(90deg);
 
     @include govuk-media-query($until: tablet) {
       background-size: 16px;
@@ -702,6 +710,18 @@ html {
   }
 }
 
+.prototypeBackLink {
+  &:before {
+    transform: rotate(-180deg);
+  }
+}
+
+.prototypeBackToTopLink {
+  &:before {
+    transform: rotate(270deg);
+  }
+}
+
 .prototypeDownloadLink {
   &:before {
     width: 27px;
@@ -709,6 +729,7 @@ html {
     background:
       (url('images/download-link-arrow.svg')),
       linear-gradient(transparent, transparent) 50% 50%;
+    transform: rotate(0deg);
 
     @include govuk-media-query($until: tablet) {
       width: 16px;
@@ -786,4 +807,8 @@ html {
   li {
     margin-bottom: 1rem;
   }
+}
+
+.prototypeSectionBreak {
+  margin: 4rem 0 1rem 0;
 }
