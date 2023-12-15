@@ -10,6 +10,7 @@ export class HomePage {
 
   constructor(page) {
     this.page = page;
+    // Locators
     this.glossary = page.locator('//h3/a[text()="Glossary"]');
   }
 
