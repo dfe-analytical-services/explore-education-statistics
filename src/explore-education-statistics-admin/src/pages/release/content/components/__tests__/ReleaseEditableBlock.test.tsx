@@ -1,18 +1,22 @@
 import { AuthContextTestProvider } from '@admin/contexts/AuthContext';
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
 import { testComments } from '@admin/components/comments/__data__/testComments';
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseContentBlockLockEvent } from '@admin/services/hubs/releaseContentHub';
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
 import { GlobalPermissions } from '@admin/services/permissionService';
 import _releaseContentService, {
-  EditableRelease,
+  ReleaseContent as ReleaseContentType,
 } from '@admin/services/releaseContentService';
 import _releaseContentCommentService from '@admin/services/releaseContentCommentService';
-import { EditableBlock } from '@admin/services/types/content';
 import { UserDetails } from '@admin/services/types/user';
+import generateReleaseContent from '@admin-test/generators/releaseContentGenerators';
+import {
+  generateEditableContentBlock,
+  generateEditableDataBlock,
+  generateEditableEmbedBlock,
+} from '@admin-test/generators/contentGenerators';
 import mockDate from '@common-test/mockDate';
 import { HubConnectionState } from '@microsoft/signalr';
 import {
@@ -41,51 +45,8 @@ const releaseContentCommentService =
   >;
 
 describe('ReleaseEditableBlock', () => {
-  const testHtmlBlock: EditableBlock = {
-    id: 'block-1',
-    type: 'HtmlBlock',
-    body: `<h3>Test heading</h3>
-           <p>Some test content</p>`,
-    comments: [],
-    order: 0,
-  };
+  const testReleaseContent = generateReleaseContent({});
 
-  const testEmbedBlock: EditableBlock = {
-    comments: testComments,
-    id: 'embed-block-id',
-    order: 0,
-    title: 'Dashboard title',
-    type: 'EmbedBlockLink',
-    url: 'https://department-for-education.shinyapps.io/test-dashboard',
-  };
-
-  const testDataBlock: EditableBlock = {
-    name: 'Test data block',
-    heading: 'Data block heading',
-    source: '',
-    query: {
-      subjectId: 'subject-id',
-      filters: [],
-      indicators: [],
-      locationIds: [],
-    },
-    charts: [],
-    table: {
-      indicators: [],
-      tableHeaders: {
-        columnGroups: [],
-        columns: [],
-        rowGroups: [],
-        rows: [],
-      },
-    },
-    type: 'DataBlock',
-    dataSetId: 'data-set-id',
-    id: 'data-block-id',
-    order: 0,
-    comments: testComments,
-    dataBlockParentId: 'daata-block-parent-id',
-  };
   const testCurrentUser: UserDetails = {
     id: 'user-1',
     displayName: 'Jane Doe',
@@ -105,16 +66,12 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={testHtmlBlock}
+        block={generateEditableContentBlock({})}
       />,
     );
 
     expect(
-      screen.getByText('Test heading', { selector: 'h3' }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.getByText('Some test content', { selector: 'p' }),
+      screen.getByText('Content block body', { selector: 'p' }),
     ).toBeInTheDocument();
 
     expect(
@@ -139,15 +96,14 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           body: `
           <h3>Test heading</h3>
           <p>Some test content</p>
           <img alt="Test image 1" src="/api/releases/{releaseId}/images/some-image-id" srcset="${image1SrcSet}" />
           <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
           `,
-        }}
+        })}
       />,
     );
 
@@ -181,12 +137,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testCurrentUser,
-        }}
+        })}
       />,
     );
 
@@ -218,7 +173,7 @@ describe('ReleaseEditableBlock', () => {
     connectionMock.invoke.mockImplementation(methodName => {
       if (methodName === 'LockContentBlock') {
         return Promise.resolve<ReleaseContentBlockLockEvent>({
-          id: 'block-1',
+          id: 'content-block-id',
           releaseId: 'release-1',
           sectionId: 'section-1',
           locked: '2022-02-16T12:05:00Z',
@@ -236,7 +191,7 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={testHtmlBlock}
+        block={generateEditableContentBlock({})}
       />,
     );
 
@@ -285,12 +240,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testCurrentUser,
-        }}
+        })}
       />,
     );
 
@@ -329,12 +283,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testCurrentUser,
-        }}
+        })}
       />,
     );
 
@@ -384,12 +337,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testOtherUser,
-        }}
+        })}
       />,
     );
 
@@ -422,12 +374,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testOtherUser,
-        }}
+        })}
       />,
     );
 
@@ -458,12 +409,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testOtherUser,
-        }}
+        })}
       />,
     );
 
@@ -523,12 +473,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:20:00Z',
           lockedBy: testCurrentUser,
-        }}
+        })}
       />,
     );
 
@@ -559,7 +508,7 @@ describe('ReleaseEditableBlock', () => {
       expect(connectionMock.invoke).toHaveBeenCalledTimes(1);
       expect(connectionMock.invoke).toHaveBeenLastCalledWith<
         Parameters<typeof connectionMock.invoke>
-      >('UnlockContentBlock', { id: testHtmlBlock.id });
+      >('UnlockContentBlock', { id: 'content-block-id' });
     });
 
     await waitFor(() => {
@@ -605,12 +554,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testOtherUser,
-        }}
+        })}
       />,
     );
 
@@ -637,7 +585,7 @@ describe('ReleaseEditableBlock', () => {
 
     // Simulates lock being renewed
     onContentBlockLocked({
-      id: 'block-1',
+      id: 'content-block-id',
       releaseId: 'release-1',
       sectionId: 'section-1',
       locked: '2022-02-16T12:08:00Z',
@@ -681,7 +629,7 @@ describe('ReleaseEditableBlock', () => {
     connectionMock.invoke.mockImplementation(methodName => {
       if (methodName === 'LockContentBlock') {
         return Promise.resolve<ReleaseContentBlockLockEvent>({
-          id: 'block-1',
+          id: 'content-block-id',
           releaseId: 'release-1',
           sectionId: 'section-1',
           locked: '2022-02-16T12:00:00Z',
@@ -699,12 +647,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={{
-          ...testHtmlBlock,
+        block={generateEditableContentBlock({
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testCurrentUser,
-        }}
+        })}
       />,
     );
 
@@ -735,7 +682,7 @@ describe('ReleaseEditableBlock', () => {
       expect(connectionMock.invoke).toHaveBeenCalledTimes(1);
       expect(connectionMock.invoke).toHaveBeenLastCalledWith<
         Parameters<typeof connectionMock.invoke>
-      >('LockContentBlock', { id: testHtmlBlock.id });
+      >('LockContentBlock', { id: 'content-block-id' });
     });
 
     expect(
@@ -775,7 +722,7 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={testHtmlBlock}
+        block={generateEditableContentBlock({})}
       />,
     );
 
@@ -789,7 +736,7 @@ describe('ReleaseEditableBlock', () => {
 
     // Simulates locking of block by other user
     onContentBlockLocked({
-      id: 'block-1',
+      id: 'content-block-id',
       releaseId: 'release-1',
       sectionId: 'section-1',
       locked: '2022-02-16T12:00:00Z',
@@ -825,7 +772,7 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={testHtmlBlock}
+        block={generateEditableContentBlock({})}
       />,
     );
 
@@ -845,7 +792,7 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={testHtmlBlock}
+        block={generateEditableContentBlock({})}
       />,
     );
 
@@ -866,7 +813,7 @@ describe('ReleaseEditableBlock', () => {
       releaseContentService.deleteContentSectionBlock,
     ).toHaveBeenCalledWith<
       Parameters<typeof releaseContentService.deleteContentSectionBlock>
-    >('release-1', 'section-1', 'block-1');
+    >('release-1', 'section-1', 'content-block-id');
   });
 
   test('renders Embed block', () => {
@@ -876,11 +823,11 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={testEmbedBlock}
+        block={generateEditableEmbedBlock({})}
       />,
     );
 
-    expect(screen.getByTitle('Dashboard title')).toHaveAttribute(
+    expect(screen.getByTitle('Embed block title')).toHaveAttribute(
       'src',
       'https://department-for-education.shinyapps.io/test-dashboard',
     );
@@ -893,7 +840,7 @@ describe('ReleaseEditableBlock', () => {
         releaseId="release-1"
         sectionId="section-1"
         sectionKey="content"
-        block={testDataBlock}
+        block={generateEditableDataBlock({})}
       />,
     );
 
@@ -901,14 +848,14 @@ describe('ReleaseEditableBlock', () => {
   });
 
   describe('data block comments', () => {
-    test('renders comments correctly`', () => {
+    test('renders comments correctly', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testDataBlock}
+          block={generateEditableDataBlock({ comments: testComments })}
         />,
       );
 
@@ -941,7 +888,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testDataBlock}
+          block={generateEditableDataBlock({ comments: testComments })}
         />,
       );
 
@@ -976,7 +923,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testDataBlock}
+          block={generateEditableDataBlock({ comments: testComments })}
         />,
       );
 
@@ -1019,7 +966,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testDataBlock}
+          block={generateEditableDataBlock({ comments: testComments })}
         />,
       );
 
@@ -1055,7 +1002,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testDataBlock}
+          block={generateEditableDataBlock({ comments: testComments })}
         />,
       );
 
@@ -1093,7 +1040,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testDataBlock}
+          block={generateEditableDataBlock({ comments: testComments })}
         />,
       );
 
@@ -1130,14 +1077,14 @@ describe('ReleaseEditableBlock', () => {
   });
 
   describe('embed block comments', () => {
-    test('renders comments correctly`', () => {
+    test('renders comments correctly', () => {
       render(
         <ReleaseEditableBlock
           publicationId="publication-1"
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testEmbedBlock}
+          block={generateEditableEmbedBlock({ comments: testComments })}
         />,
       );
 
@@ -1170,7 +1117,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testEmbedBlock}
+          block={generateEditableEmbedBlock({ comments: testComments })}
         />,
       );
 
@@ -1205,7 +1152,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testEmbedBlock}
+          block={generateEditableEmbedBlock({ comments: testComments })}
         />,
       );
 
@@ -1248,7 +1195,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testEmbedBlock}
+          block={generateEditableEmbedBlock({ comments: testComments })}
         />,
       );
 
@@ -1284,7 +1231,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testEmbedBlock}
+          block={generateEditableEmbedBlock({ comments: testComments })}
         />,
       );
 
@@ -1322,7 +1269,7 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           sectionKey="content"
-          block={testEmbedBlock}
+          block={generateEditableEmbedBlock({ comments: testComments })}
         />,
       );
 
@@ -1360,7 +1307,7 @@ describe('ReleaseEditableBlock', () => {
 
   function render(
     child: ReactNode,
-    release: EditableRelease = testEditableRelease,
+    releaseContent: ReleaseContentType = testReleaseContent,
   ): RenderResult {
     return baseRender(
       <AuthContextTestProvider
@@ -1371,12 +1318,12 @@ describe('ReleaseEditableBlock', () => {
           permissions: {} as GlobalPermissions,
         }}
       >
-        <ReleaseContentHubContextProvider releaseId={release.id}>
+        unattachedDataBlocks: [],
+        <ReleaseContentHubContextProvider releaseId={releaseContent.release.id}>
           <ReleaseContentProvider
             value={{
-              release,
+              ...releaseContent,
               canUpdateRelease: true,
-              unattachedDataBlocks: [],
             }}
           >
             <MemoryRouter>{child}</MemoryRouter>

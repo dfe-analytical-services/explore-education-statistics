@@ -2,7 +2,7 @@ import FeaturedTableLinkInsertForm from '@admin/components/editable/FeaturedTabl
 import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { FeaturedTable } from '@admin/services/featuredTableService';
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
+import { generateEditableRelease } from '@admin-test/generators/releaseContentGenerators';
 import baseRender from '@common-test/render';
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -209,7 +209,7 @@ describe('FeaturedTableLinkInsertForm ', () => {
           value={{
             canUpdateRelease: true,
             featuredTables: testFeaturedTables,
-            release: testEditableRelease,
+            release: generateEditableRelease({}),
             unattachedDataBlocks: [],
           }}
         >

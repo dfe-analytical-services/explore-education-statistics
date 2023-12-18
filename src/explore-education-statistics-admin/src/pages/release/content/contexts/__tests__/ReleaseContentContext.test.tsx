@@ -1,4 +1,3 @@
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import {
   ReleaseContentContextState,
   releaseReducer as originalReleaseReducer,
@@ -10,11 +9,20 @@ import {
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
+import { testComments } from '@admin/components/comments/__data__/testComments';
+import generateReleaseContent, {
+  generateEditableRelease,
+} from '@admin-test/generators/releaseContentGenerators';
+import {
+  generateContentSection,
+  generateEditableContentBlock,
+  generateEditableDataBlock,
+} from '@admin-test/generators/contentGenerators';
 import {
   ContentSection,
   KeyStatisticDataBlock,
 } from '@common/services/publicationService';
-import { DataBlock, Table } from '@common/services/types/blocks';
+import { Table } from '@common/services/types/blocks';
 import { produce } from 'immer';
 
 const emptyTable: Table = {
@@ -24,26 +32,6 @@ const emptyTable: Table = {
     columns: [],
     rowGroups: [],
     rows: [],
-  },
-};
-
-const basicDataBlock: DataBlock = {
-  id: 'datablock-0',
-  dataBlockParentId: 'datablock-0-parent',
-  dataSetId: 'dataSetId',
-  dataSetName: 'Test data set',
-  order: 1,
-  type: 'DataBlock',
-  name: 'Test data block',
-  heading: '',
-  source: '',
-  charts: [],
-  table: emptyTable,
-  query: {
-    filters: [],
-    indicators: [],
-    locationIds: [],
-    subjectId: 'subjectId',
   },
 };
 
@@ -69,13 +57,42 @@ const releaseReducer = (
 ) => produce(initial, draft => originalReleaseReducer(draft, action));
 
 describe('ReleaseContentContext', () => {
+  const testReleaseContent = generateReleaseContent({});
+  const testReleaseContentWithContentComments = generateReleaseContent({
+    release: generateEditableRelease({
+      content: [
+        generateContentSection({
+          content: [
+            generateEditableContentBlock({
+              comments: [testComments[0], testComments[1]],
+            }),
+          ],
+        }),
+      ],
+    }),
+  });
+  const testReleaseContentWithHeadlinesComments = generateReleaseContent({
+    release: generateEditableRelease({
+      headlinesSection: {
+        id: 'headlines-section-id',
+        heading: 'Headlines section heading',
+        order: 0,
+        content: [
+          generateEditableContentBlock({
+            comments: [testComments[0]],
+          }),
+        ],
+      },
+    }),
+  });
+  const basicDataBlock = generateEditableDataBlock({});
+
   test('SET_UNATTACHED_DATABLOCKS sets data blocks', () => {
     expect(
       releaseReducer(
         {
-          release: testEditableRelease,
+          ...testReleaseContent,
           canUpdateRelease: false,
-          unattachedDataBlocks: [],
         },
         {
           type: 'SET_UNATTACHED_DATABLOCKS',
@@ -83,21 +100,23 @@ describe('ReleaseContentContext', () => {
         },
       ),
     ).toEqual({
-      release: testEditableRelease,
+      release: testReleaseContent.release,
       canUpdateRelease: false,
       unattachedDataBlocks: [basicDataBlock],
     });
   });
 
   test('REMOVE_SECTION_BLOCK removes a block from a named section', () => {
-    const keyStatsSection = testEditableRelease.headlinesSection;
-    const removingBlockId = keyStatsSection.content[0].id;
+    const { headlinesSection } = testReleaseContent.release;
+    const removingBlockId = headlinesSection.content[0].id;
 
-    expect(testEditableRelease.headlinesSection.content.length).toEqual(1);
+    expect(testReleaseContent.release.headlinesSection.content.length).toEqual(
+      1,
+    );
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -106,7 +125,7 @@ describe('ReleaseContentContext', () => {
         payload: {
           meta: {
             blockId: removingBlockId,
-            sectionId: keyStatsSection.id,
+            sectionId: headlinesSection.id,
             sectionKey: 'headlinesSection',
           },
         },
@@ -117,14 +136,14 @@ describe('ReleaseContentContext', () => {
   });
 
   test('REMOVE_SECTION_BLOCK removes a block from generic content section', () => {
-    const contentSection = testEditableRelease.content;
+    const contentSection = testReleaseContent.release.content;
     const removingBlockId = contentSection[0].content[0].id;
 
     expect(contentSection[0].content).toHaveLength(2);
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -145,14 +164,14 @@ describe('ReleaseContentContext', () => {
   });
 
   test('UPDATE_SECTION_BLOCK updates a block from named section', () => {
-    const section = testEditableRelease.headlinesSection;
+    const section = testReleaseContent.release.headlinesSection;
     const blockToUpdate = section.content[0];
 
     const newBody = 'This is some updated text!';
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -176,15 +195,15 @@ describe('ReleaseContentContext', () => {
   });
 
   test('UPDATE_SECTION_BLOCK updates a block from a generic content section', () => {
-    const sectionId = testEditableRelease.content[0].id;
-    const blockToUpdate = testEditableRelease.content[0]
+    const sectionId = testReleaseContent.release.content[0].id;
+    const blockToUpdate = testReleaseContent.release.content[0]
       .content[0] as EditableContentBlock;
 
     const newBody = 'This is some updated text!';
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -210,20 +229,27 @@ describe('ReleaseContentContext', () => {
   });
 
   test('ADD_SECTION_BLOCK adds a block to a named section', () => {
-    const section = testEditableRelease.summarySection;
-    const newBlock: EditableContentBlock = {
-      id: '123',
-      order: 0,
+    const testReleaseContentWithoutSummaryContent = generateReleaseContent({
+      release: generateEditableRelease({
+        summarySection: {
+          id: 'summary-section-id',
+          content: [],
+          heading: 'Summary block heading',
+          order: 0,
+        },
+      }),
+    });
+    const section =
+      testReleaseContentWithoutSummaryContent.release.summarySection;
+    const newBlock = generateEditableContentBlock({
       body: 'This section is empty...',
-      comments: [],
-      type: 'MarkDownBlock',
-    };
+    });
 
     expect(section.content).toHaveLength(0);
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContentWithoutSummaryContent.release,
         canUpdateRelease: false,
         unattachedDataBlocks: [],
       },
@@ -243,7 +269,7 @@ describe('ReleaseContentContext', () => {
   });
 
   test('ADD_SECTION_BLOCK adds a block to a generic content section', () => {
-    const section = testEditableRelease.content[0];
+    const section = testReleaseContent.release.content[0];
 
     const newBlock: EditableContentBlock = {
       id: '123',
@@ -257,7 +283,7 @@ describe('ReleaseContentContext', () => {
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -348,7 +374,7 @@ describe('ReleaseContentContext', () => {
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -356,7 +382,7 @@ describe('ReleaseContentContext', () => {
         type: 'UPDATE_SECTION_CONTENT',
         payload: {
           meta: {
-            sectionId: testEditableRelease.content[0].id,
+            sectionId: testReleaseContent.release.content[0].id,
             sectionKey: 'content',
           },
           sectionContent: newContent,
@@ -369,18 +395,18 @@ describe('ReleaseContentContext', () => {
   });
 
   test('ADD_CONTENT_SECTION adds a new section to release content', () => {
-    expect(testEditableRelease.content).toHaveLength(2);
+    expect(testReleaseContent.release.content).toHaveLength(2);
 
     const newSection: ContentSection<EditableBlock> = {
       heading: 'A new section',
       id: 'new-section-1',
-      order: testEditableRelease.content.length,
+      order: testReleaseContent.release.content.length,
       content: [],
     };
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -393,8 +419,8 @@ describe('ReleaseContentContext', () => {
     );
 
     expect(release.content).toEqual([
-      testEditableRelease.content[0],
-      testEditableRelease.content[1],
+      testReleaseContent.release.content[0],
+      testReleaseContent.release.content[1],
       newSection,
     ]);
   });
@@ -402,7 +428,7 @@ describe('ReleaseContentContext', () => {
   test("SET_CONTENT sets the release's content", () => {
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -410,21 +436,21 @@ describe('ReleaseContentContext', () => {
         type: 'SET_CONTENT',
         payload: {
           content: [
-            testEditableRelease.content[1],
-            testEditableRelease.content[0],
+            testReleaseContent.release.content[1],
+            testReleaseContent.release.content[0],
           ],
         },
       },
     );
 
     expect(release.content).toEqual([
-      testEditableRelease.content[1],
-      testEditableRelease.content[0],
+      testReleaseContent.release.content[1],
+      testReleaseContent.release.content[0],
     ]);
   });
 
   test('UPDATE_CONTENT_SECTION updates a generic content section', () => {
-    const section = testEditableRelease.content[0];
+    const section = testReleaseContent.release.content[0];
 
     const updatedSection: ContentSection<EditableBlock> = {
       ...section,
@@ -433,7 +459,7 @@ describe('ReleaseContentContext', () => {
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -450,12 +476,12 @@ describe('ReleaseContentContext', () => {
   });
 
   test('ADD_BLOCK_COMMENT adds a comment to named section block', () => {
-    const sectionId = testEditableRelease.headlinesSection.id;
-    const block = testEditableRelease.headlinesSection.content[0];
+    const sectionId = testReleaseContent.release.headlinesSection.id;
+    const block = testReleaseContent.release.headlinesSection.content[0];
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -479,12 +505,12 @@ describe('ReleaseContentContext', () => {
   });
 
   test('ADD_BLOCK_COMMENT adds a comment to generic content section block', () => {
-    const sectionId = testEditableRelease.content[0].id;
-    const block = testEditableRelease.content[0].content[0];
+    const sectionId = testReleaseContent.release.content[0].id;
+    const block = testReleaseContent.release.content[0].content[0];
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -508,8 +534,11 @@ describe('ReleaseContentContext', () => {
   });
 
   test('UPDATE_BLOCK_COMMENT updates a comment in named section block', () => {
-    const sectionId = testEditableRelease.headlinesSection.id;
-    const block = testEditableRelease.headlinesSection.content[0];
+    const sectionId =
+      testReleaseContentWithHeadlinesComments.release.headlinesSection.id;
+    const block =
+      testReleaseContentWithHeadlinesComments.release.headlinesSection
+        .content[0];
 
     expect(block.comments).toHaveLength(1);
 
@@ -520,7 +549,7 @@ describe('ReleaseContentContext', () => {
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContentWithHeadlinesComments.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -543,8 +572,10 @@ describe('ReleaseContentContext', () => {
   });
 
   test('UPDATE_BLOCK_COMMENT updates a comment in generic content section block', () => {
-    const sectionId = testEditableRelease.content[0].id;
-    const block = testEditableRelease.content[0].content[0];
+    const sectionId =
+      testReleaseContentWithContentComments.release.content[0].id;
+    const block =
+      testReleaseContentWithContentComments.release.content[0].content[0];
 
     expect(block.comments).toHaveLength(2);
 
@@ -555,7 +586,7 @@ describe('ReleaseContentContext', () => {
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContentWithContentComments.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -579,14 +610,17 @@ describe('ReleaseContentContext', () => {
   });
 
   test('REMOVE_BLOCK_COMMENT removes a comment from named section block', () => {
-    const sectionId = testEditableRelease.headlinesSection.id;
-    const block = testEditableRelease.headlinesSection.content[0];
+    const sectionId =
+      testReleaseContentWithHeadlinesComments.release.headlinesSection.id;
+    const block =
+      testReleaseContentWithHeadlinesComments.release.headlinesSection
+        .content[0];
 
     expect(block.comments).toHaveLength(1);
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContentWithHeadlinesComments.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -607,14 +641,16 @@ describe('ReleaseContentContext', () => {
   });
 
   test('UPDATE_BLOCK_COMMENT removes a comment from generic content section block', () => {
-    const sectionId = testEditableRelease.content[0].id;
-    const block = testEditableRelease.content[0].content[0];
+    const sectionId =
+      testReleaseContentWithContentComments.release.content[0].id;
+    const block =
+      testReleaseContentWithContentComments.release.content[0].content[0];
 
     expect(block.comments).toHaveLength(2);
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContentWithContentComments.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -635,7 +671,7 @@ describe('ReleaseContentContext', () => {
   });
 
   test('ADD_KEY_STATISTIC adds a key statistic to release.keyStatistics array', () => {
-    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    expect(testReleaseContent.release.keyStatistics).toHaveLength(1);
     const newKeyStat: KeyStatisticDataBlock = {
       type: 'KeyStatisticDataBlock',
       id: 'keyStat-4',
@@ -649,7 +685,7 @@ describe('ReleaseContentContext', () => {
 
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -662,22 +698,22 @@ describe('ReleaseContentContext', () => {
     );
 
     expect(release.keyStatistics).toEqual([
-      ...testEditableRelease.keyStatistics,
+      ...testReleaseContent.release.keyStatistics,
       newKeyStat,
     ]);
   });
 
   test('UPDATE_KEY_STATISTIC updates a key statistic in release.keyStatistics array', () => {
-    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    expect(testReleaseContent.release.keyStatistics).toHaveLength(1);
     const updatedKeyStat1 = {
-      ...testEditableRelease.keyStatistics[0],
+      ...testReleaseContent.release.keyStatistics[0],
       trend: 'keyStat-1 trend updated',
       guidanceTitle: 'keyStat-1 new guidance title',
       guidanceText: 'keyStat-1 new guidance text',
     };
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -689,16 +725,16 @@ describe('ReleaseContentContext', () => {
 
     expect(release.keyStatistics).toEqual([
       updatedKeyStat1,
-      testEditableRelease.keyStatistics[1],
-      testEditableRelease.keyStatistics[2],
+      testReleaseContent.release.keyStatistics[1],
+      testReleaseContent.release.keyStatistics[2],
     ]);
   });
 
   test('REMOVE_KEY_STATISTIC removes a key statistic from release.keyStatistics array', () => {
-    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    expect(testReleaseContent.release.keyStatistics).toHaveLength(1);
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -711,16 +747,16 @@ describe('ReleaseContentContext', () => {
     );
 
     expect(release.keyStatistics).toEqual([
-      testEditableRelease.keyStatistics[0],
-      testEditableRelease.keyStatistics[2],
+      testReleaseContent.release.keyStatistics[0],
+      testReleaseContent.release.keyStatistics[2],
     ]);
   });
 
   test('SET_KEY_STATISTICS used to reorder existing key stats', () => {
-    expect(testEditableRelease.keyStatistics).toHaveLength(3);
+    expect(testReleaseContent.release.keyStatistics).toHaveLength(1);
     const { release } = releaseReducer(
       {
-        release: testEditableRelease,
+        release: testReleaseContent.release,
         canUpdateRelease: true,
         unattachedDataBlocks: [basicDataBlock],
       },
@@ -728,18 +764,18 @@ describe('ReleaseContentContext', () => {
         type: 'SET_KEY_STATISTICS',
         payload: {
           keyStatistics: [
-            testEditableRelease.keyStatistics[2],
-            testEditableRelease.keyStatistics[1],
-            testEditableRelease.keyStatistics[0],
+            testReleaseContent.release.keyStatistics[2],
+            testReleaseContent.release.keyStatistics[1],
+            testReleaseContent.release.keyStatistics[0],
           ],
         },
       },
     );
 
     expect(release.keyStatistics).toEqual([
-      testEditableRelease.keyStatistics[2],
-      testEditableRelease.keyStatistics[1],
-      testEditableRelease.keyStatistics[0],
+      testReleaseContent.release.keyStatistics[2],
+      testReleaseContent.release.keyStatistics[1],
+      testReleaseContent.release.keyStatistics[0],
     ]);
   });
 });

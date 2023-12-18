@@ -3524,6 +3524,12 @@
           },
           "actionGroupAlerts": {
             "value": "[variables('actionGroupAlerts')]"
+          },
+          "slackWebhook": {
+            "value": "[parameters('slackWebhook')]"
+          },
+          "slackAlertsChannel": {
+            "value": "[parameters('slackAlertsChannel')]"
           }
         }
       },
