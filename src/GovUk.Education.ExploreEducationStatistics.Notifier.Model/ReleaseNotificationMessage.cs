@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model
         public bool Amendment { get; init; }
         public string UpdateNote { get; init; } = string.Empty;
 
-        public List<Guid>  SupersededPublicationIds { get; init; } = new();
-        public List<string> SupersededPublicationTitles { get; init; } = new();
+        public List<Guid> SupersededPublicationIds { get; set; } = new();
+        public List<string> SupersededPublicationTitles { get; set; } = new();
     }
 }

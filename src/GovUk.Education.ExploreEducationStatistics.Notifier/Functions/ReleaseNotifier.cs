@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
@@ -11,8 +12,9 @@ using Microsoft.WindowsAzure.Storage.Table;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.ConfigKeys;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.NotifierUtils;
+using IConfigurationProvider = GovUk.Education.ExploreEducationStatistics.Notifier.Services.IConfigurationProvider;
 
-namespace GovUk.Education.ExploreEducationStatistics.Notifier
+namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 {
     // ReSharper disable once UnusedType.Global
     public class ReleaseNotifier
@@ -20,20 +22,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
         private readonly IStorageTableService _storageTableService;
+        private readonly IConfigurationProvider _configurationProvider;
+        private readonly INotificationClientProvider _notificationClientProvider;
 
         public ReleaseNotifier(
             ITokenService tokenService,
             IEmailService emailService,
-            IStorageTableService storageTableService)
+            IStorageTableService storageTableService,
+            IConfigurationProvider configurationProvider,
+            INotificationClientProvider notificationClientProvider)
         {
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
+            _configurationProvider = configurationProvider
+                                     ?? throw new ArgumentNullException(nameof(configurationProvider));
+            _notificationClientProvider = notificationClientProvider
+                                     ?? throw new ArgumentNullException(nameof(notificationClientProvider));
         }
 
         [FunctionName("ReleaseNotifier")]
         // ReSharper disable once UnusedMember.Global
-        public void ReleaseNotifierFunc(
+        public async Task ReleaseNotifierFunc(
             [QueueTrigger(ReleaseNotificationQueue)]
             ReleaseNotificationMessage msg,
             ILogger logger,
@@ -42,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             logger.LogInformation("{FunctionName} triggered",
                 context.FunctionName);
 
-            var config = LoadAppSettings(context);
+            var config = _configurationProvider.Get(context);
 
             var newReleaseTemplateId = msg.Amendment
                 ? config.GetValue<string>(ReleaseAmendmentEmailTemplateIdName)
@@ -55,8 +65,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var client = GetNotifyClient(config);
-            var table = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
+
+            var notifyApiKey = config.GetValue<string>(NotifyApiKeyName);
+            var notificationClient = _notificationClientProvider.Get(notifyApiKey);
+
+            var table = await GetCloudTable(_storageTableService, config, SubscriptionsTblName);
 
             var sentToEmailAddresses = new HashSet<string>();
 
@@ -70,7 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 do
                 {
                     var resultSegment =
-                        table.ExecuteQuerySegmentedAsync(query, token).Result;
+                        await table.ExecuteQuerySegmentedAsync(query, token);
                     token = resultSegment.ContinuationToken;
 
                     logger.LogInformation("Emailing {SubscriberCount} subscribers",
@@ -99,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                             { "unsubscribe_link", $"{baseUrl}{msg.PublicationId}/unsubscribe/{unsubscribeToken}" },
                         };
 
-                        _emailService.SendEmail(client, email, newReleaseTemplateId, values);
+                        _emailService.SendEmail(notificationClient, email, newReleaseTemplateId, values);
                     }
                 } while (token != null);
             }
@@ -122,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 do
                 {
                     var resultSegment =
-                        table.ExecuteQuerySegmentedAsync(query, token).Result;
+                        await table.ExecuteQuerySegmentedAsync(query, token);
                     token = resultSegment.ContinuationToken;
 
                     numSupersedeSubscriberEmailsSent += resultSegment.Results.Count;
@@ -156,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                             { "superseded_publication_title", supersededPublicationTitle },
                         };
 
-                        _emailService.SendEmail(client, email, newReleaseSupersededSubscribersTemplateId, values);
+                        _emailService.SendEmail(notificationClient, email, newReleaseSupersededSubscribersTemplateId, values);
                     }
                 } while (token != null);
 
