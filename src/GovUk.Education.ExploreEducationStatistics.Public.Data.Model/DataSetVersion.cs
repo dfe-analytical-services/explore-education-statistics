@@ -26,6 +26,8 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
 
     public DataSetMeta Meta { get; set; } = null!;
 
+    public long TotalResults { get; set; }
+
     public List<ChangeSetFilters> FilterChanges { get; set; } = [];
 
     public List<ChangeSetFilterOptions> FilterOptionChanges { get; set; } = [];
