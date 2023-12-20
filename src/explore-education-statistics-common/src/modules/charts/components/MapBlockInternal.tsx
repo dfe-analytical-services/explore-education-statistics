@@ -333,32 +333,37 @@ export default function MapBlockInternal({
           featureLayer as MapFeatureProperties['layer'];
       }
 
-      featureLayer.bindTooltip(() => {
-        if (feature.properties.dataSets[selectedDataSetKey]) {
-          const dataSetValue = formatPretty(
-            feature.properties.dataSets[selectedDataSetKey].value,
-            selectedDataSetConfig.dataSet.indicator.unit,
-            selectedDataSetConfig.dataSet.indicator.decimalPlaces,
-          );
-          const content = `${selectedDataSetConfig.config.label}: ${dataSetValue}`;
+      featureLayer.bindTooltip(
+        () => {
+          if (feature.properties.dataSets[selectedDataSetKey]) {
+            const dataSetValue = formatPretty(
+              feature.properties.dataSets[selectedDataSetKey].value,
+              selectedDataSetConfig.dataSet.indicator.unit,
+              selectedDataSetConfig.dataSet.indicator.decimalPlaces,
+            );
+            const content = `${selectedDataSetConfig.config.label}: ${dataSetValue}`;
 
-          const mapWidth = mapRef.current?.container?.clientWidth;
+            const mapWidth = mapRef.current?.container?.clientWidth;
 
-          // Not ideal, we would want to use `max-width` instead.
-          // Unfortunately it doesn't seem to work with the tooltip
-          // for some reason (maybe due to the pane styling).
-          const tooltipStyle = mapWidth ? `width: ${mapWidth / 2}px` : '';
+            // Not ideal, we would want to use `max-width` instead.
+            // Unfortunately it doesn't seem to work with the tooltip
+            // for some reason (maybe due to the pane styling).
+            const tooltipStyle = mapWidth
+              ? `width: ${mapWidth / 2 - 20}px`
+              : '';
 
-          return (
-            `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
-            `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
-            `<p class="${styles.tooltipContent}" data-testid="chartTooltip-contents">${content}</p>` +
-            `</div>`
-          );
-        }
+            return (
+              `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
+              `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
+              `<p class="${styles.tooltipContent}" data-testid="chartTooltip-contents">${content}</p>` +
+              `</div>`
+            );
+          }
 
-        return '';
-      });
+          return '';
+        },
+        { sticky: true },
+      );
     },
     [dataSetCategoryConfigs, selectedDataSetKey],
   );

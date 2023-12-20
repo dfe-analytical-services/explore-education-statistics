@@ -9,10 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
-using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Npgsql;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
@@ -53,6 +51,10 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             options.AddTrimStringBinderProvider();
         });
 
+        services.AddProblemDetails();
+        services.AddApiVersioning().AddMvc().AddApiExplorer();
+        services.AddEndpointsApiExplorer();
+
         // Databases
 
         services.AddDbContext<PublicDataDbContext>(options =>
@@ -71,27 +73,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddResponseCompression(options =>
         {
             options.EnableForHttps = true;
-        });
-
-        // Docs
-
-        services.AddEndpointsApiExplorer();
-        services.AddSwaggerGen(options =>
-        {
-            options.UseAllOfForInheritance();
-            options.UseOneOfForPolymorphism();
-
-            options.SwaggerDoc("v1", new OpenApiInfo
-            {
-                Title = "Explore education statistics - Public Data API",
-                Version = "v1",
-                Contact = new OpenApiContact
-                {
-                    Name = "Explore education statistics",
-                    Email = "explore.statistics@education.gov.uk",
-                    Url = new Uri("https://explore-education-statistics.service.gov.uk")
-                },
-            });
         });
 
         // Services
@@ -127,18 +108,6 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             app.UseHsts(hsts => hsts.MaxAge(365).IncludeSubdomains());
         }
 
-        // Swagger
-
-        app.UseSwagger(options =>
-        {
-            options.RouteTemplate = "/docs/{documentName}/openapi.json";
-        });
-        app.UseSwaggerUI(options =>
-        {
-            options.RoutePrefix = "docs";
-            options.SwaggerEndpoint("/docs/v1/openapi.json", "Public Data API v1");
-        });
-
         // Rewrites
 
         app.UseRewriter(new RewriteOptions
@@ -151,14 +120,14 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         app.UseResponseCaching();
         app.UseResponseCompression();
 
-        // MVC
+        // Routing / endpoints
 
-        app.UseMvc();
+        app.UseRouting();
+        app.UseEndpoints(builder =>
+        {
+            builder.MapControllers();
+        });
         app.UseHealthChecks("/api/health");
-
-        app.ServerFeatures.Get<IServerAddressesFeature>()
-            ?.Addresses
-            .ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
     }
 
     private static void UpdateDatabase(IApplicationBuilder app)
