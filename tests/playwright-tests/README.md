@@ -9,6 +9,8 @@ https://nodejs.org/en/download/
 https://code.visualstudio.com/download
 * Playwright VS Code plugin
 * ES-lint extension
+* Playwright test runner
+
 
 # Installation
 
