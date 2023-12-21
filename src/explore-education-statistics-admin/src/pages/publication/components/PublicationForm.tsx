@@ -28,9 +28,9 @@ const errorMappings = [
       PublicationSlugNotUnique: 'Choose a unique title',
       PublicationSlugUsedByRedirect: 'Choose a previously unused title',
       MethodologySlugNotUnique:
-        "As this publication's owned methodology inherits this publication's title, this action changes the owned methodology. Choose a unique methodology title",
+        'This title also changes the methodology title to one used by an existing methodology. Choose a unique methodology title',
       MethodologySlugUsedByRedirect:
-        "As this publication's owned methodology inherits this publication's title, this action changes the owned methodology. Choose a previously unused methodology title",
+        'This title also changes the methodology title to one that has been live previously. Choose a unique methodology title',
     },
   }),
 ];
