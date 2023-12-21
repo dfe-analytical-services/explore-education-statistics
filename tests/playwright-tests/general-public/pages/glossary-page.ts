@@ -5,34 +5,34 @@ import { Locator, Page } from '@playwright/test';
 // Glossary page
 export class GlossaryPage {
   readonly page: Page;
-  readonly page_search_box: Locator;
-  readonly page_search_results: Locator;
-  readonly page_search_selection: Locator;
-  readonly accordion_section_A: Locator;
-  readonly accordion_section_B: Locator;
-  readonly accordion_section_C: Locator;
-  readonly accordion_section_D: Locator;
-  readonly accordion_section_E: Locator;
-  readonly accordion_section_Z: Locator;
-  readonly voluntary_repayment_section: Locator;
-  readonly voluntary_repayment_section_text: Locator;
-  readonly education_statistics_methodology: Locator;
+  readonly pageSearchBox: Locator;
+  readonly pageSearchResults: Locator;
+  readonly pageSearchSelection: Locator;
+  readonly accordionSectionA: Locator;
+  readonly accordionSectionB: Locator;
+  readonly accordionSectionC: Locator;
+  readonly accordionSectionD: Locator;
+  readonly accordionSectionE: Locator;
+  readonly accordionSectionZ: Locator;
+  readonly voluntaryRepaymentSection: Locator;
+  readonly voluntaryRepaymentSectionText: Locator;
+  readonly educationStatisticsMethodology: Locator;
 
   constructor(page) {
     this.page = page;
     // Locators
-    this.page_search_box = page.locator('input#pageSearchForm-input');
-    this.page_search_results = page.locator('div#pageSearchForm-resultsLabel');
-    this.page_search_selection = page.locator('li[id="pageSearchForm-option-0"]');
-    this.accordion_section_A = page.locator('//span[text()="A"]');
-    this.accordion_section_B = page.locator('//span[text()="B"]');
-    this.accordion_section_C = page.locator('//span[text()="C"]');
-    this.accordion_section_D = page.locator('//span[text()="D"]');
-    this.accordion_section_E = page.locator('//span[text()="E"]');
-    this.accordion_section_Z = page.locator('//span[text()="Z"]');
-    this.voluntary_repayment_section = page.locator('//h3[text()="Voluntary repayment"]');
-    this.voluntary_repayment_section_text = page.locator('//div[@id="voluntary-repayment"]//p[1]');
-    this.education_statistics_methodology = page.locator('//a[text()="Education statistics: methodology"]');
+    this.pageSearchBox = page.locator('input#pageSearchForm-input');
+    this.pageSearchResults = page.locator('div#pageSearchForm-resultsLabel');
+    this.pageSearchSelection = page.locator('li[id="pageSearchForm-option-0"]');
+    this.accordionSectionA = page.locator('//span[text()="A"]');
+    this.accordionSectionB = page.locator('//span[text()="B"]');
+    this.accordionSectionC = page.locator('//span[text()="C"]');
+    this.accordionSectionD = page.locator('//span[text()="D"]');
+    this.accordionSectionE = page.locator('//span[text()="E"]');
+    this.accordionSectionZ = page.locator('//span[text()="Z"]');
+    this.voluntaryRepaymentSection = page.locator('//h3[text()="Voluntary repayment"]');
+    this.voluntaryRepaymentSectionText = page.locator('//div[@id="voluntary-repayment"]//p[1]');
+    this.educationStatisticsMethodology = page.locator('//a[text()="Education statistics: methodology"]');
   }
   // standard text
   readonly voluntary_repayment_section_paragraph_text = 'A borrower can at any time choose to repay some or all of their loan balance early, in addition to any repayments they are liable to make based on their income';

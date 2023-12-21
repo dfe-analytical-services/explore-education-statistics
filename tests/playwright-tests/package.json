@@ -1,7 +1,7 @@
 {
   "name": "playwright-tests",
   "version": "1.0.0",
-  "description": "**How to install Playwright and set up VS Code?**",
+  "description": "**UI Playwright tests**",
   "main": "index.js",
   "scripts": {
     "precommit": "lint-staged"
