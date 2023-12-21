@@ -22,6 +22,15 @@ public class RedirectsService : IRedirectsService
 
     public async Task<Either<ActionResult, RedirectsViewModel>> List()
     {
+        var publicationRedirectViewModels = await _contentDbContext.PublicationRedirects
+            .Where(pr => pr.Slug != pr.Publication.Slug) // don't use redirects to the current live slug
+            .Distinct()
+            .Select(pr => new RedirectViewModel(
+                pr.Slug,
+                pr.Publication.Slug
+            ))
+            .ToListAsync();
+
         // A redirect for a MethodologyVersion that isn't published shouldn't appear in the list. A redirect becomes
         // active once the associated MethodologyVersion is published. It remains active if subsequent methodology
         // amendments are published. We establish this by checking against each MethodologyVersion's Version number.
@@ -44,22 +53,19 @@ public class RedirectsService : IRedirectsService
             {
                 if (mr.RedirectSlug == mr.LatestPublishedSlug)
                 {
-                    // It is possible for a redirect to point to the currently active slug. This can happen as a
-                    // methodology can change to a slug even if there is a redirect for that slug,
-                    // *if* the redirect is for the same methodology - i.e. the methodology's slug is changing
-                    // back to a previous slug it used. But the slug may not change back immediately, if the change
-                    // is on an unpublished amendment, so we cannot remove the redirect immediately when changing the
-                    // slug back; redirect needs to be active until the amendment is published.
+                    // guard against redirect pointing to current slug
                     return null;
                 }
 
-                return new MethodologyRedirectViewModel(
+                return new RedirectViewModel(
                     FromSlug: mr.RedirectSlug, ToSlug: mr.LatestPublishedSlug);
             })
             .WhereNotNull()
             .Distinct()
             .ToList();
 
-        return new RedirectsViewModel(methodologyRedirectViewModels);
+        return new RedirectsViewModel(
+            publicationRedirectViewModels,
+            methodologyRedirectViewModels);
     }
 }

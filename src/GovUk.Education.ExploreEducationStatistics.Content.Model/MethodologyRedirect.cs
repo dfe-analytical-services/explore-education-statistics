@@ -6,11 +6,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 public class MethodologyRedirect : ICreatedTimestamp<DateTime>
 {
-    public string Slug { get; init; } = null!;
+    public string Slug { get; set; } = null!;
 
-    public Guid MethodologyVersionId { get; init; }
+    public Guid MethodologyVersionId { get; set; }
 
-    public MethodologyVersion MethodologyVersion { get; init; } = null!;
+    public MethodologyVersion MethodologyVersion { get; set; } = null!;
 
     public DateTime Created { get; set; }
 }
