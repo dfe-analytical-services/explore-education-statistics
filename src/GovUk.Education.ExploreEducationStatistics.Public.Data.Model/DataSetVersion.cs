@@ -1,4 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
@@ -45,4 +48,30 @@ public class DataSetVersion : ICreatedUpdatedTimestamps<DateTimeOffset, DateTime
     public DateTimeOffset Created { get; set; }
 
     public DateTimeOffset? Updated { get; set; }
+
+    internal class Config : IEntityTypeConfiguration<DataSetVersion>
+    {
+        public void Configure(EntityTypeBuilder<DataSetVersion> builder)
+        {
+            builder.OwnsOne(v => v.MetaSummary, ms =>
+            {
+                ms.ToJson();
+                ms.OwnsOne(msb => msb.TimePeriodRange, msb =>
+                {
+                    msb.OwnsOne(tpr => tpr.Start, tpr =>
+                    {
+                        tpr.Property(tpm => tpm.Code)
+                            .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                    });
+                    msb.OwnsOne(tpr => tpr.End, tpr =>
+                    {
+                        tpr.Property(tpm => tpm.Code)
+                            .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>());
+                    });
+                });
+            });
+
+            builder.Property(dsv => dsv.Status).HasConversion<string>();
+        }
+    }
 }
