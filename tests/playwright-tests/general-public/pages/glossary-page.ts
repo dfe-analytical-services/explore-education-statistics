@@ -35,5 +35,5 @@ export class GlossaryPage {
     this.educationStatisticsMethodology = page.locator('//a[text()="Education statistics: methodology"]');
   }
   // standard text
-  readonly voluntary_repayment_section_paragraph_text = 'A borrower can at any time choose to repay some or all of their loan balance early, in addition to any repayments they are liable to make based on their income';
+  readonly voluntaryRepaymentSectionParagraphText = 'A borrower can at any time choose to repay some or all of their loan balance early, in addition to any repayments they are liable to make based on their income';
 }

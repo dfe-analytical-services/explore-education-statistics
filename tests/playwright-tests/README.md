@@ -14,23 +14,30 @@ https://code.visualstudio.com/download
 
 # Installation
 
-Step 1: Navigate to 'Playwright-tests' folder
-Step 2: Ensure the NodeJS version is above 14 from the command prompt.
-        node -v
-Step 3:Launch the VS code
-Step 4:Navigate to the EXTENSIONS section and type "Playwright". There are multiple options available. Select the "Playwright Test for VS Code by Microsoft option".
-Step 6: Click Install.
-Step 7: Press CTRL + SHIFT + P to open the command panel and type "install Playwright".
-Step 8: Enable the Chromium, Firefox, and WebKit checkboxes, as Playwright supports all browser engines.
-Step 9: Click Okay.
+1.  Navigate to 'Playwright-tests' folder
+1.  Ensure the NodeJS version is above 14 from the command prompt.
+
+        ```bash 
+           node -v
+        ```
+1.  Launch the VS code
+1.  Navigate to the EXTENSIONS section and type "Playwright". There are multiple options available. Select the "Playwright Test for VS Code by Microsoft option".
+1.  Click Install.
+1.  Press CTRL + SHIFT + P to open the command panel and type "install Playwright".
+1.  Enable the Chromium, Firefox, and WebKit checkboxes, as Playwright supports all browser engines.
+1.  Click Okay.
+
 
 **Alternatively you can also install the playwright using following command.**
-pnpm:pnpm create playwright
 
-Step 1: Choose between TypeScript or JavaScript (default is TypeScript)
-Step 2: Name of your Tests folder (default is tests or e2e if you already have a tests folder in your project)
-Step 3: Add a GitHub Actions workflow to easily run tests on CI
-Step 4: Install Playwright browsers (default is true)
+    ```bash
+       pnpm create playwright
+    ```
+
+1.  Choose between TypeScript or JavaScript (default is TypeScript)
+1.  Name of your Tests folder (default is tests or e2e if you already have a tests folder in your project)
+1.  Add a GitHub Actions workflow to easily run tests on CI
+1.  Install Playwright browsers (default is true)
 
 Please visit the following URL for more information
 https://playwright.dev/docs/intro#installing-playwright
@@ -38,10 +45,19 @@ https://playwright.dev/docs/intro#installing-playwright
 **How to run the playwright test**?
 
 ## Running the end-to-end test: 
+
+ ```bash
   npx playwright test
+ ```
 
 ## Running the test in single file:
+
+ ```bash
   npx playwright test <spec-filename.ts>
+ ```
 
 ## Running the test in debug mode:
+
+  ```bash
   npx playwright test <spec-filename.ts>  --debug
+  ```

@@ -9,24 +9,24 @@ test.describe('Verify the end to end functionality of glossary page', () => {
   });
 
   test('Verify that accordion sections in glossary page are visible and voluntary repayment section is searchable via search ', async ({ page }) => {
-    const glossarypage = new GlossaryPage(page);
+    const glossaryPage = new GlossaryPage(page);
 
     const url = await page.url();
     await expect(url).toContain('glossary');
 
-    await expect(glossarypage.accordionSectionA).toBeVisible();
-    await expect(glossarypage.accordionSectionB).toBeVisible();
-    await expect(glossarypage.accordionSectionC).toBeVisible();
-    await expect(glossarypage.accordionSectionD).toBeVisible();
-    await expect(glossarypage.accordionSectionE).toBeVisible();
-    await expect(glossarypage.accordionSectionZ).toBeVisible();
+    await expect(glossaryPage.accordionSectionA).toBeVisible();
+    await expect(glossaryPage.accordionSectionB).toBeVisible();
+    await expect(glossaryPage.accordionSectionC).toBeVisible();
+    await expect(glossaryPage.accordionSectionD).toBeVisible();
+    await expect(glossaryPage.accordionSectionE).toBeVisible();
+    await expect(glossaryPage.accordionSectionZ).toBeVisible();
 
-    await glossarypage.pageSearchBox.fill('Voluntary repayment');
-    await expect(glossarypage.pageSearchResults).toBeTruthy();
+    await glossaryPage.pageSearchBox.fill('Voluntary repayment');
+    await expect(glossaryPage.pageSearchResults).toBeTruthy();
 
-    await glossarypage.pageSearchSelection.click();
+    await glossaryPage.pageSearchSelection.click();
     
-    await expect(glossarypage.voluntaryRepaymentSection).toBeVisible();
-    await expect(glossarypage.voluntaryRepaymentSectionText).toContainText(glossarypage.voluntary_repayment_section_paragraph_text);
+    await expect(glossaryPage.voluntaryRepaymentSection).toBeVisible();
+    await expect(glossaryPage.voluntaryRepaymentSectionText).toContainText(glossaryPage.voluntaryRepaymentSectionParagraphText);
   });
 });
