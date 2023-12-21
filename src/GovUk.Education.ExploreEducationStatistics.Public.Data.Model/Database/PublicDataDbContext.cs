@@ -57,11 +57,13 @@ public class PublicDataDbContext : DbContext
             .OwnsMany(m => m.Filters, m =>
             {
                 m.ToJson();
+                m.Property(fm => fm.Identifier).HasJsonPropertyName("Id");
                 m.OwnsMany(fm => fm.Options);
             })
             .OwnsMany(m => m.Indicators, m =>
             {
                 m.ToJson();
+                m.Property(im => im.Identifier).HasJsonPropertyName("Id");
                 m.Property(im => im.Unit)
                     .HasConversion(new EnumToEnumValueConverter<IndicatorUnit>());
             })
@@ -83,6 +85,7 @@ public class PublicDataDbContext : DbContext
             .OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
+                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
                 cs.Property(c => c.Type).HasConversion<string>();
                 cs.OwnsOne(c => c.CurrentState);
                 cs.OwnsOne(c => c.PreviousState);
@@ -92,6 +95,7 @@ public class PublicDataDbContext : DbContext
             .OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
+                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
                 cs.Property(c => c.Type).HasConversion<string>();
                 cs.OwnsOne(c => c.CurrentState);
                 cs.OwnsOne(c => c.PreviousState);
@@ -101,6 +105,7 @@ public class PublicDataDbContext : DbContext
             .OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
+                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
                 cs.Property(c => c.Type).HasConversion<string>();
                 cs.OwnsOne(c => c.CurrentState, s =>
                 {
@@ -118,6 +123,7 @@ public class PublicDataDbContext : DbContext
             .OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
+                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
                 cs.Property(c => c.Type).HasConversion<string>();
                 cs.OwnsOne(c => c.CurrentState, s =>
                 {
@@ -130,6 +136,7 @@ public class PublicDataDbContext : DbContext
             .OwnsMany(cs => cs.Changes, cs =>
             {
                 cs.ToJson();
+                cs.Property(c => c.Identifier).HasJsonPropertyName("Id");
                 cs.Property(c => c.Type).HasConversion<string>();
                 cs.OwnsOne(c => c.CurrentState, s =>
                 {
