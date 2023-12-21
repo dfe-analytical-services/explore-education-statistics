@@ -465,6 +465,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task ValidateDataArchiveEntriesForUpload_DataFilenameTooLong()
+        {
+            var (service, _) = BuildService();
+
+            var archiveFile = CreateDataArchiveFileMock("LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.csv", "test.meta.csv").Object;
+
+            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+                archiveFile);
+
+            result.AssertBadRequest(DataFilenameTooLong);
+        }
+
+        [Fact]
+        public async Task ValidateDataArchiveEntriesForUpload_MetaFilenameTooLong()
+        {
+            var (service, _) = BuildService();
+
+            var archiveFile = CreateDataArchiveFileMock("test.csv", "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.meta.csv").Object;
+
+            var result = await service.ValidateDataArchiveEntriesForUpload(Guid.NewGuid(),
+                archiveFile);
+
+            result.AssertBadRequest(MetaFilenameTooLong);
+        }
+
+        [Fact]
         public async Task ValidateDataArchiveEntriesForUpload_DataFileIsEmpty()
         {
             var (service, _) = BuildService();
