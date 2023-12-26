@@ -455,13 +455,6 @@
     "theme": "Higher education"
   },
   {
-    "publication_summary": "Data on suspensions and permanent exclusions, including by reason, duration, by pupil characteristics and data on independent review panels.",
-    "publication_title": "Permanent exclusions and suspensions in England",
-    "published": "23 Nov 2023",
-    "release_type": "National statistics",
-    "theme": "Pupils and schools"
-  },
-  {
     "publication_summary": "Local authority (LA) spending plans for education, children's services and social care.",
     "publication_title": "Planned LA and school expenditure",
     "published": "28 Sep 2023",
@@ -607,6 +600,13 @@
     "published": "29 Jun 2023",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
+  },
+  {
+    "publication_summary": "Data on suspensions and permanent exclusions, including by reason, duration, by pupil characteristics and data on independent review panels.",
+    "publication_title": "Suspensions and permanent exclusions in England",
+    "published": "23 Nov 2023",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
   },
   {
     "publication_summary": "",
