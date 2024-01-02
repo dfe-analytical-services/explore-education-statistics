@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -92,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         }
 
         private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,
-            ReleasePublishingStatusState state, IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
+            ReleasePublishingStatusState state, IEnumerable<ReleasePublishingStatusLogMessage>? logMessages = null)
         {
             return await _releasePublishingStatusService.CreateAsync(message.ReleaseId, message.ReleaseStatusId, state,
                 message.Immediate, logMessages);

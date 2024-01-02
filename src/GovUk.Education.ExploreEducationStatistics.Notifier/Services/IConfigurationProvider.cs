@@ -1,3 +1,4 @@
+#nullable enable
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Configuration;
 

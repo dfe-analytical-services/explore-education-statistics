@@ -1,3 +1,4 @@
+#nullable enable
 using Notify.Client;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Services

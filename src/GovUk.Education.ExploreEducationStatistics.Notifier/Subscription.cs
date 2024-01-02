@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using Microsoft.Azure.Cosmos.Table;
 
@@ -5,8 +6,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
     public class SubscriptionEntity : TableEntity
     {
-        public string Slug { get; set; }
-        public string Title { get; set; }
+        public string Slug { get; set; } = string.Empty;
+        public string Title { get; set; } = string.Empty;
         public DateTime? DateTimeCreated { get; set; }
 
         public SubscriptionEntity(string id, string email, string title, string slug, DateTime? dateTimeCreated)

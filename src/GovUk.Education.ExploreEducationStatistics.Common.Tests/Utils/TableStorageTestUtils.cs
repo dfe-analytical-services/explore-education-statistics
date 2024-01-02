@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ public static class TableStorageTestUtils
     }
 
     public static TableQuerySegment<TElement> CreateTableQuerySegment<TElement>(
-        List<TElement> results, TableContinuationToken continuationToken = null)
+        List<TElement> results, TableContinuationToken? continuationToken = null)
     {
         // https://github.com/Azure/azure-storage-net/issues/619#issuecomment-364090291
         var constructor = typeof(TableQuerySegment<TElement>)
@@ -34,6 +35,6 @@ public static class TableStorageTestUtils
 
         continuationTokenField!.SetValue(tableQuerySegment, continuationToken);
 
-        return tableQuerySegment;
+        return tableQuerySegment!;
     }
 }
