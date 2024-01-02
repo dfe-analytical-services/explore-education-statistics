@@ -15,7 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Notify.Exceptions;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.ConfigKeys;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.NotifierUtils;
 using IConfigurationProvider = GovUk.Education.ExploreEducationStatistics.Notifier.Services.IConfigurationProvider;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
@@ -59,8 +58,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var emailTemplateId = config.GetValue<string>(VerificationEmailTemplateIdName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var subscriptionsTable = await GetCloudTable(_storageTableService, config, SubscriptionsTblName);
-            var pendingSubscriptionsTable = await GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);
+
+            var storageConnectionStr = config.GetValue<string>(StorageConnectionName);
+            var subscriptionsTable = await _storageTableService.GetTable(storageConnectionStr, SubscriptionsTblName);
+            var pendingSubscriptionsTable = await _storageTableService.GetTable(storageConnectionStr, PendingSubscriptionsTblName);
 
             var notifyApiKey = config.GetValue<string>(NotifyApiKeyName);
             var notificationClient = _notificationClientProvider.Get(notifyApiKey);
@@ -175,7 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 
             if (email != null)
             {
-                var table = await GetCloudTable(_storageTableService, config, SubscriptionsTblName);
+                var storageConnectionStr = config.GetValue<string>(StorageConnectionName);
+                var table = await _storageTableService.GetTable(storageConnectionStr, SubscriptionsTblName);
+
                 var sub = new SubscriptionEntity(id, email);
                 sub = _storageTableService.RetrieveSubscriber(table, sub).Result;
 
@@ -214,8 +217,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 
             if (email != null)
             {
-                var pendingSubscriptionsTbl = await GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);
-                var subscriptionsTbl = await GetCloudTable(_storageTableService, config, SubscriptionsTblName);
+                var storageConnectionStr = config.GetValue<string>(StorageConnectionName);
+                var subscriptionsTbl = await _storageTableService.GetTable(storageConnectionStr, SubscriptionsTblName);
+                var pendingSubscriptionsTbl = await _storageTableService.GetTable(storageConnectionStr, PendingSubscriptionsTblName);
+
                 var sub = _storageTableService
                     .RetrieveSubscriber(pendingSubscriptionsTbl, new SubscriptionEntity(id, email)).Result;
 
@@ -260,7 +265,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 DateTime.UtcNow);
 
             var config = _configurationProvider.Get(context);
-            var pendingSubscriptionsTbl = await GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);
+
+            var storageConnectionStr = config.GetValue<string>(StorageConnectionName);
+            var pendingSubscriptionsTbl = await _storageTableService.GetTable(storageConnectionStr, PendingSubscriptionsTblName);
+
             // Remove any pending subscriptions where the token has expired i.e. more than 1 hour old
             var query = new TableQuery<SubscriptionEntity>()
                 .Where(TableQuery.GenerateFilterConditionForDate("DateTimeCreated", QueryComparisons.LessThan,

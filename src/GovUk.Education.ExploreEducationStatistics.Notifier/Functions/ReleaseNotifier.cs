@@ -11,7 +11,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.ConfigKeys;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.NotifierUtils;
 using IConfigurationProvider = GovUk.Education.ExploreEducationStatistics.Notifier.Services.IConfigurationProvider;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
@@ -69,7 +68,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
             var notifyApiKey = config.GetValue<string>(NotifyApiKeyName);
             var notificationClient = _notificationClientProvider.Get(notifyApiKey);
 
-            var table = await GetCloudTable(_storageTableService, config, SubscriptionsTblName);
+            var storageConnectionStr = config.GetValue<string>(StorageConnectionName);
+            var table = await _storageTableService.GetTable(storageConnectionStr, SubscriptionsTblName);
 
             var sentToEmailAddresses = new HashSet<string>();
 
