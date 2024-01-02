@@ -1,9 +1,8 @@
 #nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
+using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.Configuration;
-using Microsoft.WindowsAzure.Storage.Table;
-using Notify.Client;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.ConfigKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Utils
