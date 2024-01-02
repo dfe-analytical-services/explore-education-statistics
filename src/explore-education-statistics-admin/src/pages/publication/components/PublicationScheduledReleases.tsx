@@ -23,10 +23,10 @@ const PublicationScheduledReleases = ({ publicationId, releases }: Props) => {
       <thead>
         <tr>
           <th className="govuk-!-width-one-third">Release period</th>
-          <th className={styles.statusColumn}>
+          <th className={`${styles.statusColumn} dfe-white-space--nowrap`}>
             Status <ScheduledStatusGuidanceModal />
           </th>
-          <th className="govuk-!-width-one-quarter">
+          <th className="govuk-!-width-one-quarter dfe-white-space--nowrap">
             Stages checklist <ScheduledStagesGuidanceModal />
           </th>
           <th>Publish date</th>

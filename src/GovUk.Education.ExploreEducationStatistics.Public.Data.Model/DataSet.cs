@@ -8,6 +8,8 @@ public class DataSet : ICreatedUpdatedTimestamps<DateTimeOffset, DateTimeOffset?
 
     public required string Title { get; set; }
 
+    public required string Summary { get; set; }
+
     public required Guid PublicationId { get; set; }
 
     public required DataSetStatus Status { get; set; }

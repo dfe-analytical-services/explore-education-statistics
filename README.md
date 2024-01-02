@@ -73,11 +73,12 @@ To run applications in this service you will require the following:
 **Note** - Both .NET 6 and 8 are currently required as not all projects are using the latest SDK version.
 
 To run the databases:
-   - [Docker and Docker Compose](https://docs.docker.com/) - see [Setting up the database](#setting-up-the-database-and-storage-emulator)
+   - [Docker and Docker Compose](https://docs.docker.com/) - see [Set up your database](#set-up-your-database)
 
 To emulate Azure storage services (blobs, tables and queues) you will require one of the following options.
-   - [Azurite for Docker and Docker Compose](https://docs.docker.com/) - recommended, see [Setting up the storage emulator](#setting-up-the-database-and-storage-emulator)
-   - Alternatively, if opting to not use Storage Explorer at all, you could create your own Storage
+   - [Azurite for Docker](https://hub.docker.com/_/microsoft-azure-storage-azurite) and [Docker Compose](https://docs.docker.com/) - recommended, see [Setting up the storage emulator](#setting-up-the-storage-emulator).
+     - You will also need to [configure the storage emulator host](#set-up-the-database-and-storage-emulator-hosts)
+   - Alternatively, if opting to not use a storage emulator at all, you could create your own Storage
      Account on Azure and amend your storage connection strings to point to this.
      - [Azure Storage Account](https://azure.microsoft.com/en-gb/services/storage/)
      - [Running against other databases](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-emulator#start-and-initialize-the-storage-emulator)
@@ -123,28 +124,28 @@ Install the project's PNPM dependencies by simply running:
 pnpm i
 ```
 
-### Optional - Add the local site domain to hosts file
-
-You can skip this step if you prefer to use http://localhost.
-
-If you would like to use a 'nicer' URL instead of http://localhost, you can change your `hosts` file 
-with the following entry (or similar):
-
-```
-127.0.0.1    ees.local
-```
-
 ### Set up the database and storage emulator hosts
 
-Firstly, you'll need to add the following to your `hosts` file:
+Add the following to your `hosts` file:
 
 ```
 127.0.0.1    db
 127.0.0.1    data-storage
 ```
-   
+
 - On Unix this is located in `/etc/hosts`. 
 - On Windows this is located in `C:\Windows\System32\drivers\etc\hosts`.
+
+### Add the local site domain to hosts file
+
+> This step is only required if you are using Keycloak as the identity provider, or if you are using 
+a custom identity provider and prefer to use a 'nicer' URL instead of http://localhost.
+
+Add the following to your `hosts` file:
+
+```
+127.0.0.1    ees.local
+```
 
 ### Set up your database
 
@@ -152,14 +153,15 @@ There are two options for setting up your database:
 
 #### Option 1 - Use a pre-built development database
 
-We regularly create new development databases that are uploaded Google Drive. Ask a team member if 
-you need to access.
+We regularly create new development databases that are uploaded to Google Drive. Ask a team member if 
+you need access.
 
 These are already bootstrapped with seed data to run tests and start the project. This is the 
 **recommended** way of running the project.
 
-This data will need to be loaded into SQL Server by copying the `ees-mssql` directory into the 
-project's `data` directory. You **must** give all OS users appropriate access to this directory.
+The seed data file names are suffixed with a number to identify the latest. Download the most recent
+`ees-mssql-data-<number>.zip` and extract the `ees-mssql` directory into the project's `data` directory. 
+You **must** give all OS users appropriate access to this directory.
 
 In Linux:
   - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
@@ -170,8 +172,7 @@ In Linux:
    permissions.
 
 
-All the data in the `data/ees-mssql` directory will be mounted and loaded when the SQL Server Docker
-container starts. This cna be 
+All the data in the `data/ees-mssql` directory will be mounted and loaded automatically when the SQL Server Docker container starts.
 
 #### Option 2 - Use a bare database
 
@@ -219,22 +220,33 @@ The service can be started against a set of non-existent database. If no pre-exi
 4. Start the Admin project and this will configure the contained users' permissions via database migrations. 
    The other projects will then be able to be started, using their own contained users to connect to the databases. 
 
+### Setting up the storage emulator
+
+The Azurite Docker container can be started by one of the following methods:
+
+1. Indirectly by starting the admin via the start script
+
+    ```bash
+    pnpm start admin
+    ```
+
+2. Directly via the start script using:
+    
+    ```bash
+    pnpm start dataStorage
+    ```
+
+3. Directly via Docker Compose
+
+    ```bash
+    docker-compose up data-storage
+    ```
+
 ### Setting up an Identity Provider (IdP)
 
 The project uses an OpenID Connect Identity Provider (IdP) to allow login to the Admin service.
 
-> For team members, Azure AD configuration is available alongside other project passwords with the title 
-> `Azure AD IdP configuration`. Place the contents of this into [appsettings.Idp.json](
-src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json) and start Admin normally.
-
-An out-of-the-box IdP is provided for ease of setup which runs [Keycloak](https://www.keycloak.org/) in a Docker container 
-and contains a number of users for different roles. The [appsettings.Keycloak.json](
-src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Keycloak.json) configuration file contains the details for 
-connecting Admin to this IdP.
-
-Alternatively, you can provide your own OpenID Connect configuration in the [appsettings.Idp.json](
-src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json) file that is ignored from Git. You can use the 
-Keycloak equivalent as a template as to how the configuration in the file should be structured.
+An out-of-the-box IdP is provided for ease of setup which runs [Keycloak](https://www.keycloak.org/) in a Docker container and contains a number of users for different roles. Alternatively, you can follow the steps to [use a custom Identity Provider](#using-a-custom-identity-provider).
 
 #### Using Keycloak
 
@@ -296,9 +308,9 @@ docker-compose up --build --force-recreate idp
 
 #### Using a custom Identity Provider
 
-If you have your own custom OpenID Connect identity provider (IdP), you can provide its config in a 
-[appsettings.Idp.json](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Idp.json) file 
-that is ignored from Git.
+If you have your own custom OpenID Connect identity provider (IdP), you can provide its configuration by creating 
+an `appsettings.Idp.json` file in the `src/GovUk.Education.ExploreEducationStatistics.Admin` project directory, which is 
+excluded from Git. 
 
 You can use [appsettings.Keycloak.json](src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.Keycloak.json) 
 as a template for how the configuration should be structured.
@@ -333,9 +345,13 @@ now be in both Keycloak and in the SQL Server database.
 
 #### Bootstrapping different Identity Provider users
 
+> Shared test credentials are available to team members for use during development and testing. This step is 
+only required for creating *additional* users, or for non-team members within the open source community to create initial users.
+
 If you are using your own IdP config (via `appsettings.Idp.json`), you can bootstrap users who you want to
-have access to the system straight away by creating a `appsettings.IdpBootstrapUsers.json` (which is ignored by Git).
-This should contain a set of user emails in a format similar to `appsettings.Keycloak.json`. 
+have access to the system straight away by creating a `appsettings.IdpBootstrapUsers.json`, which is excluded from Git.
+This should contain a set of user emails in a format similar to [appsettings.KeycloakBootstrapUsers.json](
+src/GovUk.Education.ExploreEducationStatistics.Admin/appsettings.KeycloakBootstrapUsers.json). 
 
 Then set the following environment variable before starting the Admin:
 
@@ -391,6 +407,11 @@ Examples:
   ```bash
   pnpm start publicData
   ```
+
+> If running the `start` script for the first time, and using the seed data downloaded for the recommended 
+database setup, you may encounter an SQL error implying a login failure due to the server being in "script 
+upgrade mode", this is due to the data still being processed by SQL Server. Depending on the size of the 
+data, this may take a minute or two to complete, after which the `start` script can be re-ran.
 
 The frontend applications can be accessed via:
 

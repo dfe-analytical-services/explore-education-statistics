@@ -64,10 +64,10 @@ const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
                 <thead>
                   <tr>
                     <th>Publication / Release period</th>
-                    <th>
+                    <th className="dfe-white-space--nowrap">
                       Status <ScheduledStatusGuidanceModal />
                     </th>
-                    <th className="govuk-!-width-one-quarter">
+                    <th className="govuk-!-width-one-quarter dfe-white-space--nowrap">
                       Stages checklist <ScheduledStagesGuidanceModal />
                     </th>
                     <th>Scheduled publish date</th>
