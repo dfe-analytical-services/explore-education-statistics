@@ -16,9 +16,15 @@ interface Props {
   sectionExample?: string;
   change?: () => void;
   change2?: () => void;
+  change3?: () => void;
 }
 
-const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
+const ExampleSection = ({
+  sectionExample,
+  change,
+  change2,
+  change3,
+}: Props) => {
   const [showHelp1, setShowHelp1] = useToggle(false);
   const [showHelp2, setShowHelp2] = useToggle(false);
   const [showHelp3, setShowHelp3] = useToggle(false);
@@ -635,8 +641,10 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
 
           <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-top-0">
             <div>
-              <p className="govuk-body-s govuk-!-margin-bottom-6">
-                Published 16 October 2023, last updated 31 October 2023,{' '}
+              <p className="govuk-body-s govuk-!-margin-bottom-3">
+                Published 16 October 2023, next release 10 October 2024
+                <br />
+                Last updated 31 October 2023,{' '}
                 <a
                   href="#viewUpdates"
                   onClick={() => change && change()}
@@ -656,12 +664,7 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
                 National statistics{' '}
                 <InfoIcon description="What are national statistics?" />
               </a>{' '} */}
-              <p
-                className={classNames(
-                  styles.prototypeConstrainWidth,
-                  'govuk-!-margin-top-4',
-                )}
-              >
+              <p className={classNames(styles.prototypeConstrainWidth)}>
                 Apprenticeship and traineeship starts, achievements and
                 participation. Includes breakdowns by age, sex, ethnicity,
                 subject, provider, geography etc.
@@ -675,9 +678,7 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
               <a
                 href="#"
                 aria-label="What are national statistics?"
-                onClick={() => {
-                  toggleReleaseTypeModal(true);
-                }}
+                onClick={() => change3 && change3()}
               >
                 <img
                   src="/assets/images/UKSA-quality-mark.jpg"
@@ -2062,6 +2063,18 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
           <h2 id="about" className="govuk-!-margin-top-9">
             About these statistics
           </h2>
+          <h3>November 2023 release</h3>
+          <p>
+            This release shows full-year data on apprenticeships and
+            traineeships in England for the 2022/23 academic year covering the
+            period August 2022 to July 2023 (based on data returned by providers
+            in October 2023).
+          </p>
+          <p>
+            This update also includes the latest available apprenticeship
+            service data (as of 30 October 2023) and Find an apprenticeship data
+            (to October 2023).
+          </p>
           <p>
             This statistical release presents provisional information on all age
             (16+) apprenticeships starts, achievements and participation in
@@ -2089,7 +2102,35 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
             apprenticeships and traineeships published here in its headline
             figures.
           </p>
-          <h4>Individualised Learner Record (ILR) administrative data</h4>
+
+          <h3>Changes to the structure of the release</h3>
+          <p>
+            In January we changed the structure of the release to improve user
+            access to content and to allow for easier maintenance
+            <strong>
+              . The same amount of data is still being published on a quarterly
+              basis.&nbsp;
+            </strong>
+            If you wish to provide feedback on these changes please contact us
+            at{' '}
+            <a href="mailto:FE.OFFICIALSTATISTICS@education.gov.uk">
+              FE.OFFICIALSTATISTICS@education.gov.uk
+            </a>
+            .
+          </p>
+          <p>
+            As announced in November 2022 we are changing the content of the
+            monthly updates in between the quarterly updates.&nbsp;Specifically,
+            this includes February, April, May, June, August, September and
+            October.
+          </p>
+          <p>
+            All other data previously published monthly, such as that covering
+            the apprenticeship service and find an apprenticeship, will be
+            updated in the quarterly releases (January, March, July, and
+            November).
+          </p>
+          <h3>Individualised Learner Record (ILR) administrative data</h3>
           <p>
             The apprenticeship data in this release published in July 2023 are
             based on the tenth ILR data return from FE and apprenticeship
@@ -2100,7 +2141,7 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
             operational use in order to fund training providers for learners in
             FE and on apprenticeship programmes.
           </p>
-          <h4>National achievement rate tables data</h4>
+          <h3>National achievement rate tables data</h3>
           <p>
             Figures in the ‘national achievement rate tables’ section are as
             published in March 2023. These official statistics cover achievement
@@ -2108,9 +2149,9 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
             have been previously released as part of the standalone National
             achievement rate tables publication.
           </p>
-          <h4>
+          <h3>
             <strong>Provider reporting during the COVID-19 pandemic</strong>
-          </h4>
+          </h3>
           <p>
             Historic data in this publication covers periods affected by varying
             COVID-19 restrictions, which will have impacted on apprenticeship
@@ -2474,7 +2515,9 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
           <h2 className="govuk-heading-l" id="help">
             Help and support
           </h2>
-          <h3 className="govuk-heading-m">Methodology</h3>
+          <h3 className="govuk-heading-m" id="methodology">
+            Methodology
+          </h3>
           <p>
             Find out how and why we collect, process and publish these
             statistics.
@@ -2488,7 +2531,7 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
             </a>
           </p>
 
-          <h3 id="contact-us">Contact us</h3>
+          <h3 id="contactUs">Contact us</h3>
           <p>
             If you have a specific enquiry about Apprenticeships and
             traineeships statistics and data:
@@ -2532,10 +2575,19 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
             <tbody>
               <tr>
                 <td>
-                  <a href="#" className="govuk-!-margin-right-3">
-                    Academic year 2022/23
-                  </a>{' '}
-                  <span className="govuk-tag">Latest</span>
+                  Academic year 2023/24
+                  <span className="govuk-tag govuk-tag--grey govuk-!-margin-left-3">
+                    Next release
+                  </span>
+                </td>
+                <td>10 October 2024</td>
+              </tr>
+              <tr>
+                <td>
+                  <a href="#">Academic year 2022/23</a>{' '}
+                  <span className="govuk-tag govuk-!-margin-left-3">
+                    Latest data
+                  </span>
                 </td>
                 <td>16 October 2023</td>
               </tr>
@@ -2813,7 +2865,9 @@ const ExampleSection = ({ sectionExample, change, change2 }: Props) => {
       {sectionExample === 'preRelease' && (
         <>
           <hr className={styles.prototypeSectionBreak} />
-          <h2 className="govuk-!-margin-top-9">Pre-release access list</h2>
+          <h2 className="govuk-!-margin-top-9" id="preRelease">
+            Pre-release access list
+          </h2>
           <p>Published 16 October 2023</p>
           <p>
             In the 12 October update to this release (Apprenticeships and

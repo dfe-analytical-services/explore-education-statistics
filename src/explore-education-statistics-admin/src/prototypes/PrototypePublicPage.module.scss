@@ -699,7 +699,7 @@ html {
       linear-gradient(transparent, transparent) 50% 50%;
     background-repeat: no-repeat;
     margin-right: 0.5rem;
-    transform: rotate(90deg);
+    // transform: rotate(90deg);
 
     @include govuk-media-query($until: tablet) {
       background-size: 16px;
@@ -728,6 +728,22 @@ html {
     height: 27px;
     background:
       (url('images/download-link-arrow.svg')),
+      linear-gradient(transparent, transparent) 50% 50%;
+    transform: rotate(0deg);
+
+    @include govuk-media-query($until: tablet) {
+      width: 16px;
+      height: 16px;
+    }
+  }
+}
+
+.prototypeNotifyLink {
+  &:before {
+    width: 27px;
+    height: 27px;
+    background:
+      (url('images/notify-link-noBg.svg')),
       linear-gradient(transparent, transparent) 50% 50%;
     transform: rotate(0deg);
 

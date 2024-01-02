@@ -50,7 +50,6 @@ const PrototypeReleaseData = () => {
   }
 
   function viewGuidance() {
-    alert('hello');
     setShowMainRelease(false);
     setShowMethodologies(false);
     setShowData(false);
@@ -60,6 +59,18 @@ const PrototypeReleaseData = () => {
     setShowAllUpdates(false);
     setShowHelp(false);
     setShowNationalStats(false);
+  }
+
+  function viewNationalStats() {
+    setShowMainRelease(false);
+    setShowMethodologies(false);
+    setShowData(false);
+    setShowGuidance(false);
+    setShowPreRelease(false);
+    setShowOtherReleases(false);
+    setShowAllUpdates(false);
+    setShowHelp(false);
+    setShowNationalStats(true);
   }
 
   const headerRef = useRef(null);
@@ -176,7 +187,7 @@ const PrototypeReleaseData = () => {
             /* eslint-disable-next-line */
             change={viewUpdates}
             /* eslint-disable-next-line */
-            change2={viewGuidance}
+            change3={viewNationalStats}
           />
           <div className="govuk-!-margin-top-3">
             <nav className="govuk-!-margin-bottom-0" aria-label="Useful links">
@@ -403,7 +414,12 @@ const PrototypeReleaseData = () => {
                   </div>
                 </li>
                 <li>
-                  <div className={styles.prototypeActionLink}>
+                  <div
+                    className={classNames(
+                      styles.prototypeActionLink,
+                      styles.prototypeNotifyLink,
+                    )}
+                  >
                     <span className={styles.prototypeActionLinkWrapper}>
                       <a href="#" className="govuk-link--no-visited-state">
                         Sign up for email alerts
@@ -506,6 +522,67 @@ const PrototypeReleaseData = () => {
                                 href="#viewUpdates"
                               >
                                 Updates to this release
+                              </a>
+                            </li>
+                          </ul>
+                        </nav>
+                      </>
+                    )}
+                    {showHelp && (
+                      <>
+                        <h2 className="govuk-body govuk-!-margin-top-6">
+                          On this page
+                        </h2>
+                        <nav
+                          style={{ border: 'none' }}
+                          aria-label="Page contents"
+                        >
+                          <ul
+                            role="navigation"
+                            className={classNames(
+                              'govuk-list',
+                              'govuk-list--spaced',
+                              styles.prototypeInPageNavSpacing,
+                              {
+                                [styles.prototypeMobileContents]: isMobileMedia,
+                              },
+                            )}
+                            id="releaseContents"
+                          >
+                            <li>
+                              <a
+                                className={classNames(
+                                  'govuk-link--no-visited-state',
+                                  styles.prototypeLinkNoUnderline,
+                                  'govuk-body-s',
+                                )}
+                                href="#methodology"
+                              >
+                                Methodology
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className={classNames(
+                                  'govuk-link--no-visited-state',
+                                  styles.prototypeLinkNoUnderline,
+                                  'govuk-body-s',
+                                )}
+                                href="#contactUs"
+                              >
+                                Contact us
+                              </a>
+                            </li>
+                            <li>
+                              <a
+                                className={classNames(
+                                  'govuk-link--no-visited-state',
+                                  styles.prototypeLinkNoUnderline,
+                                  'govuk-body-s',
+                                )}
+                                href="#preRelease"
+                              >
+                                Pre-release access list
                               </a>
                             </li>
                           </ul>
@@ -978,7 +1055,10 @@ const PrototypeReleaseData = () => {
                 <PrototypeSectionExamples sectionExample="methodologies" />
               )}
               {showData && (
-                <PrototypeSectionExamples sectionExample="explore2" />
+                <PrototypeSectionExamples
+                  sectionExample="explore2" /* eslint-disable-next-line */
+                  change2={viewGuidance}
+                />
               )}
               {showGuidance && (
                 <PrototypeSectionExamples sectionExample="guidance" />
