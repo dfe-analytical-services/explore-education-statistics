@@ -27,8 +27,19 @@ public interface IPublicationService
 
     public enum PublicationsSortBy
     {
+        /// <summary>
+        /// The published date of the latest published release version by time series associated with the publication.
+        /// </summary>
         Published,
+
+        /// <summary>
+        /// The relevance of the publication to the search term. This option is only applicable when a search term is provided.
+        /// </summary>
         Relevance,
+
+        /// <summary>
+        /// The title of the publication.
+        /// </summary>
         Title
     }
 }

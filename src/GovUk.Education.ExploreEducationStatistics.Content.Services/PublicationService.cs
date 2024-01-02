@@ -90,7 +90,7 @@ public class PublicationService : IPublicationService
         int pageSize = 10)
     {
         sort ??= search == null ? Title : Relevance;
-        order ??= order ?? (sort == Title ? Asc : Desc);
+        order ??= sort == Title ? Asc : Desc;
 
         // Publications must have a published release and not be superseded
         var baseQueryable = _contentDbContext.Publications
@@ -121,21 +121,21 @@ public class PublicationService : IPublicationService
         {
             Published =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Publication.LatestPublishedRelease!.Published)
-                    : queryable.OrderByDescending(p => p.Publication.LatestPublishedRelease!.Published),
+                    ? queryable.OrderBy(result => result.Publication.LatestPublishedRelease!.Published)
+                    : queryable.OrderByDescending(result => result.Publication.LatestPublishedRelease!.Published),
             Relevance =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Rank)
-                    : queryable.OrderByDescending(p => p.Rank),
+                    ? queryable.OrderBy(result => result.Rank)
+                    : queryable.OrderByDescending(result => result.Rank),
             Title =>
                 order == Asc
-                    ? queryable.OrderBy(p => p.Publication.Title)
-                    : queryable.OrderByDescending(p => p.Publication.Title),
+                    ? queryable.OrderBy(result => result.Publication.Title)
+                    : queryable.OrderByDescending(result => result.Publication.Title),
             _ => throw new ArgumentOutOfRangeException(nameof(sort), sort, message: null)
         };
 
         // Then sort by publication id to provide a stable sort order
-        orderedQueryable = orderedQueryable.ThenBy(p => p.Publication.Id);
+        orderedQueryable = orderedQueryable.ThenBy(result => result.Publication.Id);
 
         // Get the total results count for the paginated response
         var totalResults = await orderedQueryable.CountAsync();
@@ -144,17 +144,17 @@ public class PublicationService : IPublicationService
         var results = await orderedQueryable
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .Select(tuple =>
+            .Select(result =>
                 new PublicationSearchResultViewModel
                 {
-                    Id = tuple.Publication.Id,
-                    Slug = tuple.Publication.Slug,
-                    Summary = tuple.Publication.Summary,
-                    Title = tuple.Publication.Title,
-                    Theme = tuple.Publication.Topic.Theme.Title,
-                    Published = tuple.Publication.LatestPublishedRelease!.Published!.Value,
-                    Type = tuple.Publication.LatestPublishedRelease!.Type,
-                    Rank = tuple.Rank
+                    Id = result.Publication.Id,
+                    Slug = result.Publication.Slug,
+                    Summary = result.Publication.Summary,
+                    Title = result.Publication.Title,
+                    Theme = result.Publication.Topic.Theme.Title,
+                    Published = result.Publication.LatestPublishedRelease!.Published!.Value,
+                    Type = result.Publication.LatestPublishedRelease!.Type,
+                    Rank = result.Rank
                 }).ToListAsync();
 
         return new PaginatedListViewModel<PublicationSearchResultViewModel>(results, totalResults, page, pageSize);
