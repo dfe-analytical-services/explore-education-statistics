@@ -143,15 +143,9 @@ describe('LegacyReleaseForm', () => {
         />,
       );
 
-      expect(screen.getByLabelText('Description')).toHaveAttribute(
-        'value',
-        'Test',
-      );
-      expect(screen.getByLabelText('URL')).toHaveAttribute(
-        'value',
-        'http://test.com',
-      );
-      expect(screen.getByLabelText('Order')).toHaveAttribute('value', '1');
+      expect(screen.getByLabelText('Description')).toHaveValue('Test');
+      expect(screen.getByLabelText('URL')).toHaveValue('http://test.com');
+      expect(screen.getByLabelText('Order')).toHaveValue(1);
     });
 
     test('cannot submit with invalid values', async () => {

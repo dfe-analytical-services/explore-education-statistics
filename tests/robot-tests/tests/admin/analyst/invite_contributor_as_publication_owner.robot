@@ -38,7 +38,7 @@ Validate Invite new users page
 
     user clicks link    Invite new contributors
 
-    user waits until page contains element    id:email
+    user waits until page contains element    id:inviteContributorForm-email
     user checks checkbox is checked    Academic year 2002/03
     user checks checkbox is checked    Academic year 2001/02
     user checks checkbox is checked    Academic year 2000/01
@@ -82,7 +82,7 @@ Validate Select release dropdown
 Invite existing user analyst2 to be a contributor for 2002/03 release
     user clicks link    Invite new contributors
     user waits until page contains    Invite a user to edit this publication
-    user enters text into element    id:email    EES-test.ANALYST2@education.gov.uk
+    user enters text into element    id:inviteContributorForm-email    EES-test.ANALYST2@education.gov.uk
 
     user checks checkbox is checked    Academic year 2002/03
     user checks checkbox is checked    Academic year 2001/02
@@ -154,7 +154,7 @@ Validate contributors for 2000/01 release
 Invite brand new user
     user clicks link    Invite new contributors
     user waits until page contains    Invite a user to edit this publication
-    user enters text into element    id:email    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
+    user enters text into element    id:inviteContributorForm-email    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
 
     user clicks button    Invite user
     user waits until page contains    Update release access
