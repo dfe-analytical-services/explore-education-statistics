@@ -1,12 +1,13 @@
-using Bogus;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 internal class ContentApiClientMock : IContentApiClient
 {
-    private readonly Faker faker = new();
+    private readonly DataFixture DataFixture = new();
 
     public async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
     {
@@ -52,16 +53,11 @@ internal class ContentApiClientMock : IContentApiClient
 
     private PublicationSearchResultViewModel CreatePublication(Guid guid)
     {
-        return new PublicationSearchResultViewModel
-        {
-            Id = guid,
-            Title = faker.Random.String(),
-            Slug = faker.Random.String(),
-            Summary = faker.Random.String(),
-            Theme = faker.Random.String(),
-            Published = faker.Date.Past(),
-            Type = Content.Model.ReleaseType.OfficialStatistics
-        };
+        return DataFixture
+            .Generator<PublicationSearchResultViewModel>()
+            .WithDefaults()
+            .WithPublicationId(guid)
+            .Generate();
     }
 
     private static async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> EmptyResult(int page, int pageSize)

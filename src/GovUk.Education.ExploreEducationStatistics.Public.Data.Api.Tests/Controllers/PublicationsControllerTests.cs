@@ -86,7 +86,8 @@ public class PublicationsControllerTests : IntegrationTestFixture
     private DataSet GeneratePublishedDataSet()
     {
         return DataFixture
-            .DefaultDataSet()
+            .Generator<DataSet>()
+            .WithDefaults()
             .WithStatus(DataSetStatus.Published)
             .Generate();
     }
@@ -101,7 +102,8 @@ public class PublicationsControllerTests : IntegrationTestFixture
     private DataSet GenerateUnublishedDataSet()
     {
         return DataFixture
-            .DefaultDataSet()
+            .Generator<DataSet>()
+            .WithDefaults()
             .WithStatus(DataSetStatus.Unpublished)
             .Generate();
     }
