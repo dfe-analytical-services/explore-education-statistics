@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1680,6 +1680,96 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(publicationB.Id, results[1].Id);
                 Assert.Equal("Theme 1 title", results[1].Theme);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_FilterByPublicationIds()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                LatestPublishedRelease = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                LatestPublishedRelease = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                LatestPublishedRelease = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var publicationD = new Publication
+            {
+                Title = "Publication D",
+                LatestPublishedRelease = new Release
+                {
+                    Type = NationalStatistics,
+                    Published = DateTime.UtcNow
+                }
+            };
+
+            var themes = new List<Theme>
+            {
+                new()
+                {
+                    Title = "Theme 1 title",
+                    Topics = new List<Topic>
+                    {
+                        new()
+                        {
+                            Publications = new List<Publication>
+                            {
+                                publicationA,
+                                publicationB,
+                                publicationC,
+                                publicationD
+                            }
+                        }
+                    },
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Themes.AddRangeAsync(themes);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var requestedPublicationIds = ListOf(publicationA.Id, publicationB.Id);
+
+                var pagedResult = (await service.ListPublications(
+                    publicationIds: requestedPublicationIds
+                )).AssertRight();
+                var results = pagedResult.Results;
+
+                Assert.Equal(2, results.Count);
+
+                Assert.Equal(publicationA.Id, results[0].Id);
+
+                Assert.Equal(publicationB.Id, results[1].Id);
             }
         }
 
