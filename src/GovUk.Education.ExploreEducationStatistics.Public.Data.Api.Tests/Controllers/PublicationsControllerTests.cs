@@ -1,4 +1,3 @@
-using FluentAssertions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
@@ -39,14 +38,14 @@ public class PublicationsControllerTests : IntegrationTestFixture
 
         var response = await ListPublications(page, pageSize);
 
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var content = await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationListViewModel>>();
 
-        content.Should().NotBeNull();
-        content!.Paging.Page.Should().Be(page);
-        content.Paging.PageSize.Should().Be(pageSize);
-        content.Paging.TotalResults.Should().Be(numberOfPublishedDataSets);
+        Assert.NotNull(content);
+        Assert.Equal(page, content!.Paging.Page);
+        Assert.Equal(pageSize, content!.Paging.PageSize);
+        Assert.Equal(numberOfPublishedDataSets, content!.Paging.TotalResults);
 
         var publishedDataSetPublicationIdsToBeReturned = allDataSets
             .Where(ds => ds.Status == DataSetStatus.Published)
@@ -54,7 +53,7 @@ public class PublicationsControllerTests : IntegrationTestFixture
             .Skip((page - 1) * pageSize)
             .Take(pageSize);
 
-        content.Results.Should().HaveCount(publishedDataSetPublicationIdsToBeReturned.Count());
+        Assert.Equal(publishedDataSetPublicationIdsToBeReturned.Count(), content.Results.Count);
 
         var publicationIdsThatShouldNotHaveBeenReturned = allDataSets
             .Select(ds => ds.PublicationId)
@@ -62,12 +61,12 @@ public class PublicationsControllerTests : IntegrationTestFixture
 
         foreach (var publicationId in publishedDataSetPublicationIdsToBeReturned)
         {
-            content.Results.Should().Contain(r => r.Id == publicationId);
+            Assert.Contains(content.Results, r => r.Id == publicationId);
         }
 
         foreach (var publicationId in publicationIdsThatShouldNotHaveBeenReturned)
         {
-            content.Results.Should().NotContain(r => r.Id == publicationId);
+            Assert.DoesNotContain(content.Results, r => r.Id == publicationId);
         }
     }
 
