@@ -23,7 +23,7 @@ const getDimensions = (e: any) => {
 
 const PrototypeReleaseData = () => {
   const { isMedia: isMobileMedia } = useMobileMedia();
-  const [showContents, setShowContents] = useState(isMobileMedia);
+  const [showContents, setShowContents] = useState(true);
   const [navSelected, setNavSelected] = useState('none');
   const [showMainRelease, setShowMainRelease] = useState(true);
   const [showMethodologies, setShowMethodologies] = useState(false);
@@ -94,7 +94,7 @@ const PrototypeReleaseData = () => {
   let section = '';
 
   if (urlSection === 'main') {
-    window.location.replace('/prototypes/release-nav8');
+    window.location.replace('/prototypes/release-nav9');
   }
 
   if (showMainRelease) {
@@ -172,7 +172,7 @@ const PrototypeReleaseData = () => {
           },
           {
             name: 'Apprenticeships and traineeships',
-            link: '/prototypes/release-nav8?section=main',
+            link: '/prototypes/release-nav9?section=main',
           },
           {
             name: section,
@@ -204,33 +204,26 @@ const PrototypeReleaseData = () => {
                     })}
                   >
                     <span className={styles.prototypeActionLinkWrapper}>
-                      {showMainRelease ? (
-                        <strong>Main release contents</strong>
-                      ) : (
-                        <a
-                          href="#"
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            {
-                              'govuk-link--no-underline': showMainRelease,
-                            },
-                          )}
-                          onClick={e => {
-                            e.preventDefault();
-                            setShowMainRelease(true);
-                            setShowMethodologies(false);
-                            setShowGuidance(false);
-                            setShowData(false);
-                            setShowPreRelease(false);
-                            setShowOtherReleases(false);
-                            setShowAllUpdates(false);
-                            setShowHelp(false);
-                            setShowNationalStats(false);
-                          }}
-                        >
-                          Main release contents
-                        </a>
-                      )}
+                      <a
+                        href="#"
+                        className={classNames('govuk-link--no-visited-state', {
+                          'govuk-link--no-underline': showMainRelease,
+                        })}
+                        onClick={e => {
+                          e.preventDefault();
+                          setShowMainRelease(true);
+                          setShowMethodologies(false);
+                          setShowGuidance(false);
+                          setShowData(false);
+                          setShowPreRelease(false);
+                          setShowOtherReleases(false);
+                          setShowAllUpdates(false);
+                          setShowHelp(false);
+                          setShowNationalStats(false);
+                        }}
+                      >
+                        Main content page
+                      </a>
                     </span>
                   </div>
                 </li>
@@ -241,33 +234,26 @@ const PrototypeReleaseData = () => {
                     })}
                   >
                     <span className={styles.prototypeActionLinkWrapper}>
-                      {showData ? (
-                        <strong>Explore data and create tables</strong>
-                      ) : (
-                        <a
-                          href="#"
-                          className={classNames(
-                            'govuk-link--no-visited-state',
-                            {
-                              'govuk-link--no-underline': showData,
-                            },
-                          )}
-                          onClick={e => {
-                            e.preventDefault();
-                            setShowMainRelease(false);
-                            setShowMethodologies(false);
-                            setShowGuidance(false);
-                            setShowData(true);
-                            setShowPreRelease(false);
-                            setShowOtherReleases(false);
-                            setShowAllUpdates(false);
-                            setShowHelp(false);
-                            setShowNationalStats(false);
-                          }}
-                        >
-                          Explore data and create tables
-                        </a>
-                      )}
+                      <a
+                        href="#"
+                        className={classNames('govuk-link--no-visited-state', {
+                          'govuk-link--no-underline': showData,
+                        })}
+                        onClick={e => {
+                          e.preventDefault();
+                          setShowMainRelease(false);
+                          setShowMethodologies(false);
+                          setShowGuidance(false);
+                          setShowData(true);
+                          setShowPreRelease(false);
+                          setShowOtherReleases(false);
+                          setShowAllUpdates(false);
+                          setShowHelp(false);
+                          setShowNationalStats(false);
+                        }}
+                      >
+                        Explore data and create tables
+                      </a>
                     </span>
                   </div>
                 </li>
@@ -542,11 +528,18 @@ const PrototypeReleaseData = () => {
                           href="#"
                           className="govuk-link--no-visited-state"
                           onClick={() => {
-                            setShowOtherReleases(false);
                             setShowMainRelease(true);
+                            setShowMethodologies(false);
+                            setShowGuidance(false);
+                            setShowData(false);
+                            setShowPreRelease(false);
+                            setShowOtherReleases(false);
+                            setShowAllUpdates(false);
+                            setShowHelp(false);
+                            setShowNationalStats(false);
                           }}
                         >
-                          Back to release
+                          Back to main content
                         </a>
                       </span>
                     </div>
@@ -927,7 +920,7 @@ const PrototypeReleaseData = () => {
                                     setNavSelected('help');
                                   }}
                                 >
-                                  Help and support
+                                  Pre-release access list
                                 </a>
                               </li>
                             </ul>
@@ -1100,11 +1093,11 @@ const PrototypeReleaseData = () => {
                     </>
                   )}
                   <section
-                    id="Help"
+                    id="help"
                     ref={helpRef}
                     aria-label="Help and support"
                   >
-                    <PrototypeSectionExamples sectionExample="help" />
+                    <PrototypeSectionExamples sectionExample="preRelease" />
                   </section>
                 </>
               )}

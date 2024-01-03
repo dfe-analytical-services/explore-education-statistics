@@ -670,15 +670,15 @@ html {
 .prototypeQuickLinks {
   align-items: center;
   display: grid;
-  gap: 1rem;
+  gap: 0.5rem;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
   max-width: 100% !important;
 
-  @include govuk-media-query($until: tablet) {
+  /*@include govuk-media-query($until: tablet) {
     gap: 1rem 0.5rem;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     font-size: 14px;
-  }
+  }*/
 }
 
 .prototypeHeaderHr {

@@ -642,7 +642,7 @@ const ExampleSection = ({
           <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-top-0">
             <div>
               <p className="govuk-body-s govuk-!-margin-bottom-3">
-                Published 16 October 2023, next release 10 October 2024
+                Published 16 October 2023, next update October 2024
                 <br />
                 Last updated 31 October 2023,{' '}
                 <a
@@ -2569,7 +2569,7 @@ const ExampleSection = ({
             <thead>
               <tr>
                 <th style={{ width: '60%' }}>Release period</th>
-                <th style={{ width: '40%' }}>Published date</th>
+                <th style={{ width: '40%' }}>Publish date</th>
               </tr>
             </thead>
             <tbody>
@@ -2577,10 +2577,10 @@ const ExampleSection = ({
                 <td>
                   Academic year 2023/24
                   <span className="govuk-tag govuk-tag--grey govuk-!-margin-left-3">
-                    Next release
+                    Next update
                   </span>
                 </td>
-                <td>10 October 2024</td>
+                <td>October 2024</td>
               </tr>
               <tr>
                 <td>
