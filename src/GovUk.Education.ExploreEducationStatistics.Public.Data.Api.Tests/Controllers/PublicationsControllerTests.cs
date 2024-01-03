@@ -1,11 +1,15 @@
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Net;
 using System.Net.Http.Json;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Controllers;
 
@@ -29,6 +33,8 @@ public class PublicationsControllerTests : IntegrationTestFixture
         int numberOfPublishedDataSets,
         int numberOfUnpublishedDataSets)
     {
+        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+
         var publishedDataSets = GeneratePublishedDataSets(numberOfPublishedDataSets);
         var unpublishedDataSets = GenerateUnublishedDataSets(numberOfUnpublishedDataSets);
 
@@ -36,7 +42,7 @@ public class PublicationsControllerTests : IntegrationTestFixture
 
         await AddTestDataSets(allDataSets.ToArray());
 
-        var response = await ListPublications(page, pageSize);
+        var response = await ListPublications(client, page, pageSize);
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
@@ -115,7 +121,7 @@ public class PublicationsControllerTests : IntegrationTestFixture
         await TestApp.AddTestData<PublicDataDbContext>(supplier);
     }
 
-    private async Task<HttpResponseMessage> ListPublications(int page, int pageSize)
+    private async Task<HttpResponseMessage> ListPublications(HttpClient client, int page, int pageSize)
     {
         var query = new Dictionary<string, string?>
         {
@@ -126,7 +132,17 @@ public class PublicationsControllerTests : IntegrationTestFixture
 
         var uri = QueryHelpers.AddQueryString(_baseUrl, query);
 
-        return await TestAppClient.GetAsync(uri);
+        return await client.GetAsync(uri);
+    }
+
+    private WebApplicationFactory<Startup> SetupApp(IContentApiClient? contentApiClient = null)
+    {
+        return TestApp.ConfigureServices(
+            services =>
+            {
+                services.ReplaceService(contentApiClient);
+            }
+        );
     }
 
     private const string _baseUrl = "api/v1/publications";

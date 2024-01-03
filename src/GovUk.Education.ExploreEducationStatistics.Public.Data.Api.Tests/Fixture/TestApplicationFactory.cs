@@ -73,8 +73,6 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
 
                 services.AddDbContext<PublicDataDbContext>(
                     options => options.UseNpgsql(_postgreSqlContainer.GetConnectionString()));
-
-                services.ReplaceService<IContentApiClient>(new ContentApiClientMock());
             });
     }
 }
