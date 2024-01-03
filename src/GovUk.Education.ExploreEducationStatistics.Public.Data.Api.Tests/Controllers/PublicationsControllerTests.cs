@@ -76,6 +76,49 @@ public class PublicationsControllerTests : IntegrationTestFixture
         }
     }
 
+    [Fact]
+    public async Task ListPublications_NoPublishedDataSets_Returns200WithEmptyList()
+    {
+        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+
+        var response = await ListPublications(client, 1, 1);
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var content = await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationListViewModel>>();
+
+        Assert.NotNull(content);
+        Assert.Equal(1, content!.Paging.Page);
+        Assert.Equal(1, content!.Paging.PageSize);
+        Assert.Equal(0, content!.Paging.TotalResults);
+        Assert.Empty(content!.Results);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    public async Task ListPublications_RequestedPageIsTooSmall_Returns400(int page)
+    {
+        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+
+        var response = await ListPublications(client, page, 1);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(41)]
+    public async Task ListPublications_RequestedPageSizeIsOutOfAcceptableRange_Returns400(int pageSize)
+    {
+        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+
+        var response = await ListPublications(client, 1, pageSize);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     private IReadOnlyList<DataSet> GeneratePublishedDataSets(int numberToGenerate)
     {
         return Enumerable.Range(0, numberToGenerate)
