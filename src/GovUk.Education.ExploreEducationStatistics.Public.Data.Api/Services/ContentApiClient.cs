@@ -1,7 +1,10 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
@@ -14,7 +17,7 @@ internal class ContentApiClient : IContentApiClient
         httpClient=HttpClient;
     }
 
-    public async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
+    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
     {
         var request = new PublicationsListPostRequest(
             Search: search,
@@ -24,8 +27,19 @@ internal class ContentApiClient : IContentApiClient
 
         var response = await httpClient.PostAsJsonAsync("api/publications", request);
 
-        response.EnsureSuccessStatusCode();
+        if (response.IsSuccessStatusCode)
+        {
+            return new Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>(await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>());
+        }
 
-        return await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>();
+        switch (response.StatusCode)
+        {
+            case HttpStatusCode.BadRequest:
+                return new BadRequestResult();
+            case HttpStatusCode.NotFound:
+                return new NotFoundResult();
+            default:
+                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
+        }
     }
 }
