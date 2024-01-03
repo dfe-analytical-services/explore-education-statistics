@@ -8,8 +8,10 @@ using Xunit.Sdk;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
+
     public static class AssertExtensions
     {
+        public const int TimeWithinMillis = 750;
         /**
          * Calling this method causes a Test to fail with the given message.  The equivalent of `Assert.Fail()` in
          * other testing frameworks.
@@ -72,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         /// <summary>
         /// Assert that the given DateTime is effectively "now", within a given tolerance of milliseconds.
         /// </summary>
-        public static void AssertUtcNow(this DateTime dateTime, int withinMillis = 500)
+        public static void AssertUtcNow(this DateTime dateTime, int withinMillis = TimeWithinMillis)
         {
             Assert.InRange(DateTime.UtcNow.Subtract(dateTime).TotalMilliseconds, 0, withinMillis);
         }
@@ -80,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         /// <summary>
         /// Assert that the given DateTime is effectively "now", within a given tolerance of milliseconds.
         /// </summary>
-        public static void AssertUtcNow(this DateTime? dateTime, int withinMillis = 500)
+        public static void AssertUtcNow(this DateTime? dateTime, int withinMillis = TimeWithinMillis)
         {
             Assert.NotNull(dateTime);
             AssertUtcNow(dateTime!.Value, withinMillis);

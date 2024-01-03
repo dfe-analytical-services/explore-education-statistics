@@ -238,6 +238,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     await _contentBlockService.DeleteContentBlockAndReorder(blockToRemove.Id);
 
                     _context.ContentSections.Update(section);
+
+                    var comments = _context.Comment
+                        .Where(c => c.ContentBlockId == blockToRemove.Id);
+                    _context.RemoveRange(comments);
+
                     await _context.SaveChangesAsync();
                     return OrderedContentBlocks(section);
                 });

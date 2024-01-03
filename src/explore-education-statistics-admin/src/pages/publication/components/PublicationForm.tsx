@@ -25,7 +25,12 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'title',
     messages: {
-      SlugNotUnique: 'Choose a unique title',
+      PublicationSlugNotUnique: 'Choose a unique title',
+      PublicationSlugUsedByRedirect: 'Choose a previously unused title',
+      MethodologySlugNotUnique:
+        'This title also changes the methodology title to one used by an existing methodology. Choose a unique methodology title',
+      MethodologySlugUsedByRedirect:
+        'This title also changes the methodology title to one that has been live previously. Choose a unique methodology title',
     },
   }),
 ];

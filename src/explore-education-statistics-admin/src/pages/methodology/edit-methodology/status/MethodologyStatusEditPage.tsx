@@ -1,26 +1,20 @@
 import methodologyService, {
   MethodologyVersion,
-  MethodologyApprovalStatus,
 } from '@admin/services/methodologyService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import MethodologyStatusForm from '@admin/pages/methodology/edit-methodology/status/components/MethodologyStatusForm';
+import MethodologyStatusForm, {
+  MethodologyStatusFormValues,
+} from '@admin/pages/methodology/edit-methodology/status/components/MethodologyStatusForm';
 import React from 'react';
 import { MethodologyStatusPermissions } from '@admin/services/permissionService';
-
-interface FormValues {
-  status: MethodologyApprovalStatus;
-  latestInternalReleaseNote: string;
-  publishingStrategy?: 'WithRelease' | 'Immediately';
-  withReleaseId?: string;
-}
 
 interface Props {
   methodology: MethodologyVersion;
   statusPermissions?: MethodologyStatusPermissions;
   onCancel: () => void;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: MethodologyStatusFormValues) => void;
 }
 
 const MethodologyStatusEditPage = ({
