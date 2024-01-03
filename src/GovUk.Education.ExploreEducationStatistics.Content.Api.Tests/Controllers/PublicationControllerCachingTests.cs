@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
 public class PublicationControllerCachingTests : CacheServiceTestFixture
 {
-    private readonly PublicationsListGetRequest _query = new(
+    private readonly PublicationsListGetRequest _getQuery = new(
         ReleaseType.ExperimentalStatistics,
         ThemeId: Guid.Empty,
         Search: "",
@@ -34,6 +34,17 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
         SortOrder.Asc,
         Page: 1,
         PageSize: 10
+    );
+
+    private readonly PublicationsListPostRequest _postQuery = new(
+        ReleaseType.ExperimentalStatistics,
+        ThemeId: Guid.Empty,
+        Search: "",
+        IPublicationService.PublicationsSortBy.Published,
+        SortOrder.Asc,
+        Page: 1,
+        PageSize: 10,
+        PublicationIds: ListOf(Guid.Empty)
     );
 
     private readonly PaginatedListViewModel<PublicationSearchResultViewModel> _publications = new(
@@ -50,13 +61,13 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
         }), 5, 1, 10);
 
     [Fact]
-    public async Task ListPublications_NoCachedEntryExists()
+    public async Task ListPublicationsAsGetRequest_NoCachedEntryExists()
     {
         var publicationService = new Mock<IPublicationService>(Strict);
 
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new GetPublicationListCacheKey(_query),
+                new GetPublicationListCacheKey(_getQuery),
                 typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
             .Returns(null);
 
@@ -65,25 +76,26 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
 
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
-                new GetPublicationListCacheKey(_query),
+                new GetPublicationListCacheKey(_getQuery),
                 _publications,
                 ItIs.DeepEqualTo(expectedCacheConfiguration),
                 null));
 
         publicationService
             .Setup(s => s.ListPublications(
-                _query.ReleaseType,
-                _query.ThemeId,
-                _query.Search,
-                _query.Sort,
-                _query.Order,
-                _query.Page,
-                _query.PageSize))
+                _getQuery.ReleaseType,
+                _getQuery.ThemeId,
+                _getQuery.Search,
+                _getQuery.Sort,
+                _getQuery.Order,
+                _getQuery.Page,
+                _getQuery.PageSize,
+                null))
             .ReturnsAsync(_publications);
 
         var controller = BuildController(publicationService.Object);
 
-        var result = await controller.ListPublications(_query);
+        var result = await controller.ListPublications(_getQuery);
 
         VerifyAllMocks(MemoryCacheService, publicationService);
 
@@ -91,17 +103,77 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
     }
 
     [Fact]
-    public async Task ListPublications_CachedEntryExists()
+    public async Task ListPublicationsAsGetRequest_CachedEntryExists()
     {
         MemoryCacheService
             .Setup(s => s.GetItem(
-                new GetPublicationListCacheKey(_query),
+                new GetPublicationListCacheKey(_getQuery),
                 typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
             .Returns(_publications);
 
         var controller = BuildController();
 
-        var result = await controller.ListPublications(_query);
+        var result = await controller.ListPublications(_getQuery);
+
+        VerifyAllMocks(MemoryCacheService);
+
+        result.AssertOkResult(_publications);
+    }
+
+    [Fact]
+    public async Task ListPublicationsAsPostRequest_NoCachedEntryExists()
+    {
+        var publicationService = new Mock<IPublicationService>(Strict);
+
+        MemoryCacheService
+            .Setup(s => s.GetItem(
+                new PostPublicationListCacheKey(_postQuery),
+                typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
+            .Returns(null);
+
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(
+            10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
+
+        MemoryCacheService
+            .Setup(s => s.SetItem<object>(
+                new PostPublicationListCacheKey(_postQuery),
+                _publications,
+                ItIs.DeepEqualTo(expectedCacheConfiguration),
+                null));
+
+        publicationService
+            .Setup(s => s.ListPublications(
+                _postQuery.ReleaseType,
+                _postQuery.ThemeId,
+                _postQuery.Search,
+                _postQuery.Sort,
+                _postQuery.Order,
+                _postQuery.Page,
+                _postQuery.PageSize,
+                _postQuery.PublicationIds))
+            .ReturnsAsync(_publications);
+
+        var controller = BuildController(publicationService.Object);
+
+        var result = await controller.ListPublications(_postQuery);
+
+        VerifyAllMocks(MemoryCacheService, publicationService);
+
+        result.AssertOkResult(_publications);
+    }
+
+    [Fact]
+    public async Task ListPublicationsAsPostRequest_CachedEntryExists()
+    {
+        MemoryCacheService
+            .Setup(s => s.GetItem(
+                new PostPublicationListCacheKey(_postQuery),
+                typeof(PaginatedListViewModel<PublicationSearchResultViewModel>)))
+            .Returns(_publications);
+
+        var controller = BuildController();
+
+        var result = await controller.ListPublications(_postQuery);
 
         VerifyAllMocks(MemoryCacheService);
 
