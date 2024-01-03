@@ -1,15 +1,17 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 internal class ContentApiClientMock : IContentApiClient
 {
     private readonly DataFixture DataFixture = new();
 
-    public async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
+    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
     {
         if (publicationIds is null)
         {

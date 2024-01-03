@@ -1,4 +1,5 @@
 using Asp.Versioning;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
@@ -15,9 +16,11 @@ public class PublicationsController(IPublicationService PublicationService) : Co
     public async Task<ActionResult<PaginatedListViewModel<PublicationListViewModel>>> ListPublications(
         [FromQuery] PublicationsListRequest request)
     {
-        return await PublicationService.ListPublications(
-            page: request.Page,
-            pageSize: request.PageSize,
-            search: request.Search);
+        return await PublicationService
+            .ListPublications(
+                page: request.Page,
+                pageSize: request.PageSize,
+                search: request.Search)
+            .HandleFailuresOrOk();
     }
 }
