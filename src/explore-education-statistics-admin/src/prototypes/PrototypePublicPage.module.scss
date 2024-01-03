@@ -698,7 +698,7 @@ html {
       (url('images/action-link-arrow.svg')),
       linear-gradient(transparent, transparent) 50% 50%;
     background-repeat: no-repeat;
-    margin-right: 0.5rem;
+    margin-right: 0.3rem;
     // transform: rotate(90deg);
 
     @include govuk-media-query($until: tablet) {
@@ -707,6 +707,15 @@ html {
       width: 16px;
       height: 16px;
     }
+  }
+}
+
+.prototypeActionLinkOn {
+  &:before {
+    background:
+      (url('images/action-link-on.svg')),
+      linear-gradient(transparent, transparent) 50% 50%;
+    transform: rotate(90deg);
   }
 }
 
