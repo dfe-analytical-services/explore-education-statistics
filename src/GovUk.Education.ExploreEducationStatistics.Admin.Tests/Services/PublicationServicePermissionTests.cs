@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -13,8 +14,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Moq;
 using Xunit;
@@ -568,7 +567,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublicationRepository? publicationRepository = null,
             IMethodologyService? methodologyService = null,
             IPublicationCacheService? publicationCacheService = null,
-            IMethodologyCacheService? methodologyCacheService = null)
+            IMethodologyCacheService? methodologyCacheService = null,
+            IRedirectsCacheService? redirectsCacheService = null)
         {
             context ??= Mock.Of<ContentDbContext>();
 
@@ -580,7 +580,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(Strict),
                 publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict),
-                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict));
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict));
         }
     }
 }

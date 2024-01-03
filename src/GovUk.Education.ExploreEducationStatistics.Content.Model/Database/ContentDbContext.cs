@@ -76,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public virtual DbSet<Permalink> Permalinks { get; set; } = null!;
         public virtual DbSet<Contact> Contacts { get; set; }
         public virtual DbSet<Update> Update { get; set; }
+        public virtual DbSet<PublicationRedirect> PublicationRedirects { get; set; }
         public virtual DbSet<MethodologyRedirect> MethodologyRedirects { get; set; }
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
@@ -101,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             ConfigureMethodologyStatus(modelBuilder);
             ConfigureMethodologyFile(modelBuilder);
             ConfigureMethodologyNote(modelBuilder);
-            ConfigureMethodologyRedirects(modelBuilder);
+            ConfigureRedirects(modelBuilder);
             ConfigurePublication(modelBuilder);
             ConfigurePublicationMethodology(modelBuilder);
             ConfigureReleaseStatus(modelBuilder);
@@ -305,13 +306,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .IsRequired(false);
         }
 
-
-        private static void ConfigureMethodologyRedirects(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<MethodologyRedirect>()
-                .HasKey(mr => new { mr.MethodologyVersionId, mr.Slug });
-        }
-
         private static void ConfigurePublication(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Publication>()
@@ -339,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         private static void ConfigurePublicationMethodology(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<PublicationMethodology>()
-                .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});
+                .HasKey(pm => new { pm.PublicationId, pm.MethodologyId });
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasOne(pm => pm.Publication)
@@ -583,6 +577,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Permalink>()
                 .HasIndex(data => data.SubjectId);
+        }
+
+        private static void ConfigureRedirects(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<PublicationRedirect>()
+                .HasKey(pr => new { pr.PublicationId, pr.Slug });
+
+            modelBuilder.Entity<MethodologyRedirect>()
+                .HasKey(mr => new { mr.MethodologyVersionId, mr.Slug });
         }
 
         private static void ConfigureUser(ModelBuilder modelBuilder)

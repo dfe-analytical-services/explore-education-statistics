@@ -23,6 +23,8 @@ export interface DataFileUploadFormValues {
   zipFile: File | null;
 }
 
+const MAX_FILENAME_SIZE = 150;
+
 function baseErrorMappings<FormValues extends DataFileUploadFormValues>(
   values: FormValues,
 ): FieldMessageMapper<FormValues>[] {
@@ -37,6 +39,10 @@ function baseErrorMappings<FormValues extends DataFileUploadFormValues>(
           DataZipFileDoesNotContainCsvFiles:
             'ZIP file does not contain any CSV files',
           DataFilenameNotUnique: 'Choose a unique ZIP data file name',
+          DataZipFilenameTooLong: `Maximum ZIP data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
+          DataFilenameTooLong: `Maximum data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
+          MetaFilenameTooLong: `Maximum metadata filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
+          DataZipContentFilenamesTooLong: `Maximum data and metadata filenames cannot exceed ${MAX_FILENAME_SIZE} characters`,
           DataAndMetadataFilesCannotHaveTheSameName:
             'ZIP data and metadata filenames cannot be the same',
           DataFileCannotBeEmpty: 'Choose a ZIP data file that is not empty',
@@ -64,6 +70,7 @@ function baseErrorMappings<FormValues extends DataFileUploadFormValues>(
         DataFileMustBeCsvFile: 'Data file must be a CSV with UTF-8 encoding',
         DataFilenameCannotContainSpacesOrSpecialCharacters:
           'Data filename cannot contain spaces or special characters',
+        DataFilenameTooLong: `Maximum data filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
       },
     }),
     mapFieldErrors<FormValues>({
@@ -75,6 +82,7 @@ function baseErrorMappings<FormValues extends DataFileUploadFormValues>(
         MetaFilenameCannotContainSpacesOrSpecialCharacters:
           'Metadata filename cannot contain spaces or special characters',
         MetaFileIsIncorrectlyNamed: 'Metadata filename is incorrectly named',
+        MetaFilenameTooLong: `Maximum metadata filename cannot exceed ${MAX_FILENAME_SIZE} characters`,
       },
     }),
   ];
@@ -183,6 +191,7 @@ export default function DataFileUploadForm<
             <FormFieldRadioGroup<DataFileUploadFormValues>
               name="uploadType"
               legend="Choose upload method"
+              hint={`Filenames must be under ${MAX_FILENAME_SIZE} characters in length`}
               options={[
                 {
                   label: 'CSV files',
