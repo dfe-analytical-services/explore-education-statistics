@@ -13,16 +13,23 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interf
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.OpenApi.Models;
 using Npgsql;
 using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
 [ExcludeFromCodeCoverage]
-public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+public class Startup
 {
+    private readonly IConfiguration configuration;
+    private readonly IHostEnvironment hostEnvironment;
+
+    public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+    {
+        this.configuration=configuration;
+        this.hostEnvironment=hostEnvironment;
+    }
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {

@@ -8,8 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
-internal class PublicationService(PublicDataDbContext publicDataDbContext, IContentApiClient contentApiClient) : IPublicationService
+internal class PublicationService : IPublicationService
 {
+    private readonly PublicDataDbContext publicDataDbContext;
+    private readonly IContentApiClient contentApiClient;
+
+    public PublicationService(PublicDataDbContext publicDataDbContext, IContentApiClient contentApiClient)
+    {
+        this.publicDataDbContext=publicDataDbContext;
+        this.contentApiClient=contentApiClient;
+    }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<PublicationListViewModel>>> ListPublications(int page, int pageSize, string? search = null)
     {
