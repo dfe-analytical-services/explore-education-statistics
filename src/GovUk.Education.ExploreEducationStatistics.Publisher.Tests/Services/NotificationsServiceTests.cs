@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
@@ -116,8 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                             ReleaseSlug = release1.Slug,
                             Amendment = false,
                             UpdateNote = "No update note provided.",
-                            SupersededPublicationIds = new List<Guid>(),
-                            SupersededPublicationTitles = new List<string>(),
+                            SupersededPublications = new List<IdTitleViewModel>(),
                         },
                         new()
                         {
@@ -128,8 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                             ReleaseSlug = amendedRelease1.Slug,
                             Amendment = true,
                             UpdateNote = "latest update note",
-                            SupersededPublicationIds = new List<Guid>(),
-                            SupersededPublicationTitles = new List<string>(),
+                            SupersededPublications = new List<IdTitleViewModel>(),
                         },
                     })), Times.Once);
             }
@@ -198,14 +197,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                             ReleaseSlug = release.Slug,
                             Amendment = false,
                             UpdateNote = "No update note provided.",
-                            SupersededPublicationIds = new List<Guid>
+                            SupersededPublications = new List<IdTitleViewModel>
                             {
-                                supersededPublication.Id,
+                                new()
+                                {
+                                    Id = supersededPublication.Id,
+                                    Title = supersededPublication.Title,
+                                },
                             },
-                            SupersededPublicationTitles = new List<string>
-                            {
-                                supersededPublication.Title,
-                            }
                         },
                     })), Times.Once);
             }

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using Microsoft.Azure.Cosmos.Table;
@@ -29,7 +30,7 @@ public class ReleaseNotifierTests
             .AddInMemoryCollection(new Dictionary<string, string>()
             {
                 { ReleaseEmailTemplateIdName, "release-template-id" },
-                { ReleaseEmailSupersededSubscribersTemplateIdName, "release-superseded-template-id" },
+                { ReleaseSupersededSubscribersEmailTemplateIdName, "release-superseded-template-id" },
                 { ReleaseAmendmentEmailTemplateIdName, "should-not-be-used" },
                 { ReleaseAmendmentSupersededSubscribersEmailTemplateIdName, "should-not-be-used" },
                 { BaseUrlName, "http://base.url/"},
@@ -115,9 +116,15 @@ public class ReleaseNotifierTests
             ReleaseName = "2000",
             ReleaseSlug = "2000",
             Amendment = false,
-            UpdateNote = "Update note",
-            SupersededPublicationIds = new List<Guid>{ supersededPubId },
-            SupersededPublicationTitles = new List<string>{ "Superseded publication" },
+            UpdateNote = string.Empty,
+            SupersededPublications = new List<IdTitleViewModel>
+            {
+                new()
+                {
+                    Id = supersededPubId,
+                    Title = "Superseded publication",
+                },
+            },
         };
         var executionContext = Mock.Of<ExecutionContext>(MockBehavior.Strict);
         var logger = Mock.Of<ILogger>(MockBehavior.Loose);
@@ -132,7 +139,7 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-1",
                         publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note", null)
+                        "2000", "2000", null, null)
                 )), Times.Once);
 
         emailService.Verify(mock =>
@@ -140,7 +147,7 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-2",
                         supersededPubId.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note",
+                        "2000", "2000", null,
                         "Superseded publication")
                 )), Times.Once);
     }
@@ -155,7 +162,7 @@ public class ReleaseNotifierTests
             .AddInMemoryCollection(new Dictionary<string, string>()
             {
                 { ReleaseEmailTemplateIdName, "release-template-id" },
-                { ReleaseEmailSupersededSubscribersTemplateIdName, "release-superseded-template-id" },
+                { ReleaseSupersededSubscribersEmailTemplateIdName, "release-superseded-template-id" },
                 { ReleaseAmendmentEmailTemplateIdName, "should-not-be-used" },
                 { ReleaseAmendmentSupersededSubscribersEmailTemplateIdName, "should-not-be-used" },
                 { BaseUrlName, "http://base.url/"},
@@ -237,9 +244,8 @@ public class ReleaseNotifierTests
             ReleaseName = "2000",
             ReleaseSlug = "2000",
             Amendment = false,
-            UpdateNote = "Update note",
-            SupersededPublicationIds = new List<Guid>(),
-            SupersededPublicationTitles = new List<string>(),
+            UpdateNote = string.Empty,
+            SupersededPublications = new List<IdTitleViewModel>(),
         };
         var executionContext = Mock.Of<ExecutionContext>(MockBehavior.Strict);
         var logger = Mock.Of<ILogger>(MockBehavior.Loose);
@@ -254,21 +260,21 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-1",
                         publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note", null)
+                        "2000", "2000", null, null)
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail(notificationClient, "test2@test.com", "release-template-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-2",
                         publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note", null)
+                        "2000", "2000", null, null)
                 )), Times.Once);
         emailService.Verify(mock =>
             mock.SendEmail(notificationClient, "test3@test.com", "release-template-id",
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-3",
                         publication1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note", null)
+                        "2000", "2000", null, null)
                 )), Times.Once);
     }
 
@@ -282,7 +288,7 @@ public class ReleaseNotifierTests
             .AddInMemoryCollection(new Dictionary<string, string>()
             {
                 { ReleaseEmailTemplateIdName, "release-template-id" },
-                { ReleaseEmailSupersededSubscribersTemplateIdName, "release-superseded-template-id" },
+                { ReleaseSupersededSubscribersEmailTemplateIdName, "release-superseded-template-id" },
                 { ReleaseAmendmentEmailTemplateIdName, "should-not-be-used" },
                 { ReleaseAmendmentSupersededSubscribersEmailTemplateIdName, "should-not-be-used" },
                 { BaseUrlName, "http://base.url/"},
@@ -375,9 +381,15 @@ public class ReleaseNotifierTests
             ReleaseName = "2000",
             ReleaseSlug = "2000",
             Amendment = false,
-            UpdateNote = "Update note",
-            SupersededPublicationIds = new List<Guid>{ supersededPubId },
-            SupersededPublicationTitles = new List<string>{ "Superseded publication" },
+            UpdateNote = string.Empty,
+            SupersededPublications = new List<IdTitleViewModel>
+            {
+                new()
+                {
+                    Id = supersededPubId,
+                    Title = "Superseded publication",
+                },
+            },
         };
         var executionContext = Mock.Of<ExecutionContext>(MockBehavior.Strict);
         var logger = Mock.Of<ILogger>(MockBehavior.Loose);
@@ -392,7 +404,7 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-1",
                         supersededPubId.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note",
+                        "2000", "2000", null,
                         "Superseded publication")
                 )), Times.Once);
         emailService.Verify(mock =>
@@ -400,7 +412,7 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-2",
                         supersededPubId.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note",
+                        "2000", "2000", null,
                         "Superseded publication")
                 )), Times.Once);
         emailService.Verify(mock =>
@@ -408,7 +420,7 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-3",
                         supersededPubId.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note",
+                        "2000", "2000", null,
                         "Superseded publication")
                 )), Times.Once);
     }
@@ -423,7 +435,7 @@ public class ReleaseNotifierTests
             .AddInMemoryCollection(new Dictionary<string, string>()
             {
                 { ReleaseEmailTemplateIdName, "release-template-id" },
-                { ReleaseEmailSupersededSubscribersTemplateIdName, "release-superseded-template-id" },
+                { ReleaseSupersededSubscribersEmailTemplateIdName, "release-superseded-template-id" },
                 { ReleaseAmendmentEmailTemplateIdName, "should-not-be-used" },
                 { ReleaseAmendmentSupersededSubscribersEmailTemplateIdName, "should-not-be-used" },
                 { BaseUrlName, "http://base.url/"},
@@ -518,9 +530,20 @@ public class ReleaseNotifierTests
             ReleaseName = "2000",
             ReleaseSlug = "2000",
             Amendment = false,
-            UpdateNote = "Update note",
-            SupersededPublicationIds = new List<Guid>{ supersededPub1Id, supersededPub2Id },
-            SupersededPublicationTitles = new List<string>{ "Superseded 1 publication", "Superseded 2 publication" },
+            UpdateNote = string.Empty,
+            SupersededPublications = new List<IdTitleViewModel>
+            {
+                new()
+                {
+                    Id = supersededPub1Id,
+                    Title = "Superseded 1 publication",
+                },
+                new()
+                {
+                   Id = supersededPub2Id,
+                   Title = "Superseded 2 publication",
+                }
+            },
         };
         var executionContext = Mock.Of<ExecutionContext>(MockBehavior.Strict);
         var logger = Mock.Of<ILogger>(MockBehavior.Loose);
@@ -535,7 +558,7 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-1",
                         supersededPub1Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note",
+                        "2000", "2000", null,
                         "Superseded 1 publication")
                 )), Times.Once);
         emailService.Verify(mock =>
@@ -543,7 +566,7 @@ public class ReleaseNotifierTests
                 It.Is<Dictionary<string, dynamic>>(d =>
                     AssertEmailTemplateValues(d, "http://web.base.url/", "http://base.url/", "unsubscribe-token-2",
                         supersededPub2Id.ToString(), "Publication 1", "publication-1",
-                        "2000", "2000", "Update note",
+                        "2000", "2000", null,
                         "Superseded 2 publication")
                 )), Times.Once);
     }
@@ -558,7 +581,7 @@ public class ReleaseNotifierTests
             .AddInMemoryCollection(new Dictionary<string, string>()
             {
                 { ReleaseEmailTemplateIdName, "should-not-be-used" },
-                { ReleaseEmailSupersededSubscribersTemplateIdName, "should-not-be-used" },
+                { ReleaseSupersededSubscribersEmailTemplateIdName, "should-not-be-used" },
                 { ReleaseAmendmentEmailTemplateIdName, "amendment-template-id" },
                 { ReleaseAmendmentSupersededSubscribersEmailTemplateIdName, "amendment-superseded-template-id" },
                 { BaseUrlName, "http://base.url/"},
@@ -645,8 +668,14 @@ public class ReleaseNotifierTests
             ReleaseSlug = "2000",
             Amendment = true,
             UpdateNote = "Update note",
-            SupersededPublicationIds = new List<Guid>{ supersededPubId },
-            SupersededPublicationTitles = new List<string>{ "Superseded publication" },
+            SupersededPublications = new List<IdTitleViewModel>
+            {
+                new()
+                {
+                    Id = supersededPubId,
+                    Title = "Superseded publication",
+                },
+            },
         };
         var executionContext = Mock.Of<ExecutionContext>(MockBehavior.Strict);
         var logger = Mock.Of<ILogger>(MockBehavior.Loose);
@@ -677,17 +706,30 @@ public class ReleaseNotifierTests
     private static bool AssertEmailTemplateValues(Dictionary<string,dynamic> values,
         string webAppBaseUrl, string baseUrl, string unsubToken,
         string pubId, string pubName, string pubSlug,
-        string releaseName, string releaseSlug, string updateNote,
+        string releaseName, string releaseSlug, string? updateNote,
         string? supersededPublicationTitle = null)
     {
         Assert.Equal(pubName, values["publication_name"]);
         Assert.Equal(releaseName, values["release_name"]);
         Assert.Equal($"{webAppBaseUrl}find-statistics/{pubSlug}/{releaseSlug}", values["release_link"]);
-        Assert.Equal(updateNote, values["update_note"]);
         Assert.Equal($"{baseUrl}{pubId}/unsubscribe/{unsubToken}", values["unsubscribe_link"]);
+
+        if (updateNote != null)
+        {
+            Assert.Equal(updateNote, values["update_note"]);
+        }
+        else
+        {
+            Assert.False(values.ContainsKey("update_note"));
+        }
+
         if (supersededPublicationTitle != null)
         {
             Assert.Equal(supersededPublicationTitle, values["superseded_publication_title"]);
+        }
+        else
+        {
+            Assert.False(values.ContainsKey("superseded_publication_title"));
         }
 
         return true;

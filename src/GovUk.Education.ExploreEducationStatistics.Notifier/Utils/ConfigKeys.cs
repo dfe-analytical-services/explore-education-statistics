@@ -1,5 +1,3 @@
-#nullable enable
-
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Utils
 {
     public static class ConfigKeys
@@ -19,9 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Utils
             "ReleaseEmailTemplateId";
         public const string ReleaseAmendmentEmailTemplateIdName =
             "ReleaseAmendmentEmailTemplateId";
-        public const string ReleaseEmailSupersededSubscribersTemplateIdName =
-            "ReleaseEmailSupersededSubscribersTemplateId";
+        public const string ReleaseSupersededSubscribersEmailTemplateIdName =
+            "ReleaseSupersededSubscribersEmailTemplateId";
         public const string ReleaseAmendmentSupersededSubscribersEmailTemplateIdName =
-            "ReleaseAmendmentEmailSupersededSubscribersTemplateId";
+            "ReleaseAmendmentSupersededSubscribersEmailTemplateId";
     }
 }

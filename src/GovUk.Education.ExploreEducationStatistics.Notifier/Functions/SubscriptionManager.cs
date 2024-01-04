@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -86,10 +85,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
 
             try
             {
-                subscriptionPending =
-                    _storageTableService
-                        .RetrieveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email)).Result !=
-                    null;
+                var pendingSub =
+                    await _storageTableService.RetrieveSubscriber(pendingSubscriptionsTable,
+                        new SubscriptionEntity(id, email));
+                subscriptionPending = pendingSub != null;
 
                 logger.LogDebug("Pending subscription found?: {PendingSubscription}", subscriptionPending);
 
@@ -98,8 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Functions
                 {
                     // Now check if already subscribed
 
-                    var activeSubscriber = _storageTableService
-                        .RetrieveSubscriber(subscriptionsTable, new SubscriptionEntity(id, email)).Result;
+                    var activeSubscriber = await _storageTableService
+                        .RetrieveSubscriber(subscriptionsTable, new SubscriptionEntity(id, email));
                     if (activeSubscriber != null)
                     {
                         var unsubscribeToken =

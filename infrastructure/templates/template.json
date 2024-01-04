@@ -325,14 +325,14 @@
         "description": "Gov UK Notify service template Id for amended release notification"
       }
     },
-    "releaseEmailSupersededSubscribersTemplateId": {
+    "releaseSupersededSubscribersEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
       "metadata": {
         "description": "Gov UK Notify service template Id for new release for superseded subscribers notification"
       }
     },
-    "releaseAmendmentEmailSupersededSubscribersTemplateId": {
+    "releaseAmendmentSupersededSubscribersEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
       "metadata": {
@@ -2910,8 +2910,8 @@
         "VerificationEmailTemplateId": "[parameters('verificationEmailTemplateId')]",
         "ReleaseEmailTemplateId": "[parameters('releaseEmailTemplateId')]",
         "ReleaseAmendmentEmailTemplateId": "[parameters('releaseAmendmentEmailTemplateId')]",
-        "ReleaseEmailSupersededSubscribersTemplateId": "[parameters('releaseEmailSupersededSubscribersTemplateId')]",
-        "ReleaseAmendmentEmailSupersededSubscribersTemplateId": "[parameters('releaseAmendmentEmailSupersededSubscribersTemplateId')]",
+        "ReleaseSupersededSubscribersEmailTemplateId": "[parameters('releaseSupersededSubscribersEmailTemplateId')]",
+        "ReleaseAmendmentSupersededSubscribersEmailTemplateId": "[parameters('releaseAmendmentSupersededSubscribersEmailTemplateId')]",
         "SubscriptionConfirmationEmailTemplateId": "[parameters('subscriptionConfirmationEmailTemplateId')]",
         "TableStorageConnString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-notifications')).secretUriWithVersion, ')')]"
       }

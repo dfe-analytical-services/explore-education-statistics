@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
@@ -67,10 +68,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 latestUpdateNoteReason = latestUpdateNote.Reason;
             }
 
-            var supersededPublications = _context.Publications
+            var supersededPublications = await _context.Publications
                 .Where(p => p.SupersededById == release.PublicationId)
                 .Select(p => new { p.Id, p.Title })
-                .ToList();
+                .ToListAsync();
 
             return new ReleaseNotificationMessage
             {
@@ -81,8 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 ReleaseSlug = release.Slug,
                 Amendment = release.Version > 0,
                 UpdateNote = latestUpdateNoteReason,
-                SupersededPublicationIds = supersededPublications.Select(p => p.Id).ToList(),
-                SupersededPublicationTitles = supersededPublications.Select(p => p.Title).ToList(),
+                SupersededPublications = supersededPublications.Select(p =>
+                    new IdTitleViewModel(p.Id, p.Title)).ToList(),
             };
         }
     }

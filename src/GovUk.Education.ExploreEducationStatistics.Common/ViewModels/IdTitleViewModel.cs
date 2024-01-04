@@ -1,6 +1,6 @@
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
+namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels
 {
     public record IdTitleViewModel
     {

@@ -8,9 +8,9 @@ using Notify.Client;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Tests.Utils;
 
-public class NotifierTestUtils
+public static class NotifierTestUtils
 {
-    private const string notificationKey =
+    private const string NotificationKey =
         "NOTIFYKEY-7ecfaa0c-d58b-43ca-a2f3-5d83c4124138-55dd5c51-3887-4941-85d5-0c1001f891b0";
 
     public static NotificationClient MockNotificationClient(HttpStatusCode responseCode, string responseContent)
@@ -28,6 +28,6 @@ public class NotifierTestUtils
 
         var httpClientWrapper = new HttpClientWrapper(new HttpClient(httpHandler.Object));
 
-        return new NotificationClient(httpClientWrapper, notificationKey);
+        return new NotificationClient(httpClientWrapper, NotificationKey);
     }
 }
