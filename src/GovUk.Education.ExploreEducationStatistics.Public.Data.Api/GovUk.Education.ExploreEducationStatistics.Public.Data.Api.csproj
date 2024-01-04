@@ -11,6 +11,8 @@
 
         <!-- Disable build warnings for undocumented methods -->
         <NoWarn>1591</NoWarn>
+        <!-- Disable code analysis warnings for not using primary constructors -->
+        <NoWarn>IDE0290</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
