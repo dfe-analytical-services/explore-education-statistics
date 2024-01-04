@@ -2,7 +2,7 @@ import redirectPages from '@frontend/middleware/pages/redirectPages';
 import type { NextRequest } from 'next/server';
 
 export default async function middleware(request: NextRequest) {
-  await redirectPages(request);
+  return redirectPages(request);
 }
 
 // Restrict to release and methodology pages.
