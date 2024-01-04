@@ -119,6 +119,18 @@ public class PublicationsControllerTests : IntegrationTestFixture
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
 
+    [Theory]
+    [InlineData("a")]
+    [InlineData("aa")]
+    public async Task ListPublications_RequestedSearchTermIsNotLongEnough_Returns400(string searchTerm)
+    {
+        var client = SetupApp(new ContentApiClientMock()).CreateClient();
+
+        var response = await ListPublications(client, null, null, searchTerm);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     private IReadOnlyList<DataSet> GeneratePublishedDataSets(int numberToGenerate)
     {
         return Enumerable.Range(0, numberToGenerate)
@@ -166,13 +178,13 @@ public class PublicationsControllerTests : IntegrationTestFixture
         await TestApp.AddTestData<PublicDataDbContext>(supplier);
     }
 
-    private async Task<HttpResponseMessage> ListPublications(HttpClient client, int page, int pageSize)
+    private async Task<HttpResponseMessage> ListPublications(HttpClient client, int? page = null, int? pageSize= null, string? search = null)
     {
         var query = new Dictionary<string, string?>
         {
-            { "page", page.ToString() },
-            { "pageSize", pageSize.ToString() },
-            { "search", null },
+            { "page", page?.ToString() },
+            { "pageSize", pageSize?.ToString() },
+            { "search", search },
         };
 
         var uri = QueryHelpers.AddQueryString(_baseUrl, query);
