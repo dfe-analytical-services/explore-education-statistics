@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
+
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 public record PaginatedListViewModel<T>
