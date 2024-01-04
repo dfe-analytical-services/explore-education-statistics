@@ -1,3 +1,4 @@
+using StringExtensions = GovUk.Education.ExploreEducationStatistics.Common.Extensions.StringExtensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
@@ -32,7 +33,11 @@ internal class ContentApiClient : IContentApiClient
         if (!response.IsSuccessStatusCode)
         {
             var message = await response.Content.ReadAsStringAsync();
-            _logger.LogError($"Failed to retrieve publications.{Environment.NewLine}Status Code: {response.StatusCode}{Environment.NewLine}Message: {message}");
+            _logger.LogError(StringExtensions.TrimIndent(
+                $"""
+                 Failed to retrieve publications with status code: {response.StatusCode}. Message:
+                 {message}
+                 """));
 
             switch (response.StatusCode)
             {

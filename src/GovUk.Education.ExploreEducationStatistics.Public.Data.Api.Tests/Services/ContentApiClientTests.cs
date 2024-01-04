@@ -1,3 +1,4 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -40,7 +41,11 @@ public class ContentApiClientTests
         _logger.Verify(logger => logger.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
                 It.Is<EventId>(eventId => eventId.Id == 0),
-                It.Is<It.IsAnyType>((@object, @type) => @object.ToString() == $"Failed to retrieve publications.{Environment.NewLine}Status Code: {HttpStatusCode.BadRequest}{Environment.NewLine}Message: test message"),
+                It.Is<It.IsAnyType>((@object, @type) => 
+                    @object.ToString() ==  $"""
+                        Failed to retrieve publications with status code: {HttpStatusCode.BadRequest}. Message:
+                        test message
+                        """.TrimIndent()),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -65,8 +70,11 @@ public class ContentApiClientTests
         _logger.Verify(logger => logger.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
                 It.Is<EventId>(eventId => eventId.Id == 0),
-                It.Is<It.IsAnyType>((@object, @type) => @object.ToString() == $"Failed to retrieve publications.{Environment.NewLine}Status Code: {responseStatusCode}{Environment.NewLine}Message: test message"),
-                It.IsAny<Exception>(),
+                It.Is<It.IsAnyType>((@object, @type) =>
+                    @object.ToString() ==  $"""
+                        Failed to retrieve publications with status code: {responseStatusCode}. Message:
+                        test message
+                        """.TrimIndent()), It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
