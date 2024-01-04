@@ -67,6 +67,8 @@ export default function ReleaseFileUploadsSection({
     [files, listFilesQuery.queryKey, queryClient, releaseId],
   );
 
+  const MAX_FILE_SIZE = 2147483647; // 2GB
+
   return (
     <>
       <h2>Add file to release</h2>
@@ -115,7 +117,8 @@ export default function ReleaseFileUploadsSection({
           validationSchema={Yup.object<Partial<AncillaryFileFormValues>>({
             file: Yup.file()
               .required('Choose a file')
-              .minSize(0, 'Choose a file that is not empty'),
+              .minSize(0, 'Choose a file that is not empty')
+              .maxSize(MAX_FILE_SIZE, 'Choose a file that is under 2GB'),
           })}
           onSubmit={handleSubmit}
         />
