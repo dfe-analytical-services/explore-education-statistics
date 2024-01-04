@@ -208,6 +208,7 @@ const PrototypeReleaseData = () => {
                         href="#"
                         className={classNames('govuk-link--no-visited-state', {
                           'govuk-link--no-underline': showMainRelease,
+                          'govuk-!-font-weight-bold': showMainRelease,
                         })}
                         onClick={e => {
                           e.preventDefault();
@@ -238,6 +239,7 @@ const PrototypeReleaseData = () => {
                         href="#"
                         className={classNames('govuk-link--no-visited-state', {
                           'govuk-link--no-underline': showData,
+                          'govuk-!-font-weight-bold': showData,
                         })}
                         onClick={e => {
                           e.preventDefault();
@@ -268,6 +270,7 @@ const PrototypeReleaseData = () => {
                         href="#releaseDetails"
                         className={classNames('govuk-link--no-visited-state', {
                           'govuk-link--no-underline': showAllUpdates,
+                          'govuk-!-font-weight-bold': showAllUpdates,
                         })}
                         onClick={e => {
                           e.preventDefault();
@@ -299,6 +302,7 @@ const PrototypeReleaseData = () => {
                         href="#National statistics"
                         className={classNames('govuk-link--no-visited-state', {
                           'govuk-link--no-underline': showNationalStats,
+                          'govuk-!-font-weight-bold': showNationalStats,
                         })}
                         onClick={e => {
                           e.preventDefault();
@@ -329,6 +333,7 @@ const PrototypeReleaseData = () => {
                         href="#releaseDetails"
                         className={classNames('govuk-link--no-visited-state', {
                           'govuk-link--no-underline': showMethodologies,
+                          'govuk-!-font-weight-bold': showMethodologies,
                         })}
                         onClick={e => {
                           e.preventDefault();
@@ -435,6 +440,7 @@ const PrototypeReleaseData = () => {
                         href="#help"
                         className={classNames('govuk-link--no-visited-state', {
                           'govuk-link--no-underline': showHelp,
+                          'govuk-!-font-weight-bold': showHelp,
                         })}
                         onClick={e => {
                           e.preventDefault();
