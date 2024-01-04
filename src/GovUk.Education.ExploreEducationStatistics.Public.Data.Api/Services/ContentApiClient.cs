@@ -10,11 +10,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class ContentApiClient : IContentApiClient
 {
-    private readonly HttpClient httpClient;
+    private readonly ILogger<ContentApiClient> _logger;
+    private readonly HttpClient _httpClient;
 
-    public ContentApiClient(HttpClient HttpClient)
+    public ContentApiClient(ILogger<ContentApiClient> logger, HttpClient HttpClient)
     {
-        httpClient=HttpClient;
+        _logger = logger;
+        _httpClient = HttpClient;
     }
 
     public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
@@ -25,21 +27,23 @@ internal class ContentApiClient : IContentApiClient
             PageSize: pageSize,
             PublicationIds: publicationIds);
 
-        var response = await httpClient.PostAsJsonAsync("api/publications", request);
+        var response = await _httpClient.PostAsJsonAsync("api/publications", request);
 
-        if (response.IsSuccessStatusCode)
+        if (!response.IsSuccessStatusCode)
         {
-            return new Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>(await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>());
+            var message = await response.Content.ReadAsStringAsync();
+            _logger.LogError($"Failed to retrieve publications.{Environment.NewLine}Status Code: {response.StatusCode}{Environment.NewLine}Message: {message}");
+
+            switch (response.StatusCode)
+            {
+                case HttpStatusCode.BadRequest:
+                    return new BadRequestObjectResult(response.Content);
+                default:
+                    response.EnsureSuccessStatusCode();
+                    break;
+            }
         }
 
-        switch (response.StatusCode)
-        {
-            case HttpStatusCode.BadRequest:
-                return new BadRequestResult();
-            case HttpStatusCode.NotFound:
-                return new NotFoundResult();
-            default:
-                return new StatusCodeResult(StatusCodes.Status500InternalServerError);
-        }
+        return new Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>(await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>());
     }
 }
