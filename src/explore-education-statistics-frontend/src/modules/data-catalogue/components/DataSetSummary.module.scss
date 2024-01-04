@@ -1,0 +1,21 @@
+@import '~govuk-frontend/govuk/base';
+
+.container {
+  border-bottom: 1px solid govuk-colour('mid-grey');
+}
+
+.hidden {
+  display: none;
+}
+
+.content {
+  /* stylelint-disable-next-line value-no-vendor-prefix */
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+
+  &.expanded {
+    -webkit-line-clamp: unset;
+  }
+}

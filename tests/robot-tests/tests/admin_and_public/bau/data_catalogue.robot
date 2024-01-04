@@ -161,3 +161,46 @@ Validate new zip contains correct files
     sleep    8    # wait for file to download
     ${list}=    create list    data/seven_filters.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2020-21-q1.zip    ${list}
+
+# TO DO EES-4781 - remove the above tests for the old version.
+
+User navigates to data catalogue page
+    user navigates to new data catalogue page on public frontend
+
+Validate Related information section and links exist
+    ${relatedInformation}=    get webelement    css:[aria-labelledby="related-information"]
+
+    user checks element contains child element    ${relatedInformation}    xpath://h2[text()="Related information"]
+
+    user checks page contains link with text and url
+    ...    Find statistics and data
+    ...    /find-statistics
+    ...    ${relatedInformation}
+    user checks page contains link with text and url
+    ...    Glossary
+    ...    /glossary
+    ...    ${relatedInformation}
+
+Validate data sets list
+    [Tags]    Local    Dev
+
+    user checks list has x items    testid:data-sets-list    10
+
+    ${dataSet}=    user gets testid element    data-set-summary-${SUBJECT_NAME_3}
+
+    user checks element contains    ${dataSet}    ${SUBJECT_NAME_3}
+    user checks element contains    ${dataSet}    ${SUBJECT_NAME_3} data guidance content
+    user checks element contains    ${dataSet}    Test theme
+    user checks element contains    ${dataSet}    This is the latest data
+    user checks element contains    ${dataSet}    ${PUBLICATION_NAME}
+    user checks element contains    ${dataSet}    ${RELEASE_NAME}
+
+    user clicks button    Show more details
+    user clicks button containing text    Download data set
+
+Validate zip contains correct files
+    [Documentation]    EES-4147
+    [Tags]    Failing
+    sleep    8    # wait for file to download
+    ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
+    zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
