@@ -251,6 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             IMethodologyImageService? methodologyImageService = null,
             IMethodologyApprovalService? methodologyApprovalService = null,
             IMethodologyCacheService? methodologyCacheService = null,
+            IRedirectsCacheService? redirectsCacheService = null,
             IUserService? userService = null)
         {
             return new(
@@ -262,6 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 methodologyImageService ?? Mock.Of<IMethodologyImageService>(),
                 methodologyApprovalService ?? Mock.Of<IMethodologyApprovalService>(Strict),
                 methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                redirectsCacheService ?? Mock.Of<IRedirectsCacheService>(Strict),
                 userService ?? Mock.Of<IUserService>()
             );
         }

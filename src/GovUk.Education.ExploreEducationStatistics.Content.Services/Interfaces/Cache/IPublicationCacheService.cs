@@ -16,5 +16,7 @@ public interface IPublicationCacheService
 
     Task<Either<ActionResult, PublicationCacheViewModel>> UpdatePublication(string publicationSlug);
 
+    Task<Either<ActionResult, Unit>> RemovePublication(string publicationSlug);
+
     Task<IList<PublicationTreeThemeViewModel>> UpdatePublicationTree();
 }

@@ -289,7 +289,7 @@
   {
     "publication_summary": "Key stage 2 attainment statistics by pupil characteristics, school characteristics, region and local authority.",
     "publication_title": "Key stage 2 attainment",
-    "published": "12 Sep 2023",
+    "published": "14 Dec 2023",
     "release_type": "National statistics",
     "theme": "School and college outcomes and performance"
   },
@@ -455,13 +455,6 @@
     "theme": "Higher education"
   },
   {
-    "publication_summary": "Data on suspensions and permanent exclusions, including by reason, duration, by pupil characteristics and data on independent review panels.",
-    "publication_title": "Permanent exclusions and suspensions in England",
-    "published": "23 Nov 2023",
-    "release_type": "National statistics",
-    "theme": "Pupils and schools"
-  },
-  {
     "publication_summary": "Local authority (LA) spending plans for education, children's services and social care.",
     "publication_title": "Planned LA and school expenditure",
     "published": "28 Sep 2023",
@@ -497,23 +490,9 @@
     "theme": "Pupils and schools"
   },
   {
-    "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the autumn and spring terms",
-    "publication_title": "Pupil absence in schools in England: autumn and spring terms",
-    "published": "20 Oct 2022",
-    "release_type": "National statistics",
-    "theme": "Pupils and schools"
-  },
-  {
-    "publication_summary": "Pupil absence, including overall, authorised and unauthorised absence and persistent absence by reason and pupil characteristics for the autumn term.",
-    "publication_title": "Pupil absence in schools in England: autumn term",
-    "published": "26 May 2022",
-    "release_type": "National statistics",
-    "theme": "Pupils and schools"
-  },
-  {
     "publication_summary": "Pupil attendance and absence data including termly national statistics and fortnightly experimental statistics derived from DfE\u2019s regular attendance data",
     "publication_title": "Pupil attendance in schools",
-    "published": "7 Dec 2023",
+    "published": "21 Dec 2023",
     "release_type": "Official statistics in development",
     "theme": "Pupils and schools"
   },
@@ -621,6 +600,13 @@
     "published": "29 Jun 2023",
     "release_type": "Official statistics",
     "theme": "Finance and funding"
+  },
+  {
+    "publication_summary": "Data on suspensions and permanent exclusions, including by reason, duration, by pupil characteristics and data on independent review panels.",
+    "publication_title": "Suspensions and permanent exclusions in England",
+    "published": "23 Nov 2023",
+    "release_type": "National statistics",
+    "theme": "Pupils and schools"
   },
   {
     "publication_summary": "",

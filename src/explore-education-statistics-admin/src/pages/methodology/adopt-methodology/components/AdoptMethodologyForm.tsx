@@ -1,5 +1,4 @@
-import Form from '@common/components/form/Form';
-import FormFieldRadioSearchGroup from '@common/components/form/FormFieldRadioSearchGroup';
+import RHFFormFieldRadioSearchGroup from '@common/components/form/rhf/RHFFormFieldRadioSearchGroup';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Button from '@common/components/Button';
 import Details from '@common/components/Details';
@@ -8,15 +7,16 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
+import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
 import { MethodologyVersion } from '@admin/services/methodologyService';
 import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
-import useFormSubmit from '@common/hooks/useFormSubmit';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import React, { useMemo } from 'react';
-import getMethodologyApprovalStatusLabel from '@admin/pages/methodology/utils/getMethodologyApprovalStatusLabel';
+import { ObjectSchema } from 'yup';
 
 const errorMappings = [
   mapFieldErrors<FormValues>({
@@ -74,22 +74,23 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
     [methodologies],
   );
 
-  const handleSubmit = useFormSubmit(async (values: FormValues) => {
-    await onSubmit(values);
-  }, errorMappings);
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      methodologyId: Yup.string().required(
+        'Select a published methodology to adopt',
+      ),
+    });
+  }, []);
 
   return (
-    <Formik<FormValues>
+    <FormProvider
+      enableReinitialize
+      errorMappings={errorMappings}
       initialValues={{ methodologyId: '' }}
-      onSubmit={handleSubmit}
-      validationSchema={Yup.object<FormValues>({
-        methodologyId: Yup.string().required(
-          'Select a published methodology to adopt',
-        ),
-      })}
+      validationSchema={validationSchema}
     >
-      <Form id="adoptMethodologyForm">
-        <FormFieldRadioSearchGroup
+      <RHFForm id="adoptMethodologyForm" onSubmit={onSubmit}>
+        <RHFFormFieldRadioSearchGroup
           id="selectMethodology"
           legend="Select a published methodology"
           name="methodologyId"
@@ -100,8 +101,8 @@ const AdoptMethodologyForm = ({ methodologies, onCancel, onSubmit }: Props) => {
           <Button type="submit">Save</Button>
           <ButtonText onClick={onCancel}>Cancel</ButtonText>
         </ButtonGroup>
-      </Form>
-    </Formik>
+      </RHFForm>
+    </FormProvider>
   );
 };
 

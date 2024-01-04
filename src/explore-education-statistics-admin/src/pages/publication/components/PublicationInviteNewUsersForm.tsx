@@ -8,25 +8,24 @@ import userService from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import {
-  FormFieldCheckboxGroup,
-  FormFieldTextInput,
-} from '@common/components/form';
-import useFormSubmit from '@common/hooks/useFormSubmit';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { Form, Formik } from 'formik';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { generatePath } from 'react-router';
+import { ObjectSchema } from 'yup';
 
-interface InviteContributorFormValues {
+interface FormValues {
   email: string;
   releaseIds: string[];
 }
 
 export const errorMappings = [
-  mapFieldErrors<InviteContributorFormValues>({
+  mapFieldErrors<FormValues>({
     target: 'releaseIds',
     messages: {
       NotAllReleasesBelongToPublication:
@@ -51,56 +50,61 @@ const PublicationInviteNewUsersForm = ({
 }: Props) => {
   const history = useHistory();
 
-  const handleSubmit = useFormSubmit<InviteContributorFormValues>(
-    async values => {
-      await userService.inviteContributor(
-        values.email,
-        publication.id,
-        values.releaseIds,
-      );
-      history.push(
-        generatePath<PublicationTeamRouteParams>(
-          publicationTeamAccessRoute.path,
-          {
-            publicationId: publication.id,
-            releaseId,
-          },
-        ),
-      );
-    },
-    errorMappings,
-  );
+  const handleSubmit = async (values: FormValues) => {
+    await userService.inviteContributor(
+      values.email,
+      publication.id,
+      values.releaseIds,
+    );
+    history.push(
+      generatePath<PublicationTeamRouteParams>(
+        publicationTeamAccessRoute.path,
+        {
+          publicationId: publication.id,
+          releaseId,
+        },
+      ),
+    );
+  };
 
-  const initialValues: InviteContributorFormValues = {
+  const initialValues: FormValues = {
     email: '',
     releaseIds: releases.map(r => r.id),
   };
+
+  const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
+    return Yup.object({
+      email: Yup.string()
+        .required('Enter an email address')
+        .email('Enter a valid email address'),
+      releaseIds: Yup.array()
+        .of(Yup.string().defined())
+        .min(1, 'Select at least one release')
+        .required('Select at least one release'),
+    });
+  }, []);
+
   return (
     <>
       <h2>Invite a user to edit this publication</h2>
-      <Formik<InviteContributorFormValues>
+      <FormProvider
+        errorMappings={errorMappings}
         initialValues={initialValues}
-        validationSchema={Yup.object({
-          email: Yup.string()
-            .required('Enter an email address')
-            .email('Enter a valid email address'),
-          releaseIds: Yup.array().min(1, 'Select at least one release'),
-        })}
-        onSubmit={handleSubmit}
+        validationSchema={validationSchema}
       >
-        {form => {
+        {({ formState }) => {
           return (
-            <Form id="inviteContributorForm">
-              <FormFieldTextInput
+            <RHFForm id="inviteContributorForm" onSubmit={handleSubmit}>
+              <RHFFormFieldTextInput
                 className="govuk-!-width-one-third"
                 name="email"
                 label="Enter an email address"
               />
-              <FormFieldCheckboxGroup<InviteContributorFormValues>
+              <RHFFormFieldCheckboxGroup<FormValues>
                 name="releaseIds"
                 legend="Select which releases you wish the user to have access"
                 legendSize="m"
-                disabled={form.isSubmitting}
+                disabled={formState.isSubmitting}
                 selectAll
                 small
                 order={[]}
@@ -112,7 +116,7 @@ const PublicationInviteNewUsersForm = ({
                 })}
               />
               <ButtonGroup>
-                <Button type="submit" disabled={form.isSubmitting}>
+                <Button type="submit" disabled={formState.isSubmitting}>
                   Invite user
                 </Button>
                 <ButtonText
@@ -131,10 +135,10 @@ const PublicationInviteNewUsersForm = ({
                   Cancel
                 </ButtonText>
               </ButtonGroup>
-            </Form>
+            </RHFForm>
           );
         }}
-      </Formik>
+      </FormProvider>
     </>
   );
 };

@@ -353,7 +353,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public async Task RemoveContentBlock()
         {
             var contentSectionId = Guid.NewGuid();
-            var contentBlockId = Guid.NewGuid();
+
+            var blockToRemove = new HtmlBlock
+            {
+                Order = 0,
+                Comments = new List<Comment>
+                {
+                    new()
+                    {
+                        Content = "Comment to be removed 1",
+                    },
+                    new()
+                    {
+                        Content = "Comment to be removed 2",
+                    },
+                },
+            };
 
             var dataBlockVersionId = Guid.NewGuid();
             var dataBlockVersion = new DataBlockVersion
@@ -362,7 +377,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ContentBlock = new DataBlock
                 {
                     Id = dataBlockVersionId,
-                    Order = 1
+                    Order = 1,
+                    Comments = new List<Comment>
+                    {
+                        new()
+                        {
+                            Content = "Comment 1",
+                        },
+                        new()
+                        {
+                            Content = "Comment 2",
+                        },
+                    },
                 },
                 DataBlockParentId = Guid.NewGuid()
             };
@@ -372,11 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = contentSectionId,
                 Content = new List<ContentBlock>
                 {
-                    new HtmlBlock
-                    {
-                        Id = contentBlockId,
-                        Order = 0,
-                    },
+                    blockToRemove,
                     dataBlockVersion.ContentBlock,
                     new HtmlBlock { Order = 2 },
                 },
@@ -397,12 +419,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.RemoveContentBlock(
                     contentSection.ReleaseId,
                     contentSectionId,
-                    contentBlockId);
+                    blockToRemove.Id);
 
                 var viewModelList = result.AssertRight();
 
                 Assert.Equal(2, viewModelList.Count);
-                Assert.Null(viewModelList.Find(viewModel => viewModel.Id == contentBlockId));
+                Assert.Null(viewModelList.Find(viewModel => viewModel.Id == blockToRemove.Id));
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -417,6 +439,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.IsType<DataBlock>(contentBlocks[0]);
                 Assert.Equal(1, contentBlocks[1].Order);
                 Assert.IsType<HtmlBlock>(contentBlocks[1]);
+
+                var comments = contentDbContext.Comment
+                    .Where(c => c.ContentBlockId == dataBlockVersion.ContentBlockId
+                                || c.ContentBlockId == blockToRemove.Id)
+                    .ToList();
+                Assert.Equal(2, comments.Count);
+                Assert.Equal("Comment 1", comments[0].Content);
+                Assert.Equal("Comment 2", comments[1].Content);
             }
         }
 

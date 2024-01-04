@@ -5,17 +5,17 @@ import {
 import releasePermissionService, {
   UserReleaseRole,
 } from '@admin/services/releasePermissionService';
-import { Form, FormFieldCheckboxGroup } from '@common/components/form';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import WarningMessage from '@common/components/WarningMessage';
-import useFormSubmit from '@common/hooks/useFormSubmit';
-import { Formik } from 'formik';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFFormFieldCheckboxGroup from '@common/components/form/rhf/RHFFormFieldCheckboxGroup';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router-dom';
 
-interface AddExistingUsersFormValues {
+interface FormValues {
   userIds: string[];
 }
 
@@ -34,24 +34,21 @@ const PublicationReleaseContributorsForm = ({
 }: Props) => {
   const history = useHistory();
 
-  const handleSubmit = useFormSubmit<AddExistingUsersFormValues>(
-    async values => {
-      await releasePermissionService.updateReleaseContributors(
-        releaseId,
-        values.userIds,
-      );
-      history.push(
-        generatePath<PublicationTeamRouteParams>(
-          publicationTeamAccessRoute.path,
-          {
-            publicationId,
-            releaseId,
-          },
-        ),
-      );
-    },
-    [],
-  );
+  const handleSubmit = async (values: FormValues) => {
+    await releasePermissionService.updateReleaseContributors(
+      releaseId,
+      values.userIds,
+    );
+    history.push(
+      generatePath<PublicationTeamRouteParams>(
+        publicationTeamAccessRoute.path,
+        {
+          publicationId,
+          releaseId,
+        },
+      ),
+    );
+  };
 
   if (!publicationContributors || !publicationContributors.length) {
     return (
@@ -79,25 +76,22 @@ const PublicationReleaseContributorsForm = ({
   }
 
   const releaseContributorIds = releaseContributors.map(c => c.userId);
-  const initialValues: AddExistingUsersFormValues = {
+  const initialValues: FormValues = {
     userIds: publicationContributors
       .map(c => c.userId)
       .filter(id => releaseContributorIds.includes(id)),
   };
 
   return (
-    <Formik<AddExistingUsersFormValues>
-      initialValues={initialValues}
-      onSubmit={handleSubmit}
-    >
-      {form => {
+    <FormProvider initialValues={initialValues}>
+      {({ formState }) => {
         return (
-          <Form id="addExistingUsersForm">
-            <FormFieldCheckboxGroup<AddExistingUsersFormValues>
+          <RHFForm id="addExistingUsersForm" onSubmit={handleSubmit}>
+            <RHFFormFieldCheckboxGroup<FormValues>
               name="userIds"
               legend="Select contributors for this release"
               legendSize="m"
-              disabled={form.isSubmitting}
+              disabled={formState.isSubmitting}
               selectAll
               small
               options={publicationContributors.map(c => {
@@ -108,7 +102,7 @@ const PublicationReleaseContributorsForm = ({
               })}
             />
             <ButtonGroup>
-              <Button type="submit" disabled={form.isSubmitting}>
+              <Button type="submit" disabled={formState.isSubmitting}>
                 Update contributors
               </Button>
               <ButtonText
@@ -127,10 +121,10 @@ const PublicationReleaseContributorsForm = ({
                 Cancel
               </ButtonText>
             </ButtonGroup>
-          </Form>
+          </RHFForm>
         );
       }}
-    </Formik>
+    </FormProvider>
   );
 };
 

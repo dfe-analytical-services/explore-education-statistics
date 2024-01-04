@@ -2,9 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -17,12 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 public class PublicationCacheService : IPublicationCacheService
 {
     private readonly IPublicationService _publicationService;
+    private readonly IPublicBlobStorageService _publicBlobStorageService;
     private readonly ILogger<PublicationCacheService> _logger;
 
     public PublicationCacheService(IPublicationService publicationService,
+        IPublicBlobStorageService publicBlobStorageService,
         ILogger<PublicationCacheService> logger)
     {
         _publicationService = publicationService;
+        _publicBlobStorageService = publicBlobStorageService;
         _logger = logger;
     }
 
@@ -49,6 +55,19 @@ public class PublicationCacheService : IPublicationCacheService
     public Task<Either<ActionResult, PublicationCacheViewModel>> UpdatePublication(string publicationSlug)
     {
         return _publicationService.Get(publicationSlug);
+    }
+
+    public async Task<Either<ActionResult, Unit>> RemovePublication(string publicationSlug)
+    {
+        await _publicBlobStorageService.DeleteBlobs(
+            containerName: BlobContainers.PublicContent,
+            options: new IBlobStorageService.DeleteBlobsOptions
+            {
+                IncludeRegex = new Regex($"^publications/{publicationSlug}/.+$")
+            }
+        );
+
+        return Unit.Instance;
     }
 
     [BlobCache(typeof(PublicationTreeCacheKey), forceUpdate: true, ServiceName = "public")]

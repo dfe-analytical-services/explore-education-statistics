@@ -127,6 +127,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         if (isToBePublished)
                         {
                             await _methodologyCacheService.UpdateSummariesTree();
+
+                            await _context.Entry(methodologyVersion)
+                                .Reference(mv => mv.Methodology)
+                                .LoadAsync();
+
+                            var redundantRedirects = await _context.MethodologyRedirects
+                                .Where(mr => mr.Slug == methodologyVersion.Slug)
+                                .ToListAsync();
+                            _context.MethodologyRedirects.RemoveRange(redundantRedirects);
+                            await _context.SaveChangesAsync();
+
                             await _redirectsCacheService.UpdateRedirects();
                         }
 

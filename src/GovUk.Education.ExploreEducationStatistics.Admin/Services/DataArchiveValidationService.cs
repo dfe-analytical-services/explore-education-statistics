@@ -19,6 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly IFileTypeService _fileTypeService;
 
+        private const int MaxFilenameSize = 150;
+
         private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
             new()
             {
@@ -56,6 +58,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
             var metaFile = file1.Name.Contains(".meta.") ? file1 : file2;
 
+            var filenamesValid = ValidateFilenameLengths(
+                zipFile.FileName.Length,
+                dataFile.Name.Length,
+                metaFile.Name.Length);
+
+            if (filenamesValid.IsLeft)
+            {
+                return filenamesValid.Left;
+            }
+
             return new DataArchiveFile(dataFile: dataFile, metaFile: metaFile);
         }
 
@@ -71,6 +83,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                        AllowedMimeTypesByFileType[DataZip]
                    )
                    && _fileTypeService.HasMatchingEncodingType(file, ZipEncodingTypes);
+        }
+
+        private static Either<ActionResult, Unit> ValidateFilenameLengths(
+            int zipFilenameLength,
+            int dataFilenameLength,
+            int metaFilenameLength)
+        {
+            if (zipFilenameLength > MaxFilenameSize)
+            {
+                return ValidationActionResult(DataZipFilenameTooLong);
+            }
+
+            if (dataFilenameLength > MaxFilenameSize && metaFilenameLength > MaxFilenameSize)
+            {
+                return ValidationActionResult(DataZipContentFilenamesTooLong);
+            }
+
+            if (dataFilenameLength > MaxFilenameSize)
+            {
+                return ValidationActionResult(DataFilenameTooLong);
+            }
+
+            if (metaFilenameLength > MaxFilenameSize)
+            {
+                return ValidationActionResult(MetaFilenameTooLong);
+            }
+
+            return Unit.Instance;
         }
     }
 }

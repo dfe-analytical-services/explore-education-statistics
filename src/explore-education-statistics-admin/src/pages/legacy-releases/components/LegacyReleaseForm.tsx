@@ -1,10 +1,10 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form, FormFieldTextInput } from '@common/components/form';
-import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
-import useFormSubmit from '@common/hooks/useFormSubmit';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldNumberInput from '@common/components/form/rhf/RHFFormFieldNumberInput';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import React, { ReactNode } from 'react';
 
 interface FormValues {
@@ -29,12 +29,9 @@ const LegacyReleaseForm = ({
   },
   onSubmit,
 }: Props) => {
-  const handleSubmit = useFormSubmit(onSubmit);
-
   return (
-    <Formik<FormValues>
+    <FormProvider
       initialValues={initialValues}
-      onSubmit={handleSubmit}
       validationSchema={Yup.object<FormValues>({
         description: Yup.string().required('Enter a description'),
         url: Yup.string().required('Enter a URL').url('Enter a valid URL'),
@@ -46,37 +43,39 @@ const LegacyReleaseForm = ({
             : Yup.number(),
       })}
     >
-      {form => (
-        <Form id={formId}>
-          <FormFieldTextInput<FormValues>
-            name="description"
-            label="Description"
-            className="govuk-!-width-two-thirds"
-          />
-
-          <FormFieldTextInput<FormValues>
-            name="url"
-            label="URL"
-            className="govuk-!-width-two-thirds"
-          />
-
-          {typeof initialValues?.order !== 'undefined' && (
-            <FormFieldNumberInput<FormValues>
-              name="order"
-              label="Order"
-              width={2}
+      {({ formState }) => {
+        return (
+          <RHFForm id={formId} onSubmit={onSubmit}>
+            <RHFFormFieldTextInput<FormValues>
+              name="description"
+              label="Description"
+              className="govuk-!-width-two-thirds"
             />
-          )}
 
-          <ButtonGroup>
-            <Button type="submit" disabled={form.isSubmitting}>
-              Save legacy release
-            </Button>
-            {cancelButton}
-          </ButtonGroup>
-        </Form>
-      )}
-    </Formik>
+            <RHFFormFieldTextInput<FormValues>
+              name="url"
+              label="URL"
+              className="govuk-!-width-two-thirds"
+            />
+
+            {typeof initialValues?.order !== 'undefined' && (
+              <RHFFormFieldNumberInput<FormValues>
+                name="order"
+                label="Order"
+                width={2}
+              />
+            )}
+
+            <ButtonGroup>
+              <Button type="submit" disabled={formState.isSubmitting}>
+                Save legacy release
+              </Button>
+              {cancelButton}
+            </ButtonGroup>
+          </RHFForm>
+        );
+      }}
+    </FormProvider>
   );
 };
 

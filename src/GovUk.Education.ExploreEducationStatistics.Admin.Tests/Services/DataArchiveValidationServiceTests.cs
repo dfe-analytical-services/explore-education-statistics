@@ -10,6 +10,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -38,6 +39,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public void UploadedZippedDataFilenameTooLong()
+        {
+            var fileTypeService = new Mock<IFileTypeService>(Strict);
+            var service = SetupDataArchiveValidationService(fileTypeService: fileTypeService.Object);
+
+            var fileName = "LoremipsumdolorsitametconsecteturadipiscingelitInsitametelitaccumsanbibendumlacusutmattismaurisCrasvehiculaaccumsaneratidelementumaugueposuereatNuncege.zip";
+            var archive = CreateFormFileCopyFromResource("data-zip-valid.zip", fileName);
+
+            fileTypeService
+                .Setup(s => s.HasMatchingMimeType(archive, It.IsAny<IEnumerable<Regex>>()))
+                .ReturnsAsync(() => true);
+            fileTypeService
+                .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
+                .Returns(() => true);
+
+            var result = service.ValidateDataArchiveFile(archive).Result;
+            VerifyAllMocks(fileTypeService);
+
+            result.AssertBadRequest(DataZipFilenameTooLong);
+        }
+
+        [Fact]
         public void UploadedZippedDatafileIsInvalid()
         {
             var fileTypeService = new Mock<IFileTypeService>(MockBehavior.Strict);
@@ -54,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = service.ValidateDataArchiveFile(archive).Result;
             VerifyAllMocks(fileTypeService);
-            
+
             result.AssertBadRequest(DataZipFileDoesNotContainCsvFiles);
         }
 
@@ -73,6 +96,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(() => fileName);
 
             return formFile.Object;
+        }
+
+        private static IFormFile CreateFormFileCopyFromResource(string originalFileName, string newFileName)
+        {
+            var originalFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "Resources" + Path.DirectorySeparatorChar + originalFileName);
+
+            var newFilePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                "Resources" + Path.DirectorySeparatorChar + newFileName);
+
+            File.Copy(originalFilePath, newFilePath, true);
+
+            return CreateFormFileFromResource(newFileName);
         }
 
         private static DataArchiveValidationService SetupDataArchiveValidationService(

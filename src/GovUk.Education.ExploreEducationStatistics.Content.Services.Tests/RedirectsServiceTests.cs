@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,6 +12,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
     public class RedirectsServiceTests
     {
+        [Fact]
+        public async Task List_PublicationRedirect()
+        {
+            var publication = new Publication
+            {
+                Slug = "redirect-to",
+            };
+
+            var publicationRedirects = new List<PublicationRedirect>
+            {
+                new()
+                {
+                    Slug = "redirect-from-2",
+                    Publication = publication,
+                },
+                new()
+                {
+                    Slug = "redirect-from-1",
+                    Publication = publication,
+                },
+                new()
+                {
+                    Slug = "redirect-to", // should be excluded in results, as same as current publication slug
+                    Publication = publication,
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.PublicationRedirects.AddRangeAsync(publicationRedirects);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var redirectsService = SetupRedirectsService(contentDbContext);
+
+                var result = await redirectsService.List();
+
+                var viewModel = result.AssertRight();
+                var publicationsRedirectViewModel = viewModel.Publications;
+
+                Assert.Equal(2, publicationsRedirectViewModel.Count);
+
+                Assert.Equal("redirect-from-2", publicationsRedirectViewModel[0].FromSlug);
+                Assert.Equal("redirect-to", publicationsRedirectViewModel[0].ToSlug);
+
+                Assert.Equal("redirect-from-1", publicationsRedirectViewModel[1].FromSlug);
+                Assert.Equal("redirect-to", publicationsRedirectViewModel[1].ToSlug);
+            }
+        }
+
         [Fact]
         public async Task List_MethodologyRedirect()
         {
