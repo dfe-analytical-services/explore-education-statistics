@@ -2,6 +2,7 @@ import ContentHtml from '@common/components/ContentHtml';
 import CollapsibleList from '@common/components/CollapsibleList';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import getTimePeriodString from '@common/modules/table-tool/utils/getTimePeriodString';
 import { Subject } from '@common/services/tableBuilderService';
 import orderBy from 'lodash/orderBy';
 import React from 'react';
@@ -12,7 +13,7 @@ interface Props {
 
 export default function DataSetDetailsList({ subject }: Props) {
   const { content, filters, geographicLevels, indicators, name } = subject;
-  const timePeriod = getTimePeriod(subject);
+  const timePeriod = getTimePeriodString(subject.timePeriods);
 
   return (
     <SummaryList className="govuk-!-margin-bottom-4" noBorder>
@@ -64,14 +65,4 @@ export default function DataSetDetailsList({ subject }: Props) {
       )}
     </SummaryList>
   );
-}
-
-function getTimePeriod(subject: Subject) {
-  const { from, to } = subject.timePeriods;
-
-  if (from && to) {
-    return from === to ? from : `${from} to ${to}`;
-  }
-
-  return from || to;
 }

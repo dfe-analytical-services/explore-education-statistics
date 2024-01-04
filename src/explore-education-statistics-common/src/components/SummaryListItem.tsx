@@ -1,9 +1,11 @@
+import styles from '@common/components/SummaryList.module.scss';
+import classNames from 'classnames';
 import React, { ReactNode } from 'react';
-import styles from './SummaryList.module.scss';
 
 interface Props {
   actions?: ReactNode;
   children?: ReactNode;
+  className?: string;
   term: string | ReactNode;
   testId?: string;
 }
@@ -11,11 +13,15 @@ interface Props {
 const SummaryListItem = ({
   actions,
   children,
+  className,
   term,
   testId = typeof term === 'string' ? term : undefined,
 }: Props) => {
   return (
-    <div className="govuk-summary-list__row" data-testid={testId}>
+    <div
+      className={classNames('govuk-summary-list__row', className)}
+      data-testid={testId}
+    >
       <dt
         className={`govuk-summary-list__key ${styles.key}`}
         data-testid={`${testId}-key`}

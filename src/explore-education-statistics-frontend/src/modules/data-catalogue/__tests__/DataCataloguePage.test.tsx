@@ -2,22 +2,37 @@ import _downloadService from '@common/services/downloadService';
 import _tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
-import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
 import _publicationService, {
   ReleaseSummary,
   PublicationTreeSummary,
   Theme,
 } from '@common/services/publicationService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import DataCataloguePage from '@frontend/modules/data-catalogue/DataCataloguePage';
+import { testDataSetSummaries } from '@frontend/modules/data-catalogue/__data__/testDataSets';
+import _dataSetService from '@frontend/services/dataSetService';
+import { screen, waitFor, within } from '@testing-library/react';
+import render from '@common-test/render';
 import userEvent from '@testing-library/user-event';
-import preloadAll from 'jest-next-dynamic';
 import React from 'react';
 import { produce } from 'immer';
+import { Paging } from '@common/services/types/pagination';
+import mockRouter from 'next-router-mock';
 
+jest.mock('@frontend/services/dataSetService');
 jest.mock('@common/services/downloadService');
 jest.mock('@common/services/publicationService');
 jest.mock('@common/services/tableBuilderService');
 
+const mockIsMedia = false;
+jest.mock('@common/hooks/useMedia', () => ({
+  useMobileMedia: () => {
+    return {
+      isMedia: mockIsMedia,
+    };
+  },
+}));
+
+const dataSetService = _dataSetService as jest.Mocked<typeof _dataSetService>;
 const downloadService = _downloadService as jest.Mocked<
   typeof _downloadService
 >;
@@ -141,8 +156,6 @@ describe('DataCataloguePage', () => {
       indicators: ['Indicator 1'],
     },
   ];
-
-  beforeAll(preloadAll);
 
   test('renders the page correctly with themes and publications', async () => {
     render(<DataCataloguePage themes={testThemes} />);
@@ -475,5 +488,134 @@ describe('DataCataloguePage', () => {
     expect(fileCheckboxes[2]).toEqual(
       step3.getByLabelText('Subject 3 (csv, 30 Mb)'),
     );
+  });
+
+  // TO DO EES-4781 remove tests for old version
+  describe('new version', () => {
+    const testPaging: Paging = {
+      page: 1,
+      pageSize: 10,
+      totalResults: 30,
+      totalPages: 3,
+    };
+
+    beforeEach(() => {
+      mockRouter.setCurrentUrl('/data-catalogue');
+    });
+
+    test('renders related information links', async () => {
+      dataSetService.listDataSets.mockResolvedValue({
+        results: testDataSetSummaries,
+        paging: testPaging,
+      });
+
+      render(<DataCataloguePage newDesign />);
+
+      const relatedInformationNav = screen.getByRole('navigation', {
+        name: 'Related information',
+      });
+
+      const relatedInformationLinks = within(
+        relatedInformationNav,
+      ).getAllByRole('link');
+
+      expect(relatedInformationLinks).toHaveLength(2);
+      expect(relatedInformationLinks[0]).toHaveTextContent(
+        'Find statistics and data',
+      );
+      expect(relatedInformationLinks[1]).toHaveTextContent('Glossary');
+    });
+
+    test('renders correctly with data sets', async () => {
+      dataSetService.listDataSets.mockResolvedValue({
+        results: testDataSetSummaries,
+        paging: testPaging,
+      });
+
+      render(<DataCataloguePage newDesign />);
+
+      expect(
+        screen.getByRole('heading', { name: 'Data catalogue' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByText(
+          'Find and download data sets with associated guidance files.',
+        ),
+      ).toBeInTheDocument();
+
+      await waitFor(() => {
+        expect(screen.getByText('30 results')).toBeInTheDocument();
+      });
+
+      expect(
+        screen.getByRole('heading', { name: '30 results' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByText('Page 1 of 3, showing all available data sets'),
+      ).toBeInTheDocument();
+
+      const dataSets = screen.queryAllByTestId(/data-set-summary/);
+      expect(dataSets).toHaveLength(3);
+
+      expect(
+        within(dataSets[0]).getByRole('heading', { name: 'Data set 1' }),
+      ).toBeInTheDocument();
+      expect(
+        within(dataSets[1]).getByRole('heading', { name: 'Data set 2' }),
+      ).toBeInTheDocument();
+      expect(
+        within(dataSets[2]).getByRole('heading', { name: 'Data set 3' }),
+      ).toBeInTheDocument();
+
+      const pagination = within(
+        screen.getByRole('navigation', { name: 'Pagination' }),
+      );
+      expect(pagination.getByRole('link', { name: 'Page 1' })).toHaveAttribute(
+        'href',
+        '/data-catalogue?page=1',
+      );
+      expect(pagination.getByRole('link', { name: 'Page 2' })).toHaveAttribute(
+        'href',
+        '/data-catalogue?page=2',
+      );
+      expect(pagination.getByRole('link', { name: 'Page 3' })).toHaveAttribute(
+        'href',
+        '/data-catalogue?page=3',
+      );
+      expect(pagination.getByRole('link', { name: 'Next' })).toHaveAttribute(
+        'href',
+        '/data-catalogue?page=2',
+      );
+
+      expect(
+        screen.queryByText('No data currently published.'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('renders correctly with no data sets', async () => {
+      dataSetService.listDataSets.mockResolvedValue({
+        results: [],
+        paging: {
+          ...testPaging,
+          totalPages: 0,
+          totalResults: 0,
+        },
+      });
+      render(<DataCataloguePage newDesign />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('No data currently published.'),
+        ).toBeInTheDocument();
+      });
+
+      expect(screen.queryByTestId('dataSetsList')).not.toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('navigation', { name: 'Pagination navigation' }),
+      ).not.toBeInTheDocument();
+    });
   });
 });
