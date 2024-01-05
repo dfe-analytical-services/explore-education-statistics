@@ -1,9 +1,10 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
 import { environment } from '../../utils/env';
 
-// Home page
+// AzureLogin Page
 export class AzureLoginPage {
   readonly page: Page;
     emailAddress: Locator;
@@ -15,12 +16,23 @@ export class AzureLoginPage {
   constructor(page) {
     this.page = page;
     // Locators
-    this.emailAddress = page.locator('input[type="email"]');
-    this.nextButton =  page.getByRole('button', { name: 'Next' });
-    this.password =  page.getByPlaceholder('Password');
-    this.signInButton = page.getByRole('button', { name: 'Sign in' })
-    this.noButton = page.getByRole('button', { name: 'No' });
+    this.emailAddress = page.locator('input[placeholder="Email, phone, or Skype"]')
+    this.nextButton =  page.locator('input[type="submit"]');
+    this.password =  page.locator('input[type="password"]');
+    this.signInButton = page.locator('input[type="submit"][id="idSIButton9"]');
+    this.noButton = page.locator('input[id="idBtn_Back"]');
   }
 
-
+  async doSignIn() {
+    await this.emailAddress.fill(environment.ADMIN_EMAILADDR!);
+    await this.nextButton.click();
+    await this.password.waitFor({state:'visible'})
+    await this.password.fill(environment.ADMIN_PASSWORD!);
+    await this.signInButton.click();
+    await this.noButton.waitFor({ state: 'visible'});
+    await this.noButton.click();
+  }
 }
+
+
+
