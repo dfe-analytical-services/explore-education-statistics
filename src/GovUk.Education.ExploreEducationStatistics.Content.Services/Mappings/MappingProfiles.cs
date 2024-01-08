@@ -1,9 +1,9 @@
-﻿#nullable enable
+#nullable enable
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
 {
