@@ -19,7 +19,7 @@ internal class PublicationService : IPublicationService
         this._contentApiClient = contentApiClient;
     }
 
-    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationListViewModel>>> ListPublications(
+    public async Task<Either<ActionResult, PaginatedPublicationListViewModel>> ListPublications(
         int page,
         int pageSize, 
         string? search = null)
@@ -31,12 +31,11 @@ internal class PublicationService : IPublicationService
             {
                 var results = paginatedPublications.Results.Select(MapPublication).ToList();
 
-                var paging = new PagingViewModel(
+                return new PaginatedPublicationListViewModel(
+                    results, 
                     paginatedPublications.Paging.Page,
                     paginatedPublications.Paging.PageSize,
                     paginatedPublications.Paging.TotalResults);
-
-                return new PaginatedListViewModel<PublicationListViewModel>(results, paging);
             });
     }
 

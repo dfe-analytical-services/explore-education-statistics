@@ -20,7 +20,7 @@ public class PublicationsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<PaginatedListViewModel<PublicationListViewModel>>> ListPublications(
+    public async Task<ActionResult<PaginatedPublicationListViewModel>> ListPublications(
         [FromQuery] PublicationsListRequest request)
     {
         return await _publicationService
