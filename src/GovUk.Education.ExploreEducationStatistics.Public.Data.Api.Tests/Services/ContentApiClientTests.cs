@@ -34,18 +34,23 @@ public class ContentApiClientTests
         _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
             .Respond(HttpStatusCode.BadRequest, new StringContent("test message"));
 
-        var response = await _contentApiClient.ListPublications(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<IEnumerable<Guid>>());
+        var response = await _contentApiClient.ListPublications(
+            It.IsAny<int>(), 
+            It.IsAny<int>(), 
+            It.IsAny<string>(),
+            It.IsAny<IEnumerable<Guid>>());
 
         _mockHttp.VerifyNoOutstandingExpectation();
 
         _logger.Verify(logger => logger.Log(
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
                 It.Is<EventId>(eventId => eventId.Id == 0),
-                It.Is<It.IsAnyType>((@object, @type) => 
-                    @object.ToString() ==  $"""
-                        Failed to retrieve publications with status code: {HttpStatusCode.BadRequest}. Message:
-                        test message
-                        """.TrimIndent()),
+                It.Is<It.IsAnyType>((@object, @type) =>
+                    @object.ToString() == 
+                        $"""
+                         Failed to retrieve publications with status code: {HttpStatusCode.BadRequest}. Message:
+                         test message
+                         """.TrimIndent()),
                 It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
@@ -56,12 +61,18 @@ public class ContentApiClientTests
 
     [Theory]
     [InlineData(HttpStatusCode.RequestTimeout)]
-    public async Task ListPublications_HttpClientRespondsWithUnsuccessfulStatusCode_ThrowsHttpRequestExceptionAndLogsError(HttpStatusCode responseStatusCode)
+    public async Task
+        ListPublications_HttpClientRespondsWithUnsuccessfulStatusCode_ThrowsHttpRequestExceptionAndLogsError(
+            HttpStatusCode responseStatusCode)
     {
         _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
             .Respond(responseStatusCode, new StringContent("test message"));
 
-        var action = async () => await _contentApiClient.ListPublications(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<IEnumerable<Guid>>());
+        var action = async () => await _contentApiClient.ListPublications(
+            It.IsAny<int>(),
+            It.IsAny<int>(),
+            It.IsAny<string>(), 
+            It.IsAny<IEnumerable<Guid>>());
 
         await Assert.ThrowsAsync<HttpRequestException>(action);
 
@@ -71,10 +82,11 @@ public class ContentApiClientTests
                 It.Is<LogLevel>(logLevel => logLevel == LogLevel.Error),
                 It.Is<EventId>(eventId => eventId.Id == 0),
                 It.Is<It.IsAnyType>((@object, @type) =>
-                    @object.ToString() ==  $"""
-                        Failed to retrieve publications with status code: {responseStatusCode}. Message:
-                        test message
-                        """.TrimIndent()), It.IsAny<Exception>(),
+                    @object.ToString() == 
+                        $"""
+                         Failed to retrieve publications with status code: {responseStatusCode}. Message:
+                         test message
+                         """.TrimIndent()), It.IsAny<Exception>(),
                 It.IsAny<Func<It.IsAnyType, Exception?, string>>()),
             Times.Once);
     }
@@ -84,16 +96,22 @@ public class ContentApiClientTests
     {
         var results = new List<PublicationSearchResultViewModel>()
         {
-            new() {
+            new()
+            {
                 Id = Guid.NewGuid(),
             }
         };
-        var responseBody = new PaginatedListViewModel<PublicationSearchResultViewModel>(results, results.Count, 1, results.Count);
+        var responseBody =
+            new PaginatedListViewModel<PublicationSearchResultViewModel>(results, results.Count, 1, results.Count);
 
         _mockHttp.Expect(HttpMethod.Post, "http://localhost/api/publications")
             .Respond(HttpStatusCode.OK, "application/json", JsonSerializer.Serialize(responseBody));
 
-        var response = await _contentApiClient.ListPublications(It.IsAny<int>(), It.IsAny<int>(), It.IsAny<string>(), It.IsAny<IEnumerable<Guid>>());
+        var response = await _contentApiClient.ListPublications(
+            It.IsAny<int>(), 
+            It.IsAny<int>(), 
+            It.IsAny<string>(),
+            It.IsAny<IEnumerable<Guid>>());
 
         _mockHttp.VerifyNoOutstandingExpectation();
 

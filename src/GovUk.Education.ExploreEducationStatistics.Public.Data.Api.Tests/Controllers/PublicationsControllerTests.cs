@@ -178,7 +178,11 @@ public class PublicationsControllerTests : IntegrationTestFixture
         await TestApp.AddTestData<PublicDataDbContext>(supplier);
     }
 
-    private async Task<HttpResponseMessage> ListPublications(HttpClient client, int? page = null, int? pageSize= null, string? search = null)
+    private async Task<HttpResponseMessage> ListPublications(
+        HttpClient client, 
+        int? page = null, 
+        int? pageSize = null,
+        string? search = null)
     {
         var query = new Dictionary<string, string?>
         {
@@ -195,10 +199,7 @@ public class PublicationsControllerTests : IntegrationTestFixture
     private WebApplicationFactory<Startup> SetupApp(IContentApiClient? contentApiClient = null)
     {
         return TestApp.ConfigureServices(
-            services =>
-            {
-                services.ReplaceService(contentApiClient);
-            }
+            services => { services.ReplaceService(contentApiClient); }
         );
     }
 

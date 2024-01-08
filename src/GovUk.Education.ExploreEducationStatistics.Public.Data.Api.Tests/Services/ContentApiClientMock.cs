@@ -7,11 +7,16 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.D
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
+
 internal class ContentApiClientMock : IContentApiClient
 {
     private readonly DataFixture DataFixture = new();
 
-    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
+    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
+        int page,
+        int pageSize,
+        string? search = null,
+        IEnumerable<Guid>? publicationIds = null)
     {
         if (publicationIds is null)
         {
@@ -25,7 +30,11 @@ internal class ContentApiClientMock : IContentApiClient
 
         var publicationsToReturn = PaginatePublications(page, pageSize, publicationIds);
 
-        return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>(publicationsToReturn, publicationIds!.Count(), page, pageSize));
+        return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>(
+            publicationsToReturn,
+            publicationIds!.Count(), 
+            page, 
+            pageSize));
     }
 
     private async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> AllPublications(int page, int pageSize)
@@ -34,7 +43,11 @@ internal class ContentApiClientMock : IContentApiClient
 
         var publicationsToReturn = PaginatePublications(page, pageSize, allPublicationIds);
 
-        return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>(publicationsToReturn, allPublicationIds.Count, page, pageSize));
+        return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>(
+            publicationsToReturn,
+            allPublicationIds.Count, 
+            page, 
+            pageSize));
     }
 
     private static IReadOnlyList<Guid> GenerateRandomPublicationIds()
@@ -44,7 +57,8 @@ internal class ContentApiClientMock : IContentApiClient
             .ToList();
     }
 
-    private List<PublicationSearchResultViewModel> PaginatePublications(int page, int pageSize, IEnumerable<Guid> allPublicationIds)
+    private List<PublicationSearchResultViewModel> PaginatePublications(int page, int pageSize,
+        IEnumerable<Guid> allPublicationIds)
     {
         return allPublicationIds!
             .Skip((page - 1) * pageSize)
@@ -62,8 +76,10 @@ internal class ContentApiClientMock : IContentApiClient
             .Generate();
     }
 
-    private static async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> EmptyResult(int page, int pageSize)
+    private static async Task<PaginatedListViewModel<PublicationSearchResultViewModel>> EmptyResult(int page,
+        int pageSize)
     {
-        return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>([], 0, page, pageSize));
+        return await Task.FromResult(new PaginatedListViewModel<PublicationSearchResultViewModel>([], 0, page,
+            pageSize));
     }
 }

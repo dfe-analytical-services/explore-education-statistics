@@ -14,13 +14,17 @@ internal class ContentApiClient : IContentApiClient
     private readonly ILogger<ContentApiClient> _logger;
     private readonly HttpClient _httpClient;
 
-    public ContentApiClient(ILogger<ContentApiClient> logger, HttpClient HttpClient)
+    public ContentApiClient(ILogger<ContentApiClient> logger, HttpClient httpClient)
     {
         _logger = logger;
-        _httpClient = HttpClient;
+        _httpClient = httpClient;
     }
 
-    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(int page, int pageSize, string? search = null, IEnumerable<Guid>? publicationIds = null)
+    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>> ListPublications(
+        int page, 
+        int pageSize, 
+        string? search = null, 
+        IEnumerable<Guid>? publicationIds = null)
     {
         var request = new PublicationsListPostRequest(
             Search: search,
@@ -49,6 +53,9 @@ internal class ContentApiClient : IContentApiClient
             }
         }
 
-        return new Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>(await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>());
+        var deserializedResponse =
+            await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationSearchResultViewModel>>();
+
+        return new Either<ActionResult, PaginatedListViewModel<PublicationSearchResultViewModel>>(deserializedResponse);
     }
 }

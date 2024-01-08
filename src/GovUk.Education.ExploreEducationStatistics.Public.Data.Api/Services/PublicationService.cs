@@ -10,19 +10,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 
 internal class PublicationService : IPublicationService
 {
-    private readonly PublicDataDbContext publicDataDbContext;
-    private readonly IContentApiClient contentApiClient;
+    private readonly PublicDataDbContext _publicDataDbContext;
+    private readonly IContentApiClient _contentApiClient;
 
     public PublicationService(PublicDataDbContext publicDataDbContext, IContentApiClient contentApiClient)
     {
-        this.publicDataDbContext=publicDataDbContext;
-        this.contentApiClient=contentApiClient;
+        this._publicDataDbContext = publicDataDbContext;
+        this._contentApiClient = contentApiClient;
     }
 
-    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationListViewModel>>> ListPublications(int page, int pageSize, string? search = null)
+    public async Task<Either<ActionResult, PaginatedListViewModel<PublicationListViewModel>>> ListPublications(
+        int page,
+        int pageSize, 
+        string? search = null)
     {
-        return await GetPublishedDataSetPublicationIds(publicDataDbContext)
-            .OnSuccess(async (publicationIds) => await contentApiClient.ListPublications(page, pageSize, search, publicationIds))
+        return await GetPublishedDataSetPublicationIds(_publicDataDbContext)
+            .OnSuccess(async (publicationIds) =>
+                await _contentApiClient.ListPublications(page, pageSize, search, publicationIds))
             .OnSuccess((paginatedPublications) =>
             {
                 var results = paginatedPublications.Results.Select(MapPublication).ToList();
@@ -36,7 +40,8 @@ internal class PublicationService : IPublicationService
             });
     }
 
-    private static Either<ActionResult, HashSet<Guid>> GetPublishedDataSetPublicationIds(PublicDataDbContext publicDataDbContext)
+    private static Either<ActionResult, HashSet<Guid>> GetPublishedDataSetPublicationIds(
+        PublicDataDbContext publicDataDbContext)
     {
         return publicDataDbContext.DataSets
             .Where(ds => ds.Status == DataSetStatus.Published)

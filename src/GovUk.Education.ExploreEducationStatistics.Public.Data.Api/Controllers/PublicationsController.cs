@@ -12,18 +12,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Controllers
 [Route("api/v{version:apiVersion}/[controller]")]
 public class PublicationsController : ControllerBase
 {
-    private readonly IPublicationService publicationService;
+    private readonly IPublicationService _publicationService;
 
     public PublicationsController(IPublicationService publicationService)
     {
-        this.publicationService=publicationService;
+        this._publicationService = publicationService;
     }
 
     [HttpGet]
     public async Task<ActionResult<PaginatedListViewModel<PublicationListViewModel>>> ListPublications(
         [FromQuery] PublicationsListRequest request)
     {
-        return await publicationService
+        return await _publicationService
             .ListPublications(
                 page: request.Page,
                 pageSize: request.PageSize,
