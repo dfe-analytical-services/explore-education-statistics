@@ -1,12 +1,10 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 
 public record PublicationsListPostRequest(
     ReleaseType? ReleaseType = null,

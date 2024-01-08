@@ -1,8 +1,3 @@
-#nullable enable
-<<<<<<<< HEAD:src/GovUk.Education.ExploreEducationStatistics.Content.Requests/PublicationsListGetRequest.cs
-using System;
-========
->>>>>>>> EES-4705-removing-content-api-and-content-services-dependencies:src/GovUk.Education.ExploreEducationStatistics.Content.Requests/PublicationsListRequest.cs
 using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
