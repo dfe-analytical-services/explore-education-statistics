@@ -21,12 +21,12 @@ public class EnumToEnumLabelConverter<TEnum> : ValueConverter<TEnum, string> whe
     {
     }
 
-    private static string ToProvider(TEnum value)
+    public static string ToProvider(TEnum value)
     {
         return value.GetEnumLabel();
     }
 
-    private static TEnum FromProvider(string label)
+    public static TEnum FromProvider(string label)
     {
         if (label == null)
         {
