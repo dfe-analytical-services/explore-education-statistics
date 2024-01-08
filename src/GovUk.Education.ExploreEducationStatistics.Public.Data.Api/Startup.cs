@@ -59,7 +59,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
 
         services.AddDbContext<PublicDataDbContext>(options =>
         {
-            var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("PublicDataDbContext"));
+            var dataSourceBuilder = new NpgsqlDataSourceBuilder(configuration.GetConnectionString("PublicDataDb"));
             dataSourceBuilder.MapEnum<GeographicLevel>();
 
             options
