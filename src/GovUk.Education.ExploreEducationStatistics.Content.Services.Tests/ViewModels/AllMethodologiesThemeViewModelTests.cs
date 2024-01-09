@@ -1,6 +1,6 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
