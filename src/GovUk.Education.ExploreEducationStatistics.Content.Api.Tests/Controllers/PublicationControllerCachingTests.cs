@@ -40,7 +40,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
         ReleaseType.ExperimentalStatistics,
         ThemeId: Guid.Empty,
         Search: "",
-        IPublicationService.PublicationsSortBy.Published,
+        PublicationsSortBy.Published,
         SortOrder.Asc,
         Page: 1,
         PageSize: 10,
