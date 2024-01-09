@@ -8,7 +8,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
-    <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Services\GovUk.Education.ExploreEducationStatistics.Content.Services.csproj" />
   </ItemGroup>
 
 </Project>
