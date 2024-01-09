@@ -91,7 +91,9 @@ public class Startup
         services.AddValidatorsFromAssemblyContaining<Startup>();
         services.AddFluentValidationAutoValidation();
 
-        services.AddHttpClient<ContentApiClient>(httpClient =>
+        //services.AddScoped<IContentApiClient, ContentApiClient>();
+
+        services.AddHttpClient<IContentApiClient, ContentApiClient>(httpClient =>
         {
             var contentApiOptions = configuration
                 .GetRequiredSection(ContentApiOptions.Section)
@@ -101,7 +103,6 @@ public class Startup
             httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
         });
 
-        services.AddScoped<IContentApiClient, ContentApiClient>();
 
         services.AddScoped<IPublicationService, PublicationService>();
     }
