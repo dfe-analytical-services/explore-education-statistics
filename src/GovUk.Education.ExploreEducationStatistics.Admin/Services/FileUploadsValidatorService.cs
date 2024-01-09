@@ -16,6 +16,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTy
 using static System.StringComparison;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
+using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -23,6 +25,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
+
+        private const int MaxFilenameSize = 150;
+        private const int MaxFileSize = int.MaxValue; // 2GB
 
         public FileUploadsValidatorService(IFileTypeService fileTypeService,
             ContentDbContext context)
@@ -69,6 +74,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (file.Length == 0)
             {
                 return ValidationActionResult(FileCannotBeEmpty);
+            }
+            
+            if (file.Length > MaxFileSize)
+            {
+                return ValidationActionResult(FileSizeLimitExceeded);
             }
 
             if (!await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[type]))
@@ -164,6 +174,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
+            var filenamesValid = ValidateFilenameLengths(
+                dataFileName.Length,
+                metaFileName.Length);
+
+            if (filenamesValid.IsLeft)
+            {
+                return filenamesValid.Left;
+            }
+
             if (IsFileExisting(releaseId, FileType.Data, dataFileName) &&
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
@@ -207,6 +226,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static bool ValidateFileExtension(string fileName, string requiredExtension)
         {
             return fileName.EndsWith(requiredExtension);
+        }
+
+        private static Either<ActionResult, Unit> ValidateFilenameLengths(
+            int dataFilenameLength,
+            int metaFilenameLength)
+        {
+            var errorMessages = new List<ValidationErrorMessages>();
+
+            if (dataFilenameLength > MaxFilenameSize)
+            {
+                errorMessages.Add(DataFilenameTooLong);
+            }
+
+            if (metaFilenameLength > MaxFilenameSize)
+            {
+                errorMessages.Add(MetaFilenameTooLong);
+            }
+
+            if (errorMessages.Any()) {
+                return ValidationActionResult(errorMessages);
+            }
+
+            return Unit.Instance;
         }
     }
 }

@@ -156,6 +156,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Summary")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<Guid?>("SupersedingDataSetId")
                         .HasColumnType("uuid");
 
@@ -235,6 +239,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<long>("TotalResults")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTimeOffset?>("Unpublished")
                         .HasColumnType("timestamp with time zone");
@@ -864,15 +871,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .ValueGeneratedOnAdd()
                                         .HasColumnType("integer");
 
-                                    b2.Property<string>("Identifier")
-                                        .IsRequired()
-                                        .HasColumnType("text")
-                                        .HasAnnotation("Relational:JsonPropertyName", "Id");
-
                                     b2.Property<bool?>("IsAggregate")
                                         .HasColumnType("boolean");
 
                                     b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<int>("PrivateId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("PublicId")
                                         .IsRequired()
                                         .HasColumnType("text");
 
@@ -958,12 +967,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                                         .IsRequired()
                                         .HasColumnType("text");
 
-                                    b2.Property<string>("Identifier")
-                                        .IsRequired()
-                                        .HasColumnType("text")
-                                        .HasAnnotation("Relational:JsonPropertyName", "Id");
-
                                     b2.Property<string>("Label")
+                                        .IsRequired()
+                                        .HasColumnType("text");
+
+                                    b2.Property<int>("PrivateId")
+                                        .HasColumnType("integer");
+
+                                    b2.Property<string>("PublicId")
                                         .IsRequired()
                                         .HasColumnType("text");
 

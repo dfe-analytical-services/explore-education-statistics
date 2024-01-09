@@ -3,18 +3,16 @@ import methodologyNoteService, {
   MethodologyNote,
 } from '@admin/services/methodologyNoteService';
 import { MethodologyContent } from '@admin/services/methodologyContentService';
+import MethodologyNotesAddForm from '@admin/pages/methodology/edit-methodology/content/components/MethodologyNotesAddForm';
+import MethodologyNotesEditForm from '@admin/pages/methodology/edit-methodology/content/components/MethodologyNotesEditForm';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Details from '@common/components/Details';
-import { Form } from '@common/components/form';
-import FormFieldDateInput from '@common/components/form/FormFieldDateInput';
-import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import FormattedDate from '@common/components/FormattedDate';
 import ModalConfirm from '@common/components/ModalConfirm';
 import SummaryListItem from '@common/components/SummaryListItem';
-import Yup from '@common/validation/yup';
+import useToggle from '@common/hooks/useToggle';
 import orderBy from 'lodash/orderBy';
-import { Formik } from 'formik';
 import React, { useState } from 'react';
 
 interface Props {
@@ -32,8 +30,8 @@ interface EditFormValues {
 }
 
 const MethodologyNotesSection = ({ methodology }: Props) => {
-  const [addFormOpen, setAddFormOpen] = useState<boolean>(false);
-  const [editFormOpen, setEditFormOpen] = useState<boolean>(false);
+  const [addFormOpen, toggleAddFormOpen] = useToggle(false);
+  const [editFormOpen, toggleEditFormOpen] = useToggle(false);
   const [selectedMethodologyNote, setSelectedMethodologyNote] = useState<
     MethodologyNote | undefined
   >();
@@ -49,7 +47,7 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
     });
 
     setMethodologyNotes([...methodologyNotes, newNote]);
-    setAddFormOpen(false);
+    toggleAddFormOpen.off();
   };
 
   const editMethodologyNote = async (methodologyNote: EditFormValues) => {
@@ -65,7 +63,7 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
       note.id === updatedNote.id ? updatedNote : note,
     );
     setSelectedMethodologyNote(undefined);
-    setEditFormOpen(false);
+    toggleEditFormOpen.off();
     setMethodologyNotes(updatedNotes);
   };
 
@@ -76,109 +74,24 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
   };
 
   const openAddForm = () => {
-    setAddFormOpen(true);
-    setEditFormOpen(false);
+    toggleAddFormOpen.on();
+    toggleEditFormOpen.off();
   };
 
   const openEditForm = (selected: MethodologyNote) => {
-    setAddFormOpen(false);
-    setEditFormOpen(true);
+    toggleAddFormOpen.off();
+    toggleEditFormOpen.on();
     setSelectedMethodologyNote(selected);
   };
 
   const renderAddForm = () => {
-    const formId = 'createMethodologyNoteForm';
-
     return !addFormOpen ? (
       <Button onClick={openAddForm}>Add note</Button>
     ) : (
-      <Formik<CreateFormValues>
-        initialValues={{ content: '' }}
-        validationSchema={Yup.object<CreateFormValues>({
-          content: Yup.string().required('Methodology note must be provided'),
-        })}
-        onSubmit={methodologyNote => addMethodologyNote(methodologyNote)}
-      >
-        {form => {
-          return (
-            <Form id={formId}>
-              <FormFieldTextArea<CreateFormValues>
-                label="New methodology note"
-                name="content"
-                rows={3}
-              />
-
-              <ButtonGroup>
-                <Button type="submit">Save note</Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    form.resetForm();
-                    setAddFormOpen(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </ButtonGroup>
-            </Form>
-          );
-        }}
-      </Formik>
-    );
-  };
-
-  const renderEditForm = () => {
-    const formId = 'editMethodologyNoteForm';
-
-    return (
-      <Formik<EditFormValues>
-        initialValues={
-          selectedMethodologyNote
-            ? {
-                id: selectedMethodologyNote.id,
-                displayDate: new Date(selectedMethodologyNote.displayDate),
-                content: selectedMethodologyNote.content,
-              }
-            : ({
-                content: '',
-              } as EditFormValues)
-        }
-        validationSchema={Yup.object<Omit<EditFormValues, 'id'>>({
-          displayDate: Yup.date().required('Enter a valid edit date'),
-          content: Yup.string().required('Methodology note must be provided'),
-        })}
-        onSubmit={methodologyNote => editMethodologyNote(methodologyNote)}
-      >
-        {form => {
-          return (
-            <Form id={formId}>
-              <FormFieldDateInput<EditFormValues>
-                name="displayDate"
-                legend="Edit date"
-                legendSize="s"
-              />
-              <FormFieldTextArea<EditFormValues>
-                label="Edit methodology note"
-                name="content"
-                rows={3}
-              />
-
-              <ButtonGroup>
-                <Button type="submit">Update note</Button>
-                <Button
-                  variant="secondary"
-                  onClick={() => {
-                    form.resetForm();
-                    setEditFormOpen(false);
-                  }}
-                >
-                  Cancel
-                </Button>
-              </ButtonGroup>
-            </Form>
-          );
-        }}
-      </Formik>
+      <MethodologyNotesAddForm
+        onCancel={toggleAddFormOpen.off}
+        onSubmit={addMethodologyNote}
+      />
     );
   };
 
@@ -202,7 +115,17 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
                   {editingMode === 'edit' &&
                   editFormOpen &&
                   selectedMethodologyNote?.id === note.id ? (
-                    renderEditForm()
+                    <MethodologyNotesEditForm
+                      initialValues={{
+                        id: selectedMethodologyNote.id,
+                        displayDate: new Date(
+                          selectedMethodologyNote.displayDate,
+                        ),
+                        content: selectedMethodologyNote.content,
+                      }}
+                      onCancel={toggleEditFormOpen.off}
+                      onSubmit={editMethodologyNote}
+                    />
                   ) : (
                     <>
                       <FormattedDate

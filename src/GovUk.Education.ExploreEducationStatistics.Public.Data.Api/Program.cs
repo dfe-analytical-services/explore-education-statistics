@@ -1,45 +1,63 @@
-using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Config;
 using Microsoft.Extensions.Logging.ApplicationInsights;
+using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
+var builder = WebApplication.CreateBuilder(args);
 
-[ExcludeFromCodeCoverage]
-public class Program
+builder.WebHost.ConfigureKestrel(options =>
 {
-    public static void Main(string[] args)
+    options.AddServerHeader = false;
+});
+
+builder.Configuration.AddJsonFile(
+    path:"appsettings.Local.json",
+    optional: true,
+    reloadOnChange: true);
+
+
+// Logging
+
+builder.Logging.AddConsole();
+builder.Logging.AddApplicationInsights();
+builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Program).FullName, LogLevel.Debug);
+builder.Logging.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Startup).FullName, LogLevel.Debug);
+builder.Logging.AddAzureWebAppDiagnostics();
+
+builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfig>();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.EnableAnnotations();
+});
+
+var startup = new Startup(builder.Configuration, builder.Environment);
+
+startup.ConfigureServices(builder.Services);
+
+var app = builder.Build();
+
+startup.Configure(app, app.Environment);
+
+app.UseSwagger(options =>
+{
+     options.RouteTemplate = "/docs/{documentName}/openapi.json";
+});
+app.UseSwaggerUI(options =>
+{
+    options.RoutePrefix = "docs";
+
+    foreach (var description in app.DescribeApiVersions())
     {
-        CreateHostBuilder(args).Build().Run();
+        options.SwaggerEndpoint(
+            url: $"/docs/{description.GroupName}/openapi.json",
+            name: $"v{description.GroupName}");
     }
+});
 
-    private static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-                webBuilder.ConfigureKestrel(serverOptions => { serverOptions.AddServerHeader = false; });
-            })
-            .ConfigureAppConfiguration((_, builder) =>
-            {
-                builder.AddJsonFile(
-                    "appsettings.Local.json",
-                    optional: true,
-                    reloadOnChange: true);
-            })
-            .ConfigureLogging(builder =>
-            {
-                // Capture logs from early in the application startup
-                // pipeline from Startup.cs or Program.cs itself.
-                builder.AddApplicationInsights();
+await app.StartAsync();
 
-                // Adding the filter below to ensure logs of all severity from Program.cs
-                // is sent to ApplicationInsights.
-                builder.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Program).FullName, LogLevel.Debug);
+app.Urls.ForEach(address => Console.WriteLine($"Server listening on address: {address}"));
 
-                // Adding the filter below to ensure logs of all severity from Startup.cs
-                // is sent to ApplicationInsights.
-                builder.AddFilter<ApplicationInsightsLoggerProvider>(typeof(Startup).FullName, LogLevel.Debug);
-
-                // Allow capturing logs in the App Service if turned on in the App Service logs settings page.
-                builder.AddAzureWebAppDiagnostics();
-            });
-}
+await app.WaitForShutdownAsync();

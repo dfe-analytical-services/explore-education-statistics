@@ -1,12 +1,12 @@
 import { FormFieldset, FormGroup } from '@common/components/form';
-import Form from '@common/components/form/Form';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
 import ButtonGroup from '@common/components/ButtonGroup';
 import Button from '@common/components/Button';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import { ExternalMethodology } from '@admin/services/publicationService';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
 import React, { useMemo } from 'react';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 
 interface Props {
   initialValues?: ExternalMethodology;
@@ -41,7 +41,7 @@ const ExternalMethodologyForm = ({
   }, []);
 
   return (
-    <Formik<ExternalMethodology>
+    <FormProvider
       enableReinitialize
       initialValues={
         initialValues ?? {
@@ -49,47 +49,41 @@ const ExternalMethodologyForm = ({
           url: 'https://',
         }
       }
-      onSubmit={values => {
-        onSubmit(values);
-      }}
       validationSchema={validationSchema}
     >
-      {form => (
-        <Form id="methodology-external">
-          <FormFieldset
-            id="methodology-external-fieldset"
-            legend="Link to an externally hosted methodology"
-            legendHidden
-          >
-            <FormGroup>
-              <FormFieldTextInput
-                label="Link title"
-                name="title"
-                className="govuk-!-width-two-thirds"
-              />
-              <FormFieldTextInput
-                label="URL"
-                name="url"
-                className="govuk-!-width-two-thirds"
-              />
-            </FormGroup>
-            <ButtonGroup>
-              <Button type="submit">Save</Button>
-              <Button
-                type="reset"
-                variant="secondary"
-                onClick={() => {
-                  form.resetForm();
-                  onCancel();
-                }}
-              >
-                Cancel
-              </Button>
-            </ButtonGroup>
-          </FormFieldset>
-        </Form>
-      )}
-    </Formik>
+      <RHFForm id="methodology-external" onSubmit={onSubmit}>
+        <FormFieldset
+          id="methodology-external-fieldset"
+          legend="Link to an externally hosted methodology"
+          legendHidden
+        >
+          <FormGroup>
+            <RHFFormFieldTextInput
+              label="Link title"
+              name="title"
+              className="govuk-!-width-two-thirds"
+            />
+            <RHFFormFieldTextInput
+              label="URL"
+              name="url"
+              className="govuk-!-width-two-thirds"
+            />
+          </FormGroup>
+          <ButtonGroup>
+            <Button type="submit">Save</Button>
+            <Button
+              type="reset"
+              variant="secondary"
+              onClick={() => {
+                onCancel();
+              }}
+            >
+              Cancel
+            </Button>
+          </ButtonGroup>
+        </FormFieldset>
+      </RHFForm>
+    </FormProvider>
   );
 };
 

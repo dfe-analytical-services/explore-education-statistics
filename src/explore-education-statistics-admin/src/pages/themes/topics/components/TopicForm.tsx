@@ -1,11 +1,12 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { Form, FormFieldTextInput } from '@common/components/form';
-import useFormSubmit from '@common/hooks/useFormSubmit';
+import FormProvider from '@common/components/form/rhf/FormProvider';
+import RHFForm from '@common/components/form/rhf/RHFForm';
+import RHFFormFieldTextInput from '@common/components/form/rhf/RHFFormFieldTextInput';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
-import { Formik } from 'formik';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
+import { ObjectSchema } from 'yup';
 
 export interface TopicFormValues {
   title: string;
@@ -33,39 +34,42 @@ const TopicForm = ({
   initialValues,
   onSubmit,
 }: Props) => {
-  const handleSubmit = useFormSubmit<TopicFormValues>(values => {
-    onSubmit(values);
-  }, errorMappings);
+  const validationSchema = useMemo<ObjectSchema<TopicFormValues>>(() => {
+    return Yup.object({
+      title: Yup.string().required('Enter a title'),
+    });
+  }, []);
 
   return (
-    <Formik<TopicFormValues>
+    <FormProvider
+      enableReinitialize
+      errorMappings={errorMappings}
       initialValues={
         initialValues ?? {
           title: '',
         }
       }
-      validationSchema={Yup.object<TopicFormValues>({
-        title: Yup.string().required('Enter a title'),
-      })}
-      onSubmit={handleSubmit}
+      validationSchema={validationSchema}
     >
-      {form => (
-        <Form id={id}>
-          <FormFieldTextInput<TopicFormValues>
-            label="Title"
-            name="title"
-            className="govuk-!-width-two-thirds"
-          />
+      {({ formState }) => {
+        return (
+          <RHFForm id={id} onSubmit={onSubmit}>
+            <RHFFormFieldTextInput<TopicFormValues>
+              label="Title"
+              name="title"
+              className="govuk-!-width-two-thirds"
+            />
 
-          <ButtonGroup>
-            <Button type="submit" disabled={form.isSubmitting}>
-              Save topic
-            </Button>
-            {cancelButton}
-          </ButtonGroup>
-        </Form>
-      )}
-    </Formik>
+            <ButtonGroup>
+              <Button type="submit" disabled={formState.isSubmitting}>
+                Save topic
+              </Button>
+              {cancelButton}
+            </ButtonGroup>
+          </RHFForm>
+        );
+      }}
+    </FormProvider>
   );
 };
 

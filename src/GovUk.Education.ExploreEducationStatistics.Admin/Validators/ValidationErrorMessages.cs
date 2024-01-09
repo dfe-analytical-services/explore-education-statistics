@@ -1,11 +1,14 @@
-﻿#nullable enable
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 {
     public enum ValidationErrorMessages
     {
         // Slug
         SlugNotUnique,
-        SlugUsedByRedirect,
+        PublicationSlugNotUnique,
+        PublicationSlugUsedByRedirect,
+        MethodologySlugNotUnique,
+        MethodologySlugUsedByRedirect,
 
         // Partial date
         PartialDateNotValid,
@@ -46,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotOverwriteFile,
         FileCannotBeEmpty,
         FileTypeInvalid,
+        FileSizeLimitExceeded,
 
         // Data file
         SubjectTitleCannotBeEmpty,
@@ -61,11 +65,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileTypeMustBeData,
         FileIdsShouldBeDistinct,
         IncorrectNumberOfFileIds,
+        DataFilenameTooLong,
 
         // Data zip file
         DataZipMustBeZipFile,
         DataZipFileCanOnlyContainTwoFiles,
         DataZipFileDoesNotContainCsvFiles,
+        DataZipFilenameTooLong,
+        DataZipContentFilenamesTooLong,
 
         // Meta file
         MetadataFileCannotBeEmpty,
@@ -73,6 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UnableToFindMetadataFileToDelete,
         MetaFilenameCannotContainSpacesOrSpecialCharacters,
         MetaFileIsIncorrectlyNamed,
+        MetaFilenameTooLong,
 
         // Data replacement
         ReplacementMustBeValid,

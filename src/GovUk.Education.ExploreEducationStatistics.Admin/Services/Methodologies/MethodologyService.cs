@@ -39,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IMethodologyApprovalService _methodologyApprovalService;
         private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IRedirectsCacheService _redirectsCacheService;
         private readonly IUserService _userService;
 
         public MethodologyService(
@@ -50,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IMethodologyImageService methodologyImageService,
             IMethodologyApprovalService methodologyApprovalService,
             IMethodologyCacheService methodologyCacheService,
+            IRedirectsCacheService redirectsCacheService,
             IUserService userService)
         {
             _persistenceHelper = persistenceHelper;
@@ -60,6 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _methodologyImageService = methodologyImageService;
             _methodologyApprovalService = methodologyApprovalService;
             _methodologyCacheService = methodologyCacheService;
+            _redirectsCacheService = redirectsCacheService;
             _userService = userService;
         }
 
@@ -370,22 +373,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                             .Collection(m => m.Versions)
                             .LoadAsync();
 
-                        // Only unpublished versions need a redirect to be created, as users cannot
-                        // update a published methodology version's AlternativeSlug
-                        if (methodologyVersion.Id == methodology.LatestVersion().Id
-                            // If an unpublished version already has a redirect, that means the version's slug has
-                            // been updated previously. And so it doesn't need a new redirect, as the hypothetical
-                            // redirect's `Slug` would have never have been live. We only need to create one redirect
-                            // from the methodology's current slug for the unpublished amendment, as that is the only
-                            // slug that has been live.
+                        if (methodology.LatestPublishedVersionId != null
+                            && methodologyVersion.Amendment
                             && !await _context.MethodologyRedirects.AnyAsync(mr =>
-                                mr.MethodologyVersionId == methodologyVersion.Id))
-
+                                // no redirect needed for an unpublished amendment that already has a redirect
+                                // as the new redirect would be for a slug that hasn't been live
+                                mr.MethodologyVersionId == methodologyVersion.Id
+                                // don't create if a redirect for this slug already exists
+                                || mr.Slug == methodologyVersion.Slug))
                         {
                             var methodologyRedirect = new MethodologyRedirect
                             {
                                 MethodologyVersionId = methodologyVersion.Id,
-                                Slug = methodologyVersion.Slug,
+                                Slug = methodologyVersion.Slug, // i.e. from the currently live slug
                             };
                             await _context.MethodologyRedirects.AddAsync(methodologyRedirect);
                         }
@@ -516,6 +516,94 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .ToList();
         }
 
+        // This method is responsible for keeping methodology titles and slugs and associated redirects in sync with
+        // their owning publications. Methodologies keep track of their owning publication's titles and slugs for
+        // optimisation purposes.
+        public async Task PublicationTitleOrSlugChanged(Guid publicationId, string originalSlug, string updatedTitle,
+            string updatedSlug)
+        {
+            var slugChanged = originalSlug != updatedSlug;
+
+            var ownedMethodology = await _context
+                .PublicationMethodologies
+                .Include(pm => pm.Methodology.LatestPublishedVersion)
+                .Include(pm => pm.Methodology.Versions)
+                .Where(pm => pm.PublicationId == publicationId && pm.Owner)
+                .Select(pm => pm.Methodology)
+                .SingleOrDefaultAsync();
+
+            if (ownedMethodology == null)
+            {
+                return;
+            }
+
+            ownedMethodology.OwningPublicationTitle = updatedTitle;
+            ownedMethodology.OwningPublicationSlug = updatedSlug;
+
+            _context.Methodologies.Update(ownedMethodology);
+
+            if (slugChanged)
+            {
+                var latestPublishedVersion = ownedMethodology.LatestPublishedVersion;
+
+                // If the LatestPublishedVersion inherits the publication slug, it needs a redirect
+                if (latestPublishedVersion is { AlternativeSlug: null })
+                {
+                    var redirect = new MethodologyRedirect
+                    {
+                        MethodologyVersion = latestPublishedVersion,
+                        Slug = originalSlug,
+                    };
+                    _context.MethodologyRedirects.Add(redirect);
+
+                    // If redirects already exists from updatedSlug - i.e. we're changing back to a slug we've used
+                    // previously. The redirect is redundant, as we're now using that slug. So remove
+                    var redundantRedirects = await _context.MethodologyRedirects
+                        .Where(mr => mr.Slug == updatedSlug)
+                        .ToListAsync();
+                    if (redundantRedirects.Count > 0)
+                    {
+                        _context.MethodologyRedirects.RemoveRange(redundantRedirects);
+                    }
+
+                    // If we have an unpublished amendment with an AlternativeSlug set, then it'll have an
+                    // inactive redirect from originalSlug. We remove that redirect - we've just created
+                    // a redirect for originalSlug / LatestPublishedRelease - and create a new inactive
+                    // redirect for the unpublished amendment from updatedSlug. We need this redirect for when
+                    // the amendment is published and the new AlternativeSlug goes live.
+                    var latestVersion = ownedMethodology.LatestVersion();
+                    if (latestVersion.Id != latestPublishedVersion.Id
+                        && latestVersion.AlternativeSlug != null)
+                    {
+                        var unpublishedAmendmentRedirectsToRemove = await _context.MethodologyRedirects
+                            .Where(mr =>
+                                mr.MethodologyVersionId == latestVersion.Id
+                                && mr.Slug == originalSlug)
+                            .ToListAsync();
+
+                        if (unpublishedAmendmentRedirectsToRemove.Count > 0)
+                        {
+                            _context.MethodologyRedirects.RemoveRange(unpublishedAmendmentRedirectsToRemove);
+                        }
+
+                        var unpublishedAmendmentRedirect = new MethodologyRedirect
+                        {
+                            MethodologyVersion = latestVersion,
+                            Slug = updatedSlug,
+                        };
+                        _context.MethodologyRedirects.Add(unpublishedAmendmentRedirect);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            if (slugChanged)
+            {
+                await _redirectsCacheService.UpdateRedirects();
+            }
+        }
+
         private async Task<Either<ActionResult, Unit>> DeleteVersion(MethodologyVersion methodologyVersion,
             bool forceDelete = false)
         {
@@ -559,8 +647,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             return new PublicationSummaryViewModel(publication.Id, publication.Title, publication.Slug, publicationMethodology.Owner, publication.Contact);
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateMethodologySlug(
-           string newSlug, string? oldSlug = null, Guid? methodologyId = null)
+        public async Task<Either<ActionResult, Unit>> ValidateMethodologySlug(
+            string newSlug, string? oldSlug = null, Guid? methodologyId = null)
         {
             if (newSlug == oldSlug)
             {
@@ -572,7 +660,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             if (methodologyVersion != null)
             {
-                return ValidationActionResult(SlugNotUnique);
+                return ValidationActionResult(MethodologySlugNotUnique);
             }
 
             var redirectExistsToOtherMethodology = await _context.MethodologyRedirects
@@ -584,7 +672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
             if (redirectExistsToOtherMethodology)
             {
-                return ValidationActionResult(SlugUsedByRedirect);
+                return ValidationActionResult(MethodologySlugUsedByRedirect);
             }
 
             return Unit.Instance;
