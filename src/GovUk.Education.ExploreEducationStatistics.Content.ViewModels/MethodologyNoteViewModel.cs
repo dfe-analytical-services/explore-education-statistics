@@ -1,14 +1,10 @@
-﻿#nullable enable
-using System;
+namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels
+public record MethodologyNoteViewModel
 {
-    public record MethodologyNoteViewModel
-    {
-        public Guid Id { get; set; }
+    public Guid Id { get; set; }
 
-        public string Content { get; set; } = null!;
+    public string Content { get; set; } = null!;
 
-        public DateTime DisplayDate { get; set; }
-    }
+    public DateTime DisplayDate { get; set; }
 }

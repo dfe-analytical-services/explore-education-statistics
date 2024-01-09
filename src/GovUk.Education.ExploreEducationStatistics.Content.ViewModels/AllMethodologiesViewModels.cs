@@ -1,79 +1,73 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
+namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels
+public class AllMethodologiesThemeViewModel : IComparable<AllMethodologiesThemeViewModel>
 {
-    public class AllMethodologiesThemeViewModel : IComparable<AllMethodologiesThemeViewModel>
+    public Guid Id { get; set; }
+
+    public string Title { get; set; } = string.Empty;
+
+    public List<AllMethodologiesTopicViewModel> Topics { get; set; } = new();
+
+    public void RemoveTopicNodesWithoutMethodologiesAndSort()
     {
-        public Guid Id { get; set; }
+        // Remove all publications without any methodologies
+        Topics.ForEach(topic => topic.RemovePublicationNodesWithoutMethodologiesAndSort());
 
-        public string Title { get; set; } = string.Empty;
+        // Remove all topics without any publications
+        Topics = Topics
+            .Where(topic => topic.Publications.Any())
+            .ToList();
 
-        public List<AllMethodologiesTopicViewModel> Topics { get; set; } = new();
-
-        public void RemoveTopicNodesWithoutMethodologiesAndSort()
-        {
-            // Remove all publications without any methodologies
-            Topics.ForEach(topic => topic.RemovePublicationNodesWithoutMethodologiesAndSort());
-
-            // Remove all topics without any publications
-            Topics = Topics
-                .Where(topic => topic.Publications.Any())
-                .ToList();
-
-            Topics.Sort();
-        }
-
-        public int CompareTo(AllMethodologiesThemeViewModel? other)
-        {
-            if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
-            return string.Compare(Title, other.Title, StringComparison.Ordinal);
-        }
+        Topics.Sort();
     }
 
-    public class AllMethodologiesTopicViewModel : IComparable<AllMethodologiesTopicViewModel>
+    public int CompareTo(AllMethodologiesThemeViewModel? other)
     {
-        public Guid Id { get; set; }
+        if (ReferenceEquals(this, other)) return 0;
+        if (ReferenceEquals(null, other)) return 1;
+        return string.Compare(Title, other.Title, StringComparison.Ordinal);
+    }
+}
 
-        public string Title { get; set; } = string.Empty;
+public class AllMethodologiesTopicViewModel : IComparable<AllMethodologiesTopicViewModel>
+{
+    public Guid Id { get; set; }
 
-        public List<AllMethodologiesPublicationViewModel> Publications { get; set; } = new();
+    public string Title { get; set; } = string.Empty;
 
-        public void RemovePublicationNodesWithoutMethodologiesAndSort()
-        {
-            Publications = Publications
-                .Where(publication => publication.Methodologies.Any())
-                .ToList();
+    public List<AllMethodologiesPublicationViewModel> Publications { get; set; } = new();
 
-            Publications.Sort();
-        }
+    public void RemovePublicationNodesWithoutMethodologiesAndSort()
+    {
+        Publications = Publications
+            .Where(publication => publication.Methodologies.Any())
+            .ToList();
 
-
-        public int CompareTo(AllMethodologiesTopicViewModel? other)
-        {
-            if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
-            return string.Compare(Title, other.Title, StringComparison.Ordinal);
-        }
+        Publications.Sort();
     }
 
-    public class AllMethodologiesPublicationViewModel : IComparable<AllMethodologiesPublicationViewModel>
+
+    public int CompareTo(AllMethodologiesTopicViewModel? other)
     {
-        public Guid Id { get; set; }
+        if (ReferenceEquals(this, other)) return 0;
+        if (ReferenceEquals(null, other)) return 1;
+        return string.Compare(Title, other.Title, StringComparison.Ordinal);
+    }
+}
 
-        public string Title { get; set; } = string.Empty;
+public class AllMethodologiesPublicationViewModel : IComparable<AllMethodologiesPublicationViewModel>
+{
+    public Guid Id { get; set; }
 
-        public List<MethodologyVersionSummaryViewModel> Methodologies { get; set; } = new();
+    public string Title { get; set; } = string.Empty;
+
+    public List<MethodologyVersionSummaryViewModel> Methodologies { get; set; } = new();
 
 
-        public int CompareTo(AllMethodologiesPublicationViewModel? other)
-        {
-            if (ReferenceEquals(this, other)) return 0;
-            if (ReferenceEquals(null, other)) return 1;
-            return string.Compare(Title, other.Title, StringComparison.Ordinal);
-        }
+    public int CompareTo(AllMethodologiesPublicationViewModel? other)
+    {
+        if (ReferenceEquals(this, other)) return 0;
+        if (ReferenceEquals(null, other)) return 1;
+        return string.Compare(Title, other.Title, StringComparison.Ordinal);
     }
 }

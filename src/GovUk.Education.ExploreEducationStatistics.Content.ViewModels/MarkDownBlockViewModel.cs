@@ -1,5 +1,3 @@
-﻿#nullable enable
-using System;
 using JsonKnownTypes;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
