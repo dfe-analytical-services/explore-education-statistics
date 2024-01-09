@@ -7,7 +7,7 @@ public record PaginatedPublicationListViewModel(
     int TotalResults, 
     int Page, 
     int PageSize) : PaginatedListViewModel<PublicationListViewModel>(
-        Results, 
-        TotalResults, 
-        Page, 
-        PageSize);
+        results: Results, 
+        totalResults: TotalResults, 
+        page: Page, 
+        pageSize: PageSize);

@@ -32,10 +32,11 @@ internal class PublicationService : IPublicationService
                 var results = paginatedPublications.Results.Select(MapPublication).ToList();
 
                 return new PaginatedPublicationListViewModel(
-                    results, 
-                    paginatedPublications.Paging.Page,
-                    paginatedPublications.Paging.PageSize,
-                    paginatedPublications.Paging.TotalResults);
+                    Results: results, 
+                    TotalResults: paginatedPublications.Paging.TotalResults,
+                    Page: paginatedPublications.Paging.Page,
+                    PageSize: paginatedPublications.Paging.PageSize
+                    );
             });
     }
 
