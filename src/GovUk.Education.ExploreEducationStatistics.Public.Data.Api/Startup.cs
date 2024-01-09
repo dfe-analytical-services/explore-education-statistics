@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -91,7 +92,7 @@ public class Startup
         services.AddValidatorsFromAssemblyContaining<Startup>();
         services.AddFluentValidationAutoValidation();
 
-        //services.AddScoped<IContentApiClient, ContentApiClient>();
+        services.AddFluentValidationRulesToSwagger();
 
         services.AddHttpClient<IContentApiClient, ContentApiClient>(httpClient =>
         {

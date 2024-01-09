@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
 
-public record PaginatedListViewModel<T>
+public abstract record PaginatedListViewModel<T>
 {
     public List<T> Results { get; }
 
