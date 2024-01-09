@@ -1,6 +1,3 @@
-#nullable enable
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record RedirectsViewModel(

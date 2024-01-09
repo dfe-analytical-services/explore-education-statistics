@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -23,13 +24,5 @@ public interface IPublicationService
         PublicationsSortBy? sort = null,
         SortOrder? order = null,
         int page = 1,
-        int pageSize = 10,
-        IEnumerable<Guid>? publicationIds = null);
-
-    public enum PublicationsSortBy
-    {
-        Published,
-        Relevance,
-        Title
-    }
+        int pageSize = 10);
 }

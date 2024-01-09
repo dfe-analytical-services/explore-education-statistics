@@ -1,6 +1,3 @@
-﻿#nullable enable
-using System;
-
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public record ReleaseNoteViewModel

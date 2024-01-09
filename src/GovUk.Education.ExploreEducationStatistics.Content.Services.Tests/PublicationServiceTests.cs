@@ -17,8 +17,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.SortOrder;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IPublicationService.
-    PublicationsSortBy;
+using static GovUk.Education.ExploreEducationStatistics.Content.Requests.PublicationsSortBy;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {

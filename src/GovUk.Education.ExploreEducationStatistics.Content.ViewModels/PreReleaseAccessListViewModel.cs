@@ -1,15 +1,13 @@
-#nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels
-{
-    public record PreReleaseAccessListViewModel : ReleaseSummaryViewModel
-    {
-        public string PreReleaseAccessList { get; }
+namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
-        public PreReleaseAccessListViewModel(
-            ReleaseCacheViewModel release,
-            PublicationCacheViewModel publication) : base(release, publication)
-        {
-            PreReleaseAccessList = release.PreReleaseAccessList;
-        }
+public record PreReleaseAccessListViewModel : ReleaseSummaryViewModel
+{
+    public string PreReleaseAccessList { get; }
+
+    public PreReleaseAccessListViewModel(
+        ReleaseCacheViewModel release,
+        PublicationCacheViewModel publication) : base(release, publication)
+    {
+        PreReleaseAccessList = release.PreReleaseAccessList;
     }
 }

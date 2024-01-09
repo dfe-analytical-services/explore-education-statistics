@@ -1,7 +1,3 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
-
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 public class ContentSectionViewModel
