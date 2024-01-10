@@ -4,7 +4,7 @@ import  AzureLoginPage  from "../admin/azpage/AzLoginPage";
 import AdminPage from "../admin/pages/AdminPage";
 import  ThemesPage  from "../admin/pages/ThemesPage";
 import generateUIThemeName from "../utils/generateUITheme";
-import  CreateThemePage  from "../admin/pages/createthemepage";
+import  CreateThemePage  from "../admin/pages/CreateThemePage";
 
 test.describe('Verify the end to end functionality of themes and topics', () => {
     test.beforeEach(async ({ page }) => {

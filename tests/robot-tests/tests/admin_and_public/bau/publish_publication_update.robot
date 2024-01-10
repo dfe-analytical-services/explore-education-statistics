@@ -12,8 +12,10 @@ Force Tags          Admin    Local    Dev    AltersData
 
 
 *** Variables ***
-${PUBLICATION_NAME}=            UI tests - publish publication update %{RUN_IDENTIFIER}
-${PUBLICATION_NAME_UPDATED}=    ${PUBLICATION_NAME} updated
+${PUBLICATION_NAME}=                UI tests - publish publication update %{RUN_IDENTIFIER}
+${PUBLIC_PUBLICATION_URL_ENDING}    /find-statistics/ui-tests-publish-publication-update-%{RUN_IDENTIFIER}
+${ACADEMIC_YEAR}                    /2046-47
+${PUBLICATION_NAME_UPDATED}=        ${PUBLICATION_NAME} updated
 
 
 *** Test Cases ***
@@ -78,6 +80,11 @@ Check publication is updated on dashboard
     user selects dashboard theme and topic if possible
 
     user waits until page contains link    ${PUBLICATION_NAME_UPDATED}
+
+Validate publication redirect works
+    go to    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}${ACADEMIC_YEAR}
+    user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}
+    user checks url contains    %{PUBLIC_URL}${PUBLIC_PUBLICATION_URL_ENDING}-updated${ACADEMIC_YEAR}
 
 Go to public release page
     user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}

@@ -22,7 +22,7 @@ export default class FileSchema extends Yup.MixedSchema<File> {
   minSize(minBytes: number, message?: string): FileSchema {
     return this.test({
       name: 'minSize',
-      message: message || 'File must be larger than 0 bytes',
+      message: message ?? 'File must be larger than 0 bytes',
       exclusive: true,
 
       test(value) {
@@ -31,6 +31,21 @@ export default class FileSchema extends Yup.MixedSchema<File> {
         }
 
         return value.size > minBytes;
+      },
+    });
+  }
+
+  maxSize(maxBytes: number, message?: string): FileSchema {
+    return this.test({
+      name: 'maxSize',
+      message: message ?? `File must be smaller than ${maxBytes} bytes`,
+      exclusive: true,
+
+      test(value) {
+        if (!value) {
+          return true;
+        }
+        return value.size < maxBytes;
       },
     });
   }

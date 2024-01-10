@@ -144,6 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Migration
                     VersionMinor = table.Column<int>(type: "integer", nullable: false),
                     Notes = table.Column<string>(type: "text", nullable: false),
                     MetaSummary = table.Column<string>(type: "jsonb", nullable: false),
+                    TotalResults = table.Column<long>(type: "bigint", nullable: false),
                     Published = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Unpublished = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),

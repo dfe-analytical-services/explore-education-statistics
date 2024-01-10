@@ -1,4 +1,3 @@
-/* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
 
 // Create themes Page

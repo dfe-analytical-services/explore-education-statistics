@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
 import  environment  from '../../utils/env';
 

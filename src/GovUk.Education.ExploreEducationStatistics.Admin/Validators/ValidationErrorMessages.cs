@@ -49,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotOverwriteFile,
         FileCannotBeEmpty,
         FileTypeInvalid,
+        FileSizeLimitExceeded,
 
         // Data file
         SubjectTitleCannotBeEmpty,
