@@ -30,10 +30,17 @@ export class GlossaryPage {
     this.accordionSectionD = page.locator('//span[text()="D"]');
     this.accordionSectionE = page.locator('//span[text()="E"]');
     this.accordionSectionZ = page.locator('//span[text()="Z"]');
-    this.voluntaryRepaymentSection = page.locator('//h3[text()="Voluntary repayment"]');
-    this.voluntaryRepaymentSectionText = page.locator('//div[@id="voluntary-repayment"]//p[1]');
-    this.educationStatisticsMethodology = page.locator('//a[text()="Education statistics: methodology"]');
+    this.voluntaryRepaymentSection = page.locator(
+      '//h3[text()="Voluntary repayment"]',
+    );
+    this.voluntaryRepaymentSectionText = page.locator(
+      '//div[@id="voluntary-repayment"]//p[1]',
+    );
+    this.educationStatisticsMethodology = page.locator(
+      '//a[text()="Education statistics: methodology"]',
+    );
   }
   // standard text
-  readonly voluntaryRepaymentSectionParagraphText = 'A borrower can at any time choose to repay some or all of their loan balance early, in addition to any repayments they are liable to make based on their income';
+  readonly voluntaryRepaymentSectionParagraphText =
+    'A borrower can at any time choose to repay some or all of their loan balance early, in addition to any repayments they are liable to make based on their income';
 }
