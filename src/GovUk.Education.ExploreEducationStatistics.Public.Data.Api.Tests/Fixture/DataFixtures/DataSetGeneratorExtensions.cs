@@ -1,4 +1,3 @@
-#nullable enable
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 
@@ -24,16 +23,8 @@ public static class DataSetGeneratorExtensions
                 (f, dataSet) => f.Date.SoonOffset(14, dataSet.Created)
             );
 
-    public static Generator<DataSet> WithPublicationId(this Generator<DataSet> generator, Guid publicationId)
-        => generator.ForInstance(s => s.SetPublicationId(publicationId));
-
     public static Generator<DataSet> WithStatus(this Generator<DataSet> generator, DataSetStatus status)
         => generator.ForInstance(s => s.SetStatus(status));
-
-    public static InstanceSetters<DataSet> SetPublicationId(
-        this InstanceSetters<DataSet> instanceSetter, 
-        Guid publicationId)
-        => instanceSetter.Set(f => f.PublicationId, publicationId);
 
     public static InstanceSetters<DataSet> SetStatus(
         this InstanceSetters<DataSet> instanceSetter,

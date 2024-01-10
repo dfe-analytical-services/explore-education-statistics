@@ -8,8 +8,6 @@ public abstract class IntegrationTestFixture : IClassFixture<TestApplicationFact
 
     protected readonly TestApplicationFactory TestApp;
 
-    protected HttpClient TestAppClient => TestApp.CreateClient();
-
     public IntegrationTestFixture(TestApplicationFactory testApp)
     {
         TestApp = testApp;
