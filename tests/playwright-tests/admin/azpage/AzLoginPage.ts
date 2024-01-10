@@ -4,11 +4,11 @@ import  environment  from '../../utils/env';
 // AzureLogin Page
 export default class AzureLoginPage {
   readonly page: Page;
-    emailAddress: Locator;
-    nextButton: Locator;
-    password: Locator;
-    signInButton: Locator;
-    noButton: Locator;
+  readonly emailAddress: Locator;
+  readonly nextButton: Locator;
+  readonly password: Locator;
+  readonly signInButton: Locator;
+  readonly noButton: Locator;
 
   constructor(page) {
     this.page = page;

@@ -1,10 +1,9 @@
-/* eslint-disable import/prefer-default-export */
 /* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
-import { environment } from '../../utils/env';
+import environment  from '../../utils/env';
 
 // Home page
-export class HomePage {
+export default class HomePage {
   readonly page: Page;
   readonly glossary: Locator;
 
@@ -15,7 +14,7 @@ export class HomePage {
   }
 
   async navigateToGlossaryPage() {
-    await this.page.goto(environment.BASE_URL!);
+    await this.page.goto(environment.PUBLIC_URL);
     await this.glossary.click();
     await this.page.waitForURL('**/glossary');
   }

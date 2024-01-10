@@ -15,9 +15,9 @@ export default class CreateThemePage {
     this.saveThemeButton = page.locator('//button[text()="Save theme"]')
   }
 
-  async doCreateTheme(value1 : string, value2: string) {
-    await this.themeTitle.fill(value1);
-    await this.themeSummary.fill(value2);
+  async doCreateTheme(title : string, summary: string) {
+    await this.themeTitle.fill(title);
+    await this.themeSummary.fill(summary);
     await this.saveThemeButton.click();
   }
 }
