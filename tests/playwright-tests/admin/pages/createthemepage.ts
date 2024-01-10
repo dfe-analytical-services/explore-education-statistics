@@ -1,10 +1,8 @@
-/* eslint-disable import/prefer-default-export */
 /* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
-import generateUIThemeName from '../../utils/util';
 
 // Create themes Page
-export class CreateThemePage {
+export default class CreateThemePage {
   readonly page: Page;
   readonly themeTitle: Locator;
   readonly themeSummary: Locator;
@@ -23,5 +21,4 @@ export class CreateThemePage {
     await this.themeSummary.fill(value2);
     await this.saveThemeButton.click();
   }
-
 }

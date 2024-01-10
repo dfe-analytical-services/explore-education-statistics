@@ -1,12 +1,11 @@
-/* eslint-disable import/prefer-default-export */
 /* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
 
 // Admin homepage
-export class AdminPage {
+export default class AdminPage {
   readonly page: Page;
   readonly signInButton: Locator;
-  manageThemesTopicLink: Locator;
+  readonly manageThemesTopicLink: Locator;
 
   constructor(page) {
     this.page = page;

@@ -2,10 +2,10 @@
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
-import { environment } from '../../utils/env';
+import  environment  from '../../utils/env';
 
 // AzureLogin Page
-export class AzureLoginPage {
+export default class AzureLoginPage {
   readonly page: Page;
     emailAddress: Locator;
     nextButton: Locator;
@@ -24,10 +24,10 @@ export class AzureLoginPage {
   }
 
   async doSignIn() {
-    await this.emailAddress.fill(environment.ADMIN_EMAILADDR!);
+    await this.emailAddress.fill(environment.ADMIN_EMAILADDR);
     await this.nextButton.click();
     await this.password.waitFor({state:'visible'})
-    await this.password.fill(environment.ADMIN_PASSWORD!);
+    await this.password.fill(environment.ADMIN_PASSWORD);
     await this.signInButton.click();
     await this.noButton.waitFor({ state: 'visible'});
     await this.noButton.click();
