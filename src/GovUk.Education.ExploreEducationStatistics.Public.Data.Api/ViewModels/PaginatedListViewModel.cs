@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
+namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 
 public abstract record PaginatedListViewModel<T>
 {

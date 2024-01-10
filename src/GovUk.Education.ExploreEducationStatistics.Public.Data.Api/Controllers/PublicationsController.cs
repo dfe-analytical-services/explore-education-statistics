@@ -2,7 +2,7 @@ using Asp.Versioning;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Requests;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
 

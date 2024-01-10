@@ -1,7 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Fixture.DataFixtures;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;

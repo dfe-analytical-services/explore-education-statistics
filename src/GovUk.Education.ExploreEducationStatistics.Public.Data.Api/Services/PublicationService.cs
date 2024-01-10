@@ -1,7 +1,7 @@
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
