@@ -1,6 +1,5 @@
-/* eslint-disable lines-between-class-members */
 import { Locator, Page } from '@playwright/test';
-import environment  from '../../utils/env';
+import environment from '../../utils/env';
 
 // Home page
 export default class HomePage {
