@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Views;
 
 public record PublicationListViewModel(Guid Id, string Title, string Slug);
@@ -14,6 +16,12 @@ public record PaginatedPublicationListViewModel : PaginatedListViewModel<Publica
             totalResults: totalResults,
             page: page,
             pageSize: pageSize)
+    {
+    }
+
+    [JsonConstructor]
+    public PaginatedPublicationListViewModel(List<PublicationListViewModel> results, PagingViewModel paging)
+        : base(results, paging)
     {
     }
 }

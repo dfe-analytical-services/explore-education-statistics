@@ -46,7 +46,7 @@ public class PublicationsControllerTests : IntegrationTestFixture
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var content = await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationListViewModel>>();
+        var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
 
         Assert.NotNull(content);
         Assert.Equal(page, content!.Paging.Page);
@@ -85,7 +85,7 @@ public class PublicationsControllerTests : IntegrationTestFixture
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var content = await response.Content.ReadFromJsonAsync<PaginatedListViewModel<PublicationListViewModel>>();
+        var content = await response.Content.ReadFromJsonAsync<PaginatedPublicationListViewModel>();
 
         Assert.NotNull(content);
         Assert.Equal(1, content!.Paging.Page);
