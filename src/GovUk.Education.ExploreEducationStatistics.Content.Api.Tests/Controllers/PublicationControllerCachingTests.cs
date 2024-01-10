@@ -8,11 +8,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 using Moq;
 using NCrontab;
 using Xunit;
@@ -30,7 +30,7 @@ public class PublicationControllerCachingTests : CacheServiceTestFixture
         ReleaseType.ExperimentalStatistics,
         ThemeId: Guid.Empty,
         Search: "",
-        IPublicationService.PublicationsSortBy.Published,
+        PublicationsSortBy.Published,
         SortOrder.Asc,
         Page: 1,
         PageSize: 10

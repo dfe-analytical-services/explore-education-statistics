@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -11,8 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;

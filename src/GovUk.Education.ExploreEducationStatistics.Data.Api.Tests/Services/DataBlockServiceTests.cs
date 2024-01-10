@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;

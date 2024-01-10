@@ -2,7 +2,7 @@
 
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 
