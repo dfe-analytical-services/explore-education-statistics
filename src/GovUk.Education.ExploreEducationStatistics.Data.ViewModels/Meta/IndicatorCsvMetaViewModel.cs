@@ -1,11 +1,9 @@
-#nullable enable
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Newtonsoft.Json;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+namespace GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 
 public record IndicatorCsvMetaViewModel
 {

@@ -1,9 +1,4 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+namespace GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 
 public record SubjectCsvMetaViewModel
 {

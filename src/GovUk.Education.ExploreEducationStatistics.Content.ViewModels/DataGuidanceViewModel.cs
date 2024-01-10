@@ -1,4 +1,4 @@
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.ViewModels;
 

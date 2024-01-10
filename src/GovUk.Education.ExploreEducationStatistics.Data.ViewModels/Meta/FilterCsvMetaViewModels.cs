@@ -1,10 +1,6 @@
-#nullable enable
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+namespace GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 
 public record FilterCsvMetaViewModel
 {

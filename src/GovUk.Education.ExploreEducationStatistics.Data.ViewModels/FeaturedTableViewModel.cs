@@ -1,7 +1,4 @@
-#nullable enable
-using System;
-
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 
 public record FeaturedTableViewModel(
     Guid Id,

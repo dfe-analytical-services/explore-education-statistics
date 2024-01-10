@@ -63,9 +63,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEduc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts", "GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts\GovUk.Education.ExploreEducationStatistics.Public.Data.Scripts.csproj", "{65A141C6-EA38-40E7-844A-4EAA24AD17E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Content.Requests", "GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj", "{0F0F94FF-AD31-4F0E-BE7B-4D9C26FF1E82}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.Requests", "GovUk.Education.ExploreEducationStatistics.Content.Requests\GovUk.Education.ExploreEducationStatistics.Content.Requests.csproj", "{0F0F94FF-AD31-4F0E-BE7B-4D9C26FF1E82}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Content.ViewModels", "GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj", "{B932E8D0-BBB2-468C-A682-41BFA1462FF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GovUk.Education.ExploreEducationStatistics.Content.ViewModels", "GovUk.Education.ExploreEducationStatistics.Content.ViewModels\GovUk.Education.ExploreEducationStatistics.Content.ViewModels.csproj", "{B932E8D0-BBB2-468C-A682-41BFA1462FF3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GovUk.Education.ExploreEducationStatistics.Data.ViewModels", "GovUk.Education.ExploreEducationStatistics.Data.ViewModels\GovUk.Education.ExploreEducationStatistics.Data.ViewModels.csproj", "{CEA32610-A401-4A66-9874-45838C497DE7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -461,6 +463,18 @@ Global
 		{B932E8D0-BBB2-468C-A682-41BFA1462FF3}.Release|x64.Build.0 = Release|Any CPU
 		{B932E8D0-BBB2-468C-A682-41BFA1462FF3}.Release|x86.ActiveCfg = Release|Any CPU
 		{B932E8D0-BBB2-468C-A682-41BFA1462FF3}.Release|x86.Build.0 = Release|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Debug|x64.Build.0 = Debug|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Debug|x86.Build.0 = Debug|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Release|x64.ActiveCfg = Release|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Release|x64.Build.0 = Release|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Release|x86.ActiveCfg = Release|Any CPU
+		{CEA32610-A401-4A66-9874-45838C497DE7}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

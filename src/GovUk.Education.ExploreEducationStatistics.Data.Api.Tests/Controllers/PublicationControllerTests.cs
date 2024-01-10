@@ -13,7 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;

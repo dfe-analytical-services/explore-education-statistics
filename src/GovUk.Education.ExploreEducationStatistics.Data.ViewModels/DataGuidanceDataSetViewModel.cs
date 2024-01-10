@@ -1,9 +1,6 @@
-﻿#nullable enable
-using System;
-using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+namespace GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
 
 public record DataGuidanceDataSetViewModel
 {
