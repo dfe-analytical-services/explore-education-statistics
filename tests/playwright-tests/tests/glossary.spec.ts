@@ -8,7 +8,9 @@ test.describe('Verify the end to end functionality of glossary page', () => {
     await homePage.navigateToGlossaryPage();
   });
 
-  test('Verify that accordion sections in glossary page are visible and voluntary repayment section is searchable via search ', async ({ page }) => {
+  test('Verify that accordion sections in glossary page are visible and voluntary repayment section is searchable via search ', async ({
+    page,
+  }) => {
     const glossaryPage = new GlossaryPage(page);
 
     const url = await page.url();
@@ -25,8 +27,10 @@ test.describe('Verify the end to end functionality of glossary page', () => {
     await expect(glossaryPage.pageSearchResults).toBeTruthy();
 
     await glossaryPage.pageSearchSelection.click();
-    
+
     await expect(glossaryPage.voluntaryRepaymentSection).toBeVisible();
-    await expect(glossaryPage.voluntaryRepaymentSectionText).toContainText(glossaryPage.voluntaryRepaymentSectionParagraphText);
+    await expect(glossaryPage.voluntaryRepaymentSectionText).toContainText(
+      glossaryPage.voluntaryRepaymentSectionParagraphText,
+    );
   });
 });
