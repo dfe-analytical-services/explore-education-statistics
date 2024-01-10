@@ -24,12 +24,10 @@ public class PublicationsController : ControllerBase
     /// List Publications
     /// </summary>
     /// <remarks>
-    /// Lists all of the publications which are published to the Public API. It will paginate
-    /// the response based on the request parameters. By default, the results will be ordered
-    /// by the title of the publications in ascending order. If a search term is supplied, it will
-    /// order the results by how well their titles match the search term.
+    /// Lists details about publications with data available for querying.
     /// </remarks>
     [HttpGet]
+    [Produces("application/json")]
     [SwaggerResponse(200, "The paginated list of publications", type: typeof(PaginatedPublicationListViewModel))]
     [SwaggerResponse(400)]
     public async Task<ActionResult<PaginatedPublicationListViewModel>> ListPublications(

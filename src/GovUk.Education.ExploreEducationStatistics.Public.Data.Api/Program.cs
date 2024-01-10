@@ -29,6 +29,7 @@ builder.Logging.AddAzureWebAppDiagnostics();
 builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfig>();
 builder.Services.AddSwaggerGen(options =>
 {
+    options.DescribeAllParametersInCamelCase();
     options.EnableAnnotations();
 });
 

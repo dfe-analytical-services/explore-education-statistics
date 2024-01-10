@@ -83,7 +83,7 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
             foreach (var parameter in operation.Parameters)
             {
                 var description = apiDescription.ParameterDescriptions
-                    .First(p => p.Name == parameter.Name);
+                    .First(p => p.Name.ToLower() == parameter.Name.ToLower());
 
                 parameter.Description ??= description.ModelMetadata?.Description;
 
