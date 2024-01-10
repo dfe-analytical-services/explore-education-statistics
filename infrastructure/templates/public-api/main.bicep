@@ -92,7 +92,6 @@ param containerSeedImage string = 'mcr.microsoft.com/azuredocs/aci-helloworld'
 param seedRegistry bool = true
 
 //ServiceBus Queue Params -------------------------------------------------------------------
-//Specific parameters for the resources
 @description('Name of the Service Bus namespace')
 param namespaceName string = 'etlnamespace'
 
@@ -100,7 +99,6 @@ param namespaceName string = 'etlnamespace'
 param queueName string = 'etlfunctionqueue'
 
 //ETL Function Paramenters ------------------------------------------------------------------
-//Specific parameters for the resources
 @description('Application : Insights name')
 param applicationInsightsName string = 'etlFunctionInsights'
 
