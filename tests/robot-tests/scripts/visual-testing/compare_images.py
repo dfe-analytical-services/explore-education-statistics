@@ -60,7 +60,6 @@ def resize_and_pad(img, size, padColor=0):
 def compare_images(
     first_filepath, second_filepath, diff_folder, original_filename, diff_threshold=0, visual_diff=False
 ):
-
     try:
         # load the two input images
         image1 = cv2.imread(first_filepath)
