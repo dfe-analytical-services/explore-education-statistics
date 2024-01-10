@@ -1,4 +1,3 @@
-/* eslint-disable lines-between-class-members */
 import dotenv from 'dotenv';
 
 dotenv.config();

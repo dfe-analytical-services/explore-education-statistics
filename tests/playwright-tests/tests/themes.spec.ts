@@ -23,7 +23,7 @@ test.describe('Verify the end to end functionality of themes and topics', () => 
         await azPage.doSignIn();
     });
 
-test("Verify that themes are being created and displayed in the themes home screen", async ({ page }) => {
+test("Verify that themes are being created and displayed in the themes home screen", async () => {
     await adminPage.manageThemesTopicLink.click();
     await themesPage.createThemeLink.click();
 
