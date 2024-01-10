@@ -30,7 +30,7 @@ builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfi
 builder.Services.AddSwaggerGen(options =>
 {
     options.DescribeAllParametersInCamelCase();
-    options.EnableAnnotations();
+    options.EnableAnnotations(enableAnnotationsForInheritance: true, enableAnnotationsForPolymorphism: true);
 });
 
 var startup = new Startup(builder.Configuration, builder.Environment);

@@ -17,8 +17,6 @@ public class SwaggerConfig(IApiVersionDescriptionProvider provider) : IConfigure
         var filePath = Path.Combine(AppContext.BaseDirectory, fileName);
 
         options.IncludeXmlComments(filePath);
-        options.UseAllOfForInheritance();
-        options.UseOneOfForPolymorphism();
         options.CustomOperationIds(apiDesc =>
             {
                 var actionDescriptor = apiDesc.ActionDescriptor;
