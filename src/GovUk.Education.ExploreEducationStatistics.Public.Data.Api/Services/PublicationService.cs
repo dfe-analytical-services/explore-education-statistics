@@ -54,6 +54,8 @@ internal class PublicationService : IPublicationService
         return new(
             Id: publication.Id,
             Title: publication.Title,
-            Slug: publication.Slug);
+            Slug: publication.Slug,
+            Summary: publication.Summary,
+            LastPublished: publication.Published);
     }
 }
