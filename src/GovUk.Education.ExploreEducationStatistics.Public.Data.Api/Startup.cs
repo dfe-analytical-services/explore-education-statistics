@@ -9,6 +9,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Rules;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Options;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
@@ -17,8 +21,17 @@ using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 namespace GovUk.Education.ExploreEducationStatistics.Public.Data.Api;
 
 [ExcludeFromCodeCoverage]
-public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+public class Startup
 {
+    private readonly IConfiguration configuration;
+    private readonly IHostEnvironment hostEnvironment;
+
+    public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
+    {
+        this.configuration=configuration;
+        this.hostEnvironment=hostEnvironment;
+    }
+
     // This method gets called by the runtime. Use this method to add services to the container.
     public void ConfigureServices(IServiceCollection services)
     {
@@ -80,7 +93,9 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
         services.AddValidatorsFromAssemblyContaining<Startup>();
         services.AddFluentValidationAutoValidation();
 
-        services.AddHttpClient("ContentApi", httpClient =>
+        services.AddFluentValidationRulesToSwagger();
+
+        services.AddHttpClient<IContentApiClient, ContentApiClient>(httpClient =>
         {
             var contentApiOptions = configuration
                 .GetRequiredSection(ContentApiOptions.Section)
@@ -90,7 +105,7 @@ public class Startup(IConfiguration configuration, IHostEnvironment hostEnvironm
             httpClient.DefaultRequestHeaders.Add(HeaderNames.UserAgent, "EES Public Data API");
         });
 
-        // TODO: Add more services
+        services.AddScoped<IPublicationService, PublicationService>();
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

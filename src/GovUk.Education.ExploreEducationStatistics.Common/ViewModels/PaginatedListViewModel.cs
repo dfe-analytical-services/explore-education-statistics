@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
@@ -20,7 +19,8 @@ public record PaginatedListViewModel<T>
         Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults);
     }
 
-    [JsonConstructor]
+    [System.Text.Json.Serialization.JsonConstructor]
+    [Newtonsoft.Json.JsonConstructor]
     public PaginatedListViewModel(List<T> results, PagingViewModel paging)
     {
         Results = results;
@@ -82,9 +82,9 @@ public record PagingViewModel
             throw new ArgumentException("Page cannot be less than 1");
         }
 
-        if (pageSize < 0)
+        if (pageSize < 1)
         {
-            throw new ArgumentException("Page size cannot be less than 0");
+            throw new ArgumentException("Page size cannot be less than 1");
         }
         
         Page = page;

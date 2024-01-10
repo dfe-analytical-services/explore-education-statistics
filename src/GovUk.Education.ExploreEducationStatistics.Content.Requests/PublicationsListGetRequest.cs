@@ -4,7 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Requests;
 
-public record PublicationsListRequest(
+public record PublicationsListGetRequest(
     ReleaseType? ReleaseType,
     Guid? ThemeId,
     [MinLength(3)] string? Search,

@@ -1,4 +1,7 @@
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Public.Data.Api.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Public.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -65,7 +68,7 @@ public class TestApplicationFactory : TestApplicationFactory<Startup>
             .ConfigureServices(services =>
             {
                 var dbContext = services.Single(
-                    d => d.ServiceType == typeof(DbContextOptions<PublicDataDbContext>));
+                    sd => sd.ServiceType == typeof(DbContextOptions<PublicDataDbContext>));
                 services.Remove(dbContext);
 
                 services.AddDbContext<PublicDataDbContext>(
