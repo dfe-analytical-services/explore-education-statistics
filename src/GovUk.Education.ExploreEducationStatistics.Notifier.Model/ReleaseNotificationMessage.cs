@@ -1,5 +1,7 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model
 {
@@ -14,5 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model
 
         public bool Amendment { get; init; }
         public string UpdateNote { get; init; } = string.Empty;
+
+        public List<IdTitleViewModel> SupersededPublications { get; set; } = new();
     }
 }
