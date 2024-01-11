@@ -118,7 +118,6 @@ param appServiceplanOS string = 'Linux'
 ])
 param functionAppRuntime string = 'python'
 
-
 //---------------------------------------------------------------------------------------------------------------
 // All resources via modules
 //---------------------------------------------------------------------------------------------------------------
@@ -187,7 +186,7 @@ module fileShareModule 'components/fileShares.bicep' = {
 }
 
 //Deploy Function blob store
-module blobStoreModule 'components/fileShares.bicep' = {
+module blobStoreModule 'components/blobStore.bicep' = {
   name: 'blobStoreDeploy'
   params: {
     storageAccountName: storageAccountModule.outputs.storageAccountName
@@ -197,7 +196,6 @@ module blobStoreModule 'components/fileShares.bicep' = {
     storageAccountModule
   ]
 }
-
 
 //Deploy Key Vault
 module keyVaultModule 'components/keyvault.bicep' = {
@@ -304,7 +302,6 @@ module containerAppModule 'components/containerApp.bicep' = {
   ]
 }
 
-
 //Deploy Service Bus
 module serviceBusFunctionQueueModule 'components/serviceBusQueue.bicep' = {
   name: 'serviceBusQueueDeploy'
@@ -326,7 +323,6 @@ module serviceBusFunctionQueueModule 'components/serviceBusQueue.bicep' = {
     deploymentScript: 'functionQueue.bicep'
   }
 }
-
 
 //Deploy ETL Function
 module etlFunctionAppModule 'application/etlFunctionApp.bicep' = {
@@ -360,13 +356,7 @@ module etlFunctionAppModule 'application/etlFunctionApp.bicep' = {
 }
 
 
-
-
 //outputs
 output crLoginServer string = containerRegistryModule.outputs.crLoginServer
 output crName string = containerRegistryModule.name
 output metadataDatabaseRef string = databaseModule.outputs.metadataDatabaseRef
-
-
-
-
