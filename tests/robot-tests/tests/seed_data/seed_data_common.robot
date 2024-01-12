@@ -1,7 +1,7 @@
 *** Settings ***
-Resource    ../common.robot
-Resource    ../admin-common.robot
-Library     ../admin_api.py
+Resource    ../libs/common.robot
+Resource    ../libs/admin-common.robot
+Library     ../libs/admin_api.py
 
 
 *** Variables ***
@@ -96,8 +96,8 @@ user creates a fully populated draft release
     user clicks link    Data guidance
     user waits until page finishes loading
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
-    user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    user adds data guidance for subject
+    ...    ${SUBJECT_NAME}
     ...    data guidance content
     user clicks button    Save guidance
     user waits until page finishes loading
