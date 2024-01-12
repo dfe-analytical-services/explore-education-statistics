@@ -202,6 +202,7 @@ const ReleaseDataBlocksPage = ({
                     <Link
                       className="govuk-!-margin-bottom-0"
                       unvisited
+                      data-testid={`Edit data block ${dataBlock.name}`}
                       to={generatePath<ReleaseDataBlockRouteParams>(
                         releaseDataBlockEditRoute.path,
                         {
