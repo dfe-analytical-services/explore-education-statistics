@@ -292,20 +292,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _cacheService.DeleteCacheFolderAsync(new PrivateReleaseContentFolderCacheKey(releaseId));
         }
 
-        private async Task DeleteSoftDeletedContentDbRelease(Guid releaseId)
-        {
-            var contentRelease = await _contentContext.Releases
-                .IgnoreQueryFilters()
-                .SingleOrDefaultAsync(r => r.Id == releaseId && r.SoftDeleted);
-
-            if (contentRelease != null)
-            {
-                await RemoveReleaseDependencies(releaseId);
-                _contentContext.Releases.Remove(contentRelease);
-                await _contentContext.SaveChangesAsync();
-            }
-        }
-
         private async Task DeleteStatsDbRelease(Guid releaseId)
         {
             var statsRelease = await _statisticsContext
@@ -376,9 +362,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             // Then remove the now-unreferenced DataBlockVersions.
             _contentContext.DataBlockVersions.RemoveRange(dataBlockVersions);
+            await _contentContext.SaveChangesAsync();
 
-            // And finally, delete the DataBlockParents.
-            _contentContext.DataBlockParents.RemoveRange(dataBlockParents);
+            // And finally, delete the DataBlockParents if they are now orphaned.
+            var orphanedDataBlockParents = dataBlockParents
+                .Where(dataBlockParent =>
+                    !_contentContext
+                        .DataBlockVersions
+                        .Any(dataBlockVersion => dataBlockVersion.DataBlockParentId == dataBlockParent.Id))
+                .ToList();
+
+            _contentContext.DataBlockParents.RemoveRange(orphanedDataBlockParents);
             await _contentContext.SaveChangesAsync();
         }
     }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
@@ -98,6 +99,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .HandleFailuresOrOk();
         }
 
+        [HttpPatch("methodology/{methodologyVersionId:guid}/published")]
+        public async Task<ActionResult<Unit>> UpdateMethodologyPublished(
+            Guid methodologyVersionId,
+            MethodologyPublishedUpdateRequest request)
+        {
+            return await _methodologyService
+                .UpdateMethodologyPublished(methodologyVersionId, request)
+                .HandleFailuresOrOk();
+        }
+
         [HttpPost("methodology/{originalMethodologyVersionId:guid}/amendment")]
         public Task<ActionResult<MethodologyVersionViewModel>> CreateMethodologyAmendment(
             Guid originalMethodologyVersionId)
@@ -122,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Metho
                 .GetMethodologyStatuses(methodologyVersionId)
                 .HandleFailuresOrOk();
         }
-        
+
         [HttpGet("methodology/approvals")]
         public async Task<ActionResult<List<MethodologyVersionViewModel>>> ListMethodologyVersionsForApproval()
         {

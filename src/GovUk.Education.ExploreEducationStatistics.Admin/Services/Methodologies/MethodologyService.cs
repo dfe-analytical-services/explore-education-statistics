@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Requests;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
@@ -256,6 +257,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(methodologyVersion => UpdateStatus(methodologyVersion, request))
                 .OnSuccess(methodologyVersion => UpdateDetails(methodologyVersion, request))
                 .OnSuccess(BuildMethodologyVersionViewModel);
+        }
+
+        public async Task<Either<ActionResult, Unit>> UpdateMethodologyPublished(Guid methodologyVersionId,
+            MethodologyPublishedUpdateRequest request)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+                .OnSuccessDo(_userService.CheckIsBauUser)
+                .OnSuccess<ActionResult, MethodologyVersion, Unit>(async methodologyVersion =>
+                {
+                    if (methodologyVersion.Published == null)
+                    {
+                        return ValidationActionResult(MethodologyNotPublished);
+                    }
+
+                    var newPublishedDate = request.Published?.ToUniversalTime() ?? DateTime.UtcNow;
+
+                    // Prevent assigning a future date since it would have the effect of un-publishing the methodology
+                    if (newPublishedDate > DateTime.UtcNow)
+                    {
+                        return ValidationActionResult(MethodologyPublishedCannotBeFutureDate);
+                    }
+
+                    _context.MethodologyVersions.Update(methodologyVersion);
+                    methodologyVersion.Published = newPublishedDate;
+                    await _context.SaveChangesAsync();
+
+                    // Update the cached methodology
+                    await _methodologyCacheService.UpdateSummariesTree();
+
+                    return Unit.Instance;
+                });
         }
 
         public async Task<MethodologyVersionViewModel> BuildMethodologyVersionViewModel(
