@@ -28,13 +28,17 @@ In order to create seed data for a target environment, follow these steps:
   The script will run to completion and then the theme and all of its data (including real data files) will be available in the
   target environment.
 
-## Regenerating local seed data and distributing new dump files
+## Regenerating local seed data and distributing new database dump files and storage files
 
 In order to provide a new local seed data dump, we will generally follow the same steps as above, firstly by clearing out any existing 
 themes that we wish to replace, and then running the scripts to regenerate them.
 
 There are some additional clean-up tasks that are also useful to do prior to issuing a new dump file, in order to keep it as clean as
 possible.
+
+We will also be generating a CSV which allows us to upload seed data files to the local storage emulator. 
+
+### Generating a new database dump
 
 As a full run-through, we can do the following steps to provide a new and clean data dump:
 
@@ -80,6 +84,33 @@ As a full run-through, we can do the following steps to provide a new and clean 
 
 Note that before running the UI tests against this new dump, it is best to clear out public and private caches form storage so 
 as to prevent any confusion with old and new cache files existing under similar folders.
+
+### Generating a new seed data files CSV for local storage
+
+In order to allow us to upload real files to our local storage emulators, we need to provide a CSV that will allow the
+[create_emulator_release_files.py](tests/robot-tests/tests/libs/create_emulator_release_files.py) to upload correct files into
+the appropriate locations in storage, as these are tied to ids which will change each time that seed data is regenerated.
+
+To do this, perform the following steps:
+
+1. Run the following SQL against the `content` database:
+   ```sql
+   SELECT ReleaseFiles.ReleaseId, Files.Id, Files.Filename, Files.Type
+   FROM Files
+   JOIN ReleaseFiles ON Files.Id = ReleaseFiles.FileId
+   AND Files.Type IN ('Data', 'Metadata')
+   ORDER BY ReleaseFiles.ReleaseId, Files.Filename, Files.Type;
+   ```
+2. Save the contents to 
+   [tests/robot-tests/tests/seed_data/seed_data_emulator_files.csv](tests/robot-tests/tests/seed_data/seed_data_emulator_files.csv)
+   and ensure that it is saved with a CSV heading row, as this is what is expected.
+
+The next time that someone runs the UI tests locally, the run tests process will upload any missing files to storage.
+
+Note that the process that uploads files into local storage when the tests run will expect to find files with matching filenames
+in `seed-data-files.zip`, which is then unpacked into the 
+[.unzipped-seed-data-files folder](tests/robot-tests/tests/files/.unzipped-seed-data-files). If new files have been included in an 
+update to our seed data process, they must be added 
 
 ## Regenerating visual testing scripts based on seed data
 

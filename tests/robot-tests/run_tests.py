@@ -29,6 +29,8 @@ from tests.libs.slack import SlackService
 
 pabot_suite_names_filename = ".pabotsuitenames"
 results_foldername = "test-results"
+seed_data_files_filepath = "tests/files/seed-data-files.zip"
+unzipped_seed_data_folderpath = "tests/files/.unzipped-seed-data-files"
 
 logger = get_logger(__name__)
 
@@ -46,9 +48,11 @@ def setup_python_path():
 
 
 def unzip_data_files():
-    if not Path("tests/files/.unzipped-seed-data-files").exists() and Path("tests/files/seed-data-files.zip").exists():
-        with ZipFile("tests/files/seed-data-files.zip", "r") as zipfile:
-            zipfile.extractall("tests/files/.unzipped-seed-data-files")
+    if not os.path.exists(seed_data_files_filepath):
+        logger.warn(f"Unable to find seed data files bundle at {seed_data_files_filepath}")
+    else:
+        with ZipFile(seed_data_files_filepath, "r") as zipfile:
+            zipfile.extractall(unzipped_seed_data_folderpath)
 
 
 def install_chromedriver(chromedriver_version: str):
