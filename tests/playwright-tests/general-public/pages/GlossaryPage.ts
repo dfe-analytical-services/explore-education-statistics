@@ -1,6 +1,5 @@
 import { Locator, Page } from '@playwright/test';
 
-// Glossary page
 export default class GlossaryPage {
   readonly page: Page;
   readonly pageSearchBox: Locator;

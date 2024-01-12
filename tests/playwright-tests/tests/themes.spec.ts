@@ -1,6 +1,6 @@
 import { test } from "@playwright/test";
 import  environment  from "../utils/env";
-import  AzureLoginPage  from "../admin/azpage/AzLoginPage";
+import  AzureLoginPage  from "../admin/azpage/AzureLoginPage";
 import AdminPage from "../admin/pages/AdminPage";
 import  ThemesPage  from "../admin/pages/ThemesPage";
 import generateUIThemeName from "../utils/generateUITheme";
@@ -24,12 +24,13 @@ test.describe('Verify the end to end functionality of themes and topics', () => 
     });
 
 test("Verify that themes are being created and displayed in the themes home screen", async () => {
+    
     await adminPage.manageThemesTopicLink.click();
     await themesPage.createThemeLink.click();
 
-    const uiThemeName: string = generateUIThemeName();
-    const uiThemeTile: string = 'Title'.concat(uiThemeName);
-    const uiThemeSummary: string = 'Summary'.concat(uiThemeName);
+    const uiThemeName = generateUIThemeName();
+    const uiThemeTile = `Theme${uiThemeName}`;
+    const uiThemeSummary = `Summary${uiThemeName}`;
 
     await createThemePage.doCreateTheme(uiThemeTile,uiThemeSummary);
     await themesPage.checkThemeIsDisplayed(uiThemeTile);  

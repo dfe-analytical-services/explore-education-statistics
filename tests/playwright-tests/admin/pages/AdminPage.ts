@@ -1,6 +1,5 @@
 import { Locator, Page } from '@playwright/test';
 
-// Admin homepage
 export default class AdminPage {
   readonly page: Page;
   readonly signInButton: Locator;

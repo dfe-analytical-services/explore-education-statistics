@@ -1,6 +1,5 @@
 import { Locator, Page } from '@playwright/test';
 
-// Create themes Page
 export default class CreateThemePage {
   readonly page: Page;
   readonly themeTitle: Locator;

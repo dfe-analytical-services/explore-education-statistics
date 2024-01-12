@@ -9,5 +9,4 @@ const environment =  {
   ADMIN_PASSWORD : process.env.ADMIN_PASSWORD ?? "",
 }
 
-// Export the function
 export default environment;
