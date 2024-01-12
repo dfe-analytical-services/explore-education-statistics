@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -43,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublishingService _publishingService;
         private readonly IMethodologyService _methodologyService;
         private readonly IBlobCacheService _cacheService;
+        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
         private readonly bool _topicDeletionAllowed;
 
         public TopicService(
@@ -57,7 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseFileService releaseFileService,
             IPublishingService publishingService,
             IMethodologyService methodologyService,
-            IBlobCacheService cacheService)
+            IBlobCacheService cacheService,
+            IReleasePublishingStatusRepository releasePublishingStatusRepository)
         {
             _contentContext = contentContext;
             _statisticsContext = statisticsContext;
@@ -70,6 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publishingService = publishingService;
             _methodologyService = methodologyService;
             _cacheService = cacheService;
+            _releasePublishingStatusRepository = releasePublishingStatusRepository;
             _topicDeletionAllowed = configuration.GetValue<bool>("enableThemeDeletion");
         }
 
@@ -229,12 +231,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var releaseIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
                 .Sort(releaseIdsToDelete)
-                .Select(ids => Guid.Parse(ids.Id));
+                .Select(ids => Guid.Parse(ids.Id))
+                .ToList();
+
+            // Delete release entries in the Azure Storage ReleaseStatus table - if not it will attempt to publish
+            // deleted releases that were left scheduled
+            await _releasePublishingStatusRepository.RemovePublisherReleaseStatuses(releaseIdsInDeleteOrder);
 
             return await releaseIdsInDeleteOrder
                 .Select(DeleteContentAndStatsRelease)
                 .OnSuccessAll()
                 .OnSuccessVoid();
+
         }
 
         private async Task<Either<ActionResult, Unit>> DeletePublications(IEnumerable<Guid> publicationIds)
