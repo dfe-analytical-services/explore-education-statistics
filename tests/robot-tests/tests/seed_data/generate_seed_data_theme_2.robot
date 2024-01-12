@@ -8,22 +8,14 @@
 #
 
 #
-# When seeding data against different environments, you will need to remove the
-# "SeedDataGeneration" tag from the 'Force Tags' settings as this will prevent it from
-# being run against a given enironment.
-#
-
-#
-# If you see a consistent error such as 'Parent 'css:body' did not contain 'link:UI tests - Publication and Release UI Permissions Publication Owner' in 1 minute 40 seconds.'
-# then you will need to run this test suite against the environment you are testing against in order to seed the environment so that other tests
-# that depend on this test data don't fail.
+# When seeding data for an environment, you will need to use the `--reseed` option of the `run_tests.py` script.
 #
 
 
 *** Settings ***
 Library             ../libs/admin_api.py
 Resource            ../libs/admin-common.robot
-Resource            seed_data_constants.robot
+Resource            seed_data_theme_2_constants.robot
 Resource            seed_data_common.robot
 
 Suite Setup         user signs in as bau1

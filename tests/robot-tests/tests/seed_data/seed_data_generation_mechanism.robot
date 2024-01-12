@@ -12,7 +12,6 @@
 *** Settings ***
 Library             ../libs/admin_api.py
 Resource            ../libs/admin-common.robot
-Resource            seed_data_constants.robot
 Resource            seed_data_common.robot
 
 Suite Setup         user signs in as bau1

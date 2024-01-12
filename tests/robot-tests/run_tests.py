@@ -13,6 +13,7 @@ import random
 import shutil
 import string
 from pathlib import Path
+from zipfile import ZipFile
 
 import admin_api as admin_api
 import args_and_variables as args_and_variables
@@ -22,7 +23,7 @@ from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
 from scripts.get_webdriver import get_webdriver
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
-from tests.libs.fail_fast import failing_suites_filename
+from tests.libs.fail_fast import failing_suites_filename, get_failing_test_suites
 from tests.libs.logger import get_logger
 from tests.libs.slack import SlackService
 
@@ -44,6 +45,12 @@ def setup_python_path():
         os.environ["PYTHONPATH"] = str(current_dir)
 
 
+def unzip_data_files():
+    if not Path("tests/files/.unzipped-seed-data-files").exists() and Path("tests/files/seed-data-files.zip").exists():
+        with ZipFile("tests/files/seed-data-files.zip", "r") as zipfile:
+            zipfile.extractall("tests/files/.unzipped-seed-data-files")
+
+
 def install_chromedriver(chromedriver_version: str):
     # Install chromedriver and add it to PATH
     get_webdriver(chromedriver_version)
@@ -57,8 +64,6 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
         "Failing",
         "--exclude",
         "UnderConstruction",
-        "--exclude",
-        "SeedDataGeneration",
         "--exclude",
         "VisualTesting",
         "--xunit",
@@ -75,16 +80,18 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
         # NOTE(mark): Ensure secrets aren't visible in CI logs/reports
         robot_args += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
         robot_args += ["--removekeywords", "name:common.user goes to url"]  # To hide basic auth credentials
+    if arguments.reseed:
+        robot_args += ["--include", "SeedDataGeneration"]
+    else:
+        robot_args += ["--exclude", "SeedDataGeneration"]
     if arguments.env == "local":
-        robot_args += ["--include", "Local"]
-        robot_args += ["--exclude", "NotAgainstLocal"]
+        robot_args += ["--include", "Local", "--exclude", "NotAgainstLocal"]
         # seed Azure storage emulator release files
         generator = ReleaseFilesGenerator()
         generator.create_public_release_files()
         generator.create_private_release_files()
     if arguments.env == "dev":
-        robot_args += ["--include", "Dev"]
-        robot_args += ["--exclude", "NotAgainstDev"]
+        robot_args += ["--include", "Dev", "--exclude", "NotAgainstDev"]
     if arguments.env == "test":
         robot_args += ["--include", "Test", "--exclude", "NotAgainstTest", "--exclude", "AltersData"]
     # fmt off
@@ -116,12 +123,6 @@ def create_robot_arguments(arguments: argparse.Namespace, rerunning_failed: bool
     robot_args += [arguments.tests]
 
     return robot_args
-
-
-def get_failing_suites() -> []:
-    if Path(failing_suites_filename).exists():
-        return open(failing_suites_filename, "r").readlines()
-    return []
 
 
 def create_run_identifier():
@@ -172,6 +173,9 @@ def execute_tests(arguments: argparse.Namespace, rerunning_failures: bool):
 
 
 def run():
+    # Unzip any data files that may be used in tests.
+    unzip_data_files()
+
     args = args_and_variables.initialise()
 
     # If running all tests, or admin, admin_and_public, admin_and_public_2 or seed_data suites,
@@ -244,7 +248,7 @@ def run():
                     admin_api.delete_test_topic()
 
             # If all tests passed, return early.
-            if not get_failing_suites():
+            if not get_failing_test_suites():
                 break
 
         logger.info(f"Log available at: file://{os.getcwd()}{os.sep}{results_foldername}{os.sep}log.html")
@@ -252,11 +256,12 @@ def run():
 
         logger.info(f"Number of test runs: {test_run_index + 1}")
 
-        failing_suites = get_failing_suites()
+        failing_suites = get_failing_test_suites()
 
         if failing_suites:
+            logger.info(f"Number of failing suites: {len(failing_suites)}")
             logger.info(f"Failing suites:")
-            [logger.info(r"  * file://" + suite) for suite in failing_suites]
+            [logger.info(r"  * file://" + suite.strip()) for suite in failing_suites]
         else:
             logger.info("\nAll tests passed!")
 

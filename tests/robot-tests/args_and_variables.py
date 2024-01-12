@@ -126,12 +126,22 @@ def create_argument_parser() -> argparse.ArgumentParser:
         default=None,
         help="manually specify the expiredinvite user password",
     )
+    parser.add_argument(
+        "--reseed",
+        dest="reseed",
+        action="store_true",
+        help="run the seed data generation scripts against the target environment",
+    )
 
     return parser
 
 
 def initialise() -> argparse.Namespace:
     args = create_argument_parser().parse_args()
+
+    if args.reseed and args.env == "prod":
+        raise Exception(f"Cannot generate seed data against environment {args.env}")
+
     load_environment_variables(args)
     store_credential_environment_variables(args)
     return args
