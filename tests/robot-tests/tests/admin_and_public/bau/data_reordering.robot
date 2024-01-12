@@ -222,7 +222,7 @@ Replace subject data
     ...    grouped-filters-and-indicators-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    140    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    2    19 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK

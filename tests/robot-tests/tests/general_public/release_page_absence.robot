@@ -1,7 +1,7 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
 Resource            ../libs/charts.robot
-Resource            ../seed_data/seed_data_constants.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -33,12 +33,12 @@ Validate URL
     user checks url contains    %{PUBLIC_URL}${SEED_DATA_THEME_1_PUBLICATION_1_RELATIVE_URL}
 
 Validate Published date
-    [Tags]    NotAgainstPreProd    Failing
-    user checks summary list contains    Published date    25 April 2018
+    [Tags]    NotAgainstPreProd
+    user checks summary list contains    Published    25 April 2018
 
 Validate Next update date
     [Tags]    NotAgainstPreProd
-    user checks summary list contains    Next update    22 March 2019
+    user checks summary list contains    Next update    March 2019
 
 Validate Email alerts link
     user checks page contains link with text and url    Sign up for email alerts
@@ -76,8 +76,8 @@ Check quick links navigation contains links
     user checks element contains link    testid:quick-links    Download all data (zip)
 
 Check supporting information contains methodology link
-    user checks page contains link with text and url    ${SEED_DATA_THEME_1_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_METHODOLOGY_1_RELATIVE_URL}
+    user checks page contains link with text and url    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_RELATIVE_URL}
 
 Validate subject files file type and file unit style
     [Documentation]    DFE-958    DFE-562

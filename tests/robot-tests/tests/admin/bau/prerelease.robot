@@ -57,6 +57,8 @@ Add metadata guidance
 
     user waits until page contains button    Edit guidance
 
+# TODO DW - this could make use of the new "user creates data block" keyword.
+
 Add featured table
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks

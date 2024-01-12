@@ -1,6 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_constants.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -14,7 +14,7 @@ Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Select Seed Data Theme 1 publication 2
-    user clicks radio    ${SEED_DATA_THEME_1}
+    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
     user clicks radio    ${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set

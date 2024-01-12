@@ -1,6 +1,7 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
-Resource            ../../seed_data/seed_data_constants.robot
+Resource            ../../libs/admin/manage-content-common.robot
+Resource            ../../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user signs in as analyst1
 Suite Teardown      user closes the browser
@@ -11,15 +12,15 @@ Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
-    user waits until h3 is visible    ${SEED_DATA_THEME_1} / ${SEED_DATA_THEME_1_TOPIC_2}
+    user waits until h3 is visible    ${SEED_DATA_THEME_1_TITLE} / ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
     ${ABSENCE_PUBLICATIONS}=    get webelement
-    ...    xpath://*[@data-testid="topic-publications-${SEED_DATA_THEME_1}-${SEED_DATA_THEME_1_TOPIC_2}"]
+    ...    xpath://*[@data-testid="topic-publications-${SEED_DATA_THEME_1_TITLE}-${SEED_DATA_THEME_1_TOPIC_1_TITLE}"]
     user waits until parent contains element    ${ABSENCE_PUBLICATIONS}
     ...    link:${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
 
-    user waits until h3 is visible    ${SEED_DATA_THEME_1} / ${SEED_DATA_THEME_1_TOPIC_1}
+    user waits until h3 is visible    ${SEED_DATA_THEME_1_TITLE} / ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
     ${EXCLUSION_PUBLICATIONS}=    get webelement
-    ...    xpath://*[@data-testid="topic-publications-${SEED_DATA_THEME_1}-${SEED_DATA_THEME_1_TOPIC_1}"]
+    ...    xpath://*[@data-testid="topic-publications-${SEED_DATA_THEME_1_TITLE}-${SEED_DATA_THEME_1_TOPIC_2_TITLE}"]
     user waits until parent contains element    ${EXCLUSION_PUBLICATIONS}
     ...    link:${SEED_DATA_THEME_1_PUBLICATION_2_TITLE}
 
@@ -42,32 +43,32 @@ Navigate to legacy releases
 Validate Analyst1 can see correct legacy releases
     user checks element count is x    css:tbody tr    6
 
-    user checks table cell contains    1    1    5
+    user checks table cell contains    1    1    6
     user checks table cell contains    1    2    Academic year 2014/15
     user checks table cell contains    1    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2014-to-2015
 
-    user checks table cell contains    2    1    4
+    user checks table cell contains    2    1    5
     user checks table cell contains    2    2    Academic year 2013/14
     user checks table cell contains    2    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2013-to-2014
 
-    user checks table cell contains    3    1    3
+    user checks table cell contains    3    1    4
     user checks table cell contains    3    2    Academic year 2012/13
     user checks table cell contains    3    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-2012-to-2013
 
-    user checks table cell contains    4    1    2
+    user checks table cell contains    4    1    3
     user checks table cell contains    4    2    Academic year 2011/12
     user checks table cell contains    4    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics
 
-    user checks table cell contains    5    1    1
+    user checks table cell contains    5    1    2
     user checks table cell contains    5    2    Academic year 2010/11
     user checks table cell contains    5    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2010-to-2011
 
-    user checks table cell contains    6    1    0
+    user checks table cell contains    6    1    1
     user checks table cell contains    6    2    Academic year 2009/10
     user checks table cell contains    6    3
     ...    https://www.gov.uk/government/statistics/pupil-absence-in-schools-in-england-including-pupil-characteristics-academic-year-2009-to-2010
@@ -126,16 +127,18 @@ Validate Analyst1 can see 'Content' page key stats
     user checks element count is x    css:[data-testid="keyStat"]    3
 
 Validate Analyst1 can see 'Content' page accordion sections
-    user checks accordion is in position    About these statistics    1    id:releaseMainContent
-    user checks accordion is in position    Pupil absence rates    2    id:releaseMainContent
-    user checks accordion is in position    Persistent absence    3    id:releaseMainContent
-    user checks accordion is in position    Reasons for absence    4    id:releaseMainContent
-    user checks accordion is in position    Distribution of absence    5    id:releaseMainContent
-    user checks accordion is in position    Absence by pupil characteristics    6    id:releaseMainContent
-    user checks accordion is in position    Absence for 4-year-olds    7    id:releaseMainContent
-    user checks accordion is in position    Pupil referral unit absence    8    id:releaseMainContent
-    user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:releaseMainContent
-    user checks there are x accordion sections    9    id:releaseMainContent
+    user checks accordion is in position    About these statistics    1    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Pupil absence rates    2    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Persistent absence    3    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Reasons for absence    4    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Distribution of absence    5    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Absence by pupil characteristics    6
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Absence for 4-year-olds    7    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Pupil referral unit absence    8    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Regional and local authority (LA) breakdown    9
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user checks there are x accordion sections    9    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Validate Analyst1 can see help and support section
     user checks page contains    Help and support

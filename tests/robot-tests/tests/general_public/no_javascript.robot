@@ -1,7 +1,7 @@
 *** Settings ***
 Resource        ../libs/public-common.robot
 Library         ../libs/no_javascript.py
-Resource        ../seed_data/seed_data_constants.robot
+Resource        ../seed_data/seed_data_theme_1_constants.robot
 
 Test Setup      fail test fast if required
 

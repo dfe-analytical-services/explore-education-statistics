@@ -3,7 +3,7 @@ Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
 Resource            ../../libs/public-common.robot
 Resource            ../../libs/admin/manage-content-common.robot
-Resource            ../../seed_data/seed_data_constants.robot
+Resource            ../../seed_data/seed_data_theme_1_constants.robot
 
 Force Tags          Admin    Local    Dev    AltersData
 

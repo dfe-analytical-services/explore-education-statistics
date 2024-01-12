@@ -114,7 +114,7 @@ Start replacing last subject in order
     user checks headed table body row cell contains    Data file    1    ordering-test-3.csv
     user checks headed table body row cell contains    Subject title    2    Three
     user checks headed table body row cell contains    Data file    2    ordering-test-3-replacement.csv
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Reorder subject that is being replaced
     user clicks link    Data and files

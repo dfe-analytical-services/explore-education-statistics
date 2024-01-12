@@ -1,7 +1,7 @@
 *** Settings ***
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
-Resource            ../../seed_data/seed_data_constants.robot
+Resource            ../../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      teardown suite
@@ -18,24 +18,25 @@ ${CREATED_THEME_ID}         ${EMPTY}
 ${CREATED_THEME_NAME}       UI test theme - suite created %{RUN_IDENTIFIER}
 ${CREATED_TOPIC_NAME}       UI test topic - suite created %{RUN_IDENTIFIER}
 
+
 *** Test Cases ***
 Go to 'Manage themes and topics'
     user clicks link    manage themes and topics
     user waits until h1 is visible    Manage themes and topics
 
 Verify existing theme and topics
-    user waits until page contains accordion section    ${SEED_DATA_THEME_1}
-    user opens accordion section    ${SEED_DATA_THEME_1}
+    user waits until page contains accordion section    ${SEED_DATA_THEME_1_TITLE}
+    user opens accordion section    ${SEED_DATA_THEME_1_TITLE}
     user checks summary list contains    Summary
     ...    Including absence, application and offers, capacity exclusion and special educational needs (SEN) statistics
-    user checks topic is in correct position    ${SEED_DATA_THEME_1}    1
-    ...    ${SEED_DATA_THEME_1_TOPIC_1}
-    user checks topic is in correct position    ${SEED_DATA_THEME_1}    2
-    ...    ${SEED_DATA_THEME_1_TOPIC_2}
-    user checks topic is in correct position    ${SEED_DATA_THEME_1}    3
-    ...    ${SEED_DATA_THEME_1_TOPIC_3}
-    user checks topic is in correct position    ${SEED_DATA_THEME_1}    4
-    ...    ${SEED_DATA_THEME_1_TOPIC_4}
+    user checks topic is in correct position    ${SEED_DATA_THEME_1_TITLE}    1
+    ...    ${SEED_DATA_THEME_1_TOPIC_2_TITLE}
+    user checks topic is in correct position    ${SEED_DATA_THEME_1_TITLE}    2
+    ...    ${SEED_DATA_THEME_1_TOPIC_1_TITLE}
+    user checks topic is in correct position    ${SEED_DATA_THEME_1_TITLE}    3
+    ...    ${SEED_DATA_THEME_1_TOPIC_3_TITLE}
+    user checks topic is in correct position    ${SEED_DATA_THEME_1_TITLE}    4
+    ...    ${SEED_DATA_THEME_1_TOPIC_4_TITLE}
 
 Create theme
     user clicks link    Create theme

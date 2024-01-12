@@ -1,6 +1,7 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_constants.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
+Resource            ../seed_data/seed_data_theme_2_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -34,8 +35,8 @@ Validate Related information section and links exist
 
 Validate themes filters exist
     user checks radio is checked    All themes
-    user checks page contains radio    ${SEED_DATA_THEME_1}
-    user checks page contains radio    UI tests - Publication and Release UI Permissions Theme
+    user checks page contains radio    ${SEED_DATA_THEME_1_TITLE}
+    user checks page contains radio    ${SEED_DATA_THEME_2_TITLE}
 
 Validate release type filters exist
     user clicks button    Release type
@@ -56,12 +57,12 @@ Validate publications list exists
     user checks page contains element    testid:publicationsList
 
 Filter by theme
-    user clicks radio    ${SEED_DATA_THEME_1}
-    user checks page contains button    ${SEED_DATA_THEME_1}
+    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
+    user checks page contains button    ${SEED_DATA_THEME_1_TITLE}
 
 Remove theme filter
-    user clicks button    ${SEED_DATA_THEME_1}
-    user checks page does not contain button    ${SEED_DATA_THEME_1}
+    user clicks button    ${SEED_DATA_THEME_1_TITLE}
+    user checks page does not contain button    ${SEED_DATA_THEME_1_TITLE}
     user checks radio is checked    All themes
 
 Filter by release type
@@ -90,17 +91,17 @@ Clear all filters
     user clicks element    id:searchForm-search
     user presses keys    pupil
     user clicks button    Search
-    user clicks radio    ${SEED_DATA_THEME_1}
+    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
     user clicks radio    Official statistics
 
     user checks page contains button    pupil
-    user checks page contains button    ${SEED_DATA_THEME_1}
+    user checks page contains button    ${SEED_DATA_THEME_1_TITLE}
     user checks page contains button    Official statistics
 
     user clicks button    Clear all filters
 
     user checks page does not contain button    pupil
-    user checks page does not contain button    ${SEED_DATA_THEME_1}
+    user checks page does not contain button    ${SEED_DATA_THEME_1_TITLE}
     user checks page does not contain button    Official statistics
     user checks page does not contain button    Clear all filters
 

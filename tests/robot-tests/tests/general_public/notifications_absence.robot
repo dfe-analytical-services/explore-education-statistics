@@ -1,6 +1,6 @@
 *** Settings ***
 Resource            ../libs/common.robot
-Resource            ../seed_data/seed_data_constants.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Force Tags          GeneralPublic    Dev    Test    Preprod    Prod
 

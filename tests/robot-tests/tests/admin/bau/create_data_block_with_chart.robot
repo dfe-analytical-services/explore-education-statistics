@@ -48,6 +48,10 @@ Create footnote
     user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
     user waits until page finishes loading
 
+# TODO DW - this could make use of new table_tool.robot "user creates data block" keyword.
+# Note that if so, "user creates data block" keyword could do with extra assertions adding
+# in that are a part of this test.
+
 Start creating a data block
     user clicks link    Data blocks
     user waits until h2 is visible    Data blocks
@@ -74,7 +78,7 @@ Select locations
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    3    Choose time period    90
+    user waits until table tool wizard step is available    3    Choose time period    %{WAIT_MEDIUM}
 
 Select time period
     user waits until page contains element    id:timePeriodForm-start
@@ -280,8 +284,9 @@ Embed data block into release content
     user chooses and embeds data block    ${DATABLOCK_NAME}
 
 Check footnote is displayed in content Tab
-    user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
-    user scrolls to accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user scrolls to accordion section    ${CONTENT_SECTION_NAME}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     user waits until page contains element    testid:Data block - ${DATABLOCK_NAME}
     user scrolls to element    testid:Data block - ${DATABLOCK_NAME}
@@ -320,9 +325,9 @@ Check updated footnote is displayed in release content page
 
 Validate embedded table rows
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
-    user scrolls to element    id:releaseMainContent
+    user scrolls to element    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
-    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${table}=    set variable    ${datablock} >> css:table
     user waits until page contains element    ${table}    30
@@ -419,12 +424,7 @@ Validate marked as 'In content' on data block list
     user checks table cell contains    1    3    Yes    testid:dataBlocks
 
 Navigate to Chart tab
-    user clicks link    Edit block    testid:dataBlocks
-
-    user waits until h2 is visible    Edit data block
-    user waits until h2 is visible    ${DATABLOCK_NAME}
-
-    user waits until page finishes loading
+    user clicks edit data block link    ${DATABLOCK_NAME}
 
     # Set url in suite variable so that we
     # can get back to this page quickly
@@ -538,9 +538,7 @@ Remove reference line
     user waits until parent does not contain element    id:chartBuilderPreview    Edited reference line
 
 Save chart and validate marked as 'Has chart' in data blocks list
-    user clicks link    Chart configuration
-    user clicks button    Save chart options
-    user waits until button is enabled    Save chart options
+    user saves chart configuration
 
     user clicks link    Back
     user waits until h2 is visible    Data blocks
@@ -556,7 +554,7 @@ Save chart and validate marked as 'Has chart' in data blocks list
 Validate line chart embeds correctly
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -601,7 +599,6 @@ Configure basic vertical bar chart
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
     user waits until page finishes loading
 
-    user clicks link    Chart
     user configures basic chart    Vertical bar    500    800
 
 Change vertical bar chart legend
@@ -648,14 +645,11 @@ Validate basic vertical bar chart preview
     user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 4,198
 
 Save and validate vertical bar chart embeds correctly
-    # Transient React error that happens locally & on dev sometimes: TypeError: Cannot read property '_leaflet_pos' of undefined
-    user clicks link    Chart configuration
-    user clicks button    Save chart options
-    user waits until button is enabled    Save chart options
+    user saves chart configuration
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -699,7 +693,6 @@ Configure basic horizontal bar chart
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page finishes loading
 
-    user clicks link    Chart
     user configures basic chart    Horizontal bar    600    700
 
 Validate basic horizontal bar chart preview
@@ -735,14 +728,11 @@ Validate basic horizontal bar chart preview
     user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 4,198
 
 Save and validate horizontal bar chart embeds correctly
-    user clicks link    Chart configuration
-    user clicks button    Save chart options
-    user waits until button is enabled    Save chart options
-    user waits until page finishes loading
+    user saves chart configuration
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}
@@ -785,7 +775,6 @@ Configure basic geographic chart
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page finishes loading
 
-    user clicks link    Chart
     user configures basic chart    Geographic    700    600
 
     user clicks link    Data sets
@@ -917,7 +906,7 @@ Save and validate geographic chart embeds correctly
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user waits until page finishes loading
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
@@ -955,13 +944,11 @@ Validate basic infographic chart preview
     user checks infographic chart contains alt    id:chartBuilderPreview    Test chart alt
 
 Save and validate infographic chart embeds correctly
-    user clicks button    Save chart options
-    user waits until button is enabled    Save chart options
-    user waits until page finishes loading
+    user saves infographic configuration
 
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user opens accordion section    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user opens accordion section    ${CONTENT_SECTION_NAME}    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user waits until page contains element    ${datablock}

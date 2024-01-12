@@ -66,7 +66,7 @@ Add empty Summary section text block to the page
 
 Add content section with empty content block to the page
     user creates new content section    1    Test section one
-    user adds text block to editable accordion section    Test section one    id:releaseMainContent
+    user adds text block to editable accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add empty content section to the page
     user creates new content section    2    Test section two
@@ -102,15 +102,15 @@ Add content to text block in Summary section
     ...    Summary test text
 
 Add content to text block in Test section one
-    user opens accordion section    Test section one    id:releaseMainContent
+    user opens accordion section    Test section one    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test section one    1
-    ...    Test section one text    id:releaseMainContent
+    ...    Test section one text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add text block with content to Test section two
-    user opens accordion section    Test section two    id:releaseMainContent
-    user adds text block to editable accordion section    Test section two    id:releaseMainContent
+    user opens accordion section    Test section two    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Test section two    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test section two    1
-    ...    Test section two text    id:releaseMainContent
+    ...    Test section two text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add content to text block in Related dashboards section
     user opens accordion section    View related dashboard(s)    id:data-accordion

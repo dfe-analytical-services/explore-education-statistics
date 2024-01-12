@@ -1,7 +1,7 @@
 *** Settings ***
 Resource            ../../../libs/admin-common.robot
 Resource            ../../../libs/common.robot
-Resource            ../../../seed_data/seed_data_constants.robot
+Resource            ../../../seed_data/seed_data_theme_2_constants.robot
 Resource            ../../../libs/admin/analyst/role_ui_permissions.robot
 
 Suite Setup         user signs in as analyst1

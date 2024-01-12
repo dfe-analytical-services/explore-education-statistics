@@ -1,6 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_constants.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -14,7 +14,7 @@ Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Select "Seed Data Theme 1 Publication 1" publication
-    user clicks radio    ${SEED_DATA_THEME_1}
+    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
     user clicks radio    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
@@ -24,7 +24,7 @@ Validate "Absence by characteristic" subject details
     user clicks radio    Absence by characteristic
     user checks summary list contains    Geographic levels    Local authority; Local authority district; National
     user checks summary list contains    Time period    2012/13 to 2016/17
-    user checks summary list contains    Content    1
+    user checks summary list contains    Content    Absence by characteristic data guidance content
 
 Validate back takes you to step 1
     user goes back

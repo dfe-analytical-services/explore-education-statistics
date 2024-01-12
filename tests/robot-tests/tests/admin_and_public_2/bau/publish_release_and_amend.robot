@@ -112,8 +112,7 @@ Create chart for data block
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
     user checks radio is checked    Use table title
     user enters text into element    id:chartConfigurationForm-alt    Sample alt text
-
-    user clicks button    Save chart options
+    user saves infographic configuration
 
     user waits until page contains    Chart preview
     user checks infographic chart contains alt    id:chartBuilderPreview    Sample alt text
@@ -142,7 +141,7 @@ Add three accordion sections to release
 
 Add data block to first accordion section
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
 
     user scrolls to element    ${datablock}
@@ -152,7 +151,7 @@ Add data block to first accordion section
     user checks infographic chart contains alt    ${datablock}    Sample alt text
 
 Verify data block table has footnotes
-    ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
+    ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
@@ -164,14 +163,14 @@ Verify data block table has footnotes
     ...    ${data_block_table}
 
 Add test text to second accordion section
-    user adds text block to editable accordion section    Test text    id:releaseMainContent
+    user adds text block to editable accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test text    1    Some test text!
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add embedded dashboard to third accordion section
     user chooses to embed a URL in editable accordion section
     ...    Test embedded dashboard section
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${modal}=    user updates embedded URL details in modal
     ...    Test embedded dashboard title
@@ -200,10 +199,7 @@ User navigates to Data blocks page to edit block
 
 Edit data block
     user waits until table is visible
-
-    user clicks link    Edit block    css:tbody > tr:first-child
-    user waits until h2 is visible    ${DATABLOCK_NAME}
-    user waits until h2 is visible    Data block details
+    user clicks edit data block link    ${DATABLOCK_NAME}
 
     user checks page contains element    //*[@data-testid="Data set name-key" and contains(text(), "Data set name")]
     user checks page contains element
@@ -224,8 +220,8 @@ Navigate to the 'Content' page
 
 Verify data block is updated correctly
     #checking if data block cache has been invalidated by verifying the updates on the block
-    user scrolls to accordion section    Dates data block    id:releaseMainContent
-    user opens accordion section    Dates data block    id:releaseMainContent
+    user scrolls to accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
 
     user checks chart title contains    ${datablock}    Updated dates table title
@@ -233,7 +229,7 @@ Verify data block is updated correctly
     user waits until parent contains element    ${datablock}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element    ${datablock}    xpath:.//*[.="Source: Updated dates source"]
-    user closes accordion section    Dates data block    id:releaseMainContent
+    user closes accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -521,7 +517,7 @@ Upload replacement data
     user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
     user checks headed table body row cell contains    Number of rows    2    118    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    2    17 Kb    wait=%{WAIT_SMALL}
-    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
+    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_DATA_FILE_IMPORT}
 
 Confirm data replacement
     user waits until page contains    Data blocks: OK
@@ -606,10 +602,7 @@ Edit data block for amendment
     user checks table cell contains    1    2    Yes
     user checks table cell contains    1    3    Yes
 
-    user clicks link    Edit block    css:tbody > tr:first-child
-
-    user waits until h2 is visible    ${DATABLOCK_NAME}
-    user waits until h2 is visible    Data block details
+    user clicks edit data block link    ${DATABLOCK_NAME}
 
     user clicks element    testid:wizardStep-4-goToButton
 
@@ -647,10 +640,7 @@ Update data block chart for amendment
     user checks input field contains    id:chartConfigurationForm-title    Amended sample title
     user enters text into element    id:chartConfigurationForm-alt    Amended sample alt text
     user checks textarea contains    id:chartConfigurationForm-alt    Amended sample alt text
-
-    user clicks button    Save chart options
-    user waits until page finishes loading
-    user waits until page contains element    id:chartBuilderPreview
+    user saves infographic configuration
     user checks infographic chart contains alt    id:chartBuilderPreview    Amended sample alt text
 
 Navigate to 'Content' page for amendment
@@ -667,7 +657,7 @@ Update free text key stat
     user checks key stat guidance    1    Updated guidance title    Updated guidance text
 
 Verify amended Dates data block table has footnotes
-    ${accordion}=    user opens accordion section    Dates data block    id:releaseMainContent
+    ${accordion}=    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
 
     user checks list has x items    testid:footnotes    2    ${data_block_table}
@@ -685,14 +675,14 @@ Verify amended Dates data block table has footnotes
     ...    ${data_block_table}
 
 Update second accordion section text for amendment
-    user opens accordion section    Test text    id:releaseMainContent
+    user opens accordion section    Test text    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Test text    1    Amended test text!
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Update embedded dashboard title and url
     user chooses to update an embedded URL in editable accordion section
     ...    Test embedded dashboard section
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
     ${modal}=    user updates embedded URL details in modal
     ...    Amended Test embedded dashboard title
@@ -716,7 +706,7 @@ Update embedded dashboard title and url
     user waits until h1 is visible    Explore Education Statistics Robot Framework tests    %{WAIT_SMALL}
     unselect frame
 
-    user closes accordion section    Test embedded dashboard section    id:releaseMainContent
+    user closes accordion section    Test embedded dashboard section    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add release note to first amendment
     user clicks button    Add note
@@ -998,8 +988,8 @@ Remove the data block from the second amendment
 Remove the content section that originally contained the deleted data block
     user clicks link    Content
     user waits until page contains accordion section    Dates data block
-    user opens accordion section    Dates data block    id:releaseMainContent
-    user deletes editable accordion section    Dates data block    id:releaseMainContent
+    user opens accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
+    user deletes editable accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Approve release amendment for scheduled publication and update published date
     ${days_until_release}=    set variable    2

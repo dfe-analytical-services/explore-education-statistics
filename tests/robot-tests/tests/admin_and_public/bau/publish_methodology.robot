@@ -238,7 +238,6 @@ Amend the methodology in preparation to test publishing immediately
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - Amended methodology
-    ...    Edit
 
 Update the methodology amendment's content
     user clicks link    Manage content
@@ -418,9 +417,9 @@ Verify that the amended methodology is visible on the public methodologies page
     ...    ${PUBLIC_METHODOLOGY_URL_ENDING}-amended-methodology    # Slug has changed
 
 Validate methodology redirect works
-    go to   %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
-    user waits until h1 is visible   ${PUBLICATION_NAME} - Amended methodology
-    user checks url contains  %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-amended-methodology
+    go to    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}
+    user waits until h1 is visible    ${PUBLICATION_NAME} - Amended methodology
+    user checks url contains    %{PUBLIC_URL}${PUBLIC_METHODOLOGY_URL_ENDING}-amended-methodology
 
 Schedule a methodology amendment to be published with a release amendment
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}

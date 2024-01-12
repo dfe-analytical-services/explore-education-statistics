@@ -1,5 +1,6 @@
 *** Settings ***
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/charts.robot
 Library             ../../libs/admin_api.py
 
 Force Tags          Admin    Local    Dev    AltersData
@@ -145,8 +146,7 @@ Navigate to Create chart tab
     user clicks radio    Set an alternative title
     user enters text into element    id:chartConfigurationForm-title    Sample title
     user enters text into element    id:chartConfigurationForm-alt    Sample alt text
-    user clicks button    Save chart options
-    user waits until page contains    Chart preview
+    user saves infographic configuration
 
 Navigate back to 'Data and files' page
     user clicks link    Data and files

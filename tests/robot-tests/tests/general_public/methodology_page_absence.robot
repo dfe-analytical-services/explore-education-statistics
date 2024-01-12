@@ -1,6 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_constants.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -12,14 +12,14 @@ Force Tags          GeneralPublic    Local    Dev    PreProd
 *** Test Cases ***
 Navigate to Seed Data Theme 1 methodologies
     user navigates to public methodologies page
-    user opens accordion section    ${SEED_DATA_THEME_1}
+    user opens accordion section    ${SEED_DATA_THEME_1_TITLE}
 
 Go to Seed Data Theme 1 Publication 1 Methodology 1
     user checks page contains link with text and url
-    ...    ${SEED_DATA_THEME_1_METHODOLOGY_1_TITLE}
-    ...    ${SEED_DATA_THEME_1_METHODOLOGY_1_RELATIVE_URL}
-    user clicks link    ${SEED_DATA_THEME_1_METHODOLOGY_1_TITLE}
-    user waits until h1 is visible    ${SEED_DATA_THEME_1_METHODOLOGY_1_TITLE}
+    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+    ...    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_RELATIVE_URL}
+    user clicks link    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
+    user waits until h1 is visible    ${SEED_DATA_THEME_1_PUBLICATION_1_METHODOLOGY_1_TITLE}
     user waits until page contains title caption    Methodology
 
 Validate Published date
@@ -74,7 +74,13 @@ Search for "pupil"
 
     # This is the number of text matches found when using the in-browser javascript search.
     # This number can vary depending on the data itself as it will scan all the html on the page.
-    ${expected_occurrences_of_pupil}=    Set Variable    128
+    # This value of "5" matches:
+    #    1. A text hit in an h3 in content section 1.
+    #    1. A text hit in the paragraph content of content section 1.
+    #    3. A text hit in the content of annex section 1.
+    #    4. A text hit in the section title of annex section 3.
+    #    5. A mention of the publication title in the "Contact us" section.
+    ${expected_occurrences_of_pupil}=    Set Variable    5
 
     user verifies accordion is closed    1. Overview of absence statistics
 
@@ -84,14 +90,17 @@ Search for "pupil"
     user clicks element    id:pageSearchForm-option-0
 
     user verifies accordion is open    1. Overview of absence statistics
-    user waits until element is visible    id:section1-1
-    user waits until page contains    All maintained schools are required to provide 2 possible sessions per day,
+    user waits until element is visible    id:content-section-0-content-1
+    user waits until page contains    The data used to publish absence statistics is collected via the school census
+    user waits until element is visible    id:content-section-0-content-2
+    user waits until page contains    All maintained schools are required to provide 2 possible sessions per day
 
 Search for "specific enquiry"
     [Documentation]    EES-807
 
     # The words "specific inquiry" occur once in the Contact Us Section,
-    # and once in some custom text the user has uploaded to the editor
+    # and once in some custom text the user has uploaded to the "7. Contacts"
+    # section.
     ${expected_occurrences_of_specific_inquiry}=    Set Variable    2
 
     user verifies accordion is closed    7. Contacts

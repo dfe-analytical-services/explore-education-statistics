@@ -1,6 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_constants.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
@@ -14,21 +14,21 @@ Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Select "Seed Data Theme 1 Publication 1" publication
-    user clicks radio    ${SEED_DATA_THEME_1}
+    user clicks radio    ${SEED_DATA_THEME_1_TITLE}
     user clicks radio    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Select a data set
     user checks previous table tool step contains    1    Publication    ${SEED_DATA_THEME_1_PUBLICATION_1_TITLE}
 
-Validate "Absence in prus" subject details
-    user clicks radio    Absence in prus
+Validate "Absence in PRUs" subject details
+    user clicks radio    Absence in PRUs
     user checks summary list contains    Geographic levels    Local authority; National; Regional
     user checks summary list contains    Time period    2013/14 to 2016/17
 
-Select subject "Absence in prus"
+Select subject "Absence in PRUs"
     user clicks element    id:publicationDataStepForm-submit
     user waits until table tool wizard step is available    3    Choose locations
-    user checks previous table tool step contains    2    Data set    Absence in prus
+    user checks previous table tool step contains    2    Data set    Absence in PRUs
 
 Select Location Country, England
     user opens details dropdown    National
@@ -53,7 +53,7 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_SMALL}
     user waits until page contains element
-    ...    xpath://*[@data-testid="dataTableCaption" and text()="Number of schools for 'Absence in prus' in England between 2013/14 and 2016/17"]
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Number of schools for 'Absence in PRUs' in England between 2013/14 and 2016/17"]
 
 Validate results table column headings
     user checks table column heading contains    1    1    2013/14
@@ -122,7 +122,7 @@ Create table again
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_SMALL}
     user waits until page contains element
-    ...    xpath://*[@data-testid="dataTableCaption" and text()="'Absence in prus' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="'Absence in PRUs' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
 
 Validate new table column headings
     user checks table column heading contains    1    1    2014/15

@@ -1,6 +1,6 @@
 *** Settings ***
 Resource            ../libs/public-common.robot
-Resource            ../seed_data/seed_data_constants.robot
+Resource            ../seed_data/seed_data_theme_1_constants.robot
 
 Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
@@ -47,10 +47,9 @@ Validate table data
     user checks table column heading contains    1    4    2015/16
     user checks table column heading contains    1    5    2016/17
 
-    user checks table row heading contains    1    1    England
-    user checks table row heading contains    1    2    Authorised absence rate
-    user checks table row heading contains    2    1    Unauthorised absence rate
-    user checks table row heading contains    3    1    Overall absence rate
+    user checks table row heading contains    1    1    Authorised absence rate
+    user checks table row heading contains    2    1    Overall absence rate
+    user checks table row heading contains    3    1    Unauthorised absence rate
 
     # Authorised absence rate
     user checks table cell contains    1    1    4.2%
@@ -59,16 +58,16 @@ Validate table data
     user checks table cell contains    1    4    3.4%
     user checks table cell contains    1    5    3.4%
 
-    # Unauthorised absence rate
-    user checks table cell contains    2    1    1.1%
-    user checks table cell contains    2    2    1.1%
-    user checks table cell contains    2    3    1.1%
-    user checks table cell contains    2    4    1.1%
-    user checks table cell contains    2    5    1.3%
-
     # Overall absence rate
-    user checks table cell contains    3    1    5.3%
-    user checks table cell contains    3    2    4.5%
-    user checks table cell contains    3    3    4.6%
-    user checks table cell contains    3    4    4.6%
-    user checks table cell contains    3    5    4.7%
+    user checks table cell contains    2    1    5.3%
+    user checks table cell contains    2    2    4.5%
+    user checks table cell contains    2    3    4.6%
+    user checks table cell contains    2    4    4.6%
+    user checks table cell contains    2    5    4.7%
+
+    # Unauthorised absence rate
+    user checks table cell contains    3    1    1.1%
+    user checks table cell contains    3    2    1.1%
+    user checks table cell contains    3    3    1.1%
+    user checks table cell contains    3    4    1.1%
+    user checks table cell contains    3    5    1.3%

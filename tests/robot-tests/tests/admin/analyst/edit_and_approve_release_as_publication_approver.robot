@@ -91,8 +91,7 @@ Create chart for data block
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
     user checks radio is checked    Use table title
     user enters text into element    id:chartConfigurationForm-alt    Sample alt text
-
-    user clicks button    Save chart options
+    user saves infographic configuration
 
     user waits until page contains    Chart preview
     user checks infographic chart contains alt    id:chartBuilderPreview    Sample alt text
@@ -108,17 +107,15 @@ Create some release content
     user clicks button    Add new section
     user changes accordion section title    1    Dates data block
 
-    user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
-    ...    id:releaseMainContent
-    ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    user waits until page contains element    ${datablock}    %{WAIT_SMALL}
+    ${datablock}=    user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
 
-    user adds text block to editable accordion section    Dates data block    id:releaseMainContent
+    user adds text block to editable accordion section    Dates data block    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
     user adds content to autosaving accordion section text block    Dates data block    2    Some test text!
-    ...    id:releaseMainContent
+    ...    ${RELEASE_CONTENT_EDITABLE_ACCORDION}
 
 Add public prerelease access list
     user clicks link    Pre-release access
