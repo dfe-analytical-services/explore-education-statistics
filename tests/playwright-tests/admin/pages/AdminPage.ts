@@ -9,7 +9,9 @@ export default class AdminPage {
     this.page = page;
     // Locators
     this.signInButton = page.locator('button[id="signin-button"]');
-    this.manageThemesTopicLink = page.locator('//a[text()="manage themes and topics" ]');
+    this.manageThemesTopicLink = page.locator(
+      '//a[text()="manage themes and topics" ]',
+    );
   }
 
   async clickSignIn() {

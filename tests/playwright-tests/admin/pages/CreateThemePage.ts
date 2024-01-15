@@ -10,11 +10,11 @@ export default class CreateThemePage {
     this.page = page;
     // Locators
     this.themeTitle = page.locator('input[id="themeForm-title"]');
-    this.themeSummary= page.locator('input[id="themeForm-summary"]');
-    this.saveThemeButton = page.locator('//button[text()="Save theme"]')
+    this.themeSummary = page.locator('input[id="themeForm-summary"]');
+    this.saveThemeButton = page.locator('//button[text()="Save theme"]');
   }
 
-  async doCreateTheme(title : string, summary: string) {
+  async doCreateTheme(title: string, summary: string) {
     await this.themeTitle.fill(title);
     await this.themeSummary.fill(summary);
     await this.saveThemeButton.click();

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import  HomePage from '../general-public/pages/HomePage'
-import  GlossaryPage  from '../general-public/pages/GlossaryPage';
+import HomePage from '../general-public/pages/HomePage';
+import GlossaryPage from '../general-public/pages/GlossaryPage';
 
 test.describe('Verify the end to end functionality of glossary page', () => {
   test.beforeEach(async ({ page }) => {
