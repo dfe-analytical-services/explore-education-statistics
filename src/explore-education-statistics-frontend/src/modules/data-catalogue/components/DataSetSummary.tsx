@@ -16,20 +16,25 @@ import { DataSetSummary as DataSetSummaryData } from '@frontend/services/dataSet
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
-import React, { useEffect } from 'react';
+import React, { createElement, useEffect } from 'react';
 
 const maxContentLength = 300;
 
 interface Props {
   dataSet: DataSetSummaryData;
   expanded?: boolean;
+  headingTag?: 'h3' | 'h4';
+  showLatestDataTag?: boolean;
 }
 
-export default function DataSetSummary({ dataSet, expanded = false }: Props) {
+export default function DataSetSummary({
+  dataSet,
+  expanded = false,
+  headingTag = 'h3',
+  showLatestDataTag = true,
+}: Props) {
   const {
     fileId,
-    fileExtension,
-    fileSize,
     filters = [],
     geographicLevels = [],
     indicators = [],
@@ -57,18 +62,23 @@ export default function DataSetSummary({ dataSet, expanded = false }: Props) {
     logEvent({
       category: 'Data catalogue',
       action: 'Data set file download',
-      label: `Publication: ${publication.title}, Release: ${release.title}, File: ${title}`,
+      label: `Publication: ${publication.title}, Release: ${release.title}, Data set: ${title}`,
     });
   };
 
   return (
     <li
-      className={`${styles.container} govuk-!-margin-top-4 govuk-!-padding-bottom-2`}
+      className="dfe-border-bottom govuk-!-margin-top-4 govuk-!-padding-bottom-2"
       data-testid={`data-set-summary-${title}`}
     >
-      <h3 className="govuk-!-margin-bottom-2" id={`${id}-heading`}>
-        <Link to="#">{title}</Link>
-      </h3>
+      {createElement(
+        headingTag,
+        {
+          className: `govuk-heading-m govuk-!-margin-bottom-2`,
+          id: `${id}-heading`,
+        },
+        <Link to="#">{title}</Link>,
+      )}
 
       <ContentHtml
         className={classNames({
@@ -84,14 +94,15 @@ export default function DataSetSummary({ dataSet, expanded = false }: Props) {
           <VisuallyHidden> about {title}</VisuallyHidden>
         </ButtonText>
       )}
-
-      <p className="govuk-!-margin-top-4">
-        <Tag strong colour={latestData ? undefined : 'orange'}>
-          {latestData
-            ? 'This is the latest data'
-            : 'This is not the latest data'}
-        </Tag>
-      </p>
+      {showLatestDataTag && (
+        <p className="govuk-!-margin-top-4">
+          <Tag strong colour={latestData ? undefined : 'orange'}>
+            {latestData
+              ? 'This is the latest data'
+              : 'This is not the latest data'}
+          </Tag>
+        </p>
+      )}
 
       <SummaryList
         ariaLabel={`Details list for ${title}`}
@@ -111,7 +122,7 @@ export default function DataSetSummary({ dataSet, expanded = false }: Props) {
         {geographicLevels.length > 0 && (
           <SummaryListItem
             className={classNames({
-              [styles.hidden]: !showDetails,
+              'dfe-js-hidden': !showDetails,
             })}
             term="Geographic levels"
           >
@@ -121,7 +132,7 @@ export default function DataSetSummary({ dataSet, expanded = false }: Props) {
         {indicators.length > 0 && (
           <SummaryListItem
             className={classNames({
-              [styles.hidden]: !showDetails,
+              'dfe-js-hidden': !showDetails,
             })}
             term="Indicators"
           >
@@ -144,7 +155,7 @@ export default function DataSetSummary({ dataSet, expanded = false }: Props) {
         {filters.length > 0 && (
           <SummaryListItem
             className={classNames({
-              [styles.hidden]: !showDetails,
+              'dfe-js-hidden': !showDetails,
             })}
             term="Filters"
           >
@@ -167,7 +178,7 @@ export default function DataSetSummary({ dataSet, expanded = false }: Props) {
         {(timePeriods.from || timePeriods.to) && (
           <SummaryListItem
             className={classNames({
-              [styles.hidden]: !showDetails,
+              'dfe-js-hidden': !showDetails,
             })}
             term="Time period"
           >
@@ -176,13 +187,13 @@ export default function DataSetSummary({ dataSet, expanded = false }: Props) {
         )}
         <SummaryListItem
           className={classNames({
-            [styles.hidden]: !showDetails,
+            'dfe-js-hidden': !showDetails,
           })}
           term="File"
         >
           <ButtonText onClick={handleDownload}>
             Download data set <VisuallyHidden>{`for ${title} `}</VisuallyHidden>
-            {`(${fileExtension.toUpperCase()}, ${fileSize})`}
+            (ZIP)
           </ButtonText>
         </SummaryListItem>
       </SummaryList>
@@ -201,7 +212,7 @@ export default function DataSetSummary({ dataSet, expanded = false }: Props) {
           logEvent({
             category: 'Data catalogue',
             action: 'Data set details toggled',
-            label: `Publication: ${publication.title}, Release: ${release.title}, File: ${title}`,
+            label: `Publication: ${publication.title}, Release: ${release.title}, Data set: ${title}`,
           });
         }}
       />

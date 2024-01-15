@@ -13,6 +13,7 @@ import DataCataloguePageCurrent from '@frontend/modules/data-catalogue/DataCatal
 import DataCataloguePageNew from '@frontend/modules/data-catalogue/DataCataloguePageNew';
 import dataSetQueries from '@frontend/queries/dataSetQueries';
 import { QueryClient, dehydrate } from '@tanstack/react-query';
+import publicationQueries from '@frontend/queries/publicationQueries';
 
 interface Props {
   releases?: ReleaseSummary[];
@@ -57,6 +58,11 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
 
   if (newDesign) {
     await queryClient.prefetchQuery(dataSetQueries.list(context.query));
+    await queryClient.prefetchQuery(
+      publicationQueries.getPublicationTree({
+        publicationFilter: 'DataCatalogue',
+      }),
+    );
   }
 
   const themes = newDesign

@@ -5,11 +5,16 @@ const min = 3;
 const formId = 'searchForm';
 
 interface Props {
+  label?: string;
   value?: string;
   onSubmit: (value: string) => void;
 }
 
-const SearchForm = ({ value: initialValue = '', onSubmit }: Props) => {
+const SearchForm = ({
+  label = 'Search',
+  value: initialValue = '',
+  onSubmit,
+}: Props) => {
   const [searchTerm, setSearchTerm] = useState<string>(initialValue);
 
   useEffect(() => {
@@ -29,7 +34,7 @@ const SearchForm = ({ value: initialValue = '', onSubmit }: Props) => {
     >
       <FormSearchBar
         id={`${formId}-search`}
-        label="Search"
+        label={label}
         min={min}
         name="search"
         value={searchTerm}

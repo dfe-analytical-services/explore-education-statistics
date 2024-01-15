@@ -3,7 +3,6 @@ import parseNumber from '@common/utils/number/parseNumber';
 import isOneOf from '@common/utils/type-guards/isOneOf';
 import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
 import {
-  DataSetListRequest,
   DataSetOrderParam,
   DataSetSortParam,
   dataSetOrderOptions,
@@ -13,11 +12,17 @@ import omitBy from 'lodash/omitBy';
 
 export default function createDataSetListRequest(
   query: DataCataloguePageQuery,
-): DataSetListRequest {
-  const { searchTerm: searchParam, orderBy: orderByParam } =
-    getParamsFromQuery(query);
+): DataCataloguePageQuery {
+  const {
+    latest,
+    orderBy: orderByParam,
+    publicationId,
+    releaseId,
+    searchTerm: searchParam,
+    themeId,
+  } = getParamsFromQuery(query);
 
-  const { orderBy, sort } = getOrderParams(orderByParam);
+  const { orderBy, sort } = getOrderParams(orderByParam as DataSetOrderOption); // TO DO shouldnt need this as
 
   const minSearchCharacters = 3;
   const searchTerm =
@@ -25,10 +30,14 @@ export default function createDataSetListRequest(
 
   return omitBy(
     {
+      latest,
       orderBy,
       page: parseNumber(query.page) ?? 1,
+      publicationId,
+      // releaseId, // commenting out as the api errors with release id currently
       sort,
       searchTerm,
+      themeId,
     },
     value => typeof value === 'undefined',
   );
@@ -62,15 +71,18 @@ function getOrderParams(orderBy: DataSetOrderOption): {
   };
 }
 
-export function getParamsFromQuery(query: DataCataloguePageQuery): {
-  searchTerm?: string;
-  orderBy: DataSetOrderOption;
-} {
+export function getParamsFromQuery(
+  query: DataCataloguePageQuery,
+): DataCataloguePageQuery {
   return {
-    searchTerm: getFirst(query.searchTerm),
+    latest: getFirst(query.latest),
     orderBy:
       query.orderBy && isOneOf(query.orderBy, dataSetOrderOptions)
         ? query.orderBy
         : 'newest',
+    publicationId: getFirst(query.publicationId),
+    releaseId: getFirst(query.releaseId),
+    searchTerm: getFirst(query.searchTerm),
+    themeId: getFirst(query.themeId),
   };
 }

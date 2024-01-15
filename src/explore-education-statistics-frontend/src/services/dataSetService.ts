@@ -1,5 +1,6 @@
 import { PaginatedList } from '@common/services/types/pagination';
 import { contentApi } from '@common/services/api';
+import { DataCataloguePageQuery } from '@frontend/modules/data-catalogue/DataCataloguePageNew';
 
 export interface DataSetSummary {
   fileId: string;
@@ -44,21 +45,19 @@ export type DataSetSortParam = 'asc' | 'desc';
 
 export type DataSetOrderParam = 'published' | 'title' | 'relevance';
 
-export const dataSetFilters = ['releaseType', 'search', 'themeId'] as const;
+export const dataSetFilters = [
+  'latest',
+  'publicationId',
+  'releaseId',
+  'searchTerm',
+  'themeId',
+] as const;
 
 export type DataSetFilter = (typeof dataSetFilters)[number];
 
-export interface DataSetListRequest {
-  order?: DataSetOrderParam;
-  page?: number;
-  pageSize?: number;
-  search?: string;
-  sort?: DataSetSortParam;
-}
-
 const dataSetService = {
   listDataSets(
-    params: DataSetListRequest,
+    params: DataCataloguePageQuery,
   ): Promise<PaginatedList<DataSetSummary>> {
     return contentApi.get(`/data-sets`, {
       params,

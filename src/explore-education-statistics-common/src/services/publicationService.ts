@@ -231,7 +231,7 @@ export interface Theme {
   topics: Topic[];
 }
 
-interface PublicationTreeOptions {
+export interface PublicationTreeOptions {
   publicationFilter?: 'DataTables' | 'DataCatalogue' | 'FastTrack';
 }
 

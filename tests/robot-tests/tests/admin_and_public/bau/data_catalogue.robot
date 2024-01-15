@@ -200,7 +200,91 @@ Validate data sets list
 
 Validate zip contains correct files
     [Documentation]    EES-4147
-    [Tags]    Failing
     sleep    8    # wait for file to download
     ${list}=    create list    data/dates.csv    data-guidance/data-guidance.txt
     zip should contain directories and files    ui-tests-data-catalogue-%{RUN_IDENTIFIER}_2021-22-q1.zip    ${list}
+
+Validate theme filter exists
+    [Tags]    Local    Dev
+    user checks select contains option    id:theme    All themes
+    user checks select contains option    id:theme    Pupils and schools
+    user checks select contains option    id:theme    UI tests - Publication and Release UI Permissions Theme
+
+Validate publication filter exists
+    [Tags]    Local    Dev
+    user checks select contains option    id:publication    All publications
+
+Validate release filter exists
+    [Tags]    Local    Dev
+    user checks select contains option    id:release    Latest releases
+    user checks select contains option    id:release    All releases
+
+Filter by theme
+    [Tags]    Local    Dev
+    user chooses select option    id:theme    Pupils and schools
+    user checks page contains button    Pupils and schools
+
+Filter by publication
+    [Tags]    Local    Dev
+    user chooses select option    id:publication    Pupil absence in schools in England
+    user checks page contains button    Pupil absence in schools in England
+    user checks page contains button    Academic year 2016/17
+
+Filter by all releases
+    [Tags]    Local    Dev
+    user chooses select option    id:release    All releases
+    user checks page contains button    Pupil absence in schools in England
+    user checks page does not contain button    Academic year 2016/17
+
+Remove theme filter
+    [Tags]    Local    Dev
+    user clicks button    Pupils and schools
+    user checks page does not contain button    Pupils and schools
+    user checks page does not contain button    Pupil absence in schools in England
+
+Remove publication filter
+    [Tags]    Local    Dev
+    user chooses select option    id:theme    Pupils and schools
+    user chooses select option    id:publication    Pupil absence in schools in England
+    user clicks button    Pupil absence in schools in England
+    user checks page contains button    Pupils and schools
+    user checks page does not contain button    Pupil absence in schools in England
+    user checks page does not contain button    Academic year 2016/17
+
+Remove release filter
+    [Tags]    Local    Dev
+    user chooses select option    id:theme    Pupils and schools
+    user chooses select option    id:publication    Pupil absence in schools in England
+    user clicks button    Academic year 2016/17
+    user checks page contains button    Pupils and schools
+    user checks page contains button    Pupil absence in schools in England
+    user checks page does not contain button    Academic year 2016/17
+
+Clear all filters
+    [Tags]    Local    Dev
+    user clicks element    id:searchForm-search
+    user presses keys    pupil
+    user clicks button    Search
+    user chooses select option    id:theme    Pupils and schools
+
+    user checks page contains button    pupil
+    user checks page contains button    Pupils and schools
+
+    user clicks button    Clear filters
+
+    user checks page does not contain button    pupil
+    user checks page does not contain button    Pupils and schools
+    user checks page does not contain button    Clear filters
+
+Searching
+    [Tags]    Local    Dev
+    user clicks element    id:searchForm-search
+    user presses keys    Absence for four year olds
+    user clicks button    Search
+    user checks page contains button    Absence for four year olds
+    user checks list item contains    testid:data-sets-list    1    Absence for four year olds
+
+Removing search
+    [Tags]    Local    Dev
+    user clicks button    Absence for four year olds
+    user checks page does not contain button    Absence for four year olds

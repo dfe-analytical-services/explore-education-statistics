@@ -51,8 +51,8 @@ export const testDataSetSummaries: DataSetSummary[] = [
     },
     summary: 'Data set summary 1',
     theme: {
-      id: 'theme-1',
-      title: 'Theme 1',
+      id: 'theme-2',
+      title: 'Theme 2',
     },
     timePeriods: {
       from: '2010',
@@ -70,8 +70,8 @@ export const testDataSetSummaries: DataSetSummary[] = [
     indicators: ['Indicator 1', 'Indicator 2'],
     latestData: true,
     publication: {
-      id: 'publication-1',
-      title: 'Publication 1',
+      id: 'publication-2',
+      title: 'Publication 2',
     },
     published: new Date('2020-01-01'),
     release: {
@@ -80,8 +80,8 @@ export const testDataSetSummaries: DataSetSummary[] = [
     },
     summary: 'Data set summary 1',
     theme: {
-      id: 'theme-1',
-      title: 'Theme 1',
+      id: 'theme-2',
+      title: 'Theme 2',
     },
     timePeriods: {
       from: '2010',
