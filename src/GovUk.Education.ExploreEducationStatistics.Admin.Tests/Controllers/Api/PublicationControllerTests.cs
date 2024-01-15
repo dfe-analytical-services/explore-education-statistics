@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
 using Moq;

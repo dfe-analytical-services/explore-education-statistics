@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Utils.FiltersMetaViewModelBuilder;

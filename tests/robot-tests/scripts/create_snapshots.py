@@ -266,98 +266,139 @@ class SnapshotService:
 
 
 if __name__ == "__main__":
-    from get_webdriver import get_webdriver
 
-    ap = argparse.ArgumentParser(
-        prog=f"pipenv run python {os.path.basename(__file__)}",
-        description="To create snapshots of specific public frontend pages",
-    )
+    def send_alert(message: str) -> None:
+        if args.slack_webhook_url is None or args.slack_webhook_url == "":
+            return
 
-    ap.add_argument(
-        "--public-url",
-        dest="public_url",
-        default="https://explore-education-statistics.service.gov.uk",
-        nargs="?",
-        help="URL of public frontend you wish to create snapshots for",
-        type=str,
-        required=False,
-    )
+        snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)
+        snapshot_service._send_slack_notification(
+            text="fallback",
+            blocks=[
+                {
+                    "type": "header",
+                    "text": {
+                        "type": "plain_text",
+                        "text": ":x: Snapshot process failed",
+                    },
+                },
+                {
+                    "type": "section",
+                    "text": {
+                        "type": "plain_text",
+                        "text": f"{message}",
+                    },
+                },
+            ],
+        )
 
-    ap.add_argument(
-        "--basic-auth-user",
-        dest="basic_auth_user",
-        help="Username for basic auth",
-        type=str,
-        required=False,
-    )
+    try:
+        from get_webdriver import get_webdriver
 
-    ap.add_argument(
-        "--basic-auth-pass",
-        dest="basic_auth_password",
-        help="Password for basic auth",
-        type=str,
-        required=False,
-    )
+        ap = argparse.ArgumentParser(
+            prog=f"pipenv run python {os.path.basename(__file__)}",
+            description="To create snapshots of specific public frontend pages",
+        )
 
-    group = ap.add_mutually_exclusive_group(required=True)
-    group.add_argument(
-        "--validate",
-        dest="validate",
-        action="store_true",
-        help="Compares the latest snapshots to the existing versions and does not write any snapshot files",
-        required=False,
-    )
-    group.add_argument(
-        "--ci",
-        dest="ci",
-        action="store_true",
-        help="Signifies that the test is running in a CI environment, which will make the test validate snapshots and write any snapshot files which have changed",
-        required=False,
-    )
+        ap.add_argument(
+            "--public-url",
+            dest="public_url",
+            default="https://explore-education-statistics.service.gov.uk",
+            nargs="?",
+            help="URL of public frontend you wish to create snapshots for",
+            type=str,
+            required=False,
+        )
 
-    ap.add_argument(
-        "--slack-webhook-url",
-        dest="slack_webhook_url",
-        default=None,
-        help="URL for Slack webhook to send notifications when snapshot differences are found during validation",
-        type=str,
-        required=False,
-    )
+        ap.add_argument(
+            "--basic-auth-user",
+            dest="basic_auth_user",
+            help="Username for basic auth",
+            type=str,
+            required=False,
+        )
 
-    ap.add_argument(
-        "-v",
-        "--visual",
-        dest="visual",
-        action="store_true",
-        help="display browser window that the tests run in",
-        required=False,
-    )
+        ap.add_argument(
+            "--basic-auth-pass",
+            dest="basic_auth_password",
+            help="Password for basic auth",
+            type=str,
+            required=False,
+        )
 
-    args = ap.parse_args()
+        group = ap.add_mutually_exclusive_group(required=True)
+        group.add_argument(
+            "--validate",
+            dest="validate",
+            action="store_true",
+            help="Compares the latest snapshots to the existing versions and does not write any snapshot files",
+            required=False,
+        )
+        group.add_argument(
+            "--ci",
+            dest="ci",
+            action="store_true",
+            help="Signifies that the test is running in a CI environment, which will make the test validate snapshots and write any snapshot files which have changed",
+            required=False,
+        )
 
-    assert os.path.basename(os.getcwd()) == "robot-tests", "Must run from the robot-tests directory!"
+        ap.add_argument(
+            "--slack-webhook-url",
+            dest="slack_webhook_url",
+            default=None,
+            help="URL for Slack webhook to send notifications when snapshot differences are found during validation",
+            type=str,
+            required=False,
+        )
 
-    chrome_options = Options()
+        ap.add_argument(
+            "-v",
+            "--visual",
+            dest="visual",
+            action="store_true",
+            help="display browser window that the tests run in",
+            required=False,
+        )
 
-    if not args.visual:
-        chrome_options.add_argument("--headless")
+        args = ap.parse_args()
 
-    get_webdriver()
+        assert os.path.basename(os.getcwd()) == "robot-tests", "Must run from the robot-tests directory!"
 
-    driver = webdriver.Chrome(options=chrome_options)
+        chrome_options = Options()
 
-    if args.basic_auth_user and args.basic_auth_password:
-        driver.execute_cdp_cmd("Network.enable", {})
-        token = base64.b64encode(f"{args.basic_auth_user}:{args.basic_auth_password}".encode())
-        driver.execute_cdp_cmd("Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}})
+        if not args.visual:
+            chrome_options.add_argument("--headless")
 
-    snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)
+        get_webdriver()
 
-    if args.ci:
-        snapshot_service.validate_snapshots()
-        snapshot_service.write_snapshots_to_file()
+        driver = webdriver.Chrome(options=chrome_options)
 
-    if args.validate:
-        snapshot_service.validate_snapshots()
+        if args.basic_auth_user and args.basic_auth_password:
+            driver.execute_cdp_cmd("Network.enable", {})
+            token = base64.b64encode(f"{args.basic_auth_user}:{args.basic_auth_password}".encode())
+            driver.execute_cdp_cmd(
+                "Network.setExtraHTTPHeaders", {"headers": {"Authorization": f"Basic {token.decode()}"}}
+            )
 
-    driver.quit()
+        snapshot_service = SnapshotService(public_url=args.public_url, slack_webhook_url=args.slack_webhook_url)
+
+        if args.ci:
+            snapshot_service.validate_snapshots()
+            snapshot_service.write_snapshots_to_file()
+
+        if args.validate:
+            snapshot_service.validate_snapshots()
+
+        driver.quit()
+    except Exception as ex:
+        message = ""
+
+        if hasattr(ex, "message"):
+            message = ex.message
+        elif hasattr(ex, "msg"):
+            message = ex.msg
+        else:
+            message = ex
+
+        send_alert(message)
+        raise

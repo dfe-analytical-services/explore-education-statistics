@@ -21,12 +21,12 @@ public class EnumToEnumValueConverter<TEnum> : ValueConverter<TEnum, string> whe
     {
     }
 
-    private static string ToProvider(TEnum value)
+    public static string ToProvider(TEnum value)
     {
         return value.GetEnumValue();
     }
 
-    private static TEnum FromProvider(string value)
+    public static TEnum FromProvider(string value)
     {
         if (Lookup.TryGetValue(value, out var enumVal))
         {

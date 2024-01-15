@@ -15,7 +15,6 @@ import tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
-import Link from '@frontend/components/Link';
 import Page from '@frontend/components/Page';
 import DownloadStep, {
   DownloadFormSubmitHandler,
@@ -167,12 +166,12 @@ const DataCataloguePage: NextPage<Props> = ({
                 state.query.publication.supersededBy ? (
                   <WarningMessage testId="superseded-warning">
                     This publication has been superseded by{' '}
-                    <Link
-                      testId="superseded-by-link"
-                      to={`/data-catalogue?publicationSlug=${state.query.publication.supersededBy.slug}`}
+                    <a
+                      data-testid="superseded-by-link"
+                      href={`/data-catalogue?publicationSlug=${state.query.publication.supersededBy.slug}`}
                     >
                       {state.query.publication.supersededBy.title}
-                    </Link>
+                    </a>
                   </WarningMessage>
                 ) : null
               }

@@ -7,5 +7,10 @@
             "Function": "Information",
             "GovUk.Education.ExploreEducationStatistics": "Information"
         }
+    },
+    "extensions": {
+        "queues": {
+            "maxDequeueCount": 1
+        }
     }
 }

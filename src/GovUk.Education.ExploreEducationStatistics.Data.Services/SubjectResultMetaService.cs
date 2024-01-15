@@ -18,13 +18,13 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.LocationViewModelBuilder;
+using static GovUk.Education.ExploreEducationStatistics.Data.ViewModels.LocationViewModelBuilder;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {

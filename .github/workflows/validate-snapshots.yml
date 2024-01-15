@@ -71,3 +71,20 @@ jobs:
           title: ${{ steps.vars.outputs.pr_title }}
           body: ${{ steps.vars.outputs.pr_body }}
           draft: false
+  on-failure:
+    runs-on: ubuntu-latest
+    if: ${{ always() && (needs.test.result == 'failure' || needs.test.result == 'timed_out') }}
+    needs:
+      - test
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_USERNAME: Alertbot
+          SLACK_ICON_EMOJI: ':x:'
+          SLACK_COLOR: '#a30200'
+          SLACK_TITLE: Workflow ${{ needs.test.result }}
+          MSG_MINIMAL: actions url
+          SLACK_WEBHOOK: ${{ env.SLACK_WEBHOOK_URL }}

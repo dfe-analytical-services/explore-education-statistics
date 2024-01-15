@@ -5,7 +5,6 @@ from compare_images import compare_images
 
 
 def compare_images_in_folder_trees(first_folderpath: str, second_folderpath: str, diff_folderpath: str) -> None:
-
     first_folderpath_absolute = os.path.abspath(os.path.join(os.getcwd(), first_folderpath))
     second_folderpath_absolute = os.path.abspath(os.path.join(os.getcwd(), second_folderpath))
     diff_folderpath_absolute = os.path.abspath(os.path.join(os.getcwd(), diff_folderpath))
