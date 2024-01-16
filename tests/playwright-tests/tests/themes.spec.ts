@@ -3,8 +3,9 @@ import environment from '../utils/env';
 import AzureLoginPage from '../admin/azpage/AzureLoginPage';
 import AdminPage from '../admin/pages/AdminPage';
 import ThemesPage from '../admin/pages/ThemesPage';
-import generateUIThemeName from '../utils/generateUITheme';
+import generateUIThemeName from '../utils/generateRunIdentifier';
 import CreateThemePage from '../admin/pages/CreateThemePage';
+import generateRunIdentifier from '../utils/generateRunIdentifier';
 
 test.describe('Verify the end to end functionality of themes and topics', () => {
   let adminPage: AdminPage;
@@ -27,11 +28,11 @@ test.describe('Verify the end to end functionality of themes and topics', () => 
     await adminPage.manageThemesTopicLink.click();
     await themesPage.createThemeLink.click();
 
-    const uiThemeName = generateUIThemeName();
-    const uiThemeTile = `Theme${uiThemeName}`;
+    const uiThemeName = generateRunIdentifier();
+    const uiThemeTitle = `Theme${uiThemeName}`;
     const uiThemeSummary = `Summary${uiThemeName}`;
 
-    await createThemePage.doCreateTheme(uiThemeTile, uiThemeSummary);
-    await themesPage.checkThemeIsDisplayed(uiThemeTile);
+    await createThemePage.doCreateTheme(uiThemeTitle, uiThemeSummary);
+    await themesPage.checkThemeIsDisplayed(uiThemeTitle);
   });
 });
