@@ -3,7 +3,6 @@ import environment from '../utils/env';
 import AzureLoginPage from '../admin/azpage/AzureLoginPage';
 import AdminPage from '../admin/pages/AdminPage';
 import ThemesPage from '../admin/pages/ThemesPage';
-import generateUIThemeName from '../utils/generateRunIdentifier';
 import CreateThemePage from '../admin/pages/CreateThemePage';
 import generateRunIdentifier from '../utils/generateRunIdentifier';
 
