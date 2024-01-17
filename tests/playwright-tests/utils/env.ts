@@ -1,7 +1,14 @@
 import dotenv from 'dotenv';
+import generateRunIdentifier from './generateRunIdentifier';
 
 dotenv.config();
-// eslint-disable-next-line import/prefer-default-export
-export class environment {
-  public static BASE_URL = process.env.PUBLIC_URL;
-}
+
+const environment = {
+  PUBLIC_URL: process.env.PUBLIC_URL ?? '',
+  ADMIN_URL: process.env.ADMIN_URL ?? '',
+  ADMIN_EMAIL: process.env.ADMIN_EMAIL ?? '',
+  ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ?? '',
+  RUN_IDENTIFIER: generateRunIdentifier(),
+};
+
+export default environment;
