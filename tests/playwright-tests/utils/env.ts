@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import generateRunIdentifier from './generateRunIdentifier'
+import generateRunIdentifier from './generateRunIdentifier';
 
 dotenv.config();
 
