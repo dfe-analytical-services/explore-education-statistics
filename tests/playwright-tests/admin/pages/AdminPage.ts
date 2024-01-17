@@ -5,7 +5,7 @@ export default class AdminPage {
   readonly signInButton: Locator;
   readonly manageThemesTopicLink: Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     this.page = page;
     // Locators
     this.signInButton = page.locator('button[id="signin-button"]');

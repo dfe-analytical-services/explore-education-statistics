@@ -5,7 +5,7 @@ export default class HomePage {
   readonly page: Page;
   readonly glossary: Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     this.page = page;
     // Locators
     this.glossary = page.locator('//h3/a[text()="Glossary"]');

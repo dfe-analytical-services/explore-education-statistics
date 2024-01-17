@@ -15,7 +15,7 @@ export default class GlossaryPage {
   readonly voluntaryRepaymentSectionText: Locator;
   readonly educationStatisticsMethodology: Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     this.page = page;
     // Locators
     this.pageSearchBox = page.locator('input#pageSearchForm-input');

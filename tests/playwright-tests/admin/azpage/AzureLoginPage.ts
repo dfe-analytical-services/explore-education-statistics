@@ -9,7 +9,7 @@ export default class AzureLoginPage {
   readonly signInButton: Locator;
   readonly noButton: Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     this.page = page;
     // Locators
     this.emailAddress = page.locator(
@@ -22,7 +22,7 @@ export default class AzureLoginPage {
   }
 
   async doSignIn() {
-    await this.emailAddress.fill(environment.ADMIN_EMAILADDR);
+    await this.emailAddress.fill(environment.ADMIN_EMAIL);
     await this.nextButton.click();
     await this.password.waitFor({ state: 'visible' });
     await this.password.fill(environment.ADMIN_PASSWORD);

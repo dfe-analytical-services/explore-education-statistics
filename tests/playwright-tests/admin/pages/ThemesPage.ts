@@ -5,7 +5,7 @@ export default class ThemesPage {
   readonly createThemeLink: Locator;
   readonly themeTitle: (text: string) => Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     this.page = page;
     // Locators
     this.createThemeLink = page.locator('//a[text()="Create theme"]');

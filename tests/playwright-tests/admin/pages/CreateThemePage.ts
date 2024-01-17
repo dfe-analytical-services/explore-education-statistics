@@ -6,7 +6,7 @@ export default class CreateThemePage {
   readonly themeSummary: Locator;
   readonly saveThemeButton: Locator;
 
-  constructor(page) {
+  constructor(page: Page) {
     this.page = page;
     // Locators
     this.themeTitle = page.locator('input[id="themeForm-title"]');
