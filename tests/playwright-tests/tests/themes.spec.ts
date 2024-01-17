@@ -4,7 +4,6 @@ import AzureLoginPage from '../admin/azpage/AzureLoginPage';
 import AdminPage from '../admin/pages/AdminPage';
 import ThemesPage from '../admin/pages/ThemesPage';
 import CreateThemePage from '../admin/pages/CreateThemePage';
-import generateRunIdentifier from '../utils/generateRunIdentifier';
 import uiTestString from '../utils/uiTestString';
 
 test.describe('Verify the end to end functionality of themes and topics', () => {
@@ -28,13 +27,8 @@ test.describe('Verify the end to end functionality of themes and topics', () => 
     await adminPage.manageThemesTopicLink.click();
     await themesPage.createThemeLink.click();
 
-    // const uiThemeName = `UI Test - Test theme - ${environment.RUN_IDENTIFIER}`;
-    // const uiThemeTitle = `Theme${uiThemeName}`;
-    // const uiThemeSummary = `Summary${uiThemeName}`;
-
-    const uiThemeTitle = uiTestString('Title');
-    const uiThemeSummary = uiTestString('Summary');
-
+    const uiThemeTitle = uiTestString('Test theme');
+    const uiThemeSummary = uiTestString('Test summary');
 
     await createThemePage.doCreateTheme(uiThemeTitle, uiThemeSummary);
     await themesPage.checkThemeIsDisplayed(uiThemeTitle);
